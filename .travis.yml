@@ -3,7 +3,7 @@ language: php
 before_script:
   - wget https://getcomposer.org/composer.phar
   - chmod +x composer.phar
-  - ./composer.phar update nothing
+  - ./composer.phar update
   - ./composer.phar install
 
 
