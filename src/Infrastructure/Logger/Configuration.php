@@ -10,7 +10,7 @@ use Logeecom\Infrastructure\ServiceRegister;
  *
  * @package Logeecom\Infrastructure\Logger
  */
-class Configuration
+class Configuration extends \Logeecom\Infrastructure\Singleton
 {
     /**
      * Default minimum level for logging.
@@ -21,11 +21,11 @@ class Configuration
      */
     const DEFAULT_IS_DEFAULT_LOGGER_ENABLED = false;
     /**
-     * Singleton instance.
+     * Singleton instance of this class.
      *
-     * @var self
+     * @var Configuration
      */
-    private static $instance;
+    protected static $instance;
     /**
      * Whether default logger is enabled or not.
      *
@@ -52,32 +52,9 @@ class Configuration
     private $integrationName;
 
     /**
-     * Getting logger configuration instance
+     * Set default logger status (turning on/off).
      *
-     * @return Configuration
-     */
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new static();
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * Resets singleton instance. Required for proper tests.
-     */
-    public static function resetInstance()
-    {
-        self::$instance = null;
-    }
-
-    /**
-     * Set default logger status (turning on/off)
-     *
-     * @param boolean $status
-     *
+     * @param bool $status
      */
     public static function setDefaultLoggerEnabled($status)
     {

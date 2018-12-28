@@ -84,13 +84,13 @@ class QueueItem extends Entity
     public function getConfig()
     {
         $indexMap = new IndexMap();
-        $indexMap->addIndex(new StringIndex('status', 1))
-            ->addIndex(new StringIndex('taskType', 2))
-            ->addIndex(new StringIndex('queueName', 3))
-            ->addIndex(new DateTimeIndex('queueTimestamp', 4))
-            ->addIndex(new IntegerIndex('lastExecutionProgress', 5))
-            ->addIndex(new DateTimeIndex('lastUpdateTimestamp', 6));
+        $indexMap->addIndex(new StringIndex('status'))
+            ->addIndex(new StringIndex('taskType'))
+            ->addIndex(new StringIndex('queueName'))
+            ->addIndex(new DateTimeIndex('queueTimestamp'))
+            ->addIndex(new IntegerIndex('lastExecutionProgress'))
+            ->addIndex(new DateTimeIndex('lastUpdateTimestamp'));
 
-        return new EntityConfiguration($indexMap, 'QueueItem', 'QueueItem');
+        return new EntityConfiguration($indexMap, 'QueueItem');
     }
 }

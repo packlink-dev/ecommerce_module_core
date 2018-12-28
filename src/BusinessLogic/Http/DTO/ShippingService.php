@@ -12,7 +12,7 @@ class ShippingService extends BaseDto
     /**
      * Service Id.
      *
-     * @var string
+     * @var int
      */
     public $id;
     /**
@@ -89,7 +89,7 @@ class ShippingService extends BaseDto
     {
         $instance = new static();
 
-        $instance->id = self::getValue($raw, 'service_id');
+        $instance->id = (int)self::getValue($raw, 'service_id');
         $instance->enabled = (bool)self::getValue($raw, 'enabled');
         $instance->carrierName = self::getValue($raw, 'carrier_name');
         $instance->serviceName = self::getValue($raw, 'service_name');
@@ -98,5 +98,7 @@ class ShippingService extends BaseDto
         $instance->destinationDropOff = self::getValue($raw, 'destination_type') === 'drop-off';
         $instance->serviceDetails = self::getValue($raw, 'service_details', array());
         $instance->packlinkInfo = self::getValue($raw, 'packlink_info', array());
+
+        return $instance;
     }
 }

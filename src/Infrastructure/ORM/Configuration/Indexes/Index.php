@@ -3,19 +3,14 @@
 namespace Logeecom\Infrastructure\ORM\Configuration\Indexes;
 
 /**
- * Class Index
+ * Represents an indexed column in database table.
+ *
  * @package Logeecom\Infrastructure\ORM\Configuration\Types
  */
 abstract class Index
 {
     /**
-     * Index number
-     *
-     * @var int
-     */
-    private $index;
-    /**
-     * Property name
+     * Property name (column name).
      *
      * @var string
      */
@@ -24,27 +19,17 @@ abstract class Index
     /**
      * Index constructor.
      *
-     * @param $property
-     * @param int $index
+     * @param string $property Column name.
      */
-    public function __construct($property, $index)
+    public function __construct($property)
     {
-        $this->index = $index;
         $this->property = $property;
     }
 
     /**
-     * Returns index number
+     * Returns property name.
      *
-     * @return int Index number
-     */
-    public function getIndex()
-    {
-        return $this->index;
-    }
-
-    /**
-     * @return string
+     * @return string Property name.
      */
     public function getProperty()
     {
@@ -52,9 +37,9 @@ abstract class Index
     }
 
     /**
-     * Returns index field type
+     * Returns index field type.
      *
-     * @return string Field type
+     * @return string Field type.
      */
     abstract public function getType();
 }

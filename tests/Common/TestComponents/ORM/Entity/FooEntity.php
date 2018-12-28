@@ -48,16 +48,16 @@ class FooEntity extends Entity
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new StringIndex('text', 1));
-        $map->addIndex(new IntegerIndex('int', 2));
-        $map->addIndex(new IntegerIndex('intNegative', 3));
-        $map->addIndex(new DateTimeIndex('date', 4));
-        $map->addIndex(new BooleanIndex('boolTrue', 5));
-        $map->addIndex(new BooleanIndex('boolFalse', 6));
-        $map->addIndex(new DoubleIndex('double', 7));
-        $map->addIndex(new DoubleIndex('doubleNegative', 8));
-        $map->addIndex(new DoubleIndex('empty', 9));
+        $map->addIndex(new StringIndex('text'));
+        $map->addIndex(new IntegerIndex('int'));
+        $map->addIndex(new IntegerIndex('intNegative'));
+        $map->addIndex(new DateTimeIndex('date'));
+        $map->addIndex(new BooleanIndex('boolTrue'));
+        $map->addIndex(new BooleanIndex('boolFalse'));
+        $map->addIndex(new DoubleIndex('double'));
+        $map->addIndex(new DoubleIndex('doubleNegative'));
+        $map->addIndex(new DoubleIndex('empty'));
 
-        return new EntityConfiguration($map,'TestEntity', 'TestEntity');
+        return new EntityConfiguration($map, 'TestEntity');
     }
 }

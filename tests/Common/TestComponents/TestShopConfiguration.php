@@ -2,205 +2,32 @@
 
 namespace Logeecom\Tests\Common\TestComponents;
 
-use Logeecom\Infrastructure\Logger\Logger;
-use Packlink\BusinessLogic\Configuration;
-
-class TestShopConfiguration extends Configuration
+class TestShopConfiguration extends \Packlink\BusinessLogic\Configuration
 {
-    private $token = '';
-    private $context = '';
-    private $integrationID;
-    private $minLogeLevel = Logger::DEBUG;
-    private $shopName = 'Unit Test';
-    private $publicKey;
-    private $secretKey;
-    private $baseUrl = 'https://some-shop.test';
     private $callbackUrl = 'https://some-shop.test/callback?a=1&b=abc';
-    private $integrationName = 'api';
-    private $loggerStatus;
-    private $maxStartedTasksLimit = 8;
-    private $userInfo;
-    private $taskRunnerStatus = '';
     private $servicePointEnabled = true;
-    private $carriers = array();
-
     /**
-     * Sets task execution context.
+     * Singleton instance of this class.
      *
-     * When integration supports multiple accounts (middleware integration) proper context must be set based on middleware account
-     * that is using core library functionality. This context should then be used by business services to fetch account specific
-     * data.Core will set context provided upon task enqueueing before task execution.
+     * @var static
+     */
+    protected static $instance;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        static::$instance = $this;
+    }
+
+    /**
+     * Returns current system identifier.
      *
-     * @param string $context Context to set
+     * @return string Current system identifier.
      */
-    public function setContext($context)
+    public function getCurrentSystemId()
     {
-        $this->context = $context;
-    }
-
-    /**
-     * Gets task execution context
-     *
-     * @return string Context in which task is being executed. If no context is provided empty string is returned (global context)
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIntegrationId()
-    {
-        return $this->integrationID;
-    }
-
-    /**
-     * @param int $integrationID
-     */
-    public function setIntegrationId($integrationID)
-    {
-        $this->integrationID = $integrationID;
-    }
-
-    /**
-     * Saves min log level in integration database
-     *
-     * @param int $minLogLevel
-     */
-    public function saveMinLogLevel($minLogLevel)
-    {
-        $this->minLogeLevel = $minLogLevel;
-    }
-
-    /**
-     * Retrieves min log level from integration database
-     *
-     * @return int
-     */
-    public function getMinLogLevel()
-    {
-        return $this->minLogeLevel;
-    }
-
-    /**
-     * Retrieves integration name
-     *
-     * @return string
-     */
-    public function getIntegrationName()
-    {
-        return $this->integrationName;
-    }
-
-    /**
-     * Set default logger status (enabled/disabled)
-     *
-     * @param bool $status
-     */
-    public function setDefaultLoggerEnabled($status)
-    {
-        $this->loggerStatus = $status;
-    }
-
-    /**
-     * Return whether default logger is enabled or not
-     *
-     * @return bool
-     */
-    public function isDefaultLoggerEnabled()
-    {
-        return $this->loggerStatus;
-    }
-
-    /**
-     * Gets the number of maximum allowed started task at the point in time. This number will determine how many tasks can be
-     * in "in_progress" status at the same time
-     *
-     * @return int
-     */
-    public function getMaxStartedTasksLimit()
-    {
-        return $this->maxStartedTasksLimit;
-    }
-
-    public function getTaskRunnerWakeupDelay()
-    {
-        return null;
-    }
-
-    public function getTaskRunnerMaxAliveTime()
-    {
-        return null;
-    }
-
-    /**
-     * Gets maximum number of failed task execution retries. System will retry task execution in case of error until this number
-     * is reached. Return null to use default system value (5)
-     *
-     * @return int|null
-     */
-    public function getMaxTaskExecutionRetries()
-    {
-        return null;
-    }
-
-    /**
-     * Gets max inactivity period for a task in seconds. After inactivity period is passed, system will fail such tasks as expired.
-     * Return null to use default system value (30)
-     *
-     * @return int|null
-     */
-    public function getMaxTaskInactivityPeriod()
-    {
-        return null;
-    }
-
-    /**
-     * @param array $userInfo
-     */
-    public function setUserInfo($userInfo)
-    {
-        $this->userInfo = $userInfo;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTaskRunnerStatus()
-    {
-        return json_decode($this->taskRunnerStatus, true);
-    }
-
-    /**
-     * Sets task runner status information as JSON encoded string.
-     *
-     * @param string $guid
-     * @param int $timestamp
-     */
-    public function setTaskRunnerStatus($guid, $timestamp)
-    {
-        $this->taskRunnerStatus = json_encode(array('guid' => $guid, 'timestamp' => $timestamp));
-    }
-
-    /**
-     * Resets authorization credentials to null
-     */
-    public function resetAuthorizationCredentials()
-    {
-        $this->publicKey = null;
-        $this->secretKey = null;
-    }
-
-    /**
-     * Returns shop base url, if it is sub-shop it should return its specific url
-     *
-     * @return string
-     */
-    public function getBaseUrl()
-    {
-        return $this->baseUrl;
+        return 'test';
     }
 
     /**
@@ -213,27 +40,6 @@ class TestShopConfiguration extends Configuration
     {
         return $this->callbackUrl;
     }
-
-    /**
-     * Returns name of current shop.
-     *
-     * @return string
-     */
-    public function getShopName()
-    {
-        return $this->shopName;
-    }
-
-    public function setIntegrationName($integrationName)
-    {
-        $this->integrationName = $integrationName;
-    }
-
-    public function setMaxStartedTasksLimit($limit)
-    {
-        $this->maxStartedTasksLimit = $limit;
-    }
-
     /**
      * Returns service point enabled flag
      *
@@ -252,26 +58,6 @@ class TestShopConfiguration extends Configuration
     public function setServicePointEnabled($enabled)
     {
         $this->servicePointEnabled = $enabled;
-    }
-
-    /**
-     * Returns list of enabled carriers
-     *
-     * @return array
-     */
-    public function getCarriers()
-    {
-        return $this->carriers;
-    }
-
-    /**
-     * Sets a list of available carriers
-     *
-     * @param array $carriers
-     */
-    public function setCarriers(array $carriers = array())
-    {
-        $this->carriers = $carriers;
     }
 
     /**
@@ -295,22 +81,32 @@ class TestShopConfiguration extends Configuration
     }
 
     /**
-     * Returns current system identifier.
+     * Returns web-hook callback URL for current system.
      *
-     * @return string Current system identifier.
+     * @return string Web-hook callback URL.
      */
-    public function getCurrentSystemId()
+    public function getWebHookUrl()
     {
-        return '';
+        return 'https://example.com';
     }
 
     /**
-     * Returns authorization token value or null
+     * Retrieves integration name.
      *
-     * @return string Authorization token value
+     * @return string Integration name.
      */
-    public function getAuthorizationToken()
+    public function getIntegrationName()
     {
-        return $this->token;
+        return $this->getConfigValue('integrationName', 'test-system');
+    }
+
+    /**
+     * Sets integration name.
+     *
+     * @param string $name Integration name.
+     */
+    public function setIntegrationName($name)
+    {
+        $this->saveConfigValue('integrationName', $name);
     }
 }

@@ -7,13 +7,13 @@ use Logeecom\Infrastructure\Logger\LogData;
 
 class TestShopLogger implements ShopLoggerAdapter
 {
-
     /**
      * @var LogData
      */
     public $data;
-
-    /** @var LogData[] */
+    /**
+     * @var LogData[]
+     */
     public $loggedMessages = array();
 
     public function logMessage(LogData $data)

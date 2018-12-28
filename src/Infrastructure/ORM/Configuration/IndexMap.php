@@ -5,24 +5,25 @@ namespace Logeecom\Infrastructure\ORM\Configuration;
 use Logeecom\Infrastructure\ORM\Configuration\Indexes\Index;
 
 /**
- * Class IndexMap
+ * Represents a map of all columns that are indexed.
+ *
  * @package Logeecom\Infrastructure\ORM\Configuration
  */
 class IndexMap
 {
     /**
-     * Index config
+     * Array of indexed columns.
      *
      * @var Index[]
      */
     private $indexes = array();
 
     /**
-     * Adds index to map
+     * Adds index to map.
      *
-     * @param Index $index Index to be added
+     * @param Index $index Index to be added.
      *
-     * @return IndexMap
+     * @return self This instance for chaining.
      */
     public function addIndex(Index $index)
     {
@@ -32,9 +33,9 @@ class IndexMap
     }
 
     /**
-     * Returns array of indexes
+     * Returns array of indexes.
      *
-     * @return Index[] Array of indexes
+     * @return Index[] Array of indexes.
      */
     public function getIndexes()
     {

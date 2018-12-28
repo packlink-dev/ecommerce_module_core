@@ -34,8 +34,8 @@ class Process extends Entity
     public function getConfig()
     {
         $indexMap = new IndexMap();
-        $indexMap->addIndex(new StringIndex('guid', 1));
+        $indexMap->addIndex(new StringIndex('guid'));
 
-        return new EntityConfiguration($indexMap, 'Process', 'Process');
+        return new EntityConfiguration($indexMap, 'Process');
     }
 }

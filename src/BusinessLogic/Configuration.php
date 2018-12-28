@@ -3,11 +3,13 @@
 namespace Packlink\BusinessLogic;
 
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 
 /**
- * Interface Configuration
- * @package Packlink\BusinessLogic\Interfaces
+ * Class Configuration.
+ *
+ * @package Packlink\BusinessLogic
  */
 abstract class Configuration extends \Logeecom\Infrastructure\Configuration
 {
@@ -19,6 +21,19 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration
      * Default scheduler queue name.
      */
     const DEFAULT_SCHEDULER_QUEUE_NAME = 'SchedulerCheckTaskQueue';
+    /**
+     * Singleton instance of this class.
+     *
+     * @var static
+     */
+    protected static $instance;
+
+    /**
+     * Returns web-hook callback URL for current system.
+     *
+     * @return string Web-hook callback URL.
+     */
+    abstract public function getWebHookUrl();
 
     /**
      * Returns scheduler time threshold between checks.
@@ -51,16 +66,6 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration
     }
 
     /**
-     * Save user information in integration database.
-     *
-     * @param array $userInfo User information.
-     */
-    public function setUserInfo($userInfo)
-    {
-        $this->saveConfigValue('userInfo', $userInfo);
-    }
-
-    /**
      * Sets authorization token.
      *
      * @param string $token Authorization token.
@@ -79,16 +84,29 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration
     }
 
     /**
-     * Returns web-hook callback URL for current system.
+     * Returns user information from integration database.
      *
-     * @return string Web-hook callback URL.
+     * @return User|null User info.
      */
-    abstract public function getWebHookUrl();
+    public function getUserInfo()
+    {
+        return $this->getConfigValue('userInfo');
+    }
+
+    /**
+     * Save user information in integration database.
+     *
+     * @param User $userInfo User information.
+     */
+    public function setUserInfo(User $userInfo)
+    {
+        $this->saveConfigValue('userInfo', $userInfo);
+    }
 
     /**
      * Returns default Parcel object.
      *
-     * @return ParcelInfo Default parcel object.
+     * @return ParcelInfo|null Default parcel object.
      */
     public function getDefaultParcel()
     {
@@ -108,7 +126,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration
     /**
      * Returns default Warehouse object.
      *
-     * @return Warehouse Default warehouse object.
+     * @return Warehouse|null Default warehouse object.
      */
     public function getDefaultWarehouse()
     {

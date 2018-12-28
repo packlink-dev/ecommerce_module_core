@@ -1,0 +1,24 @@
+{
+  "carrier_name": "TNT",
+  "service_name": "Economy",
+  "service_logo": "https://pro.packlink.it/private/assets/images/carriers/it/tnt_economy_door-door_it.png",
+  "service_id": "20943",
+  "enabled": true,
+  "departure_type": "pick-up",
+  "destination_type": "home",
+  "service_details": [
+    "TRANSITO STIMATO dal lunedì al venerdì, festivi nazionali o locali esclusi.",
+    "Ritiro dalle 9 alle 18. Consegna nell'intero arco della giornata.",
+    "Due tentativi di consegna. Svincolo su richiesta contattando l'assistenza.",
+    "Trasporto camionistico terrestre.",
+    "Peso massimo: 1000 kg."
+  ],
+  "packlink_info": [
+    "Le date di ritiro e consegna possono subire variazioni.",
+    "Il transito indicato non include la maggiorazione di 48-96 ore da/per le isole, Calabria, zone remote.",
+    "Traccia le spedizioni su \"Ricerca spedizione\" o dalla web del corriere.",
+    "Attenzione al cliente Packlink disponibile dal lunedi al venerdi dalle 9 alle 18, festivi esclusi.",
+    "POD gratuita su richiesta."
+  ],
+  "service_type": "standard"
+}

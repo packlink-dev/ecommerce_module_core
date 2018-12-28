@@ -83,7 +83,7 @@ class TaskRunnerWakeupTest extends TestCase
             )
         );
 
-        new Logger();
+        Logger::resetInstance();
 
         $this->asyncProcessStarter = $asyncProcessStarter;
         $this->runnerStatusStorage = $runnerStatusStorage;

@@ -8,8 +8,10 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Queue;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Tasks\GetDefaultParcelAndWarehouseTask;
+use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
  * Class UserAccountService.
@@ -23,142 +25,130 @@ class UserAccountService extends BaseService
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * Configuration service instance
+     * Singleton instance of this class.
+     *
+     * @var static
+     */
+    protected static $instance;
+    /**
+     * Configuration service instance.
      *
      * @var Configuration
      */
     private $configuration;
     /**
-     * Proxy instance
+     * Proxy instance.
      *
      * @var Proxy
      */
     private $proxy;
 
     /**
+     * UserAccountService constructor.
+     */
+    protected function __construct()
+    {
+        parent::__construct();
+
+        $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+    }
+
+    /**
      * Logs in user with provided API key.
      *
-     * @param string $apiKey
+     * @param string $apiKey API key.
      *
      * @return bool TRUE if login went successfully; otherwise, FALSE.
      */
     public function login($apiKey)
     {
-
         if (empty($apiKey)) {
             return false;
         }
 
         $result = true;
         // set token before calling API
-        $this->getConfigService()->setAuthorizationToken($apiKey);
+        $this->configuration->setAuthorizationToken($apiKey);
 
         try {
-            $userDto = $this->getProxy()->getUserData();
-            $this->initializeUser($userDto->toArray());
+            $userDto = $this->proxy->getUserData();
+            $this->initializeUser($userDto);
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage());
             $result = false;
         }
 
-
         return $result;
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
+     * Sets default parcel information.
      *
-     * Initializes user configuration and subscribes web-hook callback
-     *
-     * @param array $user User data.
-     *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
-     */
-    protected function initializeUser(array $user)
-    {
-        $config = $this->getConfigService();
-        $config->setUserInfo($user);
-
-        /** @var Queue $queueService */
-        $queueService = ServiceRegister::getService(Queue::CLASS_NAME);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $queueService->enqueue($config->getDefaultQueueName(), new GetDefaultParcelAndWarehouseTask());
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $queueService->enqueue($config->getDefaultQueueName(), new GetDefaultParcelAndWarehouseTask());
-
-
-        $this->getProxy()->registerWebHookHandler($config->getWebHookUrl());
-    }
-
-    /**
-     * Sets default parcel information
-     *
-     * @param bool $force Force retrieval of parcel info from Packlink API
+     * @param bool $force Force retrieval of parcel info from Packlink API.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      */
     public function setDefaultParcel($force)
     {
-        $parcelInfo = $this->getConfigService()->getDefaultParcel();
+        $parcelInfo = $this->configuration->getDefaultParcel();
         if ($parcelInfo === null || $force) {
-            $parcels = $this->getProxy()->getUsersParcelInfo();
+            $parcels = $this->proxy->getUsersParcelInfo();
             foreach ($parcels as $parcel) {
                 if ($parcel->default) {
                     $parcelInfo = $parcel;
+                    break;
                 }
             }
 
-            $this->getConfigService()->setDefaultParcel($parcelInfo);
+            $this->configuration->setDefaultParcel($parcelInfo);
         }
     }
 
     /**
-     * Sets warehouse information
+     * Sets warehouse information.
      *
-     * @param bool $force Force retrieval of warehouse info from Packlink API
+     * @param bool $force Force retrieval of warehouse info from Packlink API.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      */
     public function setWarehouseInfo($force)
     {
-        $warehouse = $this->getConfigService()->getDefaultWarehouse();
+        $warehouse = $this->configuration->getDefaultWarehouse();
         if ($warehouse === null || $force) {
-            $usersWarehouses = $this->getProxy()->getUsersWarehouses();
+            $usersWarehouses = $this->proxy->getUsersWarehouses();
             foreach ($usersWarehouses as $usersWarehouse) {
                 if ($usersWarehouse->default) {
                     $warehouse = $usersWarehouse;
+                    break;
                 }
             }
 
-            $this->getConfigService()->setDefaultWarehouse($warehouse);
+            $this->configuration->setDefaultWarehouse($warehouse);
         }
     }
 
     /**
-     * Returns configuration service.
+     * @noinspection PhpDocMissingThrowsInspection
      *
-     * @return Configuration Configuration service.
-     */
-    private function getConfigService()
-    {
-        if ($this->configuration === null) {
-            $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-        }
-
-        return $this->configuration;
-    }
-
-    /**
-     * Returns proxy service.
+     * Initializes user configuration and subscribes web-hook callback.
      *
-     * @return Proxy Proxy service.
+     * @param User $user User data.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      */
-    private function getProxy()
+    protected function initializeUser(User $user)
     {
-        if ($this->proxy === null) {
-            $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        }
+        $this->configuration->setUserInfo($user);
+        $defaultQueueName = $this->configuration->getDefaultQueueName();
 
-        return $this->proxy;
+        /** @var Queue $queueService */
+        $queueService = ServiceRegister::getService(Queue::CLASS_NAME);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $queueService->enqueue($defaultQueueName, new GetDefaultParcelAndWarehouseTask());
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask());
+
+        $this->proxy->registerWebHookHandler($this->configuration->getWebHookUrl());
     }
 }

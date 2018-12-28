@@ -1,0 +1,59 @@
+<?php
+
+namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
+
+use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+
+/**
+ * Class TestShopShippingMethodService.
+ *
+ * @package Logeecom\Tests\BusinessLogic\ShippingMethod
+ */
+class TestShopShippingMethodService implements ShopShippingMethodService
+{
+    /**
+     * History of method calls for testing purposes.
+     *
+     * @var array
+     */
+    public $callHistory = array();
+
+    /**
+     * Adds / Activates shipping method in shop integration.
+     *
+     * @param ShippingMethod $shippingMethod Shipping method.
+     *
+     * @return bool TRUE if activation succeeded; otherwise, FALSE.
+     */
+    public function add(ShippingMethod $shippingMethod)
+    {
+        $this->callHistory['add'][] = $shippingMethod;
+
+        return true;
+    }
+
+    /**
+     * Updates shipping method in shop integration.
+     *
+     * @param ShippingMethod $shippingMethod Shipping method.
+     */
+    public function update(ShippingMethod $shippingMethod)
+    {
+        $this->callHistory['update'][] = $shippingMethod;
+    }
+
+    /**
+     * Deletes shipping method in shop integration.
+     *
+     * @param ShippingMethod $shippingMethod Shipping method.
+     *
+     * @return bool TRUE if deletion succeeded; otherwise, FALSE.
+     */
+    public function delete(ShippingMethod $shippingMethod)
+    {
+        $this->callHistory['delete'][] = $shippingMethod;
+
+        return true;
+    }
+}

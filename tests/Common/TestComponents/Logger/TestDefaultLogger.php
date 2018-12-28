@@ -9,13 +9,13 @@ use Logeecom\Infrastructure\ServiceRegister;
 
 class TestDefaultLogger implements ShopLoggerAdapter
 {
-
     /**
      * @var LogData
      */
     public $data;
-
-    /** @var LogData[] */
+    /**
+     * @var LogData[]
+     */
     public $loggedMessages = array();
 
     public function logMessage(LogData $data)

@@ -1,0 +1,32 @@
+[
+  {
+    "city":"El Piquillo 2",
+    "surname":"MyLastname2",
+    "name":"MyName2",
+    "phone":"1234567",
+    "country":"ES",
+    "company":"MyCompanyName2",
+    "default_selection":true,
+    "email":"example2@email.com",
+    "alias":"MyWarehouse1",
+    "postal_code":"28045",
+    "address":"MyAddress2",
+    "created_at":"2018-11-08 15:44:21",
+    "id":"222459d5e4b0ed5488fe91544"
+  },
+  {
+    "city":"El Piquillo 1",
+    "surname":"MyLastname1",
+    "name":"MyName1",
+    "phone":"1234567",
+    "country":"ES",
+    "company":"MyCompanyName1",
+    "default_selection":false,
+    "email":"example1@email.com",
+    "alias":"MyWarehouse1",
+    "postal_code":"28049",
+    "address":"MyAddress1",
+    "created_at":"2018-11-08 15:44:21",
+    "id":"5be459d5e4b0ed5488fe9159"
+  }
+]

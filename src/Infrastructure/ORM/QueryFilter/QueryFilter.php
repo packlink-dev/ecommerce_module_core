@@ -5,41 +5,49 @@ namespace Logeecom\Infrastructure\ORM\QueryFilter;
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 
 /**
- * Class QueryFilter
+ * Class QueryFilter.
+ *
  * @package Logeecom\Infrastructure\ORM
  */
 class QueryFilter
 {
     const ORDER_ASC = 'ASC';
     const ORDER_DESC = 'DESC';
-
     /**
+     * List of filter conditions.
+     *
      * @var QueryCondition[]
      */
     private $conditions = array();
-
     /**
+     * Order by column name.
+     *
      * @var string
      */
     private $orderByColumn;
-
     /**
+     * Order direction.
+     *
      * @var string
      */
     private $orderDirection = 'ASC';
-
     /**
+     * Limit for select.
+     *
      * @var int
      */
     private $limit;
-
     /**
+     * Offset for select.
+     *
      * @var int
      */
     private $offset;
 
     /**
-     * @return int
+     * Gets limit for select.
+     *
+     * @return int Limit for select.
      */
     public function getLimit()
     {
@@ -47,9 +55,11 @@ class QueryFilter
     }
 
     /**
-     * @param int $limit
+     * Sets limit for select.
      *
-     * @return QueryFilter
+     * @param int $limit Limit for select.
+     *
+     * @return self This instance for chaining.
      */
     public function setLimit($limit)
     {
@@ -59,7 +69,9 @@ class QueryFilter
     }
 
     /**
-     * @return int
+     * Gets select offset.
+     *
+     * @return int Offset.
      */
     public function getOffset()
     {
@@ -67,9 +79,11 @@ class QueryFilter
     }
 
     /**
-     * @param int $offset
+     * Sets select offset.
      *
-     * @return QueryFilter
+     * @param int $offset Offset.
+     *
+     * @return self This instance for chaining.
      */
     public function setOffset($offset)
     {
@@ -81,16 +95,19 @@ class QueryFilter
     /**
      * Sets order by column and direction
      *
-     * @param string $column
-     * @param string $direction
+     * @param string $column Column name.
+     * @param string $direction Order direction (@see self::ORDER_ASC or @see self::ORDER_DESC).
      *
-     * @return QueryFilter
-     * @throws QueryFilterInvalidParamException
+     * @return self This instance for chaining.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function orderBy($column, $direction = self::ORDER_ASC)
     {
         if (!is_string($column) || !\in_array($direction, array(self::ORDER_ASC, self::ORDER_DESC), false)) {
-            throw new QueryFilterInvalidParamException('Column value must be string type and direction must be ASC or DESC');
+            throw new QueryFilterInvalidParamException(
+                'Column value must be string type and direction must be ASC or DESC'
+            );
         }
 
         $this->orderByColumn = $column;
@@ -100,7 +117,9 @@ class QueryFilter
     }
 
     /**
-     * @return string
+     * Gets name for order by column.
+     *
+     * @return string Order column name.
      */
     public function getOrderByColumn()
     {
@@ -108,7 +127,9 @@ class QueryFilter
     }
 
     /**
-     * @return string
+     * Gets order direction.
+     *
+     * @return string Order direction (@see self::ORDER_ASC or @see self::ORDER_DESC)
      */
     public function getOrderDirection()
     {
@@ -116,7 +137,9 @@ class QueryFilter
     }
 
     /**
-     * @return QueryCondition[]
+     * Gets all conditions for this filter.
+     *
+     * @return QueryCondition[] Filter conditions.
      */
     public function getConditions()
     {
@@ -126,12 +149,13 @@ class QueryFilter
     /**
      * Sets where condition, if chained AND operator will be used
      *
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
+     * @param string $column Column name.
+     * @param string $operator Operator. Use constants from @see Operator class.
+     * @param mixed $value Value of condition.
      *
-     * @return QueryFilter
-     * @throws QueryFilterInvalidParamException
+     * @return self This instance for chaining.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function where($column, $operator, $value = null)
     {
@@ -143,14 +167,15 @@ class QueryFilter
     }
 
     /**
-     * Sets where condition, if chained OR operator will be used
+     * Sets where condition, if chained OR operator will be used.
      *
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
+     * @param string $column Column name.
+     * @param string $operator Operator. Use constants from @see Operator class.
+     * @param mixed $value Value of condition.
      *
-     * @return QueryFilter
-     * @throws QueryFilterInvalidParamException
+     * @return self This instance for chaining.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function orWhere($column, $operator, $value = null)
     {
@@ -162,13 +187,13 @@ class QueryFilter
     }
 
     /**
-     * Validates condition parameters
+     * Validates condition parameters.
      *
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
+     * @param string $column Column name.
+     * @param string $operator Operator. Use constants from @see Operator class.
+     * @param mixed $value Value of condition.
      *
-     * @throws QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     private function validateConditionParameters($column, $operator, $value)
     {
@@ -177,7 +202,7 @@ class QueryFilter
         }
 
         $operator = strtoupper($operator);
-        if (!\in_array($operator, Conditions::$AVAILABLE_OPERATORS, true)) {
+        if (!\in_array($operator, Operators::$AVAILABLE_OPERATORS, true)) {
             throw new QueryFilterInvalidParamException("Operator $operator is not supported");
         }
 
@@ -186,11 +211,11 @@ class QueryFilter
             $valueType = 'dateTime';
         }
 
-        if (!array_key_exists($valueType, Conditions::$TYPE_OPERATORS)) {
+        if (!array_key_exists($valueType, Operators::$TYPE_OPERATORS)) {
             throw new QueryFilterInvalidParamException('Value type is not supported');
         }
 
-        if (!\in_array($operator, Conditions::$TYPE_OPERATORS[$valueType], true)) {
+        if (!\in_array($operator, Operators::$TYPE_OPERATORS[$valueType], true)) {
             throw new QueryFilterInvalidParamException("Operator $operator is not supported for $valueType type");
         }
     }

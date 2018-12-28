@@ -24,4 +24,12 @@ class MemoryStorage
     {
         return static::$incrementId++;
     }
+
+    /**
+     * Empties storage.
+     */
+    public static function reset()
+    {
+        static::$storage = array();
+    }
 }

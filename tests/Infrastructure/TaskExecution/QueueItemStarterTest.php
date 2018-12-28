@@ -80,7 +80,7 @@ class QueueItemStarterTest extends TestCase
             ));
 
         // Initialize logger component with new set of log adapters
-        new Logger();
+        Logger::resetInstance();
 
         $this->queueStorage = $queueStorage;
         $this->timeProvider = $timeProvider;

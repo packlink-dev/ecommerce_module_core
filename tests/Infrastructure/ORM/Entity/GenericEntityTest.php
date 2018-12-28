@@ -46,10 +46,6 @@ abstract class GenericEntityTest extends TestCase
     {
         $config = $entity->getConfig();
 
-        $code = $config->getCode();
-        $this->assertNotEmpty($code);
-        $this->assertInternalType('string', $code);
-
         $type = $config->getType();
         $this->assertNotEmpty($type);
         $this->assertInternalType('string', $type);
@@ -71,7 +67,6 @@ abstract class GenericEntityTest extends TestCase
                 "Entity $class, must have declared property $key, because it is used as index."
             );
 
-            $this->assertInternalType('int', $item->getIndex(), 'Index value must be of integer type');
             $this->assertContains(
                 $item->getType(),
                 self::$ALLOWED_INDEX_TYPES,

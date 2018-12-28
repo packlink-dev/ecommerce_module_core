@@ -9,7 +9,8 @@ use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 
 /**
- * Class RepositoryRegistry
+ * Class RepositoryRegistry.
+ *
  * @package Logeecom\Infrastructure\ORM
  */
 class RepositoryRegistry
@@ -27,52 +28,54 @@ class RepositoryRegistry
     /**
      * Returns an instance of repository that is responsible for handling the entity
      *
-     * @param string $class
+     * @param string $entityClass Class name of entity.
      *
      * @return RepositoryInterface
-     * @throws RepositoryNotRegisteredException
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
-    public static function getRepository($class)
+    public static function getRepository($entityClass)
     {
-        if (!array_key_exists($class, self::$repositories)) {
-            throw new RepositoryNotRegisteredException("Repository for entity $class not found or registered.");
+        if (!array_key_exists($entityClass, self::$repositories)) {
+            throw new RepositoryNotRegisteredException("Repository for entity $entityClass not found or registered.");
         }
 
-        if (!array_key_exists($class, self::$instantiated)) {
-            $repositoryClass = self::$repositories[$class];
+        if (!array_key_exists($entityClass, self::$instantiated)) {
+            $repositoryClass = self::$repositories[$entityClass];
             /** @var RepositoryInterface $repository */
             $repository = new $repositoryClass();
-            $repository->setEntityClass($class);
-            self::$instantiated[$class] = $repository;
+            $repository->setEntityClass($entityClass);
+            self::$instantiated[$entityClass] = $repository;
         }
 
-        return self::$instantiated[$class];
+        return self::$instantiated[$entityClass];
     }
 
     /**
      * Registers repository for provided entity class
      *
-     * @param string $class
-     * @param string $repositoryClass
+     * @param string $entityClass Class name of entity.
+     * @param string $repositoryClass Class name of repository.
      *
-     * @throws RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    public static function registerRepository($class, $repositoryClass)
+    public static function registerRepository($entityClass, $repositoryClass)
     {
         if (!is_subclass_of($repositoryClass, RepositoryInterface::CLASS_NAME)) {
             throw new RepositoryClassException("Class $repositoryClass is not implementation of RepositoryInterface.");
         }
 
-        unset(self::$instantiated[$class]);
-        self::$repositories[$class] = $repositoryClass;
+        unset(self::$instantiated[$entityClass]);
+        self::$repositories[$entityClass] = $repositoryClass;
     }
 
     /**
-     * Returns queue item repository
+     * Returns queue item repository.
      *
      * @return QueueItemRepository
-     * @throws RepositoryClassException
-     * @throws RepositoryNotRegisteredException
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public static function getQueueItemRepository()
     {

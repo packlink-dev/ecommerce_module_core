@@ -337,4 +337,18 @@ class MemoryRepository implements RepositoryInterface
 
         return $translator->translate($intermediates);
     }
+
+    /**
+     * Counts records that match filter criteria.
+     *
+     * @param QueryFilter $filter Filter for query.
+     *
+     * @return int Number of records that match filter criteria.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     */
+    public function count(QueryFilter $filter = null)
+    {
+        return count($this->select($filter));
+    }
 }

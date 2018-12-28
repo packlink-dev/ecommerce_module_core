@@ -15,19 +15,16 @@ class BootstrapComponent
 {
     /**
      * Initializes infrastructure components.
-     *
-     * @throws \Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException
      */
     public static function init()
     {
         static::initServices();
+        static::initRepositories();
         static::initEvents();
     }
 
     /**
-     * Initializes infrastructure services and utilities.
-     *
-     * @throws \Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException
+     * Initializes services and utilities.
      */
     protected static function initServices()
     {
@@ -52,7 +49,14 @@ class BootstrapComponent
     }
 
     /**
-     * Initializes infrastructure events.
+     * Initializes repositories.
+     */
+    protected static function initRepositories()
+    {
+    }
+
+    /**
+     * Initializes events.
      */
     protected static function initEvents()
     {

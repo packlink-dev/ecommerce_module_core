@@ -7,11 +7,16 @@ use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 
 /**
- * Class Configuration
+ * Class ConfigEntity.
+ *
  * @package Logeecom\Infrastructure\ORM\Entities
  */
 class ConfigEntity extends Entity
 {
+    /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
     /**
      * Configuration property name.
      *
@@ -39,9 +44,9 @@ class ConfigEntity extends Entity
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new StringIndex('name', 1));
-        $map->addIndex(new StringIndex('systemId', 2));
+        $map->addIndex(new StringIndex('name'));
+        $map->addIndex(new StringIndex('systemId'));
 
-        return new EntityConfiguration($map, 'Configuration', 'Configuration');
+        return new EntityConfiguration($map, 'Configuration');
     }
 }

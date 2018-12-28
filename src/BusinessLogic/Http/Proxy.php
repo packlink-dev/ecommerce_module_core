@@ -9,11 +9,13 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
+use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentReference;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
+use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 
@@ -196,7 +198,14 @@ class Proxy
     {
         $response = $this->call(self::HTTP_METHOD_GET, 'services?' . http_build_query($params->toArray()));
 
-        return ShippingServiceDeliveryDetails::fromArrayBatch($response->decodeBodyAsJson());
+        $shippingDetails = ShippingServiceDeliveryDetails::fromArrayBatch($response->decodeBodyAsJson());
+
+        foreach ($shippingDetails as $shippingDetail) {
+            $shippingDetail->departureCountry = $params->fromCountry;
+            $shippingDetail->destinationCountry = $params->toCountry;
+        }
+
+        return $shippingDetails;
     }
 
     /**
@@ -218,6 +227,57 @@ class Proxy
     }
 
     /**
+     * Returns list of shipping labels for shipment with provided reference.
+     *
+     * @param string $referenceId Packlink shipment reference identifier.
+     * @return string[] Array of shipping labels.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getLabels($referenceId)
+    {
+        $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/labels");
+
+        return $response->decodeBodyAsJson();
+    }
+
+    /**
+     * Returns shipment by its reference identifier.
+     *
+     * @param string $referenceId Packlink shipment reference identifier.
+     *
+     * @return Shipment Shipment DTO.
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getShipment($referenceId)
+    {
+        $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId");
+
+        return Shipment::fromArray($response->decodeBodyAsJson());
+    }
+
+    /**
+     * Returns tracking information by its reference identifier.
+     *
+     * @param string $referenceId Packlink shipment reference identifier.
+     *
+     * @return Tracking[] Tracking DTO.
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getTrackingInfo($referenceId)
+    {
+        $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/track");
+
+        return Tracking::fromArrayBatch($response->decodeBodyAsJson());
+    }
+
+    /**
      * Makes a HTTP call and returns response.
      *
      * @param string $method HTTP method (GET, POST, PUT, etc.).
@@ -232,7 +292,6 @@ class Proxy
      */
     protected function call($method, $endpoint, array $body = array())
     {
-
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(self::HTTP_METHOD_POST, self::HTTP_METHOD_PUT), true)) {
             $bodyStringToSend = json_encode($body);

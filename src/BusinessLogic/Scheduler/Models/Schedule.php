@@ -95,9 +95,9 @@ class Schedule extends Entity
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new DateTimeIndex('nextSchedule', 1));
+        $map->addIndex(new DateTimeIndex('nextSchedule'));
 
-        return new EntityConfiguration($map, 'Schedule', 'Schedule');
+        return new EntityConfiguration($map, 'Schedule');
     }
 
     /**

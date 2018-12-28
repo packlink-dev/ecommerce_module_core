@@ -17,11 +17,9 @@ class EntityConfigurationTest extends TestCase
     {
         $map = new IndexMap();
         $type = 'test';
-        $code = 'test';
-        $config = new EntityConfiguration($map, $type, $code);
+        $config = new EntityConfiguration($map, $type);
 
         $this->assertEquals($map, $config->getIndexMap());
         $this->assertEquals($type, $config->getType());
-        $this->assertEquals($code, $config->getCode());
     }
 }

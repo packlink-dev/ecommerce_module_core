@@ -48,4 +48,30 @@ abstract class Entity
     {
         return $this->id;
     }
+
+    /**
+     * Gets instance value for given index key.
+     *
+     * @param string $indexKey Name of index column.
+     *
+     * @return mixed Value for index.
+     */
+    public function getIndexValue($indexKey)
+    {
+        $methodName = 'get' . ucfirst($indexKey);
+        if (method_exists($this, $methodName)) {
+            return $this->$methodName();
+        }
+
+        $methodName = 'is' . ucfirst($indexKey);
+        if (method_exists($this, $methodName)) {
+            return $this->$methodName();
+        }
+
+        if (isset($this->$indexKey)) {
+            return $this->$indexKey;
+        }
+
+        throw new \InvalidArgumentException('Neither field not getter found for index "' . $indexKey . '".');
+    }
 }

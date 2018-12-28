@@ -108,7 +108,7 @@ class ScheduleCheckTaskTest extends TestCase
             )
         );
 
-        new Logger();
+        Logger::resetInstance();
 
         $this->syncTask = new ScheduleCheckTask();
         $this->queueStorage = $queueStorage;

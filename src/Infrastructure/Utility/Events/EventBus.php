@@ -41,6 +41,14 @@ class EventBus extends EventEmitter
     }
 
     /**
+     * Resets singleton instance. Required for proper tests.
+     */
+    public static function resetInstance()
+    {
+        static::$instance = null;
+    }
+
+    /**
      * Fires requested event by calling all its registered handlers.
      *
      * @param \Logeecom\Infrastructure\Utility\Events\Event $event Event to fire.

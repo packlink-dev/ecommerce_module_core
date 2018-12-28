@@ -64,26 +64,6 @@ class ParcelInfo extends BaseDto
     public $default;
 
     /**
-     * Transforms DTO to its array format suitable for http client.
-     *
-     * @return array DTO in array format.
-     */
-    public function toArray()
-    {
-        return array(
-            'id' => $this->id,
-            'name' => $this->name,
-            'weight' => $this->weight,
-            'length' => $this->length,
-            'height' => $this->height,
-            'width' => $this->width,
-            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
-            'created_at' => $this->createdAt ? $this->createdAt->format('Y-m-d H:i:s') : null,
-            'default' => $this->default,
-        );
-    }
-
-    /**
      * Transforms raw array data to its DTO.
      *
      * @param array $raw Raw array data.
@@ -109,5 +89,44 @@ class ParcelInfo extends BaseDto
             : null;
 
         return $instance;
+    }
+
+    /**
+     * Gets default parcel details.
+     *
+     * @return static Default parcel.
+     */
+    public static function defaultParcel()
+    {
+        return static::fromArray(
+            array(
+                'name' => 'Default parcel',
+                'weight' => 1,
+                'width' => 10,
+                'height' => 10,
+                'length' => 10,
+                'default' => true,
+            )
+        );
+    }
+
+    /**
+     * Transforms DTO to its array format suitable for http client.
+     *
+     * @return array DTO in array format.
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->id,
+            'name' => $this->name,
+            'weight' => $this->weight,
+            'length' => $this->length,
+            'height' => $this->height,
+            'width' => $this->width,
+            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
+            'created_at' => $this->createdAt ? $this->createdAt->format('Y-m-d H:i:s') : null,
+            'default' => $this->default,
+        );
     }
 }

@@ -12,7 +12,7 @@ use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnav
  *
  * @package Logeecom\Infrastructure\Interfaces\Required
  */
-abstract class Configuration
+abstract class Configuration extends Singleton
 {
     /**
      * Fully qualified name of this interface.
@@ -42,6 +42,25 @@ abstract class Configuration
      * @var \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface
      */
     protected $repository;
+
+    /**
+     * Retrieves integration name.
+     *
+     * @return string Integration name.
+     */
+    abstract public function getIntegrationName();
+
+    /**
+     * Returns current system identifier.
+     *
+     * @return string Current system identifier.
+     */
+    abstract public function getCurrentSystemId();
+
+    /**
+     * Resets authorization credentials to null
+     */
+    abstract public function resetAuthorizationCredentials();
 
     /**
      * Sets task execution context.
@@ -90,18 +109,6 @@ abstract class Configuration
     }
 
     /**
-     * Retrieves integration name.
-     *
-     * @return string Integration name.
-     */
-    abstract public function getIntegrationName();
-
-    /**
-     * Resets authorization credentials to null
-     */
-    abstract public function resetAuthorizationCredentials();
-
-    /**
      * Set default logger status (enabled/disabled).
      *
      * @param bool $status TRUE if default logger is enabled; otherwise, false.
@@ -130,6 +137,17 @@ abstract class Configuration
     public function getMaxStartedTasksLimit()
     {
         return $this->getConfigValue('maxStartedTasksLimit', static::DEFAULT_MAX_STARTED_TASK_LIMIT);
+    }
+
+    /**
+     * Sets the number of maximum allowed started task at the point in time. This number will determine how many tasks
+     * can be in "in_progress" status at the same time.
+     *
+     * @param int $limit Max started tasks limit.
+     */
+    public function setMaxStartedTasksLimit($limit)
+    {
+        $this->saveConfigValue('maxStartedTasksLimit', $limit);
     }
 
     /**
@@ -216,13 +234,6 @@ abstract class Configuration
     }
 
     /**
-     * Returns current system identifier.
-     *
-     * @return string Current system identifier.
-     */
-    abstract public function getCurrentSystemId();
-
-    /**
      * Gets configuration value for given name.
      *
      * @param string $name Name of the config parameter.
@@ -253,6 +264,7 @@ abstract class Configuration
         $filter->where('name', '=', $name);
         /** @noinspection PhpUnhandledExceptionInspection */
         $filter->where('systemId', '=', $this->getCurrentSystemId());
+
         /** @var ConfigEntity $config */
         $config = $this->getRepository()->selectOne($filter);
 
@@ -273,7 +285,7 @@ abstract class Configuration
         $config = $this->getConfigEntity($name) ?: new ConfigEntity();
         $config->systemId = $this->getCurrentSystemId();
         $config->value = $value;
-        if ($config === null) {
+        if ($config->getId() === null) {
             $config->name = $name;
             $this->getRepository()->save($config);
         } else {

@@ -17,25 +17,25 @@ class ShippingServiceSearch extends BaseDto
      */
     public $serviceId;
     /**
-     * 2 letter country code.
+     * Departure country 2 letter code.
      *
      * @var string
      */
     public $fromCountry;
     /**
-     * Postal code.
+     * Departure country postal/zip code.
      *
      * @var string
      */
     public $fromZip;
     /**
-     * 2 letter country code.
+     * Destination country 2 letter code.
      *
      * @var string
      */
     public $toCountry;
     /**
-     * Postal code.
+     * Destination country postal/zip code.
      *
      * @var string
      */
@@ -66,7 +66,9 @@ class ShippingServiceSearch extends BaseDto
     public $packageWeight;
 
     /**
-     * @inheritdoc
+     * Transforms DTO to its array format suitable for http client.
+     *
+     * @return array DTO in array format.
      */
     public function toArray()
     {
@@ -85,11 +87,25 @@ class ShippingServiceSearch extends BaseDto
     }
 
     /**
-     * @inheritdoc
+     * Transforms raw array data to object.
+     *
+     * @param array $raw Raw array data.
+     *
+     * @return static Transformed DTO object.
      */
     public static function fromArray(array $raw)
     {
-        // this class is not intent to be built from array
-        return new static();
+        $instance = new static();
+        $instance->serviceId = self::getValue($raw, 'service_id');
+        $instance->fromCountry = self::getValue($raw, 'from[country]');
+        $instance->fromZip = self::getValue($raw, 'from[zip]');
+        $instance->toCountry = self::getValue($raw, 'to[country]');
+        $instance->toZip = self::getValue($raw, 'to[zip]');
+        $instance->packageHeight = self::getValue($raw, 'packages[0][height]');
+        $instance->packageWidth = self::getValue($raw, 'packages[0][width]');
+        $instance->packageLength = self::getValue($raw, 'packages[0][length]');
+        $instance->packageWeight = self::getValue($raw, 'packages[0][weight]');
+
+        return $instance;
     }
 }

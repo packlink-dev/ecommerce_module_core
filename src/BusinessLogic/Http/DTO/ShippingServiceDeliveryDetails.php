@@ -41,6 +41,18 @@ class ShippingServiceDeliveryDetails extends BaseDto
      */
     public $country;
     /**
+     * Departure country for delivery details. 2 letter country code.
+     *
+     * @var string
+     */
+    public $departureCountry;
+    /**
+     * Destination country for delivery details. 2 letter country code.
+     *
+     * @var string
+     */
+    public $destinationCountry;
+    /**
      * Indicates whether service requires departure drop-off.
      *
      * @var bool
@@ -64,6 +76,12 @@ class ShippingServiceDeliveryDetails extends BaseDto
      * @var string
      */
     public $category;
+    /**
+     * Express delivery support.
+     *
+     * @var bool
+     */
+    public $expressDelivery;
     /**
      * Transit time in days as string "X DAYS".
      *
@@ -154,12 +172,13 @@ class ShippingServiceDeliveryDetails extends BaseDto
         $instance->id = self::getValue($raw, 'id');
         $instance->carrierName = self::getValue($raw, 'carrier_name');
         $instance->serviceName = self::getValue($raw, 'service_name');
-        $instance->currency = self::getValue($raw, 'service_logo');
+        $instance->currency = self::getValue($raw, 'currency');
         $instance->country = self::getValue($raw, 'country');
         $instance->departureDropOff = self::getValue($raw, 'dropoff', false);
         $instance->destinationDropOff = self::getValue($raw, 'delivery_to_parcelshop', false);
         $instance->labelsRequired = self::getValue($raw, 'labels_required', false);
         $instance->category = self::getValue($raw, 'category');
+        $instance->expressDelivery = $instance->category === 'express';
         $instance->transitTime = self::getValue($raw, 'transit_time');
         $instance->transitHours = (int)self::getValue($raw, 'transit_hours', 0);
         $instance->firstEstimatedDeliveryDate = \DateTime::createFromFormat(
@@ -167,7 +186,7 @@ class ShippingServiceDeliveryDetails extends BaseDto
             self::getValue($raw, 'first_estimated_delivery_date', '1970/01/01')
         );
         /** @var array $prices */
-        $prices = self::getValue($raw, 'prices', array());
+        $prices = self::getValue($raw, 'price', array());
         if (!empty($prices)) {
             $instance->totalPrice = self::getValue($prices, 'total_price', 0);
             $instance->taxPrice = self::getValue($prices, 'tax_price', 0);

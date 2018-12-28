@@ -2,77 +2,35 @@
 
 namespace Logeecom\Tests\Infrastructure\logger;
 
+use Logeecom\Tests\Common\BaseTestWithServices;
 use Logeecom\Tests\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Configuration as ConfigInterface;
-use Logeecom\Infrastructure\Interfaces\required\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
 use Logeecom\Tests\Common\TestComponents\TestHttpClient;
 
-class LoggerTest extends TestCase
+class LoggerTest extends BaseTestWithServices
 {
-    /**
-     * @var TimeProvider
-     */
-    private $timeProvider;
-    /**
-     * @var TestDefaultLogger
-     */
-    private $defaultLogger;
-    /**
-     * @var TestShopLogger
-     */
-    private $shopLogger;
-    /**
-     * @var TestShopConfiguration
-     */
-    private $shopConfiguration;
     /**
      * @var TestHttpClient
      */
     private $httpClient;
 
-    protected function setUp()
+    public function setUp()
     {
-        Configuration::resetInstance();
-        $this->defaultLogger = new TestDefaultLogger();
-        $this->shopLogger = new TestShopLogger();
+        parent::setUp();
+
+        $this->shopConfig->setIntegrationName('Shop1');
+        $this->shopConfig->setDefaultLoggerEnabled(true);
+
+        $me = $this;
         $this->httpClient = new TestHttpClient();
-        $this->timeProvider = TimeProvider::getInstance();
-        $this->shopConfiguration = new TestShopConfiguration();
-        $this->shopConfiguration->setIntegrationName('Shop1');
-        $this->shopConfiguration->setDefaultLoggerEnabled(true);
-
-        $componentInstance = $this;
-
-        new TestServiceRegister(
-            array(
-                TimeProvider::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->timeProvider;
-                },
-                DefaultLoggerAdapter::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->defaultLogger;
-                },
-                ShopLoggerAdapter::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->shopLogger;
-                },
-                ConfigInterface::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->shopConfiguration;
-                },
-                HttpClient::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->httpClient;
-                },
-            )
+        TestServiceRegister::registerService(
+            HttpClient::CLASS_NAME,
+            function () use ($me) {
+                return $me->httpClient;
+            }
         );
-
-        new Logger();
     }
 
     /**

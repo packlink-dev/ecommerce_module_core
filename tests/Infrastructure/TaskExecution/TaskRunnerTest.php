@@ -110,7 +110,7 @@ class TaskRunnerTest extends TestCase
             )
         );
 
-        new Logger();
+        Logger::resetInstance();
 
         $this->asyncProcessStarter = $asyncProcessStarter;
         $this->taskRunnerStarter = $taskRunnerStarter;

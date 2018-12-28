@@ -72,13 +72,13 @@ class StudentEntity extends Entity
     public function getConfig()
     {
         $indexMap = new IndexMap();
-        $indexMap->addIndex(new StringIndex('localId', 1));
-        $indexMap->addIndex(new IntegerIndex('username', 2));
-        $indexMap->addIndex(new IntegerIndex('email', 3));
-        $indexMap->addIndex(new IntegerIndex('gender', 4));
-        $indexMap->addIndex(new IntegerIndex('firstName', 5));
-        $indexMap->addIndex(new IntegerIndex('lastName', 6));
+        $indexMap->addIndex(new IntegerIndex('localId'));
+        $indexMap->addIndex(new StringIndex('username'));
+        $indexMap->addIndex(new StringIndex('email'));
+        $indexMap->addIndex(new StringIndex('gender'));
+        $indexMap->addIndex(new StringIndex('firstName'));
+        $indexMap->addIndex(new StringIndex('lastName'));
 
-        return new EntityConfiguration($indexMap, 'Student', 'Student');
+        return new EntityConfiguration($indexMap, 'Student');
     }
 }
