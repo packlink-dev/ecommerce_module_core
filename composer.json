@@ -1,8 +1,8 @@
 {
     "require": {
+
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7",
-        "phpunit/php-code-coverage": "^4.0"
+        "codacy/coverage": "dev-master"
     }
 }

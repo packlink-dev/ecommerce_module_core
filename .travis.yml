@@ -1,5 +1,10 @@
 language: php
 
+sudo: false
+
+php:
+  - '5.3'
+
 env:
   global:
     - DEFAULT_COMPOSER_FLAGS="--no-interaction --no-ansi --no-progress --no-suggest"
@@ -7,9 +12,11 @@ env:
 before_script:
   - wget https://getcomposer.org/composer.phar
   - chmod +x composer.phar
-  - ./composer.phar install $DEFAULT_COMPOSER_FLAGS
-
+  - composer.phar install $DEFAULT_COMPOSER_FLAGS
 
 script:
-  - mkdir coverage-report
-  - ./vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-html coverage-report
+  - mkdir -p build/logs
+  - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+after_script:
+  - vendor/bin/codacycoverage clover
