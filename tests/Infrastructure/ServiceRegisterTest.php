@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure;
 
-use Logeecom\Tests\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\Common\TestComponents\TestService;
+use Logeecom\Tests\Common\TestServiceRegister;
+use PHPUnit\Framework\TestCase;
 
 class ServiceRegisterTest extends TestCase
 {
@@ -70,23 +70,21 @@ class ServiceRegisterTest extends TestCase
     }
 
     /**
-     * Test throwing exception when service is not registered
-     *
+     * Test throwing exception when service is not registered.
+     * @expectedException \Logeecom\Infrastructure\Exceptions\ServiceNotRegisteredException
      */
     public function testGettingServiceWhenItIsNotRegistered()
     {
-        $this->expectException('\Logeecom\Infrastructure\Exceptions\ServiceNotRegisteredException');
         ServiceRegister::getService('SomeService');
     }
 
     /**
      * Test throwing exception when trying to register service with non callable delegate
      *
-     * @throws \InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRegisteringServiceWhenDelegateIsNotCallable()
     {
-        $this->expectException('\InvalidArgumentException');
         new TestServiceRegister(
             array(
                 TestService::CLASS_NAME => 'Some non callable string',

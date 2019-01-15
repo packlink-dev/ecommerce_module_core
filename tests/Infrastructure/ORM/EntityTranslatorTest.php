@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\Process;
-use Logeecom\Infrastructure\ORM\Entities\QueueItem;
 use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\Utility\EntityTranslator;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,12 +21,12 @@ class EntityTranslatorTest extends TestCase
     public function testTranslate()
     {
         $entity = new QueueItem();
-        $entity->status = 'TestStatus';
+        $entity->setStatus('created');
         $entity->id = 'TestId';
-        $entity->createTimestamp = new \DateTime();
-        $entity->lastUpdateTimestamp = new \DateTime();
-        $entity->failTimestamp = new \DateTime();
-        $entity->finishTimestamp = new \DateTime();
+        $entity->setCreateTimestamp(time());
+        $entity->setLastUpdateTimestamp(time());
+        $entity->setFailTimestamp(time());
+        $entity->setFinishTimestamp(time());
 
         $intermediate = new IntermediateObject();
         $intermediate->setData(serialize($entity));
@@ -62,8 +62,7 @@ class EntityTranslatorTest extends TestCase
      */
     public function testTranslateWrongEntity()
     {
-        $entity = new Process();
-        $entity->runner = 'TEST';
+        $entity = new TaskRunnerStatus('Test', 123);
 
         $intermediate = new IntermediateObject();
         $intermediate->setData(serialize($entity));

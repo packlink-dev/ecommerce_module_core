@@ -34,4 +34,29 @@ class PercentPricePolicy
         $this->increase = $increase;
         $this->amount = $amount;
     }
+
+    /**
+     * Transforms raw array data to this entity instance.
+     *
+     * @param array $data Raw array data.
+     *
+     * @return static Transformed entity object.
+     */
+    public static function fromArray($data)
+    {
+        return new static($data['increase'], $data['amount']);
+    }
+
+    /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        return array(
+            'increase' => $this->increase,
+            'amount' => $this->amount,
+        );
+    }
 }

@@ -2,11 +2,10 @@
 
 namespace Logeecom\Tests\Common\TestComponents\TaskExecution;
 
-use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 
-class TestTaskRunnerWakeup extends TaskRunnerWakeup
+class TestTaskRunnerWakeupService extends TaskRunnerWakeupService
 {
-
     private $callHistory = array();
 
     public function getMethodCallHistory($methodName)

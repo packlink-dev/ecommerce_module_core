@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Common\TestComponents\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryCondition;
@@ -315,7 +315,7 @@ class MemoryRepository implements RepositoryInterface
     /**
      * @param array $result
      *
-     * @return \Logeecom\Infrastructure\ORM\Entities\Entity[]
+     * @return \Logeecom\Infrastructure\ORM\Entity[]
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     private function translateToEntities(array $result)

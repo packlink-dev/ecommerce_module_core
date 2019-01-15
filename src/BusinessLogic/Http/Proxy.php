@@ -9,9 +9,10 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentReference;
-use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
@@ -230,6 +231,7 @@ class Proxy
      * Returns list of shipping labels for shipment with provided reference.
      *
      * @param string $referenceId Packlink shipment reference identifier.
+     *
      * @return string[] Array of shipping labels.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
@@ -275,6 +277,24 @@ class Proxy
         $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/track");
 
         return Tracking::fromArrayBatch($response->decodeBodyAsJson());
+    }
+
+    /**
+     * Returns array of PostalCode objects by specified country and specified zip code.
+     *
+     * @param string $countryCode Two-letter iso code of a country.
+     * @param string $zipCode Zip code.
+     *
+     * @return PostalCode[] PostalCode DTO.
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getPostalCodes($countryCode, $zipCode)
+    {
+        $response = $this->call(self::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
+
+        return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
     }
 
     /**
@@ -344,8 +364,18 @@ class Proxy
         if (!$response->isSuccessful()) {
             $httpCode = $response->getStatus();
             $error = $message = $response->decodeBodyAsJson();
-            if (is_array($error) && isset($error['messages']) && is_array($error['messages'])) {
-                $message = implode("\n", array_column($error['messages'], ' message'));
+            if (is_array($error)) {
+                if (isset($error['messages']) && is_array($error['messages'])) {
+                    $message = implode("\n", array_column($error['messages'], 'message'));
+                } elseif (isset($error['message'])) {
+                    $message = $error['message'];
+                } else {
+                    $message = '';
+                }
+            }
+
+            if ($httpCode === 404) {
+                $message = '404 Not found.';
             }
 
             Logger::logInfo($message);

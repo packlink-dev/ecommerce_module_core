@@ -2,42 +2,46 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerStatusStorage;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup;
-use Logeecom\Infrastructure\Interfaces\Required\AsyncProcessStarter;
-use Logeecom\Infrastructure\Configuration;
+use Logeecom\Infrastructure\Configuration\ConfigEntity;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\TaskQueueStorage;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\TaskRunner;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
 use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\InMemoryTestQueueStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestAsyncProcessStarter;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueue;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeup;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Common\TestComponents\Utility\TestGuidProvider;
 use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Common\TestServiceRegister;
+use PHPUnit\Framework\TestCase;
 
 class TaskRunnerTest extends TestCase
 {
-    /** @var TestAsyncProcessStarter */
+    /** @var AsyncProcessService */
     private $asyncProcessStarter;
-    /** @var TestTaskRunnerWakeup */
+    /** @var TestTaskRunnerWakeupService */
     private $taskRunnerStarter;
     /** @var TestRunnerStatusStorage */
     private $runnerStatusStorage;
@@ -49,9 +53,9 @@ class TaskRunnerTest extends TestCase
     private $configuration;
     /** @var TestShopLogger */
     private $logger;
-    /** @var InMemoryTestQueueStorage */
+    /** @var MemoryQueueItemRepository */
     private $queueStorage;
-    /** @var TestQueue */
+    /** @var TestQueueService */
     private $queue;
     /** @var TaskRunner */
     private $taskRunner;
@@ -61,21 +65,23 @@ class TaskRunnerTest extends TestCase
      */
     protected function setUp()
     {
-        $asyncProcessStarter = new TestAsyncProcessStarter();
-        $taskRunnerStarter = new TestTaskRunnerWakeup();
+        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+        RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
+        RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
+
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
         $runnerStatusStorage = new TestRunnerStatusStorage();
         $timeProvider = new TestTimeProvider();
         $guidProvider = TestGuidProvider::getInstance();
         $configuration = new TestShopConfiguration();
-        $queueStorage = new InMemoryTestQueueStorage();
-        $queue = new TestQueue();
+        $queue = new TestQueueService();
 
         $shopLogger = new TestShopLogger();
 
         new TestServiceRegister(
             array(
-                AsyncProcessStarter::CLASS_NAME => function () use ($asyncProcessStarter) {
-                    return $asyncProcessStarter;
+                AsyncProcessService::CLASS_NAME => function () {
+                    return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
                 },
                 TaskRunnerWakeup::CLASS_NAME => function () use ($taskRunnerStarter) {
                     return $taskRunnerStarter;
@@ -83,10 +89,7 @@ class TaskRunnerTest extends TestCase
                 TaskRunnerStatusStorage::CLASS_NAME => function () use ($runnerStatusStorage) {
                     return $runnerStatusStorage;
                 },
-                TaskQueueStorage::CLASS_NAME => function () use ($queueStorage) {
-                    return $queueStorage;
-                },
-                Queue::CLASS_NAME => function () use ($queue) {
+                QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
                 },
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
@@ -104,6 +107,9 @@ class TaskRunnerTest extends TestCase
                 Configuration::CLASS_NAME => function () use ($configuration) {
                     return $configuration;
                 },
+                EventBus::CLASS_NAME => function () {
+                    return EventBus::getInstance();
+                },
                 HttpClient::CLASS_NAME => function () {
                     return new TestHttpClient();
                 },
@@ -112,10 +118,10 @@ class TaskRunnerTest extends TestCase
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = $asyncProcessStarter;
+        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
         $this->taskRunnerStarter = $taskRunnerStarter;
         $this->runnerStatusStorage = $runnerStatusStorage;
-        $this->queueStorage = $queueStorage;
+        $this->queueStorage = RepositoryRegistry::getQueueItemRepository();
         $this->timeProvider = $timeProvider;
         $this->guidProvider = $guidProvider;
         $this->configuration = $configuration;
@@ -127,6 +133,13 @@ class TaskRunnerTest extends TestCase
         $currentTimestamp = $this->timeProvider->getCurrentLocalTime()->getTimestamp();
         $this->taskRunner->setGuid($guid);
         $this->runnerStatusStorage->initializeStatus(new TaskRunnerStatus($guid, $currentTimestamp));
+    }
+
+    protected function tearDown()
+    {
+        MemoryStorage::reset();
+        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::resetInstance();
+        parent::tearDown();
     }
 
     /**
@@ -150,7 +163,7 @@ class TaskRunnerTest extends TestCase
         $this->taskRunner->run();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(2, $startCallHistory, 'Run call should start earliest queued items asynchronously.');
         $this->assertTrue(
             $this->isQueueItemInStartCallHistory($earliestQueue1Item, $startCallHistory),
@@ -191,7 +204,7 @@ class TaskRunnerTest extends TestCase
         $this->taskRunner->run();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             3,
             $startCallHistory,
@@ -357,7 +370,7 @@ class TaskRunnerTest extends TestCase
         $this->taskRunner->run();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $failCallHistory = $this->queue->getMethodCallHistory('fail');
         $wakeupCallHistory = $this->taskRunnerStarter->getMethodCallHistory('wakeup');
         $this->assertCount(1, $wakeupCallHistory, 'Run call must auto wakeup if no active runner is detected.');
@@ -392,7 +405,7 @@ class TaskRunnerTest extends TestCase
         $this->taskRunner->run();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $failCallHistory = $this->queue->getMethodCallHistory('fail');
         $wakeupCallHistory = $this->taskRunnerStarter->getMethodCallHistory('wakeup');
         $this->assertCount(1, $wakeupCallHistory, 'Run call must auto wakeup if no active runner is detected.');
@@ -407,9 +420,10 @@ class TaskRunnerTest extends TestCase
     private function isQueueItemInStartCallHistory(QueueItem $needle, array $callHistory)
     {
         /** @var QueueItem $queueItem */
+        /** @var Process $callHistoryItem */
         foreach ($callHistory as $callHistoryItem) {
             /** @var QueueItemStarter $queueItemStarter */
-            $queueItemStarter = $callHistoryItem['runner'];
+            $queueItemStarter = $callHistoryItem->getRunner();
             if ($queueItemStarter->getQueueItemId() === $needle->getId()) {
                 return true;
             }

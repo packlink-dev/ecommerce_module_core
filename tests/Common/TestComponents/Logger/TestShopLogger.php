@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Common\TestComponents\Logger;
 
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\LogData;
 
 class TestShopLogger implements ShopLoggerAdapter

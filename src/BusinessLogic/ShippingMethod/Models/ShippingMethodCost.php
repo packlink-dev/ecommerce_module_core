@@ -63,4 +63,38 @@ class ShippingMethodCost
         $this->basePrice = $basePrice;
         $this->taxPrice = $taxPrice;
     }
+
+    /**
+     * Transforms raw array data to this entity instance.
+     *
+     * @param array $data Raw array data.
+     *
+     * @return static Transformed entity object.
+     */
+    public static function fromArray($data)
+    {
+        return new static(
+            $data['departure'],
+            $data['destination'],
+            $data['totalPrice'],
+            $data['basePrice'],
+            $data['taxPrice']
+        );
+    }
+
+    /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        return array(
+            'departure' => $this->departureCountry,
+            'destination' => $this->destinationCountry,
+            'totalPrice' => $this->totalPrice,
+            'basePrice' => $this->basePrice,
+            'taxPrice' => $this->taxPrice,
+        );
+    }
 }

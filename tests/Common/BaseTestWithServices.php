@@ -2,12 +2,13 @@
 
 namespace Logeecom\Tests\Common;
 
-use Logeecom\Infrastructure\Configuration;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
+use Logeecom\Infrastructure\Configuration\ConfigEntity;
+use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\ORM\Entities\ConfigEntity;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
 use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
@@ -73,6 +74,9 @@ abstract class BaseTestWithServices extends TestCase
                 },
                 ShopLoggerAdapter::CLASS_NAME => function () use ($me) {
                     return $me->shopLogger;
+                },
+                EventBus::CLASS_NAME => function () {
+                    return EventBus::getInstance();
                 },
             )
         );

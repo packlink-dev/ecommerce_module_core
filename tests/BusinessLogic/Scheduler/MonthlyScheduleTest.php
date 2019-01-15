@@ -64,8 +64,9 @@ class MonthlyScheduleTest extends TestCase
     public function testNextScheduleOnNextMonth()
     {
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 4, 15);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -78,8 +79,9 @@ class MonthlyScheduleTest extends TestCase
     {
         $this->nowTime->setDate(2018, 2, 1);
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 2, 15);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -94,8 +96,9 @@ class MonthlyScheduleTest extends TestCase
         $this->monthlySchedule->setDay(31);
 
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 2, 28);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());

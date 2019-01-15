@@ -41,6 +41,7 @@ class WeeklyScheduleTest extends TestCase
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 21);
         $nowDateTime->setTime(13, 42, 5);
 
@@ -65,8 +66,9 @@ class WeeklyScheduleTest extends TestCase
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 26);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -79,8 +81,9 @@ class WeeklyScheduleTest extends TestCase
     {
         $this->weeklySchedule->setDay(4);
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 22);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -94,8 +97,9 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setDay(5);
         $this->weeklySchedule->setLastWeek(true);
         $expected = new \DateTime();
-        $expected->setDate(2018, 3, 30);
-        $expected->setTime(3, 0, 0);
+        $expected->setTimezone(new \DateTimeZone('UTC'));
+        $expected->setDate(2018, 3, 29);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -110,8 +114,9 @@ class WeeklyScheduleTest extends TestCase
         $this->nowTime->setDate(2018, 3, 31);
         $this->weeklySchedule->setLastWeek(true);
         $expected = new \DateTime();
-        $expected->setDate(2018, 4, 27);
-        $expected->setTime(3, 0, 0);
+        $expected->setTimezone(new \DateTimeZone('UTC'));
+        $expected->setDate(2018, 4, 26);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -125,8 +130,9 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setDay(5);
         $this->weeklySchedule->setWeeks(array(51));
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 12, 21);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -140,8 +146,9 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setDay(5);
         $this->weeklySchedule->setWeeks(array(1));
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2019, 1, 4);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());

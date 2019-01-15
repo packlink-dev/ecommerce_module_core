@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Common\TestComponents\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\QueueItem;
 use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
-use Logeecom\Infrastructure\TaskExecution\QueueItem as QueueItemInterface;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 
 class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRepository
 {
@@ -13,6 +13,12 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
      * Fully qualified name of this class.
      */
     const THIS_CLASS_NAME = __CLASS__;
+    /**
+     * Disabled flag.
+     *
+     * @var bool
+     */
+    public $disabled = false;
 
     /**
      * Finds list of earliest queued queue items per queue. Following list of criteria for searching must be satisfied:
@@ -28,19 +34,19 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
     public function findOldestQueuedItems($limit = 10)
     {
         $filter = new QueryFilter();
-        $filter->where('status', '=', QueueItemInterface::IN_PROGRESS);
+        $filter->where('status', '=', QueueItem::IN_PROGRESS);
 
         $entities = $this->select($filter);
         $runningQueuesQuery = array();
         /** @var QueueItem $entity */
         foreach ($entities as $entity) {
-            $runningQueuesQuery[] = $entity->queueName;
+            $runningQueuesQuery[] = $entity->getQueueName();
         }
 
         $filter = new QueryFilter();
-        $filter->where('status', '=', QueueItemInterface::QUEUED);
+        $filter->where('status', '=', QueueItem::QUEUED);
         $filter->where('queueName', 'NOT IN', array_unique($runningQueuesQuery));
-        $filter->orderBy('queueTimestamp', 'ASC');
+        $filter->orderBy('queueTime', 'ASC');
 
         $results = $this->select($filter);
         $this->groupByQueueName($results);
@@ -55,12 +61,41 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
     {
         $result = array();
         foreach ($queueItems as $queueItem) {
-            $queueName = $queueItem->queueName;
+            $queueName = $queueItem->getQueueName();
             if (!array_key_exists($queueName, $result)) {
                 $result[$queueName] = $queueItem;
             }
         }
 
         $queueItems = array_values($result);
+    }
+
+    /**
+     * Creates or updates given queue item. If queue item id is not set, new queue item will be created otherwise
+     * update will be performed.
+     *
+     * @param QueueItem $queueItem Item to save
+     * @param array $additionalWhere List of key/value pairs that must be satisfied upon saving queue item. Key is
+     *                               queue item property and value is condition value for that property. Example for
+     *     MySql storage:
+     *                               $storage->save($queueItem, array('status' => 'queued')) should produce query
+     *                               UPDATE queue_storage_table SET .... WHERE .... AND status => 'queued'
+     *
+     * @return int Id of saved queue item
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
+     */
+    public function saveWithCondition(QueueItem $queueItem, array $additionalWhere = array())
+    {
+        if ($this->disabled) {
+            throw new QueueItemSaveException('Failed to save queue item due to save restriction rule.');
+        }
+
+        if ($queueItem->getId()) {
+            $this->update($queueItem);
+
+            return $queueItem->getId();
+        }
+
+        return $this->save($queueItem);
     }
 }

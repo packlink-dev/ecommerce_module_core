@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Common\TestComponents\TaskExecution;
 
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 
 class TestRunnerStatusStorage implements TaskRunnerStatusStorage

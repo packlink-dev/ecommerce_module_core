@@ -2,13 +2,12 @@
 
 namespace Logeecom\Tests\Common\TestComponents\TaskExecution;
 
-use Logeecom\Infrastructure\TaskExecution\Queue;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 
-class TestQueue extends Queue
+class TestQueueService extends QueueService
 {
-
     private $callHistory = array();
     private $exceptionResponses = array();
 
@@ -50,6 +49,7 @@ class TestQueue extends Queue
         }
 
         $this->callHistory['find'][] = array('id' => $id);
+
         return parent::find($id);
     }
 

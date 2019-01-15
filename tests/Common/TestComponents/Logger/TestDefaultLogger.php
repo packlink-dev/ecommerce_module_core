@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\Common\TestComponents\Logger;
 
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\LogData;
 use Logeecom\Infrastructure\ServiceRegister;
 

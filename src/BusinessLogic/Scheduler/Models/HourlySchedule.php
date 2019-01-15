@@ -3,46 +3,65 @@
 namespace Packlink\BusinessLogic\Scheduler\Models;
 
 /**
- * Class HourlySchedule
+ * Class HourlySchedule.
+ *
  * @package Logeecom\Infrastructure\Scheduler\Models
  */
 class HourlySchedule extends Schedule
 {
     /**
-     * Start hour of the interval
+     * Array of field names.
+     *
+     * @var array
+     */
+    protected static $fields = array(
+        'id',
+        'queueName',
+        'minute',
+        'hour',
+        'day',
+        'month',
+        'startHour',
+        'startMinute',
+        'endHour',
+        'endMinute',
+        'interval',
+    );
+    /**
+     * Start hour of the interval.
      *
      * @var int
      */
     protected $startHour = 0;
     /**
-     * Start minute of the interval
+     * Start minute of the interval.
      *
      * @var int
      */
     protected $startMinute = 0;
     /**
-     * End hour of the interval
+     * End hour of the interval.
      *
      * @var int
      */
     protected $endHour = 23;
     /**
-     * End minute of the interval
+     * End minute of the interval.
      *
      * @var int
      */
     protected $endMinute = 59;
     /**
-     * Schedule interval in hours
+     * Schedule interval in hours.
      *
      * @var int
      */
     protected $interval = 1;
 
     /**
-     * Returns schedule start hour
+     * Returns schedule start hour.
      *
-     * @return int Interval start hour
+     * @return int Interval start hour.
      */
     public function getStartHour()
     {
@@ -50,9 +69,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Sets schedule start hour
+     * Sets schedule start hour.
      *
-     * @param int $startHour Interval start hour
+     * @param int $startHour Interval start hour.
      */
     public function setStartHour($startHour)
     {
@@ -60,9 +79,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Returns schedule start minute
+     * Returns schedule start minute.
      *
-     * @return int Interval start minute
+     * @return int Interval start minute.
      */
     public function getStartMinute()
     {
@@ -70,9 +89,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Sets schedule start minute
+     * Sets schedule start minute.
      *
-     * @param int $startMinute Interval start minute
+     * @param int $startMinute Interval start minute.
      */
     public function setStartMinute($startMinute)
     {
@@ -80,9 +99,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Returns schedule end hour
+     * Returns schedule end hour.
      *
-     * @return int Interval end hour
+     * @return int Interval end hour.
      */
     public function getEndHour()
     {
@@ -90,9 +109,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Sets schedule end hour
+     * Sets schedule end hour.
      *
-     * @param int $endHour Interval end hour
+     * @param int $endHour Interval end hour.
      */
     public function setEndHour($endHour)
     {
@@ -100,9 +119,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Returns schedule end minute
+     * Returns schedule end minute.
      *
-     * @return int Interval end minute
+     * @return int Interval end minute.
      */
     public function getEndMinute()
     {
@@ -110,9 +129,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Sets schedule end minute
+     * Sets schedule end minute.
      *
-     * @param int $endMinute Interval end minute
+     * @param int $endMinute Interval end minute.
      */
     public function setEndMinute($endMinute)
     {
@@ -120,9 +139,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Returns schedule interval
+     * Returns schedule interval.
      *
-     * @return int Interval in hours
+     * @return int Interval in hours.
      */
     public function getInterval()
     {
@@ -130,9 +149,9 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Sets schedule interval
+     * Sets schedule interval.
      *
-     * @param int $interval Interval in hours
+     * @param int $interval Interval in hours.
      */
     public function setInterval($interval)
     {
@@ -140,10 +159,10 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Calculates next schedule time
+     * Calculates next schedule time.
      *
-     * @return \DateTime Next schedule date
-     * @throws \Exception Emits Exception in case of an error while creating DateTime instance
+     * @return \DateTime Next schedule date.
+     * @throws \Exception Emits Exception in case of an error while creating DateTime instance.
      */
     public function calculateNextSchedule()
     {
@@ -157,7 +176,7 @@ class HourlySchedule extends Schedule
 
         $endTime = $this->now();
         $endTime->setTimestamp($nowTs);
-        $endTime->setTime($this->getEndHour(), $this->getEndMinute(), 0);
+        $endTime->setTime($this->getEndHour(), $this->getEndMinute());
         $endTs = $endTime->getTimestamp();
 
         if ($nowTs <= $startTs) {
@@ -187,18 +206,17 @@ class HourlySchedule extends Schedule
     }
 
     /**
-     * Returns start date time for the day of provided timestamp
+     * Returns start date time for the day of provided timestamp.
      *
-     * @param int $nowTs Now timestamp
+     * @param int $nowTs Now timestamp.
      *
-     * @return \DateTime Start schedule interval date and time
-     * @throws \Exception Emits Exception in case of an error while creating DateTime instance
+     * @return \DateTime Start schedule interval date and time.
      */
     private function getStartTime($nowTs)
     {
         $startTime = $this->now();
         $startTime->setTimestamp($nowTs);
-        $startTime->setTime($this->getStartHour(), $this->getStartMinute(), 0);
+        $startTime->setTime($this->getStartHour(), $this->getStartMinute());
 
         return $startTime;
     }

@@ -2,10 +2,10 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\Interfaces\Exposed\Runnable;
-use Logeecom\Infrastructure\Configuration;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
 
 /**
  * Class QueueItemStarter
@@ -22,9 +22,9 @@ class QueueItemStarter implements Runnable
     /**
      * Service instance.
      *
-     * @var Queue
+     * @var QueueService
      */
-    private $queue;
+    private $queueService;
     /**
      * Service instance.
      *
@@ -139,15 +139,15 @@ class QueueItemStarter implements Runnable
     /**
      * Gets Queue service instance.
      *
-     * @return Queue Service instance.
+     * @return QueueService Service instance.
      */
     private function getQueueService()
     {
-        if ($this->queue === null) {
-            $this->queue = ServiceRegister::getService(Queue::CLASS_NAME);
+        if ($this->queueService === null) {
+            $this->queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
         }
 
-        return $this->queue;
+        return $this->queueService;
     }
 
     /**

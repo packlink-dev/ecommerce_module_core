@@ -106,7 +106,7 @@ class Shipment extends BaseDto
     public static function fromArray(array $raw)
     {
         $shipment = new static();
-        $shipment->orderDate = \DateTime::createFromFormat("Y-m-d|", $raw['orderDate']);
+        $shipment->orderDate = \DateTime::createFromFormat('Y-m-d|', $raw['orderDate']);
         $shipment->reference = $raw['reference'];
         $shipment->shipmentCustomReference = $raw['shipment_custom_reference'];
         $shipment->status = $raw['status'];

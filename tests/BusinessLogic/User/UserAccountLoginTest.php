@@ -4,14 +4,14 @@ namespace Logeecom\Tests\BusinessLogic\User;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup;
-use Logeecom\Infrastructure\Interfaces\Required\TaskQueueStorage;
-use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\InMemoryTestQueueStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueue;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeup;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Common\TestServiceRegister;
@@ -51,6 +51,10 @@ class UserAccountLoginTest extends BaseTestWithServices
 
     /**
      * Tests user login and user initialization
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testLogin()
     {
@@ -60,11 +64,12 @@ class UserAccountLoginTest extends BaseTestWithServices
 
         $this->assertEquals('GoodApiKey', TestShopConfiguration::getInstance()->getAuthorizationToken());
         $this->assertCount(2, $this->httpClient->getHistory());
-        /** @var TaskQueueStorage $queueStorage */
-        $queueStorage = ServiceRegister::getService(TaskQueueStorage::CLASS_NAME);
+
+        /** @var \Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository $queueStorage */
+        $queueStorage = RepositoryRegistry::getQueueItemRepository();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $queueStorage->findAll();
+        $queueItems = $queueStorage->select();
         $this->assertCount(2, $queueItems);
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->assertEquals('GetDefaultParcelAndWarehouseTask', $queueItems[0]->getTaskType());
@@ -169,31 +174,25 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
     protected function setUp()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         parent::setUp();
 
+        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+
         $this->httpClient = new TestHttpClient();
-        $queue = new TestQueue();
-        $queueStorage = new InMemoryTestQueueStorage();
-        $taskRunnerStarter = new TestTaskRunnerWakeup();
+        $queue = new TestQueueService();
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
         $self = $this;
 
         /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(
-            Queue::CLASS_NAME,
+            QueueService::CLASS_NAME,
             function () use ($queue) {
                 return $queue;
-            }
-        );
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(
-            TaskQueueStorage::CLASS_NAME,
-            function () use ($queueStorage) {
-                return $queueStorage;
             }
         );
 

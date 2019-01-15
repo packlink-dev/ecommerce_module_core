@@ -104,6 +104,8 @@ class Warehouse extends BaseDto
         $instance->phone = static::getValue($raw, 'phone');
         $instance->country = static::getValue($raw, 'country');
         $instance->company = static::getValue($raw, 'company');
+        $instance->email = static::getValue($raw, 'email');
+        $instance->alias = static::getValue($raw, 'alias');
         $instance->postalCode = static::getValue($raw, 'postal_code');
         $instance->address = static::getValue($raw, 'address');
         $instance->createdAt = static::getValue($raw, 'created_at');

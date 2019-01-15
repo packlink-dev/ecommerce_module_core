@@ -2,7 +2,7 @@
 
 namespace Logeecom\Infrastructure\ORM\Utility;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 
 /**
  * Class IndexHelper.

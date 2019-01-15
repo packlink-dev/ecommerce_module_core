@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM\Entity;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -52,7 +52,6 @@ abstract class GenericEntityTest extends TestCase
 
         $indexMap = $config->getIndexMap();
         $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\IndexMap", $indexMap);
-        $class = $this->getEntityClass();
         /**
          * @var string $key
          * @var \Logeecom\Infrastructure\ORM\Configuration\Indexes\Index $item
@@ -60,12 +59,6 @@ abstract class GenericEntityTest extends TestCase
         foreach ($indexMap->getIndexes() as $key => $item) {
             $this->assertNotEmpty($item, "Index configuration for $key must not be empty.");
             $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\Indexes\Index", $item);
-
-            $this->assertObjectHasAttribute(
-                $key,
-                $entity,
-                "Entity $class, must have declared property $key, because it is used as index."
-            );
 
             $this->assertContains(
                 $item->getType(),

@@ -2,8 +2,8 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
 
 /**
  * Class CompositeTask
@@ -201,6 +201,7 @@ abstract class CompositeTask extends Task
      */
     protected function registerSubTaskEvents(Task $task)
     {
+        $task->setExecutionId($this->getExecutionId());
         $this->registerReportAliveEvent($task);
         $this->registerReportProgressEvent($task);
     }

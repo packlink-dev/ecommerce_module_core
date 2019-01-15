@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\Indexes\BooleanIndex;
 use Logeecom\Infrastructure\ORM\Configuration\Indexes\IntegerIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 
 /**
  * This class represents shipping service from Packlink with specific data for integration.
@@ -31,6 +31,29 @@ class ShippingMethod extends Entity
      * Indicates that fixed price pricing policy is used.
      */
     const PRICING_POLICY_FIXED = 3;
+    /**
+     * Array of field names.
+     *
+     * @var array
+     */
+    protected static $fields = array(
+        'id',
+        'serviceId',
+        'serviceName',
+        'carrierName',
+        'title',
+        'enabled',
+        'activated',
+        'logoUrl',
+        'displayLogo',
+        'departureDropOff',
+        'destinationDropOff',
+        'expressDelivery',
+        'deliveryTime',
+        'national',
+        'pricingPolicy',
+    );
+
     /**
      * Packlink service id.
      *
@@ -135,6 +158,73 @@ class ShippingMethod extends Entity
     protected $shippingCosts = array();
 
     /**
+     * Transforms raw array data to this entity instance.
+     *
+     * @param array $data Raw array data.
+     *
+     * @return static Transformed entity object.
+     */
+    public static function fromArray(array $data)
+    {
+        /** @var self $instance */
+        $instance = parent::fromArray($data);
+
+        if (!$instance->getPricingPolicy()) {
+            $instance->pricingPolicy = static::PRICING_POLICY_PACKLINK;
+        }
+
+        if (!empty($data['fixedPricePolicy'])) {
+            $policies = array();
+            foreach ($data['fixedPricePolicy'] as $fixedPricePolicy) {
+                $policies[] = FixedPricePolicy::fromArray($fixedPricePolicy);
+            }
+
+            $instance->setFixedPricePolicy($policies);
+        }
+
+        if (!empty($data['percentPricePolicy'])) {
+            $instance->setPercentPricePolicy(PercentPricePolicy::fromArray($data['percentPricePolicy']));
+        }
+
+        if (!empty($data['shippingCosts'])) {
+            foreach ($data['shippingCosts'] as $shippingCost) {
+                $instance->shippingCosts = ShippingMethodCost::fromArray($shippingCost);
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        $data = parent::toArray();
+
+        if ($this->fixedPricePolicy) {
+            $policy = $this->fixedPricePolicy;
+            foreach ($policy as $fixedPricePolicy) {
+                $data['fixedPricePolicy'][] = $fixedPricePolicy->toArray();
+            }
+        }
+
+        if ($this->percentPricePolicy) {
+            $data['percentPricePolicy'] = $this->percentPricePolicy->toArray();
+        }
+
+        if ($this->shippingCosts) {
+            foreach ($this->shippingCosts as $shippingCost) {
+                $data['shippingCosts'][] = $shippingCost->toArray();
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Returns entity configuration object.
      *
      * @return EntityConfiguration Configuration object.
@@ -221,6 +311,11 @@ class ShippingMethod extends Entity
      */
     public function getTitle()
     {
+        if (!$this->title) {
+            return $this->getCarrierName() . ' ' . $this->getDeliveryTime() . ' '
+                . ($this->isDestinationDropOff() ? 'drop-off' : 'home') . ' delivery';
+        }
+
         return $this->title;
     }
 
@@ -455,10 +550,10 @@ class ShippingMethod extends Entity
     public function setFixedPricePolicy($fixedPricePolicy)
     {
         $this->percentPricePolicy = null;
-        uasort(
+        usort(
             $fixedPricePolicy,
-            function (FixedPricePolicy $a, FixedPricePolicy $b) {
-                return $a->from < $b->from;
+            function (FixedPricePolicy $first, FixedPricePolicy $second) {
+                return $first->from > $second->from;
             }
         );
 

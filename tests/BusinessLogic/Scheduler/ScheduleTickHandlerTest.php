@@ -2,15 +2,18 @@
 
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup;
-use Logeecom\Infrastructure\Configuration;
-use Logeecom\Infrastructure\Interfaces\Required\TaskQueueStorage;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueue;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\InMemoryTestQueueStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeup;
 use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
@@ -25,13 +28,13 @@ class ScheduleTickHandlerTest extends TestCase
     /**
      * Queue instance
      *
-     * @var Queue
+     * @var QueueService
      */
     private $queue;
     /**
      * QueueStorage instance\
      *
-     * @var InMemoryTestQueueStorage
+     * @var MemoryQueueItemRepository
      */
     private $queueStorage;
     /**
@@ -43,29 +46,30 @@ class ScheduleTickHandlerTest extends TestCase
     /**
      * TaskRunnerWakeup instance
      *
-     * @var TestTaskRunnerWakeup
+     * @var TestTaskRunnerWakeupService
      */
     private $taskRunnerStarter;
 
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     protected function setUp()
     {
         parent::setUp();
 
-        $queueStorage = new InMemoryTestQueueStorage();
+        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+
         /** @noinspection PhpUnhandledExceptionInspection */
         $timeProvider = new TestTimeProvider();
-        $taskRunnerStarter = new TestTaskRunnerWakeup();
-        $queue = new TestQueue();
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
+        $queue = new TestQueueService();
 
         new TestServiceRegister(
             array(
-                TaskQueueStorage::CLASS_NAME => function () use ($queueStorage) {
-                    return $queueStorage;
-                },
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
@@ -75,22 +79,27 @@ class ScheduleTickHandlerTest extends TestCase
                 Configuration::CLASS_NAME => function () {
                     return new TestShopConfiguration();
                 },
-                Queue::CLASS_NAME => function () use ($queue) {
+                QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
+                },
+                EventBus::CLASS_NAME => function () {
+                    return EventBus::getInstance();
                 },
             )
         );
 
-        $this->queueStorage = $queueStorage;
+        $this->queueStorage = RepositoryRegistry::getQueueItemRepository();
         $this->timeProvider = $timeProvider;
         $this->taskRunnerStarter = $taskRunnerStarter;
         $this->queue = $queue;
+        MemoryStorage::reset();
     }
 
     /**
      * Tests queue of ScheduleCheckTask when queue is empty
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     public function testFirstQueueOfHandler()
     {
@@ -98,7 +107,7 @@ class ScheduleTickHandlerTest extends TestCase
         $tickHandler->handle();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertCount(1, $queueItems);
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->assertEquals('ScheduleCheckTask', $queueItems[0]->getTaskType());
@@ -108,6 +117,7 @@ class ScheduleTickHandlerTest extends TestCase
      * Tests queue of ScheduleCheckTask when threshold is not up
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     public function testSecondQueueOfHandler()
     {
@@ -115,7 +125,7 @@ class ScheduleTickHandlerTest extends TestCase
         $tickHandler->handle();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertCount(1, $queueItems);
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->assertEquals('ScheduleCheckTask', $queueItems[0]->getTaskType());
@@ -123,7 +133,7 @@ class ScheduleTickHandlerTest extends TestCase
 
         $tickHandler->handle();
 
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertCount(1, $queueItems);
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->assertEquals('ScheduleCheckTask', $queueItems[0]->getTaskType());
@@ -133,7 +143,7 @@ class ScheduleTickHandlerTest extends TestCase
      * Tests queue of ScheduleCheckTask when threshold is up
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     public function testSecondQueueOfHandlerAfterThreshold()
     {
@@ -141,7 +151,7 @@ class ScheduleTickHandlerTest extends TestCase
         $tickHandler->handle();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertCount(1, $queueItems);
         /** @noinspection PhpUnhandledExceptionInspection */
         $queueItem = $queueItems[0];
@@ -151,7 +161,7 @@ class ScheduleTickHandlerTest extends TestCase
         $this->queueStorage->save($queueItem);
         $tickHandler->handle();
 
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertCount(2, $queueItems);
     }
 }

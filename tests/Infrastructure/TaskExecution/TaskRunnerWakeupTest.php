@@ -2,34 +2,37 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerStatusStorage;
-use Logeecom\Infrastructure\Interfaces\Required\AsyncProcessStarter;
-use Logeecom\Infrastructure\Configuration;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
-use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 use Logeecom\Infrastructure\Utility\GuidProvider;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
 use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestAsyncProcessStarter;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
 use Logeecom\Tests\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Common\TestComponents\Utility\TestGuidProvider;
 use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Common\TestServiceRegister;
+use PHPUnit\Framework\TestCase;
 
 class TaskRunnerWakeupTest extends TestCase
 {
-    /** @var TestAsyncProcessStarter */
+    /** @var AsyncProcessService */
     private $asyncProcessStarter;
     /** @var TestRunnerStatusStorage */
     private $runnerStatusStorage;
@@ -37,7 +40,7 @@ class TaskRunnerWakeupTest extends TestCase
     private $timeProvider;
     /** @var TestGuidProvider */
     private $guidProvider;
-    /** @var TaskRunnerWakeup */
+    /** @var TaskRunnerWakeupService */
     private $runnerWakeup;
     /** @var TestShopLogger */
     private $logger;
@@ -47,7 +50,8 @@ class TaskRunnerWakeupTest extends TestCase
      */
     protected function setUp()
     {
-        $asyncProcessStarter = new TestAsyncProcessStarter();
+        RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
+
         $runnerStatusStorage = new TestRunnerStatusStorage();
         $timeProvider = new TestTimeProvider();
         $guidProvider = TestGuidProvider::getInstance();
@@ -56,8 +60,8 @@ class TaskRunnerWakeupTest extends TestCase
 
         new TestServiceRegister(
             array(
-                AsyncProcessStarter::CLASS_NAME => function () use ($asyncProcessStarter) {
-                    return $asyncProcessStarter;
+                AsyncProcessService::CLASS_NAME => function () {
+                    return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
                 },
                 TaskRunnerStatusStorage::CLASS_NAME => function () use ($runnerStatusStorage) {
                     return $runnerStatusStorage;
@@ -85,12 +89,19 @@ class TaskRunnerWakeupTest extends TestCase
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = $asyncProcessStarter;
+        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
         $this->runnerStatusStorage = $runnerStatusStorage;
         $this->timeProvider = $timeProvider;
         $this->guidProvider = $guidProvider;
-        $this->runnerWakeup = new TaskRunnerWakeup();
+        $this->runnerWakeup = new TaskRunnerWakeupService();
         $this->logger = $shopLogger;
+    }
+
+    protected function tearDown()
+    {
+        MemoryStorage::reset();
+        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::resetInstance();
+        parent::tearDown();
     }
 
     /**
@@ -107,7 +118,8 @@ class TaskRunnerWakeupTest extends TestCase
         $this->runnerWakeup->wakeup();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        /** @var Process[] $startCallHistory */
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             1,
             $startCallHistory,
@@ -115,7 +127,7 @@ class TaskRunnerWakeupTest extends TestCase
         );
 
         /** @var TaskRunnerStarter $runnerStarter */
-        $runnerStarter = $startCallHistory[0]['runner'];
+        $runnerStarter = $startCallHistory[0]->getRunner();
         $this->assertInstanceOf(
             '\Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter',
             $runnerStarter,
@@ -152,7 +164,8 @@ class TaskRunnerWakeupTest extends TestCase
 
         $this->runnerWakeup->wakeup();
 
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        /** @var Process[] $startCallHistory */
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             0,
             $startCallHistory,
@@ -173,7 +186,8 @@ class TaskRunnerWakeupTest extends TestCase
 
         $this->runnerWakeup->wakeup();
 
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        /** @var Process[] $startCallHistory */
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             1,
             $startCallHistory,
@@ -181,7 +195,7 @@ class TaskRunnerWakeupTest extends TestCase
         );
 
         /** @var TaskRunnerStarter $runnerStarter */
-        $runnerStarter = $startCallHistory[0]['runner'];
+        $runnerStarter = $startCallHistory[0]->getRunner();
         $this->assertInstanceOf(
             '\Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter',
             $runnerStarter,
@@ -189,6 +203,9 @@ class TaskRunnerWakeupTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
     public function testWakeupWhenRunnerStatusServiceFailToSaveNewStatus()
     {
         // Arrange
@@ -201,7 +218,8 @@ class TaskRunnerWakeupTest extends TestCase
         $this->runnerWakeup->wakeup();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        /** @var Process[] $startCallHistory */
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             0,
             $startCallHistory,
@@ -213,6 +231,9 @@ class TaskRunnerWakeupTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
     public function testWakeupWhenRunnerStatusServiceIsUnavailable()
     {
         // Arrange
@@ -225,7 +246,8 @@ class TaskRunnerWakeupTest extends TestCase
         $this->runnerWakeup->wakeup();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        /** @var Process[] $startCallHistory */
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             0,
             $startCallHistory,
@@ -234,6 +256,9 @@ class TaskRunnerWakeupTest extends TestCase
         $this->assertContains('Runner status storage unavailable.', $this->logger->data->getMessage());
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
     public function testWakeupInCaseOfUnexpectedException()
     {
         // Arrange
@@ -246,7 +271,8 @@ class TaskRunnerWakeupTest extends TestCase
         $this->runnerWakeup->wakeup();
 
         // Assert
-        $startCallHistory = $this->asyncProcessStarter->getMethodCallHistory('start');
+        /** @var Process[] $startCallHistory */
+        $startCallHistory = RepositoryRegistry::getRepository(Process::CLASS_NAME)->select();
         $this->assertCount(
             0,
             $startCallHistory,

@@ -2,7 +2,7 @@
 
 namespace Logeecom\Infrastructure\ORM\Interfaces;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 
 /**

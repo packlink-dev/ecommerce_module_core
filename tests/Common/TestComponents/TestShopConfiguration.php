@@ -109,4 +109,16 @@ class TestShopConfiguration extends \Packlink\BusinessLogic\Configuration
     {
         $this->saveConfigValue('integrationName', $name);
     }
+
+    /**
+     * Returns async process starter url, always in http.
+     *
+     * @param string $guid Process identifier.
+     *
+     * @return string Formatted URL of async process starter endpoint.
+     */
+    public function getAsyncProcessUrl($guid)
+    {
+        return str_replace('https://', 'http://', $this->callbackUrl . '&guid=' . $guid);
+    }
 }

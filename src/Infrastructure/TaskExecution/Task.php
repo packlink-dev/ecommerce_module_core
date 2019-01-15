@@ -2,10 +2,10 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\Configuration;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\Events\EventEmitter;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
@@ -35,6 +35,12 @@ abstract class Task extends EventEmitter implements \Serializable
      * @var Configuration
      */
     private $configService;
+    /**
+     * Task execution id.
+     *
+     * @var string
+     */
+    private $executionId;
 
     /**
      * Runs task logic.
@@ -153,6 +159,26 @@ abstract class Task extends EventEmitter implements \Serializable
      */
     public function reconfigure()
     {
+    }
+
+    /**
+     * Gets execution Id.
+     *
+     * @return string Execution Id.
+     */
+    public function getExecutionId()
+    {
+        return $this->executionId;
+    }
+
+    /**
+     * Sets Execution id.
+     *
+     * @param string $executionId Execution id.
+     */
+    public function setExecutionId($executionId)
+    {
+        $this->executionId = $executionId;
     }
 
     /**

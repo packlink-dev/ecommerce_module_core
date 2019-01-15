@@ -111,7 +111,7 @@ class SendDraftTaskTest extends BaseSyncTest
         }
 
         $this->httpClient->setMockResponses($this->getMockResponses());
-        $orderRepository->shouldThrowException(false);
+        $orderRepository->shouldThrowException();
         /** @var SendDraftTask $task */
         $task = unserialize($serialized);
         $task->execute();

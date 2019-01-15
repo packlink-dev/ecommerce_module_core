@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\User;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\User;
@@ -51,7 +51,6 @@ class UserAccountService extends BaseService
         parent::__construct();
 
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
     }
 
     /**
@@ -72,9 +71,10 @@ class UserAccountService extends BaseService
         $this->configuration->setAuthorizationToken($apiKey);
 
         try {
-            $userDto = $this->proxy->getUserData();
+            $userDto = $this->getProxy()->getUserData();
             $this->initializeUser($userDto);
         } catch (HttpBaseException $e) {
+            $this->configuration->resetAuthorizationCredentials();
             Logger::logError($e->getMessage());
             $result = false;
         }
@@ -93,7 +93,7 @@ class UserAccountService extends BaseService
     {
         $parcelInfo = $this->configuration->getDefaultParcel();
         if ($parcelInfo === null || $force) {
-            $parcels = $this->proxy->getUsersParcelInfo();
+            $parcels = $this->getProxy()->getUsersParcelInfo();
             foreach ($parcels as $parcel) {
                 if ($parcel->default) {
                     $parcelInfo = $parcel;
@@ -116,7 +116,7 @@ class UserAccountService extends BaseService
     {
         $warehouse = $this->configuration->getDefaultWarehouse();
         if ($warehouse === null || $force) {
-            $usersWarehouses = $this->proxy->getUsersWarehouses();
+            $usersWarehouses = $this->getProxy()->getUsersWarehouses();
             foreach ($usersWarehouses as $usersWarehouse) {
                 if ($usersWarehouse->default) {
                     $warehouse = $usersWarehouse;
@@ -142,13 +142,27 @@ class UserAccountService extends BaseService
         $this->configuration->setUserInfo($user);
         $defaultQueueName = $this->configuration->getDefaultQueueName();
 
-        /** @var Queue $queueService */
-        $queueService = ServiceRegister::getService(Queue::CLASS_NAME);
+        /** @var QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
         /** @noinspection PhpUnhandledExceptionInspection */
         $queueService->enqueue($defaultQueueName, new GetDefaultParcelAndWarehouseTask());
         /** @noinspection PhpUnhandledExceptionInspection */
         $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask());
 
-        $this->proxy->registerWebHookHandler($this->configuration->getWebHookUrl());
+        $this->getProxy()->registerWebHookHandler($this->configuration->getWebHookUrl());
+    }
+
+    /**
+     * Gets Proxy.
+     *
+     * @return \Packlink\BusinessLogic\Http\Proxy Proxy.
+     */
+    protected function getProxy()
+    {
+        if ($this->proxy === null) {
+            $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        }
+
+        return $this->proxy;
     }
 }

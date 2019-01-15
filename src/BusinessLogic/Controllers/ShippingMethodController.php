@@ -6,11 +6,11 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\FixedPricePolicy;
 use Packlink\BusinessLogic\Controllers\DTO\PercentPricePolicy;
-use Packlink\BusinessLogic\Controllers\DTO\ShippingMethod;
+use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy as FixedPricePolicyModel;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy as PercentPricePolicyModel;
-use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod as ShippingMethodModel;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
@@ -53,9 +53,9 @@ class ShippingMethodController
      * @var array
      */
     private static $policies = array(
-        ShippingMethodModel::PRICING_POLICY_PACKLINK,
-        ShippingMethodModel::PRICING_POLICY_PERCENT,
-        ShippingMethodModel::PRICING_POLICY_FIXED,
+        ShippingMethod::PRICING_POLICY_PACKLINK,
+        ShippingMethod::PRICING_POLICY_PERCENT,
+        ShippingMethod::PRICING_POLICY_FIXED,
     );
     /**
      * Shipping method service.
@@ -91,11 +91,11 @@ class ShippingMethodController
     /**
      * Validates and stores shipping method.
      *
-     * @param ShippingMethod $shippingMethod Shipping method object.
+     * @param ShippingMethodConfiguration $shippingMethod Shipping method object.
      *
-     * @return bool Returns true when method is saved, false otherwise.
+     * @return ShippingMethodResponse | bool Returns ShippingMethod object when method is saved, false otherwise.
      */
-    public function save(ShippingMethod $shippingMethod)
+    public function save(ShippingMethodConfiguration $shippingMethod)
     {
         if (!$this->isValid($shippingMethod)) {
             return false;
@@ -108,10 +108,11 @@ class ShippingMethodController
             return false;
         }
 
-        $result = true;
         try {
             $this->updateModelData($shippingMethod, $model);
             $this->shippingMethodService->save($model);
+
+            return $this->transformShippingMethodModelToDto($model);
         } catch (\Exception $e) {
             Logger::logError($e->getMessage(), 'Core', $shippingMethod->toArray());
             $result = false;
@@ -161,11 +162,11 @@ class ShippingMethodController
     /**
      * Transforms ShippingMethod model class to ShippingMethod DTO.
      *
-     * @param ShippingMethodModel $item Shipping method model to be transformed.
+     * @param ShippingMethod $item Shipping method model to be transformed.
      *
      * @return ShippingMethodResponse Shipping method DTO.
      */
-    private function transformShippingMethodModelToDto(ShippingMethodModel $item)
+    private function transformShippingMethodModelToDto(ShippingMethod $item)
     {
         $shippingMethod = new ShippingMethodResponse();
         $shippingMethod->id = $item->getId();
@@ -181,14 +182,14 @@ class ShippingMethodController
         $pricingPolicy = $item->getPricingPolicy();
         $percentPolicy = $item->getPercentPricePolicy();
         $shippingMethod->pricePolicy = $pricingPolicy;
-        if ($pricingPolicy === ShippingMethodModel::PRICING_POLICY_PERCENT && $percentPolicy) {
+        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PERCENT && $percentPolicy) {
             $shippingMethod->percentPricePolicy = new PercentPricePolicy();
             $shippingMethod->percentPricePolicy->amount = $percentPolicy->amount;
             $shippingMethod->percentPricePolicy->increase = $percentPolicy->increase;
         }
 
         $fixedPolicy = $item->getFixedPricePolicy();
-        if ($pricingPolicy === ShippingMethodModel::PRICING_POLICY_FIXED && !empty($fixedPolicy)) {
+        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED && !empty($fixedPolicy)) {
             $shippingMethod->fixedPricePolicy = array();
             foreach ($fixedPolicy as $fixed) {
                 $fixedDto = new FixedPricePolicy();
@@ -206,11 +207,11 @@ class ShippingMethodController
     /**
      * Validates shipping method data.
      *
-     * @param ShippingMethod $data Shipping method data object.
+     * @param ShippingMethodConfiguration $data Shipping method data object.
      *
      * @return bool Returns true if shipping method data is valid, false otherwise.
      */
-    private function isValid(ShippingMethod $data)
+    private function isValid(ShippingMethodConfiguration $data)
     {
         if (!isset($data->id, $data->name, $data->showLogo, $data->pricePolicy)) {
             return false;
@@ -220,11 +221,11 @@ class ShippingMethodController
             return false;
         }
 
-        if ($data->pricePolicy === ShippingMethodModel::PRICING_POLICY_PERCENT && !isset($data->percentPricePolicy)) {
+        if ($data->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && !isset($data->percentPricePolicy)) {
             return false;
         }
 
-        if ($data->pricePolicy === ShippingMethodModel::PRICING_POLICY_FIXED && empty($data->fixedPricePolicy)) {
+        if ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED && empty($data->fixedPricePolicy)) {
             return false;
         }
 
@@ -234,28 +235,28 @@ class ShippingMethodController
     /**
      * Updates model data from data transfer object.
      *
-     * @param ShippingMethod $shippingMethod Shipping method DTO.
-     * @param ShippingMethodModel $model Shipping method model.
+     * @param ShippingMethodConfiguration $configuration Shipping method DTO.
+     * @param ShippingMethod $model Shipping method model.
      */
-    private function updateModelData(ShippingMethod $shippingMethod, ShippingMethodModel $model)
+    private function updateModelData(ShippingMethodConfiguration $configuration, ShippingMethod $model)
     {
-        $model->setTitle($shippingMethod->name);
-        $model->setDisplayLogo($shippingMethod->showLogo);
-        switch ($shippingMethod->pricePolicy) {
-            case ShippingMethodModel::PRICING_POLICY_PACKLINK:
+        $model->setTitle($configuration->name);
+        $model->setDisplayLogo($configuration->showLogo);
+        switch ($configuration->pricePolicy) {
+            case ShippingMethod::PRICING_POLICY_PACKLINK:
                 $model->setPacklinkPricePolicy();
                 break;
-            case ShippingMethodModel::PRICING_POLICY_PERCENT:
+            case ShippingMethod::PRICING_POLICY_PERCENT:
                 $model->setPercentPricePolicy(
                     new PercentPricePolicyModel(
-                        $shippingMethod->percentPricePolicy->increase,
-                        $shippingMethod->percentPricePolicy->amount
+                        $configuration->percentPricePolicy->increase,
+                        $configuration->percentPricePolicy->amount
                     )
                 );
                 break;
-            case ShippingMethodModel::PRICING_POLICY_FIXED:
+            case ShippingMethod::PRICING_POLICY_FIXED:
                 $policies = array();
-                foreach ($shippingMethod->fixedPricePolicy as $item) {
+                foreach ($configuration->fixedPricePolicy as $item) {
                     $policies[] = new FixedPricePolicyModel($item->from, $item->to, $item->amount);
                 }
 

@@ -82,7 +82,8 @@ class ParcelInfo extends BaseDto
         $instance->default = static::getValue($raw, 'default');
 
         $instance->updatedAt = static::getValue($raw, 'updated_at');
-        $instance->updatedAt = $instance->updatedAt ? \DateTime::createFromFormat('Y-m-d H:i:s', $instance->updatedAt) : null;
+        $instance->updatedAt = $instance->updatedAt ? \DateTime::createFromFormat('Y-m-d H:i:s', $instance->updatedAt)
+            : null;
 
         $instance->createdAt = static::getValue($raw, 'created_at');
         $instance->createdAt = $instance->createdAt ? \DateTime::createFromFormat('Y-m-d H:i:s', $instance->createdAt)

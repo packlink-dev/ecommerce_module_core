@@ -2,12 +2,12 @@
 
 namespace Logeecom\Tests\Infrastructure\logger;
 
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestServiceRegister;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Logger\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Logger\LoggerConfiguration;
+use Logeecom\Tests\Common\BaseTestWithServices;
 use Logeecom\Tests\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Common\TestServiceRegister;
 
 class LoggerTest extends BaseTestWithServices
 {
@@ -101,7 +101,7 @@ class LoggerTest extends BaseTestWithServices
      */
     public function testNotLoggingToDefaultLoggerWhenItIsOff()
     {
-        Configuration::setDefaultLoggerEnabled(false);
+        LoggerConfiguration::setDefaultLoggerEnabled(false);
         Logger::logInfo('Some data');
         $this->assertFalse($this->httpClient->calledAsync, 'Default logger should not send log when it is off.');
     }
@@ -111,7 +111,7 @@ class LoggerTest extends BaseTestWithServices
      */
     public function testLoggingToDefaultLoggerWhenItIsOn()
     {
-        Configuration::setDefaultLoggerEnabled(true);
+        LoggerConfiguration::setDefaultLoggerEnabled(true);
         Logger::logInfo('Some data');
         $this->assertTrue($this->httpClient->calledAsync, 'Default logger should send log when it is on.');
     }
@@ -131,7 +131,7 @@ class LoggerTest extends BaseTestWithServices
      */
     public function testLoggingToDefaultLoggerWhenLogLevelIsLowerThanMinLogLevel()
     {
-        Configuration::getInstance()->setMinLogLevel(Logger::INFO);
+        LoggerConfiguration::getInstance()->setMinLogLevel(Logger::INFO);
         Logger::logWarning('Some data');
         $this->assertTrue(
             $this->httpClient->calledAsync,
@@ -144,7 +144,7 @@ class LoggerTest extends BaseTestWithServices
      */
     public function testNotLoggingToDefaultLoggerWhenLogLevelIsHigherThanMinLogLevel()
     {
-        Configuration::getInstance()->setMinLogLevel(Logger::ERROR);
+        LoggerConfiguration::getInstance()->setMinLogLevel(Logger::ERROR);
         Logger::logWarning('Some data');
         $this->assertFalse(
             $this->httpClient->calledAsync,

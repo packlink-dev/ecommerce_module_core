@@ -42,4 +42,30 @@ class FixedPricePolicy
         $this->to = $to;
         $this->amount = $amount;
     }
+
+    /**
+     * Transforms raw array data to this entity instance.
+     *
+     * @param array $data Raw array data.
+     *
+     * @return static Transformed entity object.
+     */
+    public static function fromArray($data)
+    {
+        return new static($data['from'], $data['to'], $data['amount']);
+    }
+
+    /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        return array(
+            'from' => $this->from,
+            'to' => $this->to,
+            'amount' => $this->amount,
+        );
+    }
 }

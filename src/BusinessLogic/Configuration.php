@@ -11,7 +11,7 @@ use Packlink\BusinessLogic\Http\DTO\Warehouse;
  *
  * @package Packlink\BusinessLogic
  */
-abstract class Configuration extends \Logeecom\Infrastructure\Configuration
+abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Configuration
 {
     /**
      * Threshold between two runs of scheduler.

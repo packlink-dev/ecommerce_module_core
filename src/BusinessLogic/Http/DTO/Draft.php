@@ -204,7 +204,6 @@ class Draft extends BaseDto
             $result['packages'] = array();
             foreach ($this->packages as $package) {
                 $result['packages'][] = $package->toArray();
-
             }
         }
 

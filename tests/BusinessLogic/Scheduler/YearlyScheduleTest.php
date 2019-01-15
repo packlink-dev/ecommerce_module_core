@@ -42,6 +42,7 @@ class YearlyScheduleTest extends TestCase
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 21);
         $nowDateTime->setTime(13, 42, 5);
 
@@ -65,8 +66,9 @@ class YearlyScheduleTest extends TestCase
     public function testNextScheduleThisYear()
     {
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 7, 24);
-        $expected->setTime(13, 45, 0);
+        $expected->setTime(13, 45);
 
         $nextSchedule = $this->yearlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -79,8 +81,9 @@ class YearlyScheduleTest extends TestCase
     {
         $this->yearlySchedule->setMonth(1);
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2019, 1, 24);
-        $expected->setTime(13, 45, 0);
+        $expected->setTime(13, 45);
 
         $nextSchedule = $this->yearlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());

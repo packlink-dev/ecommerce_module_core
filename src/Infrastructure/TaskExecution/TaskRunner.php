@@ -2,12 +2,12 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\Interfaces\Required\AsyncProcessStarter;
-use Logeecom\Infrastructure\Configuration;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerStatusStorage as TaskRunnerStatusStorageInterface;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup as TaskRunnerWakeupInterface;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
@@ -40,13 +40,13 @@ class TaskRunner
     /**
      * Service.
      *
-     * @var Queue
+     * @var QueueService
      */
-    private $queue;
+    private $queueService;
     /**
      * Service.
      *
-     * @var TaskRunnerStatusStorageInterface
+     * @var TaskRunnerStatusStorage
      */
     private $runnerStorage;
     /**
@@ -64,7 +64,7 @@ class TaskRunner
     /**
      * Service.
      *
-     * @var TaskRunnerWakeupInterface
+     * @var TaskRunnerWakeup
      */
     private $taskWakeup;
 
@@ -151,6 +151,7 @@ class TaskRunner
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\ProcessStarterSaveException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     private function startOldestQueuedItems()
     {
@@ -262,35 +263,35 @@ class TaskRunner
     private function getAsyncProcessStarter()
     {
         if ($this->asyncProcessStarter === null) {
-            $this->asyncProcessStarter = ServiceRegister::getService(AsyncProcessStarter::CLASS_NAME);
+            $this->asyncProcessStarter = ServiceRegister::getService(AsyncProcessService::CLASS_NAME);
         }
 
         return $this->asyncProcessStarter;
     }
 
     /**
-     * Gets @see Queue service instance.
+     * Gets @see QueueService service instance.
      *
-     * @return Queue Queue service instance.
+     * @return QueueService Queue service instance.
      */
     private function getQueue()
     {
-        if ($this->queue === null) {
-            $this->queue = ServiceRegister::getService(Queue::CLASS_NAME);
+        if ($this->queueService === null) {
+            $this->queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
         }
 
-        return $this->queue;
+        return $this->queueService;
     }
 
     /**
      * Gets @see TaskRunnerStatusStorageInterface service instance.
      *
-     * @return TaskRunnerStatusStorageInterface Service instance.
+     * @return TaskRunnerStatusStorage Service instance.
      */
     private function getRunnerStorage()
     {
         if ($this->runnerStorage === null) {
-            $this->runnerStorage = ServiceRegister::getService(TaskRunnerStatusStorageInterface::CLASS_NAME);
+            $this->runnerStorage = ServiceRegister::getService(TaskRunnerStatusStorage::CLASS_NAME);
         }
 
         return $this->runnerStorage;
@@ -327,12 +328,12 @@ class TaskRunner
     /**
      * Gets @see TaskRunnerWakeupInterface service instance.
      *
-     * @return TaskRunnerWakeupInterface Service instance.
+     * @return TaskRunnerWakeup Service instance.
      */
     private function getTaskWakeup()
     {
         if ($this->taskWakeup === null) {
-            $this->taskWakeup = ServiceRegister::getService(TaskRunnerWakeupInterface::CLASS_NAME);
+            $this->taskWakeup = ServiceRegister::getService(TaskRunnerWakeup::CLASS_NAME);
         }
 
         return $this->taskWakeup;

@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Common\TestComponents\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 
 /**
  * Class MemoryStorage

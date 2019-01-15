@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: kostandin
- * Date: 16.12.18.
- * Time: 13.45
- */
 
 namespace Logeecom\Tests\Common;
 

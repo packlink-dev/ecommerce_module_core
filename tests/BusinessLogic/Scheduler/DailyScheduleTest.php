@@ -58,8 +58,9 @@ class DailyScheduleTest extends TestCase
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 21);
-        $expected->setTime(15, 0, 0);
+        $expected->setTime(15, 0);
 
         $nextSchedule = $this->dailySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -73,8 +74,9 @@ class DailyScheduleTest extends TestCase
         $this->dailySchedule->setHour(11);
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 22);
-        $expected->setTime(11, 0, 0);
+        $expected->setTime(11, 0);
 
         $nextSchedule = $this->dailySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -89,8 +91,9 @@ class DailyScheduleTest extends TestCase
         $this->dailySchedule->setDaysOfWeek(array(1, 5));
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 23);
-        $expected->setTime(15, 0, 0);
+        $expected->setTime(15, 0);
 
         $nextSchedule = $this->dailySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -105,8 +108,9 @@ class DailyScheduleTest extends TestCase
         $this->dailySchedule->setDaysOfWeek(array(1));
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 26);
-        $expected->setTime(15, 0, 0);
+        $expected->setTime(15, 0);
 
         $nextSchedule = $this->dailySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());

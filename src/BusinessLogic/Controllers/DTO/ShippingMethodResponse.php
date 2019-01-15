@@ -3,7 +3,7 @@
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
-use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod as ShippingMethodModel;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
 /**
  * Class ShippingMethodResponse
@@ -104,11 +104,11 @@ class ShippingMethodResponse extends BaseDto
             'pricePolicy' => $this->pricePolicy,
         );
 
-        if ($this->pricePolicy === ShippingMethodModel::PRICING_POLICY_PERCENT && $this->percentPricePolicy) {
+        if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && $this->percentPricePolicy) {
             $result['percentPricePolicy'] = $this->percentPricePolicy->toArray();
         }
 
-        if ($this->pricePolicy === ShippingMethodModel::PRICING_POLICY_FIXED && $this->fixedPricePolicy) {
+        if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED && $this->fixedPricePolicy) {
             $result['fixedPricePolicy'] = array();
             foreach ($this->fixedPricePolicy as $item) {
                 $result['fixedPricePolicy'][] = $item->toArray();

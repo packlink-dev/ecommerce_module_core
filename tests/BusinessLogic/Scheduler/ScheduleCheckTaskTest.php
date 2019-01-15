@@ -2,26 +2,27 @@
 
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
-use Logeecom\Infrastructure\Configuration;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\TaskQueueStorage;
+use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
 use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\InMemoryTestQueueStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueue;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeup;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Common\TestServiceRegister;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
 use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
@@ -56,9 +57,9 @@ class ScheduleCheckTaskTest extends TestCase
      */
     protected $syncTask;
     /**
-     * QueueStorage instance\
+     * QueueItem repository instance
      *
-     * @var InMemoryTestQueueStorage
+     * @var MemoryQueueItemRepository
      */
     private $queueStorage;
 
@@ -78,9 +79,10 @@ class ScheduleCheckTaskTest extends TestCase
         $timeProvider->setCurrentLocalTime($nowDateTime);
         $this->shopConfig = new TestShopConfiguration();
         $this->shopLogger = new TestShopLogger();
-        $queue = new TestQueue();
-        $taskRunnerStarter = new TestTaskRunnerWakeup();
-        $queueStorage = new InMemoryTestQueueStorage();
+        $queue = new TestQueueService();
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
+
+        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
 
         new TestServiceRegister(
             array(
@@ -96,14 +98,14 @@ class ScheduleCheckTaskTest extends TestCase
                 ShopLoggerAdapter::CLASS_NAME => function () use ($taskInstance) {
                     return $taskInstance->shopLogger;
                 },
-                TaskQueueStorage::CLASS_NAME => function () use ($queueStorage) {
-                    return $queueStorage;
-                },
                 TaskRunnerWakeup::CLASS_NAME => function () use ($taskRunnerStarter) {
                     return $taskRunnerStarter;
                 },
-                Queue::CLASS_NAME => function () use ($queue) {
+                QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
+                },
+                EventBus::CLASS_NAME => function () {
+                    return EventBus::getInstance();
                 },
             )
         );
@@ -111,8 +113,8 @@ class ScheduleCheckTaskTest extends TestCase
         Logger::resetInstance();
 
         $this->syncTask = new ScheduleCheckTask();
-        $this->queueStorage = $queueStorage;
         $this->timeProvider = $timeProvider;
+        $this->queueStorage = RepositoryRegistry::getQueueItemRepository();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
@@ -120,15 +122,17 @@ class ScheduleCheckTaskTest extends TestCase
 
     /**
      * Tests when there are no scheduled tasks
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     public function testEmptyExecution()
     {
         $this->syncTask->execute();
-        $this->assertEmpty($this->queueStorage->findAll());
+        $this->assertEmpty($this->queueStorage->select());
     }
 
     /**
      *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     public function testSchedulingTasks()
     {
@@ -142,9 +146,9 @@ class ScheduleCheckTaskTest extends TestCase
         $this->syncTask->execute();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertNotEmpty($queueItems);
-        $this->assertCount(2, $queueItems);
+        $this->assertCount(3, $queueItems);
         $this->assertEquals('queueForDailyFoo', $queueItems[0]->getQueueName());
         $this->assertEquals('queueForWeeklyFoo', $queueItems[1]->getQueueName());
     }

@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\Scheduler\Models;
 
 /**
- * Class WeeklySchedule
+ * Class WeeklySchedule.
+ *
  * @package Logeecom\Infrastructure\Scheduler\Models
  */
 class WeeklySchedule extends Schedule
@@ -24,43 +25,29 @@ class WeeklySchedule extends Schedule
         'december',
     );
     /**
-     * Last week flag
+     * Array of field names.
+     *
+     * @var array
+     */
+    protected static $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'lastWeek', 'weeks');
+    /**
+     * Last week flag.
      *
      * @var bool
      */
     protected $lastWeek;
     /**
-     * Array of week numbers when task should be queued
+     * Array of week numbers when task should be queued.
      *
      * @var int[]
      */
     protected $weeks;
 
     /**
-     * Returns array of week numbers
+     * Calculates next schedule time.
      *
-     * @return int[] Week numbers
-     */
-    public function getWeeks()
-    {
-        return $this->weeks;
-    }
-
-    /**
-     * Sets array of week numbers
-     *
-     * @param int[] $weeks Week numbers
-     */
-    public function setWeeks($weeks)
-    {
-        $this->weeks = $weeks;
-    }
-
-    /**
-     * Calculates next schedule time
-     *
-     * @return \DateTime Next schedule date
-     * @throws \Exception Emits Exception in case of an error while creating DateTime instance
+     * @return \DateTime Next schedule date.
+     * @throws \Exception Emits Exception in case of an error while creating DateTime instance.
      */
     public function calculateNextSchedule()
     {
@@ -68,19 +55,25 @@ class WeeklySchedule extends Schedule
         $day = ($this->getDay() ?: 0) % 7;
 
         if ($this->isLastWeek()) {
+            $year = (int)date('Y', $now->getTimestamp());
             $day = static::$daysMap[$day - 1];
             $monthNumber = (int)date('m', $now->getTimestamp());
             $month = static::$monthMap[$monthNumber - 1];
-            $shouldStartAt = strtotime("last {$day} of {$month}");
+            $shouldStartAt = strtotime("last {$day} of {$month} {$year}");
             if ($now->getTimestamp() > $shouldStartAt) {
                 $monthNumberNext = 1 + $monthNumber % 12;
                 $month = static::$monthMap[$monthNumber % 12];
-                $str = "last {$day} of " . ($monthNumberNext < $monthNumber ? 'next ' : ' ') . $month;
-                $shouldStartAt = strtotime($str);
+                $str = "last {$day} of ";
+                if ($monthNumberNext < $monthNumber) {
+                    $str .= 'next';
+                    $year++;
+                }
+
+                $shouldStartAt = strtotime($str . " $month $year");
             }
 
             $now->setTimestamp($shouldStartAt);
-            $now->setTime($this->getHour(), $this->getMinute(), 0);
+            $now->setTime($this->getHour(), $this->getMinute());
 
             return $now;
         }
@@ -90,7 +83,7 @@ class WeeklySchedule extends Schedule
 
         $nextSchedule = $this->now();
         $nextSchedule->setTimestamp($now->getTimestamp());
-        $nextSchedule->setTime($this->getHour(), $this->getMinute(), 0);
+        $nextSchedule->setTime($this->getHour(), $this->getMinute());
 
         // move to day in the week
         $nextSchedule->add(new \DateInterval("P{$daysToAdd}D"));
@@ -106,9 +99,29 @@ class WeeklySchedule extends Schedule
     }
 
     /**
-     * Returns last week flag
+     * Returns array of week numbers.
      *
-     * @return bool Last week flag
+     * @return int[] Week numbers.
+     */
+    public function getWeeks()
+    {
+        return $this->weeks;
+    }
+
+    /**
+     * Sets array of week numbers.
+     *
+     * @param int[] $weeks Week numbers.
+     */
+    public function setWeeks($weeks)
+    {
+        $this->weeks = $weeks;
+    }
+
+    /**
+     * Returns last week flag.
+     *
+     * @return bool Last week flag.
      */
     public function isLastWeek()
     {
@@ -116,9 +129,9 @@ class WeeklySchedule extends Schedule
     }
 
     /**
-     * Sets last week flag
+     * Sets last week flag.
      *
-     * @param bool $lastWeek Last week flag
+     * @param bool $lastWeek Last week flag.
      */
     public function setLastWeek($lastWeek)
     {

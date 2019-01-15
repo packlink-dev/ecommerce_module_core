@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;

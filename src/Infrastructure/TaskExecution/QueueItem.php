@@ -3,9 +3,16 @@
 namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
+use Logeecom\Infrastructure\ORM\Configuration\Indexes\DateTimeIndex;
+use Logeecom\Infrastructure\ORM\Configuration\Indexes\IntegerIndex;
+use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
+use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
+use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
@@ -13,115 +20,136 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
  *
  * @package Logeecom\Infrastructure\TaskExecution
  */
-class QueueItem
+class QueueItem extends Entity
 {
+    /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
     const CREATED = 'created';
     const QUEUED = 'queued';
     const IN_PROGRESS = 'in_progress';
     const COMPLETED = 'completed';
     const FAILED = 'failed';
     /**
-     * Queue item ID.
+     * Array of simple field names.
      *
-     * @var int
+     * @var array
      */
-    private $id;
+    protected static $fields = array(
+        'id',
+        'status',
+        'context',
+        'serializedTask',
+        'queueName',
+        'lastExecutionProgressBasePoints',
+        'progressBasePoints',
+        'retries',
+        'failureDescription',
+        'createTime',
+        'startTime',
+        'finishTime',
+        'failTime',
+        'earliestStartTime',
+        'queueTime',
+        'lastUpdateTime',
+    );
     /**
      * Queue item status.
      *
      * @var string
      */
-    private $status;
+    protected $status;
     /**
      * Task associated to queue item.
      *
      * @var Task
      */
-    private $task;
+    protected $task;
     /**
      * Context in which task will be executed.
      *
      * @var string
      */
-    private $context;
+    protected $context;
     /**
      * String representation of task.
      *
      * @var string
      */
-    private $serializedTask;
+    protected $serializedTask;
     /**
      * Integration queue name.
      *
      * @var string
      */
-    private $queueName;
+    protected $queueName;
     /**
      * Last execution progress base points (integer value of 0.01%).
      *
      * @var int $lastExecutionProgressBasePoints
      */
-    private $lastExecutionProgressBasePoints;
+    protected $lastExecutionProgressBasePoints;
     /**
      * Current execution progress in base points (integer value of 0.01%).
      *
      * @var int $progressBasePoints
      */
-    private $progressBasePoints;
+    protected $progressBasePoints;
     /**
      * Number of attempts to execute task.
      *
      * @var int
      */
-    private $retries;
+    protected $retries;
     /**
      * Description of failure when task fails.
      *
      * @var string
      */
-    private $failureDescription;
+    protected $failureDescription;
     /**
      * Datetime when queue item is created.
      *
      * @var \DateTime
      */
-    private $createTime;
+    protected $createTime;
     /**
      * Datetime when queue item is started.
      *
      * @var \DateTime
      */
-    private $startTime;
+    protected $startTime;
     /**
      * Datetime when queue item is finished.
      *
      * @var \DateTime
      */
-    private $finishTime;
+    protected $finishTime;
     /**
      * Datetime when queue item is failed.
      *
      * @var \DateTime
      */
-    private $failTime;
+    protected $failTime;
     /**
      * Min datetime when queue item can start.
      *
      * @var \DateTime
      */
-    private $earliestStartTime;
+    protected $earliestStartTime;
     /**
      * Datetime when queue item is enqueued.
      *
      * @var \DateTime
      */
-    private $queueTime;
+    protected $queueTime;
     /**
      * Datetime when queue item is last updated.
      *
      * @var \DateTime
      */
-    private $lastUpdateTime;
+    protected $lastUpdateTime;
     /**
      * Instance of time provider.
      *
@@ -152,16 +180,6 @@ class QueueItem
     }
 
     /**
-     * Gets queue item id.
-     *
-     * @return int Queue item id.
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Sets queue item id.
      *
      * @param int $id Queue item id.
@@ -169,6 +187,30 @@ class QueueItem
     public function setId($id)
     {
         $this->id = $id;
+
+        if ($this->task !== null) {
+            $this->task->setExecutionId($id);
+        }
+    }
+
+    /**
+     * Returns queueTime.
+     *
+     * @return \DateTime queueTime Queue date and time.
+     */
+    public function getQueueTime()
+    {
+        return $this->queueTime;
+    }
+
+    /**
+     * Returns lastUpdateTime.
+     *
+     * @return \DateTime lastUpdateTime Date and time of last update.
+     */
+    public function getLastUpdateTime()
+    {
+        return $this->lastUpdateTime;
     }
 
     /**
@@ -352,7 +394,7 @@ class QueueItem
         if ($this->task === null) {
             $this->task = @unserialize($this->serializedTask);
             if (empty($this->task)) {
-                throw new Exceptions\QueueItemDeserializationException(
+                throw new QueueItemDeserializationException(
                     json_encode(
                         array(
                             'Message' => 'Unable to deserialize queue item task',
@@ -605,30 +647,22 @@ class QueueItem
     }
 
     /**
-     * Attach Task event handlers.
+     * Returns entity configuration object.
+     *
+     * @return EntityConfiguration Configuration object.
      */
-    private function attachTaskEventHandlers()
+    public function getConfig()
     {
-        if ($this->task === null) {
-            return;
-        }
+        $indexMap = new IndexMap();
+        $indexMap->addIndex(new StringIndex('status'))
+            ->addIndex(new StringIndex('taskType'))
+            ->addIndex(new StringIndex('queueName'))
+            ->addIndex(new StringIndex('context'))
+            ->addIndex(new DateTimeIndex('queueTime'))
+            ->addIndex(new IntegerIndex('lastExecutionProgressBasePoints'))
+            ->addIndex(new DateTimeIndex('lastUpdateTime'));
 
-        $self = $this;
-        $this->task->when(
-            TaskProgressEvent::CLASS_NAME,
-            function (TaskProgressEvent $event) use ($self) {
-                $queue = new Queue();
-                $queue->updateProgress($self, $event->getProgressBasePoints());
-            }
-        );
-
-        $this->task->when(
-            AliveAnnouncedTaskEvent::CLASS_NAME,
-            function () use ($self) {
-                $queue = new Queue();
-                $queue->keepAlive($self);
-            }
-        );
+        return new EntityConfiguration($indexMap, 'QueueItem');
     }
 
     /**
@@ -655,5 +689,33 @@ class QueueItem
     protected function getDateTimeFromTimestamp($timestamp)
     {
         return !empty($timestamp) ? $this->timeProvider->getDateTime($timestamp) : null;
+    }
+
+    /**
+     * Attach Task event handlers.
+     */
+    private function attachTaskEventHandlers()
+    {
+        if ($this->task === null) {
+            return;
+        }
+
+        $this->task->setExecutionId($this->getId());
+        $self = $this;
+        $this->task->when(
+            TaskProgressEvent::CLASS_NAME,
+            function (TaskProgressEvent $event) use ($self) {
+                $queue = new QueueService();
+                $queue->updateProgress($self, $event->getProgressBasePoints());
+            }
+        );
+
+        $this->task->when(
+            AliveAnnouncedTaskEvent::CLASS_NAME,
+            function () use ($self) {
+                $queue = new QueueService();
+                $queue->keepAlive($self);
+            }
+        );
     }
 }

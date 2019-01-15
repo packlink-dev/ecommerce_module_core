@@ -62,8 +62,9 @@ class HourlyScheduleTest extends TestCase
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 21);
-        $expected->setTime(14, 15, 0);
+        $expected->setTime(14, 15);
 
         $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -78,8 +79,9 @@ class HourlyScheduleTest extends TestCase
         $this->hourlySchedule->setEndMinute(0);
 
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 22);
-        $expected->setTime(8, 15, 0);
+        $expected->setTime(8, 15);
 
         $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
@@ -94,8 +96,9 @@ class HourlyScheduleTest extends TestCase
         $this->hourlySchedule->setEndMinute(15);
 
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 21);
-        $expected->setTime(14, 15, 0);
+        $expected->setTime(14, 15);
 
         $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());

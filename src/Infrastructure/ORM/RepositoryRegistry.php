@@ -2,11 +2,11 @@
 
 namespace Logeecom\Infrastructure\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\QueueItem;
 use Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException;
 use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 
 /**
  * Class RepositoryRegistry.

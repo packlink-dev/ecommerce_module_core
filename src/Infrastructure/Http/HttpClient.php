@@ -54,7 +54,6 @@ abstract class HttpClient
                 'Headers' => json_encode($response->getHeaders()),
                 'Content' => $response->getBody(),
             )
-
         );
 
         return $response;

@@ -2,14 +2,14 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\Interfaces\Exposed\Runnable;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerStatusStorage as TaskRunnerStatusStorageInterface;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup as TaskRunnerWakeupInterface;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Events\TickEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerRunException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 
 /**
@@ -28,7 +28,7 @@ class TaskRunnerStarter implements Runnable
     /**
      * Instance of task runner status storage.
      *
-     * @var TaskRunnerStatusStorageInterface
+     * @var TaskRunnerStatusStorage
      */
     private $runnerStatusStorage;
     /**
@@ -40,7 +40,7 @@ class TaskRunnerStarter implements Runnable
     /**
      * Instance of task runner wakeup service.
      *
-     * @var TaskRunnerWakeupInterface
+     * @var TaskRunnerWakeup
      */
     private $taskWakeup;
 
@@ -107,7 +107,7 @@ class TaskRunnerStarter implements Runnable
             );
         } catch (TaskRunnerRunException $ex) {
             Logger::logInfo($ex->getMessage());
-            Logger::logDebug($ex->getMessage(), 'Core',  array('ExceptionTrace' => $ex->getTraceAsString()));
+            Logger::logDebug($ex->getMessage(), 'Core', array('ExceptionTrace' => $ex->getTraceAsString()));
         } catch (\Exception $ex) {
             Logger::logError(
                 'Failed to run task runner. Unexpected error occurred.',
@@ -154,12 +154,12 @@ class TaskRunnerStarter implements Runnable
     /**
      * Gets task runner status storage instance.
      *
-     * @return TaskRunnerStatusStorageInterface Instance of runner status storage service.
+     * @return TaskRunnerStatusStorage Instance of runner status storage service.
      */
     private function getRunnerStorage()
     {
         if ($this->runnerStatusStorage === null) {
-            $this->runnerStatusStorage = ServiceRegister::getService(TaskRunnerStatusStorageInterface::CLASS_NAME);
+            $this->runnerStatusStorage = ServiceRegister::getService(TaskRunnerStatusStorage::CLASS_NAME);
         }
 
         return $this->runnerStatusStorage;
@@ -182,12 +182,12 @@ class TaskRunnerStarter implements Runnable
     /**
      * Gets task runner wakeup instance.
      *
-     * @return TaskRunnerWakeupInterface Instance of runner wakeup service.
+     * @return TaskRunnerWakeup Instance of runner wakeup service.
      */
     private function getTaskWakeup()
     {
         if ($this->taskWakeup === null) {
-            $this->taskWakeup = ServiceRegister::getService(TaskRunnerWakeupInterface::CLASS_NAME);
+            $this->taskWakeup = ServiceRegister::getService(TaskRunnerWakeup::CLASS_NAME);
         }
 
         return $this->taskWakeup;

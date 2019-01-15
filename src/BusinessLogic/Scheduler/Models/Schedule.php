@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\Scheduler\Models;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\Indexes\DateTimeIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -28,6 +28,12 @@ class Schedule extends Entity
      * @var \DateTime
      */
     public $nextSchedule;
+    /**
+     * Array of field names.
+     *
+     * @var array
+     */
+    protected static $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month');
     /**
      * Queue name where task should be queued to
      *
@@ -75,6 +81,35 @@ class Schedule extends Entity
     {
         $this->task = $task;
         $this->queueName = $queueName;
+    }
+
+    /**
+     * Transforms raw array data to this entity instance.
+     *
+     * @param array $data Raw array data.
+     *
+     * @return Schedule Transformed entity object.
+     */
+    public static function fromArray(array $data)
+    {
+        /** @var self $instance */
+        $instance = parent::fromArray($data);
+        $instance->task = unserialize($data['task']);
+
+        return $instance;
+    }
+
+    /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        $data = parent::toArray();
+        $data['task'] = serialize($this->task);
+
+        return $data;
     }
 
     /**

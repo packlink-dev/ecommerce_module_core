@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM\Entity;
 
-use Logeecom\Infrastructure\ORM\Entities\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 
 /**
  * Class QueueItemTest.

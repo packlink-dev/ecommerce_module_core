@@ -7,7 +7,7 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
@@ -31,8 +31,8 @@ class ScheduleCheckTask extends Task
      */
     public function execute()
     {
-        /** @var Queue $queueService */
-        $queueService = ServiceRegister::getService(Queue::CLASS_NAME);
+        /** @var QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
         /** @var Schedule $scheduledTask */
         foreach ($this->getScheduledTasks() as $scheduledTask) {
@@ -73,7 +73,7 @@ class ScheduleCheckTask extends Task
     /**
      * Returns an array of Scheduled tasks that are due for execution
      *
-     * @return \Logeecom\Infrastructure\ORM\Entities\Entity[]
+     * @return \Logeecom\Infrastructure\ORM\Entity[]
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     private function getScheduledTasks()

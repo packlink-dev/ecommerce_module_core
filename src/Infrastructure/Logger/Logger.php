@@ -2,8 +2,8 @@
 
 namespace Logeecom\Infrastructure\Logger;
 
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
@@ -43,12 +43,6 @@ class Logger extends \Logeecom\Infrastructure\Singleton
      */
     private $shopLogger;
     /**
-     * Default logger.
-     *
-     * @var DefaultLoggerAdapter
-     */
-    private $defaultLogger;
-    /**
      * Time provider.
      *
      * @var TimeProvider
@@ -62,7 +56,6 @@ class Logger extends \Logeecom\Infrastructure\Singleton
     {
         parent::__construct();
 
-        $this->defaultLogger = ServiceRegister::getService(DefaultLoggerAdapter::CLASS_NAME);
         $this->shopLogger = ServiceRegister::getService(ShopLoggerAdapter::CLASS_NAME);
         $this->timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
     }
@@ -125,7 +118,7 @@ class Logger extends \Logeecom\Infrastructure\Singleton
      */
     private function logMessage($level, $message, $component, array $context = array())
     {
-        $config = Configuration::getInstance();
+        $config = LoggerConfiguration::getInstance();
         $logData = new LogData(
             $config->getIntegrationName(),
             $level,
@@ -137,7 +130,8 @@ class Logger extends \Logeecom\Infrastructure\Singleton
 
         // If default logger is turned on and message level is lower or equal than set in configuration
         if ($config->isDefaultLoggerEnabled() && $level <= $config->getMinLogLevel()) {
-            $this->defaultLogger->logMessage($logData);
+            $defaultLogger = ServiceRegister::getService(DefaultLoggerAdapter::CLASS_NAME);
+            $defaultLogger->logMessage($logData);
         }
 
         $this->shopLogger->logMessage($logData);
