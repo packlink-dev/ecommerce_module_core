@@ -18,12 +18,12 @@ class YearlyScheduleTest extends TestCase
      * Current date time
      * @var \DateTime
      */
-    private $nowTime;
+    public $nowTime;
     /**
      * Yearly schedule instance
      * @var \Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule
      */
-    protected $yearlySchedule;
+    public $yearlySchedule;
 
     /**
      * Sets up the fixture, for example, open a network connection.

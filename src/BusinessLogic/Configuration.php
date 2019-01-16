@@ -142,4 +142,35 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     {
         $this->saveConfigValue('defaultWarehouse', $warehouse);
     }
+
+    /**
+     * Sets order status mapping configuration.
+     *
+     * Expected mapping format:
+     *
+     * [
+     *      'shipped' => 1,
+     *      'transit' => 7,
+     *      ...
+     * ]
+     *
+     * Keys in submitted array are order statuses available on Packlink.
+     * Values are system specific order status identifiers.
+     *
+     * @param array $mappings As described above.
+     */
+    public function setOrderStatusMappings(array $mappings)
+    {
+        $this->saveConfigValue('orderStatusMappings', $mappings);
+    }
+
+    /**
+     * Retrieves order status mappings.
+     *
+     * @return array | null  Order status mapping configuration.
+     */
+    public function getOrderStatusMappings()
+    {
+        return $this->getConfigValue('orderStatusMappings');
+    }
 }

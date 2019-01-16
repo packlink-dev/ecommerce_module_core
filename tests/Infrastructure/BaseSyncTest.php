@@ -18,14 +18,13 @@ abstract class BaseSyncTest extends BaseTestWithServices
      *
      * @var Task
      */
-    protected $syncTask;
+    public $syncTask;
     /**
      * History of events from task.
      *
      * @var array
      */
-    protected $eventHistory;
-
+    public $eventHistory;
     /**
      * @inheritdoc
      */

@@ -23,6 +23,12 @@ class DashboardStatus extends BaseDto
      */
     public $isParcelSet;
     /**
+     * Order status mappings set flag.
+     *
+     * @var bool
+     */
+    public $isOrderStatusMappingsSet;
+    /**
      * Warehouse set flag.
      *
      * @var bool
@@ -38,6 +44,7 @@ class DashboardStatus extends BaseDto
     {
         return array(
             'parcelSet' => $this->isParcelSet,
+            'orderStatusMappingsSet' => $this->isOrderStatusMappingsSet,
             'warehouseSet' => $this->isWarehouseSet,
             'shippingMethodSet' => $this->isShippingMethodSet,
         );

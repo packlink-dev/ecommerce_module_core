@@ -18,12 +18,12 @@ class MonthlyScheduleTest extends TestCase
      * Monthly schedule instance
      * @var \Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule
      */
-    private $monthlySchedule;
+    public $monthlySchedule;
     /**
      * Current Date time
      * @var \DateTime
      */
-    private $nowTime;
+    public $nowTime;
 
     /**
      * Sets up the fixture, for example, open a network connection.

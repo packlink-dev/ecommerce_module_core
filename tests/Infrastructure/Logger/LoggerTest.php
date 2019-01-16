@@ -14,7 +14,7 @@ class LoggerTest extends BaseTestWithServices
     /**
      * @var TestHttpClient
      */
-    private $httpClient;
+    public $httpClient;
 
     public function setUp()
     {

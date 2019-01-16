@@ -39,29 +39,29 @@ class ScheduleCheckTaskTest extends TestCase
     /**
      * @var TestTimeProvider
      */
-    protected $timeProvider;
+    public $timeProvider;
     /**
      * @var TestShopConfiguration
      */
-    protected $shopConfig;
+    public $shopConfig;
     /**
      * @var TestShopLogger
      */
-    protected $shopLogger;
+    public $shopLogger;
     /**
      * @var array
      */
-    protected $eventHistory;
+    public $eventHistory;
     /**
      * @var Task
      */
-    protected $syncTask;
+    public $syncTask;
     /**
      * QueueItem repository instance
      *
      * @var MemoryQueueItemRepository
      */
-    private $queueStorage;
+    public $queueStorage;
 
     /**
      * @throws \Exception

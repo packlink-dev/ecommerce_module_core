@@ -18,12 +18,12 @@ class WeeklyScheduleTest extends TestCase
      * Current date time
      * @var \DateTime
      */
-    private $nowTime;
+    public $nowTime;
     /**
      * Weekly schedule instance
      * @var \Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule
      */
-    private $weeklySchedule;
+    public $weeklySchedule;
 
     /**
      * Sets up the fixture, for example, open a network connection.

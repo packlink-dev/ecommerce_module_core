@@ -26,13 +26,13 @@ use PHPUnit\Framework\TestCase;
 class QueueTest extends TestCase
 {
     /** @var QueueService */
-    private $queue;
+    public $queue;
     /** @var MemoryQueueItemRepository */
-    private $queueStorage;
+    public $queueStorage;
     /** @var TestTimeProvider */
-    private $timeProvider;
+    public $timeProvider;
     /** @var TestTaskRunnerWakeupService */
-    private $taskRunnerStarter;
+    public $taskRunnerStarter;
 
     /**
      * @throws \Exception

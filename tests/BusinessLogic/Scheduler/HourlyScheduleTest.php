@@ -14,12 +14,11 @@ use PHPUnit\Framework\TestCase;
  */
 class HourlyScheduleTest extends TestCase
 {
-
     /**
      * Hourly schedule instance
      * @var \Packlink\BusinessLogic\Scheduler\Models\HourlySchedule
      */
-    private $hourlySchedule;
+    public $hourlySchedule;
 
     /**
      * Sets up the fixture, for example, open a network connection.

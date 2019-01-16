@@ -22,7 +22,7 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
     /**
      * @var TestHttpClient
      */
-    private $httpClient;
+    public $httpClient;
 
     /**
      * @inheritdoc

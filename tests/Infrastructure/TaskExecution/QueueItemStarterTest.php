@@ -32,15 +32,15 @@ use PHPUnit\Framework\TestCase;
 class QueueItemStarterTest extends TestCase
 {
     /** @var TestQueueService */
-    private $queue;
+    public $queue;
     /** @var MemoryQueueItemRepository */
-    private $queueStorage;
+    public $queueStorage;
     /** @var TestTimeProvider */
-    private $timeProvider;
+    public $timeProvider;
     /** @var TestShopLogger */
-    private $logger;
+    public $logger;
     /** @var Configuration */
-    private $shopConfiguration;
+    public $shopConfiguration;
 
     /**
      * @throws \Exception

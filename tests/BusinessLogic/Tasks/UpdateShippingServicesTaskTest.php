@@ -27,11 +27,11 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     /**
      * @var TestHttpClient
      */
-    private $httpClient;
+    public $httpClient;
     /**
      * @var ShippingMethodService
      */
-    private $shippingMethodService;
+    public $shippingMethodService;
     /**
      * Tested task instance.
      *

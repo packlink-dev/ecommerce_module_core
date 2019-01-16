@@ -28,23 +28,23 @@ abstract class BaseTestWithServices extends TestCase
     /**
      * @var TestShopConfiguration
      */
-    protected $shopConfig;
+    public $shopConfig;
     /**
      * @var TestShopLogger
      */
-    protected $shopLogger;
+    public $shopLogger;
     /**
      * @var TimeProvider
      */
-    protected $timeProvider;
+    public $timeProvider;
     /**
      * @var TestDefaultLogger
      */
-    protected $defaultLogger;
+    public $defaultLogger;
     /**
      * @var array
      */
-    protected $eventHistory;
+    public $eventHistory;
 
     /**
      * @throws \Exception

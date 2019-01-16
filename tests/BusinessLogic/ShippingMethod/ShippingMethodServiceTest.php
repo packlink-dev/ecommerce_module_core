@@ -21,15 +21,15 @@ class ShippingMethodServiceTest extends BaseTestWithServices
     /**
      * @var ShippingMethodService
      */
-    private $shippingMethodService;
+    public $shippingMethodService;
     /**
      * @var TestShopShippingMethodService
      */
-    private $testShopShippingMethodService;
+    public $testShopShippingMethodService;
     /**
      * @var TestHttpClient
      */
-    private $httpClient;
+    public $httpClient;
 
     /**
      * @inheritdoc
