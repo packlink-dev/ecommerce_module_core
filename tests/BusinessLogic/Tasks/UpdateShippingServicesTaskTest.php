@@ -37,7 +37,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      *
      * @var UpdateShippingServicesTask
      */
-    protected $syncTask;
+    public $syncTask;
 
     /**
      * @inheritdoc
