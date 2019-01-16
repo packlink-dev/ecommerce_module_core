@@ -13,6 +13,11 @@ use Packlink\BusinessLogic\Http\Proxy;
 
 class PostalCodeEntityTest extends BaseTestWithServices
 {
+    /**
+     * @var TestHttpClient
+     */
+    public $httpClient;
+
     protected function setUp()
     {
         parent::setUp();
@@ -36,11 +41,6 @@ class PostalCodeEntityTest extends BaseTestWithServices
             }
         );
     }
-
-    /**
-     * @var TestHttpClient
-     */
-    protected $httpClient;
 
     public function testRetrievingPostalCodes()
     {

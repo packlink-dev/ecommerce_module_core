@@ -52,7 +52,7 @@ abstract class Task extends EventEmitter implements \Serializable
      */
     public function serialize()
     {
-        return serialize($this);
+        return '';
     }
 
     /**

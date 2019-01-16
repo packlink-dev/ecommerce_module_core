@@ -148,7 +148,7 @@ class ScheduleCheckTaskTest extends TestCase
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
         $queueItems = $this->queueStorage->select();
         $this->assertNotEmpty($queueItems);
-        $this->assertCount(3, $queueItems);
+        $this->assertCount(2, $queueItems);
         $this->assertEquals('queueForDailyFoo', $queueItems[0]->getQueueName());
         $this->assertEquals('queueForWeeklyFoo', $queueItems[1]->getQueueName());
     }

@@ -181,7 +181,7 @@ class TaskRunnerStarterTest extends BaseTestWithServices
         TestServiceRegister::registerService(
             AsyncProcessService::CLASS_NAME,
             function () {
-                return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
+                return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
             }
         );
         TestServiceRegister::registerService(
@@ -217,7 +217,7 @@ class TaskRunnerStarterTest extends BaseTestWithServices
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
+        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
         $this->runnerStatusStorage = $runnerStatusStorage;
         $this->taskRunner = $taskRunner;
         $this->guidProvider = $guidProvider;
@@ -233,7 +233,7 @@ class TaskRunnerStarterTest extends BaseTestWithServices
      */
     protected function tearDown()
     {
-        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::resetInstance();
+        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::resetInstance();
         MemoryStorage::reset();
         parent::tearDown();
     }

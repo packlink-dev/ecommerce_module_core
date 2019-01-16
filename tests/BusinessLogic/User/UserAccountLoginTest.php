@@ -30,13 +30,13 @@ class UserAccountLoginTest extends BaseTestWithServices
      *
      * @var TestHttpClient
      */
-    private $httpClient;
+    public $httpClient;
     /**
      * User account service instance.
      *
      * @var UserAccountService
      */
-    private $userAccountService;
+    public $userAccountService;
 
     /**
      * Tests when empty value is provided for API key.

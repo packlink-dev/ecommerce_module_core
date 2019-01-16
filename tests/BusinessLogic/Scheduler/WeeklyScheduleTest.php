@@ -98,7 +98,7 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setLastWeek(true);
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 3, 29);
+        $expected->setDate(2018, 3, 30);
         $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
@@ -115,7 +115,7 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setLastWeek(true);
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 4, 26);
+        $expected->setDate(2018, 4, 27);
         $expected->setTime(3, 0);
 
         $nextSchedule = $this->weeklySchedule->calculateNextSchedule();

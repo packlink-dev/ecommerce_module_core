@@ -22,7 +22,7 @@ class TaskRunnerWakeupService implements TaskRunnerWakeup
     /**
      * Service instance.
      *
-     * @var AsyncProcessStarter
+     * @var AsyncProcessStarterService
      */
     private $asyncProcessStarter;
     /**
@@ -157,9 +157,9 @@ class TaskRunnerWakeupService implements TaskRunnerWakeup
     }
 
     /**
-     * Gets instance of @see AsyncProcessStarter.
+     * Gets instance of @see AsyncProcessStarterService.
      *
-     * @return AsyncProcessStarter Service instance.
+     * @return AsyncProcessStarterService Service instance.
      */
     private function getAsyncProcessStarter()
     {

@@ -28,7 +28,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     /**
      * @var TestHttpClient
      */
-    private $httpClient;
+    public $httpClient;
 
     /**
      * @inheritdoc

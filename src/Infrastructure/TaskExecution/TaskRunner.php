@@ -34,7 +34,7 @@ class TaskRunner
     /**
      * Service.
      *
-     * @var AsyncProcessStarter
+     * @var AsyncProcessStarterService
      */
     private $asyncProcessStarter;
     /**
@@ -256,9 +256,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see AsyncProcessStarter service instance.
+     * Gets @see AsyncProcessStarterService service instance.
      *
-     * @return AsyncProcessStarter Class instance.
+     * @return AsyncProcessStarterService Class instance.
      */
     private function getAsyncProcessStarter()
     {

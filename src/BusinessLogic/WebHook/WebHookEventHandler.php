@@ -6,6 +6,8 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Http\DTO\Shipment;
+use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
@@ -78,6 +80,7 @@ class WebHookEventHandler extends BaseService
     {
         $referenceId = $event->referenceId;
         try {
+            /** @var Shipment $shipment */
             $shipment = $this->proxy->getShipment($referenceId);
             $this->orderRepository->setShippingStatusByReference($referenceId, $shipment->status);
         } catch (HttpBaseException $e) {
@@ -101,6 +104,7 @@ class WebHookEventHandler extends BaseService
     {
         $referenceId = $event->referenceId;
         try {
+            /** @var Tracking[] $trackingHistory */
             $trackingHistory = $this->proxy->getTrackingInfo($referenceId);
             $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory);
         } catch (HttpBaseException $e) {

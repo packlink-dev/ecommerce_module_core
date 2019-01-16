@@ -2,7 +2,7 @@
 
 namespace Logeecom\Infrastructure;
 
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -57,7 +57,7 @@ class BootstrapComponent
         ServiceRegister::registerService(
             AsyncProcessService::CLASS_NAME,
             function () {
-                return AsyncProcessStarter::getInstance();
+                return AsyncProcessStarterService::getInstance();
             }
         );
         ServiceRegister::registerService(

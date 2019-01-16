@@ -22,7 +22,7 @@ class TaskRunnerWakeup implements TaskRunnerWakeupInterface
     /**
      * Service instance.
      *
-     * @var AsyncProcessStarter
+     * @var AsyncProcessStarterService
      */
     private $asyncProcessStarter;
     /**
@@ -87,6 +87,7 @@ class TaskRunnerWakeup implements TaskRunnerWakeupInterface
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\ProcessStarterSaveException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     private function doWakeup()
     {
@@ -158,7 +159,7 @@ class TaskRunnerWakeup implements TaskRunnerWakeupInterface
     /**
      * Gets instance of @see AsyncProcessStarter.
      *
-     * @return AsyncProcessStarter Service instance.
+     * @return AsyncProcessStarterService Service instance.
      */
     private function getAsyncProcessStarter()
     {

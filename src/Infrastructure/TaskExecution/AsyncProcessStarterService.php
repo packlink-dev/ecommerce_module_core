@@ -21,7 +21,7 @@ use Logeecom\Infrastructure\Utility\GuidProvider;
  *
  * @package Logeecom\Infrastructure\TaskExecution
  */
-class AsyncProcessStarter extends Singleton implements AsyncProcessService
+class AsyncProcessStarterService extends Singleton implements AsyncProcessService
 {
     /**
      * Singleton instance of this class.

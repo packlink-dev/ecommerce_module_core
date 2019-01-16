@@ -61,7 +61,7 @@ class TaskRunnerWakeupTest extends TestCase
         new TestServiceRegister(
             array(
                 AsyncProcessService::CLASS_NAME => function () {
-                    return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
+                    return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
                 },
                 TaskRunnerStatusStorage::CLASS_NAME => function () use ($runnerStatusStorage) {
                     return $runnerStatusStorage;
@@ -89,7 +89,7 @@ class TaskRunnerWakeupTest extends TestCase
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::getInstance();
+        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
         $this->runnerStatusStorage = $runnerStatusStorage;
         $this->timeProvider = $timeProvider;
         $this->guidProvider = $guidProvider;
@@ -100,7 +100,7 @@ class TaskRunnerWakeupTest extends TestCase
     protected function tearDown()
     {
         MemoryStorage::reset();
-        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarter::resetInstance();
+        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::resetInstance();
         parent::tearDown();
     }
 
