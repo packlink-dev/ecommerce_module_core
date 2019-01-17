@@ -30,6 +30,12 @@ class ShippingMethodResponse extends BaseDto
      */
     public $title;
     /**
+     * Description of delivery.
+     *
+     * @var string
+     */
+    public $deliveryDescription;
+    /**
      * Shipping delivery type.
      *
      * @var string
@@ -95,6 +101,7 @@ class ShippingMethodResponse extends BaseDto
             'id' => $this->id,
             'name' => $this->name,
             'title' => $this->title,
+            'deliveryDescription' => $this->deliveryDescription,
             'deliveryType' => $this->deliveryType,
             'parcelOrigin' => $this->parcelOrigin,
             'parcelDestination' => $this->parcelDestination,

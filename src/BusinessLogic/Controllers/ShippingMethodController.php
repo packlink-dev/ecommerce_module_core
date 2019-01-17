@@ -178,6 +178,8 @@ class ShippingMethodController
         $shippingMethod->logoUrl = $item->getLogoUrl();
         $shippingMethod->showLogo = $item->isDisplayLogo();
         $shippingMethod->title = $item->isNational() ? static::NATIONAL : static::INTERNATIONAL;
+        $shippingMethod->deliveryDescription = ($item->isExpressDelivery() ? 'Express' : 'Economic') . ' '
+            . $item->getDeliveryTime();
         $shippingMethod->deliveryType = $item->isExpressDelivery() ? static::EXPRESS : static::ECONOMIC;
         $shippingMethod->name = $item->getTitle();
         $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::HOME;
