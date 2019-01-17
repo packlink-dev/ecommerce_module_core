@@ -24,6 +24,10 @@ class WeeklyScheduleTest extends TestCase
      * @var \Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule
      */
     public $weeklySchedule;
+    /**
+     * @var string
+     */
+    private $oldTimeZone;
 
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -32,6 +36,9 @@ class WeeklyScheduleTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+
+        $this->oldTimeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         // Always return 2018-03-21 13:42:05
         $this->weeklySchedule = new WeeklySchedule();
@@ -57,6 +64,15 @@ class WeeklyScheduleTest extends TestCase
                 },
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function tearDown()
+    {
+        date_default_timezone_set($this->oldTimeZone);
+        parent::tearDown();
     }
 
     /**

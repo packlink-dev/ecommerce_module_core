@@ -62,12 +62,19 @@ class ScheduleCheckTaskTest extends TestCase
      * @var MemoryQueueItemRepository
      */
     public $queueStorage;
+    /**
+     * @var string
+     */
+    private $oldTimeZone;
 
     /**
      * @throws \Exception
      */
     public function setUp()
     {
+        $this->oldTimeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
         $taskInstance = $this;
 
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -121,6 +128,15 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
+     * @inheritdoc
+     */
+    public function tearDown()
+    {
+        date_default_timezone_set($this->oldTimeZone);
+        parent::tearDown();
+    }
+
+    /**
      * Tests when there are no scheduled tasks
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
@@ -163,7 +179,7 @@ class ScheduleCheckTaskTest extends TestCase
         $daily = new DailySchedule(new FooTask(), 'queueForDailyFoo');
         $daily->setHour(13);
         $daily->setMinute(40);
-        $daily->setDaysOfWeek(array(1,2,3,4,5));
+        $daily->setDaysOfWeek(array(1, 2, 3, 4, 5));
         /** @noinspection PhpUnhandledExceptionInspection */
         $daily->setNextSchedule($daily->calculateNextSchedule());
 
