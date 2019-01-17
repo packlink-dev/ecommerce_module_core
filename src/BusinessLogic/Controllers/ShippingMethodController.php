@@ -32,6 +32,10 @@ class ShippingMethodController
      */
     const PICKUP = 'pickup';
     /**
+     * Home constant
+     */
+    const HOME = 'home';
+    /**
      * Shipping type: national
      */
     const NATIONAL = 'national';
@@ -176,7 +180,7 @@ class ShippingMethodController
         $shippingMethod->title = $item->isNational() ? static::NATIONAL : static::INTERNATIONAL;
         $shippingMethod->deliveryType = $item->isExpressDelivery() ? static::EXPRESS : static::ECONOMIC;
         $shippingMethod->name = $item->getTitle();
-        $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::PICKUP;
+        $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::HOME;
         $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::PICKUP;
 
         $pricingPolicy = $item->getPricingPolicy();
