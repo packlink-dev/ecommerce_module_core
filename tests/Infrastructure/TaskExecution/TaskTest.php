@@ -2,8 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;

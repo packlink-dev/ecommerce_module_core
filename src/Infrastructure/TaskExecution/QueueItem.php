@@ -10,9 +10,9 @@ use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**

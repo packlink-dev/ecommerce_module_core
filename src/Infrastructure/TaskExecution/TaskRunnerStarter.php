@@ -4,12 +4,12 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Events\TickEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerRunException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 
 /**
