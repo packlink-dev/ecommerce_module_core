@@ -3,8 +3,6 @@
 namespace Logeecom\Tests\Common\TestComponents\ORM\Entity;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\IntegerIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 
@@ -68,7 +66,7 @@ class StudentEntity extends Entity
      *
      * @var array
      */
-    protected static $fields = array(
+    protected $fields = array(
         'id',
         'localId',
         'username',
@@ -91,12 +89,12 @@ class StudentEntity extends Entity
     public function getConfig()
     {
         $indexMap = new IndexMap();
-        $indexMap->addIndex(new IntegerIndex('localId'));
-        $indexMap->addIndex(new StringIndex('username'));
-        $indexMap->addIndex(new StringIndex('email'));
-        $indexMap->addIndex(new StringIndex('gender'));
-        $indexMap->addIndex(new StringIndex('firstName'));
-        $indexMap->addIndex(new StringIndex('lastName'));
+        $indexMap->addIntegerIndex('localId')
+            ->addStringIndex('username')
+            ->addStringIndex('email')
+            ->addStringIndex('gender')
+            ->addStringIndex('firstName')
+            ->addStringIndex('lastName');
 
         return new EntityConfiguration($indexMap, 'Student');
     }

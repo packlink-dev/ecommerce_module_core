@@ -3,11 +3,6 @@
 namespace Logeecom\Tests\Common\TestComponents\ORM\Entity;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\BooleanIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\DateTimeIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\DoubleIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\IntegerIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 
@@ -35,7 +30,7 @@ class FooEntity extends Entity
      *
      * @var array
      */
-    protected static $fields = array(
+    protected $fields = array(
         'id',
         'text',
         'int',
@@ -56,15 +51,15 @@ class FooEntity extends Entity
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new StringIndex('text'));
-        $map->addIndex(new IntegerIndex('int'));
-        $map->addIndex(new IntegerIndex('intNegative'));
-        $map->addIndex(new DateTimeIndex('date'));
-        $map->addIndex(new BooleanIndex('boolTrue'));
-        $map->addIndex(new BooleanIndex('boolFalse'));
-        $map->addIndex(new DoubleIndex('double'));
-        $map->addIndex(new DoubleIndex('doubleNegative'));
-        $map->addIndex(new DoubleIndex('empty'));
+        $map->addStringIndex('text');
+        $map->addIntegerIndex('int');
+        $map->addIntegerIndex('intNegative');
+        $map->addDateTimeIndex('date');
+        $map->addBooleanIndex('boolTrue');
+        $map->addBooleanIndex('boolFalse');
+        $map->addDoubleIndex('double');
+        $map->addDoubleIndex('doubleNegative');
+        $map->addDoubleIndex('empty');
 
         return new EntityConfiguration($map, 'TestEntity');
     }

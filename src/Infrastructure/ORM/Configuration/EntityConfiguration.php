@@ -3,8 +3,9 @@
 namespace Logeecom\Infrastructure\ORM\Configuration;
 
 /**
- * Class EntityConfiguration
- * @package Logeecom\Infrastructure\ORM
+ * Class EntityConfiguration.
+ *
+ * @package Logeecom\Infrastructure\ORM\Configuration
  */
 class EntityConfiguration
 {

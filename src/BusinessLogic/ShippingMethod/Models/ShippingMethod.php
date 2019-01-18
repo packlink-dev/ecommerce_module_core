@@ -3,8 +3,6 @@
 namespace Packlink\BusinessLogic\ShippingMethod\Models;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\BooleanIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\IntegerIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 
@@ -36,7 +34,7 @@ class ShippingMethod extends Entity
      *
      * @var array
      */
-    protected static $fields = array(
+    protected $fields = array(
         'id',
         'serviceId',
         'serviceName',
@@ -161,16 +159,13 @@ class ShippingMethod extends Entity
      * Transforms raw array data to this entity instance.
      *
      * @param array $data Raw array data.
-     *
-     * @return static Transformed entity object.
      */
-    public static function fromArray(array $data)
+    public function inflate(array $data)
     {
-        /** @var self $instance */
-        $instance = parent::fromArray($data);
+        parent::inflate($data);
 
-        if (!$instance->getPricingPolicy()) {
-            $instance->pricingPolicy = static::PRICING_POLICY_PACKLINK;
+        if (!$this->getPricingPolicy()) {
+            $this->pricingPolicy = static::PRICING_POLICY_PACKLINK;
         }
 
         if (!empty($data['fixedPricePolicy'])) {
@@ -179,20 +174,18 @@ class ShippingMethod extends Entity
                 $policies[] = FixedPricePolicy::fromArray($fixedPricePolicy);
             }
 
-            $instance->setFixedPricePolicy($policies);
+            $this->setFixedPricePolicy($policies);
         }
 
         if (!empty($data['percentPricePolicy'])) {
-            $instance->setPercentPricePolicy(PercentPricePolicy::fromArray($data['percentPricePolicy']));
+            $this->setPercentPricePolicy(PercentPricePolicy::fromArray($data['percentPricePolicy']));
         }
 
         if (!empty($data['shippingCosts'])) {
             foreach ($data['shippingCosts'] as $shippingCost) {
-                $instance->shippingCosts = ShippingMethodCost::fromArray($shippingCost);
+                $this->shippingCosts = ShippingMethodCost::fromArray($shippingCost);
             }
         }
-
-        return $instance;
     }
 
     /**
@@ -233,13 +226,13 @@ class ShippingMethod extends Entity
     {
         $indexMap = new IndexMap();
 
-        $indexMap->addIndex(new IntegerIndex('serviceId'))
-            ->addIndex(new BooleanIndex('activated'))
-            ->addIndex(new BooleanIndex('enabled'))
-            ->addIndex(new BooleanIndex('departureDropOff'))
-            ->addIndex(new BooleanIndex('destinationDropOff'))
-            ->addIndex(new BooleanIndex('national'))
-            ->addIndex(new BooleanIndex('expressDelivery'));
+        $indexMap->addIntegerIndex('serviceId')
+            ->addBooleanIndex('activated')
+            ->addBooleanIndex('enabled')
+            ->addBooleanIndex('departureDropOff')
+            ->addBooleanIndex('destinationDropOff')
+            ->addBooleanIndex('national')
+            ->addBooleanIndex('expressDelivery');
 
         return new EntityConfiguration($indexMap, 'ShippingService');
     }

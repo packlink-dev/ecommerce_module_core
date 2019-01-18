@@ -14,7 +14,7 @@ class DailySchedule extends Schedule
      *
      * @var array
      */
-    protected static $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'daysOfWeek');
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'daysOfWeek');
     /**
      * Week day numbers, starting from Monday to Sunday.
      *

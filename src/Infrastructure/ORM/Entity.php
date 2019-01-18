@@ -26,7 +26,7 @@ abstract class Entity
      *
      * @var array
      */
-    protected static $fields = array('id');
+    protected $fields = array('id');
 
     /**
      * Returns full class name.
@@ -41,16 +41,14 @@ abstract class Entity
     /**
      * Transforms raw array data to this entity instance.
      *
-     * @param array $data Raw array data.
+     * @param array $data Raw array data with keys for class fields. @see self::$fields for field names.
      *
      * @return static Transformed entity object.
      */
     public static function fromArray(array $data)
     {
         $instance = new static();
-        foreach (static::$fields as $fieldName) {
-            $instance->$fieldName = static::getArrayValue($data, $fieldName);
-        }
+        $instance->inflate($data);
 
         return $instance;
     }
@@ -63,6 +61,18 @@ abstract class Entity
     abstract public function getConfig();
 
     /**
+     * Sets raw array data to this entity instance properties.
+     *
+     * @param array $data Raw array data with keys for class fields. @see self::$fields for field names.
+     */
+    public function inflate(array $data)
+    {
+        foreach ($this->fields as $fieldName) {
+            $this->$fieldName = static::getArrayValue($data, $fieldName);
+        }
+    }
+
+    /**
      * Transforms entity to its array format representation.
      *
      * @return array Entity in array format.
@@ -70,7 +80,7 @@ abstract class Entity
     public function toArray()
     {
         $data = array();
-        foreach (static::$fields as $fieldName) {
+        foreach ($this->fields as $fieldName) {
             $data[$fieldName] = $this->$fieldName;
         }
 
