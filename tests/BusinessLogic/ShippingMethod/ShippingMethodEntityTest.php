@@ -339,9 +339,6 @@ class ShippingMethodEntityTest extends TestCase
     public function testResetAfterPercentPricingPolicy()
     {
         $method = new ShippingMethod();
-
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-
         $method->setPercentPricePolicy(new PercentPricePolicy(true, 10));
 
         self::assertNotEmpty($method->getPercentPricePolicy());

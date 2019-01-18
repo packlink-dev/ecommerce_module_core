@@ -160,14 +160,14 @@ class TaskRunner
         // Calculate how many queue items can be started
         $maxRunningTasks = $this->getConfigurationService()->getMaxStartedTasksLimit();
         $alreadyRunningItems = $this->getQueue()->findRunningItems();
-        $numberOfAvailableSlotsForTaskRunning = $maxRunningTasks - count($alreadyRunningItems);
-        if ($numberOfAvailableSlotsForTaskRunning <= 0) {
+        $numberOfAvailableSlots = $maxRunningTasks - count($alreadyRunningItems);
+        if ($numberOfAvailableSlots <= 0) {
             $this->logDebug(array('Message' => 'Task runner: max number of active tasks reached.'));
 
             return;
         }
 
-        $items = $this->getQueue()->findOldestQueuedItems($numberOfAvailableSlotsForTaskRunning);
+        $items = $this->getQueue()->findOldestQueuedItems($numberOfAvailableSlots);
 
         if (!$this->isCurrentRunnerAlive()) {
             return;

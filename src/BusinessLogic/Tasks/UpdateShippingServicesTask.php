@@ -81,7 +81,7 @@ class UpdateShippingServicesTask extends Task
         $parcel = $config->getDefaultParcel();
 
         $allServices = array();
-        foreach (static::$countryParams as $country => $zip) {
+        foreach (array_keys(static::$countryParams) as $country) {
             $this->setServices($allServices, $this->getServiceSearchParams($user->country, $country, $parcel));
         }
 

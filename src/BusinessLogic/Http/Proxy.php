@@ -365,12 +365,11 @@ class Proxy
             $httpCode = $response->getStatus();
             $error = $message = $response->decodeBodyAsJson();
             if (is_array($error)) {
+                $message = '';
                 if (isset($error['messages']) && is_array($error['messages'])) {
                     $message = implode("\n", array_column($error['messages'], 'message'));
                 } elseif (isset($error['message'])) {
                     $message = $error['message'];
-                } else {
-                    $message = '';
                 }
             }
 
