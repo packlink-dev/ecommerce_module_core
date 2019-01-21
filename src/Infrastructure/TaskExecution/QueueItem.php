@@ -666,6 +666,18 @@ class QueueItem extends Entity
     }
 
     /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        $this->serializedTask = $this->getSerializedTask();
+
+        return parent::toArray();
+    }
+
+    /**
      * Gets timestamp of datetime.
      *
      * @param \DateTime|null $time Datetime object.
