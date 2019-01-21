@@ -161,7 +161,7 @@ class Proxy
      */
     public function registerWebHookHandler($webHookUrl)
     {
-        $this->call(self::HTTP_METHOD_POST, 'shipments/callback', array('url' => urlencode($webHookUrl)));
+        $this->call(self::HTTP_METHOD_POST, 'shipments/callback', array('url' => $webHookUrl));
     }
 
     /**
