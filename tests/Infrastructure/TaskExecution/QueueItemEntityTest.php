@@ -115,13 +115,13 @@ class QueueItemEntityTest extends TestCase
             'progressBasePoints' => 7345,
             'retries' => 2,
             'failureDescription' => 'failure',
-            'createTime' => $createdTime,
-            'startTime' => $startTime,
-            'finishTime' => $finishTime,
-            'failTime' => $failTime,
-            'earliestStartTime' => $earliestTime,
-            'queueTime' => $queueTime,
-            'lastUpdateTime' => $lastUpdateTime,
+            'createTime' => (array)$createdTime,
+            'startTime' => (array)$startTime,
+            'finishTime' => (array)$finishTime,
+            'failTime' => (array)$failTime,
+            'earliestStartTime' => (array)$earliestTime,
+            'queueTime' => (array)$queueTime,
+            'lastUpdateTime' => (array)$lastUpdateTime,
         );
 
         $entity = QueueItem::fromArray($data);
@@ -135,13 +135,13 @@ class QueueItemEntityTest extends TestCase
         self::assertEquals($data['progressBasePoints'], $entity->getProgressBasePoints());
         self::assertEquals($data['retries'], $entity->getRetries());
         self::assertEquals($data['failureDescription'], $entity->getFailureDescription());
-        self::assertEquals($data['createTime'], $createdTime);
-        self::assertEquals($data['startTime'], $startTime);
-        self::assertEquals($data['finishTime'], $finishTime);
-        self::assertEquals($data['failTime'], $failTime);
-        self::assertEquals($data['earliestStartTime'], $earliestTime);
-        self::assertEquals($data['queueTime'], $queueTime);
-        self::assertEquals($data['lastUpdateTime'], $lastUpdateTime);
+        self::assertEquals($createdTime->getTimestamp(), $entity->getCreateTimestamp());
+        self::assertEquals($startTime->getTimestamp(), $entity->getStartTimestamp());
+        self::assertEquals($finishTime->getTimestamp(), $entity->getFinishTimestamp());
+        self::assertEquals($failTime->getTimestamp(), $entity->getFailTimestamp());
+        self::assertEquals($earliestTime->getTimestamp(), $entity->getEarliestStartTimestamp());
+        self::assertEquals($queueTime->getTimestamp(), $entity->getQueueTimestamp());
+        self::assertEquals($lastUpdateTime->getTimestamp(), $entity->getLastUpdateTimestamp());
 
         self::assertEquals(json_encode($data), json_encode($entity->toArray()));
     }
