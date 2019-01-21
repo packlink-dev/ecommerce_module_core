@@ -696,13 +696,14 @@ class QueueItem extends Entity
     {
         parent::inflate($data);
 
-        $this->createTime = $this->createDateTimeFromArray($data['createTime']);
-        $this->lastUpdateTime = $this->createDateTimeFromArray($data['lastUpdateTime']);
-        $this->queueTime = $this->createDateTimeFromArray($data['queueTime']);
-        $this->startTime = $this->createDateTimeFromArray($data['startTime']);
-        $this->finishTime = $this->createDateTimeFromArray($data['finishTime']);
-        $this->failTime = $this->createDateTimeFromArray($data['failTime']);
-        $this->earliestStartTime = $this->createDateTimeFromArray($data['earliestStartTime']);
+
+        $this->createTime = $this->timeProvider->createDateTimeFromArray($data['createTime']);
+        $this->lastUpdateTime = $this->timeProvider->createDateTimeFromArray($data['lastUpdateTime']);
+        $this->queueTime = $this->timeProvider->createDateTimeFromArray($data['queueTime']);
+        $this->startTime = $this->timeProvider->createDateTimeFromArray($data['startTime']);
+        $this->finishTime = $this->timeProvider->createDateTimeFromArray($data['finishTime']);
+        $this->failTime = $this->timeProvider->createDateTimeFromArray($data['failTime']);
+        $this->earliestStartTime = $this->timeProvider->createDateTimeFromArray($data['earliestStartTime']);
     }
 
     /**
@@ -757,29 +758,5 @@ class QueueItem extends Entity
                 $queue->keepAlive($self);
             }
         );
-    }
-
-    /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
-     * Converts array to DateTime object.
-     *
-     * @param array $dateTime DateTime in array format.
-     *
-     * @return \DateTime | null Date or null.
-     */
-    private function createDateTimeFromArray($dateTime)
-    {
-        $value = null;
-        if (is_array($dateTime)
-            && array_key_exists('date', $dateTime)
-            && array_key_exists('timezone_type', $dateTime)
-            && array_key_exists('timezone', $dateTime)
-        ) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $value = new \DateTime($dateTime['date'], new \DateTimeZone($dateTime['timezone']));
-        }
-
-        return $value;
     }
 }

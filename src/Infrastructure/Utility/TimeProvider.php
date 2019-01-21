@@ -88,4 +88,46 @@ class TimeProvider
     {
         sleep($sleepTime);
     }
+
+    /**
+     * Converts array to DateTime object.
+     *
+     * @param array $dateTime DateTime in array format.
+     *
+     * @return \DateTime | null Date or null.
+     */
+    public function createDateTimeFromArray($dateTime)
+    {
+        $value = null;
+        if (is_array($dateTime)
+            && array_key_exists('date', $dateTime)
+            && array_key_exists('timezone_type', $dateTime)
+            && array_key_exists('timezone', $dateTime)
+        ) {
+            try {
+                $value = new \DateTime($dateTime['date'], new \DateTimeZone($dateTime['timezone']));
+            } catch (\Exception $exception) {
+                // if timezone is in offset format, try to convert offset to abbreviation
+                if ($dateTime['timezone_type'] === 1) {
+                    $offset = (int)str_replace(':', '', $dateTime['timezone']);
+                    $timezone = timezone_name_from_abbr('', $offset * 36);
+                    if ($timezone) {
+                        try {
+                            return new \DateTime($dateTime['date'], new \DateTimeZone($timezone));
+                        } catch (\Exception $e) {
+                            // if this fails proceed to default timezone
+                        }
+                    }
+                }
+
+                try {
+                    // try with default timezone
+                    $value = new \DateTime($dateTime['date']);
+                } catch (\Exception $e) {
+                }
+            }
+        }
+
+        return $value;
+    }
 }
