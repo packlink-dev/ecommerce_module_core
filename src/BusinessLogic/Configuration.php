@@ -90,7 +90,9 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function getUserInfo()
     {
-        return $this->getConfigValue('userInfo');
+        $value = $this->getConfigValue('userInfo');
+
+        return $value && is_array($value) ? User::fromArray($value) : null;
     }
 
     /**
@@ -100,7 +102,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function setUserInfo(User $userInfo)
     {
-        $this->saveConfigValue('userInfo', $userInfo);
+        $this->saveConfigValue('userInfo', $userInfo->toArray());
     }
 
     /**
@@ -110,7 +112,9 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function getDefaultParcel()
     {
-        return $this->getConfigValue('defaultParcel');
+        $value = $this->getConfigValue('defaultParcel');
+
+        return $value && is_array($value) ? ParcelInfo::fromArray($value) : null;
     }
 
     /**
@@ -120,7 +124,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function setDefaultParcel(ParcelInfo $parcelInfo)
     {
-        $this->saveConfigValue('defaultParcel', $parcelInfo);
+        $this->saveConfigValue('defaultParcel', $parcelInfo->toArray());
     }
 
     /**
@@ -130,7 +134,9 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function getDefaultWarehouse()
     {
-        return $this->getConfigValue('defaultWarehouse');
+        $value = $this->getConfigValue('defaultWarehouse');
+
+        return $value && is_array($value) ? Warehouse::fromArray($value) : null;
     }
 
     /**
@@ -140,7 +146,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function setDefaultWarehouse(Warehouse $warehouse)
     {
-        $this->saveConfigValue('defaultWarehouse', $warehouse);
+        $this->saveConfigValue('defaultWarehouse', $warehouse->toArray());
     }
 
     /**
