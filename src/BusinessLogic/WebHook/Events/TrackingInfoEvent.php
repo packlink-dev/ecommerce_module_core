@@ -23,7 +23,7 @@ class TrackingInfoEvent extends Event
     public $referenceId;
 
     /**
-     * ShippingLabelEvent constructor.
+     * ShipmentLabelEvent constructor.
      *
      * @param string $referenceId Reference identifier.
      */

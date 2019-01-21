@@ -14,7 +14,7 @@ use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
-use Packlink\BusinessLogic\WebHook\Events\ShippingLabelEvent;
+use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
 use Packlink\BusinessLogic\WebHook\Events\ShippingStatusEvent;
 use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
 use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
@@ -72,33 +72,33 @@ class WebHookHandlerTest extends BaseTestWithServices
     }
 
     /**
-     * Tests setting of shipping labels
+     * Tests setting of shipment labels
      */
-    public function testHandleShippingLabelEvent()
+    public function testHandleShipmentLabelEvent()
     {
         $this->httpClient->setMockResponses($this->getMockLabelResponse());
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShippingLabelEvent('test'));
+        $bus->fire(new ShipmentLabelEvent('test'));
 
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         $order = $orderRepository->getOrder('test');
 
         $this->assertNotNull($order);
-        $this->assertNotEmpty($order->getPacklinkShippingLabels());
-        $this->assertCount(1, $order->getPacklinkShippingLabels());
+        $this->assertNotEmpty($order->getPacklinkShipmentLabels());
+        $this->assertCount(1, $order->getPacklinkShipmentLabels());
     }
 
     /**
      * Tests when API fails
      */
-    public function testHandleShippingLabelEventHttpError()
+    public function testHandleShipmentLabelEventHttpError()
     {
         $this->httpClient->setMockResponses($this->getErrorMockResponse());
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShippingLabelEvent('test'));
+        $bus->fire(new ShipmentLabelEvent('test'));
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         /** @var \Logeecom\Infrastructure\Logger\LogData $logData */
@@ -113,7 +113,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     /**
      * Tests when order fetch fails
      */
-    public function testHandleShippingLabelEventNoOrder()
+    public function testHandleShipmentLabelEventNoOrder()
     {
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
@@ -122,7 +122,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses($this->getMockLabelResponse());
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShippingLabelEvent('test'));
+        $bus->fire(new ShipmentLabelEvent('test'));
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[0]->getMessage());

@@ -161,7 +161,7 @@ class Proxy
      */
     public function registerWebHookHandler($webHookUrl)
     {
-        $this->call(self::HTTP_METHOD_POST, 'shipments/callback', array('url' => urlencode($webHookUrl)));
+        $this->call(self::HTTP_METHOD_POST, 'shipments/callback', array('url' => $webHookUrl));
     }
 
     /**
@@ -228,11 +228,11 @@ class Proxy
     }
 
     /**
-     * Returns list of shipping labels for shipment with provided reference.
+     * Returns list of shipment labels for shipment with provided reference.
      *
      * @param string $referenceId Packlink shipment reference identifier.
      *
-     * @return string[] Array of shipping labels.
+     * @return string[] Array of shipment labels.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
@@ -365,12 +365,11 @@ class Proxy
             $httpCode = $response->getStatus();
             $error = $message = $response->decodeBodyAsJson();
             if (is_array($error)) {
+                $message = '';
                 if (isset($error['messages']) && is_array($error['messages'])) {
                     $message = implode("\n", array_column($error['messages'], 'message'));
                 } elseif (isset($error['message'])) {
                     $message = $error['message'];
-                } else {
-                    $message = '';
                 }
             }
 

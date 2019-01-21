@@ -2,8 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure;
 
-use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Tests\Common\BaseTestWithServices;
 
 /**

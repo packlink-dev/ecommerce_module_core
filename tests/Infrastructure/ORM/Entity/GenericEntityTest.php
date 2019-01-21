@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM\Entity;
 
+use Logeecom\Infrastructure\ORM\Configuration\Index;
 use Logeecom\Infrastructure\ORM\Entity;
 use PHPUnit\Framework\TestCase;
 
@@ -54,11 +55,11 @@ abstract class GenericEntityTest extends TestCase
         $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\IndexMap", $indexMap);
         /**
          * @var string $key
-         * @var \Logeecom\Infrastructure\ORM\Configuration\Indexes\Index $item
+         * @var \Logeecom\Infrastructure\ORM\Configuration\Index $item
          */
         foreach ($indexMap->getIndexes() as $key => $item) {
             $this->assertNotEmpty($item, "Index configuration for $key must not be empty.");
-            $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\Indexes\Index", $item);
+            $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\Index", $item);
 
             $this->assertContains(
                 $item->getType(),
@@ -66,5 +67,13 @@ abstract class GenericEntityTest extends TestCase
                 "Index type '{$item->getType()}' for field $key is not supported."
             );
         }
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidIndexType()
+    {
+        new Index('type', 'name');
     }
 }

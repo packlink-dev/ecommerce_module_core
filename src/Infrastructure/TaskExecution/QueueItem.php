@@ -4,15 +4,12 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\DateTimeIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\IntegerIndex;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
@@ -36,7 +33,7 @@ class QueueItem extends Entity
      *
      * @var array
      */
-    protected static $fields = array(
+    protected $fields = array(
         'id',
         'status',
         'context',
@@ -654,13 +651,13 @@ class QueueItem extends Entity
     public function getConfig()
     {
         $indexMap = new IndexMap();
-        $indexMap->addIndex(new StringIndex('status'))
-            ->addIndex(new StringIndex('taskType'))
-            ->addIndex(new StringIndex('queueName'))
-            ->addIndex(new StringIndex('context'))
-            ->addIndex(new DateTimeIndex('queueTime'))
-            ->addIndex(new IntegerIndex('lastExecutionProgressBasePoints'))
-            ->addIndex(new DateTimeIndex('lastUpdateTime'));
+        $indexMap->addStringIndex('status')
+            ->addStringIndex('taskType')
+            ->addStringIndex('queueName')
+            ->addStringIndex('context')
+            ->addDateTimeIndex('queueTime')
+            ->addIntegerIndex('lastExecutionProgressBasePoints')
+            ->addDateTimeIndex('lastUpdateTime');
 
         return new EntityConfiguration($indexMap, 'QueueItem');
     }

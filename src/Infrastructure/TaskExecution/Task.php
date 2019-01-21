@@ -4,8 +4,8 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Events\AliveAnnouncedTaskEvent;
-use Logeecom\Infrastructure\TaskExecution\Events\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\Events\EventEmitter;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 

@@ -65,7 +65,7 @@ class ShippingServiceDeliveryDetails extends BaseDto
      */
     public $destinationDropOff;
     /**
-     * Indicates whether shipping labels are required.
+     * Indicates whether shipment labels are required.
      *
      * @var bool
      */

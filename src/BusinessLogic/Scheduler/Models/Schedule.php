@@ -3,7 +3,6 @@
 namespace Packlink\BusinessLogic\Scheduler\Models;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\DateTimeIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ServiceRegister;
@@ -33,7 +32,7 @@ class Schedule extends Entity
      *
      * @var array
      */
-    protected static $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month');
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month');
     /**
      * Queue name where task should be queued to
      *
@@ -87,16 +86,12 @@ class Schedule extends Entity
      * Transforms raw array data to this entity instance.
      *
      * @param array $data Raw array data.
-     *
-     * @return Schedule Transformed entity object.
      */
-    public static function fromArray(array $data)
+    public function inflate(array $data)
     {
-        /** @var self $instance */
-        $instance = parent::fromArray($data);
-        $instance->task = unserialize($data['task']);
+        parent::inflate($data);
 
-        return $instance;
+        $this->task = unserialize($data['task']);
     }
 
     /**
@@ -130,7 +125,7 @@ class Schedule extends Entity
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new DateTimeIndex('nextSchedule'));
+        $map->addDateTimeIndex('nextSchedule');
 
         return new EntityConfiguration($map, 'Schedule');
     }

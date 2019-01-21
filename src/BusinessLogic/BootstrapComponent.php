@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Events\TickEvent;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
@@ -13,7 +13,7 @@ use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\BusinessLogic\WebHook\Events\ShippingLabelEvent;
+use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
 use Packlink\BusinessLogic\WebHook\Events\ShippingStatusEvent;
 use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
 use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
@@ -99,11 +99,11 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             }
         );
 
-        // subscribe web hook shipping label listener
+        // subscribe web hook shipment label listener
         $eventBuss->when(
-            ShippingLabelEvent::CLASS_NAME,
-            function (ShippingLabelEvent $event) {
-                WebHookEventHandler::getInstance()->handleShippingLabelEvent($event);
+            ShipmentLabelEvent::CLASS_NAME,
+            function (ShipmentLabelEvent $event) {
+                WebHookEventHandler::getInstance()->handleShipmentLabelEvent($event);
             }
         );
 

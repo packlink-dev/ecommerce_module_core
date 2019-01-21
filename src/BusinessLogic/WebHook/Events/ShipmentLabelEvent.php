@@ -5,10 +5,10 @@ namespace Packlink\BusinessLogic\WebHook\Events;
 use Logeecom\Infrastructure\Utility\Events\Event;
 
 /**
- * Class ShippingLabelEvent
+ * Class ShipmentLabelEvent
  * @package Packlink\BusinessLogic\WebHook\Events
  */
-class ShippingLabelEvent extends Event
+class ShipmentLabelEvent extends Event
 {
     /**
      * Fully qualified name of this class.
@@ -23,7 +23,7 @@ class ShippingLabelEvent extends Event
     public $referenceId;
 
     /**
-     * ShippingLabelEvent constructor.
+     * ShipmentLabelEvent constructor.
      *
      * @param string $referenceId Reference identifier.
      */

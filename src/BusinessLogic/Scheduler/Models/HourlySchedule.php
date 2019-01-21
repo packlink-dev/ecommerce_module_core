@@ -14,7 +14,7 @@ class HourlySchedule extends Schedule
      *
      * @var array
      */
-    protected static $fields = array(
+    protected $fields = array(
         'id',
         'queueName',
         'minute',

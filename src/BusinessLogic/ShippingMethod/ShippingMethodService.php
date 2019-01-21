@@ -271,11 +271,7 @@ class ShippingMethodService extends BaseService
         $result = false;
         $method = $this->getShippingMethodForService($serviceId);
         if ($method !== null) {
-            if ($activated) {
-                $result = $this->shopShippingMethodService->add($method);
-            } else {
-                $result = $this->shopShippingMethodService->delete($method);
-            }
+            $result = $this->setActivationStateInShop($activated, $method);
 
             if ($result) {
                 $method->setActivated($activated);
@@ -284,6 +280,23 @@ class ShippingMethodService extends BaseService
         }
 
         return $result;
+    }
+
+    /**
+     * Activates or deactivates shipping method in shop.
+     *
+     * @param bool $activated TRUE if service is being activated.
+     * @param ShippingMethod $method Shipping method.
+     *
+     * @return bool TRUE if setting state succeeded; otherwise, FALSE.
+     */
+    protected function setActivationStateInShop($activated, ShippingMethod $method)
+    {
+        if ($activated) {
+            return $this->shopShippingMethodService->add($method);
+        }
+
+        return $this->shopShippingMethodService->delete($method);
     }
 
     /**

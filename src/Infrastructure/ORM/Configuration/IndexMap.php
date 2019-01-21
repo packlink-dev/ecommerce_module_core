@@ -2,8 +2,6 @@
 
 namespace Logeecom\Infrastructure\ORM\Configuration;
 
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\Index;
-
 /**
  * Represents a map of all columns that are indexed.
  *
@@ -19,17 +17,63 @@ class IndexMap
     private $indexes = array();
 
     /**
-     * Adds index to map.
+     * Adds boolean index.
      *
-     * @param Index $index Index to be added.
+     * @param string $name Column name for index.
      *
      * @return self This instance for chaining.
      */
-    public function addIndex(Index $index)
+    public function addBooleanIndex($name)
     {
-        $this->indexes[$index->getProperty()] = $index;
+        return $this->addIndex(new Index(Index::BOOLEAN, $name));
+    }
 
-        return $this;
+    /**
+     * Adds datetime index.
+     *
+     * @param string $name Column name for index.
+     *
+     * @return self This instance for chaining.
+     */
+    public function addDateTimeIndex($name)
+    {
+        return $this->addIndex(new Index(Index::DATETIME, $name));
+    }
+
+    /**
+     * Adds double index.
+     *
+     * @param string $name Column name for index.
+     *
+     * @return self This instance for chaining.
+     */
+    public function addDoubleIndex($name)
+    {
+        return $this->addIndex(new Index(Index::DOUBLE, $name));
+    }
+
+    /**
+     * Adds integer index.
+     *
+     * @param string $name Column name for index.
+     *
+     * @return self This instance for chaining.
+     */
+    public function addIntegerIndex($name)
+    {
+        return $this->addIndex(new Index(Index::INTEGER, $name));
+    }
+
+    /**
+     * Adds string index.
+     *
+     * @param string $name Column name for index.
+     *
+     * @return self This instance for chaining.
+     */
+    public function addStringIndex($name)
+    {
+        return $this->addIndex(new Index(Index::STRING, $name));
     }
 
     /**
@@ -40,5 +84,19 @@ class IndexMap
     public function getIndexes()
     {
         return $this->indexes;
+    }
+
+    /**
+     * Adds index to map.
+     *
+     * @param Index $index Index to be added.
+     *
+     * @return self This instance for chaining.
+     */
+    protected function addIndex(Index $index)
+    {
+        $this->indexes[$index->getProperty()] = $index;
+
+        return $this;
     }
 }

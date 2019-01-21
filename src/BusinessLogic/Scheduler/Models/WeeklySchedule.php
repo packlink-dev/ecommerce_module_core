@@ -29,7 +29,7 @@ class WeeklySchedule extends Schedule
      *
      * @var array
      */
-    protected static $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'lastWeek', 'weeks');
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'lastWeek', 'weeks');
     /**
      * Last week flag.
      *

@@ -3,7 +3,6 @@
 namespace Logeecom\Infrastructure\Configuration;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 
@@ -41,7 +40,7 @@ class ConfigEntity extends Entity
      *
      * @var array
      */
-    protected static $fields = array('id', 'name', 'value', 'systemId');
+    protected $fields = array('id', 'name', 'value', 'systemId');
 
     /**
      * Returns entity configuration object.
@@ -51,8 +50,8 @@ class ConfigEntity extends Entity
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new StringIndex('name'));
-        $map->addIndex(new StringIndex('systemId'));
+        $map->addStringIndex('name')
+            ->addStringIndex('systemId');
 
         return new EntityConfiguration($map, 'Configuration');
     }

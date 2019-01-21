@@ -3,7 +3,6 @@
 namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\StringIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
@@ -32,26 +31,21 @@ class Process extends Entity
     protected $runner;
 
     /**
-     * Transforms raw array data to this entity instance.
+     * Sets raw array data to this entity instance properties.
      *
      * @param array $data Raw array data with keys 'id', 'guid' and 'runner'.
      *
-     * @return static Transformed entity object.
-     *
      * @throws \InvalidArgumentException In case when @see $data does not have all needed keys.
      */
-    public static function fromArray(array $data)
+    public function inflate(array $data)
     {
         if (!isset($data['guid'], $data['runner'])) {
             throw new \InvalidArgumentException('Data array needs to have "guid" and "runner" keys.');
         }
 
-        /** @var self $instance */
-        $instance = parent::fromArray($data);
-        $instance->setGuid($data['guid']);
-        $instance->setRunner(unserialize($data['runner']));
-
-        return $instance;
+        parent::inflate($data);
+        $this->setGuid($data['guid']);
+        $this->setRunner(unserialize($data['runner']));
     }
 
     /**
@@ -76,7 +70,7 @@ class Process extends Entity
     public function getConfig()
     {
         $indexMap = new IndexMap();
-        $indexMap->addIndex(new StringIndex('guid'));
+        $indexMap->addStringIndex('guid');
 
         return new EntityConfiguration($indexMap, 'Process');
     }
