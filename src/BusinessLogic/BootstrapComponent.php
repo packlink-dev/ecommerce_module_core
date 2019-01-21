@@ -99,7 +99,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             }
         );
 
-        // subscribe web hook shipping label listener
+        // subscribe web hook shipment label listener
         $eventBuss->when(
             ShipmentLabelEvent::CLASS_NAME,
             function (ShipmentLabelEvent $event) {

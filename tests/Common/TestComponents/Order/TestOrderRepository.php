@@ -77,10 +77,10 @@ class TestOrderRepository implements OrderRepository
     }
 
     /**
-     * Sets order packlink shipping labels to an order by shipment reference.
+     * Sets order packlink shipment labels to an order by shipment reference.
      *
      * @param string $shipmentReference Packlink shipment reference.
-     * @param string[] $labels Packlink shipping labels.
+     * @param string[] $labels Packlink shipment labels.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */

@@ -228,11 +228,11 @@ class Proxy
     }
 
     /**
-     * Returns list of shipping labels for shipment with provided reference.
+     * Returns list of shipment labels for shipment with provided reference.
      *
      * @param string $referenceId Packlink shipment reference identifier.
      *
-     * @return string[] Array of shipping labels.
+     * @return string[] Array of shipment labels.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
