@@ -183,7 +183,7 @@ class ShippingMethod extends Entity
 
         if (!empty($data['shippingCosts'])) {
             foreach ($data['shippingCosts'] as $shippingCost) {
-                $this->shippingCosts = ShippingMethodCost::fromArray($shippingCost);
+                $this->shippingCosts[] = ShippingMethodCost::fromArray($shippingCost);
             }
         }
     }
