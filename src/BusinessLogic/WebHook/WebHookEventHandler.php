@@ -11,7 +11,7 @@ use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
-use Packlink\BusinessLogic\WebHook\Events\ShippingLabelEvent;
+use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
 use Packlink\BusinessLogic\WebHook\Events\ShippingStatusEvent;
 use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
 
@@ -53,11 +53,11 @@ class WebHookEventHandler extends BaseService
     }
 
     /**
-     * Handles web hook shipping label event.
+     * Handles web hook shipment label event.
      *
-     * @param ShippingLabelEvent $event Web-hook event.
+     * @param ShipmentLabelEvent $event Web-hook event.
      */
-    public function handleShippingLabelEvent(ShippingLabelEvent $event)
+    public function handleShipmentLabelEvent(ShipmentLabelEvent $event)
     {
         $labels = array();
         $referenceId = $event->referenceId;

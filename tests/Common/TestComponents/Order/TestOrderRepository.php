@@ -91,7 +91,7 @@ class TestOrderRepository implements OrderRepository
         }
 
         $order = $this->getOrder($shipmentReference);
-        $order->setPacklinkShippingLabels($labels);
+        $order->setPacklinkShipmentLabels($labels);
     }
 
     /**

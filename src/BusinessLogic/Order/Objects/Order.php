@@ -117,11 +117,11 @@ class Order
      */
     private $items = array();
     /**
-     * Packlink shipping reference labels.
+     * Packlink shipment reference labels.
      *
      * @var string[]
      */
-    private $packlinkShippingLabels = array();
+    private $packlinkShipmentLabels = array();
 
     /**
      * Returns order unique identifier.
@@ -444,23 +444,23 @@ class Order
     }
 
     /**
-     * Returns Packlink shipping labels.
+     * Returns Packlink shipment labels.
      *
-     * @return string[] Array of Packlink shipping labels.
+     * @return string[] Array of Packlink shipment labels.
      */
-    public function getPacklinkShippingLabels()
+    public function getPacklinkShipmentLabels()
     {
-        return $this->packlinkShippingLabels;
+        return $this->packlinkShipmentLabels;
     }
 
     /**
-     * Sets Packlink shipping labels.
+     * Sets Packlink shipment labels.
      *
-     * @param string[] $packlinkShippingLabels Array of Packlink shipping labels.
+     * @param string[] $packlinkShipmentLabels Array of Packlink shipment labels.
      */
-    public function setPacklinkShippingLabels($packlinkShippingLabels)
+    public function setPacklinkShipmentLabels($packlinkShipmentLabels)
     {
-        $this->packlinkShippingLabels = $packlinkShippingLabels;
+        $this->packlinkShipmentLabels = $packlinkShipmentLabels;
     }
 
     /**
