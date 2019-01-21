@@ -54,6 +54,8 @@ class ScheduleCheckTask extends Task
                 );
             }
         }
+
+        $this->reportProgress(100);
     }
 
     /**

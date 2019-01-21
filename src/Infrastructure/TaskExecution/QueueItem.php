@@ -628,6 +628,19 @@ class QueueItem extends Entity
     }
 
     /**
+     * Gets queue item last execution progress in base points as value between 0 and 10000.
+     *
+     * One base point is equal to 0.01%.
+     * For example 23.58% is equal to 2358 base points.
+     *
+     * @return int Last execution progress expressed in base points.
+     */
+    public function getLastExecutionProgress()
+    {
+        return $this->lastExecutionProgressBasePoints;
+    }
+
+    /**
      * Reconfigures underlying task.
      *
      * @throws Exceptions\QueueItemDeserializationException
@@ -656,8 +669,8 @@ class QueueItem extends Entity
             ->addStringIndex('queueName')
             ->addStringIndex('context')
             ->addDateTimeIndex('queueTime')
-            ->addIntegerIndex('lastExecutionProgressBasePoints')
-            ->addDateTimeIndex('lastUpdateTime');
+            ->addIntegerIndex('lastExecutionProgress')
+            ->addIntegerIndex('lastUpdateTimestamp');
 
         return new EntityConfiguration($indexMap, 'QueueItem');
     }
@@ -672,6 +685,24 @@ class QueueItem extends Entity
         $this->serializedTask = $this->getSerializedTask();
 
         return parent::toArray();
+    }
+
+    /**
+     * Sets raw array data to this entity instance properties.
+     *
+     * @param array $data Raw array data with keys for class fields. @see self::$fields for field names.
+     */
+    public function inflate(array $data)
+    {
+        parent::inflate($data);
+
+        $this->createTime = $this->createDateTimeFromArray($data['createTime']);
+        $this->lastUpdateTime = $this->createDateTimeFromArray($data['lastUpdateTime']);
+        $this->queueTime = $this->createDateTimeFromArray($data['queueTime']);
+        $this->startTime = $this->createDateTimeFromArray($data['startTime']);
+        $this->finishTime = $this->createDateTimeFromArray($data['finishTime']);
+        $this->failTime = $this->createDateTimeFromArray($data['failTime']);
+        $this->earliestStartTime = $this->createDateTimeFromArray($data['earliestStartTime']);
     }
 
     /**
@@ -726,5 +757,29 @@ class QueueItem extends Entity
                 $queue->keepAlive($self);
             }
         );
+    }
+
+    /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
+     * Converts array to DateTime object.
+     *
+     * @param array $dateTime DateTime in array format.
+     *
+     * @return \DateTime | null Date or null.
+     */
+    private function createDateTimeFromArray($dateTime)
+    {
+        $value = null;
+        if (is_array($dateTime)
+            && array_key_exists('date', $dateTime)
+            && array_key_exists('timezone_type', $dateTime)
+            && array_key_exists('timezone', $dateTime)
+        ) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $value = new \DateTime($dateTime['date'], new \DateTimeZone($dateTime['timezone']));
+        }
+
+        return $value;
     }
 }
