@@ -45,9 +45,6 @@ class QueueItemEntityTest extends TestCase
      */
     public function testToArray()
     {
-        $tz = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-
         $createdTime = time();
         $startTime = time() + 1;
         $finishTime = time() + 2;
@@ -96,12 +93,13 @@ class QueueItemEntityTest extends TestCase
         $task = $entity->getTask();
         self::assertNotNull($task);
         self::assertInstanceOf('\\Packlink\\BusinessLogic\\Tasks\\UpdateShippingServicesTask', $task);
-
-        date_default_timezone_set($tz);
     }
 
     public function testFromArrayAndToJSON()
     {
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
         $createdTime = $this->timeProvider->getDateTime(time());
         $startTime = $this->timeProvider->getDateTime(time() + 1);
         $finishTime = $this->timeProvider->getDateTime(time() + 2);
@@ -149,5 +147,7 @@ class QueueItemEntityTest extends TestCase
         self::assertEquals($lastUpdateTime->getTimestamp(), $entity->getLastUpdateTimestamp());
 
         self::assertEquals(json_encode($data), json_encode($entity->toArray()));
+
+        date_default_timezone_set($tz);
     }
 }
