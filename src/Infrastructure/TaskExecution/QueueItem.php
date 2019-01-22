@@ -683,8 +683,17 @@ class QueueItem extends Entity
     public function toArray()
     {
         $this->serializedTask = $this->getSerializedTask();
+        $result = parent::toArray();
 
-        return parent::toArray();
+        $result['createTime'] = $this->timeProvider->serializeDate($this->createTime);
+        $result['lastUpdateTime'] = $this->timeProvider->serializeDate($this->lastUpdateTime);
+        $result['queueTime'] = $this->timeProvider->serializeDate($this->queueTime);
+        $result['startTime'] = $this->timeProvider->serializeDate($this->startTime);
+        $result['finishTime'] = $this->timeProvider->serializeDate($this->finishTime);
+        $result['failTime'] = $this->timeProvider->serializeDate($this->failTime);
+        $result['earliestStartTime'] = $this->timeProvider->serializeDate($this->earliestStartTime);
+
+        return $result;
     }
 
     /**
@@ -696,14 +705,13 @@ class QueueItem extends Entity
     {
         parent::inflate($data);
 
-
-        $this->createTime = $this->timeProvider->createDateTimeFromArray($data['createTime']);
-        $this->lastUpdateTime = $this->timeProvider->createDateTimeFromArray($data['lastUpdateTime']);
-        $this->queueTime = $this->timeProvider->createDateTimeFromArray($data['queueTime']);
-        $this->startTime = $this->timeProvider->createDateTimeFromArray($data['startTime']);
-        $this->finishTime = $this->timeProvider->createDateTimeFromArray($data['finishTime']);
-        $this->failTime = $this->timeProvider->createDateTimeFromArray($data['failTime']);
-        $this->earliestStartTime = $this->timeProvider->createDateTimeFromArray($data['earliestStartTime']);
+        $this->createTime = $this->timeProvider->deserializeDateString($data['createTime']);
+        $this->lastUpdateTime = $this->timeProvider->deserializeDateString($data['lastUpdateTime']);
+        $this->queueTime = $this->timeProvider->deserializeDateString($data['queueTime']);
+        $this->startTime = $this->timeProvider->deserializeDateString($data['startTime']);
+        $this->finishTime = $this->timeProvider->deserializeDateString($data['finishTime']);
+        $this->failTime = $this->timeProvider->deserializeDateString($data['failTime']);
+        $this->earliestStartTime = $this->timeProvider->deserializeDateString($data['earliestStartTime']);
     }
 
     /**

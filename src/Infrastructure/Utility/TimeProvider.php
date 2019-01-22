@@ -90,44 +90,36 @@ class TimeProvider
     }
 
     /**
-     * Converts array to DateTime object.
+     * Converts serialized string time to DateTime object.
      *
-     * @param array $dateTime DateTime in array format.
+     * @param string $dateTime DateTime in string format.
+     * @param string $format DateTime string format.
      *
      * @return \DateTime | null Date or null.
      */
-    public function createDateTimeFromArray($dateTime)
+    public function deserializeDateString($dateTime, $format = null)
     {
-        $value = null;
-        if (is_array($dateTime)
-            && array_key_exists('date', $dateTime)
-            && array_key_exists('timezone_type', $dateTime)
-            && array_key_exists('timezone', $dateTime)
-        ) {
-            try {
-                $value = new \DateTime($dateTime['date'], new \DateTimeZone($dateTime['timezone']));
-            } catch (\Exception $exception) {
-                // if timezone is in offset format, try to convert offset to abbreviation
-                if ($dateTime['timezone_type'] === 1) {
-                    $offset = (int)str_replace(':', '', $dateTime['timezone']);
-                    $timezone = timezone_name_from_abbr('', $offset * 36);
-                    if ($timezone) {
-                        try {
-                            return new \DateTime($dateTime['date'], new \DateTimeZone($timezone));
-                        } catch (\Exception $e) {
-                            // if this fails proceed to default timezone
-                        }
-                    }
-                }
-
-                try {
-                    // try with default timezone
-                    $value = new \DateTime($dateTime['date']);
-                } catch (\Exception $e) {
-                }
-            }
+        if ($dateTime === null) {
+            return null;
         }
 
-        return $value;
+        return \DateTime::createFromFormat($format ?: DATE_ATOM, $dateTime);
+    }
+
+    /**
+     * Serializes date time object to its string format.
+     *
+     * @param \DateTime|null $dateTime Date time object to be serialized.
+     * @param string $format DateTime string format.
+     *
+     * @return string|null String serialized date.
+     */
+    public function serializeDate(\DateTime $dateTime = null, $format = null)
+    {
+        if ($dateTime === null) {
+            return null;
+        }
+
+        return $dateTime->format($format ?: DATE_ATOM);
     }
 }

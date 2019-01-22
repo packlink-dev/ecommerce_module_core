@@ -82,13 +82,13 @@ class QueueItemEntityTest extends TestCase
         self::assertEquals($data['progressBasePoints'], $entity->getProgressBasePoints());
         self::assertEquals($data['retries'], $entity->getRetries());
         self::assertEquals($data['failureDescription'], $entity->getFailureDescription());
-        self::assertEquals($data['createTime'], $this->timeProvider->getDateTime($createdTime));
-        self::assertEquals($data['startTime'], $this->timeProvider->getDateTime($startTime));
-        self::assertEquals($data['finishTime'], $this->timeProvider->getDateTime($finishTime));
-        self::assertEquals($data['failTime'], $this->timeProvider->getDateTime($failTime));
-        self::assertEquals($data['earliestStartTime'], $this->timeProvider->getDateTime($earliestTime));
-        self::assertEquals($data['queueTime'], $this->timeProvider->getDateTime($queueTime));
-        self::assertEquals($data['lastUpdateTime'], $this->timeProvider->getDateTime($lastUpdateTime));
+        self::assertEquals($data['createTime'], $this->timeProvider->getDateTime($createdTime)->format(DATE_ATOM));
+        self::assertEquals($data['startTime'], $this->timeProvider->getDateTime($startTime)->format(DATE_ATOM));
+        self::assertEquals($data['finishTime'], $this->timeProvider->getDateTime($finishTime)->format(DATE_ATOM));
+        self::assertEquals($data['failTime'], $this->timeProvider->getDateTime($failTime)->format(DATE_ATOM));
+        self::assertEquals($data['earliestStartTime'], $this->timeProvider->getDateTime($earliestTime)->format(DATE_ATOM));
+        self::assertEquals($data['queueTime'], $this->timeProvider->getDateTime($queueTime)->format(DATE_ATOM));
+        self::assertEquals($data['lastUpdateTime'], $this->timeProvider->getDateTime($lastUpdateTime)->format(DATE_ATOM));
 
         $task = $entity->getTask();
         self::assertNotNull($task);
@@ -118,13 +118,13 @@ class QueueItemEntityTest extends TestCase
             'progressBasePoints' => 7345,
             'retries' => 2,
             'failureDescription' => 'failure',
-            'createTime' => (array)$createdTime,
-            'startTime' => (array)$startTime,
-            'finishTime' => (array)$finishTime,
-            'failTime' => (array)$failTime,
-            'earliestStartTime' => (array)$earliestTime,
-            'queueTime' => (array)$queueTime,
-            'lastUpdateTime' => (array)$lastUpdateTime,
+            'createTime' => $createdTime->format(DATE_ATOM),
+            'startTime' => $startTime->format(DATE_ATOM),
+            'finishTime' => $finishTime->format(DATE_ATOM),
+            'failTime' => $failTime->format(DATE_ATOM),
+            'earliestStartTime' => $earliestTime->format(DATE_ATOM),
+            'queueTime' => $queueTime->format(DATE_ATOM),
+            'lastUpdateTime' => $lastUpdateTime->format(DATE_ATOM),
         );
 
         $entity = QueueItem::fromArray($data);
