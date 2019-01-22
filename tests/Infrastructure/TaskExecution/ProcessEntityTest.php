@@ -17,7 +17,7 @@ class ProcessEntityTest extends TestCase
     {
         $runner = new QueueItemStarter(1234);
         $entity = new Process();
-        $entity->id = 1234;
+        $entity->setId(1234);
         $entity->setGuid('test');
         $entity->setRunner($runner);
 

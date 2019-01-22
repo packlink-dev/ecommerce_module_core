@@ -71,7 +71,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
         /** @var QueueItem $queueItem */
         $queueItem = $repository->selectOne($queryFilter);
 
-        $id = $queueItem->id;
+        $id = $queueItem->getId();
         $queueItem->setQueueName('Test' . $queueItem->getQueueName());
         $repository->update($queueItem);
 

@@ -6,13 +6,14 @@ use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\Utility\EntityTranslator;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Common\BaseTestWithServices;
 
 /**
- * Class EntityTranslatorTest
+ * Class EntityTranslatorTest.
+ *
  * @package Logeecom\Tests\Infrastructure\ORM
  */
-class EntityTranslatorTest extends TestCase
+class EntityTranslatorTest extends BaseTestWithServices
 {
     /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
@@ -22,7 +23,7 @@ class EntityTranslatorTest extends TestCase
     {
         $entity = new QueueItem();
         $entity->setStatus('created');
-        $entity->id = 'TestId';
+        $entity->setId(123);
         $entity->setCreateTimestamp(time());
         $entity->setLastUpdateTimestamp(time());
         $entity->setFailTimestamp(time());

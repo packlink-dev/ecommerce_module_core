@@ -16,11 +16,11 @@ abstract class Entity
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * Identifier.
+     * Entity identifier.
      *
      * @var int
      */
-    public $id;
+    protected $id;
     /**
      * Array of field names.
      *
@@ -95,6 +95,16 @@ abstract class Entity
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Sets entity identifier.
+     *
+     * @param int $id entity identifier.
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**

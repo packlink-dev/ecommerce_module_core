@@ -95,7 +95,7 @@ class MemoryRepository implements RepositoryInterface
     public function save(Entity $entity)
     {
         $id = MemoryStorage::generateId();
-        $entity->id = $id;
+        $entity->setId($id);
         $this->saveEntityToStorage($entity);
 
         return $id;
@@ -110,7 +110,7 @@ class MemoryRepository implements RepositoryInterface
      */
     public function update(Entity $entity)
     {
-        $result = $entity->id !== null && isset(MemoryStorage::$storage[$entity->id]);
+        $result = $entity->getId() !== null && isset(MemoryStorage::$storage[$entity->getId()]);
         if ($result) {
             $this->saveEntityToStorage($entity);
         }
@@ -127,9 +127,9 @@ class MemoryRepository implements RepositoryInterface
      */
     public function delete(Entity $entity)
     {
-        $result = $entity->id !== null && isset(MemoryStorage::$storage[$entity->id]);
+        $result = $entity->getId() !== null && isset(MemoryStorage::$storage[$entity->getId()]);
         if ($result) {
-            unset(MemoryStorage::$storage[$entity->id]);
+            unset(MemoryStorage::$storage[$entity->getId()]);
         }
 
         return $result;
@@ -159,7 +159,7 @@ class MemoryRepository implements RepositoryInterface
     {
         $indexes = IndexHelper::transformFieldsToIndexes($entity);
         $storageItem = array(
-            'id' => $entity->id,
+            'id' => $entity->getId(),
             'type' => $entity->getConfig()->getType(),
             'index_1' => null,
             'index_2' => null,
@@ -178,7 +178,7 @@ class MemoryRepository implements RepositoryInterface
             $storageItem['index_' . $index] = $value;
         }
 
-        MemoryStorage::$storage[$entity->id] = $storageItem;
+        MemoryStorage::$storage[$entity->getId()] = $storageItem;
     }
 
     /**

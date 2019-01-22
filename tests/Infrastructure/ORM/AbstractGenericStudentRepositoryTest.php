@@ -67,7 +67,7 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
         /** @var StudentEntity $student */
         $student = $repository->selectOne($queryFilter);
 
-        $studentId = $student->id;
+        $studentId = $student->getId();
         $student->email = 'Test' . $student->email;
         $repository->update($student);
 

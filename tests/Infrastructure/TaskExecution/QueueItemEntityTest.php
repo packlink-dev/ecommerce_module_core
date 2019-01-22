@@ -73,7 +73,7 @@ class QueueItemEntityTest extends TestCase
 
         $data = $entity->toArray();
 
-        self::assertEquals($data['id'], $entity->id);
+        self::assertEquals($data['id'], $entity->getId());
         self::assertEquals($data['status'], $entity->getStatus());
         self::assertEquals($data['context'], $entity->getContext());
         self::assertEquals($data['serializedTask'], $entity->getSerializedTask());
@@ -129,7 +129,7 @@ class QueueItemEntityTest extends TestCase
 
         $entity = QueueItem::fromArray($data);
 
-        self::assertEquals($data['id'], $entity->id);
+        self::assertEquals($data['id'], $entity->getId());
         self::assertEquals($data['status'], $entity->getStatus());
         self::assertEquals($data['context'], $entity->getContext());
         self::assertEquals($data['serializedTask'], $entity->getSerializedTask());

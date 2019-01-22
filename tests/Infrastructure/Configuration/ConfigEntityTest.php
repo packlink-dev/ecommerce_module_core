@@ -15,7 +15,7 @@ class ConfigEntityTest extends TestCase
     public function testToArray()
     {
         $entity = new ConfigEntity();
-        $entity->id = 1234;
+        $entity->setId(1234);
         $entity->setName('test_name');
         $entity->setValue('test_value');
         $entity->setSystemId(221);

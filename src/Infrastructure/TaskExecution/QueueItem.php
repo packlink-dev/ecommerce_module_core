@@ -183,7 +183,7 @@ class QueueItem extends Entity
      */
     public function setId($id)
     {
-        $this->id = $id;
+        parent::setId($id);
 
         if ($this->task !== null) {
             $this->task->setExecutionId($id);
