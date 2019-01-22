@@ -3,6 +3,7 @@
 namespace Logeecom\Tests\Common\TestComponents\ORM;
 
 use Logeecom\Infrastructure\ORM\Entity;
+use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryCondition;
@@ -33,6 +34,7 @@ class MemoryRepository implements RepositoryInterface
      *
      * @return Entity[]
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function select(QueryFilter $filter = null)
     {
@@ -74,6 +76,7 @@ class MemoryRepository implements RepositoryInterface
      *
      * @return Entity | null
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function selectOne(QueryFilter $filter = null)
     {
@@ -292,6 +295,7 @@ class MemoryRepository implements RepositoryInterface
      * @param array $fieldIndexMap
      *
      * @return array
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     private function buildConditionGroups(QueryFilter $filter, array $fieldIndexMap)
     {
@@ -304,9 +308,13 @@ class MemoryRepository implements RepositoryInterface
             }
 
             // only index columns can be filtered
-            if (array_key_exists($condition->getColumn(), $fieldIndexMap)) {
-                $groups[$counter][] = $condition;
+            if (!array_key_exists($condition->getColumn(), $fieldIndexMap)) {
+                throw new QueryFilterInvalidParamException(
+                    'Field ' . $condition->getColumn() . ' is not indexed in class ' . $this->entityClass
+                );
             }
+
+            $groups[$counter][] = $condition;
         }
 
         return $groups;
@@ -346,6 +354,7 @@ class MemoryRepository implements RepositoryInterface
      * @return int Number of records that match filter criteria.
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function count(QueryFilter $filter = null)
     {

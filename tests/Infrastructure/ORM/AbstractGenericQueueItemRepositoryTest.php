@@ -125,10 +125,17 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('progress', '<', 10000);
-        $queryFilter->where('progress', '>', 0);
+        $queryFilter->where('lastExecutionProgress', '>', 0);
 
-        $this->assertCount(50, $repository->select($queryFilter));
+        $this->assertCount(23, $repository->select($queryFilter));
+
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('lastExecutionProgress', '<', 10000);
+
+        $this->assertCount(37, $repository->select($queryFilter));
+
+        $queryFilter->where('lastExecutionProgress', '>', 0);
+        $this->assertCount(10, $repository->select($queryFilter));
     }
 
     /**
@@ -158,7 +165,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('queueTimestamp', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
+        $queryFilter->where('queueTime', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
         $queryFilter->setLimit(5);
 
         $results = $repository->select($queryFilter);
@@ -176,6 +183,21 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
 
         $this->assertCount(2, $repository->findOldestQueuedItems());
         $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testInvalidQueryFilter()
+    {
+        $repository = RepositoryRegistry::getQueueItemRepository();
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('progress', '=', 20);
+
+        $repository->select($queryFilter);
     }
 
     /**
