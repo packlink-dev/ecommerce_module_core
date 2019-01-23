@@ -274,9 +274,18 @@ class Proxy
      */
     public function getTrackingInfo($referenceId)
     {
-        $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/track");
+        try {
+            $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/track");
+            $result = $response->decodeBodyAsJson();
+        } catch (HttpRequestException $e) {
+            if ($e->getCode() === 404) {
+                $result = array();
+            } else {
+                throw $e;
+            }
+        }
 
-        return Tracking::fromArrayBatch($response->decodeBodyAsJson());
+        return Tracking::fromArrayBatch($result);
     }
 
     /**
