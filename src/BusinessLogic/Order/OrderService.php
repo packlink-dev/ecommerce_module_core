@@ -105,6 +105,7 @@ class OrderService extends BaseService
         $this->addDestinationAddress($order, $draft);
         $this->addPriceInfo($order, $draft);
         $this->addAdditionalData($order, $draft);
+        $this->addPackages($order, $draft);
 
         return $draft;
     }
@@ -183,5 +184,28 @@ class OrderService extends BaseService
         }
 
         $draft->additionalData = $additional;
+    }
+
+    /**
+     * Adds item packages to draft shipment.
+     *
+     * @param Order $order Shop order.
+     * @param Draft $draft Packlink shipment draft.
+     */
+    private function addPackages(Order $order, Draft $draft)
+    {
+        $draft->packages = array();
+        foreach ($order->getItems() as $item) {
+            $quantity = $item->getQuantity() ?: 1;
+            for ($i = 0; $i < $quantity; $i++) {
+                $package = new Draft\Package();
+                $package->height = $item->getHeight();
+                $package->width = $item->getWidth();
+                $package->length = $item->getLength();
+                $package->weight = $item->getWeight();
+
+                $draft->packages[] = $package;
+            }
+        }
     }
 }

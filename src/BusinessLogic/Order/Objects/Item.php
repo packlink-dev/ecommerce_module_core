@@ -63,6 +63,30 @@ class Item
      */
     private $categoryName;
     /**
+     * Weight of item in kg.
+     *
+     * @var float
+     */
+    private $weight;
+    /**
+     * Width of item in cm.
+     *
+     * @var float
+     */
+    private $width;
+    /**
+     * Height of item in cm.
+     *
+     * @var float
+     */
+    private $height;
+    /**
+     * Length of item in cm.
+     *
+     * @var float
+     */
+    private $length;
+    /**
      * Other extra item properties in key => value format
      *
      * @var array
@@ -247,6 +271,86 @@ class Item
     public function setConcept($concept)
     {
         $this->concept = $concept;
+    }
+
+    /**
+     * Return weight of item in kg.
+     *
+     * @return float Item weight.
+     */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    /**
+     * Sets weight of item in kg.
+     *
+     * @param float $weight Item weight.
+     */
+    public function setWeight($weight)
+    {
+        $this->weight = $weight;
+    }
+
+    /**
+     * Returns width of item in cm.
+     *
+     * @return float Item width.
+     */
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    /**
+     * Sets width of item in cm.
+     *
+     * @param float $width Item width.
+     */
+    public function setWidth($width)
+    {
+        $this->width = $width;
+    }
+
+    /**
+     * Return height of item in cm.
+     *
+     * @return float Item height.
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * Sets height of item in cm.
+     *
+     * @param float $height Item height.
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
+    }
+
+    /**
+     * Returns length of item in cm.
+     *
+     * @return float Item length.
+     */
+    public function getLength()
+    {
+        return $this->length;
+    }
+
+    /**
+     * Sets length of item in cm.
+     *
+     * @param float $length Item length.
+     */
+    public function setLength($length)
+    {
+        $this->length = $length;
     }
 
     /**
