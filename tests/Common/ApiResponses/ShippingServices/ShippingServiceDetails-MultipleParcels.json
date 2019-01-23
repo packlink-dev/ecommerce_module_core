@@ -1,0 +1,67 @@
+[
+  {
+    "currency": "EUR",
+    "carrier_name": "NEXIVE",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20339,
+    "carrier_product_id": "IT_NEXIVE_8",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 17.13,
+      "tax_price": 2.97,
+      "base_price": 14.16
+    },
+    "first_estimated_delivery_date": "2019/01/29",
+    "customs_required": false,
+    "name": "Espresso",
+    "transit_time": "3 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "4.00",
+      "offered": true,
+      "max_cash_on_delivery": "2.90",
+      "min_cash_on_delivery": "999.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 10,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "72",
+    "available_dates": {
+      "2019/01/25": "[09:00 , 18:00]",
+      "2019/01/24": "[09:00 , 18:00]",
+      "2019/01/30": "[09:00 , 18:00]",
+      "2019/01/31": "[09:00 , 18:00]",
+      "2019/01/29": "[09:00 , 18:00]",
+      "2019/01/28": "[09:00 , 18:00]",
+      "2019/02/08": "[09:00 , 18:00]",
+      "2019/02/01": "[09:00 , 18:00]",
+      "2019/02/06": "[09:00 , 18:00]",
+      "2019/02/07": "[09:00 , 18:00]",
+      "2019/02/04": "[09:00 , 18:00]",
+      "2019/02/05": "[09:00 , 18:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "14.16"
+  }
+]

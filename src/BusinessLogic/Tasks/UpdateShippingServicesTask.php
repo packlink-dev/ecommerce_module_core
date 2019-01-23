@@ -167,14 +167,12 @@ class UpdateShippingServicesTask extends Task
     protected function getServiceSearchParams($fromCountry, $toCountry, ParcelInfo $parcel)
     {
         $params = new ShippingServiceSearch();
+
         $params->fromCountry = $fromCountry;
         $params->fromZip = self::$countryParams[$fromCountry];
         $params->toCountry = $toCountry;
         $params->toZip = self::$countryParams[$toCountry];
-        $params->packageWeight = $parcel->weight;
-        $params->packageHeight = $parcel->height;
-        $params->packageWidth = $parcel->width;
-        $params->packageLength = $parcel->length;
+        $params->parcels = array($parcel);
 
         return $params;
     }
@@ -214,6 +212,7 @@ class UpdateShippingServicesTask extends Task
     protected function getProxy()
     {
         /** @var Proxy $proxy */
+        /** @noinspection OneTimeUseVariablesInspection */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
 
         return $proxy;

@@ -214,11 +214,11 @@ class ShippingMethodService extends BaseService
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param ParcelInfo $parcel Parcel info.
+     * @param ParcelInfo[] $parcels Array of parcels.
      *
      * @return float Calculated shipping cost for service if found. Otherwise, 0.0;
      */
-    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, ParcelInfo $parcel)
+    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $parcels)
     {
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
@@ -229,9 +229,13 @@ class ShippingMethodService extends BaseService
             return $defaultCost;
         }
 
+        if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
+            return round($this->calculateFixedPriceCost($shippingMethod, $parcels), 2);
+        }
+
         try {
             $response = $proxy->getShippingServicesDeliveryDetails(
-                $this->getCostSearchParameters($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $parcel)
+                $this->getCostSearchParameters($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $parcels)
             );
             if (count($response)) {
                 $defaultCost = $response[0]->basePrice;
@@ -241,7 +245,7 @@ class ShippingMethodService extends BaseService
             $defaultCost = $this->getDefaultCost($shippingMethod, $fromCountry, $toCountry);
         }
 
-        return $defaultCost ? round($this->calculateCost($shippingMethod, $defaultCost, $parcel->weight), 2) : 0;
+        return $defaultCost ? round($this->calculateVariableCost($shippingMethod, $defaultCost), 2) : 0;
     }
 
     /**
@@ -367,6 +371,31 @@ class ShippingMethodService extends BaseService
     }
 
     /**
+     * Calculates shipping cost for fixed price policy.
+     *
+     * @param ShippingMethod $shippingMethod Shipping method.
+     * @param ParcelInfo[] $parcels Array of parcels.
+     *
+     * @return float Calculated fixed price cost.
+     */
+    protected function calculateFixedPriceCost(ShippingMethod $shippingMethod, array $parcels)
+    {
+        $totalWeight = 0;
+        foreach ($parcels as $parcel) {
+            $totalWeight += $parcel->weight;
+        }
+
+        $fixedPricePolicies = $shippingMethod->getFixedPricePolicy();
+        foreach ($fixedPricePolicies as $fixedPricePolicy) {
+            if ($fixedPricePolicy->from <= $totalWeight && $fixedPricePolicy->to > $totalWeight) {
+                return $fixedPricePolicy->amount;
+            }
+        }
+
+        return $fixedPricePolicies[count($fixedPricePolicies) - 1]->amount;
+    }
+
+    /**
      * Gets default shipping cost from shipping method.
      *
      * @param ShippingMethod $shippingMethod A method to get costs from.
@@ -389,42 +418,27 @@ class ShippingMethodService extends BaseService
     }
 
     /**
-     * Calculates cost based on default value and pricing policy.
+     * Calculates cost based on default value and percent or Packlink pricing policy.
      *
      * @param ShippingMethod $shippingMethod
      * @param float $defaultCost Base cost on which to apply pricing policy.
-     * @param $packageWeight
      *
      * @return float Final cost.
      */
-    protected function calculateCost($shippingMethod, $defaultCost, $packageWeight)
+    protected function calculateVariableCost($shippingMethod, $defaultCost)
     {
         $pricingPolicy = $shippingMethod->getPricingPolicy();
         if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PACKLINK) {
             return $defaultCost;
         }
 
-        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PERCENT) {
-            $policy = $shippingMethod->getPercentPricePolicy();
-            $amount = $defaultCost * ($policy->amount / 100);
-            if ($policy->increase) {
-                return $defaultCost + $amount;
-            }
-
-            return $defaultCost - $amount;
+        $policy = $shippingMethod->getPercentPricePolicy();
+        $amount = $defaultCost * ($policy->amount / 100);
+        if ($policy->increase) {
+            return $defaultCost + $amount;
         }
 
-        $fixedPricePolicies = $shippingMethod->getFixedPricePolicy();
-        foreach ($fixedPricePolicies as $fixedPricePolicy) {
-            if ($fixedPricePolicy->from <= $packageWeight && $fixedPricePolicy->to > $packageWeight) {
-                return $fixedPricePolicy->amount;
-            }
-        }
-
-        /** @var Models\FixedPricePolicy $lastPolicy */
-        $lastPolicy = $fixedPricePolicies[count($fixedPricePolicies) - 1];
-
-        return $lastPolicy->amount;
+        return $defaultCost - $amount;
     }
 
     /**
@@ -435,7 +449,7 @@ class ShippingMethodService extends BaseService
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param ParcelInfo $parcel Parcel info.
+     * @param ParcelInfo[] $parcels Parcel info.
      *
      * @return \Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch Resulting object
      */
@@ -445,18 +459,16 @@ class ShippingMethodService extends BaseService
         $fromZip,
         $toCountry,
         $toZip,
-        ParcelInfo $parcel
+        array $parcels
     ) {
         $params = new ShippingServiceSearch();
+
         $params->serviceId = $serviceId;
         $params->fromCountry = $fromCountry;
         $params->fromZip = $fromZip;
         $params->toCountry = $toCountry;
         $params->toZip = $toZip;
-        $params->packageLength = $parcel->length;
-        $params->packageWidth = $parcel->width;
-        $params->packageHeight = $parcel->height;
-        $params->packageWeight = $parcel->weight;
+        $params->parcels = $parcels;
 
         return $params;
     }

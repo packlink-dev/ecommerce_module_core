@@ -68,7 +68,7 @@ class Draft extends BaseDto
      */
     public $carrierName;
     /**
-     * Specification of packages that are being sent.
+     * Specification of parcels that are being sent.
      *
      * @var Package[]
      */
@@ -201,9 +201,9 @@ class Draft extends BaseDto
         }
 
         if (!empty($this->packages)) {
-            $result['packages'] = array();
+            $result['parcels'] = array();
             foreach ($this->packages as $package) {
-                $result['packages'][] = $package->toArray();
+                $result['parcels'][] = $package->toArray();
             }
         }
 

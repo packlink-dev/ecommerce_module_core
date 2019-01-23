@@ -41,29 +41,11 @@ class ShippingServiceSearch extends BaseDto
      */
     public $toZip;
     /**
-     * Package width in cm.
+     * Array of parcels.
      *
-     * @var float
+     * @var ParcelInfo[]
      */
-    public $packageWidth;
-    /**
-     * Package height in cm.
-     *
-     * @var float
-     */
-    public $packageHeight;
-    /**
-     * Package length in cm.
-     *
-     * @var float
-     */
-    public $packageLength;
-    /**
-     * Package weight in kg.
-     *
-     * @var float
-     */
-    public $packageWeight;
+    public $parcels;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -72,18 +54,23 @@ class ShippingServiceSearch extends BaseDto
      */
     public function toArray()
     {
-        return array(
+        $data = array(
             'service_id' => $this->serviceId,
             'from[country]' => $this->fromCountry,
             'from[zip]' => $this->fromZip,
             'to[country]' => $this->toCountry,
             'to[zip]' => $this->toZip,
-            'packages[0][height]' => $this->packageHeight,
-            'packages[0][width]' => $this->packageWidth,
-            'packages[0][length]' => $this->packageLength,
-            'packages[0][weight]' => $this->packageWeight,
             'source' => 'PRO',
         );
+
+        foreach ($this->parcels as $index => $parcel) {
+            $data["parcels[$index][height]"] = $parcel->height;
+            $data["parcels[$index][width]"] = $parcel->width;
+            $data["parcels[$index][length]"] = $parcel->length;
+            $data["parcels[$index][weight]"] = $parcel->weight;
+        }
+
+        return $data;
     }
 
     /**
@@ -96,15 +83,26 @@ class ShippingServiceSearch extends BaseDto
     public static function fromArray(array $raw)
     {
         $instance = new static();
+
         $instance->serviceId = self::getValue($raw, 'service_id');
         $instance->fromCountry = self::getValue($raw, 'from[country]');
         $instance->fromZip = self::getValue($raw, 'from[zip]');
         $instance->toCountry = self::getValue($raw, 'to[country]');
         $instance->toZip = self::getValue($raw, 'to[zip]');
-        $instance->packageHeight = self::getValue($raw, 'packages[0][height]');
-        $instance->packageWidth = self::getValue($raw, 'packages[0][width]');
-        $instance->packageLength = self::getValue($raw, 'packages[0][length]');
-        $instance->packageWeight = self::getValue($raw, 'packages[0][weight]');
+        $instance->parcels = array();
+
+        $index = 0;
+        while (array_key_exists("parcels[$index][height]", $raw)) {
+            $parcel = new ParcelInfo();
+
+            $parcel->height = self::getValue($raw, "parcels[$index][height]");
+            $parcel->width = self::getValue($raw, "parcels[$index][width]");
+            $parcel->length = self::getValue($raw, "parcels[$index][length]");
+            $parcel->weight = self::getValue($raw, "parcels[$index][weight]");
+
+            $instance->parcels[] = $parcel;
+            $index++;
+        }
 
         return $instance;
     }

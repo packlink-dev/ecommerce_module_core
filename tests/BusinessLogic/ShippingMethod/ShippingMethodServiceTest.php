@@ -9,8 +9,10 @@ use Logeecom\Tests\Common\BaseTestWithServices;
 use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -246,6 +248,44 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         );
 
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
+    }
+
+    public function testShippingServiceSearchFromArray()
+    {
+        /** @var ParcelInfo[] $parcels */
+        $parcels = array();
+
+        $firstParcel = ParcelInfo::defaultParcel();
+        $secondParcel = ParcelInfo::defaultParcel();
+        $firstParcel->weight = 1;
+        $secondParcel->weight = 10;
+        $parcels[] = $firstParcel;
+        $parcels[] = $secondParcel;
+
+        $data = array(
+            'service_id' => 20339,
+            'from[country]' => 'IT',
+            'from[zip]' => '00118',
+            'to[country]' => 'IT',
+            'to[zip]' => '00118',
+            'parcels[0][height]' => $parcels[0]->height,
+            'parcels[0][width]' => $parcels[0]->width,
+            'parcels[0][length]' => $parcels[0]->length,
+            'parcels[0][weight]' => $parcels[0]->weight,
+            'parcels[1][height]' => $parcels[1]->height,
+            'parcels[1][width]' => $parcels[1]->width,
+            'parcels[1][length]' => $parcels[1]->length,
+            'parcels[1][weight]' => $parcels[1]->weight,
+        );
+
+        $serviceSearch = ShippingServiceSearch::fromArray($data);
+
+        self::assertEquals(20339, $serviceSearch->serviceId, 'Error in array to object conversion');
+        self::assertEquals(
+            $parcels[1]->weight,
+            $serviceSearch->parcels[1]->weight,
+            'Error in array to object conversion'
+        );
     }
 
     private function getShippingService($id)
