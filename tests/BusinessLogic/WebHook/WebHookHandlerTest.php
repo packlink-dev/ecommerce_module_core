@@ -245,6 +245,22 @@ class WebHookHandlerTest extends BaseTestWithServices
     }
 
     /**
+     * Tests when reference has no tracking info associated with it.
+     */
+    public function testHandleShippingTrackingEventWhen404IsThrown()
+    {
+        /** @var TestOrderRepository $orderRepository */
+        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+
+        $this->httpClient->setMockResponses($this->get404ErrorResponse());
+        /** @var EventBus $bus */
+        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
+        $bus->fire(new TrackingInfoEvent('test'));
+
+        $this->assertEmpty($orderRepository->getOrder('test')->getShipment()->getTrackingHistory());
+    }
+
+    /**
      * Returns responses for testing parcel and warehouse initialization.
      *
      * @return HttpResponse[] Array of Http responses.
@@ -295,6 +311,18 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(400, array(), null)
+        );
+    }
+
+    /**
+     * Returns response with 404 status code.
+     *
+     * @return HttpResponse[]
+     */
+    private function get404ErrorResponse()
+    {
+        return array(
+            new HttpResponse(404, array(), null)
         );
     }
 }

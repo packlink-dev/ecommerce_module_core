@@ -279,10 +279,10 @@ class Proxy
             $result = $response->decodeBodyAsJson();
         } catch (HttpRequestException $e) {
             if ($e->getCode() === 404) {
-                $result = array();
-            } else {
-                throw $e;
+                return array();
             }
+
+            throw $e;
         }
 
         return Tracking::fromArrayBatch($result);
