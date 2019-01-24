@@ -103,7 +103,6 @@ class OrderService extends BaseService
         }
 
         $this->addDestinationAddress($order, $draft);
-        $this->addPriceInfo($order, $draft);
         $this->addAdditionalData($order, $draft);
         $this->addPackages($order, $draft);
 
@@ -130,34 +129,6 @@ class OrderService extends BaseService
         $draft->to->phone = $to->getPhone();
         $draft->to->street1 = $to->getStreet1();
         $draft->to->street2 = $to->getStreet2();
-    }
-
-    /**
-     * Adds price info to draft shipment.
-     *
-     * @param Order $order Shop order.
-     * @param Draft $draft Packlink shipment draft.
-     */
-    private function addPriceInfo(Order $order, Draft $draft)
-    {
-        $draft->price = new Draft\DraftPrice();
-        $draft->price->totalPrice = $order->getTotalPrice();
-        $draft->price->basePrice = $order->getBasePrice();
-        $draft->price->taxPrice = $draft->price->totalPrice - $draft->price->basePrice;
-
-        $itemPrices = array();
-        foreach ($order->getItems() as $item) {
-            $itemPrice = new Draft\ItemPrice();
-            $itemPrice->concept = $item->getConcept();
-            $itemPrice->basePrice = $item->getPrice();
-            $itemPrice->totalPrice = $item->getTotalPrice();
-            $itemPrice->taxPrice = $itemPrice->totalPrice - $itemPrice->basePrice;
-            $itemPrice->extraData = $item->getExtraProperties();
-
-            $itemPrices[] = $itemPrice;
-        }
-
-        $draft->price->items = $itemPrices;
     }
 
     /**

@@ -184,12 +184,8 @@ class Draft extends BaseDto
             $result['from'] = $this->from->toArray();
         }
 
-        if ($this->price) {
-            $result['price'] = $this->price->toArray();
-        }
-
         if ($this->to) {
-            $result['from'] = $this->to->toArray();
+            $result['to'] = $this->to->toArray();
         }
 
         if ($this->additionalData) {
