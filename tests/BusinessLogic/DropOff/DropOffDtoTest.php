@@ -5,9 +5,9 @@ namespace Logeecom\Tests\BusinessLogic\DropOff;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\Proxy;
 
 class DropOffDtoTest extends BaseTestWithServices
@@ -84,7 +84,7 @@ class DropOffDtoTest extends BaseTestWithServices
      */
     protected function getSuccessfulResponses()
     {
-        $response = file_get_contents(__DIR__ . '/../../Common/ApiResponses/dropOffs.json');
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/dropOffs.json');
 
         return array(new HttpResponse(200, array(), $response));
     }

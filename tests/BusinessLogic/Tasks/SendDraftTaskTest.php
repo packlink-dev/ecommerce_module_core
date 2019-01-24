@@ -5,10 +5,10 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\TaskExecution\Task;
-use Logeecom\Tests\Common\TestComponents\Order\TestOrderRepository;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
 use Logeecom\Tests\Infrastructure\BaseSyncTest;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
@@ -91,7 +91,7 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->httpClient->setMockResponses($this->getMockResponses());
         $this->syncTask->execute();
 
-        /** @var TestOrderRepository $orderRepository */
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
         $order = $orderRepository->getOrder('test');
 
@@ -100,7 +100,7 @@ class SendDraftTaskTest extends BaseSyncTest
 
     public function testAfterFailure()
     {
-        /** @var TestOrderRepository $orderRepository */
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
         $orderRepository->shouldThrowException(true);
         $serialized = '';
@@ -140,7 +140,7 @@ class SendDraftTaskTest extends BaseSyncTest
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/draftResponse.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/draftResponse.json')
             ),
         );
     }

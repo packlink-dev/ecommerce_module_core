@@ -5,8 +5,8 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\BarTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -224,7 +224,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     protected function readQueueItemsFromFile()
     {
         $queueItems = array();
-        $json = file_get_contents(__DIR__ . '/../../Common/EntityData/QueueItems.json');
+        $json = file_get_contents(__DIR__ . '/../Common/EntityData/QueueItems.json');
         $queueItemsRaw = json_decode($json, true);
         foreach ($queueItemsRaw as $item) {
             if ($item['taskType'] === 'FooTask') {

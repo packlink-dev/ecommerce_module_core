@@ -2,8 +2,6 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-
 /**
  * Class MemoryGenericStudentRepositoryTest.
  *
@@ -16,7 +14,7 @@ class MemoryGenericStudentRepositoryTest extends AbstractGenericStudentRepositor
      */
     public function getStudentEntityRepositoryClass()
     {
-        return MemoryRepository::getClassName();
+        return \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName();
     }
 
     /**

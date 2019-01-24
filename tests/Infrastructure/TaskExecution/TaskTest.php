@@ -5,14 +5,14 @@ namespace Logeecom\Tests\Infrastructure\TaskExecution;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
 class TaskTest extends TestCase
 {
-    /** @var TestTimeProvider */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider */
     private $timeProvider;
 
     /**

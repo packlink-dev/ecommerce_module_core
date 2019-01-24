@@ -2,9 +2,9 @@
 
 namespace Logeecom\Tests\BusinessLogic\Order;
 
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\Order\TestOrderRepository;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShipmentReference;

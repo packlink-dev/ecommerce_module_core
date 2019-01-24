@@ -14,21 +14,20 @@ use Logeecom\Infrastructure\TaskExecution\TaskRunner;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunner;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestComponents\Utility\TestGuidProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
 class TaskRunnerStarterTest extends BaseTestWithServices
 {
     /** @var AsyncProcessService */
     private $asyncProcessStarter;
-    /** @var TestTaskRunner */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunner */
     private $taskRunner;
     /** @var TestRunnerStatusStorage */
     private $runnerStatusStorage;
@@ -175,7 +174,7 @@ class TaskRunnerStarterTest extends BaseTestWithServices
         RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
 
         $runnerStatusStorage = new TestRunnerStatusStorage();
-        $taskRunner = new TestTaskRunner();
+        $taskRunner = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunner();
         $guidProvider = TestGuidProvider::getInstance();
 
         TestServiceRegister::registerService(

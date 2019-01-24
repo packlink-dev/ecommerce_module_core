@@ -16,28 +16,27 @@ use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
 class QueueItemStarterTest extends TestCase
 {
-    /** @var TestQueueService */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService */
     public $queue;
     /** @var MemoryQueueItemRepository */
     public $queueStorage;
     /** @var TestTimeProvider */
     public $timeProvider;
-    /** @var TestShopLogger */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger */
     public $logger;
     /** @var Configuration */
     public $shopConfiguration;
@@ -62,7 +61,8 @@ class QueueItemStarterTest extends TestCase
                     return $timeProvider;
                 },
                 TaskRunnerWakeup::CLASS_NAME => function () {
-                    return new TestTaskRunnerWakeupService();
+                    return new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService(
+                    );
                 },
                 QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
@@ -100,7 +100,10 @@ class QueueItemStarterTest extends TestCase
     public function testRunningItemStarter()
     {
         // Arrange
-        $queueItem = $this->queue->enqueue('test', new FooTask());
+        $queueItem = $this->queue->enqueue(
+            'test',
+            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+        );
         $itemStarter = new QueueItemStarter($queueItem->getId());
 
         // Act
@@ -128,7 +131,10 @@ class QueueItemStarterTest extends TestCase
     public function testItemStarterMustBeRunnableAfterDeserialization()
     {
         // Arrange
-        $queueItem = $this->queue->enqueue('test', new FooTask());
+        $queueItem = $this->queue->enqueue(
+            'test',
+            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+        );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         /** @var QueueItemStarter $unserializedItemStarter */
         $unserializedItemStarter = unserialize(serialize($itemStarter));
@@ -169,7 +175,10 @@ class QueueItemStarterTest extends TestCase
     public function testItemsStarterExceptionHandling()
     {
         // Arrange
-        $queueItem = $this->queue->enqueue('test', new FooTask());
+        $queueItem = $this->queue->enqueue(
+            'test',
+            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+        );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         $this->queue->setExceptionResponse(
             'start',

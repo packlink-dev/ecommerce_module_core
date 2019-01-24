@@ -3,8 +3,8 @@
 namespace Logeecom\Tests\Infrastructure;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Tests\Common\TestComponents\TestService;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestService;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
 class ServiceRegisterTest extends TestCase

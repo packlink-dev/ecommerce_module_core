@@ -4,8 +4,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use PHPUnit\Framework\TestCase;
 
 /***
@@ -20,10 +19,16 @@ class RepositoryRegistryTest extends TestCase
      */
     public function testRegisterRepository()
     {
-        RepositoryRegistry::registerRepository('test', MemoryRepository::getClassName());
+        RepositoryRegistry::registerRepository(
+            'test',
+            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName()
+        );
 
         $repository = RepositoryRegistry::getRepository('test');
-        $this->assertInstanceOf(MemoryRepository::getClassName(), $repository);
+        $this->assertInstanceOf(
+            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName(),
+            $repository
+        );
     }
 
     /**
@@ -35,7 +40,10 @@ class RepositoryRegistryTest extends TestCase
         RepositoryRegistry::registerRepository('test', MemoryQueueItemRepository::getClassName());
 
         $repository = RepositoryRegistry::getRepository('test');
-        $this->assertNotEquals(MemoryRepository::getClassName(), $repository);
+        $this->assertNotEquals(
+            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName(),
+            $repository
+        );
     }
 
     /**
@@ -72,7 +80,10 @@ class RepositoryRegistryTest extends TestCase
      */
     public function testGetQueueItemRepositoryException()
     {
-        RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryRepository::getClassName());
+        RepositoryRegistry::registerRepository(
+            QueueItem::getClassName(),
+            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName()
+        );
 
         RepositoryRegistry::getQueueItemRepository();
     }

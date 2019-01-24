@@ -6,10 +6,10 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\Order\TestOrderRepository;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -26,7 +26,7 @@ use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 class WebHookHandlerTest extends BaseTestWithServices
 {
     /**
-     * @var TestHttpClient
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
 
@@ -171,7 +171,7 @@ class WebHookHandlerTest extends BaseTestWithServices
      */
     public function testHandleShippingStatusEventNoOrder()
     {
-        /** @var TestOrderRepository $orderRepository */
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         $orderRepository->shouldThrowException(true);
 
@@ -194,7 +194,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
         $bus->fire(new TrackingInfoEvent('test'));
 
-        /** @var TestOrderRepository $orderRepository */
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         $order = $orderRepository->getOrder('test');
 
@@ -269,7 +269,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/shipmentLabels.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
             )
         );
     }
@@ -283,7 +283,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/shipment.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
             )
         );
     }
@@ -297,7 +297,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/tracking.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/tracking.json')
             )
         );
     }

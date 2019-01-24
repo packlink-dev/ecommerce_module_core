@@ -5,9 +5,9 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\TaskExecution\Task;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
 use Logeecom\Tests\Infrastructure\BaseSyncTest;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Tasks\GetDefaultParcelAndWarehouseTask;
@@ -20,7 +20,7 @@ use Packlink\BusinessLogic\User\UserAccountService;
 class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
 {
     /**
-     * @var TestHttpClient
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
 
@@ -101,10 +101,10 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/parcels.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/parcels.json')
             ),
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/warehouses.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json')
             ),
         );
     }

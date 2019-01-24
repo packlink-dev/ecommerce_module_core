@@ -6,10 +6,10 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
@@ -31,7 +31,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
      */
     public $testShopShippingMethodService;
     /**
-     * @var TestHttpClient
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
 
@@ -91,7 +91,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     {
         // first service from this response has id 20339 and cost of 4.94
         $response = file_get_contents(
-            __DIR__ . '/../../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
         );
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
 
@@ -119,7 +119,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         // first service from this response has id 20339 and cost of 4.94
         $response = file_get_contents(
-            __DIR__ . '/../../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
         );
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
 
@@ -145,7 +145,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         // first service from this response has id 20339 and total base price of 14.16
         $response = file_get_contents(
-            __DIR__ . '/../../Common/ApiResponses/ShippingServices/ShippingServiceDetails-MultipleParcels.json'
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-MultipleParcels.json'
         );
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
 

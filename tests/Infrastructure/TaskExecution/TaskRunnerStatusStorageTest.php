@@ -10,17 +10,17 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\RunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
 class TaskRunnerStatusStorageTest extends TestCase
 {
-    /** @var TestShopConfiguration */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration */
     private $configuration;
 
     /**

@@ -13,16 +13,16 @@ use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
@@ -37,7 +37,7 @@ use PHPUnit\Framework\TestCase;
 class ScheduleCheckTaskTest extends TestCase
 {
     /**
-     * @var TestTimeProvider
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
      */
     public $timeProvider;
     /**
@@ -137,8 +137,10 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
-     * Tests when there are no scheduled tasks
+     * Tests when there are no scheduled tasks.
+     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testEmptyExecution()
     {
@@ -147,8 +149,8 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
-     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testSchedulingTasks()
     {

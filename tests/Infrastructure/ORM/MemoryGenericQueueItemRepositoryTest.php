@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 
 /**
  * Class MemoryGenericQueueItemRepositoryTest.

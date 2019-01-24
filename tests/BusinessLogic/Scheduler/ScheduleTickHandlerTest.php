@@ -9,13 +9,13 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use PHPUnit\Framework\TestCase;
 
@@ -34,13 +34,13 @@ class ScheduleTickHandlerTest extends TestCase
     /**
      * QueueStorage instance\
      *
-     * @var MemoryQueueItemRepository
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository
      */
     private $queueStorage;
     /**
      * TimeProvider instance
      *
-     * @var TestTimeProvider
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
      */
     private $timeProvider;
     /**
@@ -100,6 +100,7 @@ class ScheduleTickHandlerTest extends TestCase
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testFirstQueueOfHandler()
     {
@@ -118,6 +119,7 @@ class ScheduleTickHandlerTest extends TestCase
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testSecondQueueOfHandler()
     {
@@ -144,6 +146,7 @@ class ScheduleTickHandlerTest extends TestCase
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testSecondQueueOfHandlerAfterThreshold()
     {

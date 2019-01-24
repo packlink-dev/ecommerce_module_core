@@ -4,7 +4,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Tests\Common\TestComponents\ORM\Entity\StudentEntity;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\StudentEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -64,7 +64,7 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->where('email', '=', 'Brandon.Adair@powerschool.com');
-        /** @var StudentEntity $student */
+        /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\StudentEntity $student */
         $student = $repository->selectOne($queryFilter);
 
         $studentId = $student->getId();
@@ -192,7 +192,7 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     protected function readStudentsFromFile()
     {
         $students = array();
-        $json = file_get_contents(__DIR__ . '/../../Common/EntityData/Students.json');
+        $json = file_get_contents(__DIR__ . '/../Common/EntityData/Students.json');
         $studentsRaw = json_decode($json, true);
         foreach ($studentsRaw as $item) {
             $student = new StudentEntity();

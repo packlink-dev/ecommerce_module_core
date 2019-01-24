@@ -4,7 +4,7 @@ namespace Logeecom\Tests\Infrastructure;
 
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
-use Logeecom\Tests\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
 
 /**
  * Class BaseSyncTest.

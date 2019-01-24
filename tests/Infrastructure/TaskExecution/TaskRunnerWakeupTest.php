@@ -18,16 +18,16 @@ use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 use Logeecom\Infrastructure\Utility\GuidProvider;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Utility\TestGuidProvider;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
 class TaskRunnerWakeupTest extends TestCase
@@ -38,11 +38,11 @@ class TaskRunnerWakeupTest extends TestCase
     private $runnerStatusStorage;
     /** @var TestTimeProvider */
     private $timeProvider;
-    /** @var TestGuidProvider */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider */
     private $guidProvider;
     /** @var TaskRunnerWakeupService */
     private $runnerWakeup;
-    /** @var TestShopLogger */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger */
     private $logger;
 
     /**

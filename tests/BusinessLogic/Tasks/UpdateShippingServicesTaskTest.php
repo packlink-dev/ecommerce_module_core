@@ -9,10 +9,10 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
 use Logeecom\Tests\Infrastructure\BaseSyncTest;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -25,7 +25,7 @@ use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 class UpdateShippingServicesTaskTest extends BaseSyncTest
 {
     /**
-     * @var TestHttpClient
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
     /**
@@ -360,12 +360,12 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     private function getDemoServiceDeliveryDetails($countries)
     {
         return file_get_contents(
-            __DIR__ . "/../../Common/ApiResponses/ShippingServices/ShippingServiceDetails-$countries.json"
+            __DIR__ . "/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-$countries.json"
         );
     }
 
     private function getDemoServiceDetails($id)
     {
-        return file_get_contents(__DIR__ . "/../../Common/ApiResponses/ShippingServices/ServiceDetails-$id.json");
+        return file_get_contents(__DIR__ . "/../Common/ApiResponses/ShippingServices/ServiceDetails-$id.json");
     }
 }

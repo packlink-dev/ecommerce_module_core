@@ -5,16 +5,16 @@ namespace Logeecom\Tests\BusinessLogic\Location;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\Proxy;
 
 class PostalCodeEntityTest extends BaseTestWithServices
 {
     /**
-     * @var TestHttpClient
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
 
@@ -102,7 +102,7 @@ class PostalCodeEntityTest extends BaseTestWithServices
      */
     protected function getSuccessfulResponses()
     {
-        $response = file_get_contents(__DIR__ . '/../../Common/ApiResponses/postalCodes.json');
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/postalCodes.json');
 
         return array(new HttpResponse(200, array(), $response));
     }

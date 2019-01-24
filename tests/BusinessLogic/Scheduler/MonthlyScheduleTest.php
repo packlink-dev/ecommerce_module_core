@@ -3,8 +3,8 @@
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
 use PHPUnit\Framework\TestCase;
 

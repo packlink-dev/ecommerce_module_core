@@ -4,14 +4,14 @@ namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
 class QueueItemTest extends TestCase
 {
-    /** @var TestTimeProvider */
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider */
     private $timeProvider;
 
     /**
@@ -38,7 +38,7 @@ class QueueItemTest extends TestCase
      */
     public function testWhenQueueItemIsCreatedItShouldBeInCreatedStatus()
     {
-        $task = new FooTask();
+        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
         $queueItem = new QueueItem($task);
 
         $this->assertEquals(
@@ -109,12 +109,12 @@ class QueueItemTest extends TestCase
      */
     public function testQueueItemShouldThrowExceptionWhenSerializationFails()
     {
-        $task = new FooTask('test task', 123);
+        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask('test task', 123);
         $queueItem = new QueueItem();
 
         $queueItem->setSerializedTask('invalid serialized task content');
 
-        /** @var FooTask $actualTask */
+        /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
         $actualTask = $queueItem->getTask();
         $this->assertSame($task->getDependency1(), $actualTask->getDependency1());
         $this->assertSame($task->getDependency2(), $actualTask->getDependency2());
@@ -126,11 +126,13 @@ class QueueItemTest extends TestCase
     public function testItShouldUpdateTaskWhenSettingSerializedTask()
     {
         $newTask = new FooTask('new task', 123);
-        $queueItem = new QueueItem(new FooTask('initial task', 1));
+        $queueItem = new QueueItem(
+            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask('initial task', 1)
+        );
 
         $queueItem->setSerializedTask(serialize($newTask));
 
-        /** @var FooTask $actualTask */
+        /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
         $actualTask = $queueItem->getTask();
         $this->assertSame(
             'new task',
@@ -248,7 +250,7 @@ class QueueItemTest extends TestCase
      */
     public function testQueueItemIdToTask()
     {
-        $task = new FooTask('test task', 123);
+        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask('test task', 123);
         $queueItem = new QueueItem($task);
         $queueItem->setId(27);
 
@@ -270,7 +272,7 @@ class QueueItemTest extends TestCase
 
         $queueItem->setSerializedTask(serialize($task));
 
-        /** @var FooTask $actualTask */
+        /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
         $actualTask = $queueItem->getTask();
 
         self::assertEquals(27, $actualTask->getExecutionId());

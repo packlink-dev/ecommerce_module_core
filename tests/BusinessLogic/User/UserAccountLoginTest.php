@@ -8,13 +8,13 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Logeecom\Tests\Common\BaseTestWithServices;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueueService;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\User\UserAccountService;
@@ -86,7 +86,7 @@ class UserAccountLoginTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/user.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
             ),
             new HttpResponse(
                 200, array(), null
@@ -136,7 +136,7 @@ class UserAccountLoginTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/parcels.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/parcels.json')
             ),
         );
     }
@@ -166,7 +166,7 @@ class UserAccountLoginTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../../Common/ApiResponses/warehouses.json')
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json')
             ),
         );
     }
