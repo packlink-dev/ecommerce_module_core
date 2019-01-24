@@ -21,9 +21,9 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class BaseTest.
  *
- * @package Logeecom\Infrastructure\Tests\Common
+ * @package Logeecom\Tests\Infrastructure\Common
  */
-abstract class BaseTestWithServices extends TestCase
+abstract class BaseInfrastructureTestWithServices extends TestCase
 {
     /**
      * @var TestShopConfiguration

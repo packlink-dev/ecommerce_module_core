@@ -6,14 +6,14 @@ use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\Utility\EntityTranslator;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 
 /**
  * Class EntityTranslatorTest.
  *
  * @package Logeecom\Tests\Infrastructure\ORM
  */
-class EntityTranslatorTest extends BaseTestWithServices
+class EntityTranslatorTest extends BaseInfrastructureTestWithServices
 {
     /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException

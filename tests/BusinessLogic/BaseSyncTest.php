@@ -1,10 +1,10 @@
 <?php
 
-namespace Logeecom\Tests\Infrastructure;
+namespace Logeecom\Tests\BusinessLogic;
 
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 
 /**
  * Class BaseSyncTest.

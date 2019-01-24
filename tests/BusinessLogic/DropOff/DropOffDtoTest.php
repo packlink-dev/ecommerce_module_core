@@ -5,7 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\DropOff;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\Proxy;

@@ -58,11 +58,6 @@ abstract class Configuration extends Singleton
     abstract public function getCurrentSystemId();
 
     /**
-     * Resets authorization credentials to null
-     */
-    abstract public function resetAuthorizationCredentials();
-
-    /**
      * Returns async process starter url, always in http.
      *
      * @param string $guid Process identifier.

@@ -4,9 +4,9 @@ namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,7 +57,7 @@ class QueueItemEntityTest extends TestCase
         $entity->setId(1234);
         $entity->setStatus(QueueItem::COMPLETED);
         $entity->setContext('context');
-        $entity->setSerializedTask(serialize(new UpdateShippingServicesTask()));
+        $entity->setSerializedTask(serialize(new FooTask()));
         $entity->setQueueName('queue');
         $entity->setLastExecutionProgressBasePoints(2541);
         $entity->setProgressBasePoints(458);
@@ -92,7 +92,10 @@ class QueueItemEntityTest extends TestCase
 
         $task = $entity->getTask();
         self::assertNotNull($task);
-        self::assertInstanceOf('\\Packlink\\BusinessLogic\\Tasks\\UpdateShippingServicesTask', $task);
+        self::assertInstanceOf(
+            '\\Logeecom\\Tests\\Infrastructure\\Common\\TestComponents\\TaskExecution\\FooTask',
+            $task
+        );
     }
 
     public function testFromArrayAndToJSON()
@@ -112,7 +115,7 @@ class QueueItemEntityTest extends TestCase
             'id' => 123,
             'status' => QueueItem::COMPLETED,
             'context' => 'context',
-            'serializedTask' => serialize(new UpdateShippingServicesTask()),
+            'serializedTask' => serialize(new FooTask()),
             'queueName' => 'queue',
             'lastExecutionProgressBasePoints' => 1234,
             'progressBasePoints' => 7345,

@@ -5,11 +5,11 @@ namespace Logeecom\Tests\Infrastructure\logger;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Logger\LoggerConfiguration;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
-class LoggerTest extends BaseTestWithServices
+class LoggerTest extends BaseInfrastructureTestWithServices
 {
     /**
      * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient

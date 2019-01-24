@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\BusinessLogic\Order;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
 class OrderStatusMappingTest extends BaseTestWithServices

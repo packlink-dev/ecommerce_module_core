@@ -14,7 +14,7 @@ use Logeecom\Infrastructure\TaskExecution\TaskRunner;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
@@ -23,7 +23,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
-class TaskRunnerStarterTest extends BaseTestWithServices
+class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
 {
     /** @var AsyncProcessService */
     private $asyncProcessStarter;

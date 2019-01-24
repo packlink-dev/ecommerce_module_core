@@ -4,8 +4,8 @@ namespace Logeecom\Tests\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
-use Logeecom\Tests\Infrastructure\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;

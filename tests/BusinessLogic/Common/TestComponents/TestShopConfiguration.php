@@ -1,8 +1,8 @@
 <?php
 
-namespace Logeecom\Tests\Infrastructure\Common\TestComponents;
+namespace Logeecom\Tests\BusinessLogic\Common\TestComponents;
 
-class TestShopConfiguration extends \Logeecom\Infrastructure\Configuration\Configuration
+class TestShopConfiguration extends \Packlink\BusinessLogic\Configuration
 {
     private $callbackUrl = 'https://some-shop.test/callback?a=1&b=abc';
     private $servicePointEnabled = true;

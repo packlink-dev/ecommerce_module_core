@@ -5,7 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\TaskExecution\Task;
-use Logeecom\Tests\Infrastructure\BaseSyncTest;
+use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
