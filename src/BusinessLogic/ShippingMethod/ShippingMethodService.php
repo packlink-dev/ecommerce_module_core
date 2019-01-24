@@ -230,7 +230,7 @@ class ShippingMethodService extends BaseService
         }
 
         if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
-            return round($this->calculateFixedPriceCost($shippingMethod, $parcels), 2);
+            return round($this->calculateFixedPriceCost($shippingMethod, $fromCountry, $toCountry, $parcels), 2);
         }
 
         try {
@@ -374,12 +374,19 @@ class ShippingMethodService extends BaseService
      * Calculates shipping cost for fixed price policy.
      *
      * @param ShippingMethod $shippingMethod Shipping method.
+     * @param string $fromCountry Departure country code.
+     * @param string $toCountry Destination country code.
      * @param ParcelInfo[] $parcels Array of parcels.
      *
      * @return float Calculated fixed price cost.
      */
-    protected function calculateFixedPriceCost(ShippingMethod $shippingMethod, array $parcels)
+    protected function calculateFixedPriceCost(ShippingMethod $shippingMethod, $fromCountry, $toCountry, array $parcels)
     {
+        if ($this->getDefaultCost($shippingMethod, $fromCountry, $toCountry) === 0) {
+            // this method is not available for selected departure and destination
+            return 0;
+        }
+
         $totalWeight = 0;
         foreach ($parcels as $parcel) {
             $totalWeight += $parcel->weight;
