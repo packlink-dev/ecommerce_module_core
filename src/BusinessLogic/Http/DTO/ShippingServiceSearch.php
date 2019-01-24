@@ -64,10 +64,10 @@ class ShippingServiceSearch extends BaseDto
         );
 
         foreach ($this->parcels as $index => $parcel) {
-            $data["parcels[$index][height]"] = $parcel->height;
-            $data["parcels[$index][width]"] = $parcel->width;
-            $data["parcels[$index][length]"] = $parcel->length;
-            $data["parcels[$index][weight]"] = $parcel->weight;
+            $data["packages[$index][height]"] = $parcel->height;
+            $data["packages[$index][width]"] = $parcel->width;
+            $data["packages[$index][length]"] = $parcel->length;
+            $data["packages[$index][weight]"] = $parcel->weight;
         }
 
         return $data;
@@ -92,13 +92,13 @@ class ShippingServiceSearch extends BaseDto
         $instance->parcels = array();
 
         $index = 0;
-        while (array_key_exists("parcels[$index][height]", $raw)) {
+        while (array_key_exists("packages[$index][height]", $raw)) {
             $parcel = new ParcelInfo();
 
-            $parcel->height = self::getValue($raw, "parcels[$index][height]");
-            $parcel->width = self::getValue($raw, "parcels[$index][width]");
-            $parcel->length = self::getValue($raw, "parcels[$index][length]");
-            $parcel->weight = self::getValue($raw, "parcels[$index][weight]");
+            $parcel->height = self::getValue($raw, "packages[$index][height]");
+            $parcel->width = self::getValue($raw, "packages[$index][width]");
+            $parcel->length = self::getValue($raw, "packages[$index][length]");
+            $parcel->weight = self::getValue($raw, "packages[$index][weight]");
 
             $instance->parcels[] = $parcel;
             $index++;

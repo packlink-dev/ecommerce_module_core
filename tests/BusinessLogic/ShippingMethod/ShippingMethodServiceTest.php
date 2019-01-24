@@ -268,14 +268,14 @@ class ShippingMethodServiceTest extends BaseTestWithServices
             'from[zip]' => '00118',
             'to[country]' => 'IT',
             'to[zip]' => '00118',
-            'parcels[0][height]' => $parcels[0]->height,
-            'parcels[0][width]' => $parcels[0]->width,
-            'parcels[0][length]' => $parcels[0]->length,
-            'parcels[0][weight]' => $parcels[0]->weight,
-            'parcels[1][height]' => $parcels[1]->height,
-            'parcels[1][width]' => $parcels[1]->width,
-            'parcels[1][length]' => $parcels[1]->length,
-            'parcels[1][weight]' => $parcels[1]->weight,
+            'packages[0][height]' => $parcels[0]->height,
+            'packages[0][width]' => $parcels[0]->width,
+            'packages[0][length]' => $parcels[0]->length,
+            'packages[0][weight]' => $parcels[0]->weight,
+            'packages[1][height]' => $parcels[1]->height,
+            'packages[1][width]' => $parcels[1]->width,
+            'packages[1][length]' => $parcels[1]->length,
+            'packages[1][weight]' => $parcels[1]->weight,
         );
 
         $serviceSearch = ShippingServiceSearch::fromArray($data);
