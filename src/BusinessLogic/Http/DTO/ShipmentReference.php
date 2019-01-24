@@ -25,7 +25,7 @@ class ShipmentReference extends BaseDto
     public static function fromArray(array $raw)
     {
         $instance = new static();
-        $instance->reference = static::getValue($raw, 'shipment_reference');
+        $instance->reference = static::getValue($raw, 'reference');
 
         return $instance;
     }
@@ -38,7 +38,7 @@ class ShipmentReference extends BaseDto
     public function toArray()
     {
         return array(
-            'shipment_reference' => $this->reference,
+            'reference' => $this->reference,
         );
     }
 }

@@ -80,11 +80,31 @@ class CurlHttpClient extends HttpClient
             throw new HttpCommunicationException('Request ' . $url . ' failed.');
         }
 
+        $apiResponse = $this->strip100Header($apiResponse);
+
         return new HttpResponse(
             $statusCode,
             $this->getHeadersFromCurlResponse($apiResponse),
             $this->getBodyFromCurlResponse($apiResponse)
         );
+    }
+
+    /**
+     * Strips 100 header that is added before regular header in certain requests.
+     *
+     * @param string $response API response.
+     *
+     * @return string Returns refined response.
+     */
+    protected function strip100Header($response)
+    {
+        $delimiter = "\r\n\r\n";
+        $needle = 'HTTP/1.1 100';
+        if (strpos($response, $needle) === 0) {
+            return substr($response, strpos($response, $delimiter) + 4);
+        }
+
+        return $response;
     }
 
     /**
