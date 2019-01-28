@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
+use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\StudentEntity;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractGenericStudentRepositoryTest extends TestCase
 {
     protected $femaleStudents = 2;
+    protected $maleStudents = 8;
     protected $studentCount = 10;
 
     /**
@@ -133,11 +135,11 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
-        $queryFilter->where('gender', '=', 'F');
+        $queryFilter->where('gender', Operators::EQUALS, 'M');
         $queryFilter->orderBy('email');
 
         $entities = $repository->select($queryFilter);
-        $this->assertCount($this->femaleStudents, $entities);
+        $this->assertCount($this->maleStudents, $entities);
         $emails = array();
         /** @var StudentEntity $item */
         foreach ($entities as $item) {
@@ -147,6 +149,38 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
         $emails2 = $emails;
         sort($emails);
         $this->assertEquals($emails, $emails2);
+    }
+
+    /**
+     * @depends testStudentMassInsert
+     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    public function testQueryWithUnknownFieldSort()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+        $queryFilter->orderBy('some_field', QueryFilter::ORDER_DESC);
+
+        $repository->select($queryFilter);
+    }
+
+    /**
+     * @depends testStudentMassInsert
+     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    public function testQueryWithUnIndexedFieldSort()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+        $queryFilter->orderBy('contact', QueryFilter::ORDER_DESC);
+
+        $repository->select($queryFilter);
     }
 
     /**

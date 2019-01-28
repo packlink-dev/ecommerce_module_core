@@ -258,21 +258,31 @@ class MemoryRepository implements RepositoryInterface
      * @param array $result
      * @param QueryFilter $filter
      * @param array $fieldIndexMap
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     private function sortResults(array &$result, QueryFilter $filter, array $fieldIndexMap)
     {
         $column = $filter->getOrderByColumn();
-        if ($column && array_key_exists($column, $fieldIndexMap)) {
-            $direction = $filter->getOrderDirection();
-            $indexKey = 'index_' . $fieldIndexMap[$column];
-            $i = ($direction === 'ASC' ? 1 : -1);
-            usort(
-                $result,
-                function ($a, $b) use ($i, $indexKey) {
-                    return strcmp($a[$indexKey], $b[$indexKey]) * $i;
-                }
+        if (empty($column)) {
+            return;
+        }
+
+        if (!array_key_exists($column, $fieldIndexMap)) {
+            throw new QueryFilterInvalidParamException(
+                'Unknown or not indexed OrderBy column ' . $filter->getOrderByColumn()
             );
         }
+
+        $direction = $filter->getOrderDirection();
+        $indexKey = 'index_' . $fieldIndexMap[$column];
+        $i = ($direction === 'ASC' ? 1 : -1);
+        usort(
+            $result,
+            function ($a, $b) use ($i, $indexKey) {
+                return strcmp($a[$indexKey], $b[$indexKey]) * $i;
+            }
+        );
     }
 
     /**
