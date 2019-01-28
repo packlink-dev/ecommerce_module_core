@@ -257,7 +257,15 @@ class Proxy
      */
     public function getShipment($referenceId)
     {
-        $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId");
+        try {
+            $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId");
+        } catch (HttpRequestException $e) {
+            if ($e->getCode() === 404) {
+                return new Shipment();
+            }
+
+            throw $e;
+        }
 
         return Shipment::fromArray($response->decodeBodyAsJson());
     }

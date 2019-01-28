@@ -7,6 +7,7 @@ use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Address;
 use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\Http\DTO\Shipment as ShipmentDetails;
 use Packlink\BusinessLogic\Order\Objects\Shipment;
 use Packlink\BusinessLogic\Order\Objects\Shipping;
 use Packlink\BusinessLogic\Order\Objects\TrackingHistory;
@@ -100,10 +101,11 @@ class TestOrderRepository implements OrderRepository
      *
      * @param string $shipmentReference Packlink shipment reference.
      * @param Tracking[] $trackingHistory Shipment tracking history.
+     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipmentDetails Packlink shipment details.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
-    public function updateTrackingInfo($shipmentReference, array $trackingHistory)
+    public function updateTrackingInfo($shipmentReference, array $trackingHistory, ShipmentDetails $shipmentDetails)
     {
         if ($this->throw) {
             throw new OrderNotFound('Order not found.');

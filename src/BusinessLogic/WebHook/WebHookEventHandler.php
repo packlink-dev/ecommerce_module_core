@@ -106,7 +106,9 @@ class WebHookEventHandler extends BaseService
         try {
             /** @var Tracking[] $trackingHistory */
             $trackingHistory = $this->proxy->getTrackingInfo($referenceId);
-            $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory);
+            $sortedHistory = $this->sortTrackingHistoryRecords($trackingHistory);
+            $shipmentDetails = $this->proxy->getShipment($referenceId);
+            $this->orderRepository->updateTrackingInfo($referenceId, $sortedHistory, $shipmentDetails);
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
         } catch (OrderNotFound $e) {
@@ -122,5 +124,28 @@ class WebHookEventHandler extends BaseService
                 array('referenceId' => $referenceId, 'trackingHistory' => $trackingAsArray)
             );
         }
+    }
+
+    /**
+     * Sort tracking history records by timestamps.
+     *
+     * @param array $trackingHistory Array of tracking history records.
+     *
+     * @return array Sorted array of tracking history records.
+     */
+    private function sortTrackingHistoryRecords(array $trackingHistory)
+    {
+        usort(
+            $trackingHistory,
+            function ($first, $second) {
+                if ($first->timestamp === $second->timestamp) {
+                    return 0;
+                }
+
+                return ($first->timestamp < $second->timestamp) ? -1 : 1;
+            }
+        );
+
+        return $trackingHistory;
     }
 }

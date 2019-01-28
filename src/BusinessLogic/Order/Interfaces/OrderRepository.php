@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Order\Interfaces;
 
+use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Order\Objects\Order;
 
@@ -51,10 +52,11 @@ interface OrderRepository
      *
      * @param string $shipmentReference Packlink shipment reference.
      * @param Tracking[] $trackingHistory Shipment tracking history.
+     * @param Shipment $shipmentDetails Packlink shipment details.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
-    public function updateTrackingInfo($shipmentReference, array $trackingHistory);
+    public function updateTrackingInfo($shipmentReference, array $trackingHistory, Shipment $shipmentDetails);
 
     /**
      * Sets order packlink shipping status to an order by shipment reference.

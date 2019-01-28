@@ -56,12 +56,15 @@ class WebHookHandlerTest extends BaseTestWithServices
             }
         );
 
-        TestServiceRegister::registerService(Proxy::CLASS_NAME, function () use ($me) {
-            /** @var Configuration $config */
-            $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        TestServiceRegister::registerService(
+            Proxy::CLASS_NAME,
+            function () use ($me) {
+                /** @var Configuration $config */
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-            return new Proxy($config->getAuthorizationToken(), $me->httpClient);
-        });
+                return new Proxy($config->getAuthorizationToken(), $me->httpClient);
+            }
+        );
     }
 
     protected function tearDown()
@@ -189,7 +192,9 @@ class WebHookHandlerTest extends BaseTestWithServices
      */
     public function testHandleShippingTrackingEvent()
     {
-        $this->httpClient->setMockResponses($this->getMockTrackingResponse());
+        $this->httpClient->setMockResponses(
+            array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())
+        );
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
         $bus->fire(new TrackingInfoEvent('test'));
@@ -200,10 +205,11 @@ class WebHookHandlerTest extends BaseTestWithServices
 
         $this->assertNotNull($order);
         $trackingHistories = $order->getShipment()->getTrackingHistory();
+        $trackingHistoryCount = \count($trackingHistories);
         $this->assertCount(3, $trackingHistories);
-        $this->assertEquals(14242322, $trackingHistories[0]->getTimestamp());
-        $this->assertEquals('DELIVERED', $trackingHistories[0]->getDescription());
-        $this->assertEquals('MIAMI', $trackingHistories[0]->getCity());
+        $this->assertEquals(14242322, $trackingHistories[$trackingHistoryCount - 1]->getTimestamp());
+        $this->assertEquals('DELIVERED', $trackingHistories[$trackingHistoryCount - 1]->getDescription());
+        $this->assertEquals('MIAMI', $trackingHistories[$trackingHistoryCount - 1]->getCity());
     }
 
     /**
@@ -235,7 +241,9 @@ class WebHookHandlerTest extends BaseTestWithServices
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         $orderRepository->shouldThrowException(true);
 
-        $this->httpClient->setMockResponses($this->getMockTrackingResponse());
+        $this->httpClient->setMockResponses(
+            array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())
+        );
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
         $bus->fire(new TrackingInfoEvent('test'));
@@ -252,7 +260,9 @@ class WebHookHandlerTest extends BaseTestWithServices
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
 
-        $this->httpClient->setMockResponses($this->get404ErrorResponse());
+        $this->httpClient->setMockResponses(
+            array_merge($this->get404ErrorResponse(), $this->get404ErrorResponse())
+        );
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
         $bus->fire(new TrackingInfoEvent('test'));

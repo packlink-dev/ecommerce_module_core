@@ -45,12 +45,6 @@ class Shipment extends BaseDto
      */
     public $content;
     /**
-     * Shipment weight.
-     *
-     * @var float
-     */
-    public $weight;
-    /**
      * Shipment price.
      *
      * @var float
@@ -63,11 +57,11 @@ class Shipment extends BaseDto
      */
     public $trackingCodes;
     /**
-     * Shipment canceled flag.
+     * Carrier tracking URL.
      *
-     * @var bool
+     * @var string
      */
-    public $canceled;
+    public $carrierTrackingUrl;
     /**
      * Order date.
      *
@@ -82,17 +76,18 @@ class Shipment extends BaseDto
     public function toArray()
     {
         return array(
-            'reference' => $this->reference,
+            'packlink_reference' => $this->reference,
             'shipment_custom_reference' => $this->shipmentCustomReference,
-            'status' => $this->status,
             'service' => $this->service,
             'content' => $this->content,
             'carrier' => $this->carrier,
-            'weight' => $this->weight,
+            'state' => $this->status,
             'tracking_codes' => $this->trackingCodes,
-            'price' => $this->price,
-            'canceled' => $this->canceled,
-            'orderDate' => $this->orderDate->format('Y-m-d'),
+            'price' => array(
+                'base_price' => $this->price,
+            ),
+            'order_date' => $this->orderDate->format('Y-m-d'),
+            'tracking_url' => $this->carrierTrackingUrl,
         );
     }
 
@@ -106,17 +101,16 @@ class Shipment extends BaseDto
     public static function fromArray(array $raw)
     {
         $shipment = new static();
-        $shipment->orderDate = \DateTime::createFromFormat('Y-m-d|', $raw['orderDate']);
-        $shipment->reference = $raw['reference'];
+        $shipment->orderDate = \DateTime::createFromFormat('Y-m-d', $raw['order_date']);
+        $shipment->reference = $raw['packlink_reference'];
         $shipment->shipmentCustomReference = $raw['shipment_custom_reference'];
-        $shipment->status = $raw['status'];
         $shipment->service = $raw['service'];
         $shipment->content = $raw['content'];
         $shipment->carrier = $raw['carrier'];
-        $shipment->weight = $raw['weight'];
-        $shipment->trackingCodes = $raw['tracking_codes'];
-        $shipment->price = $raw['price'];
-        $shipment->canceled = $raw['canceled'];
+        $shipment->status = $raw['state'];
+        $shipment->trackingCodes = $raw['trackings'];
+        $shipment->price = $raw['price']['base_price'];
+        $shipment->carrierTrackingUrl = $raw['tracking_url'];
 
         return $shipment;
     }
