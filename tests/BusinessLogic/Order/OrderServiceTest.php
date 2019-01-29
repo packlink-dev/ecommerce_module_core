@@ -7,7 +7,6 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
-use Packlink\BusinessLogic\Http\DTO\ShipmentReference;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
@@ -44,12 +43,13 @@ class OrderServiceTest extends BaseTestWithServices
         $this->orderService->prepareDraft('123');
     }
 
+    /**
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testSetReference()
     {
-        $reference = new ShipmentReference();
-        $reference->reference = 'test_reference';
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->orderService->setReference('test', $reference);
+        $this->orderService->setReference('test', 'test_reference');
 
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
@@ -67,7 +67,7 @@ class OrderServiceTest extends BaseTestWithServices
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
         $orderRepository->shouldThrowException(true);
 
-        $this->orderService->setReference('123', new ShipmentReference());
+        $this->orderService->setReference('123', '');
     }
 
     /**

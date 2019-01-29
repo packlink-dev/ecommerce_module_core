@@ -6,8 +6,6 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\Http\DTO\Shipment;
-use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
@@ -79,18 +77,19 @@ class WebHookEventHandler extends BaseService
     public function handleShippingStatusEvent(ShippingStatusEvent $event)
     {
         $referenceId = $event->referenceId;
+        $shipment = null;
         try {
-            /** @var Shipment $shipment */
             $shipment = $this->proxy->getShipment($referenceId);
-            $this->orderRepository->setShippingStatusByReference($referenceId, $shipment->status);
+            if ($shipment !== null) {
+                $this->orderRepository->setShippingStatusByReference($referenceId, $shipment->status);
+            }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
         } catch (OrderNotFound $e) {
-            /** @noinspection PhpUndefinedVariableInspection */
             Logger::logError(
                 $e->getMessage(),
                 'Core',
-                array('referenceId' => $referenceId, 'shipment' => $shipment->toArray())
+                array('referenceId' => $referenceId, 'shipment' => $shipment ? $shipment->toArray() : 'NONE')
             );
         }
     }
@@ -103,17 +102,18 @@ class WebHookEventHandler extends BaseService
     public function handleTrackingInfoEvent(TrackingInfoEvent $event)
     {
         $referenceId = $event->referenceId;
+        $trackingHistory = array();
         try {
-            /** @var Tracking[] $trackingHistory */
             $trackingHistory = $this->proxy->getTrackingInfo($referenceId);
             $sortedHistory = $this->sortTrackingHistoryRecords($trackingHistory);
             $shipmentDetails = $this->proxy->getShipment($referenceId);
-            $this->orderRepository->updateTrackingInfo($referenceId, $sortedHistory, $shipmentDetails);
+            if ($shipmentDetails !== null) {
+                $this->orderRepository->updateTrackingInfo($referenceId, $sortedHistory, $shipmentDetails);
+            }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
         } catch (OrderNotFound $e) {
             $trackingAsArray = array();
-            /** @noinspection PhpUndefinedVariableInspection */
             foreach ($trackingHistory as $item) {
                 $trackingAsArray[] = $item->toArray();
             }

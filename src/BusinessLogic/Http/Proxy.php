@@ -12,7 +12,6 @@ use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
-use Packlink\BusinessLogic\Http\DTO\ShipmentReference;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
@@ -133,24 +132,6 @@ class Proxy
     }
 
     /**
-     * Sends shipment draft to Packlink.
-     *
-     * @param Draft $draft Shipment draft.
-     *
-     * @return ShipmentReference Shipment reference for uploaded draft.
-     *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     */
-    public function sendDraft(Draft $draft)
-    {
-        $response = $this->call(self::HTTP_METHOD_POST, 'shipments', $draft->toArray());
-
-        return ShipmentReference::fromArray($response->decodeBodyAsJson());
-    }
-
-    /**
      * Subscribes web-hook callback url.
      *
      * @param string $webHookUrl Web-hook URL.
@@ -182,6 +163,24 @@ class Proxy
         $response = $this->call(self::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
 
         return DropOff::fromArrayBatch($response->decodeBodyAsJson());
+    }
+
+    /**
+     * Returns array of PostalCode objects by specified country and specified zip code.
+     *
+     * @param string $countryCode Two-letter iso code of a country.
+     * @param string $zipCode Zip code.
+     *
+     * @return PostalCode[] PostalCode DTO.
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getPostalCodes($countryCode, $zipCode)
+    {
+        $response = $this->call(self::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
+
+        return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
     }
 
     /**
@@ -228,6 +227,44 @@ class Proxy
     }
 
     /**
+     * Sends shipment draft to Packlink.
+     *
+     * @param Draft $draft Shipment draft.
+     *
+     * @return string Shipment reference for uploaded draft.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function sendDraft(Draft $draft)
+    {
+        $response = $this->call(self::HTTP_METHOD_POST, 'shipments', $draft->toArray());
+
+        $result = $response->decodeBodyAsJson();
+
+        return array_key_exists('reference', $result) ? $result['reference'] : '';
+    }
+
+    /**
+     * Returns shipment by its reference identifier.
+     *
+     * @param string $referenceId Packlink shipment reference identifier.
+     *
+     * @return Shipment|null Shipment DTO if it exists for given reference number; otherwise, null.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getShipment($referenceId)
+    {
+        $response = $this->getShipmentData($referenceId);
+
+        return $response !== null ? Shipment::fromArray($response->decodeBodyAsJson()) : null;
+    }
+
+    /**
      * Returns list of shipment labels for shipment with provided reference.
      *
      * @param string $referenceId Packlink shipment reference identifier.
@@ -240,34 +277,9 @@ class Proxy
      */
     public function getLabels($referenceId)
     {
-        $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/labels");
+        $response = $this->getShipmentData($referenceId, 'labels');
 
-        return $response->decodeBodyAsJson();
-    }
-
-    /**
-     * Returns shipment by its reference identifier.
-     *
-     * @param string $referenceId Packlink shipment reference identifier.
-     *
-     * @return Shipment Shipment DTO.
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     */
-    public function getShipment($referenceId)
-    {
-        try {
-            $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId");
-        } catch (HttpRequestException $e) {
-            if ($e->getCode() === 404) {
-                return new Shipment();
-            }
-
-            throw $e;
-        }
-
-        return Shipment::fromArray($response->decodeBodyAsJson());
+        return $response !== null ? $response->decodeBodyAsJson() : array();
     }
 
     /**
@@ -282,36 +294,40 @@ class Proxy
      */
     public function getTrackingInfo($referenceId)
     {
+        $response = $this->getShipmentData($referenceId, 'track');
+
+        return $response !== null ? Tracking::fromArrayBatch($response->decodeBodyAsJson()) : array();
+    }
+
+    /**
+     * Calls shipments endpoint and handles response. Any shipment endpoint can return 404 so this call handles that.
+     *
+     * @param string $reference Shipment reference number.
+     * @param string $endpoint Endpoint to call.
+     *
+     * @return \Logeecom\Infrastructure\Http\HttpResponse|null Response if API returned it; NULL if 404.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    protected function getShipmentData($reference, $endpoint = '')
+    {
+        if ($endpoint) {
+            $endpoint = '/' . $endpoint;
+        }
+
         try {
-            $response = $this->call(self::HTTP_METHOD_GET, "shipments/$referenceId/track");
-            $result = $response->decodeBodyAsJson();
+            $response = $this->call(self::HTTP_METHOD_GET, "shipments/{$reference}{$endpoint}");
         } catch (HttpRequestException $e) {
             if ($e->getCode() === 404) {
-                return array();
+                return null;
             }
 
             throw $e;
         }
 
-        return Tracking::fromArrayBatch($result);
-    }
-
-    /**
-     * Returns array of PostalCode objects by specified country and specified zip code.
-     *
-     * @param string $countryCode Two-letter iso code of a country.
-     * @param string $zipCode Zip code.
-     *
-     * @return PostalCode[] PostalCode DTO.
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     */
-    public function getPostalCodes($countryCode, $zipCode)
-    {
-        $response = $this->call(self::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
-
-        return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
+        return $response;
     }
 
     /**

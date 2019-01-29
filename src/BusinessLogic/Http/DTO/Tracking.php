@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 /**
- * Class Tracking
+ * Class Tracking.
+ *
  * @package Packlink\BusinessLogic\Http\DTO
  */
 class Tracking extends BaseDto
@@ -51,9 +52,9 @@ class Tracking extends BaseDto
     public static function fromArray(array $raw)
     {
         $tracking = new static();
-        $tracking->timestamp = $raw['timestamp'];
-        $tracking->description = $raw['description'];
-        $tracking->city = $raw['city'];
+        $tracking->timestamp = static::getValue($raw, 'timestamp');
+        $tracking->description = static::getValue($raw, 'description');
+        $tracking->city = static::getValue($raw, 'city');
 
         return $tracking;
     }

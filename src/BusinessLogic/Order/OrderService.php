@@ -6,7 +6,6 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
-use Packlink\BusinessLogic\Http\DTO\ShipmentReference;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Order;
 
@@ -70,13 +69,13 @@ class OrderService extends BaseService
      * Sets order packlink reference number.
      *
      * @param string $orderId Unique order id.
-     * @param ShipmentReference $shipmentReference Packlink shipment reference.
+     * @param string $shipmentReference Packlink shipment reference.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      */
-    public function setReference($orderId, ShipmentReference $shipmentReference)
+    public function setReference($orderId, $shipmentReference)
     {
-        $this->orderRepository->setReference($orderId, $shipmentReference->reference);
+        $this->orderRepository->setReference($orderId, $shipmentReference);
     }
 
     /**

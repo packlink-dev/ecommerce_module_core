@@ -69,18 +69,20 @@ class SendDraftTask extends Task
 
     /**
      * Runs task logic.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function execute()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $draft = $this->getOrderService()->prepareDraft($this->orderId);
         $this->reportProgress(35);
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         $reference = $this->getProxy()->sendDraft($draft);
         $this->reportProgress(85);
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->getOrderService()->setReference($this->orderId, $reference);
         $this->reportProgress(100);
     }

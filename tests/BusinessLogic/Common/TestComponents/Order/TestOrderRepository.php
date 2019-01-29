@@ -2,12 +2,12 @@
 
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\Order;
 
+use Packlink\BusinessLogic\Http\DTO\Shipment as ShipmentDetails;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Address;
 use Packlink\BusinessLogic\Order\Objects\Order;
-use Packlink\BusinessLogic\Http\DTO\Shipment as ShipmentDetails;
 use Packlink\BusinessLogic\Order\Objects\Shipment;
 use Packlink\BusinessLogic\Order\Objects\Shipping;
 use Packlink\BusinessLogic\Order\Objects\TrackingHistory;
@@ -24,14 +24,19 @@ class TestOrderRepository implements OrderRepository
      *
      * @var Order[]
      */
-    private static $orders = array();
-
+    private static $orders;
     /**
      * Flag to throw exception.
      *
      * @var bool
      */
     private $throw = false;
+
+    public function __construct()
+    {
+
+        static::$orders = array();
+    }
 
     /**
      * Sets if exception should be thrown.
