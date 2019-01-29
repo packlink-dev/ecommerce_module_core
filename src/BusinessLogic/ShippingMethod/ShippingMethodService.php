@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\ShippingMethod;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
+use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -255,7 +256,7 @@ class ShippingMethodService extends BaseService
      *
      * @return ShippingMethod|null Shipping method if found; otherwise, NULL.
      */
-    protected function getShippingMethodForService($serviceId)
+    public function getShippingMethodForService($serviceId)
     {
         $filter = $this->setFilterCondition(new QueryFilter(), 'serviceId', Operators::EQUALS, $serviceId);
 
@@ -481,8 +482,6 @@ class ShippingMethodService extends BaseService
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * Sets filter condition. Wrapper method for suppressing warning.
      *
      * @param QueryFilter $filter Filter object.
@@ -494,8 +493,12 @@ class ShippingMethodService extends BaseService
      */
     protected function setFilterCondition(QueryFilter $filter, $column, $operator, $value = null)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return $filter->where($column, $operator, $value);
+        try {
+            return $filter->where($column, $operator, $value);
+        } catch (QueryFilterInvalidParamException $e) {
+        }
+
+        return $filter;
     }
 
     /**

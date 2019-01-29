@@ -250,6 +250,17 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
     }
 
+    public function testGetByServiceId()
+    {
+        $this->shippingMethodService->add(
+            $this->getShippingService(1123),
+            $this->getShippingServiceDetails(1)
+        );
+
+        $shippingMethod = $this->shippingMethodService->getShippingMethodForService(1123);
+        self::assertNotNull($shippingMethod, 'Failed to retrieve created shipping method!');
+    }
+
     public function testShippingServiceSearchFromArray()
     {
         /** @var ParcelInfo[] $parcels */
