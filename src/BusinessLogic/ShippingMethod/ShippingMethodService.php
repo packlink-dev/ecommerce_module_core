@@ -9,7 +9,7 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
@@ -215,11 +215,11 @@ class ShippingMethodService extends BaseService
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param ParcelInfo[] $parcels Array of parcels.
+     * @param Package[] $packages Array of parcels.
      *
      * @return float Calculated shipping cost for service if found. Otherwise, 0.0;
      */
-    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $parcels)
+    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
     {
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
@@ -231,12 +231,12 @@ class ShippingMethodService extends BaseService
         }
 
         if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
-            return round($this->calculateFixedPriceCost($shippingMethod, $fromCountry, $toCountry, $parcels), 2);
+            return round($this->calculateFixedPriceCost($shippingMethod, $fromCountry, $toCountry, $packages), 2);
         }
 
         try {
             $response = $proxy->getShippingServicesDeliveryDetails(
-                $this->getCostSearchParameters($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $parcels)
+                $this->getCostSearchParameters($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $packages)
             );
             if (count($response)) {
                 $defaultCost = $response[0]->basePrice;
@@ -377,11 +377,16 @@ class ShippingMethodService extends BaseService
      * @param ShippingMethod $shippingMethod Shipping method.
      * @param string $fromCountry Departure country code.
      * @param string $toCountry Destination country code.
-     * @param ParcelInfo[] $parcels Array of parcels.
+     * @param Package[] $packages Array of packages.
      *
      * @return float Calculated fixed price cost.
      */
-    protected function calculateFixedPriceCost(ShippingMethod $shippingMethod, $fromCountry, $toCountry, array $parcels)
+    protected function calculateFixedPriceCost(
+        ShippingMethod $shippingMethod,
+        $fromCountry,
+        $toCountry,
+        array $packages
+    )
     {
         if ($this->getDefaultCost($shippingMethod, $fromCountry, $toCountry) === 0) {
             // this method is not available for selected departure and destination
@@ -389,8 +394,8 @@ class ShippingMethodService extends BaseService
         }
 
         $totalWeight = 0;
-        foreach ($parcels as $parcel) {
-            $totalWeight += $parcel->weight;
+        foreach ($packages as $package) {
+            $totalWeight += $package->weight;
         }
 
         $fixedPricePolicies = $shippingMethod->getFixedPricePolicy();
@@ -457,7 +462,7 @@ class ShippingMethodService extends BaseService
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param ParcelInfo[] $parcels Parcel info.
+     * @param Package[] $packages Parcel info.
      *
      * @return \Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch Resulting object
      */
@@ -467,7 +472,7 @@ class ShippingMethodService extends BaseService
         $fromZip,
         $toCountry,
         $toZip,
-        array $parcels
+        array $packages
     ) {
         $params = new ShippingServiceSearch();
 
@@ -476,7 +481,7 @@ class ShippingMethodService extends BaseService
         $params->fromZip = $fromZip;
         $params->toCountry = $toCountry;
         $params->toZip = $toZip;
-        $params->parcels = $parcels;
+        $params->packages = $packages;
 
         return $params;
     }

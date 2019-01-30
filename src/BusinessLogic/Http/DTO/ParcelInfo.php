@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 /**
- * Class ParcelInfo
+ * Class ParcelInfo.
+ *
  * @package Packlink\BusinessLogic\Http\DTO
  */
 class ParcelInfo extends BaseDto

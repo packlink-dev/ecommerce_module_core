@@ -5,10 +5,10 @@ namespace Packlink\BusinessLogic\Http\DTO;
 use Packlink\BusinessLogic\Http\DTO\Draft\AdditionalData;
 use Packlink\BusinessLogic\Http\DTO\Draft\Address;
 use Packlink\BusinessLogic\Http\DTO\Draft\DraftPrice;
-use Packlink\BusinessLogic\Http\DTO\Draft\Package;
 
 /**
- * Class Draft
+ * Class Draft.
+ *
  * @package Packlink\BusinessLogic\Http\DTO
  */
 class Draft extends BaseDto
@@ -68,7 +68,7 @@ class Draft extends BaseDto
      */
     public $carrierName;
     /**
-     * Specification of parcels that are being sent.
+     * Specification of packages that are being sent.
      *
      * @var Package[]
      */
@@ -129,12 +129,6 @@ class Draft extends BaseDto
      */
     public $shipmentCustomReference;
     /**
-     * Total insurance amount.
-     *
-     * @var float
-     */
-    public $insuranceAmount;
-    /**
      * Determines if sender has selected priority customer.
      *
      * @var bool
@@ -192,14 +186,10 @@ class Draft extends BaseDto
             $result['additional_data'] = $this->additionalData->toArray();
         }
 
-        if ($this->insuranceAmount) {
-            $result['insurance']['amount'] = round($this->insuranceAmount, 2);
-        }
-
         if (!empty($this->packages)) {
-            $result['parcels'] = array();
+            $result['packages'] = array();
             foreach ($this->packages as $package) {
-                $result['parcels'][] = $package->toArray();
+                $result['packages'][] = $package->toArray();
             }
         }
 

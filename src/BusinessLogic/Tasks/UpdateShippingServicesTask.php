@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -77,12 +78,12 @@ class UpdateShippingServicesTask extends Task
 
         /** @var \Packlink\BusinessLogic\Http\DTO\User $user */
         $user = $config->getUserInfo();
-        /** @var \Packlink\BusinessLogic\Http\DTO\ParcelInfo $parcel */
-        $parcel = $config->getDefaultParcel();
+        $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
+        $package = Package::fromArray($parcel->toArray());
 
         $allServices = array();
         foreach (array_keys(static::$countryParams) as $country) {
-            $this->setServices($allServices, $this->getServiceSearchParams($user->country, $country, $parcel));
+            $this->setServices($allServices, $this->getServiceSearchParams($user->country, $country, $package));
         }
 
         return $allServices;
@@ -160,11 +161,11 @@ class UpdateShippingServicesTask extends Task
      *
      * @param string $fromCountry Country code for departure country.
      * @param string $toCountry Country code for destination country.
-     * @param ParcelInfo $parcel Parcel information.
+     * @param Package $package Parcel information.
      *
      * @return ShippingServiceSearch Search parameters object.
      */
-    protected function getServiceSearchParams($fromCountry, $toCountry, ParcelInfo $parcel)
+    protected function getServiceSearchParams($fromCountry, $toCountry, Package $package)
     {
         $params = new ShippingServiceSearch();
 
@@ -172,7 +173,7 @@ class UpdateShippingServicesTask extends Task
         $params->fromZip = self::$countryParams[$fromCountry];
         $params->toCountry = $toCountry;
         $params->toZip = self::$countryParams[$toCountry];
-        $params->parcels = array($parcel);
+        $params->packages = array($package);
 
         return $params;
     }

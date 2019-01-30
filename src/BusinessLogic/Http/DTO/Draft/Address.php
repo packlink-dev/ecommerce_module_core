@@ -5,7 +5,8 @@ namespace Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
 
 /**
- * Class Address
+ * Class Address.
+ *
  * @package Packlink\BusinessLogic\Http\DTO\Draft
  */
 class Address extends BaseDto

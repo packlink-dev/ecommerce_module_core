@@ -43,9 +43,9 @@ class ShippingServiceSearch extends BaseDto
     /**
      * Array of parcels.
      *
-     * @var ParcelInfo[]
+     * @var \Packlink\BusinessLogic\Http\DTO\Package[]
      */
-    public $parcels;
+    public $packages;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -63,11 +63,11 @@ class ShippingServiceSearch extends BaseDto
             'source' => 'PRO',
         );
 
-        foreach ($this->parcels as $index => $parcel) {
-            $data["packages[$index][height]"] = $parcel->height;
-            $data["packages[$index][width]"] = $parcel->width;
-            $data["packages[$index][length]"] = $parcel->length;
-            $data["packages[$index][weight]"] = $parcel->weight;
+        foreach ($this->packages as $index => $package) {
+            $data["packages[$index][height]"] = (int)ceil($package->height);
+            $data["packages[$index][width]"] = (int)ceil($package->width);
+            $data["packages[$index][length]"] = (int)ceil($package->length);
+            $data["packages[$index][weight]"] = (int)ceil($package->weight);
         }
 
         return $data;
@@ -89,18 +89,18 @@ class ShippingServiceSearch extends BaseDto
         $instance->fromZip = self::getValue($raw, 'from[zip]');
         $instance->toCountry = self::getValue($raw, 'to[country]');
         $instance->toZip = self::getValue($raw, 'to[zip]');
-        $instance->parcels = array();
+        $instance->packages = array();
 
         $index = 0;
         while (array_key_exists("packages[$index][height]", $raw)) {
-            $parcel = new ParcelInfo();
+            $package = new Package();
 
-            $parcel->height = self::getValue($raw, "packages[$index][height]");
-            $parcel->width = self::getValue($raw, "packages[$index][width]");
-            $parcel->length = self::getValue($raw, "packages[$index][length]");
-            $parcel->weight = self::getValue($raw, "packages[$index][weight]");
+            $package->height = self::getValue($raw, "packages[$index][height]");
+            $package->width = self::getValue($raw, "packages[$index][width]");
+            $package->length = self::getValue($raw, "packages[$index][length]");
+            $package->weight = self::getValue($raw, "packages[$index][weight]");
 
-            $instance->parcels[] = $parcel;
+            $instance->packages[] = $package;
             $index++;
         }
 

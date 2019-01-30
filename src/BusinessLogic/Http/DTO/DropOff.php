@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 /**
- * Class DropOff
+ * Class DropOff.
+ *
  * @package Packlink\BusinessLogic\Http\DTO
  */
 class DropOff extends BaseDto
@@ -118,17 +119,17 @@ class DropOff extends BaseDto
     {
         $entity = new self();
 
-        $entity->id = !empty($raw['id']) ? $raw['id'] : '';
-        $entity->name = !empty($raw['commerce_name']) ? $raw['commerce_name'] : '';
-        $entity->type = !empty($raw['type']) ? $raw['type'] : '';
-        $entity->countryCode = !empty($raw['country']) ? $raw['country'] : '';
-        $entity->state = !empty($raw['state']) ? $raw['state'] : '';
-        $entity->zip = !empty($raw['zip']) ? $raw['zip'] : '';
-        $entity->city= !empty($raw['city']) ? $raw['city'] : '';
-        $entity->address = !empty($raw['address']) ? $raw['address'] : '';
-        $entity->lat = !empty($raw['lat']) ? $raw['lat'] : 0;
-        $entity->long = !empty($raw['long']) ? $raw['long'] : 0;
-        $entity->phone = !empty($raw['phone']) ? $raw['phone'] : '';
+        $entity->id = static::getValue($raw, 'id');
+        $entity->name = static::getValue($raw, 'commerce_name');
+        $entity->type = static::getValue($raw, 'type');
+        $entity->countryCode = static::getValue($raw, 'country');
+        $entity->state = static::getValue($raw, 'state');
+        $entity->zip = static::getValue($raw, 'zip');
+        $entity->city = static::getValue($raw, 'city');
+        $entity->address = static::getValue($raw, 'address');
+        $entity->lat = static::getValue($raw, 'lat', 0);
+        $entity->long = static::getValue($raw, 'long', 0);
+        $entity->phone = static::getValue($raw, 'phone');
         $entity->workingHours =
             !empty($raw['opening_times']['opening_times']) ? $raw['opening_times']['opening_times'] : array();
 

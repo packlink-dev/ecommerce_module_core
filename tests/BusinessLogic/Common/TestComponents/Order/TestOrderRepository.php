@@ -7,6 +7,7 @@ use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Address;
+use Packlink\BusinessLogic\Order\Objects\Item;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\Objects\Shipment;
 use Packlink\BusinessLogic\Order\Objects\Shipping;
@@ -163,12 +164,15 @@ class TestOrderRepository implements OrderRepository
     public function getOrder($orderId)
     {
         if (!isset(static::$orders[$orderId])) {
-            static::$orders[$orderId] = new Order();
-            static::$orders[$orderId]->setId($orderId);
-            static::$orders[$orderId]->setShipment(new Shipment());
-            static::$orders[$orderId]->setShipping(new Shipping());
-            static::$orders[$orderId]->setShippingAddress(new Address());
-            static::$orders[$orderId]->setBillingAddress(new Address());
+            $order = new Order();
+            $order->setId($orderId);
+            $order->setShipment(new Shipment());
+            $order->setShipping(new Shipping());
+            $order->setShippingAddress(new Address());
+            $order->setBillingAddress(new Address());
+            $order->setItems(array(new Item()));
+
+            static::$orders[$orderId] = $order;
         }
 
         return static::$orders[$orderId];
