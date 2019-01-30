@@ -101,6 +101,10 @@ class OrderService extends BaseService
             $draft->platformCountry = $user->country;
         }
 
+        if (!$draft->dropOffPointId) {
+            $this->addDepartureAddress($draft);
+        }
+
         $this->addDestinationAddress($order, $draft);
         $this->addAdditionalData($order, $draft);
         $this->addPackages($order, $draft);
@@ -128,6 +132,27 @@ class OrderService extends BaseService
         $draft->to->phone = $to->getPhone();
         $draft->to->street1 = $to->getStreet1();
         $draft->to->street2 = $to->getStreet2();
+    }
+
+    /**
+     * Adds source address to draft shipment from default warehouse.
+     *
+     * @param Draft $draft Packlink shipment draft.
+     */
+    private function addDepartureAddress(Draft $draft)
+    {
+        /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+        $warehouse = $this->configuration->getDefaultWarehouse();
+        $draft->from = new Draft\Address();
+        $draft->from->country = $warehouse->country;
+        $draft->from->zipCode = $warehouse->postalCode;
+        $draft->from->email = $warehouse->email;
+        $draft->from->name = $warehouse->name;
+        $draft->from->surname = $warehouse->surname;
+        $draft->from->city = $warehouse->city;
+        $draft->from->company = $warehouse->company;
+        $draft->from->phone = $warehouse->phone;
+        $draft->from->street1 = $warehouse->address;
     }
 
     /**
@@ -168,7 +193,7 @@ class OrderService extends BaseService
         foreach ($order->getItems() as $item) {
             $quantity = $item->getQuantity() ?: 1;
             for ($i = 0; $i < $quantity; $i++) {
-                $package = new Draft\Package();
+                $package = new \Packlink\BusinessLogic\Http\DTO\Package();
                 $package->height = $item->getHeight();
                 $package->width = $item->getWidth();
                 $package->length = $item->getLength();
