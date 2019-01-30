@@ -205,11 +205,10 @@ class WebHookHandlerTest extends BaseTestWithServices
 
         $this->assertNotNull($order);
         $trackingHistories = $order->getShipment()->getTrackingHistory();
-        $trackingHistoryCount = \count($trackingHistories);
         $this->assertCount(3, $trackingHistories);
-        $this->assertEquals(14242322, $trackingHistories[$trackingHistoryCount - 1]->getTimestamp());
-        $this->assertEquals('DELIVERED', $trackingHistories[$trackingHistoryCount - 1]->getDescription());
-        $this->assertEquals('MIAMI', $trackingHistories[$trackingHistoryCount - 1]->getCity());
+        $this->assertEquals(14242322, $trackingHistories[0]->getTimestamp());
+        $this->assertEquals('DELIVERED', $trackingHistories[0]->getDescription());
+        $this->assertEquals('MIAMI', $trackingHistories[0]->getCity());
     }
 
     /**
