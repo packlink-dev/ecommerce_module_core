@@ -55,13 +55,16 @@ class ShippingServiceSearch extends BaseDto
     public function toArray()
     {
         $data = array(
-            'service_id' => $this->serviceId,
             'from[country]' => $this->fromCountry,
             'from[zip]' => $this->fromZip,
             'to[country]' => $this->toCountry,
             'to[zip]' => $this->toZip,
             'source' => 'PRO',
         );
+
+        if ($this->serviceId) {
+            $data['serviceId'] = $this->serviceId;
+        }
 
         foreach ($this->packages as $index => $package) {
             $data["packages[$index][height]"] = (int)ceil($package->height);
