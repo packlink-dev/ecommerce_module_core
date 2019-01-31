@@ -236,7 +236,7 @@ class ShippingMethodService extends BaseService
 
         try {
             $response = $proxy->getShippingServicesDeliveryDetails(
-                $this->getCostSearchParameters($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $packages)
+                $this->getCostSearchParameters($fromCountry, $fromZip, $toCountry, $toZip, $packages, $serviceId)
             );
             if (count($response)) {
                 $defaultCost = $response[0]->basePrice;
@@ -247,6 +247,48 @@ class ShippingMethodService extends BaseService
         }
 
         return $defaultCost ? round($this->calculateVariableCost($shippingMethod, $defaultCost), 2) : 0;
+    }
+
+    /**
+     * Returns shipping costs for all available shipping services that support specified parameters.
+     *
+     * @param string $fromCountry Departure country code.
+     * @param string $fromZip Departure zip code.
+     * @param string $toCountry Destination country code.
+     * @param string $toZip Destination zip code.
+     * @param Package[] $packages Array of parcels.
+     *
+     * @return array Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
+     */
+    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages)
+    {
+        $activeMethods = $this->getActiveMethods();
+        if (empty($activeMethods)) {
+            return array();
+        }
+
+        try {
+            $shippingCosts = $this->getShippingCostsFromProxy(
+                $fromCountry,
+                $fromZip,
+                $toCountry,
+                $toZip,
+                $packages,
+                $activeMethods
+            );
+        } catch (HttpBaseException $e) {
+            // Fallback when API is not available.
+            $shippingCosts = $this->getDefaultShippingCosts($fromCountry, $toCountry, $activeMethods);
+        }
+
+        $calculatedShippingCosts = $this->calculateShippingCosts(
+            $fromCountry,
+            $toCountry,
+            $packages,
+            $shippingCosts
+        );
+
+        return $calculatedShippingCosts;
     }
 
     /**
@@ -372,40 +414,149 @@ class ShippingMethodService extends BaseService
     }
 
     /**
-     * Calculates shipping cost for fixed price policy.
+     * Retrieves API response for all available shipping delivery methods
+     * and prepares it for shipping costs calculation.
      *
-     * @param ShippingMethod $shippingMethod Shipping method.
      * @param string $fromCountry Departure country code.
+     * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
-     * @param Package[] $packages Array of packages.
+     * @param string $toZip Destination zip code.
+     * @param Package[] $packages Array of parcels.
+     * @param ShippingMethod[] $activeMethods Array of active shipping methods in the system.
      *
-     * @return float Calculated fixed price cost.
+     * @return array Array of prepared data for shipping costs calculation.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
-    protected function calculateFixedPriceCost(
-        ShippingMethod $shippingMethod,
+    protected function getShippingCostsFromProxy(
         $fromCountry,
+        $fromZip,
         $toCountry,
-        array $packages
-    )
-    {
-        if ($this->getDefaultCost($shippingMethod, $fromCountry, $toCountry) === 0) {
-            // this method is not available for selected departure and destination
-            return 0;
-        }
+        $toZip,
+        array $packages,
+        array $activeMethods
+    ) {
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
 
-        $totalWeight = 0;
-        foreach ($packages as $package) {
-            $totalWeight += $package->weight;
-        }
+        $response = $proxy->getShippingServicesDeliveryDetails(
+            $this->getCostSearchParameters($fromCountry, $fromZip, $toCountry, $toZip, $packages)
+        );
 
-        $fixedPricePolicies = $shippingMethod->getFixedPricePolicy();
-        foreach ($fixedPricePolicies as $fixedPricePolicy) {
-            if ($fixedPricePolicy->from <= $totalWeight && $fixedPricePolicy->to > $totalWeight) {
-                return $fixedPricePolicy->amount;
+        $shippingCosts = $this->prepareDataForShippingCostsCalculation($response, $activeMethods);
+
+        return $shippingCosts;
+    }
+
+    /**
+     * Prepares raw response data for shipping costs calculation.
+     *
+     * @param ShippingServiceDeliveryDetails[] $shippingServiceDeliveries Array of shipping service delivery details.
+     * @param ShippingMethod[] $activeMethods Array of active shipping methods in the system.
+     *
+     * @return array Array of prepared data for shipping cost calculation.
+     */
+    protected function prepareDataForShippingCostsCalculation(
+        array $shippingServiceDeliveries,
+        array $activeMethods
+    ) {
+        $shippingCosts = array();
+        $activeMethodServiceIds = array_map(
+            function ($activeMethod) {
+                /** @var ShippingMethod $activeMethod */
+                return $activeMethod->getServiceId();
+            },
+            $activeMethods
+        );
+
+        foreach ($shippingServiceDeliveries as $shippingServiceDeliveryDetails) {
+            if (!in_array($shippingServiceDeliveryDetails->id, $activeMethodServiceIds, true)) {
+                continue;
+            }
+
+            $shippingMethod = $this->getShippingMethodForService($shippingServiceDeliveryDetails->id);
+            if ($shippingMethod === null) {
+                continue;
+            }
+
+            if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
+                $shippingCosts[$shippingMethod->getServiceId()] = 0;
+            } else {
+                $shippingCosts[$shippingMethod->getServiceId()] = $shippingServiceDeliveryDetails->basePrice;
             }
         }
 
-        return $fixedPricePolicies[count($fixedPricePolicies) - 1]->amount;
+        return $shippingCosts;
+    }
+
+    /**
+     * Calculates shipping costs based on their pricing policy.
+     *
+     * @param string $fromCountry Departure country code.
+     * @param string $toCountry Destination country code.
+     * @param Package[] $packages Array of parcels.
+     * @param array $shippingCosts Array of prepared data that needs to be calculated.
+     *
+     * @return array Calculated shipping costs.
+     */
+    protected function calculateShippingCosts(
+        $fromCountry,
+        $toCountry,
+        array $packages,
+        array $shippingCosts
+    ) {
+        $calculatedShippingCosts = array();
+
+        foreach ($shippingCosts as $serviceId => $shippingCost) {
+            $shippingMethod = $this->getShippingMethodForService($serviceId);
+            if ($shippingMethod === null) {
+                continue;
+            }
+
+            if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
+                $calculatedShippingCosts[$shippingMethod->getServiceId()] = round(
+                    $this->calculateFixedPriceCost($shippingMethod, $fromCountry, $toCountry, $packages),
+                    2
+                );
+            } else {
+                $calculatedShippingCosts[$shippingMethod->getServiceId()] = round(
+                    $this->calculateVariableCost($shippingMethod, $shippingCost),
+                    2
+                );
+            }
+        }
+
+        return $calculatedShippingCosts;
+    }
+
+    /**
+     * Returns default shipping costs for all active shipping methods in the system.
+     *
+     * @param string $fromCountry Departure country code.
+     * @param string $toCountry Destination country code.
+     * @param ShippingMethod[] $activeMethods Array of active shipping methods in the system.
+     *
+     * @return array Prepared data of default shipping costs for
+     */
+    protected function getDefaultShippingCosts($fromCountry, $toCountry, array $activeMethods)
+    {
+        $shippingCosts = array();
+
+        foreach ($activeMethods as $shippingMethod) {
+            if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
+                $shippingCosts[$shippingMethod->getServiceId()] = 0;
+            } else {
+                $shippingCosts[$shippingMethod->getServiceId()] = $this->getDefaultCost(
+                    $shippingMethod,
+                    $fromCountry,
+                    $toCountry
+                );
+            }
+        }
+
+        return $shippingCosts;
     }
 
     /**
@@ -428,6 +579,42 @@ class ShippingMethodService extends BaseService
         }
 
         return 0;
+    }
+
+    /**
+     * Calculates shipping cost for fixed price policy.
+     *
+     * @param ShippingMethod $shippingMethod Shipping method.
+     * @param string $fromCountry Departure country code.
+     * @param string $toCountry Destination country code.
+     * @param Package[] $packages Array of packages.
+     *
+     * @return float Calculated fixed price cost.
+     */
+    protected function calculateFixedPriceCost(
+        ShippingMethod $shippingMethod,
+        $fromCountry,
+        $toCountry,
+        array $packages
+    ) {
+        if ($this->getDefaultCost($shippingMethod, $fromCountry, $toCountry) === 0) {
+            // this method is not available for selected departure and destination
+            return 0;
+        }
+
+        $totalWeight = 0;
+        foreach ($packages as $package) {
+            $totalWeight += $package->weight;
+        }
+
+        $fixedPricePolicies = $shippingMethod->getFixedPricePolicy();
+        foreach ($fixedPricePolicies as $fixedPricePolicy) {
+            if ($fixedPricePolicy->from <= $totalWeight && $fixedPricePolicy->to > $totalWeight) {
+                return $fixedPricePolicy->amount;
+            }
+        }
+
+        return $fixedPricePolicies[count($fixedPricePolicies) - 1]->amount;
     }
 
     /**
@@ -457,26 +644,29 @@ class ShippingMethodService extends BaseService
     /**
      * Transforms parameters to proper DTO.
      *
-     * @param int $serviceId ID of service to calculate costs for.
      * @param string $fromCountry Departure country code.
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Parcel info.
+     * @param int $serviceId ID of service to calculate costs for.
      *
      * @return \Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch Resulting object
      */
     protected function getCostSearchParameters(
-        $serviceId,
         $fromCountry,
         $fromZip,
         $toCountry,
         $toZip,
-        array $packages
+        array $packages,
+        $serviceId = null
     ) {
         $params = new ShippingServiceSearch();
 
-        $params->serviceId = $serviceId;
+        if ($serviceId !== null) {
+            $params->serviceId = $serviceId;
+        }
+
         $params->fromCountry = $fromCountry;
         $params->fromZip = $fromZip;
         $params->toCountry = $toCountry;
