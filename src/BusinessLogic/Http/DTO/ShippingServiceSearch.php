@@ -67,7 +67,7 @@ class ShippingServiceSearch extends BaseDto
             $data["packages[$index][height]"] = (int)ceil($package->height);
             $data["packages[$index][width]"] = (int)ceil($package->width);
             $data["packages[$index][length]"] = (int)ceil($package->length);
-            $data["packages[$index][weight]"] = (int)ceil($package->weight);
+            $data["packages[$index][weight]"] = $package->weight;
         }
 
         return $data;
