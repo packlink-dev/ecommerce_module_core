@@ -89,7 +89,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $this->assertCount(21, $all);
         foreach ($all as $item) {
             $this->assertInstanceOf(
-                \Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse::CLASS_NAME,
+                '\Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse',
                 $item
             );
             $this->assertInternalType('array', $item->toArray());

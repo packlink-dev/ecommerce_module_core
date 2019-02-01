@@ -12,11 +12,6 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 class ShippingMethodResponse extends BaseDto
 {
     /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
-
-    /**
      * Shipping method identifier.
      *
      * @var int

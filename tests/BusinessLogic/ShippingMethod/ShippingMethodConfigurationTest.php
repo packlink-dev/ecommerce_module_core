@@ -3,8 +3,6 @@
 namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Packlink\BusinessLogic\Controllers\DTO\FixedPricePolicy;
-use Packlink\BusinessLogic\Controllers\DTO\PercentPricePolicy;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
@@ -14,21 +12,24 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
     {
         $config1 = ShippingMethodConfiguration::fromArray($this->getPacklinkPriceRawData());
 
-        $this->assertInstanceOf(ShippingMethodConfiguration::CLASS_NAME, $config1);
+        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration', $config1);
         $this->assertEquals(1, $config1->id);
         $this->assertEquals('Test', $config1->name);
         $this->assertEquals(true, $config1->showLogo);
         $this->assertEquals(ShippingMethod::PRICING_POLICY_PACKLINK, $config1->pricePolicy);
 
         $config2 = ShippingMethodConfiguration::fromArray($this->getPacklinkPercentPriceRawData());
-        $this->assertInstanceOf(PercentPricePolicy::CLASS_NAME, $config2->percentPricePolicy);
+        $this->assertInstanceOf(
+            'Packlink\BusinessLogic\Controllers\DTO\PercentPricePolicy',
+            $config2->percentPricePolicy
+        );
         $this->assertEquals(50, $config2->percentPricePolicy->amount);
         $this->assertEquals(true, $config2->percentPricePolicy->increase);
 
         $config3 = ShippingMethodConfiguration::fromArray($this->getFixedPriceRawData());
         $this->assertCount(2, $config3->fixedPricePolicy);
         $policy = $config3->fixedPricePolicy[1];
-        $this->assertInstanceOf(FixedPricePolicy::CLASS_NAME, $policy);
+        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\FixedPricePolicy', $policy);
         $this->assertEquals(10, $policy->from);
         $this->assertEquals(22.5, $policy->to);
         $this->assertEquals(32.13, $policy->amount);

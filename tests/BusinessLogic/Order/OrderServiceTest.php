@@ -5,7 +5,6 @@ namespace Logeecom\Tests\BusinessLogic\Order;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
@@ -28,7 +27,7 @@ class OrderServiceTest extends BaseTestWithServices
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $draft = $this->orderService->prepareDraft('test');
-        $this->assertInstanceOf(Draft::CLASS_NAME, $draft);
+        $this->assertInstanceOf('Packlink\BusinessLogic\Http\DTO\Draft', $draft);
     }
 
     /**

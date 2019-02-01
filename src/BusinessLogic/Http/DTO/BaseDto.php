@@ -11,10 +11,6 @@ namespace Packlink\BusinessLogic\Http\DTO;
 abstract class BaseDto
 {
     /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
-    /**
      * Transforms DTO to its array format suitable for http client.
      *
      * @return array DTO in array format.
@@ -33,7 +29,7 @@ abstract class BaseDto
     public static function fromArray(array $raw)
     {
         throw new \BadMethodCallException(
-            'Method "' . static::CLASS_NAME . '::fromArray" not implemented! Given array: ' . print_r($raw, true)
+            'Method "fromArray" not implemented! Given array: ' . print_r($raw, true)
         );
     }
 

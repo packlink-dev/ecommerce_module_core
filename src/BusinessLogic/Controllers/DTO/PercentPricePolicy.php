@@ -11,11 +11,6 @@ use Packlink\BusinessLogic\Http\DTO\BaseDto;
 class PercentPricePolicy extends BaseDto
 {
     /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
-
-    /**
      * Percent amount.
      *
      * @var float

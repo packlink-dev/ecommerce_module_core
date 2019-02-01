@@ -10,7 +10,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\DashboardController;
-use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
@@ -87,7 +86,7 @@ class DashboardControllerTest extends BaseTestWithServices
     {
         $status = $this->dashboardController->getStatus();
 
-        $this->assertInstanceOf(DashboardStatus::CLASS_NAME, $status);
+        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\DashboardStatus', $status);
         $this->assertFalse($status->isParcelSet);
         $this->assertFalse($status->isWarehouseSet);
         $this->assertFalse($status->isShippingMethodSet);
@@ -109,7 +108,7 @@ class DashboardControllerTest extends BaseTestWithServices
 
         $status = $this->dashboardController->getStatus();
 
-        $this->assertInstanceOf(DashboardStatus::CLASS_NAME, $status);
+        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\DashboardStatus', $status);
         $this->assertTrue($status->isParcelSet);
         $this->assertTrue($status->isWarehouseSet);
         $this->assertFalse($status->isShippingMethodSet);
@@ -134,7 +133,7 @@ class DashboardControllerTest extends BaseTestWithServices
 
         $status = $this->dashboardController->getStatus();
 
-        $this->assertInstanceOf(DashboardStatus::CLASS_NAME, $status);
+        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\DashboardStatus', $status);
         $this->assertTrue($status->isParcelSet);
         $this->assertTrue($status->isWarehouseSet);
         $this->assertTrue($status->isShippingMethodSet);
