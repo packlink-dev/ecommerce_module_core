@@ -94,7 +94,6 @@ class ShippingService extends BaseDto
         $instance->carrierName = self::getValue($raw, 'carrier_name');
         $instance->serviceName = self::getValue($raw, 'service_name');
         $instance->logoUrl = self::getValue($raw, 'service_logo');
-        $instance->logoUrl = substr($instance->logoUrl, strpos($instance->logoUrl, '/carriers'));
         $instance->departureDropOff = self::getValue($raw, 'departure_type') === 'drop-off';
         $instance->destinationDropOff = self::getValue($raw, 'destination_type') === 'drop-off';
         $instance->serviceDetails = self::getValue($raw, 'service_details', array());
