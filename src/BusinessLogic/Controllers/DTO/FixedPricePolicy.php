@@ -11,6 +11,11 @@ use Packlink\BusinessLogic\Http\DTO\BaseDto;
 class FixedPricePolicy extends BaseDto
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Price amount.
      *
      * @var float

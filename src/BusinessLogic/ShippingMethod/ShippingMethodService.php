@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\ShippingMethod;
 
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
@@ -256,18 +257,22 @@ class ShippingMethodService extends BaseService
      */
     protected function setActivationState($serviceId, $activated)
     {
-        $result = false;
         $method = $this->getShippingMethodForService($serviceId);
-        if ($method !== null) {
-            $result = $this->setActivationStateInShop($activated, $method);
+        if ($method === null) {
+            Logger::logWarning('Shipping method for service ' . $serviceId . ' does not exist.');
 
-            if ($result) {
-                $method->setActivated($activated);
-                $this->shippingMethodRepository->update($method);
-            }
+            return false;
         }
 
-        return $result;
+        if ($this->setActivationStateInShop($activated, $method)) {
+            $method->setActivated($activated);
+
+            return $this->shippingMethodRepository->update($method);
+        }
+
+        Logger::logWarning('Could not activate/deactivate shipping service ' . $serviceId . ' in shop.');
+
+        return false;
     }
 
     /**
