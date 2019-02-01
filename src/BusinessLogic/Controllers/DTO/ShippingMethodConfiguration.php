@@ -13,6 +13,11 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 class ShippingMethodConfiguration extends BaseDto
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Shipping method identifier.
      *
      * @var int
@@ -71,6 +76,45 @@ class ShippingMethodConfiguration extends BaseDto
             $result['fixedPricePolicy'] = array();
             foreach ($this->fixedPricePolicy as $item) {
                 $result['fixedPricePolicy'][] = $item->toArray();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Creates ShippingMethodConfiguration object instance from an array of raw data.
+     *
+     * @param array $raw
+     *
+     * @return ShippingMethodConfiguration
+     */
+    public static function fromArray(array $raw)
+    {
+        $result = new self();
+
+        $result->id = $raw['id'];
+        $result->name = $raw['name'];
+        $result->showLogo = $raw['showLogo'];
+        $result->pricePolicy = $raw['pricePolicy'];
+
+        if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT) {
+            $value = $raw['percentPricePolicy'];
+            $result->percentPricePolicy = new PercentPricePolicy();
+            $result->percentPricePolicy->amount = $value['amount'];
+            $result->percentPricePolicy->increase = $value['increase'];
+        }
+
+        if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED) {
+            $value = $raw['fixedPricePolicy'];
+            $result->fixedPricePolicy = array();
+            foreach ($value as $policy) {
+                $fixedPolicy = new FixedPricePolicy();
+                $fixedPolicy->amount = $policy['amount'];
+                $fixedPolicy->from = $policy['from'];
+                $fixedPolicy->to = $policy['to'];
+
+                $result->fixedPricePolicy[] = $fixedPolicy;
             }
         }
 

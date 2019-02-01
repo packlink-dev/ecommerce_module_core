@@ -11,6 +11,11 @@ use Packlink\BusinessLogic\Http\DTO\BaseDto;
 class DashboardStatus extends BaseDto
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Shipping method set flag.
      *
      * @var bool
