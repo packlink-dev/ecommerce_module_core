@@ -45,7 +45,7 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
             'id' => 1,
             'name' => 'Test',
             'showLogo' => true,
-            'pricePolicy' => ShippingMethod::PRICING_POLICY_PACKLINK
+            'pricePolicy' => ShippingMethod::PRICING_POLICY_PACKLINK,
         );
     }
 
@@ -63,7 +63,7 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
             'pricePolicy' => ShippingMethod::PRICING_POLICY_PERCENT,
             'percentPricePolicy' => array(
                 'amount' => 50,
-                'increase' => true
+                'increase' => true,
             ),
         );
     }
