@@ -48,7 +48,6 @@ class DashboardController
     {
         $dashboardDto = new DashboardStatus();
         $dashboardDto->isParcelSet = (bool)$this->configuration->getDefaultParcel();
-        $dashboardDto->isOrderStatusMappingsSet = (bool)$this->configuration->getOrderStatusMappings();
         $dashboardDto->isWarehouseSet = (bool)$this->configuration->getDefaultWarehouse();
         $dashboardDto->isShippingMethodSet = $this->shippingMethodService->isAnyMethodActive();
 

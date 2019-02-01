@@ -89,7 +89,6 @@ class DashboardControllerTest extends BaseTestWithServices
 
         $this->assertInstanceOf(DashboardStatus::CLASS_NAME, $status);
         $this->assertFalse($status->isParcelSet);
-        $this->assertFalse($status->isOrderStatusMappingsSet);
         $this->assertFalse($status->isWarehouseSet);
         $this->assertFalse($status->isShippingMethodSet);
 
@@ -97,8 +96,6 @@ class DashboardControllerTest extends BaseTestWithServices
 
         $this->assertArrayHasKey('parcelSet', $asArray);
         $this->assertFalse($asArray['parcelSet']);
-        $this->assertArrayHasKey('orderStatusMappingsSet', $asArray);
-        $this->assertFalse($asArray['orderStatusMappingsSet']);
         $this->assertArrayHasKey('warehouseSet', $asArray);
         $this->assertFalse($asArray['warehouseSet']);
         $this->assertArrayHasKey('shippingMethodSet', $asArray);
@@ -109,29 +106,13 @@ class DashboardControllerTest extends BaseTestWithServices
     {
         $this->shopConfig->setDefaultWarehouse(new Warehouse());
         $this->shopConfig->setDefaultParcel(new ParcelInfo());
-        $this->shopConfig->setOrderStatusMappings(array('transit' => 1));
 
         $status = $this->dashboardController->getStatus();
 
         $this->assertInstanceOf(DashboardStatus::CLASS_NAME, $status);
         $this->assertTrue($status->isParcelSet);
         $this->assertTrue($status->isWarehouseSet);
-        $this->assertTrue($status->isOrderStatusMappingsSet);
         $this->assertFalse($status->isShippingMethodSet);
-    }
-
-    public function testOrderStatusMappingsSetFlag()
-    {
-        $status = $this->dashboardController->getStatus();
-        $this->assertFalse($status->isOrderStatusMappingsSet);
-
-        $this->shopConfig->setOrderStatusMappings(array());
-        $status = $this->dashboardController->getStatus();
-        $this->assertFalse($status->isOrderStatusMappingsSet);
-
-        $this->shopConfig->setOrderStatusMappings(array('transit' => 1));
-        $status = $this->dashboardController->getStatus();
-        $this->assertTrue($status->isOrderStatusMappingsSet);
     }
 
     public function testGetStatusAllSet()
