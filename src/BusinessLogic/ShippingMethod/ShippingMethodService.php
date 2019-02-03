@@ -67,34 +67,6 @@ class ShippingMethodService extends BaseService
         return $this->select();
     }
 
-    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
-    {
-        return ShippingCostCalculator::getShippingCost(
-            $serviceId,
-            $fromCountry,
-            $fromZip,
-            $toCountry,
-            $toZip,
-            $packages
-        );
-    }
-
-    /**
-     * Returns shipping costs for all available shipping services that support specified parameters.
-     *
-     * @param string $fromCountry Departure country code.
-     * @param string $fromZip Departure zip code.
-     * @param string $toCountry Destination country code.
-     * @param string $toZip Destination zip code.
-     * @param Package[] $packages Array of parcels.
-     *
-     * @return array Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
-     */
-    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages)
-    {
-        return ShippingCostCalculator::getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, $packages);
-    }
-
     /**
      * Returns all shipping methods for current user.
      *
@@ -231,6 +203,76 @@ class ShippingMethodService extends BaseService
         $filter = $this->setFilterCondition(new QueryFilter(), 'activated', Operators::EQUALS, true);
 
         return $this->shippingMethodRepository->count($filter) > 0;
+    }
+
+    /**
+     * Returns shipping costs for given shipping service for delivery of specified packages from specified
+     * departure country and postal area to specified destination country and postal area.
+     *
+     * @param int $serviceId Id of service for which to calculate costs.
+     * @param string $fromCountry Departure country code.
+     * @param string $fromZip Departure zip code.
+     * @param string $toCountry Destination country code.
+     * @param string $toZip Destination zip code.
+     * @param Package[] $packages Array of packages.
+     *
+     * @return float Calculated shipping cost
+     */
+    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
+    {
+        $shippingMethod = $this->getShippingMethodForService($serviceId);
+        if ($shippingMethod === null || !$shippingMethod->isActivated()) {
+            Logger::logWarning(
+                'Tried to calculate shipping cost for service that does not exist in shop '
+                . 'or is not activated (' . $serviceId . ')'
+            );
+
+            return 0;
+        }
+
+        return ShippingCostCalculator::getShippingCost(
+            $shippingMethod,
+            $fromCountry,
+            $fromZip,
+            $toCountry,
+            $toZip,
+            $packages
+        );
+    }
+
+    /**
+     * Returns shipping costs for all available shipping services that support delivery of given packages
+     * from specified departure country and postal area to specified destination country and postal area.
+     *
+     * @param string $fromCountry Departure country code.
+     * @param string $fromZip Departure zip code.
+     * @param string $toCountry Destination country code.
+     * @param string $toZip Destination zip code.
+     * @param Package[] $packages Array of packages.
+     *
+     * @return array <p>Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
+     *  array(
+     *     20345 => 34.47,
+     *     20337 => 27.11,
+     *     ...
+     *  )
+     * </p>
+     */
+    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages)
+    {
+        $activeMethods = $this->getActiveMethods();
+        if (empty($activeMethods)) {
+            return array();
+        }
+
+        return ShippingCostCalculator::getShippingCosts(
+            $activeMethods,
+            $fromCountry,
+            $fromZip,
+            $toCountry,
+            $toZip,
+            $packages
+        );
     }
 
     /**

@@ -11,154 +11,116 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
 /**
- * Class ShippingCostCalculator
+ * Class ShippingCostCalculator.
  *
  * @package Packlink\BusinessLogic\ShippingMethod
  */
 class ShippingCostCalculator
 {
     /**
-     * @var ShippingMethodService
-     */
-    private static $shippingMethodService;
-
-    /**
-     * Calculates shipping cost for specified parameters.
+     * Calculates shipping cost for specified shipping method and delivery parameters.
      *
-     * @param int $serviceId ID of service to calculate costs for.
+     * @param ShippingMethod $shippingMethod Shipping method to calculate costs for.
      * @param string $fromCountry Departure country code.
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param Package[] $packages Array of parcels.
+     * @param Package[] $packages Array of packages.
      *
      * @return float Calculated shipping cost for service if found. Otherwise, 0.0;
      */
-    public static function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
-    {
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-
+    public static function getShippingCost(
+        ShippingMethod $shippingMethod,
+        $fromCountry,
+        $fromZip,
+        $toCountry,
+        $toZip,
+        array $packages
+    ) {
         $defaultCost = 0;
-        $shippingMethod = self::getShippingMethodService()->getShippingMethodForService($serviceId);
-        if ($shippingMethod === null) {
-            return $defaultCost;
-        }
-
-        if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
-            return $shippingMethod->getCost(0, $fromCountry, $toCountry, $packages);
-        }
+        $serviceId = $shippingMethod->getServiceId();
+        $params = new ShippingServiceSearch($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
 
         try {
-            $response = $proxy->getShippingServicesDeliveryDetails(
-                self::getCostSearchParameters($fromCountry, $fromZip, $toCountry, $toZip, $packages, $serviceId)
-            );
+            $response = self::getProxy()->getShippingServicesDeliveryDetails($params);
+            // if we don't get a response, it means this shipping method does not do delivery for specified params
             if (count($response)) {
                 $defaultCost = $response[0]->basePrice;
             }
         } catch (HttpBaseException $e) {
-            // Fallback when API is not available.
-            $defaultCost = $shippingMethod->getDefaultShippingCost($fromCountry, $toCountry);
+            // If API is not available, get stored default shipping cost on method without calculation.
+            $defaultCost = $shippingMethod->getDefaultPacklinkShippingCost($fromCountry, $toCountry);
         }
 
-        return $defaultCost ? $shippingMethod->getCost($defaultCost) : 0;
+        return $defaultCost ? $shippingMethod->getCost($defaultCost, $packages) : 0;
     }
 
     /**
-     * Returns shipping costs for all available shipping services that support specified parameters.
+     * Returns shipping costs for all given shipping methods that support delivery with specified parameters.
      *
+     * @param ShippingMethod[] $shippingMethods Shipping methods to do a calculation for.
      * @param string $fromCountry Departure country code.
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param Package[] $packages Array of parcels.
+     * @param Package[] $packages Array of packages.
      *
-     * @return array Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
+     * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
-    public static function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages)
-    {
-        $activeMethods = self::getShippingMethodService()->getActiveMethods();
-        if (empty($activeMethods)) {
+    public static function getShippingCosts(
+        $shippingMethods,
+        $fromCountry,
+        $fromZip,
+        $toCountry,
+        $toZip,
+        array $packages
+    ) {
+        if (empty($shippingMethods)) {
             return array();
         }
 
+        $params = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
         try {
-            $response = self::getShippingCostsFromProxy($fromCountry, $fromZip, $toCountry, $toZip, $packages);
-            $shippingCosts = self::prepareDataForShippingCostsCalculation($response, $activeMethods);
+            $response = self::getProxy()->getShippingServicesDeliveryDetails($params);
+
+            $result = self::calculateShippingCostsPerShippingMethod($shippingMethods, $response, $packages);
         } catch (HttpBaseException $e) {
             // Fallback when API is not available.
-            $shippingCosts = self::getDefaultShippingCosts($fromCountry, $toCountry, $activeMethods);
+            $result = self::getDefaultShippingCosts($shippingMethods, $fromCountry, $toCountry, $packages);
         }
 
-        $calculatedShippingCosts = self::calculateShippingCosts($fromCountry, $toCountry, $packages, $shippingCosts);
-
-        return $calculatedShippingCosts;
-    }
-
-    /**
-     * Retrieves API response for all available shipping delivery methods
-     * and prepares it for shipping costs calculation.
-     *
-     * @param string $fromCountry Departure country code.
-     * @param string $fromZip Departure zip code.
-     * @param string $toCountry Destination country code.
-     * @param string $toZip Destination zip code.
-     * @param Package[] $packages Array of parcels.
-     *
-     * @return array Array of prepared data for shipping costs calculation.
-     *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     */
-    private static function getShippingCostsFromProxy($fromCountry, $fromZip, $toCountry, $toZip, array $packages)
-    {
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-
-        $response = $proxy->getShippingServicesDeliveryDetails(
-            self::getCostSearchParameters($fromCountry, $fromZip, $toCountry, $toZip, $packages)
-        );
-
-        return $response;
+        return $result;
     }
 
     /**
      * Prepares raw response data for shipping costs calculation.
      *
+     * @param ShippingMethod[] $shippingMethods Array of active shipping methods in the system.
+     *
      * @param ShippingServiceDeliveryDetails[] $shippingServiceDeliveries Array of shipping service delivery details.
-     * @param ShippingMethod[] $activeMethods Array of active shipping methods in the system.
      *
-     * @return array Array of prepared data for shipping cost calculation.
+     * @param Package[] $packages Array of packages.
+     *
+     * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
-    private static function prepareDataForShippingCostsCalculation(
+    private static function calculateShippingCostsPerShippingMethod(
+        array $shippingMethods,
         array $shippingServiceDeliveries,
-        array $activeMethods
+        array $packages
     ) {
         $shippingCosts = array();
-        $activeMethodServiceIds = array_map(
-            function ($activeMethod) {
-                /** @var ShippingMethod $activeMethod */
-                return $activeMethod->getServiceId();
-            },
-            $activeMethods
-        );
 
-        foreach ($shippingServiceDeliveries as $shippingServiceDeliveryDetails) {
-            if (!in_array($shippingServiceDeliveryDetails->id, $activeMethodServiceIds, true)) {
-                continue;
-            }
+        foreach ($shippingMethods as $shippingMethod) {
+            foreach ($shippingServiceDeliveries as $id => $shippingServiceDeliveryDetails) {
+                if ($shippingMethod->getServiceId() === $shippingServiceDeliveryDetails->id) {
+                    $shippingCosts[$shippingMethod->getServiceId()] = $shippingMethod->getCost(
+                        $shippingServiceDeliveryDetails->basePrice,
+                        $packages
+                    );
 
-            $shippingMethod = self::getShippingMethodService()
-                ->getShippingMethodForService($shippingServiceDeliveryDetails->id);
-            if ($shippingMethod === null) {
-                continue;
-            }
-
-            if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
-                $shippingCosts[$shippingMethod->getServiceId()] = 0;
-            } else {
-                $shippingCosts[$shippingMethod->getServiceId()] = $shippingServiceDeliveryDetails->basePrice;
+                    unset($shippingServiceDeliveries[$id]);
+                    break;
+                }
             }
         }
 
@@ -166,105 +128,38 @@ class ShippingCostCalculator
     }
 
     /**
-     * Transforms parameters to proper DTO.
+     * Returns default shipping costs for all given shipping methods in the system.
      *
-     * @param string $fromCountry Departure country code.
-     * @param string $fromZip Departure zip code.
-     * @param string $toCountry Destination country code.
-     * @param string $toZip Destination zip code.
-     * @param Package[] $packages Parcel info.
-     * @param int $serviceId ID of service to calculate costs for.
-     *
-     * @return ShippingServiceSearch Resulting object
-     */
-    private static function getCostSearchParameters(
-        $fromCountry,
-        $fromZip,
-        $toCountry,
-        $toZip,
-        array $packages,
-        $serviceId = null
-    ) {
-        $params = new ShippingServiceSearch();
-
-        if ($serviceId !== null) {
-            $params->serviceId = $serviceId;
-        }
-
-        $params->fromCountry = $fromCountry;
-        $params->fromZip = $fromZip;
-        $params->toCountry = $toCountry;
-        $params->toZip = $toZip;
-        $params->packages = $packages;
-
-        return $params;
-    }
-
-    /**
-     * Calculates shipping costs based on their pricing policy.
+     * @param ShippingMethod[] $shippingMethods Array of shipping methods fmr the shop.
      *
      * @param string $fromCountry Departure country code.
      * @param string $toCountry Destination country code.
-     * @param Package[] $packages Array of parcels.
-     * @param array $shippingCosts Array of prepared data that needs to be calculated.
+     * @param Package[] $packages Array of packages.
      *
-     * @return array Calculated shipping costs.
+     * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
-    private static function calculateShippingCosts($fromCountry, $toCountry, array $packages, array $shippingCosts)
-    {
-        $calculatedShippingCosts = array();
-
-        foreach ($shippingCosts as $serviceId => $shippingCost) {
-            $shippingMethod = self::getShippingMethodService()->getShippingMethodForService($serviceId);
-            if ($shippingMethod === null) {
-                continue;
-            }
-
-            $calculatedShippingCosts[$shippingMethod->getServiceId()] = $shippingMethod->getCost(
-                $shippingCost,
-                $fromCountry,
-                $toCountry,
-                $packages
-            );
-        }
-
-        return $calculatedShippingCosts;
-    }
-
-    /**
-     * Returns default shipping costs for all active shipping methods in the system.
-     *
-     * @param string $fromCountry Departure country code.
-     * @param string $toCountry Destination country code.
-     * @param ShippingMethod[] $activeMethods Array of active shipping methods in the system.
-     *
-     * @return array Prepared data of default shipping costs for
-     */
-    private static function getDefaultShippingCosts($fromCountry, $toCountry, array $activeMethods)
+    private static function getDefaultShippingCosts(array $shippingMethods, $fromCountry, $toCountry, array $packages)
     {
         $shippingCosts = array();
 
-        foreach ($activeMethods as $shippingMethod) {
-            $shippingCosts[$shippingMethod->getServiceId()] = $shippingMethod->getDefaultShippingCost(
-                $fromCountry,
-                $toCountry
-            );
+        foreach ($shippingMethods as $shippingMethod) {
+            $baseCost = $shippingMethod->getDefaultPacklinkShippingCost($fromCountry, $toCountry);
+            $shippingCosts[$shippingMethod->getServiceId()] = $shippingMethod->getCost($baseCost, $packages);
         }
 
         return $shippingCosts;
     }
 
     /**
-     * Returns shipping method service.
+     * Gets instance of proxy.
      *
-     * @return ShippingMethodService
+     * @return \Packlink\BusinessLogic\Http\Proxy Packlink Proxy.
      */
-    private static function getShippingMethodService()
+    private static function getProxy()
     {
-        if (self::$shippingMethodService === null) {
-            self::$shippingMethodService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
-        }
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
 
-        return self::$shippingMethodService;
+        return $proxy;
     }
 }

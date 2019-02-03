@@ -35,20 +35,29 @@ class Package extends BaseDto
     public $length;
 
     /**
+     * Package constructor.
+     *
+     * @param float $weight Weight of package in kg.
+     * @param float $width Width of package in cm.
+     * @param float $height Height of package in cm.
+     * @param float $length Length of package in cm.
+     */
+    public function __construct($weight = 0.0, $width = 0.0, $height = 0.0, $length = 0.0)
+    {
+        $this->weight = $weight;
+        $this->width = $width;
+        $this->height = $height;
+        $this->length = $length;
+    }
+
+    /**
      * Gets default package details.
      *
      * @return static Default package.
      */
     public static function defaultPackage()
     {
-        return static::fromArray(
-            array(
-                'weight' => 1,
-                'width' => 10,
-                'height' => 10,
-                'length' => 10,
-            )
-        );
+        return new static(1, 10, 10, 10);
     }
 
     /**
@@ -61,10 +70,10 @@ class Package extends BaseDto
     public static function fromArray(array $raw)
     {
         $instance = new static();
-        $instance->weight = static::getValue($raw, 'weight', null);
-        $instance->length = static::getValue($raw, 'length', null);
-        $instance->height = static::getValue($raw, 'height', null);
-        $instance->width = static::getValue($raw, 'width', null);
+        $instance->weight = static::getValue($raw, 'weight', 0.0);
+        $instance->length = static::getValue($raw, 'length', 0.0);
+        $instance->height = static::getValue($raw, 'height', 0.0);
+        $instance->width = static::getValue($raw, 'width', 0.0);
 
         return $instance;
     }

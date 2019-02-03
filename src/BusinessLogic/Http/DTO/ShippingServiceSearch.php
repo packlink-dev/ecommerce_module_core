@@ -41,11 +41,37 @@ class ShippingServiceSearch extends BaseDto
      */
     public $toZip;
     /**
-     * Array of parcels.
+     * Array of packages.
      *
      * @var \Packlink\BusinessLogic\Http\DTO\Package[]
      */
     public $packages;
+
+    /**
+     * ShippingServiceSearch constructor.
+     *
+     * @param int $serviceId Service Id.
+     * @param string $fromCountry Departure country 2-letter code.
+     * @param string $fromZip Departure country postal/zip code.
+     * @param string $toCountry Destination country 2-letter code.
+     * @param string $toZip Destination country postal/zip code.
+     * @param Package[] $packages Array of packages.
+     */
+    public function __construct(
+        $serviceId = null,
+        $fromCountry = '',
+        $fromZip = '',
+        $toCountry = '',
+        $toZip = '',
+        $packages = array()
+    ) {
+        $this->serviceId = $serviceId;
+        $this->fromCountry = $fromCountry;
+        $this->fromZip = $fromZip;
+        $this->toCountry = $toCountry;
+        $this->toZip = $toZip;
+        $this->packages = $packages;
+    }
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -87,7 +113,7 @@ class ShippingServiceSearch extends BaseDto
     {
         $instance = new static();
 
-        $instance->serviceId = self::getValue($raw, 'service_id');
+        $instance->serviceId = self::getValue($raw, 'service_id', null);
         $instance->fromCountry = self::getValue($raw, 'from[country]');
         $instance->fromZip = self::getValue($raw, 'from[zip]');
         $instance->toCountry = self::getValue($raw, 'to[country]');
