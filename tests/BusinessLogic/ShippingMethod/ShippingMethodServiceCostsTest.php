@@ -139,11 +139,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostFromProxy()
     {
         // this method has costs of 10.76
-        $this->shippingMethodService->add(
-            $this->getShippingService(20339),
-            $this->getShippingServiceDetails(20339)
-        );
-        $this->shippingMethodService->activate(20339);
+        $this->addShippingMethod(20339);
 
         $response = file_get_contents(
             __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
@@ -159,10 +155,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostForInactiveService()
     {
         // this method has costs of 10.76
-        $this->shippingMethodService->add(
-            $this->getShippingService(20339),
-            $this->getShippingServiceDetails(20339)
-        );
+        $this->addShippingMethod(20339, false);
 
         $response = file_get_contents(
             __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
@@ -179,11 +172,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostsFromProxy()
     {
         $serviceId = 20339;
-        $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $this->shippingMethodService->activate($serviceId);
+        $this->addShippingMethod($serviceId);
 
         // first service from this response has id 20339 and cost of 5.06
         $response = file_get_contents(
@@ -219,11 +208,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostFromProxyForMultiplePackages()
     {
         // this method has costs of 10.76
-        $this->shippingMethodService->add(
-            $this->getShippingService(20339),
-            $this->getShippingServiceDetails(20339)
-        );
-        $this->shippingMethodService->activate(20339);
+        $this->addShippingMethod(20339);
 
         // first service from this response has id 20339 and total base price of 14.16
         $response = file_get_contents(
@@ -249,11 +234,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostsFromProxyForMultiplePackages()
     {
         $serviceId = 20339;
-        $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $this->shippingMethodService->activate($serviceId);
+        $this->addShippingMethod($serviceId);
 
         // first service from this response has id 20339 and total base price of 41.43
         $response = file_get_contents(
@@ -278,22 +259,13 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostFallbackToShippingMethod()
     {
         // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(20339),
-            $this->getShippingServiceDetails(20339)
-        );
-        $this->shippingMethodService->activate(20339);
+        $serviceId = 20339;
+        $shippingMethod = $this->addShippingMethod($serviceId);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
 
-        $cost = $this->shippingMethodService->getShippingCost(
-            20339,
-            'IT',
-            '00118',
-            'IT',
-            '00118',
-            array(Package::defaultPackage())
-        );
+        $packages = array(Package::defaultPackage());
+        $cost = $this->shippingMethodService->getShippingCost($serviceId, 'IT', '00118', 'IT', '00118', $packages);
 
         $costs = $shippingMethod->getShippingCosts();
         self::assertEquals($costs[0]->basePrice, $cost, 'Failed to get default cost from local method!');
@@ -302,21 +274,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostsFallbackToShippingMethod()
     {
         $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $this->shippingMethodService->activate($serviceId);
+        $shippingMethod = $this->addShippingMethod($serviceId);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
 
-        $costs = $this->shippingMethodService->getShippingCosts(
-            'IT',
-            '00118',
-            'IT',
-            '00118',
-            array(Package::defaultPackage())
-        );
+        $packages = array(Package::defaultPackage());
+        $costs = $this->shippingMethodService->getShippingCosts('IT', '00118', 'IT', '00118', $packages);
 
         $defaultCosts = $shippingMethod->getShippingCosts();
         self::assertEquals(
@@ -329,22 +292,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostNoFallback()
     {
         // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $this->shippingMethodService->activate(1);
+        $shippingMethod = $this->addShippingMethod(1);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
 
-        $cost = $this->shippingMethodService->getShippingCost(
-            1234,
-            'IT',
-            '00118',
-            'IT',
-            '00118',
-            array(Package::defaultPackage())
-        );
+        $packages = array(Package::defaultPackage());
+        $cost = $this->shippingMethodService->getShippingCost(1234, 'IT', '00118', 'IT', '00118', $packages);
 
         $costs = $shippingMethod->getShippingCosts();
         self::assertNotEquals($costs[0]->basePrice, $cost, 'Failed to get default cost!');
@@ -354,20 +307,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testGetCostsNoFallback()
     {
         $serviceId = 1;
-        $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
+        $this->addShippingMethod($serviceId, false);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
 
-        $costs = $this->shippingMethodService->getShippingCosts(
-            'IT',
-            '00118',
-            'IT',
-            '00118',
-            array(Package::defaultPackage())
-        );
+        $packages = array(Package::defaultPackage());
+        $costs = $this->shippingMethodService->getShippingCosts('IT', '00118', 'IT', '00118', $packages);
 
         self::assertArrayNotHasKey($serviceId, $costs);
     }
@@ -376,38 +321,19 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     {
         // API has service 20339
         $serviceId = 20339;
-        $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
+        $this->addShippingMethod($serviceId, false);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
 
-        $costs = $this->shippingMethodService->getShippingCosts(
-            'IT',
-            '00118',
-            'IT',
-            '00118',
-            array(Package::defaultPackage())
-        );
+        $packages = array(Package::defaultPackage());
+        $costs = $this->shippingMethodService->getShippingCosts('IT', '00118', 'IT', '00118', $packages);
 
         self::assertArrayNotHasKey($serviceId, $costs, 'Cost should not be calculated for inactive service.');
     }
 
     public function testCalculateCostFixedPricingPolicy()
     {
-        // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
+        $shippingMethod = $this->prepareFixedPricePolicyShippingMethod(1, array(new FixedPricePolicy(0, 10, 12)));
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
         $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array(Package::defaultPackage()));
@@ -421,17 +347,10 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testCalculateCostsFixedPricingPolicy()
     {
         $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
+        $shippingMethod = $this->prepareFixedPricePolicyShippingMethod(
+            $serviceId,
+            array(new FixedPricePolicy(0, 10, 12))
         );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array(Package::defaultPackage()));
@@ -447,23 +366,11 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     public function testCalculateCostFixedPricingPolicyOutOfRange()
     {
-        // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
+        $shippingMethod = $this->prepareFixedPricePolicyShippingMethod(1, $fixedPricePolicies);
 
         $package = new Package(100, 10, 10, 10);
-        $this->httpClient->setMockResponses(
-            array(new HttpResponse(400, array(), ''), new HttpResponse(400, array(), ''))
-        );
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(2));
         $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array($package));
 
         $costs = $shippingMethod->getShippingCosts();
@@ -483,22 +390,11 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testCalculateCostsFixedPricingPolicyOutOfRange()
     {
         $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
+        $shippingMethod = $this->prepareFixedPricePolicyShippingMethod($serviceId, $fixedPricePolicies);
 
         $package = new Package(100, 10, 10, 10);
-        $this->httpClient->setMockResponses(
-            array(new HttpResponse(400, array(), ''), new HttpResponse(400, array(), ''))
-        );
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(2));
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array($package));
 
         $defaultCosts = $shippingMethod->getShippingCosts();
@@ -520,18 +416,17 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     public function testCalculateCostFixedPricingPolicyInRange()
     {
-        $this->prepareFixedPricePolicyShippingMethod();
-
-        $package = new Package(8, 10, 10, 10);
-        $this->httpClient->setMockResponses(
+        $this->prepareFixedPricePolicyShippingMethod(
+            1,
             array(
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
+                new FixedPricePolicy(0, 10, 12),
+                new FixedPricePolicy(10, 20, 10),
+                new FixedPricePolicy(20, 30, 8),
             )
         );
+
+        $package = new Package(8, 10, 10, 10);
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(5));
         $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array($package));
         self::assertEquals(12, $cost, 'Calculated cost is wrong!');
 
@@ -555,30 +450,17 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testCalculateCostsFixedPricingPolicyInRange()
     {
         $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
-        $fixedPricePolicies[] = new FixedPricePolicy(20, 30, 8);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
-
-        $package = new Package(8, 10, 10, 10);
-        $this->httpClient->setMockResponses(
+        $this->prepareFixedPricePolicyShippingMethod(
+            $serviceId,
             array(
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
+                new FixedPricePolicy(0, 10, 12),
+                new FixedPricePolicy(10, 20, 10),
+                new FixedPricePolicy(20, 30, 8),
             )
         );
+
+        $package = new Package(8, 10, 10, 10);
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(5));
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array($package));
         self::assertEquals(12, $costs[$serviceId], 'Calculated cost is wrong!');
 
@@ -602,15 +484,16 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testCalculateCostFixedPricingPolicyInRangeMultiple()
     {
         // this method has costs of 10.76
-        $this->prepareFixedPricePolicyShippingMethod();
-
-        $this->httpClient->setMockResponses(
+        $this->prepareFixedPricePolicyShippingMethod(
+            1,
             array(
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
+                new FixedPricePolicy(0, 10, 12),
+                new FixedPricePolicy(10, 20, 10),
+                new FixedPricePolicy(20, 30, 8),
             )
         );
+
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(3));
         $packages = array();
         // First range.
         $firstPackage = Package::defaultPackage();
@@ -637,77 +520,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $this->checkShippingCostMatchesExpectedCost($packages, 8);
     }
 
-    public function testCalculateCostsFixedPricingPolicyInRangeMultiple()
-    {
-        $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
-        $fixedPricePolicies[] = new FixedPricePolicy(20, 30, 8);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
-
-        $this->httpClient->setMockResponses(
-            array(
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-            )
-        );
-        $packages = array();
-
-        // First range.
-        $firstPackage = Package::defaultPackage();
-        $secondPackage = Package::defaultPackage();
-        $firstPackage->weight = 2;
-        $secondPackage->weight = 4;
-        $packages[] = $firstPackage;
-        $packages[] = $secondPackage;
-
-        $this->checkShippingCostsMatchExpectedCost($packages, 12, $serviceId);
-
-        // Second range.
-        $thirdPackage = Package::defaultPackage();
-        $thirdPackage->weight = 10;
-        $packages[] = $thirdPackage;
-
-        $this->checkShippingCostsMatchExpectedCost($packages, 10, $serviceId);
-
-        // Third range.
-        $fourthPackage = Package::defaultPackage();
-        $fourthPackage->weight = 7;
-        $packages[] = $fourthPackage;
-
-        $this->checkShippingCostsMatchExpectedCost($packages, 8, $serviceId);
-    }
-
     public function testCalculateCostPercentPricingPolicyIncreased()
     {
-        // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
-
-        $shippingMethod->setPercentPricePolicy(new PercentPricePolicy(true, 14));
-        $this->shippingMethodService->save($shippingMethod);
+        $shippingMethod = $this->preparePercentPricePolicyShippingMethod(1, true);
 
         $package = Package::defaultPackage();
-        $this->httpClient->setMockResponses(
-            array(
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-            )
-        );
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(3));
         $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array($package));
         self::assertEquals(12.27, $cost, 'Calculated cost is wrong!');
 
@@ -727,14 +545,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testCalculateCostsPercentPricingPolicyIncreased()
     {
         $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $shippingMethod->setActivated(true);
-
-        $shippingMethod->setPercentPricePolicy(new PercentPricePolicy(true, 14));
-        $this->shippingMethodService->save($shippingMethod);
+        $this->preparePercentPricePolicyShippingMethod($serviceId, true);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array(Package::defaultPackage()));
@@ -743,56 +554,31 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     public function testCalculateCostPercentPricingPolicyDecreased()
     {
-        // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
+        $shippingMethod = $this->preparePercentPricePolicyShippingMethod();
 
-        $shippingMethod->setPercentPricePolicy(new PercentPricePolicy(false, 14));
-        $this->shippingMethodService->save($shippingMethod);
+        $this->httpClient->setMockResponses($this->getBadHttpResponses(3));
 
-        $this->httpClient->setMockResponses(
-            array(
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-                new HttpResponse(400, array(), ''),
-            )
-        );
-        $package = Package::defaultPackage();
-        $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array($package));
-        self::assertEquals(9.25, $cost, 'Calculated cost is wrong!');
+        $packages = array(Package::defaultPackage());
+        $this->checkShippingCostMatchesExpectedCost($packages, 9.25);
 
         $shippingMethod->setPercentPricePolicy(new PercentPricePolicy(false, 50));
         $this->shippingMethodService->save($shippingMethod);
 
-        $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array($package));
-        self::assertEquals(5.38, $cost, 'Calculated cost is wrong!');
+        $this->checkShippingCostMatchesExpectedCost($packages, 5.38);
 
         $shippingMethod->setPercentPricePolicy(new PercentPricePolicy(false, 80));
         $this->shippingMethodService->save($shippingMethod);
 
-        $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array($package));
-        self::assertEquals(2.15, $cost, 'Calculated cost is wrong!');
+        $this->checkShippingCostMatchesExpectedCost($packages, 2.15);
     }
 
     public function testCalculateCostsPercentPricingPolicyDecreased()
     {
         $serviceId = 20339;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
-        $shippingMethod->setActivated(true);
-
-        $shippingMethod->setPercentPricePolicy(new PercentPricePolicy(false, 14));
-        $this->shippingMethodService->save($shippingMethod);
+        $this->preparePercentPricePolicyShippingMethod($serviceId);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
-        $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array(Package::defaultPackage()));
-
-        self::assertEquals(9.25, $costs[$serviceId], 'Calculated cost is wrong!');
+        $this->checkShippingCostsMatchExpectedCost(array(Package::defaultPackage()), 9.25, $serviceId);
     }
 
     /**
@@ -818,22 +604,56 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         self::assertEquals($expectedCost, $costs[$serviceId], 'Calculated cost is wrong!');
     }
 
-    protected function prepareFixedPricePolicyShippingMethod()
+    /**
+     * @param int $serviceId
+     * @param FixedPricePolicy[] $fixedPricePolicies
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
+    protected function prepareFixedPricePolicyShippingMethod($serviceId = 1, array $fixedPricePolicies = array())
     {
-        // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
-        $fixedPricePolicies[] = new FixedPricePolicy(20, 30, 8);
+        $shippingMethod = $this->addShippingMethod($serviceId);
 
         $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
         $this->shippingMethodService->save($shippingMethod);
+
+        return $shippingMethod;
+    }
+
+    /**
+     * @param int $serviceId
+     * @param bool $increase
+     * @param int $percent
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
+    protected function preparePercentPricePolicyShippingMethod($serviceId = 1, $increase = false, $percent = 14)
+    {
+        $shippingMethod = $this->addShippingMethod($serviceId);
+
+        $shippingMethod->setPercentPricePolicy(new PercentPricePolicy($increase, $percent));
+        $this->shippingMethodService->save($shippingMethod);
+
+        return $shippingMethod;
+    }
+
+    /**
+     * @param $serviceId
+     *
+     * @param bool $active
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
+    protected function addShippingMethod($serviceId, $active = true)
+    {
+        $shippingMethod = $this->shippingMethodService->add(
+            $this->getShippingService($serviceId),
+            $this->getShippingServiceDetails($serviceId)
+        );
+        $shippingMethod->setActivated($active);
+        $this->shippingMethodService->save($shippingMethod);
+
+        return $shippingMethod;
     }
 
     private function getShippingService($id)
@@ -878,5 +698,15 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $details->destinationCountry = 'IT';
 
         return $details;
+    }
+
+    private function getBadHttpResponses($number)
+    {
+        $responses = array();
+        for ($counter = 0; $counter < $number; $counter++) {
+            $responses[] = new HttpResponse(400, array(), '');
+        }
+
+        return $responses;
     }
 }
