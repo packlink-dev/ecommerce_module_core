@@ -520,20 +520,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     public function testCalculateCostFixedPricingPolicyInRange()
     {
-        // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
-        $fixedPricePolicies[] = new FixedPricePolicy(20, 30, 8);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
+        $this->prepareFixedPricePolicyShippingMethod();
 
         $package = new Package(8, 10, 10, 10);
         $this->httpClient->setMockResponses(
@@ -615,19 +602,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testCalculateCostFixedPricingPolicyInRangeMultiple()
     {
         // this method has costs of 10.76
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
-        $shippingMethod->setActivated(true);
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
-        $fixedPricePolicies[] = new FixedPricePolicy(20, 30, 8);
-
-        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
-        $this->shippingMethodService->save($shippingMethod);
+        $this->prepareFixedPricePolicyShippingMethod();
 
         $this->httpClient->setMockResponses(
             array(
@@ -841,6 +816,24 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', $packages);
 
         self::assertEquals($expectedCost, $costs[$serviceId], 'Calculated cost is wrong!');
+    }
+
+    protected function prepareFixedPricePolicyShippingMethod()
+    {
+        // this method has costs of 10.76
+        $shippingMethod = $this->shippingMethodService->add(
+            $this->getShippingService(1),
+            $this->getShippingServiceDetails(1)
+        );
+        $shippingMethod->setActivated(true);
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
+        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
+        $fixedPricePolicies[] = new FixedPricePolicy(20, 30, 8);
+
+        $shippingMethod->setFixedPricePolicy($fixedPricePolicies);
+        $this->shippingMethodService->save($shippingMethod);
     }
 
     private function getShippingService($id)
