@@ -63,9 +63,9 @@ class FixedPricePolicy
     public function toArray()
     {
         return array(
-            'from' => $this->from,
-            'to' => $this->to,
-            'amount' => $this->amount,
+            'from' => round($this->from, 2),
+            'to' => round($this->to, 2),
+            'amount' => round($this->amount, 2),
         );
     }
 }

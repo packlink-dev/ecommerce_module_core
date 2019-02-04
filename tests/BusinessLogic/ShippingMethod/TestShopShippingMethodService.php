@@ -18,6 +18,10 @@ class TestShopShippingMethodService implements ShopShippingMethodService
      * @var array
      */
     public $callHistory = array();
+    /**
+     * @var bool
+     */
+    public $returnFalse = false;
 
     /**
      * Adds / Activates shipping method in shop integration.
@@ -28,6 +32,10 @@ class TestShopShippingMethodService implements ShopShippingMethodService
      */
     public function add(ShippingMethod $shippingMethod)
     {
+        if ($this->returnFalse) {
+            return false;
+        }
+
         $this->callHistory['add'][] = $shippingMethod;
 
         return true;
@@ -52,6 +60,10 @@ class TestShopShippingMethodService implements ShopShippingMethodService
      */
     public function delete(ShippingMethod $shippingMethod)
     {
+        if ($this->returnFalse) {
+            return false;
+        }
+
         $this->callHistory['delete'][] = $shippingMethod;
 
         return true;

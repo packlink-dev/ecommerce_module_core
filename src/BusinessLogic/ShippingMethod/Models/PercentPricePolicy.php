@@ -29,7 +29,7 @@ class PercentPricePolicy
      * @param bool $increase Indicates whether to increase or decrease price for specified percent amount.
      * @param int $amount Amount in percents for increase/decrease.
      */
-    public function __construct($increase = true, $amount = 0)
+    public function __construct($increase, $amount)
     {
         $this->increase = $increase;
         $this->amount = $amount;
@@ -44,7 +44,7 @@ class PercentPricePolicy
      */
     public static function fromArray($data)
     {
-        return new static($data['increase'], $data['amount']);
+        return new static((bool)$data['increase'], $data['amount']);
     }
 
     /**

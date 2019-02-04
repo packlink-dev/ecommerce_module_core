@@ -5,6 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethodCost;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -239,7 +240,7 @@ class ShippingMethodEntityTest extends TestCase
     {
         $method = new ShippingMethod();
 
-        $policy = new PercentPricePolicy();
+        $policy = new PercentPricePolicy(false, 0);
 
         $method->setPercentPricePolicy($policy);
     }
@@ -384,6 +385,36 @@ class ShippingMethodEntityTest extends TestCase
         self::assertEquals(10, $result['fixedPricePolicy'][1]['from']);
     }
 
+    public function testFromArrayShippingCosts()
+    {
+        $data = array(
+            'departure' => 'IT',
+            'destination' => 'DE',
+            'totalPrice' => 3,
+            'basePrice' => 2,
+            'taxPrice' => 1,
+        );
+
+        $method = ShippingMethodCost::fromArray($data);
+        self::assertEquals(3, $method->totalPrice);
+        self::assertEquals(2, $method->basePrice);
+        self::assertEquals(1, $method->taxPrice);
+        self::assertEquals('IT', $method->departureCountry);
+        self::assertEquals('DE', $method->destinationCountry);
+    }
+
+    public function testFromArrayShippingMethodShippingCosts()
+    {
+        $data = $this->getShippingMethodData();
+
+        $method = ShippingMethod::fromArray($data);
+        $costs = $method->getShippingCosts();
+        self::assertCount(1, $costs);
+        self::assertEquals(3, $costs[0]->totalPrice);
+        self::assertEquals(2, $costs[0]->basePrice);
+        self::assertEquals(1, $costs[0]->taxPrice);
+    }
+
     public function testFromArrayPacklinkPricingPolicy()
     {
         $data = $this->getShippingMethodData();
@@ -490,6 +521,7 @@ class ShippingMethodEntityTest extends TestCase
         $method->setExpressDelivery($data['expressDelivery']);
         $method->setDeliveryTime($data['deliveryTime']);
         $method->setNational($data['national']);
+        $method->setShippingCosts(array(new ShippingMethodCost('IT', 'IT', 3, 2, 1)));
 
         $result = $method->toArray();
         self::assertEquals($data['serviceId'], $result['serviceId']);
@@ -506,6 +538,7 @@ class ShippingMethodEntityTest extends TestCase
         self::assertEquals($data['deliveryTime'], $result['deliveryTime']);
         self::assertEquals($data['national'], $result['national']);
         self::assertEquals(ShippingMethod::PRICING_POLICY_PACKLINK, $result['pricingPolicy']);
+        self::assertEquals($data['shippingCosts'], $result['shippingCosts']);
 
         return $method;
     }
@@ -529,6 +562,15 @@ class ShippingMethodEntityTest extends TestCase
             'expressDelivery' => true,
             'deliveryTime' => '2 DAYS',
             'national' => true,
+            'shippingCosts' => array(
+                array(
+                    'departure' => 'IT',
+                    'destination' => 'IT',
+                    'totalPrice' => 3,
+                    'basePrice' => 2,
+                    'taxPrice' => 1,
+                ),
+            ),
         );
     }
 }

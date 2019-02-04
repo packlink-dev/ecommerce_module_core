@@ -20,7 +20,7 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
 
         $config2 = ShippingMethodConfiguration::fromArray($this->getPacklinkPercentPriceRawData());
         $this->assertInstanceOf(
-            'Packlink\BusinessLogic\Controllers\DTO\PercentPricePolicy',
+            'Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy',
             $config2->percentPricePolicy
         );
         $this->assertEquals(50, $config2->percentPricePolicy->amount);
@@ -29,7 +29,7 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
         $config3 = ShippingMethodConfiguration::fromArray($this->getFixedPriceRawData());
         $this->assertCount(2, $config3->fixedPricePolicy);
         $policy = $config3->fixedPricePolicy[1];
-        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\FixedPricePolicy', $policy);
+        $this->assertInstanceOf('Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy', $policy);
         $this->assertEquals(10, $policy->from);
         $this->assertEquals(22.5, $policy->to);
         $this->assertEquals(32.13, $policy->amount);

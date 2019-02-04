@@ -3,6 +3,8 @@
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
+use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
 /**
@@ -95,21 +97,14 @@ class ShippingMethodConfiguration extends BaseDto
 
         if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT) {
             $value = $raw['percentPricePolicy'];
-            $result->percentPricePolicy = new PercentPricePolicy();
-            $result->percentPricePolicy->amount = $value['amount'];
-            $result->percentPricePolicy->increase = $value['increase'];
+            $result->percentPricePolicy = PercentPricePolicy::fromArray($value);
         }
 
         if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED) {
             $value = $raw['fixedPricePolicy'];
             $result->fixedPricePolicy = array();
             foreach ($value as $policy) {
-                $fixedPolicy = new FixedPricePolicy();
-                $fixedPolicy->amount = $policy['amount'];
-                $fixedPolicy->from = $policy['from'];
-                $fixedPolicy->to = $policy['to'];
-
-                $result->fixedPricePolicy[] = $fixedPolicy;
+                $result->fixedPricePolicy[] = FixedPricePolicy::fromArray($policy);
             }
         }
 

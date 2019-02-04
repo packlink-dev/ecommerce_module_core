@@ -3,10 +3,13 @@
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
+use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
 /**
- * Class ShippingMethodResponse
+ * Class ShippingMethodResponse.
+ *
  * @package Packlink\BusinessLogic\Controllers\DTO
  */
 class ShippingMethodResponse extends BaseDto

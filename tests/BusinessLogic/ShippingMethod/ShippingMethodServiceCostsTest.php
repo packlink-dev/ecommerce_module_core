@@ -18,6 +18,7 @@ use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 class ShippingMethodServiceCostsTest extends BaseTestWithServices
@@ -34,6 +35,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
      * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
+    protected $serviceIds = array(20203, 20945, 20189);
 
     /**
      * @inheritdoc
@@ -79,8 +81,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             }
         );
 
-        $serviceIds = array(20203, 20945, 20189);
-        foreach ($serviceIds as $serviceId) {
+        foreach ($this->serviceIds as $serviceId) {
             $shippingService = $this->getShippingService($serviceId);
             $serviceDetails = $this->getShippingServiceDetails($serviceId);
             $this->shippingMethodService->add($shippingService, $serviceDetails);
@@ -90,14 +91,26 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     protected function tearDown()
     {
-        $serviceIds = array(20203, 20945, 20189);
-        foreach ($serviceIds as $serviceId) {
+        foreach ($this->serviceIds as $serviceId) {
             $this->shippingMethodService->deactivate($serviceId);
         }
 
         ShippingMethodService::resetInstance();
 
         parent::tearDown();
+    }
+
+    public function testActivationWrongService()
+    {
+        self::assertFalse($this->shippingMethodService->activate(12345));
+        self::assertNotEmpty($this->shopLogger->loggedMessages);
+    }
+
+    public function testActivationErrorInShop()
+    {
+        $this->testShopShippingMethodService->returnFalse = true;
+        self::assertFalse($this->shippingMethodService->activate(20203));
+        self::assertNotEmpty($this->shopLogger->loggedMessages);
     }
 
     public function testGetCostFromUnknownService()
@@ -579,6 +592,28 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
         $this->checkShippingCostsMatchExpectedCost(array(Package::defaultPackage()), 9.25, $serviceId);
+    }
+
+    public function testNoMethodsCalculation()
+    {
+        self::assertEmpty(ShippingCostCalculator::getShippingCosts(array(), '', '', '', '', array()));
+        foreach ($this->serviceIds as $serviceId) {
+            $this->shippingMethodService->deactivate($serviceId);
+        }
+
+        self::assertEmpty($this->shippingMethodService->getShippingCosts('', '', '', '', array()));
+    }
+
+    public function testCostCalculationForUnknownDepartureAndDestination()
+    {
+        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+
+        $packages = array(Package::defaultPackage());
+        $costs = $this->shippingMethodService->getShippingCosts('KK', '00118', 'IT', '00118', $packages);
+        self::assertEmpty($costs);
+
+        $costs = $this->shippingMethodService->getShippingCosts('IT', '00118', 'KK', '00118', $packages);
+        self::assertEmpty($costs);
     }
 
     /**

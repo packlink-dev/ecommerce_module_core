@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\ShippingMethod\Models;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
+use Packlink\BusinessLogic\ShippingMethod\Validation\PricingPolicyValidator;
 
 /**
  * This class represents shipping service from Packlink with specific data for integration.
@@ -541,7 +542,6 @@ class ShippingMethod extends Entity
      */
     public function setFixedPricePolicy($fixedPricePolicy)
     {
-        $this->percentPricePolicy = null;
         usort(
             $fixedPricePolicy,
             function (FixedPricePolicy $first, FixedPricePolicy $second) {
@@ -549,10 +549,9 @@ class ShippingMethod extends Entity
             }
         );
 
-        if (!$this->validateFixedPricePolicy($fixedPricePolicy)) {
-            throw new \InvalidArgumentException('Fixed price policies are not valid. Check range and amounts.');
-        }
+        PricingPolicyValidator::validateFixedPricePolicy($fixedPricePolicy);
 
+        $this->percentPricePolicy = null;
         $this->fixedPricePolicy = $fixedPricePolicy;
         $this->pricingPolicy = self::PRICING_POLICY_FIXED;
     }
@@ -574,9 +573,7 @@ class ShippingMethod extends Entity
      */
     public function setPercentPricePolicy($percentPricePolicy)
     {
-        if (!$this->validatePercentPricePolicy($percentPricePolicy)) {
-            throw new \InvalidArgumentException('Percent price policy is not valid. Check range and amounts.');
-        }
+        PricingPolicyValidator::validatePercentPricePolicy($percentPricePolicy);
 
         $this->percentPricePolicy = $percentPricePolicy;
         $this->fixedPricePolicy = null;
@@ -601,62 +598,5 @@ class ShippingMethod extends Entity
         $this->percentPricePolicy = null;
         $this->fixedPricePolicy = null;
         $this->pricingPolicy = self::PRICING_POLICY_PACKLINK;
-    }
-
-    /**
-     * Validates whether fixed price policies are correct.
-     * Rules for each policy:
-     *   1. 'from' must be equal to 'to' of a previous policy, for first it must be 0
-     *   2. 'to' must be greater than 'from'
-     *   3. 'amount' must be a positive number
-     *
-     * @param FixedPricePolicy[] $fixedPricePolicies Policies array to validate.
-     *
-     * @return bool TRUE if all policies and their order are valid.
-     */
-    protected function validateFixedPricePolicy($fixedPricePolicies)
-    {
-        if (count($fixedPricePolicies) > 0) {
-            $count = count($fixedPricePolicies);
-            $previous = $fixedPricePolicies[0];
-            if (!$this->isPolicyValid($previous, 0)) {
-                return false;
-            }
-
-            for ($i = 1; $i < $count; $i++) {
-                if (!$this->isPolicyValid($fixedPricePolicies[$i], $previous->to)) {
-                    return false;
-                }
-
-                $previous = $fixedPricePolicies[$i];
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Validates single fixed price policy.
-     *
-     * @param FixedPricePolicy $policy Policy to validate.
-     * @param float $lowerBoundary Value of 'from' field.
-     *
-     * @return bool TRUE if policy is valid; otherwise, FALSE.
-     */
-    protected function isPolicyValid($policy, $lowerBoundary)
-    {
-        return (float)$policy->from === (float)$lowerBoundary && $policy->from < $policy->to && $policy->amount > 0;
-    }
-
-    /**
-     * Validates percent price policy.
-     *
-     * @param PercentPricePolicy $policy Policy to validate.
-     *
-     * @return bool TRUE if policy is valid; otherwise, FALSE.
-     */
-    protected function validatePercentPricePolicy(PercentPricePolicy $policy)
-    {
-        return $policy->amount > 0 && ($policy->increase || $policy->amount < 100);
     }
 }

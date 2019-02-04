@@ -11,8 +11,6 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
-use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
 use Packlink\BusinessLogic\WebHook\Events\ShippingStatusEvent;
@@ -53,16 +51,6 @@ class WebHookHandlerTest extends BaseTestWithServices
             OrderRepository::CLASS_NAME,
             function () use ($orderRepository) {
                 return $orderRepository;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config->getAuthorizationToken(), $me->httpClient);
             }
         );
     }

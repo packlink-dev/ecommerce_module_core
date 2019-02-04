@@ -215,6 +215,10 @@ class ShippingCostCalculator
         /** @var ShippingMethod $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
             $baseCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
+            if ($baseCost === 0) {
+                continue;
+            }
+
             $shippingCosts[$shippingMethod->getServiceId()] = self::getCostForShippingMethod(
                 $shippingMethod,
                 $baseCost,
