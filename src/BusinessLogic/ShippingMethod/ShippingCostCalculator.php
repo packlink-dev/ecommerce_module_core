@@ -49,10 +49,10 @@ class ShippingCostCalculator
             }
         } catch (HttpBaseException $e) {
             // If API is not available, get stored default shipping cost on method without calculation.
-            $defaultCost = $shippingMethod->getDefaultPacklinkShippingCost($fromCountry, $toCountry);
+            $defaultCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
         }
 
-        return $defaultCost ? $shippingMethod->getCost($defaultCost, $packages) : 0;
+        return $defaultCost ? self::getCostForShippingMethod($shippingMethod, $defaultCost, $packages) : 0;
     }
 
     /**
@@ -96,9 +96,7 @@ class ShippingCostCalculator
      * Prepares raw response data for shipping costs calculation.
      *
      * @param ShippingMethod[] $shippingMethods Array of active shipping methods in the system.
-     *
      * @param ShippingServiceDeliveryDetails[] $shippingServiceDeliveries Array of shipping service delivery details.
-     *
      * @param Package[] $packages Array of packages.
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
@@ -110,10 +108,12 @@ class ShippingCostCalculator
     ) {
         $shippingCosts = array();
 
+        /** @var ShippingMethod $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
             foreach ($shippingServiceDeliveries as $id => $shippingServiceDeliveryDetails) {
                 if ($shippingMethod->getServiceId() === $shippingServiceDeliveryDetails->id) {
-                    $shippingCosts[$shippingMethod->getServiceId()] = $shippingMethod->getCost(
+                    $shippingCosts[$shippingMethod->getServiceId()] = self::getCostForShippingMethod(
+                        $shippingMethod,
                         $shippingServiceDeliveryDetails->basePrice,
                         $packages
                     );
@@ -128,6 +128,76 @@ class ShippingCostCalculator
     }
 
     /**
+     * Calculates shipping cost for given shipping method based on its pricing policy.
+     *
+     * @param ShippingMethod $shippingMethod Method to calculate cost for.
+     * @param float $baseCost Base cost from Packlink API or from default cost.
+     * @param Package[] $packages Array of packages.
+     *
+     * @return float Calculated shipping cost.
+     */
+    protected static function getCostForShippingMethod(
+        ShippingMethod $shippingMethod,
+        $baseCost,
+        array $packages = array()
+    ) {
+        if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED) {
+            return round(self::calculateFixedPriceCost($shippingMethod, $packages), 2);
+        }
+
+        return round(self::calculateVariableCost($shippingMethod, $baseCost), 2);
+    }
+
+    /**
+     * Calculates shipping cost for fixed price policy.
+     *
+     * @param ShippingMethod $shippingMethod Method to calculate cost for.
+     * @param Package[] $packages Array of packages.
+     *
+     * @return float Calculated fixed price cost.
+     */
+    protected static function calculateFixedPriceCost(ShippingMethod $shippingMethod, array $packages)
+    {
+        $totalWeight = 0;
+        foreach ($packages as $package) {
+            $totalWeight += $package->weight;
+        }
+
+        $fixedPricePolicies = $shippingMethod->getFixedPricePolicy();
+        foreach ($fixedPricePolicies as $fixedPricePolicy) {
+            if ($fixedPricePolicy->from <= $totalWeight && $fixedPricePolicy->to > $totalWeight) {
+                return $fixedPricePolicy->amount;
+            }
+        }
+
+        return $fixedPricePolicies[count($fixedPricePolicies) - 1]->amount;
+    }
+
+    /**
+     * Calculates cost based on default value and percent or Packlink pricing policy.
+     *
+     * @param ShippingMethod $shippingMethod Method to calculate cost for.
+     * @param float $defaultCost Base cost on which to apply pricing policy.
+     *
+     * @return float Final cost.
+     */
+    protected static function calculateVariableCost(ShippingMethod $shippingMethod, $defaultCost)
+    {
+        $pricingPolicy = $shippingMethod->getPricingPolicy();
+        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PACKLINK) {
+            return $defaultCost;
+        }
+
+        $policy = $shippingMethod->getPercentPricePolicy();
+        $amount = $defaultCost * ($policy->amount / 100);
+        if ($policy->increase) {
+            return $defaultCost + $amount;
+        }
+
+        return $defaultCost - $amount;
+    }
+
+    /**
      * Returns default shipping costs for all given shipping methods in the system.
      *
      * @param ShippingMethod[] $shippingMethods Array of shipping methods fmr the shop.
@@ -138,16 +208,43 @@ class ShippingCostCalculator
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
-    private static function getDefaultShippingCosts(array $shippingMethods, $fromCountry, $toCountry, array $packages)
+    protected static function getDefaultShippingCosts(array $shippingMethods, $fromCountry, $toCountry, array $packages)
     {
         $shippingCosts = array();
 
+        /** @var ShippingMethod $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
-            $baseCost = $shippingMethod->getDefaultPacklinkShippingCost($fromCountry, $toCountry);
-            $shippingCosts[$shippingMethod->getServiceId()] = $shippingMethod->getCost($baseCost, $packages);
+            $baseCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
+            $shippingCosts[$shippingMethod->getServiceId()] = self::getCostForShippingMethod(
+                $shippingMethod,
+                $baseCost,
+                $packages
+            );
         }
 
         return $shippingCosts;
+    }
+
+    /**
+     * Returns default packlink shipping cost for given shipping method.
+     *
+     * @param ShippingMethod $shippingMethod Method to get default cost for.
+     * @param string $fromCountry Departure country code.
+     * @param string $toCountry Destination country code.
+     *
+     * @return float|int Default shipping cost.
+     */
+    protected static function getDefaultPacklinkShippingCost(ShippingMethod $shippingMethod, $fromCountry, $toCountry)
+    {
+        foreach ($shippingMethod->getShippingCosts() as $shippingCost) {
+            if ($shippingCost->departureCountry === $fromCountry
+                && $shippingCost->destinationCountry === $toCountry
+            ) {
+                return $shippingCost->basePrice;
+            }
+        }
+
+        return 0;
     }
 
     /**

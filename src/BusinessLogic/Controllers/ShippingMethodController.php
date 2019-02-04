@@ -4,8 +4,6 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Controllers\DTO\FixedPricePolicy;
-use Packlink\BusinessLogic\Controllers\DTO\PercentPricePolicy;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy as FixedPricePolicyModel;
@@ -190,22 +188,12 @@ class ShippingMethodController
         $percentPolicy = $item->getPercentPricePolicy();
         $shippingMethod->pricePolicy = $pricingPolicy;
         if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PERCENT && $percentPolicy) {
-            $shippingMethod->percentPricePolicy = new PercentPricePolicy();
-            $shippingMethod->percentPricePolicy->amount = $percentPolicy->amount;
-            $shippingMethod->percentPricePolicy->increase = $percentPolicy->increase;
+            $shippingMethod->percentPricePolicy = $percentPolicy;
         }
 
         $fixedPolicy = $item->getFixedPricePolicy();
         if ($pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED && !empty($fixedPolicy)) {
-            $shippingMethod->fixedPricePolicy = array();
-            foreach ($fixedPolicy as $fixed) {
-                $fixedDto = new FixedPricePolicy();
-                $fixedDto->amount = $fixed->amount;
-                $fixedDto->to = $fixed->to;
-                $fixedDto->from = $fixed->from;
-
-                $shippingMethod->fixedPricePolicy[] = $fixedDto;
-            }
+            $shippingMethod->fixedPricePolicy = $fixedPolicy;
         }
 
         return $shippingMethod;

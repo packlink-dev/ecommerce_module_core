@@ -12,8 +12,8 @@ When inspection finishes, no errors should be reported except spelling errors (y
 as well just in case).
 
 Also, in commit dialog you must choose at least these options:
--  Reformat code
--  Perform code analysis
--  Check TODO
+-   Reformat code
+-   Perform code analysis
+-   Check TODO
 
 This will also run analysis on commit but only on changed files.

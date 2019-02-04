@@ -5,7 +5,6 @@ namespace Packlink\BusinessLogic\ShippingMethod\Models;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
-use Packlink\BusinessLogic\Http\DTO\Package;
 
 /**
  * This class represents shipping service from Packlink with specific data for integration.
@@ -154,44 +153,6 @@ class ShippingMethod extends Entity
      * @var ShippingMethodCost[]
      */
     protected $shippingCosts = array();
-
-    /**
-     * Calculates shipping cost for this shipping method based on its pricing policy.
-     *
-     * @param float $baseCost Base cost from Packlink API or from default cost.
-     * @param Package[] $packages Array of packages.
-     *
-     * @return float Calculated shipping cost.
-     */
-    public function getCost($baseCost, array $packages = array())
-    {
-        if ($this->getPricingPolicy() === self::PRICING_POLICY_FIXED) {
-            return round($this->calculateFixedPriceCost($packages), 2);
-        }
-
-        return round($this->calculateVariableCost($baseCost), 2);
-    }
-
-    /**
-     * Returns default packlink shipping cost for this shipping method.
-     *
-     * @param string $fromCountry Departure country code.
-     * @param string $toCountry Destination country code.
-     *
-     * @return float|int Default shipping cost.
-     */
-    public function getDefaultPacklinkShippingCost($fromCountry, $toCountry)
-    {
-        foreach ($this->getShippingCosts() as $shippingCost) {
-            if ($shippingCost->departureCountry === $fromCountry
-                && $shippingCost->destinationCountry === $toCountry
-            ) {
-                return $shippingCost->basePrice;
-            }
-        }
-
-        return 0;
-    }
 
     /**
      * Transforms raw array data to this entity instance.
@@ -697,52 +658,5 @@ class ShippingMethod extends Entity
     protected function validatePercentPricePolicy(PercentPricePolicy $policy)
     {
         return $policy->amount > 0 && ($policy->increase || $policy->amount < 100);
-    }
-
-    /**
-     * Calculates shipping cost for fixed price policy.
-     *
-     * @param Package[] $packages Array of packages.
-     *
-     * @return float Calculated fixed price cost.
-     */
-    private function calculateFixedPriceCost(array $packages)
-    {
-        $totalWeight = 0;
-        foreach ($packages as $package) {
-            $totalWeight += $package->weight;
-        }
-
-        $fixedPricePolicies = $this->getFixedPricePolicy();
-        foreach ($fixedPricePolicies as $fixedPricePolicy) {
-            if ($fixedPricePolicy->from <= $totalWeight && $fixedPricePolicy->to > $totalWeight) {
-                return $fixedPricePolicy->amount;
-            }
-        }
-
-        return $fixedPricePolicies[count($fixedPricePolicies) - 1]->amount;
-    }
-
-    /**
-     * Calculates cost based on default value and percent or Packlink pricing policy.
-     *
-     * @param float $defaultCost Base cost on which to apply pricing policy.
-     *
-     * @return float Final cost.
-     */
-    private function calculateVariableCost($defaultCost)
-    {
-        $pricingPolicy = $this->getPricingPolicy();
-        if ($pricingPolicy === self::PRICING_POLICY_PACKLINK) {
-            return $defaultCost;
-        }
-
-        $policy = $this->getPercentPricePolicy();
-        $amount = $defaultCost * ($policy->amount / 100);
-        if ($policy->increase) {
-            return $defaultCost + $amount;
-        }
-
-        return $defaultCost - $amount;
     }
 }
