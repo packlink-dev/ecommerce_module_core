@@ -5,7 +5,8 @@
     "version": "1.0.0",
     "license": "proprietary",
     "require": {
-        "php": ">=5.3"
+        "php": ">=5.3",
+        "itbz/fpdi": "1.6.1"
     },
     "autoload": {
         "psr-4": {
