@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Logger\LoggerConfiguration;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -85,6 +86,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
     protected function tearDown()
     {
         Logger::resetInstance();
+        LoggerConfiguration::resetInstance();
         MemoryStorage::reset();
 
         parent::tearDown();
