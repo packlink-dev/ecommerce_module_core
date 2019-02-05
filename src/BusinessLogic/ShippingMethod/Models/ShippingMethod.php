@@ -305,7 +305,7 @@ class ShippingMethod extends Entity
     public function getTitle()
     {
         if (!$this->title) {
-            return $this->getCarrierName() . ' ' . $this->getDeliveryTime() . ' '
+            return $this->getCarrierName() . ' - ' . $this->getServiceName() . ' ' . $this->getDeliveryTime() . ' '
                 . ($this->isDestinationDropOff() ? 'drop-off' : 'home') . ' delivery';
         }
 
