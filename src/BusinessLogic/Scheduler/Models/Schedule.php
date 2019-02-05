@@ -22,7 +22,7 @@ class Schedule extends Entity
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * Date and time of next schedule
+     * Date and time of next schedule.
      *
      * @var \DateTime
      */
@@ -34,37 +34,37 @@ class Schedule extends Entity
      */
     protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month');
     /**
-     * Queue name where task should be queued to
+     * Queue name where task should be queued to.
      *
      * @var string
      */
     protected $queueName;
     /**
-     * Schedule minute
+     * Schedule minute.
      *
      * @var int
      */
     protected $minute = 0;
     /**
-     * Schedule hour
+     * Schedule hour.
      *
      * @var int
      */
     protected $hour = 0;
     /**
-     * Schedule day
+     * Schedule day.
      *
      * @var int
      */
     protected $day = 1;
     /**
-     * Schedule month
+     * Schedule month.
      *
      * @var int
      */
     protected $month = 1;
     /**
-     * Task that is to be queued for execution
+     * Task that is to be queued for execution.
      *
      * @var Task
      */
@@ -108,9 +108,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Calculates next schedule time
+     * Calculates next schedule time.
      *
-     * @return \DateTime Next schedule date
+     * @return \DateTime Next schedule date.
      */
     public function calculateNextSchedule()
     {
@@ -118,9 +118,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns entity configuration object
+     * Returns entity configuration object.
      *
-     * @return EntityConfiguration Entity configuration with index
+     * @return EntityConfiguration Entity configuration with index.
      */
     public function getConfig()
     {
@@ -131,9 +131,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns task
+     * Returns task.
      *
-     * @return Task Task for schedule
+     * @return Task Task for schedule.
      */
     public function getTask()
     {
@@ -141,9 +141,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns queue name
+     * Returns queue name.
      *
-     * @return string Queue name
+     * @return string Queue name.
      */
     public function getQueueName()
     {
@@ -151,9 +151,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets queue name
+     * Sets queue name.
      *
-     * @param string $queueName Queue name in which task is scheduled
+     * @param string $queueName Queue name in which task is scheduled.
      */
     public function setQueueName($queueName)
     {
@@ -161,9 +161,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns next schedule date
+     * Returns next schedule date.
      *
-     * @return \DateTime Next schedule
+     * @return \DateTime Next schedule.
      */
     public function getNextSchedule()
     {
@@ -171,9 +171,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets next schedule date
+     * Sets next schedule datetime.
      *
-     * @param \DateTime $nextSchedule
+     * @param \DateTime $nextSchedule Next schedule datetime.
      */
     public function setNextSchedule(\DateTime $nextSchedule)
     {
@@ -181,9 +181,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule minute
+     * Returns schedule minute.
      *
-     * @return int Schedule minute
+     * @return int Schedule minute.
      */
     public function getMinute()
     {
@@ -191,9 +191,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets schedule minute
+     * Sets schedule minute.
      *
-     * @param int $minute Schedule minute
+     * @param int $minute Schedule minute.
      */
     public function setMinute($minute)
     {
@@ -201,9 +201,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule hour
+     * Returns schedule hour.
      *
-     * @return int Schedule hour
+     * @return int Schedule hour.
      */
     public function getHour()
     {
@@ -211,9 +211,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets schedule hour
+     * Sets schedule hour.
      *
-     * @param int $hour Schedule hour
+     * @param int $hour Schedule hour.
      */
     public function setHour($hour)
     {
@@ -221,9 +221,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule day
+     * Returns schedule day.
      *
-     * @return int Schedule day
+     * @return int Schedule day.
      */
     public function getDay()
     {
@@ -231,9 +231,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule day
+     * Returns schedule day.
      *
-     * @param int $day Schedule day
+     * @param int $day Schedule day.
      */
     public function setDay($day)
     {
@@ -241,9 +241,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule month
+     * Returns schedule month.
      *
-     * @return int Month number, starting from 1 for January ending with 12 for December
+     * @return int Month number, starting from 1 for January ending with 12 for December.
      */
     public function getMonth()
     {
@@ -251,9 +251,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets schedule month
+     * Sets schedule month.
      *
-     * @param int $month Month number, starting from 1 for January ending with 12 for December
+     * @param int $month Month number, starting from 1 for January ending with 12 for December.
      */
     public function setMonth($month)
     {
@@ -261,9 +261,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns current date and time
+     * Returns current date and time.
      *
-     * @return \DateTime Date and time
+     * @return \DateTime Date and time.
      */
     protected function now()
     {
