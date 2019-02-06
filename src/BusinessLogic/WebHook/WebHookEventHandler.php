@@ -10,7 +10,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
-use Packlink\BusinessLogic\WebHook\Events\ShippingStatusEvent;
+use Packlink\BusinessLogic\WebHook\Events\ShipmentStatusChangedEvent;
 use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
 
 /**
@@ -53,7 +53,7 @@ class WebHookEventHandler extends BaseService
     /**
      * Handles web hook shipment label event.
      *
-     * @param ShipmentLabelEvent $event Web-hook event.
+     * @param ShipmentLabelEvent $event Web hook event.
      */
     public function handleShipmentLabelEvent(ShipmentLabelEvent $event)
     {
@@ -61,7 +61,13 @@ class WebHookEventHandler extends BaseService
         $referenceId = $event->referenceId;
         try {
             $labels = $this->proxy->getLabels($referenceId);
-            $this->orderRepository->setLabelsByReference($referenceId, $labels);
+            if (count($labels) > 0) {
+                $this->orderRepository->setLabelsByReference($referenceId, $labels);
+                $this->orderRepository->setShippingStatusByReference(
+                    $referenceId,
+                    ShipmentStatusChangedEvent::STATUS_READY
+                );
+            }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
         } catch (OrderNotFound $e) {
@@ -72,16 +78,16 @@ class WebHookEventHandler extends BaseService
     /**
      * Handles web hook shipping status update event.
      *
-     * @param ShippingStatusEvent $event Web-hook event.
+     * @param ShipmentStatusChangedEvent $event Web hook event.
      */
-    public function handleShippingStatusEvent(ShippingStatusEvent $event)
+    public function handleShippingStatusEvent(ShipmentStatusChangedEvent $event)
     {
-        $referenceId = $event->referenceId;
+        $referenceId = $event->getReferenceId();
         $shipment = null;
         try {
             $shipment = $this->proxy->getShipment($referenceId);
             if ($shipment !== null) {
-                $this->orderRepository->setShippingStatusByReference($referenceId, $shipment->status);
+                $this->orderRepository->setShippingStatusByReference($referenceId, $event->getStatus());
             }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
@@ -97,7 +103,7 @@ class WebHookEventHandler extends BaseService
     /**
      * Handles web hook tracking info update event.
      *
-     * @param TrackingInfoEvent $event Web-hook event.
+     * @param TrackingInfoEvent $event Web hook event.
      */
     public function handleTrackingInfoEvent(TrackingInfoEvent $event)
     {
@@ -105,9 +111,13 @@ class WebHookEventHandler extends BaseService
         $trackingHistory = array();
         try {
             $trackingHistory = $this->proxy->getTrackingInfo($referenceId);
-            $shipmentDetails = $this->proxy->getShipment($referenceId);
-            if ($shipmentDetails !== null) {
-                $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory, $shipmentDetails);
+            $shipment = $this->proxy->getShipment($referenceId);
+            if ($shipment !== null) {
+                $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory, $shipment);
+                $this->orderRepository->setShippingStatusByReference(
+                    $referenceId,
+                    ShipmentStatusChangedEvent::STATUS_IN_TRANSIT
+                );
             }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
