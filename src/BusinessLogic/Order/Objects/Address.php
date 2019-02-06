@@ -51,7 +51,7 @@ class Address
      */
     private $city;
     /**
-     * Address country.
+     * Address country ISO2 code.
      *
      * @var string
      */

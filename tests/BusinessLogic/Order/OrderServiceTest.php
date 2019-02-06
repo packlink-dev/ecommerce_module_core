@@ -23,11 +23,17 @@ class OrderServiceTest extends BaseTestWithServices
      */
     private $orderService;
 
+    /**
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testPrepareDraft()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $draft = $this->orderService->prepareDraft('test');
         $this->assertInstanceOf('Packlink\BusinessLogic\Http\DTO\Draft', $draft);
+        self::assertNotEmpty($draft->content);
+        self::assertNotEmpty($draft->packages);
+        self::assertNotEmpty($draft->to);
+        self::assertNotEmpty($draft->serviceId);
     }
 
     /**

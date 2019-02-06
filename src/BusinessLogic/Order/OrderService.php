@@ -182,16 +182,18 @@ class OrderService extends BaseService
     }
 
     /**
-     * Adds item packages to draft shipment.
+     * Adds item packages and set content to draft shipment.
      *
      * @param Order $order Shop order.
      * @param Draft $draft Packlink shipment draft.
      */
     private function addPackages(Order $order, Draft $draft)
     {
+        $content = array();
         $draft->packages = array();
         foreach ($order->getItems() as $item) {
             $quantity = $item->getQuantity() ?: 1;
+            $content[] = $quantity . ' ' . $item->getTitle();
             for ($i = 0; $i < $quantity; $i++) {
                 $package = new \Packlink\BusinessLogic\Http\DTO\Package();
                 $package->height = $item->getHeight();
@@ -202,5 +204,7 @@ class OrderService extends BaseService
                 $draft->packages[] = $package;
             }
         }
+
+        $draft->content = implode('; ', $content);
     }
 }

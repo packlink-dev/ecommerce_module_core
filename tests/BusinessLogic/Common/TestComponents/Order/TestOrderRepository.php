@@ -33,9 +33,11 @@ class TestOrderRepository implements OrderRepository
      */
     private $throw = false;
 
+    /**
+     * TestOrderRepository constructor.
+     */
     public function __construct()
     {
-
         static::$orders = array();
     }
 
@@ -168,6 +170,7 @@ class TestOrderRepository implements OrderRepository
             $order->setId($orderId);
             $order->setShipment(new Shipment());
             $order->setShipping(new Shipping());
+            $order->getShipping()->setShippingServiceId(123);
             $order->setShippingAddress(new Address());
             $order->setBillingAddress(new Address());
             $order->setItems(array(new Item()));
