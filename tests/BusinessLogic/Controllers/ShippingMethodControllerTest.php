@@ -112,7 +112,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
 
         $model = $this->controller->save($shipment);
 
-        $this->assertNotFalse($model);
+        $this->assertNotNull($model);
 
         $this->assertEquals($shipment->id, $model->id);
         $this->assertEquals($shipment->name, $model->name);
@@ -200,7 +200,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->showLogo = true;
         $shipment->pricePolicy = 1;
 
-        $this->assertFalse($this->controller->save($shipment));
+        $this->assertNull($this->controller->save($shipment));
     }
 
     public function testSaveInvalidMissingProperty()
@@ -216,7 +216,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
             $value = $shipment->$property;
             unset($shipment->$property);
 
-            $this->assertFalse($this->controller->save($shipment));
+            $this->assertNull($this->controller->save($shipment));
 
             $shipment->$property = $value;
         }
@@ -235,7 +235,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
             $oldValue = $shipment->$property;
             $shipment->$property = $value;
 
-            $this->assertFalse($this->controller->save($shipment));
+            $this->assertNull($this->controller->save($shipment));
 
             $shipment->$property = $oldValue;
         }
@@ -252,10 +252,10 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->showLogo = !$first->showLogo;
 
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
-        $this->assertFalse($this->controller->save($shipment));
+        $this->assertNull($this->controller->save($shipment));
 
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED;
-        $this->assertFalse($this->controller->save($shipment));
+        $this->assertNull($this->controller->save($shipment));
     }
 
     public function testSaveInvalidWrongPricePolicyModel()
@@ -270,7 +270,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
 
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
         $shipment->percentPricePolicy = new FixedPricePolicy(-1, 0, 0);
-        $this->assertFalse($this->controller->save($shipment));
+        $this->assertNull($this->controller->save($shipment));
     }
 
     public function testSaveCorrectPricePolicy()
@@ -285,7 +285,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
 
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
         $shipment->percentPricePolicy = new PercentPricePolicy(true, 0.1);
-        $this->assertNotFalse($this->controller->save($shipment));
+        $this->assertNotNull($this->controller->save($shipment));
 
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED;
         $shipment->fixedPricePolicy = array();
@@ -295,7 +295,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
 
         $policy = new FixedPricePolicy(1, 2.5, 1.5);
         $shipment->fixedPricePolicy[] = $policy;
-        $this->assertNotFalse($this->controller->save($shipment));
+        $this->assertNotNull($this->controller->save($shipment));
     }
 
     public function testActivate()

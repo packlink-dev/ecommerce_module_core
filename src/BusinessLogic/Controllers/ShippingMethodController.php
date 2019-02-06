@@ -95,19 +95,19 @@ class ShippingMethodController
      *
      * @param ShippingMethodConfiguration $shippingMethod Shipping method object.
      *
-     * @return ShippingMethodResponse | bool Returns ShippingMethod object when method is saved, false otherwise.
+     * @return ShippingMethodResponse | null Returns ShippingMethod object when method is saved, null otherwise.
      */
     public function save(ShippingMethodConfiguration $shippingMethod)
     {
         if (!$this->isValid($shippingMethod)) {
-            return false;
+            return null;
         }
 
         $model = $this->shippingMethodService->getShippingMethod($shippingMethod->id);
         if (!$model) {
             Logger::logError("Shipping method with id {$shippingMethod->id} not found!");
 
-            return false;
+            return null;
         }
 
         try {
@@ -117,7 +117,7 @@ class ShippingMethodController
             return $this->transformShippingMethodModelToDto($model);
         } catch (\Exception $e) {
             Logger::logError($e->getMessage(), 'Core', $shippingMethod->toArray());
-            $result = false;
+            $result = null;
         }
 
         return $result;
