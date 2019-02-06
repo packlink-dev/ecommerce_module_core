@@ -189,7 +189,7 @@ class UpdateShippingServicesTask extends Task
         /** @var Configuration $config */
         $config = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-        return $config->getUserInfo() !== null && $config->getDefaultParcel() !== null;
+        return $config->getUserInfo() !== null;
     }
 
     /**
