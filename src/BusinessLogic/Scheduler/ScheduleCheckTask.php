@@ -40,7 +40,7 @@ class ScheduleCheckTask extends Task
             try {
                 $queueService->enqueue($scheduledTask->getQueueName(), $task);
 
-                $scheduledTask->setNextSchedule($scheduledTask->calculateNextSchedule());
+                $scheduledTask->setNextSchedule();
                 $this->getRepository()->update($scheduledTask);
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(

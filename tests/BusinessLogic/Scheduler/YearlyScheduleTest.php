@@ -70,7 +70,8 @@ class YearlyScheduleTest extends TestCase
         $expected->setDate(2018, 7, 24);
         $expected->setTime(13, 45);
 
-        $nextSchedule = $this->yearlySchedule->calculateNextSchedule();
+        $this->yearlySchedule->setNextSchedule();
+        $nextSchedule = $this->yearlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -85,7 +86,8 @@ class YearlyScheduleTest extends TestCase
         $expected->setDate(2019, 1, 24);
         $expected->setTime(13, 45);
 
-        $nextSchedule = $this->yearlySchedule->calculateNextSchedule();
+        $this->yearlySchedule->setNextSchedule();
+        $nextSchedule = $this->yearlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

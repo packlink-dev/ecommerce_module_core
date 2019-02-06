@@ -183,19 +183,19 @@ class ScheduleCheckTaskTest extends TestCase
         $daily->setMinute(40);
         $daily->setDaysOfWeek(array(1, 2, 3, 4, 5));
         /** @noinspection PhpUnhandledExceptionInspection */
-        $daily->setNextSchedule($daily->calculateNextSchedule());
+        $daily->setNextSchedule();
 
         $weekly = new WeeklySchedule(new FooTask(), 'queueForWeeklyFoo');
         $weekly->setDay(4);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $weekly->setNextSchedule($weekly->calculateNextSchedule());
+        $weekly->setNextSchedule();
 
         $monthly = new MonthlySchedule(new FooTask(), 'queueForMonthlyFoo');
         $monthly->setDay(21);
         $monthly->setHour(13);
         $monthly->setMinute(42);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $monthly->setNextSchedule($monthly->calculateNextSchedule());
+        $monthly->setNextSchedule();
 
         $repository->save($daily);
         $repository->save($weekly);

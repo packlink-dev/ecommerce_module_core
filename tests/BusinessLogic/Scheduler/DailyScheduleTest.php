@@ -62,7 +62,8 @@ class DailyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 21);
         $expected->setTime(15, 0);
 
-        $nextSchedule = $this->dailySchedule->calculateNextSchedule();
+        $this->dailySchedule->setNextSchedule();
+        $nextSchedule = $this->dailySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -78,7 +79,8 @@ class DailyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 22);
         $expected->setTime(11, 0);
 
-        $nextSchedule = $this->dailySchedule->calculateNextSchedule();
+        $this->dailySchedule->setNextSchedule();
+        $nextSchedule = $this->dailySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -95,7 +97,8 @@ class DailyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 23);
         $expected->setTime(15, 0);
 
-        $nextSchedule = $this->dailySchedule->calculateNextSchedule();
+        $this->dailySchedule->setNextSchedule();
+        $nextSchedule = $this->dailySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -112,7 +115,8 @@ class DailyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 26);
         $expected->setTime(15, 0);
 
-        $nextSchedule = $this->dailySchedule->calculateNextSchedule();
+        $this->dailySchedule->setNextSchedule();
+        $nextSchedule = $this->dailySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

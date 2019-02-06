@@ -49,7 +49,7 @@ class WeeklySchedule extends Schedule
      * @return \DateTime Next schedule date.
      * @throws \Exception Emits Exception in case of an error while creating DateTime instance.
      */
-    public function calculateNextSchedule()
+    protected function calculateNextSchedule()
     {
         $now = $this->now();
         $day = ($this->getDay() ?: 0) % 7;

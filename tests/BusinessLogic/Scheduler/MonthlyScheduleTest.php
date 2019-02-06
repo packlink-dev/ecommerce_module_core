@@ -68,7 +68,8 @@ class MonthlyScheduleTest extends TestCase
         $expected->setDate(2018, 4, 15);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
+        $this->monthlySchedule->setNextSchedule();
+        $nextSchedule = $this->monthlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -83,7 +84,8 @@ class MonthlyScheduleTest extends TestCase
         $expected->setDate(2018, 2, 15);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
+        $this->monthlySchedule->setNextSchedule();
+        $nextSchedule = $this->monthlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -100,7 +102,8 @@ class MonthlyScheduleTest extends TestCase
         $expected->setDate(2018, 2, 28);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
+        $this->monthlySchedule->setNextSchedule();
+        $nextSchedule = $this->monthlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

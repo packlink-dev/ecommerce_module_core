@@ -65,7 +65,8 @@ class HourlyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 21);
         $expected->setTime(14, 15);
 
-        $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -82,7 +83,8 @@ class HourlyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 22);
         $expected->setTime(8, 15);
 
-        $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -99,7 +101,8 @@ class HourlyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 21);
         $expected->setTime(14, 15);
 
-        $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

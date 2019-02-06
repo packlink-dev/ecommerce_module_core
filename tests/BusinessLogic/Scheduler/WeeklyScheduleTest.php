@@ -86,7 +86,8 @@ class WeeklyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 26);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -101,7 +102,8 @@ class WeeklyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 22);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -117,7 +119,8 @@ class WeeklyScheduleTest extends TestCase
         $expected->setDate(2018, 3, 30);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -134,7 +137,8 @@ class WeeklyScheduleTest extends TestCase
         $expected->setDate(2018, 4, 27);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -150,7 +154,8 @@ class WeeklyScheduleTest extends TestCase
         $expected->setDate(2018, 12, 21);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -166,7 +171,8 @@ class WeeklyScheduleTest extends TestCase
         $expected->setDate(2019, 1, 4);
         $expected->setTime(3, 0);
 
-        $nextSchedule = $this->weeklySchedule->calculateNextSchedule();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

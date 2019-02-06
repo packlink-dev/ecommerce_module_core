@@ -108,16 +108,6 @@ class Schedule extends Entity
     }
 
     /**
-     * Calculates next schedule time.
-     *
-     * @return \DateTime Next schedule date.
-     */
-    public function calculateNextSchedule()
-    {
-        return $this->now();
-    }
-
-    /**
      * Returns entity configuration object.
      *
      * @return EntityConfiguration Entity configuration with index.
@@ -172,12 +162,10 @@ class Schedule extends Entity
 
     /**
      * Sets next schedule datetime.
-     *
-     * @param \DateTime $nextSchedule Next schedule datetime.
      */
-    public function setNextSchedule(\DateTime $nextSchedule)
+    public function setNextSchedule()
     {
-        $this->nextSchedule = $nextSchedule;
+        $this->nextSchedule = $this->calculateNextSchedule();
     }
 
     /**
@@ -258,6 +246,16 @@ class Schedule extends Entity
     public function setMonth($month)
     {
         $this->month = $month;
+    }
+
+    /**
+     * Calculates next schedule time.
+     *
+     * @return \DateTime Next schedule date.
+     */
+    protected function calculateNextSchedule()
+    {
+        return $this->now();
     }
 
     /**
