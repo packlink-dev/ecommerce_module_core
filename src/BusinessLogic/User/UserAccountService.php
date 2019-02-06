@@ -101,7 +101,9 @@ class UserAccountService extends BaseService
                 }
             }
 
-            $this->configuration->setDefaultParcel($parcelInfo);
+            if ($parcelInfo !== null) {
+                $this->configuration->setDefaultParcel($parcelInfo);
+            }
         }
     }
 
@@ -124,7 +126,9 @@ class UserAccountService extends BaseService
                 }
             }
 
-            $this->configuration->setDefaultWarehouse($warehouse);
+            if ($warehouse !== null) {
+                $this->configuration->setDefaultWarehouse($warehouse);
+            }
         }
     }
 
