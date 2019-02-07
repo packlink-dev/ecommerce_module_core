@@ -167,7 +167,10 @@ class OrderService extends BaseService
     {
         $additional = new Draft\AdditionalData();
         $additional->selectedWarehouseId = $this->configuration->getDefaultWarehouse()->id;
-        $additional->shippingServiceName = $order->getShipping()->getShippingServiceName();
+        if ($order->getShipping() !== null) {
+            $additional->shippingServiceName = $order->getShipping()->getShippingServiceName();
+        }
+
         $additional->items = array();
         foreach ($order->getItems() as $item) {
             $draftItem = new Draft\DraftItem();
