@@ -93,9 +93,14 @@ class OrderService extends BaseService
         $draft->contentValueCurrency = $order->getCurrency();
         $draft->contentValue = $order->getTotalPrice();
         $draft->priority = $order->isHighPriority();
-        $draft->serviceId = $order->getShipping()->getShippingServiceId();
-        $draft->serviceName = $order->getShipping()->getShippingServiceName();
-        $draft->carrierName = $order->getShipping()->getCarrierName();
+
+        $shipping = $order->getShipping();
+        if ($shipping !== null) {
+            $draft->serviceId = $shipping->getShippingServiceId();
+            $draft->serviceName = $shipping->getShippingServiceName();
+            $draft->carrierName = $shipping->getCarrierName();
+        }
+
         $draft->dropOffPointId = $order->getShippingDropOffId();
         if ($user) {
             $draft->platformCountry = $user->country;
