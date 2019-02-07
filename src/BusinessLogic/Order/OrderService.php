@@ -101,10 +101,7 @@ class OrderService extends BaseService
             $draft->platformCountry = $user->country;
         }
 
-        if (!$draft->dropOffPointId) {
-            $this->addDepartureAddress($draft);
-        }
-
+        $this->addDepartureAddress($draft);
         $this->addDestinationAddress($order, $draft);
         $this->addAdditionalData($order, $draft);
         $this->addPackages($order, $draft);
