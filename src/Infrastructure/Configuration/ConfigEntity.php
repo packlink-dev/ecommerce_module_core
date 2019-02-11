@@ -113,6 +113,6 @@ class ConfigEntity extends Entity
      */
     public function setSystemId($systemId)
     {
-        $this->systemId = $systemId;
+        $this->systemId = (string)$systemId;
     }
 }
