@@ -10,7 +10,6 @@ use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Tasks\GetDefaultParcelAndWarehouseTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
@@ -59,6 +58,7 @@ class UserAccountService extends BaseService
      * @param string $apiKey API key.
      *
      * @return bool TRUE if login went successfully; otherwise, FALSE.
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function login($apiKey)
     {
@@ -133,13 +133,12 @@ class UserAccountService extends BaseService
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * Initializes user configuration and subscribes web-hook callback.
      *
      * @param User $user User data.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     protected function initializeUser(User $user)
     {
@@ -148,9 +147,10 @@ class UserAccountService extends BaseService
 
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $queueService->enqueue($defaultQueueName, new GetDefaultParcelAndWarehouseTask());
-        /** @noinspection PhpUnhandledExceptionInspection */
+
+        $this->setDefaultParcel(true);
+        $this->setWarehouseInfo(true);
+
         $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask());
 
         $this->getProxy()->registerWebHookHandler($this->configuration->getWebHookUrl());

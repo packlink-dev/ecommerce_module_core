@@ -40,6 +40,8 @@ class UserAccountLoginTest extends BaseTestWithServices
 
     /**
      * Tests when empty value is provided for API key.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testEmptyApiKey()
     {
@@ -55,6 +57,7 @@ class UserAccountLoginTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testLogin()
     {
@@ -63,37 +66,100 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->assertTrue($this->userAccountService->login('GoodApiKey'));
 
         $this->assertEquals('GoodApiKey', TestShopConfiguration::getInstance()->getAuthorizationToken());
-        $this->assertCount(2, $this->httpClient->getHistory());
+        $this->assertCount(4, $this->httpClient->getHistory());
+
+        // check whether parcel info is set
+        $parcelInfo = $this->shopConfig->getDefaultParcel();
+        $this->assertNotNull($parcelInfo);
+        $this->assertEquals('parcel test 1', $parcelInfo->name);
+
+        // check whether warehouse info is set
+        $warehouse = $this->shopConfig->getDefaultWarehouse();
+        $this->assertNotNull($warehouse);
+        $this->assertEquals('222459d5e4b0ed5488fe91544', $warehouse->id);
 
         /** @var \Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository $queueStorage */
         $queueStorage = RepositoryRegistry::getQueueItemRepository();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
         $queueItems = $queueStorage->select();
-        $this->assertCount(2, $queueItems);
+        $this->assertCount(1, $queueItems);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->assertEquals('GetDefaultParcelAndWarehouseTask', $queueItems[0]->getTaskType());
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->assertEquals('UpdateShippingServicesTask', $queueItems[1]->getTaskType());
+        $this->assertEquals('UpdateShippingServicesTask', $queueItems[0]->getTaskType());
+    }
+
+    /**
+     * Tests user login and user initialization
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     */
+    public function testLoginNoParcel()
+    {
+        $this->httpClient->setMockResponses($this->getMockResponses(false));
+
+        $this->assertTrue($this->userAccountService->login('GoodApiKey'));
+        $this->assertCount(4, $this->httpClient->getHistory());
+
+        // check whether parcel info is set
+        $parcelInfo = $this->shopConfig->getDefaultParcel();
+        $this->assertNull($parcelInfo, 'Parcel should not be set.');
+
+        // check whether warehouse info is set
+        $warehouse = $this->shopConfig->getDefaultWarehouse();
+        $this->assertNotNull($warehouse, 'Warehouse data should be set.');
+        $this->assertEquals('222459d5e4b0ed5488fe91544', $warehouse->id);
+    }
+
+    /**
+     * Tests user login and user initialization
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     */
+    public function testLoginNoWarehouse()
+    {
+        $this->httpClient->setMockResponses($this->getMockResponses(true, false));
+
+        $this->assertTrue($this->userAccountService->login('GoodApiKey'));
+        $this->assertCount(4, $this->httpClient->getHistory());
+
+        // check whether parcel info is set
+        $parcelInfo = $this->shopConfig->getDefaultParcel();
+        $this->assertNotNull($parcelInfo, 'Parcel should be set.');
+
+        // check whether warehouse info is set
+        $warehouse = $this->shopConfig->getDefaultWarehouse();
+        $this->assertNull($warehouse, 'Warehouse data should NOT be set.');
     }
 
     /**
      * Returns responses for testing user initialization.
      *
+     * @param bool $parcel If parcel info should be set.
+     * @param bool $warehouse If warehouse info should be set.
+     *
      * @return HttpResponse[] Array of Http responses.
      */
-    private function getMockResponses()
+    private function getMockResponses($parcel = true, $warehouse = true)
     {
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
             ),
             new HttpResponse(
-                200, array(), null
+                200, array(), $parcel ? file_get_contents(__DIR__ . '/../Common/ApiResponses/parcels.json') : ''
+            ),
+            new HttpResponse(
+                200, array(), $warehouse ? file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json') : ''
+            ),
+            new HttpResponse(
+                200, array(), ''
             ),
         );
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     */
     public function testLoginBadHttp()
     {
         $this->httpClient->setMockResponses($this->getMockBadResponses());

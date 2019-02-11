@@ -95,8 +95,9 @@ class Proxy
     public function getUsersParcelInfo()
     {
         $response = $this->call(self::HTTP_METHOD_GET, 'users/parcels');
+        $data = $response->decodeBodyAsJson();
 
-        return ParcelInfo::fromArrayBatch($response->decodeBodyAsJson());
+        return ParcelInfo::fromArrayBatch($data ?: array());
     }
 
     /**
@@ -111,8 +112,9 @@ class Proxy
     public function getUsersWarehouses()
     {
         $response = $this->call(self::HTTP_METHOD_GET, 'clients/warehouses');
+        $data = $response->decodeBodyAsJson();
 
-        return Warehouse::fromArrayBatch($response->decodeBodyAsJson());
+        return Warehouse::fromArrayBatch($data ?: array());
     }
 
     /**
