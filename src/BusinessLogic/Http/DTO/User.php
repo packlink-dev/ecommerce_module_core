@@ -22,7 +22,7 @@ class User extends BaseDto
      */
     public $lastName;
     /**
-     * email name.
+     * Email.
      *
      * @var string
      */
@@ -33,6 +33,12 @@ class User extends BaseDto
      * @var string
      */
     public $country;
+    /**
+     * Zip code.
+     *
+     * @var string
+     */
+    public $zipCode;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -46,6 +52,7 @@ class User extends BaseDto
             'surname' => $this->lastName,
             'email' => $this->email,
             'country' => $this->country,
+            'postal_code' => $this->zipCode,
         );
     }
 
@@ -64,6 +71,7 @@ class User extends BaseDto
         $user->lastName = static::getValue($raw, 'surname');
         $user->email = static::getValue($raw, 'email');
         $user->country = static::getValue($raw, 'country');
+        $user->zipCode = static::getValue($raw, 'postal_code');
 
         return $user;
     }

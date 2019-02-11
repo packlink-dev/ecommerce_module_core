@@ -82,8 +82,12 @@ class UpdateShippingServicesTask extends Task
         $package = Package::fromArray($parcel->toArray());
 
         $allServices = array();
-        foreach (array_keys(static::$countryParams) as $country) {
-            $this->setServices($allServices, $this->getServiceSearchParams($user->country, $country, $package));
+        $countries = array_merge(static::$countryParams, array($user->country => $user->zipCode));
+        foreach ($countries as $country => $zip) {
+            $this->setServices(
+                $allServices,
+                new ShippingServiceSearch(null, $user->country, $user->zipCode, $country, $zip, array($package))
+            );
         }
 
         return $allServices;
@@ -154,28 +158,6 @@ class UpdateShippingServicesTask extends Task
         } else {
             $this->getShippingMethodService()->delete($shippingMethod);
         }
-    }
-
-    /**
-     * Gets search parameters for shipping method discovery.
-     *
-     * @param string $fromCountry Country code for departure country.
-     * @param string $toCountry Country code for destination country.
-     * @param Package $package Parcel information.
-     *
-     * @return ShippingServiceSearch Search parameters object.
-     */
-    protected function getServiceSearchParams($fromCountry, $toCountry, Package $package)
-    {
-        $params = new ShippingServiceSearch();
-
-        $params->fromCountry = $fromCountry;
-        $params->fromZip = self::$countryParams[$fromCountry];
-        $params->toCountry = $toCountry;
-        $params->toZip = self::$countryParams[$toCountry];
-        $params->packages = array($package);
-
-        return $params;
     }
 
     /**
