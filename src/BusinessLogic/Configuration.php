@@ -84,6 +84,16 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     }
 
     /**
+     * Returns order draft source.
+     *
+     * @return string
+     */
+    public function getDraftSource()
+    {
+        return 'source_inbound';
+    }
+
+    /**
      * Returns user information from integration database.
      *
      * @return User|null User info.

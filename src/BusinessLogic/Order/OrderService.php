@@ -93,7 +93,7 @@ class OrderService extends BaseService
         $draft->contentValueCurrency = $order->getCurrency();
         $draft->contentValue = $order->getTotalPrice();
         $draft->priority = $order->isHighPriority();
-        $draft->source = 'module_' . strtolower($this->configuration->getIntegrationName());
+        $draft->source = $this->configuration->getDraftSource();
 
         $shipping = $order->getShipping();
         if ($shipping !== null) {
