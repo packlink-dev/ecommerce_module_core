@@ -133,6 +133,26 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Sets debug mode status (enabled/disabled).
+     *
+     * @param bool $status TRUE if debug mode is enabled; otherwise, false.
+     */
+    public function setDebugModeEnabled($status)
+    {
+        $this->saveConfigValue('debugModeEnabled', (bool)$status);
+    }
+
+    /**
+     * Returns debug mode status.
+     *
+     * @return bool TRUE if debug mode is enabled; otherwise, false.
+     */
+    public function isDebugModeEnabled()
+    {
+        return $this->getConfigValue('debugModeEnabled', false);
+    }
+
+    /**
      * Gets the number of maximum allowed started task at the point in time. This number will determine how many tasks
      * can be in "in_progress" status at the same time.
      *
