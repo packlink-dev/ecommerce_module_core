@@ -200,7 +200,12 @@ class Proxy
     {
         $response = $this->call(self::HTTP_METHOD_GET, 'services?' . http_build_query($params->toArray()));
 
-        $shippingDetails = ShippingServiceDeliveryDetails::fromArrayBatch($response->decodeBodyAsJson());
+        $body = $response->decodeBodyAsJson();
+        if (empty($body)) {
+            return array();
+        }
+
+        $shippingDetails = ShippingServiceDeliveryDetails::fromArrayBatch($body);
 
         foreach ($shippingDetails as $shippingDetail) {
             $shippingDetail->departureCountry = $params->fromCountry;
