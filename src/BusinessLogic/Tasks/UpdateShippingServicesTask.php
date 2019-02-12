@@ -81,6 +81,8 @@ class UpdateShippingServicesTask extends Task
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $package = Package::fromArray($parcel->toArray());
 
+        $user->zipCode = $user->zipCode ?: static::$countryParams[$user->country];
+
         $allServices = array();
         $countries = array_merge(static::$countryParams, array($user->country => $user->zipCode));
         foreach ($countries as $country => $zip) {
