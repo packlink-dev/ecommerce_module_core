@@ -20,7 +20,7 @@ class LogContextData
     /**
      * Value of data.
      *
-     * @var string
+     * @var mixed
      */
     private $value;
 
@@ -28,7 +28,7 @@ class LogContextData
      * LogContextData constructor.
      *
      * @param string $name Name of data.
-     * @param string $value Value of data.
+     * @param mixed $value Value of data.
      */
     public function __construct($name, $value)
     {
@@ -49,7 +49,7 @@ class LogContextData
     /**
      * Gets value of data.
      *
-     * @return string Value of data.
+     * @return mixed Value of data.
      */
     public function getValue()
     {
