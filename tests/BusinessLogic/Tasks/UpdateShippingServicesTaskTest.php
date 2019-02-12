@@ -284,73 +284,23 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testExecuteNonPlatformCountry()
     {
         $user = new User();
         $user->country = 'RS';
-        $user->zipCode = '11070';
         $user->firstName = 'Test';
         $user->lastName = 'User';
         $user->email = 'test.user@example.com';
 
         $this->shopConfig->setUserInfo($user);
-        $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
-
-        $this->httpClient->setMockResponses($this->getRSMockResponses());
 
         $this->syncTask->execute();
-
-        self::assertCount(21, $this->shippingMethodService->getAllMethods());
-        self::assertCount(0, $this->shippingMethodService->getActiveMethods());
-
-        $repo = RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME);
-        $query = new QueryFilter();
-        $query->where('national', Operators::EQUALS, true);
-        self::assertEquals(8, $repo->count($query));
-
-        $query = new QueryFilter();
-        $query->where('national', Operators::EQUALS, false);
-        self::assertEquals(13, $repo->count($query));
-
-        // only international from RS do ES
-        $this->httpClient->setMockResponses(
-            array(
-                new HttpResponse(200, array(), '[]'),
-                new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-ES')),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20615)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20611)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(21105)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20209)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(21103)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20126)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20030)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20255)),
-                new HttpResponse(200, array(), $this->getDemoServiceDetails(20130)),
-                new HttpResponse(200, array(), '[]'),
-                new HttpResponse(200, array(), '[]'),
-                new HttpResponse(200, array(), '[]'),
-                new HttpResponse(200, array(), '[]'),
-            )
-        );
-
-        $this->syncTask->execute();
-
-        self::assertCount(9, $this->shippingMethodService->getAllMethods());
-
-        $repo = RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME);
-        $query = new QueryFilter();
-        $query->where('national', Operators::EQUALS, true);
-        self::assertEquals(0, $repo->count($query));
-
-        $query = new QueryFilter();
-        $query->where('national', Operators::EQUALS, false);
-        self::assertEquals(9, $repo->count($query));
     }
 
     /**
@@ -368,7 +318,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     {
         $user = new User();
         $user->country = 'IT';
-        $user->zipCode = '00118';
         $user->firstName = 'Test';
         $user->lastName = 'User';
         $user->email = 'test.user@example.com';
@@ -438,71 +387,5 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     private function getDemoServiceDetails($id)
     {
         return file_get_contents(__DIR__ . "/../Common/ApiResponses/ShippingServices/ServiceDetails-$id.json");
-    }
-
-    /**
-     *
-     * @return array
-     *
-     */
-    private function getRSMockResponses()
-    {
-        return array(
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-IT')),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20339)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21317)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20203)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20945)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20189)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20127)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20131)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20943)),
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-ES')),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20615)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20611)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21105)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20209)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21103)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20126)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20030)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20255)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20130)),
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-DE')),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20615)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20611)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20126)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20209)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21105)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20030)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20255)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21103)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20130)),
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-FR')),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20615)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20611)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20209)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20126)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21105)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20030)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20255)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21103)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20130)),
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-US')),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21279)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21103)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20937)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20329)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20255)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21051)),
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('RS-RS')),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20339)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(21317)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20203)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20945)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20189)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20127)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20131)),
-            new HttpResponse(200, array(), $this->getDemoServiceDetails(20943)),
-        );
     }
 }

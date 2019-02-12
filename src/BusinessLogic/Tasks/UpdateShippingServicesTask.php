@@ -78,17 +78,25 @@ class UpdateShippingServicesTask extends Task
 
         /** @var \Packlink\BusinessLogic\Http\DTO\User $user */
         $user = $config->getUserInfo();
+        if (!array_key_exists($user->country, static::$countryParams)) {
+            throw new \InvalidArgumentException('User country is not supported: ' . $user->country);
+        }
+
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $package = Package::fromArray($parcel->toArray());
 
-        $user->zipCode = $user->zipCode ?: static::$countryParams[$user->country];
-
         $allServices = array();
-        $countries = array_merge(static::$countryParams, array($user->country => $user->zipCode));
-        foreach ($countries as $country => $zip) {
+        foreach (static::$countryParams as $country => $zip) {
             $this->setServices(
                 $allServices,
-                new ShippingServiceSearch(null, $user->country, $user->zipCode, $country, $zip, array($package))
+                new ShippingServiceSearch(
+                    null,
+                    $user->country,
+                    static::$countryParams[$user->country],
+                    $country,
+                    $zip,
+                    array($package)
+                )
             );
         }
 

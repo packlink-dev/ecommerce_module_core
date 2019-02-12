@@ -28,17 +28,11 @@ class User extends BaseDto
      */
     public $email;
     /**
-     * Default country. Two letter country code.
+     * Default platform country. Two letter country code.
      *
      * @var string
      */
     public $country;
-    /**
-     * Zip code.
-     *
-     * @var string
-     */
-    public $zipCode;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -51,8 +45,7 @@ class User extends BaseDto
             'name' => $this->firstName,
             'surname' => $this->lastName,
             'email' => $this->email,
-            'country' => $this->country,
-            'postal_code' => $this->zipCode,
+            'platform_country' => $this->country,
         );
     }
 
@@ -70,8 +63,7 @@ class User extends BaseDto
         $user->firstName = static::getValue($raw, 'name');
         $user->lastName = static::getValue($raw, 'surname');
         $user->email = static::getValue($raw, 'email');
-        $user->country = static::getValue($raw, 'country');
-        $user->zipCode = static::getValue($raw, 'postal_code');
+        $user->country = static::getValue($raw, 'platform_country');
 
         return $user;
     }
