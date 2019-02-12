@@ -79,7 +79,7 @@ class WeeklySchedule extends Schedule
         }
 
         $currentDay = (int)date('N', $now->getTimestamp());
-        $daysToAdd = (7 + $day - $currentDay) % 7;
+        $daysToAdd = $day === $currentDay ? 7 : (7 + $day - $currentDay) % 7;
 
         $nextSchedule = $this->now();
         $nextSchedule->setTimestamp($now->getTimestamp());

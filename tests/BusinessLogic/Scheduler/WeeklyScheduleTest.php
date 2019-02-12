@@ -53,17 +53,7 @@ class WeeklyScheduleTest extends TestCase
         $nowDateTime->setTime(13, 42, 5);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $timeProvider = new TestTimeProvider();
-        $timeProvider->setCurrentLocalTime($nowDateTime);
-        $this->nowTime = $nowDateTime;
-
-        new TestServiceRegister(
-            array(
-                TimeProvider::CLASS_NAME => function () use ($timeProvider) {
-                    return $timeProvider;
-                },
-            )
-        );
+        $this->setCurrentDateTime($nowDateTime);
     }
 
     /**
@@ -89,6 +79,75 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testNextScheduleOnDifferentDays()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
+        $expected->setDate(2018, 3, 26);
+        $expected->setTime(3, 0);
+
+        $this->setMonday();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
+        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+
+        $this->setWednesday();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
+        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+
+        $this->setSunday();
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
+        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function setMonday()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
+        $nowDateTime->setDate(2018, 3, 19); // Monday
+        $nowDateTime->setTime(13, 42, 5);
+
+        $this->setCurrentDateTime($nowDateTime);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function setWednesday()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
+        $nowDateTime->setDate(2018, 3, 21); // Wednesday
+        $nowDateTime->setTime(11, 30, 5);
+
+        $this->setCurrentDateTime($nowDateTime);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function setSunday()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
+        $nowDateTime->setDate(2018, 3, 25); // Sunday
+        $nowDateTime->setTime(11, 30, 5);
+
+        $this->setCurrentDateTime($nowDateTime);
     }
 
     /**
@@ -174,5 +233,28 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+    }
+
+    /**
+     * Sets current date and time for testing purposes.
+     *
+     * @param \DateTime $dateTime
+     *
+     * @throws \Exception
+     */
+    private function setCurrentDateTime(\DateTime $dateTime)
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $timeProvider = new TestTimeProvider();
+        $timeProvider->setCurrentLocalTime($dateTime);
+        $this->nowTime = $dateTime;
+
+        new TestServiceRegister(
+            array(
+                TimeProvider::CLASS_NAME => function () use ($timeProvider) {
+                    return $timeProvider;
+                },
+            )
+        );
     }
 }
