@@ -27,6 +27,12 @@ class Shipment extends BaseDto
      */
     public $status;
     /**
+     * Packlink service Id.
+     *
+     * @var string
+     */
+    public $serviceId;
+    /**
      * Shipment service name.
      *
      * @var string
@@ -88,6 +94,7 @@ class Shipment extends BaseDto
             ),
             'order_date' => $this->orderDate->format('Y-m-d'),
             'tracking_url' => $this->carrierTrackingUrl,
+            'service_id' => $this->serviceId,
         );
     }
 
@@ -101,16 +108,27 @@ class Shipment extends BaseDto
     public static function fromArray(array $raw)
     {
         $shipment = new static();
-        $shipment->orderDate = \DateTime::createFromFormat('Y-m-d', $raw['order_date']);
-        $shipment->reference = $raw['packlink_reference'];
-        $shipment->shipmentCustomReference = $raw['shipment_custom_reference'];
-        $shipment->service = $raw['service'];
-        $shipment->content = $raw['content'];
-        $shipment->carrier = $raw['carrier'];
-        $shipment->status = $raw['state'];
-        $shipment->trackingCodes = $raw['trackings'];
-        $shipment->price = $raw['price']['base_price'];
-        $shipment->carrierTrackingUrl = $raw['tracking_url'];
+        $date = static::getValue($raw, 'order_date');
+        if ($date) {
+            $shipment->orderDate = \DateTime::createFromFormat('Y-m-d', $date);
+        }
+
+        $shipment->reference = static::getValue($raw, 'packlink_reference');
+        $shipment->shipmentCustomReference = static::getValue($raw, 'shipment_custom_reference');
+        $shipment->service = static::getValue($raw, 'service');
+        $shipment->serviceId = static::getValue($raw, 'service_id');
+        $shipment->content = static::getValue($raw, 'content');
+        $shipment->carrier = static::getValue($raw, 'carrier');
+        $shipment->status = static::getValue($raw, 'state');
+        $shipment->trackingCodes = static::getValue($raw, 'trackings', array());
+        $shipment->price = static::getValue($raw, 'price', null);
+        if (is_array($shipment->price)) {
+            $shipment->price = static::getValue($shipment->price, 'base_price');
+        } else {
+            $shipment->price = 0.0;
+        }
+
+        $shipment->carrierTrackingUrl = static::getValue($raw, 'tracking_url');
 
         return $shipment;
     }
