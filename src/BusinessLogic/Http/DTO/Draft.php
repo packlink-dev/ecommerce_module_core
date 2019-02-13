@@ -42,7 +42,7 @@ class Draft extends BaseDto
      *
      * @var string
      */
-    public $source = 'source_inbound';
+    public $source;
     /**
      * Shipment's source address.
      *

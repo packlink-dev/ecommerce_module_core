@@ -90,7 +90,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function getDraftSource()
     {
-        return 'source_inbound';
+        return '';
     }
 
     /**
