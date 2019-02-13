@@ -49,7 +49,9 @@ class ShippingCostCalculator
             }
         } catch (HttpBaseException $e) {
             // If API is not available, get stored default shipping cost on method without calculation.
-            $defaultCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
+            if ($e->getCode() !== 400) {
+                $defaultCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
+            }
         }
 
         return $defaultCost ? self::getCostForShippingMethod($shippingMethod, $defaultCost, $packages) : 0;

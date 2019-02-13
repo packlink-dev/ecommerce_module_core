@@ -275,7 +275,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $serviceId = 20339;
         $shippingMethod = $this->addShippingMethod($serviceId);
 
-        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
 
         $packages = array(Package::defaultPackage());
         $cost = $this->shippingMethodService->getShippingCost($serviceId, 'IT', '00118', 'IT', '00118', $packages);
@@ -348,7 +348,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     {
         $shippingMethod = $this->prepareFixedPricePolicyShippingMethod(1, array(new FixedPricePolicy(0, 10, 12)));
 
-        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
         $cost = $this->shippingMethodService->getShippingCost(1, 'IT', '', 'IT', '', array(Package::defaultPackage()));
 
         $costs = $shippingMethod->getShippingCosts();
@@ -739,7 +739,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     {
         $responses = array();
         for ($counter = 0; $counter < $number; $counter++) {
-            $responses[] = new HttpResponse(400, array(), '');
+            $responses[] = new HttpResponse(404, array(), '');
         }
 
         return $responses;
