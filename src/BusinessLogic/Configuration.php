@@ -36,6 +36,13 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     abstract public function getWebHookUrl();
 
     /**
+     * Returns order draft source.
+     *
+     * @return string Order draft source.
+     */
+    abstract public function getDraftSource();
+
+    /**
      * Returns scheduler time threshold between checks.
      *
      * @return int Threshold in seconds.
@@ -81,16 +88,6 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     public function resetAuthorizationCredentials()
     {
         $this->setAuthorizationToken(null);
-    }
-
-    /**
-     * Returns order draft source.
-     *
-     * @return string
-     */
-    public function getDraftSource()
-    {
-        return '';
     }
 
     /**

@@ -92,6 +92,16 @@ class TestShopConfiguration extends \Packlink\BusinessLogic\Configuration
     }
 
     /**
+     * Returns order draft source.
+     *
+     * @return string Order draft source.
+     */
+    public function getDraftSource()
+    {
+        return 'module_unknown';
+    }
+
+    /**
      * Retrieves integration name.
      *
      * @return string Integration name.
