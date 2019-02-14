@@ -81,6 +81,7 @@ class ShippingCostCalculator
             return array();
         }
 
+        $result = array();
         $params = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
         try {
             $response = self::getProxy()->getShippingServicesDeliveryDetails($params);
@@ -88,7 +89,9 @@ class ShippingCostCalculator
             $result = self::calculateShippingCostsPerShippingMethod($shippingMethods, $response, $packages);
         } catch (HttpBaseException $e) {
             // Fallback when API is not available.
-            $result = self::getDefaultShippingCosts($shippingMethods, $fromCountry, $toCountry, $packages);
+            if ($e->getCode() !== 400) {
+                $result = self::getDefaultShippingCosts($shippingMethods, $fromCountry, $toCountry, $packages);
+            }
         }
 
         return $result;

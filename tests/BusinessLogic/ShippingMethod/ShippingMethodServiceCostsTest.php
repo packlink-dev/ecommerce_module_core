@@ -289,7 +289,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $serviceId = 20339;
         $shippingMethod = $this->addShippingMethod($serviceId);
 
-        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
 
         $packages = array(Package::defaultPackage());
         $costs = $this->shippingMethodService->getShippingCosts('IT', '00118', 'IT', '00118', $packages);
@@ -365,7 +365,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             array(new FixedPricePolicy(0, 10, 12))
         );
 
-        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array(Package::defaultPackage()));
 
         $defaultCosts = $shippingMethod->getShippingCosts();
@@ -560,7 +560,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $serviceId = 20339;
         $this->preparePercentPricePolicyShippingMethod($serviceId, true);
 
-        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
         $costs = $this->shippingMethodService->getShippingCosts('IT', '', 'IT', '', array(Package::defaultPackage()));
         self::assertEquals(12.27, $costs[$serviceId], 'Calculated cost is wrong!');
     }
@@ -590,7 +590,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $serviceId = 20339;
         $this->preparePercentPricePolicyShippingMethod($serviceId);
 
-        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
         $this->checkShippingCostsMatchExpectedCost(array(Package::defaultPackage()), 9.25, $serviceId);
     }
 
