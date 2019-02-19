@@ -50,9 +50,13 @@ var Packlink = window.Packlink || {};
          * @param response
          */
         function constructPage(response) {
-            let countryField = templateService.getComponent('pl-default-warehouse-country', page);
             country = response['country'];
-            countryField.value = templateService.getComponent(`pl-country-${country.toLowerCase()}`, page).value;
+            let countryField = templateService.getComponent('pl-default-warehouse-country', page),
+                countryName = templateService.getComponent(`pl-country-${country.toLowerCase()}`, page);
+
+            if (countryField !== null && countryName !== null) {
+                countryField.value = countryName.value;
+            }
 
             for (let field of warehouseFields) {
                 let input = templateService.getComponent(`pl-default-warehouse-${field}`, page);
