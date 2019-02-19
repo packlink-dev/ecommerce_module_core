@@ -126,7 +126,12 @@ class UserAccountService extends BaseService
                 }
             }
 
-            if ($warehouse !== null) {
+            $userInfo = $this->configuration->getUserInfo();
+            if ($userInfo === null) {
+                $userInfo = $this->getProxy()->getUserData();
+            }
+
+            if ($warehouse !== null && $userInfo !== null && $warehouse->country === $userInfo->country) {
                 $this->configuration->setDefaultWarehouse($warehouse);
             }
         }

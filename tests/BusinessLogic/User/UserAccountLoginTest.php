@@ -218,7 +218,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->userAccountService->setWarehouseInfo(true);
 
         $warehouse = $this->shopConfig->getDefaultWarehouse();
-        $this->assertCount(1, $this->httpClient->getHistory());
+        $this->assertCount(2, $this->httpClient->getHistory());
         $this->assertNotNull($warehouse);
         $this->assertEquals('222459d5e4b0ed5488fe91544', $warehouse->id);
     }
@@ -233,6 +233,9 @@ class UserAccountLoginTest extends BaseTestWithServices
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json')
+            ),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
             ),
         );
     }
