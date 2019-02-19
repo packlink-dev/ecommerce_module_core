@@ -211,6 +211,38 @@ class OrderService extends BaseService
             }
         }
 
-        $draft->content = implode('; ', $content);
+        if (!empty($content)) {
+            $forbiddenCharacters = array(
+                ';',
+                ':',
+                '%',
+                '&',
+                '/',
+                'º',
+                'ª',
+                '€',
+                '$',
+                '@',
+                '#',
+                '(',
+                ')',
+                '=',
+                '?',
+                '¿',
+                '¡',
+                '!',
+                '\\',
+                '\'',
+                '`',
+                '´',
+                '^',
+                '*',
+                'Ê',
+                'è',
+            );
+            $contentString = implode('; ', $content);
+
+            $draft->content = str_replace($forbiddenCharacters, '', $contentString);
+        }
     }
 }

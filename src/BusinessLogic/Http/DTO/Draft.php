@@ -166,7 +166,7 @@ class Draft extends BaseDto
             'collection_date' => $this->collectionDate,
             'collection_time' => $this->collectionTime,
             'dropoff_point_id' => $this->dropOffPointId,
-            'content' => substr($this->content, 0, 255),
+            'content' => substr($this->content, 0, 60),
             'contentvalue' => round($this->contentValue, 2),
             'content_second_hand' => $this->contentSecondHand,
             'shipment_custom_reference' => $this->shipmentCustomReference,
