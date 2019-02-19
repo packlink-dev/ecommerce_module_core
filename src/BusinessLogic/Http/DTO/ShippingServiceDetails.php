@@ -3,12 +3,12 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 /**
- * Class ShippingServiceDeliveryDetails holds information about delivery details for specific shipping service
+ * Class ShippingServiceDetails holds information about delivery details for specific shipping service
  * and for specific departure and destination.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class ShippingServiceDeliveryDetails extends BaseDto
+class ShippingServiceDetails extends BaseDto
 {
     /**
      * Service Id.
@@ -52,6 +52,12 @@ class ShippingServiceDeliveryDetails extends BaseDto
      * @var string
      */
     public $destinationCountry;
+    /**
+     * Indicates if this is national shipping service.
+     *
+     * @var bool
+     */
+    public $national;
     /**
      * Indicates whether service requires departure drop-off.
      *
@@ -195,6 +201,7 @@ class ShippingServiceDeliveryDetails extends BaseDto
 
         $instance->serviceInfo = self::getValue($raw, 'service_info', array());
         $instance->availableDates = self::getValue($raw, 'available_dates', array());
+        $instance->national = self::getValue($raw, 'national', null);
 
         return $instance;
     }

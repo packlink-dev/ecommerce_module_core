@@ -11,7 +11,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
-use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
@@ -92,14 +92,14 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testAddNewMethod()
     {
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
+        $shippingMethod = $this->shippingMethodService->add($this->getShippingServiceDetails(1));
+        $id = $shippingMethod->getId();
 
         self::assertNotNull($shippingMethod, 'Failed to create shipping method!');
-        self::assertEquals(1, $shippingMethod->getServiceId(), 'Failed to set shipping method service ID!');
-        $id = $shippingMethod->getId();
+        $allServices = $shippingMethod->getShippingServices();
+        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $firstService */
+        $firstService = current($allServices);
+        self::assertEquals(1, $firstService->serviceId, 'Failed to set shipping method service ID!');
         self::assertGreaterThan(0, $id, 'Failed to set shipping method ID!');
 
         $shippingMethod = $this->shippingMethodService->getShippingMethod($id);
@@ -116,20 +116,23 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testUpdateMethod()
     {
-        $shippingService = $this->getShippingService(1);
         $serviceDetails = $this->getShippingServiceDetails(1);
-        $shippingMethod = $this->shippingMethodService->add($shippingService, $serviceDetails);
+        $defaultName = $serviceDetails->serviceName;
+        $shippingMethod = $this->shippingMethodService->add($this->getShippingServiceDetails(1));
 
-        $shippingService->serviceName = 'changed name';
-        $this->shippingMethodService->update($shippingService, $serviceDetails);
+        $serviceDetails->serviceName = 'changed name';
+        $this->shippingMethodService->update($serviceDetails);
 
         $updatedShippingMethod = $this->shippingMethodService->getShippingMethod($shippingMethod->getId());
+        $allServices = $updatedShippingMethod->getShippingServices();
+        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $firstService */
+        $firstService = current($allServices);
 
-        self::assertNotEquals($shippingMethod->getServiceName(), $updatedShippingMethod->getServiceName());
-        self::assertEquals('changed name', $updatedShippingMethod->getServiceName());
+        self::assertNotEquals($defaultName, $firstService->serviceName);
+        self::assertEquals('changed name', $firstService->serviceName);
 
-        $shippingService->serviceName = 'changed name';
-        $this->shippingMethodService->update($shippingService, $serviceDetails);
+        $serviceDetails->serviceName = 'changed name';
+        $this->shippingMethodService->update($serviceDetails);
 
         self::assertCount(
             0,
@@ -140,15 +143,9 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testDeleteMethod()
     {
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService(1),
-            $this->getShippingServiceDetails(1)
-        );
+        $shippingMethod = $this->shippingMethodService->add($this->getShippingServiceDetails(1));
 
         self::assertNotNull($shippingMethod, 'Failed to create shipping method!');
-        self::assertEquals(1, $shippingMethod->getServiceId(), 'Failed to set shipping method service ID!');
-        $id = $shippingMethod->getId();
-        self::assertGreaterThan(0, $id, 'Failed to set shipping method ID!');
 
         $this->shippingMethodService->delete($shippingMethod);
         self::assertCount(0, $this->shippingMethodService->getAllMethods());
@@ -162,16 +159,15 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testActivateMethod()
     {
-        $serviceId = 1;
-        $shippingService = $this->getShippingService($serviceId);
-        $serviceDetails = $this->getShippingServiceDetails($serviceId);
-        $this->shippingMethodService->add($shippingService, $serviceDetails);
+        $serviceDetails = $this->getShippingServiceDetails(1);
+        $method = $this->shippingMethodService->add($serviceDetails);
 
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
         self::assertCount(1, $this->shippingMethodService->getAllMethods());
 
-        $this->shippingMethodService->activate($serviceId);
+        $this->shippingMethodService->activate($method->getId());
 
+        self::assertTrue($this->shippingMethodService->isAnyMethodActive());
         self::assertCount(
             1,
             $this->testShopShippingMethodService->callHistory,
@@ -184,11 +180,8 @@ class ShippingMethodServiceTest extends BaseTestWithServices
             'Activation should be triggered in shop!'
         );
 
-        self::assertTrue($this->shippingMethodService->isAnyMethodActive());
-        self::assertCount(1, $this->shippingMethodService->getActiveMethods());
-
-        $shippingService->serviceName = 'changed name';
-        $this->shippingMethodService->update($shippingService, $serviceDetails);
+        $serviceDetails->serviceName = 'changed name';
+        $this->shippingMethodService->update($serviceDetails);
 
         self::assertCount(
             2,
@@ -204,20 +197,16 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testDeactivateMethod()
     {
-        $serviceId = 1;
-        $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
+        $method = $this->shippingMethodService->add($this->getShippingServiceDetails(1));
 
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
         self::assertCount(1, $this->shippingMethodService->getAllMethods());
 
-        $this->shippingMethodService->activate($serviceId);
+        $this->shippingMethodService->activate($method->getId());
 
         self::assertCount(1, $this->shippingMethodService->getActiveMethods());
 
-        $this->shippingMethodService->deactivate($serviceId);
+        $this->shippingMethodService->deactivate($method->getId());
         self::assertCount(
             1,
             $this->testShopShippingMethodService->callHistory['delete'],
@@ -229,17 +218,13 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testDeleteActiveMethod()
     {
-        $serviceId = 1;
-        $shippingMethod = $this->shippingMethodService->add(
-            $this->getShippingService($serviceId),
-            $this->getShippingServiceDetails($serviceId)
-        );
+        $method = $this->shippingMethodService->add($this->getShippingServiceDetails(1));
 
-        $this->shippingMethodService->activate($serviceId);
+        $this->shippingMethodService->activate($method->getId());
 
         self::assertCount(1, $this->shippingMethodService->getActiveMethods());
 
-        $shippingMethod = $this->shippingMethodService->getShippingMethod($shippingMethod->getId());
+        $shippingMethod = $this->shippingMethodService->getShippingMethod($method->getId());
         $this->shippingMethodService->delete($shippingMethod);
         self::assertCount(
             1,
@@ -252,12 +237,10 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     public function testGetByServiceId()
     {
-        $this->shippingMethodService->add(
-            $this->getShippingService(1123),
-            $this->getShippingServiceDetails(1)
-        );
+        $service = $this->getShippingServiceDetails(1123);
+        $this->shippingMethodService->add($service);
+        $shippingMethod = $this->shippingMethodService->getShippingMethodForService($service);
 
-        $shippingMethod = $this->shippingMethodService->getShippingMethodForService(1123);
         self::assertNotNull($shippingMethod, 'Failed to retrieve created shipping method!');
     }
 
@@ -335,7 +318,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
     private function getShippingServiceDetails($id)
     {
-        $details = ShippingServiceDeliveryDetails::fromArray(
+        $details = ShippingServiceDetails::fromArray(
             array(
                 'id' => $id,
                 'carrier_name' => 'test carrier',
@@ -348,6 +331,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
                 'transit_time' => '3 DAYS',
                 'transit_hours' => 72,
                 'first_estimated_delivery_date' => '2019-01-05',
+                'national' => true,
                 'price' => array(
                     'total_price' => 13.76,
                     'base_price' => 10.76,
@@ -358,6 +342,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
         $details->departureCountry = 'IT';
         $details->destinationCountry = 'IT';
+        $details->national = true;
 
         return $details;
     }

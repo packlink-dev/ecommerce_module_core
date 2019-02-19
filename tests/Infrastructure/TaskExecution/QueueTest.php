@@ -76,7 +76,7 @@ class QueueTest extends TestCase
     {
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         $foundQueueItem = $this->queue->find($queueItem->getId());
@@ -163,23 +163,23 @@ class QueueTest extends TestCase
         $runningItem1 = $this->generateRunningQueueItem('testQueue', new FooTask());
         $runningItem2 = $this->generateRunningQueueItem(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $runningItem3 = $this->generateRunningQueueItem(
             'otherQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->enqueue(
             'otherQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->enqueue(
             'withoutRunningItemsQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $queue = new QueueService();
 
@@ -212,30 +212,30 @@ class QueueTest extends TestCase
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
         $earliestQueue1Item = $this->queue->enqueue(
             'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $earliestQueue2Item = $this->queue->enqueue(
             'queue2',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         $this->generateRunningQueueItem(
             'queue3',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
         $this->queue->enqueue(
             'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->enqueue(
             'queue2',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->enqueue(
             'queue3',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         // Act
@@ -267,7 +267,7 @@ class QueueTest extends TestCase
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
         $this->queue->enqueue(
             'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask(),
+            new FooTask(),
             'context'
         );
         $this->queue->enqueue('queue2', new FooTask(), 'context');
@@ -275,7 +275,7 @@ class QueueTest extends TestCase
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
         $latestQueueItem = $this->queue->enqueue(
             'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask(),
+            new FooTask(),
             'context'
         );
 
@@ -283,7 +283,7 @@ class QueueTest extends TestCase
         $this->queue->enqueue('queue1', new BarTask(), 'context');
         $globallyLatestQueueItem = $this->queue->enqueue(
             'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask(),
+            new FooTask(),
             'different context'
         );
 
@@ -322,24 +322,24 @@ class QueueTest extends TestCase
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
         $this->queue->enqueue(
             'queue5',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
         $this->queue->enqueue(
             'queue4',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -4 days'));
         $earliestQueue3Item = $this->queue->enqueue(
             'queue3',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -5 days'));
         $earliestQueue2Item = $this->queue->enqueue('queue2', new FooTask());
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -6 days'));
         $earliestQueue1Item = $this->queue->enqueue(
             'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $queue = new QueueService();
 
@@ -375,7 +375,7 @@ class QueueTest extends TestCase
         // Act
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         // Assert
@@ -438,7 +438,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask(),
+            new FooTask(),
             'test'
         );
         $this->assertSame(
@@ -457,7 +457,7 @@ class QueueTest extends TestCase
         // Act
         $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         // Assert
@@ -535,7 +535,7 @@ class QueueTest extends TestCase
     public function testWhenInProgressReportedProgressShouldBeStoredUsingQueue()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
         $queueItem = $this->queue->enqueue('testQueue', $task);
         $this->queue->start($queueItem);
 
@@ -560,7 +560,7 @@ class QueueTest extends TestCase
     public function testWhenNotInProgressReportedProgressShouldFailJob()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
         $queueItem = $this->queue->enqueue('testQueue', $task);
         $this->queue->start($queueItem);
         $this->queue->fail($queueItem, 'Test failure description');
@@ -580,7 +580,7 @@ class QueueTest extends TestCase
     public function testWhenInProgressReportedAliveShouldBeStoredWithCurrentTimeAsLastUpdatedTimestamp()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
         $queueItem = $this->queue->enqueue('testQueue', $task);
         $this->queue->start($queueItem);
 
@@ -607,7 +607,7 @@ class QueueTest extends TestCase
     public function testItShouldBePossibleToTransitToCompletedStateFromInProgress()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
 
         $queuedTime = new \DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
@@ -671,7 +671,7 @@ class QueueTest extends TestCase
     public function testRequeueStartedTaskShouldReturnQueueItemInQueuedState()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
 
         $queuedTime = new \DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
@@ -717,7 +717,7 @@ class QueueTest extends TestCase
     public function testFailingLessThanMaxRetryTimesShouldReturnQueueItemInQueuedState()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
 
         $queuedTime = new \DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
@@ -782,7 +782,7 @@ class QueueTest extends TestCase
     public function testFailingMoreThanMaxRetryTimesShouldTransitQueueItemInFailedState()
     {
         // Arrange
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
 
         $queuedTime = new \DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
@@ -840,7 +840,7 @@ class QueueTest extends TestCase
      */
     public function testItShouldBeForbiddenToTransitionFromCreatedToInProgressStatus()
     {
-        $queueItem = new QueueItem(new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask());
+        $queueItem = new QueueItem(new FooTask());
 
         $this->queue->start($queueItem);
 
@@ -854,7 +854,7 @@ class QueueTest extends TestCase
      */
     public function testItShouldBeForbiddenToTransitionFromCreatedToFailedStatus()
     {
-        $queueItem = new QueueItem(new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask());
+        $queueItem = new QueueItem(new FooTask());
 
         $this->queue->fail($queueItem, 'Test failure description');
 
@@ -868,7 +868,7 @@ class QueueTest extends TestCase
      */
     public function testItShouldBeForbiddenToTransitionFromCreatedToCompletedStatus()
     {
-        $queueItem = new QueueItem(new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask());
+        $queueItem = new QueueItem(new FooTask());
 
         $this->queue->finish($queueItem);
 
@@ -884,7 +884,7 @@ class QueueTest extends TestCase
     {
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         $this->queue->fail($queueItem, 'Test failure description');
@@ -901,7 +901,7 @@ class QueueTest extends TestCase
     {
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         $this->queue->finish($queueItem);
@@ -919,7 +919,7 @@ class QueueTest extends TestCase
     {
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
 
@@ -939,7 +939,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         for ($i = 0; $i <= QueueService::MAX_RETRIES; $i++) {
@@ -966,7 +966,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         for ($i = 0; $i <= QueueService::MAX_RETRIES; $i++) {
@@ -993,7 +993,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         for ($i = 0; $i <= QueueService::MAX_RETRIES; $i++) {
@@ -1020,7 +1020,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         $this->queue->finish($queueItem);
@@ -1042,7 +1042,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         $this->queue->finish($queueItem);
@@ -1064,7 +1064,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         $this->queue->finish($queueItem);
@@ -1087,7 +1087,7 @@ class QueueTest extends TestCase
         // Act
         $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
 
         $this->fail(
@@ -1105,7 +1105,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queueStorage->disabled = true;
 
@@ -1127,7 +1127,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;
@@ -1150,7 +1150,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;
@@ -1193,7 +1193,7 @@ class QueueTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'testQueue',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;

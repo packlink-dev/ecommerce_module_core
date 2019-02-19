@@ -10,11 +10,10 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\DTO\Package;
-use Packlink\BusinessLogic\Http\DTO\ShippingService;
-use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
-use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethodCost;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 
 /**
  * Class ShippingMethodService. In charge for manipulation with shipping methods and services.
@@ -97,32 +96,30 @@ class ShippingMethodService extends BaseService
      * Creates new shipping method out of data received from Packlink API.
      * This method is alias for method @see update.
      *
-     * @param ShippingService $service Shipping service data.
-     * @param ShippingServiceDeliveryDetails $serviceDetails Shipping service details with costs.
+     * @param ShippingServiceDetails $serviceDetails Shipping service details with costs.
      *
      * @return ShippingMethod Created shipping method.
      */
-    public function add(ShippingService $service, ShippingServiceDeliveryDetails $serviceDetails)
+    public function add(ShippingServiceDetails $serviceDetails)
     {
-        return $this->update($service, $serviceDetails);
+        return $this->update($serviceDetails);
     }
 
     /**
      * Creates or Updates shipping method from Packlink data.
      *
-     * @param ShippingService $service Shipping service data update.
-     * @param ShippingServiceDeliveryDetails $serviceDetails
+     * @param ShippingServiceDetails $serviceDetails
      *
      * @return ShippingMethod Created or updated shipping method.
      */
-    public function update(ShippingService $service, ShippingServiceDeliveryDetails $serviceDetails)
+    public function update(ShippingServiceDetails $serviceDetails)
     {
-        $method = $this->getShippingMethodForService($service->id);
+        $method = $this->getShippingMethodForService($serviceDetails);
         if ($method === null) {
             $method = new ShippingMethod();
         }
 
-        $this->setShippingMethodDetails($method, $service, $serviceDetails);
+        $this->setShippingMethodDetails($method, $serviceDetails);
 
         $this->save($method);
 
@@ -170,27 +167,27 @@ class ShippingMethodService extends BaseService
     }
 
     /**
-     * Activates shipping method for provided Packlink service.
+     * Activates shipping method.
      *
-     * @param int $serviceId Packlink service identifier.
+     * @param int $id Shipping method entity identifier.
      *
      * @return bool TRUE if activation succeeded; otherwise, FALSE.
      */
-    public function activate($serviceId)
+    public function activate($id)
     {
-        return $this->setActivationState($serviceId, true);
+        return $this->setActivationState($id, true);
     }
 
     /**
-     * Deactivates shipping method for provided Packlink service.
+     * Deactivates shipping method.
      *
-     * @param int $serviceId Packlink service identifier.
+     * @param int $id Shipping method entity identifier.
      *
      * @return bool TRUE if deactivation succeeded; otherwise, FALSE.
      */
-    public function deactivate($serviceId)
+    public function deactivate($id)
     {
-        return $this->setActivationState($serviceId, false);
+        return $this->setActivationState($id, false);
     }
 
     /**
@@ -209,7 +206,7 @@ class ShippingMethodService extends BaseService
      * Returns shipping costs for given shipping service for delivery of specified packages from specified
      * departure country and postal area to specified destination country and postal area.
      *
-     * @param int $serviceId Id of service for which to calculate costs.
+     * @param int $methodId Id of shipping method entity for which to calculate costs.
      * @param string $fromCountry Departure country code.
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
@@ -218,13 +215,13 @@ class ShippingMethodService extends BaseService
      *
      * @return float Calculated shipping cost
      */
-    public function getShippingCost($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
+    public function getShippingCost($methodId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
     {
-        $shippingMethod = $this->getShippingMethodForService($serviceId);
+        $shippingMethod = $this->getShippingMethod($methodId);
         if ($shippingMethod === null || !$shippingMethod->isActivated()) {
             Logger::logWarning(
-                'Tried to calculate shipping cost for service that does not exist in shop '
-                . 'or is not activated (' . $serviceId . ')'
+                'Tried to calculate shipping cost for method that does not exist in shop '
+                . 'or is not activated (' . $methodId . ')'
             );
 
             return 0;
@@ -278,13 +275,23 @@ class ShippingMethodService extends BaseService
     /**
      * Gets shipping method for provided service.
      *
-     * @param int $serviceId Packlink service identifier.
+     * @param ShippingServiceDetails $service Packlink service.
      *
      * @return ShippingMethod|null Shipping method if found; otherwise, NULL.
      */
-    public function getShippingMethodForService($serviceId)
+    public function getShippingMethodForService($service)
     {
-        $filter = $this->setFilterCondition(new QueryFilter(), 'serviceId', Operators::EQUALS, $serviceId);
+        $filter = new QueryFilter();
+
+        try {
+            $filter->where('departureDropOff', Operators::EQUALS, $service->departureDropOff)
+                ->where('destinationDropOff', Operators::EQUALS, $service->destinationDropOff)
+                ->where('national', Operators::EQUALS, $service->national)
+                ->where('expressDelivery', Operators::EQUALS, $service->expressDelivery)
+                ->where('carrierName', Operators::EQUALS, $service->carrierName);
+        } catch (QueryFilterInvalidParamException $e) {
+            return null;
+        }
 
         return $this->selectOne($filter);
     }
@@ -292,16 +299,16 @@ class ShippingMethodService extends BaseService
     /**
      * Activates or deactivates shipping method for provided Packlink service.
      *
-     * @param int $serviceId Packlink service id.
+     * @param int $id Stored method id.
      * @param bool $activated TRUE if service is being activated.
      *
      * @return bool TRUE if setting state succeeded; otherwise, FALSE.
      */
-    protected function setActivationState($serviceId, $activated)
+    protected function setActivationState($id, $activated)
     {
-        $method = $this->getShippingMethodForService($serviceId);
+        $method = $this->getShippingMethod($id);
         if ($method === null) {
-            Logger::logWarning('Shipping method for service ' . $serviceId . ' does not exist.');
+            Logger::logWarning('Shipping method for ID ' . $id . ' does not exist.');
 
             return false;
         }
@@ -312,7 +319,7 @@ class ShippingMethodService extends BaseService
             return $this->shippingMethodRepository->update($method);
         }
 
-        Logger::logWarning('Could not activate/deactivate shipping service ' . $serviceId . ' in shop.');
+        Logger::logWarning('Could not activate/deactivate shipping method ' . $id . ' in shop.');
 
         return false;
     }
@@ -338,55 +345,39 @@ class ShippingMethodService extends BaseService
      * Sets information to shipping method from Packlink API details.
      *
      * @param ShippingMethod $shippingMethod Shipping method to update.
-     * @param ShippingService $service Packlink shipping service.
-     * @param ShippingServiceDeliveryDetails $serviceDetails Details for shipping service.
+     * @param ShippingServiceDetails $serviceDetails Details for shipping service.
      */
     protected function setShippingMethodDetails(
         ShippingMethod $shippingMethod,
-        ShippingService $service,
-        ShippingServiceDeliveryDetails $serviceDetails
+        ShippingServiceDetails $serviceDetails
     ) {
-        $shippingMethod->setServiceId($service->id);
-        $shippingMethod->setServiceName($service->serviceName);
-        $shippingMethod->setCarrierName($service->carrierName);
-        $shippingMethod->setLogoUrl($service->logoUrl);
-        $shippingMethod->setDepartureDropOff($service->departureDropOff);
-        $shippingMethod->setDestinationDropOff($service->destinationDropOff);
-        $shippingMethod->setEnabled($service->enabled);
-
+        $shippingMethod->setCarrierName($serviceDetails->carrierName);
+        $shippingMethod->setDepartureDropOff($serviceDetails->departureDropOff);
+        $shippingMethod->setDestinationDropOff($serviceDetails->destinationDropOff);
         $shippingMethod->setDeliveryTime($serviceDetails->transitTime);
         $shippingMethod->setExpressDelivery($serviceDetails->expressDelivery);
         $shippingMethod->setNational($serviceDetails->departureCountry === $serviceDetails->destinationCountry);
+        $shippingMethod->setEnabled(true);
 
-        $this->setShippingCosts($shippingMethod, $serviceDetails);
+        $this->setShippingService($shippingMethod, $serviceDetails);
     }
 
     /**
-     * Sets shipping costs on selected method.
+     * Sets shipping service on selected method.
      *
      * @param ShippingMethod $shippingMethod Method to be updated.
-     * @param ShippingServiceDeliveryDetails $serviceDetails Shipping details to get costs from.
+     * @param ShippingServiceDetails $service Shipping service.
      */
-    protected function setShippingCosts(ShippingMethod $shippingMethod, ShippingServiceDeliveryDetails $serviceDetails)
+    protected function setShippingService(ShippingMethod $shippingMethod, ShippingServiceDetails $service)
     {
-        $cost = new ShippingMethodCost(
-            $serviceDetails->departureCountry,
-            $serviceDetails->destinationCountry,
-            $serviceDetails->totalPrice,
-            $serviceDetails->basePrice,
-            $serviceDetails->taxPrice
-        );
-
+        $newService = ShippingService::fromServiceDetails($service);
         $set = false;
-        foreach ($shippingMethod->getShippingCosts() as $currentCost) {
-            if ($currentCost->departureCountry === $cost->departureCountry
-                && $currentCost->destinationCountry === $cost->destinationCountry
-            ) {
-                // update
-                $currentCost->basePrice = $cost->basePrice;
-                $currentCost->totalPrice = $cost->totalPrice;
-                $currentCost->taxPrice = $cost->taxPrice;
-
+        foreach ($shippingMethod->getShippingServices() as $currentService) {
+            if ($currentService->serviceId === $newService->serviceId) {
+                $currentService->serviceName = $newService->serviceName;
+                $currentService->basePrice = $newService->basePrice;
+                $currentService->totalPrice = $newService->totalPrice;
+                $currentService->taxPrice = $newService->taxPrice;
                 $set = true;
 
                 break;
@@ -394,10 +385,7 @@ class ShippingMethodService extends BaseService
         }
 
         if (!$set) {
-            // merge
-            $costs = $shippingMethod->getShippingCosts();
-            $costs[] = $cost;
-            $shippingMethod->setShippingCosts($costs);
+            $shippingMethod->addShippingService($newService);
         }
     }
 

@@ -7,9 +7,11 @@ use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
@@ -63,9 +65,7 @@ class UpdateShippingServicesTask extends Task
      * Gets all available services for current user.
      *
      * @return array
-     *  Key is service Id, value is an array with keys 'service' and 'serviceDetails'.
-     *  'service' holds @see \Packlink\BusinessLogic\Http\DTO\ShippingService object.
-     *  'serviceDetails' holds @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails object.
+     *  Key is service Id and value is @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
@@ -118,10 +118,7 @@ class UpdateShippingServicesTask extends Task
         $proxy = $this->getProxy();
         $serviceDeliveryDetails = $proxy->getShippingServicesDeliveryDetails($searchParams);
         foreach ($serviceDeliveryDetails as $deliveryDetail) {
-            $allServices[$deliveryDetail->id] = array(
-                'service' => $proxy->getShippingServiceDetails($deliveryDetail->id),
-                'serviceDetails' => $deliveryDetail,
-            );
+            $allServices[] = $deliveryDetail;
         }
     }
 
@@ -139,15 +136,13 @@ class UpdateShippingServicesTask extends Task
         foreach ($currentMethods as $shippingMethod) {
             $this->updateShippingMethod($shippingMethod, $apiServices);
 
-            unset($apiServices[$shippingMethod->getServiceId()]);
-
             $progress += $progressStep;
             $this->reportProgress($progress);
         }
 
         $this->reportProgress(80);
-        foreach ($apiServices as $details) {
-            $this->getShippingMethodService()->add($details['service'], $details['serviceDetails']);
+        foreach ($apiServices as $service) {
+            $this->getShippingMethodService()->add($service);
         }
     }
 
@@ -155,19 +150,30 @@ class UpdateShippingServicesTask extends Task
      * Updates shipping method from data from Packlink API or deletes it if service does not exist.
      *
      * @param ShippingMethod $shippingMethod Local shipping method.
-     * @param array $apiServices Shipping services returned from API.
+     * @param ShippingServiceDetails[] $apiServices Shipping services returned from API.
      */
     protected function updateShippingMethod(ShippingMethod $shippingMethod, array &$apiServices)
     {
-        $serviceId = $shippingMethod->getServiceId();
-        if (isset($apiServices[$serviceId])) {
-            $this->getShippingMethodService()->update(
-                $apiServices[$serviceId]['service'],
-                $apiServices[$serviceId]['serviceDetails']
-            );
-        } else {
-            $this->getShippingMethodService()->delete($shippingMethod);
+        $shippingServices = array();
+        foreach ($apiServices as $service) {
+            if ($this->serviceBelongsToMethod($service, $shippingMethod)) {
+                $shippingServices[] = ShippingService::fromServiceDetails($service);
+            }
         }
+
+        if (!empty($shippingServices)) {
+            $shippingMethod->setShippingServices($shippingServices);
+            $this->getShippingMethodService()->save($shippingMethod);
+
+            /** @var ShippingService $service */
+            foreach ($shippingServices as $service) {
+                unset($apiServices[$service->serviceId]);
+            }
+
+            return;
+        }
+
+        $this->getShippingMethodService()->delete($shippingMethod);
     }
 
     /**
@@ -209,5 +215,23 @@ class UpdateShippingServicesTask extends Task
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
 
         return $proxy;
+    }
+
+    /**
+     * Checks if given shipping service belongs to given shipping method.
+     *
+     * @param \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails $service Shipping service from API.
+     *
+     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $shippingMethod Shipping method from system.
+     *
+     * @return bool TRUE if given shipping service belongs to given shipping method; otherwise, FALSE.
+     */
+    protected function serviceBelongsToMethod(ShippingServiceDetails $service, ShippingMethod $shippingMethod)
+    {
+        return $service->carrierName === $shippingMethod->getCarrierName()
+            && $service->national === $shippingMethod->isNational()
+            && $service->expressDelivery === $shippingMethod->isExpressDelivery()
+            && $service->departureDropOff === $shippingMethod->isDepartureDropOff()
+            && $service->destinationDropOff === $shippingMethod->isDestinationDropOff();
     }
 }

@@ -2,14 +2,28 @@
 
 namespace Packlink\BusinessLogic\ShippingMethod\Models;
 
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
+
 /**
  * Class ShippingMethodCost. Represents shipping cost for default parcel for shipment
  * from departure country to destination country.
  *
  * @package Packlink\BusinessLogic\ShippingMethod\Models
  */
-class ShippingMethodCost
+class ShippingService
 {
+    /**
+     * Packlink service id.
+     *
+     * @var int
+     */
+    public $serviceId;
+    /**
+     * Shipping service name.
+     *
+     * @var string
+     */
+    public $serviceName;
     /**
      * Departure country ISO-2 code.
      *
@@ -42,8 +56,10 @@ class ShippingMethodCost
     public $basePrice;
 
     /**
-     * ShippingMethodCost constructor.
+     * ShippingService constructor.
      *
+     * @param string $serviceId Packlink service id.
+     * @param string $serviceName Service name.
      * @param string $departureCountry Departure country ISO-2 code.
      * @param string $destinationCountry Destination country ISO-2 code.
      * @param float $totalPrice Total price with tax.
@@ -51,12 +67,16 @@ class ShippingMethodCost
      * @param float $taxPrice Tax price.
      */
     public function __construct(
+        $serviceId = '',
+        $serviceName = '',
         $departureCountry = '',
         $destinationCountry = '',
         $totalPrice = 0.0,
         $basePrice = 0.0,
         $taxPrice = 0.0
     ) {
+        $this->serviceId = $serviceId;
+        $this->serviceName = $serviceName;
         $this->departureCountry = $departureCountry;
         $this->destinationCountry = $destinationCountry;
         $this->totalPrice = $totalPrice;
@@ -74,11 +94,33 @@ class ShippingMethodCost
     public static function fromArray($data)
     {
         return new static(
+            $data['serviceId'],
+            $data['serviceName'],
             $data['departure'],
             $data['destination'],
             $data['totalPrice'],
             $data['basePrice'],
             $data['taxPrice']
+        );
+    }
+
+    /**
+     * Creates new instance from data from @see ShippingServiceDetails instance.
+     *
+     * @param ShippingServiceDetails $shippingServiceDetails Service details.
+     *
+     * @return ShippingService New instance.
+     */
+    public static function fromServiceDetails(ShippingServiceDetails $shippingServiceDetails)
+    {
+        return new static(
+            $shippingServiceDetails->id,
+            $shippingServiceDetails->serviceName,
+            $shippingServiceDetails->departureCountry,
+            $shippingServiceDetails->destinationCountry,
+            $shippingServiceDetails->totalPrice,
+            $shippingServiceDetails->basePrice,
+            $shippingServiceDetails->taxPrice
         );
     }
 
@@ -90,6 +132,8 @@ class ShippingMethodCost
     public function toArray()
     {
         return array(
+            'serviceId' => $this->serviceId,
+            'serviceName' => $this->serviceName,
             'departure' => $this->departureCountry,
             'destination' => $this->destinationCountry,
             'totalPrice' => $this->totalPrice,

@@ -185,6 +185,32 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
 
     /**
      * @depends testStudentMassInsert
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithIdFieldSort()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('gender', Operators::EQUALS, 'M');
+        $queryFilter->orderBy('id', QueryFilter::ORDER_DESC);
+
+        $entities = $repository->select($queryFilter);
+        $ids = array();
+        /** @var StudentEntity $item */
+        foreach ($entities as $item) {
+            $ids[] = $item->getId();
+        }
+
+        $sortedIds = $ids;
+        sort($sortedIds);
+        $sortedIds = array_reverse($sortedIds);
+        $this->assertEquals($sortedIds, $ids);
+    }
+
+    /**
+     * @depends testStudentMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */

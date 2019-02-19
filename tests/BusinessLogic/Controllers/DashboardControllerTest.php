@@ -118,7 +118,6 @@ class DashboardControllerTest extends BaseTestWithServices
     {
         $shippingMethod = new ShippingMethod();
         $shippingMethod->setActivated(true);
-        $shippingMethod->setServiceId(123);
         $shippingMethod->setEnabled(false);
         $shippingMethod->setDepartureDropOff(false);
         $shippingMethod->setDestinationDropOff(false);

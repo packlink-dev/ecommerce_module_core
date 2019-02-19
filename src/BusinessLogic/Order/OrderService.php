@@ -8,6 +8,7 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
  * Class OrderService.
@@ -95,11 +96,17 @@ class OrderService extends BaseService
         $draft->priority = $order->isHighPriority();
         $draft->source = $this->configuration->getDraftSource();
 
-        $shipping = $order->getShipping();
-        if ($shipping !== null) {
-            $draft->serviceId = $shipping->getShippingServiceId();
-            $draft->serviceName = $shipping->getShippingServiceName();
-            $draft->carrierName = $shipping->getCarrierName();
+        $methodId = $order->getShippingMethodId();
+        if ($methodId !== null) {
+            /** @var ShippingMethodService $shippingService */
+            $shippingService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
+            $shippingMethod = $shippingService->getShippingMethod($methodId);
+            if ($shippingMethod !== null) {
+                $service = $shippingMethod->getCheapestShippingService($order->getShippingAddress()->getCountry());
+                $draft->serviceId = $service->serviceId;
+                $draft->serviceName = $shippingMethod->getTitle();
+                $draft->carrierName = $shippingMethod->getCarrierName();
+            }
         }
 
         $draft->dropOffPointId = $order->getShippingDropOffId();
@@ -168,10 +175,6 @@ class OrderService extends BaseService
     {
         $additional = new Draft\AdditionalData();
         $additional->selectedWarehouseId = $this->configuration->getDefaultWarehouse()->id;
-        if ($order->getShipping() !== null) {
-            $additional->shippingServiceName = $order->getShipping()->getShippingServiceName();
-        }
-
         $additional->items = array();
         foreach ($order->getItems() as $item) {
             $draftItem = new Draft\DraftItem();

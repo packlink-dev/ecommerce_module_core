@@ -31,6 +31,7 @@ class MemoryStorage
      */
     public static function reset()
     {
+        static::$incrementId = 1;
         static::$storage = array();
     }
 }
