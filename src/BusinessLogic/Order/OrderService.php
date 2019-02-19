@@ -195,11 +195,11 @@ class OrderService extends BaseService
      */
     private function addPackages(Order $order, Draft $draft)
     {
-        $content = array();
+        $draft->content = array();
         $draft->packages = array();
         foreach ($order->getItems() as $item) {
             $quantity = $item->getQuantity() ?: 1;
-            $content[] = $quantity . ' ' . $item->getTitle();
+            $draft->content[] = $quantity . ' ' . $item->getTitle();
             for ($i = 0; $i < $quantity; $i++) {
                 $package = new \Packlink\BusinessLogic\Http\DTO\Package();
                 $package->height = $item->getHeight();
@@ -209,40 +209,6 @@ class OrderService extends BaseService
 
                 $draft->packages[] = $package;
             }
-        }
-
-        if (!empty($content)) {
-            $forbiddenCharacters = array(
-                ';',
-                ':',
-                '%',
-                '&',
-                '/',
-                'º',
-                'ª',
-                '€',
-                '$',
-                '@',
-                '#',
-                '(',
-                ')',
-                '=',
-                '?',
-                '¿',
-                '¡',
-                '!',
-                '\\',
-                '\'',
-                '`',
-                '´',
-                '^',
-                '*',
-                'Ê',
-                'è',
-            );
-            $contentString = implode('; ', $content);
-
-            $draft->content = str_replace($forbiddenCharacters, '', $contentString);
         }
     }
 }

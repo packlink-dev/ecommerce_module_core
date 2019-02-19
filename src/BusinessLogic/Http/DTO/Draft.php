@@ -104,9 +104,9 @@ class Draft extends BaseDto
      */
     public $dropOffPointId;
     /**
-     * Description of shipment's content. Max 255 chars.
+     * Description of shipment's content.
      *
-     * @var string
+     * @var array
      */
     public $content;
     /**
@@ -166,7 +166,7 @@ class Draft extends BaseDto
             'collection_date' => $this->collectionDate,
             'collection_time' => $this->collectionTime,
             'dropoff_point_id' => $this->dropOffPointId,
-            'content' => substr($this->content, 0, 60),
+            'content' => $this->getContent(),
             'contentvalue' => round($this->contentValue, 2),
             'content_second_hand' => $this->contentSecondHand,
             'shipment_custom_reference' => $this->shipmentCustomReference,
@@ -194,5 +194,46 @@ class Draft extends BaseDto
         }
 
         return $result;
+    }
+
+    /**
+     * Gets valid content string.
+     *
+     * @return string Content of the packages as string description.
+     */
+    private function getContent()
+    {
+        $forbiddenCharacters = array(
+            ';',
+            ':',
+            '%',
+            '&',
+            '/',
+            'º',
+            'ª',
+            '€',
+            '$',
+            '@',
+            '#',
+            '(',
+            ')',
+            '=',
+            '?',
+            '¿',
+            '¡',
+            '!',
+            '\\',
+            '\'',
+            '`',
+            '´',
+            '^',
+            '*',
+            'Ê',
+            'è',
+        );
+
+        $content = implode(', ', $this->content);
+
+        return substr(str_replace($forbiddenCharacters, '', $content), 0, 60);
     }
 }
