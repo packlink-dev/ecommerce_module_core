@@ -45,9 +45,12 @@ class MemoryRepository implements RepositoryInterface
         $fieldIndexMap = IndexHelper::mapFieldsToIndexes($entity);
         $groups = $filter ? $this->buildConditionGroups($filter, $fieldIndexMap) : array();
 
-        $all = array_filter(MemoryStorage::$storage, function ($a) use($type) {
-            return $a['type'] === $type;
-        });
+        $all = array_filter(
+            MemoryStorage::$storage,
+            function ($a) use ($type) {
+                return $a['type'] === $type;
+            }
+        );
 
         $result = empty($groups) ? $all : array();
         foreach ($groups as $group) {
