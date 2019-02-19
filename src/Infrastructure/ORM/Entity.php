@@ -79,7 +79,7 @@ abstract class Entity
      */
     public function toArray()
     {
-        $data = array();
+        $data = array('class_name' => static::getClassName());
         foreach ($this->fields as $fieldName) {
             $data[$fieldName] = $this->$fieldName;
         }

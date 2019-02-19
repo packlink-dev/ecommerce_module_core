@@ -86,9 +86,15 @@ class QueueItemEntityTest extends TestCase
         self::assertEquals($data['startTime'], $this->timeProvider->getDateTime($startTime)->format(DATE_ATOM));
         self::assertEquals($data['finishTime'], $this->timeProvider->getDateTime($finishTime)->format(DATE_ATOM));
         self::assertEquals($data['failTime'], $this->timeProvider->getDateTime($failTime)->format(DATE_ATOM));
-        self::assertEquals($data['earliestStartTime'], $this->timeProvider->getDateTime($earliestTime)->format(DATE_ATOM));
+        self::assertEquals(
+            $data['earliestStartTime'],
+            $this->timeProvider->getDateTime($earliestTime)->format(DATE_ATOM)
+        );
         self::assertEquals($data['queueTime'], $this->timeProvider->getDateTime($queueTime)->format(DATE_ATOM));
-        self::assertEquals($data['lastUpdateTime'], $this->timeProvider->getDateTime($lastUpdateTime)->format(DATE_ATOM));
+        self::assertEquals(
+            $data['lastUpdateTime'],
+            $this->timeProvider->getDateTime($lastUpdateTime)->format(DATE_ATOM)
+        );
 
         $task = $entity->getTask();
         self::assertNotNull($task);
@@ -112,6 +118,7 @@ class QueueItemEntityTest extends TestCase
         $lastUpdateTime = $this->timeProvider->getDateTime(time() + 6);
 
         $data = array(
+            'class_name' => QueueItem::CLASS_NAME,
             'id' => 123,
             'status' => QueueItem::COMPLETED,
             'context' => 'context',

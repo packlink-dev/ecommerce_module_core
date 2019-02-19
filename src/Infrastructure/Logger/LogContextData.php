@@ -9,14 +9,12 @@ namespace Logeecom\Infrastructure\Logger;
  */
 class LogContextData
 {
-
     /**
      * Name of data.
      *
      * @var string
      */
     private $name;
-
     /**
      * Value of data.
      *

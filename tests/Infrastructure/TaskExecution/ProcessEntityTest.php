@@ -32,6 +32,7 @@ class ProcessEntityTest extends TestCase
     {
         $runner = new QueueItemStarter(1234);
         $data = array(
+            'class_name' => Process::CLASS_NAME,
             'id' => 123,
             'guid' => 'guid',
             'runner' => serialize($runner),
