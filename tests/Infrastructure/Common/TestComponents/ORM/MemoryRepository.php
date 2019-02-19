@@ -284,8 +284,12 @@ class MemoryRepository implements RepositoryInterface
         $i = ($direction === 'ASC' ? 1 : -1);
         usort(
             $result,
-            function ($a, $b) use ($i, $indexKey) {
-                return strcmp($a[$indexKey], $b[$indexKey]) * $i;
+            function ($first, $second) use ($i, $indexKey) {
+                if ($first[$indexKey] === $second[$indexKey]) {
+                    return 0;
+                }
+
+                return $first[$indexKey] < $second[$indexKey] ? -1 * $i : $i;
             }
         );
     }
