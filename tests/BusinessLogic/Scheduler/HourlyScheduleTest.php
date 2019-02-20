@@ -105,4 +105,22 @@ class HourlyScheduleTest extends TestCase
         $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
+
+    /**
+     * @throws \Exception Throws this exception when unable to create DateTime object
+     */
+    public function testEveryHourAtSpecificMinute()
+    {
+        $this->hourlySchedule->setStartMinute(0);
+        $this->hourlySchedule->setMinute(27);
+
+        $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
+        $expected->setDate(2018, 3, 21);
+        $expected->setTime(14, 27);
+
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
+        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+    }
 }

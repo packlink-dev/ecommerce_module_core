@@ -216,7 +216,7 @@ class HourlySchedule extends Schedule
     {
         $startTime = $this->now();
         $startTime->setTimestamp($nowTs);
-        $startTime->setTime($this->getStartHour(), $this->getStartMinute());
+        $startTime->setTime($this->getStartHour(), $this->getStartMinute() ?: $this->getMinute());
 
         return $startTime;
     }
