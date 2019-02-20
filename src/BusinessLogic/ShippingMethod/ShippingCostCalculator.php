@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\ShippingMethod;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
-use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -37,24 +37,10 @@ class ShippingCostCalculator
         $toZip,
         array $packages
     ) {
-        $defaultCost = 0;
-        $serviceId = $shippingMethod->getServiceId();
-        $params = new ShippingServiceSearch($serviceId, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
+        $data = self::getShippingCosts(array($shippingMethod), $fromCountry, $fromZip, $toCountry, $toZip, $packages);
+        $data = !empty($data) ? current($data) : 0;
 
-        try {
-            $response = self::getProxy()->getShippingServicesDeliveryDetails($params);
-            // if we don't get a response, it means this shipping method does not do delivery for specified params
-            if (count($response)) {
-                $defaultCost = $response[0]->basePrice;
-            }
-        } catch (HttpBaseException $e) {
-            // If API is not available, get stored default shipping cost on method without calculation.
-            if ($e->getCode() !== 400) {
-                $defaultCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
-            }
-        }
-
-        return $defaultCost ? self::getCostForShippingMethod($shippingMethod, $defaultCost, $packages) : 0;
+        return $data;
     }
 
     /**
@@ -98,34 +84,70 @@ class ShippingCostCalculator
     }
 
     /**
+     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $shippingMethod
+     * @param array $packages
+     * @param string $fromCountry
+     * @param string $toCountry
+     * @param int $serviceId
+     * @param float $basePrice
+     *
+     * @return float Calculated cost.
+     */
+    protected static function calculateShippingMethodCost(
+        ShippingMethod $shippingMethod,
+        array $packages,
+        $serviceId = 0,
+        $basePrice = 0.0,
+        $fromCountry = '',
+        $toCountry = ''
+    ) {
+        $cost = PHP_INT_MAX;
+        foreach ($shippingMethod->getShippingServices() as $methodService) {
+            if (($serviceId !== 0 && $methodService->serviceId === $serviceId)
+                || ($methodService->departureCountry === $fromCountry
+                    && $methodService->destinationCountry === $toCountry)
+            ) {
+                $baseCost = self::calculateCostForShippingMethod(
+                    $shippingMethod,
+                    $basePrice ?: $methodService->basePrice,
+                    $packages
+                );
+
+                $cost = min($cost, $baseCost);
+            }
+        }
+
+        return $cost !== PHP_INT_MAX ? $cost : 0.0;
+    }
+
+    /**
      * Prepares raw response data for shipping costs calculation.
      *
      * @param ShippingMethod[] $shippingMethods Array of active shipping methods in the system.
-     * @param ShippingServiceDeliveryDetails[] $shippingServiceDeliveries Array of shipping service delivery details.
+     * @param ShippingServiceDetails[] $shippingServices Array of shipping services delivery details.
      * @param Package[] $packages Array of packages.
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
     private static function calculateShippingCostsPerShippingMethod(
         array $shippingMethods,
-        array $shippingServiceDeliveries,
+        array $shippingServices,
         array $packages
     ) {
         $shippingCosts = array();
 
-        /** @var ShippingMethod $shippingMethod */
-        foreach ($shippingMethods as $shippingMethod) {
-            foreach ($shippingServiceDeliveries as $id => $shippingServiceDeliveryDetails) {
-                if ($shippingMethod->getServiceId() === $shippingServiceDeliveryDetails->id) {
-                    $shippingCosts[$shippingMethod->getServiceId()] = self::getCostForShippingMethod(
-                        $shippingMethod,
-                        $shippingServiceDeliveryDetails->basePrice,
-                        $packages
-                    );
-
-                    unset($shippingServiceDeliveries[$id]);
-                    break;
+        /** @var ShippingMethod $method */
+        foreach ($shippingMethods as $method) {
+            $cost = PHP_INT_MAX;
+            foreach ($shippingServices as $service) {
+                $baseCost = self::calculateShippingMethodCost($method, $packages, $service->id, $service->basePrice);
+                if ($baseCost > 0) {
+                    $cost = min($cost, $baseCost);
                 }
+            }
+
+            if ($cost !== PHP_INT_MAX) {
+                $shippingCosts[$method->getId()] = $cost;
             }
         }
 
@@ -141,7 +163,7 @@ class ShippingCostCalculator
      *
      * @return float Calculated shipping cost.
      */
-    protected static function getCostForShippingMethod(
+    protected static function calculateCostForShippingMethod(
         ShippingMethod $shippingMethod,
         $baseCost,
         array $packages = array()
@@ -219,16 +241,11 @@ class ShippingCostCalculator
 
         /** @var ShippingMethod $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
-            $baseCost = self::getDefaultPacklinkShippingCost($shippingMethod, $fromCountry, $toCountry);
-            if ($baseCost === 0) {
-                continue;
-            }
+            $cost = self::calculateShippingMethodCost($shippingMethod, $packages, 0, 0.0, $fromCountry, $toCountry);
 
-            $shippingCosts[$shippingMethod->getServiceId()] = self::getCostForShippingMethod(
-                $shippingMethod,
-                $baseCost,
-                $packages
-            );
+            if ($cost > 0) {
+                $shippingCosts[$shippingMethod->getId()] = $cost;
+            }
         }
 
         return $shippingCosts;
@@ -245,7 +262,7 @@ class ShippingCostCalculator
      */
     protected static function getDefaultPacklinkShippingCost(ShippingMethod $shippingMethod, $fromCountry, $toCountry)
     {
-        foreach ($shippingMethod->getShippingCosts() as $shippingCost) {
+        foreach ($shippingMethod->getShippingServices() as $shippingCost) {
             if ($shippingCost->departureCountry === $fromCountry
                 && $shippingCost->destinationCountry === $toCountry
             ) {

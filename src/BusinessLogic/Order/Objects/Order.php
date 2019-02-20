@@ -75,11 +75,11 @@ class Order
      */
     private $customerId;
     /**
-     * Shipping method information.
+     * Shipping method entity identifier.
      *
-     * @var Shipping
+     * @var int
      */
-    private $shipping;
+    private $shippingMethodId;
     /**
      * Order shipments.
      *
@@ -344,23 +344,23 @@ class Order
     }
 
     /**
-     * Returns shipping information.
+     * Returns shipping method entity identifier.
      *
-     * @return Shipping Shipping information object.
+     * @return int Shipping method entity identifier.
      */
-    public function getShipping()
+    public function getShippingMethodId()
     {
-        return $this->shipping;
+        return $this->shippingMethodId;
     }
 
     /**
-     * Sets shipping information.
+     * Sets shipping method entity identifier.
      *
-     * @param Shipping $shipping Shipping information object.
+     * @param int $shippingMethodId Shipping method entity identifier.
      */
-    public function setShipping($shipping)
+    public function setShippingMethodId($shippingMethodId)
     {
-        $this->shipping = $shipping;
+        $this->shippingMethodId = $shippingMethodId;
     }
 
     /**

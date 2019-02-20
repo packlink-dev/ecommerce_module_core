@@ -132,14 +132,7 @@ class ShippingMethodController
      */
     public function activate($id)
     {
-        $model = $this->shippingMethodService->getShippingMethod($id);
-        if (!$model) {
-            Logger::logError("Shipping method with id {$id} not found!");
-
-            return false;
-        }
-
-        return $this->shippingMethodService->activate($model->getServiceId());
+        return $this->shippingMethodService->activate($id);
     }
 
     /**
@@ -151,14 +144,7 @@ class ShippingMethodController
      */
     public function deactivate($id)
     {
-        $model = $this->shippingMethodService->getShippingMethod($id);
-        if (!$model) {
-            Logger::logError("Shipping method with id {$id} not found!");
-
-            return false;
-        }
-
-        return $this->shippingMethodService->deactivate($model->getServiceId());
+        return $this->shippingMethodService->deactivate($id);
     }
 
     /**

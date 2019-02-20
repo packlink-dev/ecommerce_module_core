@@ -5,7 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
-use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethodCost;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,14 +18,8 @@ class ShippingMethodEntityTest extends TestCase
     public function testProperties()
     {
         $method = new ShippingMethod();
-        $method->setServiceId(1234);
-        self::assertEquals(1234, $method->getServiceId());
-        $method->setServiceName('service name');
-        self::assertEquals('service name', $method->getServiceName());
-        $method->setCarrierName('carrier name');
-        self::assertEquals('carrier name', $method->getCarrierName());
-        $method->setTitle('title');
-        self::assertEquals('title', $method->getTitle());
+        $method->setCarrierName('DPD');
+        self::assertEquals('DPD', $method->getCarrierName());
         $method->setEnabled(false);
         self::assertFalse($method->isEnabled());
         $method->setActivated(true);
@@ -44,6 +38,11 @@ class ShippingMethodEntityTest extends TestCase
         self::assertEquals('2 DAYS', $method->getDeliveryTime());
         $method->setNational(true);
         self::assertTrue($method->isNational());
+
+        // default title
+        self::assertEquals('DPD - 2 DAYS delivery', $method->getTitle());
+        $method->setTitle('title');
+        self::assertEquals('title', $method->getTitle());
     }
 
     public function testDefaultPricingPolicy()
@@ -388,6 +387,8 @@ class ShippingMethodEntityTest extends TestCase
     public function testFromArrayShippingCosts()
     {
         $data = array(
+            'serviceId' => '20339',
+            'serviceName' => 'test',
             'departure' => 'IT',
             'destination' => 'DE',
             'totalPrice' => 3,
@@ -395,7 +396,9 @@ class ShippingMethodEntityTest extends TestCase
             'taxPrice' => 1,
         );
 
-        $method = ShippingMethodCost::fromArray($data);
+        $method = ShippingService::fromArray($data);
+        self::assertEquals('20339', $method->serviceId);
+        self::assertEquals('test', $method->serviceName);
         self::assertEquals(3, $method->totalPrice);
         self::assertEquals(2, $method->basePrice);
         self::assertEquals(1, $method->taxPrice);
@@ -408,7 +411,7 @@ class ShippingMethodEntityTest extends TestCase
         $data = $this->getShippingMethodData();
 
         $method = ShippingMethod::fromArray($data);
-        $costs = $method->getShippingCosts();
+        $costs = $method->getShippingServices();
         self::assertCount(1, $costs);
         self::assertEquals(3, $costs[0]->totalPrice);
         self::assertEquals(2, $costs[0]->basePrice);
@@ -420,8 +423,6 @@ class ShippingMethodEntityTest extends TestCase
         $data = $this->getShippingMethodData();
 
         $method = ShippingMethod::fromArray($data);
-        self::assertEquals($data['serviceId'], $method->getServiceId());
-        self::assertEquals($data['serviceName'], $method->getServiceName());
         self::assertEquals($data['carrierName'], $method->getCarrierName());
         self::assertEquals($data['title'], $method->getTitle());
         self::assertEquals($data['enabled'], $method->isEnabled());
@@ -508,8 +509,6 @@ class ShippingMethodEntityTest extends TestCase
         $data = $this->getShippingMethodData();
 
         $method = new ShippingMethod();
-        $method->setServiceId($data['serviceId']);
-        $method->setServiceName($data['serviceName']);
         $method->setCarrierName($data['carrierName']);
         $method->setTitle($data['title']);
         $method->setEnabled($data['enabled']);
@@ -521,11 +520,9 @@ class ShippingMethodEntityTest extends TestCase
         $method->setExpressDelivery($data['expressDelivery']);
         $method->setDeliveryTime($data['deliveryTime']);
         $method->setNational($data['national']);
-        $method->setShippingCosts(array(new ShippingMethodCost('IT', 'IT', 3, 2, 1)));
+        $method->addShippingService(ShippingService::fromArray($data['shippingServices'][0]));
 
         $result = $method->toArray();
-        self::assertEquals($data['serviceId'], $result['serviceId']);
-        self::assertEquals($data['serviceName'], $result['serviceName']);
         self::assertEquals($data['carrierName'], $result['carrierName']);
         self::assertEquals($data['title'], $result['title']);
         self::assertEquals($data['enabled'], $result['enabled']);
@@ -538,7 +535,7 @@ class ShippingMethodEntityTest extends TestCase
         self::assertEquals($data['deliveryTime'], $result['deliveryTime']);
         self::assertEquals($data['national'], $result['national']);
         self::assertEquals(ShippingMethod::PRICING_POLICY_PACKLINK, $result['pricingPolicy']);
-        self::assertEquals($data['shippingCosts'], $result['shippingCosts']);
+        self::assertEquals($data['shippingServices'], $result['shippingServices']);
 
         return $method;
     }
@@ -549,8 +546,6 @@ class ShippingMethodEntityTest extends TestCase
     private function getShippingMethodData()
     {
         return array(
-            'serviceId' => 1234,
-            'serviceName' => 'service name',
             'carrierName' => 'carrier name',
             'title' => 'title',
             'enabled' => false,
@@ -562,8 +557,10 @@ class ShippingMethodEntityTest extends TestCase
             'expressDelivery' => true,
             'deliveryTime' => '2 DAYS',
             'national' => true,
-            'shippingCosts' => array(
+            'shippingServices' => array(
                 array(
+                    'serviceId' => 1234,
+                    'serviceName' => 'service name',
                     'departure' => 'IT',
                     'destination' => 'IT',
                     'totalPrice' => 3,

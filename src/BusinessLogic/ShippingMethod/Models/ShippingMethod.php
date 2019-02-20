@@ -37,8 +37,6 @@ class ShippingMethod extends Entity
      */
     protected $fields = array(
         'id',
-        'serviceId',
-        'serviceName',
         'carrierName',
         'title',
         'enabled',
@@ -52,18 +50,6 @@ class ShippingMethod extends Entity
         'national',
         'pricingPolicy',
     );
-    /**
-     * Packlink service id.
-     *
-     * @var int
-     */
-    protected $serviceId;
-    /**
-     * Packlink service name.
-     *
-     * @var string
-     */
-    protected $serviceName;
     /**
      * Carrier name.
      *
@@ -149,11 +135,11 @@ class ShippingMethod extends Entity
      */
     protected $percentPricePolicy;
     /**
-     * All costs for this shipping method.
+     * All services for this shipping method.
      *
-     * @var ShippingMethodCost[]
+     * @var ShippingService[]
      */
-    protected $shippingCosts = array();
+    protected $shippingServices = array();
 
     /**
      * Transforms raw array data to this entity instance.
@@ -181,9 +167,9 @@ class ShippingMethod extends Entity
             $this->setPercentPricePolicy(PercentPricePolicy::fromArray($data['percentPricePolicy']));
         }
 
-        if (!empty($data['shippingCosts'])) {
-            foreach ($data['shippingCosts'] as $shippingCost) {
-                $this->shippingCosts[] = ShippingMethodCost::fromArray($shippingCost);
+        if (!empty($data['shippingServices'])) {
+            foreach ($data['shippingServices'] as $service) {
+                $this->shippingServices[] = ShippingService::fromArray($service);
             }
         }
     }
@@ -208,9 +194,9 @@ class ShippingMethod extends Entity
             $data['percentPricePolicy'] = $this->percentPricePolicy->toArray();
         }
 
-        if ($this->shippingCosts) {
-            foreach ($this->shippingCosts as $shippingCost) {
-                $data['shippingCosts'][] = $shippingCost->toArray();
+        if ($this->shippingServices) {
+            foreach ($this->shippingServices as $service) {
+                $data['shippingServices'][] = $service->toArray();
             }
         }
 
@@ -226,55 +212,15 @@ class ShippingMethod extends Entity
     {
         $indexMap = new IndexMap();
 
-        $indexMap->addIntegerIndex('serviceId')
-            ->addBooleanIndex('activated')
+        $indexMap->addBooleanIndex('activated')
             ->addBooleanIndex('enabled')
             ->addBooleanIndex('departureDropOff')
             ->addBooleanIndex('destinationDropOff')
             ->addBooleanIndex('national')
-            ->addBooleanIndex('expressDelivery');
+            ->addBooleanIndex('expressDelivery')
+            ->addStringIndex('carrierName');
 
         return new EntityConfiguration($indexMap, 'ShippingService');
-    }
-
-    /**
-     * Gets Service Id.
-     *
-     * @return int Service Id.
-     */
-    public function getServiceId()
-    {
-        return $this->serviceId;
-    }
-
-    /**
-     * Sets service id.
-     *
-     * @param int $serviceId Service id.
-     */
-    public function setServiceId($serviceId)
-    {
-        $this->serviceId = $serviceId;
-    }
-
-    /**
-     * Gets Service name.
-     *
-     * @return string Service name.
-     */
-    public function getServiceName()
-    {
-        return $this->serviceName;
-    }
-
-    /**
-     * Sets service name.
-     *
-     * @param string $serviceName Service name.
-     */
-    public function setServiceName($serviceName)
-    {
-        $this->serviceName = $serviceName;
     }
 
     /**
@@ -305,8 +251,7 @@ class ShippingMethod extends Entity
     public function getTitle()
     {
         if (!$this->title) {
-            return $this->getCarrierName() . ' - ' . $this->getServiceName() . ' ' . $this->getDeliveryTime() . ' '
-                . ($this->isDestinationDropOff() ? 'drop-off' : 'home') . ' delivery';
+            return $this->getCarrierName() . ' - ' . $this->getDeliveryTime() . ' delivery';
         }
 
         return $this->title;
@@ -503,23 +448,63 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Gets shipping method costs.
+     * Gets shipping method services.
      *
-     * @return ShippingMethodCost[] Shipping method costs.
+     * @return ShippingService[] Shipping method services.
      */
-    public function getShippingCosts()
+    public function getShippingServices()
     {
-        return $this->shippingCosts ?: array();
+        return $this->shippingServices ?: array();
     }
 
     /**
-     * Sets shipping method costs.
+     * Sets shipping method services.
      *
-     * @param ShippingMethodCost[] $shippingCosts Shipping method costs.
+     * @param ShippingService[] $shippingServices Shipping method services.
      */
-    public function setShippingCosts($shippingCosts)
+    public function setShippingServices($shippingServices)
     {
-        $this->shippingCosts = $shippingCosts;
+        $this->shippingServices = $shippingServices;
+    }
+
+    /**
+     * Adds shipping method service to the list of services.
+     *
+     * @param ShippingService $shippingService Shipping method service.
+     */
+    public function addShippingService($shippingService)
+    {
+        $this->shippingServices[] = $shippingService;
+    }
+
+    /**
+     * Gets the cheapest service for given destination country.
+     *
+     * @param string $destinationCountry Destination country code.
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService
+     *
+     * @throws \InvalidArgumentException When no service is available for given destination country.
+     */
+    public function getCheapestShippingService($destinationCountry)
+    {
+        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $result */
+        $result = null;
+        foreach ($this->getShippingServices() as $service) {
+            if ($service->destinationCountry === $destinationCountry) {
+                if ($result === null || $result->basePrice > $service->basePrice) {
+                    $result = $service;
+                }
+            }
+        }
+
+        if ($result !== null) {
+            return $result;
+        }
+
+        throw new \InvalidArgumentException(
+            'No service is available for given destination country ' . $destinationCountry
+        );
     }
 
     /**

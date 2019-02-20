@@ -13,7 +13,7 @@ use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
-use Packlink\BusinessLogic\Http\DTO\ShippingServiceDeliveryDetails;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
@@ -190,7 +190,7 @@ class Proxy
      *
      * @param ShippingServiceSearch $params Search parameters.
      *
-     * @return ShippingServiceDeliveryDetails[] Found services with details.
+     * @return ShippingServiceDetails[] Found services with details.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
@@ -205,11 +205,12 @@ class Proxy
             return array();
         }
 
-        $shippingDetails = ShippingServiceDeliveryDetails::fromArrayBatch($body);
+        $shippingDetails = ShippingServiceDetails::fromArrayBatch($body);
 
         foreach ($shippingDetails as $shippingDetail) {
             $shippingDetail->departureCountry = $params->fromCountry;
             $shippingDetail->destinationCountry = $params->toCountry;
+            $shippingDetail->national = $params->toCountry === $params->fromCountry;
         }
 
         return $shippingDetails;

@@ -45,9 +45,12 @@ class MemoryRepository implements RepositoryInterface
         $fieldIndexMap = IndexHelper::mapFieldsToIndexes($entity);
         $groups = $filter ? $this->buildConditionGroups($filter, $fieldIndexMap) : array();
 
-        $all = array_filter(MemoryStorage::$storage, function ($a) use($type) {
-            return $a['type'] === $type;
-        });
+        $all = array_filter(
+            MemoryStorage::$storage,
+            function ($a) use ($type) {
+                return $a['type'] === $type;
+            }
+        );
 
         $result = empty($groups) ? $all : array();
         foreach ($groups as $group) {
@@ -62,8 +65,8 @@ class MemoryRepository implements RepositoryInterface
         }
 
         if ($filter) {
-            $result = $this->sliceResults($filter, $result);
             $this->sortResults($result, $filter, $fieldIndexMap);
+            $result = $this->sliceResults($filter, $result);
         }
 
         return $this->translateToEntities($result);
@@ -80,6 +83,7 @@ class MemoryRepository implements RepositoryInterface
      */
     public function selectOne(QueryFilter $filter = null)
     {
+        $filter->setLimit(1);
         $results = $this->select($filter);
 
         return empty($results) ? null : $results[0];
@@ -190,68 +194,71 @@ class MemoryRepository implements RepositoryInterface
      */
     private function filterByCondition(QueryCondition $condition, array $groupResult, array $indexMap)
     {
-        return array_filter($groupResult, function ($item) use ($condition, $indexMap) {
-            $column = $condition->getColumn();
-            $indexKey = $column === 'id' ? 'id' :'index_' . $indexMap[$column];
-            $a = $item[$indexKey];
-            if ($column === 'id') {
-                $b = $condition->getValue();
-            } else {
-                $b = IndexHelper::castFieldValue($condition->getValue(), $condition->getValueType());
-            }
+        return array_filter(
+            $groupResult,
+            function ($item) use ($condition, $indexMap) {
+                $column = $condition->getColumn();
+                $indexKey = $column === 'id' ? 'id' : 'index_' . $indexMap[$column];
+                $a = $item[$indexKey];
+                if ($column === 'id') {
+                    $b = $condition->getValue();
+                } else {
+                    $b = IndexHelper::castFieldValue($condition->getValue(), $condition->getValueType());
+                }
 
-            switch ($condition->getOperator()) {
-                case '=':
-                    return $a === $b;
-                case '!=':
-                    return $a !== $b;
-                case '>':
-                    return $a > $b;
-                case '>=':
-                    return $a >= $b;
-                case '<':
-                    return $a < $b;
-                case '<=':
-                    return $a <= $b;
-                case 'IN':
-                    return in_array($a, $b, false);
-                case 'NOT IN':
-                    return !in_array($a, $b, false);
-                case 'IS NULL':
-                    return $a === null;
-                case 'IS NOT NULL':
-                    return $a !== null;
-                case 'LIKE':
-                    $firstP = strpos($b, '%');
-                    $lastP = strrpos($b, '%');
-                    $b = str_replace('%', '', $b);
-
-                    // SEARCH - no %
-                    if ($firstP === false) {
+                switch ($condition->getOperator()) {
+                    case '=':
                         return $a === $b;
-                    }
+                    case '!=':
+                        return $a !== $b;
+                    case '>':
+                        return $a > $b;
+                    case '>=':
+                        return $a >= $b;
+                    case '<':
+                        return $a < $b;
+                    case '<=':
+                        return $a <= $b;
+                    case 'IN':
+                        return in_array($a, $b, false);
+                    case 'NOT IN':
+                        return !in_array($a, $b, false);
+                    case 'IS NULL':
+                        return $a === null;
+                    case 'IS NOT NULL':
+                        return $a !== null;
+                    case 'LIKE':
+                        $firstP = strpos($b, '%');
+                        $lastP = strrpos($b, '%');
+                        $b = str_replace('%', '', $b);
 
-                    // SEARCH%
-                    $position = strpos($a, $b);
-                    if ($firstP > 0 && $firstP === $lastP) {
-                        return $position === 0;
-                    }
+                        // SEARCH - no %
+                        if ($firstP === false) {
+                            return $a === $b;
+                        }
 
-                    // %SEARCH%
-                    if ($firstP === 0 && $lastP && $lastP > 0) {
-                        return $position !== false;
-                    }
+                        // SEARCH%
+                        $position = strpos($a, $b);
+                        if ($firstP > 0 && $firstP === $lastP) {
+                            return $position === 0;
+                        }
 
-                    // %SEARCH
-                    if ($firstP === 0 && $firstP === $lastP) {
-                        return $position !== false && $position + strlen($b) === strlen($a);
-                    }
+                        // %SEARCH%
+                        if ($firstP === 0 && $lastP && $lastP > 0) {
+                            return $position !== false;
+                        }
 
-                    return false;
-                default:
-                    return false;
+                        // %SEARCH
+                        if ($firstP === 0 && $firstP === $lastP) {
+                            return $position !== false && $position + strlen($b) === strlen($a);
+                        }
+
+                        return false;
+                    default:
+                        return false;
+                }
             }
-        });
+        );
     }
 
     /**
@@ -268,19 +275,24 @@ class MemoryRepository implements RepositoryInterface
             return;
         }
 
-        if (!array_key_exists($column, $fieldIndexMap)) {
+        if ($column !== 'id' && !array_key_exists($column, $fieldIndexMap)) {
             throw new QueryFilterInvalidParamException(
                 'Unknown or not indexed OrderBy column ' . $filter->getOrderByColumn()
             );
         }
 
         $direction = $filter->getOrderDirection();
-        $indexKey = 'index_' . $fieldIndexMap[$column];
+        $indexKey = $column === 'id' ? 'id' : 'index_' . $fieldIndexMap[$column];
+
         $i = ($direction === 'ASC' ? 1 : -1);
         usort(
             $result,
-            function ($a, $b) use ($i, $indexKey) {
-                return strcmp($a[$indexKey], $b[$indexKey]) * $i;
+            function ($first, $second) use ($i, $indexKey) {
+                if ($first[$indexKey] === $second[$indexKey]) {
+                    return 0;
+                }
+
+                return $first[$indexKey] < $second[$indexKey] ? -1 * $i : $i;
             }
         );
     }

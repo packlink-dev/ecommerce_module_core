@@ -10,7 +10,6 @@ use Packlink\BusinessLogic\Order\Objects\Address;
 use Packlink\BusinessLogic\Order\Objects\Item;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\Objects\Shipment;
-use Packlink\BusinessLogic\Order\Objects\Shipping;
 use Packlink\BusinessLogic\Order\Objects\TrackingHistory;
 
 /**
@@ -32,6 +31,10 @@ class TestOrderRepository implements OrderRepository
      * @var bool
      */
     private $throw = false;
+    /**
+     * @var int
+     */
+    private $shippingMethodId;
 
     /**
      * TestOrderRepository constructor.
@@ -49,6 +52,26 @@ class TestOrderRepository implements OrderRepository
     public function shouldThrowException($throw = false)
     {
         $this->throw = $throw;
+    }
+
+    /**
+     * Shipping method entity id.
+     *
+     * @param int $id Shipping method Id
+     */
+    public function setShippingMethodId($id)
+    {
+        $this->shippingMethodId = $id;
+    }
+
+    /**
+     * Sets test order.
+     *
+     * @param \Packlink\BusinessLogic\Order\Objects\Order $order
+     */
+    public function setOrder(Order $order)
+    {
+        static::$orders[$order->getId()] = $order;
     }
 
     /**
@@ -189,17 +212,20 @@ class TestOrderRepository implements OrderRepository
      *
      * @param $orderId
      *
+     * @param $shippingMethodId
+     * @param $destinationCountry
+     *
      * @return Order
      */
-    public function getOrder($orderId)
+    public function getOrder($orderId, $shippingMethodId = 0, $destinationCountry = '')
     {
         if (!isset(static::$orders[$orderId])) {
             $order = new Order();
             $order->setId($orderId);
             $order->setShipment(new Shipment());
-            $order->setShipping(new Shipping());
-            $order->getShipping()->setShippingServiceId(123);
+            $order->setShippingMethodId($shippingMethodId ?: $this->shippingMethodId);
             $order->setShippingAddress(new Address());
+            $order->getShippingAddress()->setCountry($destinationCountry);
             $order->setBillingAddress(new Address());
             $order->setItems(array(new Item()));
 
