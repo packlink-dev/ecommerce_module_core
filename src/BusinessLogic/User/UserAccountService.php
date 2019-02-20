@@ -4,12 +4,17 @@ namespace Packlink\BusinessLogic\User;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
+use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
@@ -66,7 +71,6 @@ class UserAccountService extends BaseService
             return false;
         }
 
-        $result = true;
         // set token before calling API
         $this->configuration->setAuthorizationToken($apiKey);
 
@@ -76,10 +80,11 @@ class UserAccountService extends BaseService
         } catch (HttpBaseException $e) {
             $this->configuration->resetAuthorizationCredentials();
             Logger::logError($e->getMessage());
-            $result = false;
+
+            return false;
         }
 
-        return $result;
+        return $this->createSchedules();
     }
 
     /**
@@ -159,6 +164,46 @@ class UserAccountService extends BaseService
         $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask());
 
         $this->getProxy()->registerWebHookHandler($this->configuration->getWebHookUrl());
+    }
+
+    /**
+     * Creates schedules.
+     *
+     * @return bool
+     */
+    protected function createSchedules()
+    {
+        /** @var Configuration $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $shippingServicesSchedule = new WeeklySchedule(new UpdateShippingServicesTask());
+        $shipmentDataFullHourSchedule = new HourlySchedule(new UpdateShipmentDataTask());
+        $shipmentDataHalfHourSchedule = new HourlySchedule(new UpdateShipmentDataTask());
+
+        $shippingServicesSchedule->setQueueName($configService->getDefaultQueueName());
+        $shippingServicesSchedule->setDay(1);
+        $shippingServicesSchedule->setHour(2);
+        $shippingServicesSchedule->setNextSchedule();
+
+        $shipmentDataFullHourSchedule->setQueueName($configService->getDefaultQueueName());
+        $shipmentDataHalfHourSchedule->setQueueName($configService->getDefaultQueueName());
+        $shipmentDataFullHourSchedule->setMinute(0);
+        $shipmentDataHalfHourSchedule->setMinute(30);
+        $shipmentDataFullHourSchedule->setNextSchedule();
+        $shipmentDataHalfHourSchedule->setNextSchedule();
+
+        try {
+            $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException $e) {
+            Logger::logError('Schedule repository not registered.', 'Core');
+
+            return false;
+        }
+
+        $repository->save($shippingServicesSchedule);
+        $repository->save($shipmentDataFullHourSchedule);
+        $repository->save($shipmentDataHalfHourSchedule);
+
+        return true;
     }
 
     /**

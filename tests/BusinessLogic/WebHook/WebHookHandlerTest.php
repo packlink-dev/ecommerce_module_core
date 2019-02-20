@@ -16,6 +16,7 @@ use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
 use Packlink\BusinessLogic\WebHook\Events\ShipmentStatusChangedEvent;
 use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
 use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class WebHookHandlerTest
@@ -127,14 +128,14 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatusChangedEvent::STATUS_DELIVERED));
+        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatus::STATUS_DELIVERED));
 
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         $order = $orderRepository->getOrder('test');
 
         $this->assertNotNull($order);
-        $this->assertEquals(ShipmentStatusChangedEvent::STATUS_DELIVERED, $order->getShipment()->getStatus());
+        $this->assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getShipment()->getStatus());
     }
 
     /**
@@ -145,7 +146,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses($this->getErrorMockResponse());
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatusChangedEvent::STATUS_DELIVERED));
+        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatus::STATUS_DELIVERED));
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         /** @var \Logeecom\Infrastructure\Logger\LogData $logData */
@@ -169,7 +170,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
         /** @var EventBus $bus */
         $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatusChangedEvent::STATUS_ACCEPTED));
+        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatus::STATUS_ACCEPTED));
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[0]->getMessage());

@@ -18,6 +18,13 @@ interface OrderRepository
     const CLASS_NAME = __CLASS__;
 
     /**
+     * Returns shipment references of the orders that have not yet been completed.
+     *
+     * @return array Array of shipment references.
+     */
+    public function getIncompleteOrderReferences();
+
+    /**
      * Fetches and returns system order by its unique identifier.
      *
      * @param string $orderId $orderId Unique order id.
@@ -67,4 +74,14 @@ interface OrderRepository
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function setShippingStatusByReference($shipmentReference, $shippingStatus);
+
+    /**
+     * Sets shipping price to an order by shipment reference.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     * @param float $price Shipment price.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
+     */
+    public function setShippingPriceByReference($shipmentReference, $price);
 }

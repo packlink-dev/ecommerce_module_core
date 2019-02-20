@@ -52,6 +52,16 @@ class TestOrderRepository implements OrderRepository
     }
 
     /**
+     * Returns shipment references of the orders that have not yet been completed.
+     *
+     * @return array Array of shipment references.
+     */
+    public function getIncompleteOrderReferences()
+    {
+        return array('test');
+    }
+
+    /**
      * Fetches and returns system order by its unique identifier.
      *
      * @param string $orderId $orderId Unique order id.
@@ -154,6 +164,24 @@ class TestOrderRepository implements OrderRepository
         $shipment->setStatus($shippingStatus);
 
         $order->setShipment($shipment);
+    }
+
+    /**
+     * Sets shipping price to an order by shipment reference.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     * @param float $price Shipment price.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
+     */
+    public function setShippingPriceByReference($shipmentReference, $price)
+    {
+        if ($this->throw) {
+            throw new OrderNotFound('Order not found.');
+        }
+
+        $order = $this->getOrder($shipmentReference);
+        $order->setBasePrice($price);
     }
 
     /**

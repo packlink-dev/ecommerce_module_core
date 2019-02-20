@@ -21,14 +21,22 @@ class ShipmentLabelEvent extends Event
      * @var string
      */
     public $referenceId;
+    /**
+     * Whether to set shipment status when handling this event.
+     *
+     * @var bool
+     */
+    public $updateShipmentStatus;
 
     /**
      * ShipmentLabelEvent constructor.
      *
      * @param string $referenceId Reference identifier.
+     * @param bool $updateShipmentStatus Whether to set shipment status when handling this event.
      */
-    public function __construct($referenceId)
+    public function __construct($referenceId, $updateShipmentStatus = true)
     {
         $this->referenceId = $referenceId;
+        $this->updateShipmentStatus = $updateShipmentStatus;
     }
 }

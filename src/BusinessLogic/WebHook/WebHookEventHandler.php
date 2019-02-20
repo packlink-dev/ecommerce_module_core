@@ -9,6 +9,7 @@ use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
 use Packlink\BusinessLogic\WebHook\Events\ShipmentStatusChangedEvent;
 use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
@@ -65,7 +66,7 @@ class WebHookEventHandler extends BaseService
                 $this->orderRepository->setLabelsByReference($referenceId, $labels);
                 $this->orderRepository->setShippingStatusByReference(
                     $referenceId,
-                    ShipmentStatusChangedEvent::STATUS_READY
+                    ShipmentStatus::STATUS_READY
                 );
             }
         } catch (HttpBaseException $e) {
@@ -116,7 +117,7 @@ class WebHookEventHandler extends BaseService
                 $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory, $shipment);
                 $this->orderRepository->setShippingStatusByReference(
                     $referenceId,
-                    ShipmentStatusChangedEvent::STATUS_IN_TRANSIT
+                    ShipmentStatus::STATUS_IN_TRANSIT
                 );
             }
         } catch (HttpBaseException $e) {
