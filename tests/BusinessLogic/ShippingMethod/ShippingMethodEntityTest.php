@@ -40,6 +40,8 @@ class ShippingMethodEntityTest extends TestCase
         self::assertTrue($method->isNational());
 
         // default title
+        self::assertEquals('DPD - 2 DAYS pick up', $method->getTitle());
+        $method->setDestinationDropOff(false);
         self::assertEquals('DPD - 2 DAYS delivery', $method->getTitle());
         $method->setTitle('title');
         self::assertEquals('title', $method->getTitle());
