@@ -17,6 +17,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
+use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
 class UpdateShipmentDataTaskTest extends BaseSyncTest
 {
@@ -79,7 +80,9 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      */
     protected function tearDown()
     {
+        WebHookEventHandler::resetInstance();
         OrderService::resetInstance();
+
         parent::tearDown();
     }
 
@@ -95,6 +98,12 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $this->assertEquals(15.85, $order->getBasePrice());
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testAfterFailure()
     {
         /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
