@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Order;
 
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
@@ -102,10 +103,18 @@ class OrderService extends BaseService
             $shippingService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
             $shippingMethod = $shippingService->getShippingMethod($methodId);
             if ($shippingMethod !== null) {
-                $service = $shippingMethod->getCheapestShippingService($order->getShippingAddress()->getCountry());
-                $draft->serviceId = $service->serviceId;
-                $draft->serviceName = $shippingMethod->getTitle();
-                $draft->carrierName = $shippingMethod->getCarrierName();
+                try {
+                    $service = $shippingMethod->getCheapestShippingService($order->getShippingAddress()->getCountry());
+                    $draft->serviceId = $service->serviceId;
+                    $draft->serviceName = $shippingMethod->getTitle();
+                    $draft->carrierName = $shippingMethod->getCarrierName();
+                } catch (\InvalidArgumentException $e) {
+                    Logger::logWarning(
+                        "Invalid service method $methodId selected for order " . $order->getId()
+                        . ' because this method does not support order\'s destination country.'
+                        . ' Sending order without selected method.'
+                    );
+                }
             }
         }
 

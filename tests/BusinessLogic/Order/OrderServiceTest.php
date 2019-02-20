@@ -122,7 +122,6 @@ class OrderServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testPrepareDraftWrongDestinationCountry()
@@ -131,6 +130,13 @@ class OrderServiceTest extends BaseTestWithServices
         $this->orderRepository->getOrder('test', $method->getId(), 'DE');
 
         $this->orderService->prepareDraft('test');
+
+        self::assertCount(1, $this->shopLogger->loggedMessages);
+        self::assertEquals(
+            'Invalid service method ' . $method->getId() . ' selected for order test because this method '
+            . 'does not support order\'s destination country. Sending order without selected method.',
+            $this->shopLogger->loggedMessages[0]->getMessage()
+        );
     }
 
     /**

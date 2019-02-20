@@ -506,6 +506,26 @@ class ShippingMethodEntityTest extends TestCase
         ShippingMethod::fromArray($data);
     }
 
+    public function testCheapestService()
+    {
+        $method = $this->assertBasicDataToArray();
+        $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 4, 1));
+
+        self::assertEquals(4, $method->getCheapestShippingService('DE')->basePrice);
+        $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 3, 1));
+        self::assertEquals(3, $method->getCheapestShippingService('DE')->basePrice);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheapestServiceWrongDestination()
+    {
+        $method = $this->assertBasicDataToArray();
+
+        self::assertEquals(4, $method->getCheapestShippingService('DE'));
+    }
+
     private function assertBasicDataToArray()
     {
         $data = $this->getShippingMethodData();
