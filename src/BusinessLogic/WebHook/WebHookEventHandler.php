@@ -64,10 +64,12 @@ class WebHookEventHandler extends BaseService
             $labels = $this->proxy->getLabels($referenceId);
             if (count($labels) > 0) {
                 $this->orderRepository->setLabelsByReference($referenceId, $labels);
-                $this->orderRepository->setShippingStatusByReference(
-                    $referenceId,
-                    ShipmentStatus::STATUS_READY
-                );
+                if ($event->updateShipmentStatus) {
+                    $this->orderRepository->setShippingStatusByReference(
+                        $referenceId,
+                        ShipmentStatus::STATUS_READY
+                    );
+                }
             }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
@@ -115,10 +117,12 @@ class WebHookEventHandler extends BaseService
             $shipment = $this->proxy->getShipment($referenceId);
             if ($shipment !== null) {
                 $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory, $shipment);
-                $this->orderRepository->setShippingStatusByReference(
-                    $referenceId,
-                    ShipmentStatus::STATUS_IN_TRANSIT
-                );
+                if ($event->updateShipmentStatus) {
+                    $this->orderRepository->setShippingStatusByReference(
+                        $referenceId,
+                        ShipmentStatus::STATUS_IN_TRANSIT
+                    );
+                }
             }
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
