@@ -139,7 +139,7 @@ class OrderService extends BaseService
      */
     private function addDestinationAddress(Order $order, Draft $draft)
     {
-        $to = $order->getShippingDropOffId() ? $order->getShippingDropOffAddress() : $order->getShippingAddress();
+        $to = $order->getShippingAddress();
         $draft->to = new Draft\Address();
         $draft->to->country = $to->getCountry();
         $draft->to->zipCode = $to->getZipCode();

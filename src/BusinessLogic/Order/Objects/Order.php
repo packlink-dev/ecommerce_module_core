@@ -99,12 +99,6 @@ class Order
      */
     private $shippingDropOffId;
     /**
-     * Shipping drop-off address.
-     *
-     * @var Address
-     */
-    private $shippingDropOffAddress;
-    /**
      * Billing Address.
      *
      * @var Address
@@ -481,25 +475,5 @@ class Order
     public function setShippingDropOffId($shippingDropOffId)
     {
         $this->shippingDropOffId = $shippingDropOffId;
-    }
-
-    /**
-     * Returns shipping drop-off address.
-     *
-     * @return Address Drop-off address.
-     */
-    public function getShippingDropOffAddress()
-    {
-        return $this->shippingDropOffAddress;
-    }
-
-    /**
-     * Sets shipping drop-off address.
-     *
-     * @param Address $shippingDropOffAddress Drop-off address.
-     */
-    public function setShippingDropOffAddress($shippingDropOffAddress)
-    {
-        $this->shippingDropOffAddress = $shippingDropOffAddress;
     }
 }
