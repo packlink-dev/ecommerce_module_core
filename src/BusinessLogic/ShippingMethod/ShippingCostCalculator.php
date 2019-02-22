@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\ShippingMethod;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -81,6 +82,68 @@ class ShippingCostCalculator
         }
 
         return $result;
+    }
+
+    /**
+     * Returns cheapest service in shipping method.
+     *
+     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $method
+     * @param string $fromCountry From country code.
+     * @param string $fromZip From zip code.
+     * @param string $toCountry To country code.
+     * @param string $toZip To zip code.
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService Cheapest service.
+     */
+    public static function getCheapestShippingService(
+        ShippingMethod $method,
+        $fromCountry,
+        $fromZip,
+        $toCountry,
+        $toZip
+    ) {
+        $package = Package::fromArray(ParcelInfo::defaultParcel()->toArray());
+        $searchParams = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, array($package));
+
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        try {
+            $services = $proxy->getShippingServicesDeliveryDetails($searchParams);
+        } catch (\Exception $e) {
+            $services = array();
+        }
+
+        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $result */
+        $result = null;
+
+        if (!empty($services)) {
+            foreach ($services as $service) {
+                foreach ($method->getShippingServices() as $methodService) {
+                    if ($service->id === $methodService->serviceId
+                        && ($result === null || $result->basePrice > $methodService->basePrice)
+                    ) {
+                        $result = $methodService;
+                    }
+                }
+            }
+        } else {
+            // Fallback.
+            foreach ($method->getShippingServices() as $service) {
+                if ($service->destinationCountry === $toCountry) {
+                    if ($result === null || $result->basePrice > $service->basePrice) {
+                        $result = $service;
+                    }
+                }
+            }
+        }
+
+        if ($result !== null) {
+            return $result;
+        }
+
+        throw new \InvalidArgumentException(
+            'No service is available for given destination country ' . $toCountry
+        );
     }
 
     /**

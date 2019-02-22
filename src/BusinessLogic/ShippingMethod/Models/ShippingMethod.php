@@ -479,36 +479,6 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Gets the cheapest service for given destination country.
-     *
-     * @param string $destinationCountry Destination country code.
-     *
-     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService
-     *
-     * @throws \InvalidArgumentException When no service is available for given destination country.
-     */
-    public function getCheapestShippingService($destinationCountry)
-    {
-        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $result */
-        $result = null;
-        foreach ($this->getShippingServices() as $service) {
-            if ($service->destinationCountry === $destinationCountry) {
-                if ($result === null || $result->basePrice > $service->basePrice) {
-                    $result = $service;
-                }
-            }
-        }
-
-        if ($result !== null) {
-            return $result;
-        }
-
-        throw new \InvalidArgumentException(
-            'No service is available for given destination country ' . $destinationCountry
-        );
-    }
-
-    /**
      * Gets pricing policy. Value is one of the @see self::PRICING_POLICY_FIXED, @see self::PRICING_POLICY_PERCENT
      * of @see self::PRICING_POLICY_PACKLINK.
      *

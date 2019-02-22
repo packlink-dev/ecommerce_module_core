@@ -9,6 +9,7 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
@@ -104,7 +105,16 @@ class OrderService extends BaseService
             $shippingMethod = $shippingService->getShippingMethod($methodId);
             if ($shippingMethod !== null) {
                 try {
-                    $service = $shippingMethod->getCheapestShippingService($order->getShippingAddress()->getCountry());
+                    /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+                    $warehouse = $this->configuration->getDefaultWarehouse();
+                    $address = $order->getShippingAddress();
+                    $service = ShippingCostCalculator::getCheapestShippingService(
+                        $shippingMethod,
+                        $warehouse->country,
+                        $warehouse->postalCode,
+                        $address->getCountry(),
+                        $address->getZipCode()
+                    );
                     $draft->serviceId = $service->serviceId;
                     $draft->serviceName = $shippingMethod->getTitle();
                     $draft->carrierName = $shippingMethod->getCarrierName();

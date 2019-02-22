@@ -2,10 +2,17 @@
 
 namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
+use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,6 +22,35 @@ use PHPUnit\Framework\TestCase;
  */
 class ShippingMethodEntityTest extends TestCase
 {
+    /**
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
+     */
+    public $httpClient;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->httpClient = new TestHttpClient();
+        $self = $this;
+
+        TestServiceRegister::registerService(
+            HttpClient::CLASS_NAME,
+            function () use ($self) {
+                return $self->httpClient;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            Proxy::CLASS_NAME,
+            function () use ($self) {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+
+                return new Proxy($config->getAuthorizationToken(), $self->httpClient);
+            }
+        );
+    }
+
     public function testProperties()
     {
         $method = new ShippingMethod();
@@ -511,9 +547,15 @@ class ShippingMethodEntityTest extends TestCase
         $method = $this->assertBasicDataToArray();
         $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 4, 1));
 
-        self::assertEquals(4, $method->getCheapestShippingService('DE')->basePrice);
+        self::assertEquals(
+            4,
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->basePrice
+        );
         $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 3, 1));
-        self::assertEquals(3, $method->getCheapestShippingService('DE')->basePrice);
+        self::assertEquals(
+            3,
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->basePrice
+        );
     }
 
     /**
@@ -523,7 +565,30 @@ class ShippingMethodEntityTest extends TestCase
     {
         $method = $this->assertBasicDataToArray();
 
-        self::assertEquals(4, $method->getCheapestShippingService('DE'));
+        self::assertEquals(
+            4,
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->basePrice
+        );
+    }
+
+    public function testCheapestServiceProxyResponse()
+    {
+        $method = $this->assertBasicDataToArray();
+
+        $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 1, 1));
+        $method->addShippingService(new ShippingService(214, '', 'IT', 'DE', 5, 1.5, 1));
+        $method->addShippingService(new ShippingService(214, '', 'IT', 'DE', 5, 1.5, 1));
+        $method->addShippingService(new ShippingService(20615, '', 'IT', 'DE', 5, 8.37, 1));
+        $method->addShippingService(new ShippingService(20616, '', 'IT', 'DE', 5, 2, 1));
+
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/ShippingServices/costTest.json');
+
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        $this->assertEquals(
+            20616,
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->serviceId
+        );
     }
 
     private function assertBasicDataToArray()
