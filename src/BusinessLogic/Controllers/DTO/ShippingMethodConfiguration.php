@@ -50,6 +50,12 @@ class ShippingMethodConfiguration extends BaseDto
      * @var FixedPricePolicy[]
      */
     public $fixedPricePolicy = array();
+    /**
+     * Shop tax class.
+     *
+     * @var mixed
+     */
+    public $taxClass;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -63,6 +69,7 @@ class ShippingMethodConfiguration extends BaseDto
             'name' => $this->name,
             'pricePolicy' => $this->pricePolicy,
             'showLogo' => $this->showLogo,
+            'taxClass' => $this->taxClass,
         );
 
         if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && $this->percentPricePolicy) {
@@ -94,6 +101,8 @@ class ShippingMethodConfiguration extends BaseDto
         $result->name = $raw['name'];
         $result->showLogo = $raw['showLogo'];
         $result->pricePolicy = $raw['pricePolicy'];
+
+        $result->taxClass = isset($raw['taxClass']) ? $raw['taxClass'] : null;
 
         if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT) {
             $value = $raw['percentPricePolicy'];

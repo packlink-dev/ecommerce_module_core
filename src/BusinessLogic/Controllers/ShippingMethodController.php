@@ -169,6 +169,7 @@ class ShippingMethodController
         $shippingMethod->name = $item->getTitle();
         $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::HOME;
         $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::PICKUP;
+        $shippingMethod->taxClass = $item->getTaxClass();
 
         $pricingPolicy = $item->getPricingPolicy();
         $percentPolicy = $item->getPercentPricePolicy();

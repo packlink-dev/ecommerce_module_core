@@ -135,6 +135,12 @@ class ShippingMethod extends Entity
      */
     protected $percentPricePolicy;
     /**
+     * Shop tax class.
+     *
+     * @var mixed
+     */
+    protected $taxClass;
+    /**
      * All services for this shipping method.
      *
      * @var ShippingService[]
@@ -554,5 +560,25 @@ class ShippingMethod extends Entity
         $this->percentPricePolicy = null;
         $this->fixedPricePolicy = null;
         $this->pricingPolicy = self::PRICING_POLICY_PACKLINK;
+    }
+
+    /**
+     * Gets tax class.
+     *
+     * @return mixed Shop tax class.
+     */
+    public function getTaxClass()
+    {
+        return $this->taxClass;
+    }
+
+    /**
+     * Sets tax class.
+     *
+     * @param mixed $taxClass Shop tax class.
+     */
+    public function setTaxClass($taxClass)
+    {
+        $this->taxClass = $taxClass;
     }
 }
