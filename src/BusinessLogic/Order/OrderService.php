@@ -223,13 +223,12 @@ class OrderService extends BaseService
             $quantity = $item->getQuantity() ?: 1;
             $draft->content[] = $quantity . ' ' . $item->getTitle();
             for ($i = 0; $i < $quantity; $i++) {
-                $package = new \Packlink\BusinessLogic\Http\DTO\Package();
-                $package->height = $item->getHeight();
-                $package->width = $item->getWidth();
-                $package->length = $item->getLength();
-                $package->weight = $item->getWeight();
-
-                $draft->packages[] = $package;
+                $draft->packages[] = new \Packlink\BusinessLogic\Http\DTO\Package(
+                    $item->getWeight(),
+                    $item->getWidth(),
+                    $item->getHeight(),
+                    $item->getLength()
+                );
             }
         }
     }
