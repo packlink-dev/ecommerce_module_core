@@ -25,6 +25,9 @@ var Packlink = window.Packlink || {};
 
         let canHideSpinner = false;
 
+        let spinnerBarrierCount = 0;
+        let spinnerBarrier = configuration.hasTaxConfiguration ? 2 : 1;
+
         let dashboardData = {};
         let methodModel = {};
 
@@ -43,6 +46,7 @@ var Packlink = window.Packlink || {};
         let resultExtensionPoint;
         let tableExtensionPoint;
         let tableRowExtensionPoint;
+        let taxSelector = null;
 
         let shippingMethods = {};
 
@@ -112,6 +116,10 @@ var Packlink = window.Packlink || {};
                 }
             );
 
+            if (configuration.hasTaxConfiguration) {
+                ajaxService.get(configuration.getTaxClassesUrl, getTaxClassesSuccessHandler);
+            }
+
             ajaxService.get(configuration.getStatusUrl, getStatusHandler);
             ajaxService.get(configuration.getAllUrl, getShippingMethodsHandler);
         }
@@ -145,11 +153,11 @@ var Packlink = window.Packlink || {};
 
             renderShippingMethods();
 
-            if (canHideSpinner) {
+            if (spinnerBarrier === spinnerBarrierCount) {
                 utilityService.hideSpinner();
+            } else {
+                spinnerBarrierCount++;
             }
-
-            canHideSpinner = true;
         }
 
         /**
@@ -200,11 +208,11 @@ var Packlink = window.Packlink || {};
                 }
             );
 
-            if (canHideSpinner) {
+            if (spinnerBarrier === spinnerBarrierCount) {
                 utilityService.hideSpinner();
+            } else {
+                spinnerBarrierCount++;
             }
-
-            canHideSpinner = true;
         }
 
         /**
@@ -568,6 +576,10 @@ var Packlink = window.Packlink || {};
             methodModel = utilityService.cloneObject(shippingMethods[id]);
             templateService.getComponent('pl-method-title-input', template).value = methodModel.name;
 
+            if (configuration.hasTaxConfiguration && methodModel.taxClass !== null) {
+                templateService.getComponent('pl-tax-selector', template).value = methodModel.taxClass;
+            }
+
             if (methodModel.pricePolicy === PRICING_POLICY_FIXED) {
                 displayFixedPricesSubform(false, false);
             }
@@ -702,6 +714,10 @@ var Packlink = window.Packlink || {};
                     delete methodModel.fixedPricePolicy;
                 } else {
                     delete methodModel.percentPricePolicy;
+                }
+
+                if (configuration.hasTaxConfiguration) {
+                    methodModel.taxClass = templateService.getComponent('pl-tax-selector', extensionPoint).value;
                 }
 
                 ajaxService.post(
@@ -1204,18 +1220,27 @@ var Packlink = window.Packlink || {};
         }
 
         /**
-         * Compares to fixed price criteria objects.
+         * Fills tax selector.
          *
-         * @param {object} a
-         * @param {object} b
-         * @return {number}
+         * @param response
          */
-        function compareFixedPriceCriteria(a, b) {
-            if (a.from > b.from) {
-                return 1;
+        function getTaxClassesSuccessHandler(response) {
+            taxSelector = templateService.getComponent('pl-tax-selector', document);
+
+            for (let taxClass of response) {
+                let option = document.createElement('option');
+                option.value = taxClass['value'];
+                option.innerHTML = taxClass['label'];
+                taxSelector.appendChild(option);
             }
 
-            return a.from === b.from ? 0 : -1;
+            taxSelector.value = response[0]['value'];
+
+            if (spinnerBarrier === spinnerBarrierCount) {
+                utilityService.hideSpinner();
+            } else {
+                spinnerBarrierCount++;
+            }
         }
 
         /**

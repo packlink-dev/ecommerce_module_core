@@ -27,6 +27,8 @@ var Packlink = window.Packlink || {};
                 maxTitleLength: configuration.shippingServiceMaxTitleLength,
                 getShopShippingMethodCountUrl: configuration.shopShippingMethodCountGetUrl,
                 deleteShopShippingMethodsUrl: configuration.shopShippingMethodsDeleteUrl,
+                hasTaxConfiguration: configuration.hasTaxConfiguration,
+                getTaxClassesUrl: configuration.shippingMethodsGetTaxClasses,
             },
             'order-state-mapping': {
                 getSystemOrderStatusesUrl: configuration.getSystemOrderStatusesUrl,

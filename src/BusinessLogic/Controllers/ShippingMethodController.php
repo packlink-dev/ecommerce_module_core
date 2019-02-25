@@ -224,6 +224,7 @@ class ShippingMethodController
     {
         $model->setTitle($configuration->name);
         $model->setDisplayLogo($configuration->showLogo);
+        $model->setTaxClass($configuration->taxClass);
         switch ($configuration->pricePolicy) {
             case ShippingMethod::PRICING_POLICY_PACKLINK:
                 $model->setPacklinkPricePolicy();

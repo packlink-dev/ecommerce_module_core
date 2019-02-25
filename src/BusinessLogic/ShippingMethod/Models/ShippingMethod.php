@@ -49,6 +49,7 @@ class ShippingMethod extends Entity
         'deliveryTime',
         'national',
         'pricingPolicy',
+        'taxClass',
     );
     /**
      * Carrier name.
