@@ -24,7 +24,9 @@ var Packlink = window.Packlink || {};
                 saveUrl: configuration.shippingMethodsSaveUrl,
                 rowHeight: configuration.scrollConfiguration.rowHeight,
                 scrollOffset: configuration.scrollConfiguration.scrollOffset,
-                maxTitleLength: configuration.shippingServiceMaxTitleLength
+                maxTitleLength: configuration.shippingServiceMaxTitleLength,
+                getShopShippingMethodCountUrl: configuration.shopShippingMethodCountGetUrl,
+                deleteShopShippingMethodsUrl: configuration.shopShippingMethodsDeleteUrl,
             },
             'order-state-mapping': {
                 getSystemOrderStatusesUrl: configuration.getSystemOrderStatusesUrl,

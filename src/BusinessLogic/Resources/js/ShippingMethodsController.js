@@ -90,6 +90,28 @@ var Packlink = window.Packlink || {};
                 tableRowExtensionPoint
             );
 
+            templateService.getComponent('pl-delete-methods-modal-wrapper').addEventListener(
+                'click',
+                hideDeleteShopShippingMethodsModal
+            );
+
+            templateService.getComponent('pl-delete-methods-modal-cancel').addEventListener(
+                'click',
+                hideDeleteShopShippingMethodsModal
+            );
+
+            templateService.getComponent('pl-delete-methods-modal-accept').addEventListener(
+                'click',
+                function () {
+                    utilityService.showSpinner();
+                    ajaxService.get(
+                        configuration.deleteShopShippingMethodsUrl,
+                        methodsDeletedSuccessCallback,
+                        methodsDeletedFailedCallback
+                    );
+                }
+            );
+
             ajaxService.get(configuration.getStatusUrl, getStatusHandler);
             ajaxService.get(configuration.getAllUrl, getShippingMethodsHandler);
         }
@@ -437,8 +459,12 @@ var Packlink = window.Packlink || {};
                 utilityService.showFlashMessage(response.message, 'success');
             }
 
+            if (!dashboardData.shippingMethodSet) {
+                ajaxService.get(configuration.getShopShippingMethodCountUrl, getShopShippingMethodsCountCallback);
+            } else {
+                utilityService.hideSpinner();
+            }
             renderShippingMethods();
-            utilityService.hideSpinner();
         }
 
         /**
@@ -451,6 +477,63 @@ var Packlink = window.Packlink || {};
 
             if (response.message) {
                 utilityService.showFlashMessage(response.message, 'danger');
+            }
+
+            utilityService.hideSpinner();
+        }
+
+        /**
+         * Handles successful retrieval of shop shipping method count.
+         *
+         * @param response
+         */
+        function getShopShippingMethodsCountCallback(response) {
+            if (typeof response.count === 'number' && response.count !== 0) {
+                showDeleteShopShippingMethodsModal();
+            }
+
+            utilityService.hideSpinner();
+        }
+
+        /**
+         * Shows delete shipping methods modal.
+         */
+        function showDeleteShopShippingMethodsModal() {
+            templateService.getComponent('pl-delete-methods-modal-wrapper', extensionPoint).classList.remove('hidden');
+        }
+
+        /**
+         * Hides delete shipping methods modal.
+         */
+        function hideDeleteShopShippingMethodsModal() {
+            templateService.getComponent('pl-delete-methods-modal-wrapper', extensionPoint).classList.add('hidden');
+        }
+
+        /**
+         * Handles successfully deleting shop shipping methods.
+         *
+         * @param response
+         */
+        function methodsDeletedSuccessCallback(response) {
+            hideDeleteShopShippingMethodsModal();
+
+            if (response && response.message) {
+                utilityService.showFlashMessage(response.message, 'success');
+            }
+
+            utilityService.hideSpinner();
+        }
+
+        /**
+         * Handles error during deletion of shop shipping methods.
+         *
+         * @param response
+         */
+        function methodsDeletedFailedCallback(response) {
+            hideDeleteShopShippingMethodsModal();
+
+            if (response && response.message) {
+                utilityService.showFlashMessage(response.message, 'error');
             }
 
             utilityService.hideSpinner();
