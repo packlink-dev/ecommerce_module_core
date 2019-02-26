@@ -23,13 +23,12 @@ var Packlink = window.Packlink || {};
 
         let currentNavTab = 'all';
 
-        let canHideSpinner = false;
-
         let spinnerBarrierCount = 0;
         let spinnerBarrier = configuration.hasTaxConfiguration ? 2 : 1;
 
         let dashboardData = {};
         let methodModel = {};
+        let taxClasses = [];
 
         let filters = {
             title: [],
@@ -576,7 +575,11 @@ var Packlink = window.Packlink || {};
             methodModel = utilityService.cloneObject(shippingMethods[id]);
             templateService.getComponent('pl-method-title-input', template).value = methodModel.name;
 
-            if (configuration.hasTaxConfiguration && methodModel.taxClass !== null) {
+            if (
+                configuration.hasTaxConfiguration
+                && methodModel.taxClass !== null
+                && classExists(methodModel.taxClass)
+            ) {
                 templateService.getComponent('pl-tax-selector', template).value = methodModel.taxClass;
             }
 
@@ -1232,6 +1235,7 @@ var Packlink = window.Packlink || {};
                 option.value = taxClass['value'];
                 option.innerHTML = taxClass['label'];
                 taxSelector.appendChild(option);
+                taxClasses.push(option['value']);
             }
 
             taxSelector.value = response[0]['value'];
@@ -1241,6 +1245,23 @@ var Packlink = window.Packlink || {};
             } else {
                 spinnerBarrierCount++;
             }
+        }
+
+        /**
+         * Checks whether tax class exists in system.
+         *
+         * @param taxClass
+         *
+         * @return {boolean}
+         */
+        function classExists(taxClass) {
+            for (taxClassValue of taxClasses) {
+                if (taxClassValue == taxClass) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /**
