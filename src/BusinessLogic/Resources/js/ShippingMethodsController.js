@@ -584,11 +584,11 @@ var Packlink = window.Packlink || {};
             }
 
             if (methodModel.pricePolicy === PRICING_POLICY_FIXED) {
-                displayFixedPricesSubform(false, false);
+                displayFixedPricesSubform(false, false, true, true);
             }
 
             if (methodModel.pricePolicy === PRICING_POLICY_PERCENT) {
-                displayPercentForm();
+                displayPercentForm(true);
             }
 
             templateService.getComponent('pl-shipping-method-config-cancel-btn', template).addEventListener(
@@ -802,11 +802,11 @@ var Packlink = window.Packlink || {};
             }
 
             if (pricingPolicy === PRICING_POLICY_FIXED) {
-                displayFixedPricesSubform(false, false);
+                displayFixedPricesSubform(false, false, true, true);
             }
 
             if (pricingPolicy === PRICING_POLICY_PERCENT) {
-                displayPercentForm();
+                displayPercentForm(true);
             }
         }
 
@@ -814,28 +814,36 @@ var Packlink = window.Packlink || {};
         /**
          * Displays fixed prices subform.
          *
-         * @param validateLastAmount
-         * @param validateLastTo
+         * @param {boolean} validateLastAmount
+         * @param {boolean} validateLastTo
+         * @param {boolean} rerenderForm
+         * @param {boolean} shouldFocus
          */
-        function displayFixedPricesSubform(validateLastAmount, validateLastTo) {
-            let point = templateService.setTemplate(
-                'pl-fixed-prices-template',
-                'pl-pricing-extension-point'
-            );
+        function displayFixedPricesSubform(validateLastAmount, validateLastTo, rerenderForm, shouldFocus) {
+            if (rerenderForm) {
+                let point = templateService.setTemplate(
+                    'pl-fixed-prices-template',
+                    'pl-pricing-extension-point'
+                );
 
-            let addButton = templateService.getComponent('pl-fixed-price-add', point);
-            addButton.addEventListener('click', addFixedPriceCriteria, true);
+                let addButton = templateService.getComponent('pl-fixed-price-add', point);
+                addButton.addEventListener('click', addFixedPriceCriteria, true);
 
-            methodModel.pricePolicy = PRICING_POLICY_FIXED;
+                methodModel.pricePolicy = PRICING_POLICY_FIXED;
 
-            if (!methodModel.fixedPricePolicy || methodModel.fixedPricePolicy.length === 0) {
-                methodModel.fixedPricePolicy = [];
-                methodModel.fixedPricePolicy.push({from: 0, to: '', amount: ''});
-            }
+                if (!methodModel.fixedPricePolicy || methodModel.fixedPricePolicy.length === 0) {
+                    methodModel.fixedPricePolicy = [];
+                    methodModel.fixedPricePolicy.push({from: 0, to: '', amount: ''});
+                }
 
-            let addedPricePoint = templateService.getComponent('pl-fixed-price-criteria-extension-point', point);
-            for (let i = 0; i < methodModel.fixedPricePolicy.length; i++) {
-                constructFixedPrice(methodModel.fixedPricePolicy[i], i, addedPricePoint);
+                let addedPricePoint = templateService.getComponent('pl-fixed-price-criteria-extension-point', point);
+                for (let i = 0; i < methodModel.fixedPricePolicy.length; i++) {
+                    constructFixedPrice(methodModel.fixedPricePolicy[i], i, addedPricePoint);
+
+                    if (shouldFocus && (i === methodModel.fixedPricePolicy.length -1)) {
+                        templateService.getComponent('data-pl-to-id', extensionPoint, i).focus();
+                    }
+                }
             }
 
             isFixedPriceValid(validateLastAmount, validateLastTo);
@@ -861,11 +869,11 @@ var Packlink = window.Packlink || {};
                 currentCriteria.amount > 0
             ) {
                 methodModel.fixedPricePolicy.push({from: currentCriteria.to, to: '', amount: ''});
-                displayFixedPricesSubform(false, false);
+                displayFixedPricesSubform(false, false, true, true);
                 return;
             }
 
-            displayFixedPricesSubform(true, true);
+            displayFixedPricesSubform(true, true, false, false);
         }
 
         /**
@@ -918,10 +926,12 @@ var Packlink = window.Packlink || {};
 
                 if (field === 'to') {
                     input.addEventListener('blur', onFixedPriceToBlur, true);
+                    input.setAttribute('tabindex', id * 2 + 1);
                 }
 
                 if (field === 'amount') {
                     input.addEventListener('blur', onFixedPriceAmountBlur, true);
+                    input.setAttribute('tabindex', id * 2 + 2);
                 }
             }
         }
@@ -947,6 +957,8 @@ var Packlink = window.Packlink || {};
                         typeof successor.to !== 'number'
                     ) {
                         successor.from = methodModel.fixedPricePolicy[index].to;
+                        let fromInput = templateService.getComponent('data-pl-from-id', extensionPoint, index + 1);
+                        fromInput.value = successor.from;
                         if ((isSuccessorLast) && typeof successor.to === 'number' && successor.to <= successor.from) {
                             successor.to = '';
                         }
@@ -954,7 +966,8 @@ var Packlink = window.Packlink || {};
                 }
             }
 
-            displayFixedPricesSubform(false, index === methodModel.fixedPricePolicy.length - 1);
+            templateService.removeError(event.target);
+            displayFixedPricesSubform(false, index === methodModel.fixedPricePolicy.length - 1, false, false);
         }
 
         /**
@@ -966,7 +979,8 @@ var Packlink = window.Packlink || {};
             let index = parseInt(event.target.getAttribute('data-pl-amount-id'));
             let numeric = parseFloat(event.target.value);
             methodModel.fixedPricePolicy[index].amount = event.target.value == numeric ? numeric : event.target.value;
-            displayFixedPricesSubform(index === methodModel.fixedPricePolicy.length - 1, false);
+            templateService.removeError(event.target);
+            displayFixedPricesSubform(index === methodModel.fixedPricePolicy.length - 1, false, false, false);
         }
 
         /**
@@ -1000,20 +1014,24 @@ var Packlink = window.Packlink || {};
 
                 let last = methodModel.fixedPricePolicy[index];
                 if (validateLastTo) {
+                    let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, index);
                     if (last.to === '' || isNaN(last.to) || typeof last.to !== 'number' || last.to <= last.from ||
                         last.to != parseFloat(last.to.toFixed(2))) {
                         result = false;
-                        let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, index);
                         templateService.setError(input, Packlink.errorMsgs.invalid);
+                    } else {
+                        templateService.removeError(input);
                     }
                 }
 
                 if (validateLastAmount) {
+                    let input = templateService.getComponent('data-pl-amount-id', tableExtensionPoint, index);
                     if (last.amount === '' || isNaN(last.amount) || typeof last.amount !== 'number' || last.amount <= 0 ||
                         last.amount != parseFloat(last.amount.toFixed(2))) {
                         result = false;
-                        let input = templateService.getComponent('data-pl-amount-id', tableExtensionPoint, index);
                         templateService.setError(input, Packlink.errorMsgs.invalid);
+                    } else {
+                        templateService.removeError(input);
                     }
                 }
 
@@ -1119,13 +1137,15 @@ var Packlink = window.Packlink || {};
             }
 
             methodModel.fixedPricePolicy.splice(index, 1);
-            displayFixedPricesSubform(false, false);
+            displayFixedPricesSubform(false, false, true, true);
         }
 
         /**
          * Displays packlink percent subform.
+         *
+         * @param {boolean} [shouldFocusInput]
          */
-        function displayPercentForm() {
+        function displayPercentForm(shouldFocusInput) {
             templateService.setTemplate('pl-packlink-percent-template', 'pl-pricing-extension-point');
 
             let buttons = templateService.getComponentsByAttribute(
@@ -1142,6 +1162,10 @@ var Packlink = window.Packlink || {};
                 tableExtensionPoint
             );
             input.addEventListener('blur', handlePercentInputBlurEvent, true);
+
+            if (shouldFocusInput) {
+                input.focus();
+            }
 
             methodModel.pricePolicy = PRICING_POLICY_PERCENT;
 
@@ -1219,7 +1243,7 @@ var Packlink = window.Packlink || {};
         function handlePacklinkPercentButtonClicked(event) {
             let value = event.target.getAttribute('data-pl-packlink-percent-btn');
             methodModel.percentPricePolicy.increase = value === 'increase';
-            displayPercentForm();
+            displayPercentForm(true);
         }
 
         /**
@@ -1229,6 +1253,10 @@ var Packlink = window.Packlink || {};
          */
         function getTaxClassesSuccessHandler(response) {
             taxSelector = templateService.getComponent('pl-tax-selector', document);
+
+            while (taxSelector.firstChild) {
+                taxSelector.firstChild.remove();
+            }
 
             for (let taxClass of response) {
                 let option = document.createElement('option');
