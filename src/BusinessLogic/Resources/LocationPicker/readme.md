@@ -2,8 +2,7 @@
 
 1. Include location picker library and translations provided in `/js/` directory.
 
-2. Include location picker css provided `/css/` directory. **Note** CSS depends on images provided in
-`/img/` directory.
+2. Include location picker css provided `/css/` directory.
 
 3. Copy `<location-picker>` tag to your html page where you wish to display location picker.
 
