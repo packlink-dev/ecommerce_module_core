@@ -26,7 +26,7 @@ var Packlink = window.Packlink || {};
                 scrollOffset: configuration.scrollConfiguration.scrollOffset,
                 maxTitleLength: configuration.shippingServiceMaxTitleLength,
                 getShopShippingMethodCountUrl: configuration.shopShippingMethodCountGetUrl,
-                deleteShopShippingMethodsUrl: configuration.shopShippingMethodsDeleteUrl,
+                disableShopShippingMethodsUrl: configuration.$shopShippingMethodsDisableUrl,
                 hasTaxConfiguration: configuration.hasTaxConfiguration,
                 getTaxClassesUrl: configuration.shippingMethodsGetTaxClasses,
             },

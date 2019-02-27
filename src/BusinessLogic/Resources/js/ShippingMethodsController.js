@@ -93,24 +93,24 @@ var Packlink = window.Packlink || {};
                 tableRowExtensionPoint
             );
 
-            templateService.getComponent('pl-delete-methods-modal-wrapper').addEventListener(
+            templateService.getComponent('pl-disable-methods-modal-wrapper').addEventListener(
                 'click',
-                hideDeleteShopShippingMethodsModal
+                hideDisableShopShippingMethodsModal
             );
 
-            templateService.getComponent('pl-delete-methods-modal-cancel').addEventListener(
+            templateService.getComponent('pl-disable-methods-modal-cancel').addEventListener(
                 'click',
-                hideDeleteShopShippingMethodsModal
+                hideDisableShopShippingMethodsModal
             );
 
-            templateService.getComponent('pl-delete-methods-modal-accept').addEventListener(
+            templateService.getComponent('pl-disable-methods-modal-accept').addEventListener(
                 'click',
                 function () {
                     utilityService.showSpinner();
                     ajaxService.get(
-                        configuration.deleteShopShippingMethodsUrl,
-                        methodsDeletedSuccessCallback,
-                        methodsDeletedFailedCallback
+                        configuration.disableShopShippingMethodsUrl,
+                        methodsDisabledSuccessCallback,
+                        methodsDisabledFailedCallback
                     );
                 }
             );
@@ -496,33 +496,33 @@ var Packlink = window.Packlink || {};
          */
         function getShopShippingMethodsCountCallback(response) {
             if (typeof response.count === 'number' && response.count !== 0) {
-                showDeleteShopShippingMethodsModal();
+                showDisableShopShippingMethodsModal();
             }
 
             utilityService.hideSpinner();
         }
 
         /**
-         * Shows delete shipping methods modal.
+         * Shows disable shipping methods modal.
          */
-        function showDeleteShopShippingMethodsModal() {
-            templateService.getComponent('pl-delete-methods-modal-wrapper', extensionPoint).classList.remove('hidden');
+        function showDisableShopShippingMethodsModal() {
+            templateService.getComponent('pl-disable-methods-modal-wrapper', extensionPoint).classList.remove('hidden');
         }
 
         /**
-         * Hides delete shipping methods modal.
+         * Hides disable shipping methods modal.
          */
-        function hideDeleteShopShippingMethodsModal() {
-            templateService.getComponent('pl-delete-methods-modal-wrapper', extensionPoint).classList.add('hidden');
+        function hideDisableShopShippingMethodsModal() {
+            templateService.getComponent('pl-disable-methods-modal-wrapper', extensionPoint).classList.add('hidden');
         }
 
         /**
-         * Handles successfully deleting shop shipping methods.
+         * Handles successfully disabling shop shipping methods.
          *
          * @param response
          */
-        function methodsDeletedSuccessCallback(response) {
-            hideDeleteShopShippingMethodsModal();
+        function methodsDisabledSuccessCallback(response) {
+            hideDisableShopShippingMethodsModal();
 
             if (response && response.message) {
                 utilityService.showFlashMessage(response.message, 'success');
@@ -532,12 +532,12 @@ var Packlink = window.Packlink || {};
         }
 
         /**
-         * Handles error during deletion of shop shipping methods.
+         * Handles error during disabling of shop shipping methods.
          *
          * @param response
          */
-        function methodsDeletedFailedCallback(response) {
-            hideDeleteShopShippingMethodsModal();
+        function methodsDisabledFailedCallback(response) {
+            hideDisableShopShippingMethodsModal();
 
             if (response && response.message) {
                 utilityService.showFlashMessage(response.message, 'error');
