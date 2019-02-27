@@ -6,7 +6,7 @@
     "license": "proprietary",
     "require": {
         "php": ">=5.3",
-        "itbz/fpdi": "1.6.1"
+        "zendframework/zendpdf": "2.0.*@dev"
     },
     "autoload": {
         "psr-4": {

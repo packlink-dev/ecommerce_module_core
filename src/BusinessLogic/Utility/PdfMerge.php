@@ -2,9 +2,7 @@
 
 namespace Packlink\BusinessLogic\Utility;
 
-use Exception;
-use fpdi\FPDI;
-use Logeecom\Infrastructure\Exceptions\BaseException;
+use ZendPdf\PdfDocument;
 
 /**
  * Class PdfMerger
@@ -13,66 +11,46 @@ use Logeecom\Infrastructure\Exceptions\BaseException;
 class PdfMerge
 {
     /**
-     * List of file paths.
+     * Merges multiple pdf files specified by $pdfPaths array. Returns merged pdf file path.
      *
-     * @var string[]
+     * @param array $pdfPaths Array of paths to pdfs.
+     * @param string $outputPath Optional specified output path.
+     *
+     * @return bool | string Returns output file path on success; Returns FALSE otherwise.
      */
-    private $files = array();
-
-    /**
-     * Add a PDF for inclusion in the merge with a valid file path.
-     *
-     * @param string $filePath File path.
-     *
-     * @return PdfMerge Returns this.
-     * @throws Exception Thrown when file doesn't exist.
-     */
-    public function addPDF($filePath)
+    public static function merge(array $pdfPaths, $outputPath = '')
     {
-        if (file_exists($filePath)) {
-            $this->files[] = $filePath;
-        } else {
-            throw new BaseException("File $filePath not found.");
+        try {
+            $output = PdfDocument::load();
+
+            foreach ($pdfPaths as $path) {
+                $pdf = PdfDocument::load($path);
+                foreach ($pdf->pages as $page) {
+                    $output->pages[] = clone $page;
+                }
+            }
+
+            $path = $outputPath !== '' ? $outputPath : static::getTempFilePath();
+
+            if (!$path) {
+                return false;
+            }
+
+            $output->save($path);
+        } catch (\Exception $e) {
+            return false;
         }
 
-        return $this;
+        return $path;
     }
 
     /**
-     * Merges your provided PDFs and outputs to specified location.
+     * Generates temporary file path.
      *
-     * @param string $outputName Output file name.
-     * @param string $openMode Output open mode. D - download, I - inline PDF, S - return as string.
-     *
-     * @return bool|string Success flag or file content if open mode is "S".
-     * @throws Exception
+     * @return bool | string Returns temporary file path. Returns FALSE on failure.
      */
-    public function merge($outputName = 'new_file.pdf', $openMode = 'D')
+    protected static function getTempFilePath()
     {
-        if (!isset($this->files) || !is_array($this->files)) {
-            throw new BaseException('No PDFs to merge.');
-        }
-
-        $pdf = new FPDI;
-        // merger operations
-        foreach ($this->files as $file) {
-            $count = $pdf->setSourceFile($file);
-            //add the pages
-
-            for ($i = 1; $i <= $count; $i++) {
-                $template = $pdf->importPage($i);
-                $size = $pdf->getTemplateSize($template);
-                $pdf->AddPage('P', array($size['w'], $size['h']));
-                $pdf->useTemplate($template);
-            }
-        }
-
-        if ($openMode === 'S') {
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $pdf->Output($outputName, $openMode);
-        }
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        return '' === $pdf->Output($outputName, $openMode);
+        return tempnam(sys_get_temp_dir(), 'bulk_print');
     }
 }

@@ -11,22 +11,60 @@ use PHPUnit\Framework\TestCase;
  */
 class PdfMergeTest extends TestCase
 {
-    /**
-     * @throws \Exception
-     */
     public function testPdfMerge()
     {
-        $pdf = new PdfMerge();
+        $result = PdfMerge::merge($this->getPdfs());
+        $this->assertNotFalse($result);
+        $this->assertGreaterThan(0, filesize($result));
+        $this->assertEquals('application/pdf', mime_content_type($result));
+    }
 
-        $pdf->addPDF(__DIR__ . '/../Common/PDF/Brochure.pdf');
-        $pdf->addPDF(__DIR__ . '/../Common/PDF/Meeting notes.pdf');
-        $file = fopen(__DIR__ . '/../Common/PDF/Merged.pdf', 'rb');
-        $expected = fread($file, filesize(__DIR__ . '/../Common/PDF/Merged.pdf'));
+    public function testPdfMergeSpecifiedOutputPath()
+    {
+        $output = $this->getOutputFilePath();
 
-        $content = $pdf->merge('Merged.pdf', 'S');
-        // date can't
-        $content = preg_replace('/CreationDate \(D:\d+\)/', 'CreationDate (D:20190201191519)', $content);
+        $result = PdfMerge::merge($this->getPdfs(), $output);
+        $this->assertNotFalse($result);
+        $this->assertGreaterThan(0, filesize($result));
+        $this->assertEquals('application/pdf', mime_content_type($result));
+    }
 
-        $this->assertEquals($expected, $content);
+    public function testFailedMerge()
+    {
+        $result = PdfMerge::merge(array(__DIR__ . '/../Common/PDF/notAPdf.txt'));
+        $this->assertFalse($result);
+
+        $result = PdfMerge::merge($this->getPdfs(), false);
+        $this->assertFalse($result);
+    }
+
+    protected function tearDown()
+    {
+        if (file_exists($this->getOutputFilePath())) {
+            unlink($this->getOutputFilePath());
+        }
+    }
+
+    /**
+     * Retrieves list of pdfs to be used in tests.
+     *
+     * @return array
+     */
+    protected function getPdfs()
+    {
+        return array(
+            __DIR__ . '/../Common/PDF/Brochure.pdf',
+            __DIR__ . '/../Common/PDF/Meeting notes.pdf',
+        );
+    }
+
+    /**
+     * Retrieves test output file path.
+     *
+     * @return string
+     */
+    protected function getOutputFilePath()
+    {
+        return __DIR__ . '/../Common/PDF/testOut.pdf';
     }
 }
