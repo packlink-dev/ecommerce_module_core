@@ -9,6 +9,7 @@ use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -76,6 +77,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             ShippingMethodController::CLASS_NAME,
             function () {
                 return new ShippingMethodController();
+            }
+        );
+
+        ServiceRegister::registerService(
+            LocationService::CLASS_NAME,
+            function () {
+                return LocationService::getInstance();
             }
         );
     }
