@@ -460,18 +460,38 @@ var Packlink = window.Packlink || {};
          */
         function handleActivateSuccess(response) {
             shippingMethods[selectedId].selected = !shippingMethods[selectedId].selected;
-            selectedId = null;
 
             if (response.message) {
                 utilityService.showFlashMessage(response.message, 'success');
             }
 
-            if (!dashboardData.shippingMethodSet) {
+            if (shippingMethods[selectedId].selected && getNumberOfActiveServices() === 1) {
                 ajaxService.get(configuration.getShopShippingMethodCountUrl, getShopShippingMethodsCountCallback);
             } else {
                 utilityService.hideSpinner();
             }
+
+            selectedId = null;
             renderShippingMethods();
+        }
+
+        /**
+         * Retrieves number of active shipping methods.
+         *
+         * @return {number}
+         */
+        function getNumberOfActiveServices() {
+            let result = 0;
+
+            let serviceIds = Object.keys(shippingMethods);
+
+            for (let id of serviceIds) {
+                if (shippingMethods[id].selected) {
+                    result++;
+                }
+            }
+
+            return result;
         }
 
         /**
@@ -540,7 +560,7 @@ var Packlink = window.Packlink || {};
             hideDisableShopShippingMethodsModal();
 
             if (response && response.message) {
-                utilityService.showFlashMessage(response.message, 'error');
+                utilityService.showFlashMessage(response.message, 'danger');
             }
 
             utilityService.hideSpinner();
@@ -731,7 +751,12 @@ var Packlink = window.Packlink || {};
                         utilityService.showFlashMessage(Packlink.successMsgs.shippingMethodSaved, 'success');
                         closeConfigForm();
                         renderShippingMethods();
-                        utilityService.hideSpinner();
+
+                        if (getNumberOfActiveServices() === 1) {
+                            ajaxService.get(configuration.getShopShippingMethodCountUrl, getShopShippingMethodsCountCallback);
+                        } else {
+                            utilityService.hideSpinner();
+                        }
                     },
                     function (response) {
                         if (response.message) {
