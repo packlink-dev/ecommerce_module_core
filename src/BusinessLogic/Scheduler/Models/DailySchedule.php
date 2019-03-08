@@ -10,6 +10,11 @@ namespace Packlink\BusinessLogic\Scheduler\Models;
 class DailySchedule extends Schedule
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Array of field names.
      *
      * @var array

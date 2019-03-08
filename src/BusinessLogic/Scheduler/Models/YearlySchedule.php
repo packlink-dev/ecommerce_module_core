@@ -10,6 +10,11 @@ namespace Packlink\BusinessLogic\Scheduler\Models;
 class YearlySchedule extends Schedule
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Calculates next schedule time.
      *
      * @return \DateTime Next schedule date.

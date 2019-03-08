@@ -9,6 +9,11 @@ namespace Packlink\BusinessLogic\Scheduler\Models;
  */
 class WeeklySchedule extends Schedule
 {
+    /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
     protected static $daysMap = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
     protected static $monthMap = array(
         'january',
