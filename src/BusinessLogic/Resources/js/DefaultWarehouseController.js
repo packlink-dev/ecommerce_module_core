@@ -7,6 +7,7 @@ var Packlink = window.Packlink || {};
             'name',
             'surname',
             'company',
+            'city',
             'postal_code',
             'address',
             'phone',
@@ -54,9 +55,11 @@ var Packlink = window.Packlink || {};
 
             for (let field of warehouseFields) {
                 let input = templateService.getComponent(`pl-default-warehouse-${field}`, page);
-                input.addEventListener('blur', onBlurHandler, true);
-                if (response[field]) {
-                    input.value = response[field];
+                if (input) {
+                    input.addEventListener('blur', onBlurHandler, true);
+                    if (response[field]) {
+                        input.value = response[field];
+                    }
                 }
             }
 
