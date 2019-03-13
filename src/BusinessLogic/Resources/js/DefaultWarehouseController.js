@@ -121,6 +121,10 @@ var Packlink = window.Packlink || {};
                 oldAutocomplete.remove();
             }
 
+            if (document.activeElement !== postalCodeInput) {
+                return;
+            }
+
             let newAutoComplete = createAutoCompleteNode();
 
             createAutoCompleteListElements(newAutoComplete, response);

@@ -184,6 +184,7 @@ class Proxy
     public function searchLocations($platformCountry, $postalZone, $query)
     {
         $url = 'locations/postalcodes?' . http_build_query(array(
+                'platform' => 'PRO',
                 'platform_country' => $platformCountry,
                 'postalzone' => $postalZone,
                 'q' => $query
