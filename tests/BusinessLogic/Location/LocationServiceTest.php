@@ -169,6 +169,43 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEmpty($locations);
     }
 
+    public function testLocationSearchWithUnsupportedCountry()
+    {
+        /** @var LocationService $locationService */
+        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
+        $this->setExpectedException('\Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException');
+        $locationService->searchLocations('RS', 'Test');
+    }
+
+    public function testLocationSearch()
+    {
+        $this->httpClient->setMockResponses($this->getMockLocationInfo());
+
+        /** @var LocationService $locationService */
+        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
+
+        $result = $locationService->searchLocations('DE', '3', 'Test');
+        $this->assertCount(1, $result);
+
+        $info = $result[0];
+
+        $this->assertInstanceOf('\Packlink\BusinessLogic\Http\DTO\LocationInfo', $info);
+
+        $this->assertEquals('pc_de_44826', $info->id);
+        $this->assertEquals('Deutschland', $info->state);
+        $this->assertEquals('Münchenbernsdorf', $info->city);
+        $this->assertEquals('07589', $info->zipcode);
+        $this->assertEquals('07589 - Münchenbernsdorf', $info->text);
+
+        $asArray = $info->toArray();
+
+        $this->assertEquals($info->id, $asArray['id']);
+        $this->assertEquals($info->state, $asArray['state']);
+        $this->assertEquals($info->city, $asArray['city']);
+        $this->assertEquals($info->zipcode, $asArray['zipcode']);
+        $this->assertEquals($info->text, $asArray['text']);
+    }
+
     private function initShippingMethod()
     {
         $this->shippingMethodService->add($this->getShippingServiceDetails(1));
@@ -222,6 +259,17 @@ class LocationServiceTest extends BaseTestWithServices
         return array(
             new HttpResponse(200, array(), ''),
             new HttpResponse(200, array(), $response),
+        );
+    }
+
+    private function getMockLocationInfo()
+    {
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/locationInfo.json');
+
+        return array(
+            new HttpResponse(200, array(), '[]'),
+            new HttpResponse(200, array(), $response),
+            new HttpResponse(200, array(), '[]')
         );
     }
 

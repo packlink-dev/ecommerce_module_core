@@ -8,6 +8,7 @@ use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -22,6 +23,17 @@ class LocationService extends BaseService
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+    /**
+     * Postal zone map.
+     *
+     * @var array
+     */
+    protected $postalZoneMap = array(
+        'DE' => array('3', '248', '249'),
+        'ES' => array('65', '68', '69'),
+        'IT' => array('113', '114', '115'),
+        'FR' => array('76', '77')
+    );
     /**
      * Singleton instance of this class.
      *
@@ -93,6 +105,40 @@ class LocationService extends BaseService
         } catch (HttpBaseException $e) {
             return array();
         }
+    }
+
+    /**
+     * Performs search for locations.
+     *
+     * @param $platformCountry
+     * @param $query
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     *
+     * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
+     */
+    public function searchLocations($platformCountry, $query)
+    {
+        if (!isset($this->postalZoneMap[$platformCountry])) {
+            throw new PlatformCountryNotSupportedException('Platform country not supported');
+        }
+
+        $result = array();
+
+        foreach ($this->postalZoneMap[$platformCountry] as $postalZone) {
+            $partial = $this->proxy->searchLocations($platformCountry, $postalZone, $query);
+
+            if (!empty($partial)) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
+                $result = array_merge($result, $partial);
+            }
+        }
+
+        return $result;
     }
 
     /**

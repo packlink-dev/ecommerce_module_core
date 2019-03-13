@@ -9,6 +9,7 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
+use Packlink\BusinessLogic\Http\DTO\LocationInfo;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
@@ -165,6 +166,32 @@ class Proxy
         $response = $this->call(self::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
 
         return DropOff::fromArrayBatch($response->decodeBodyAsJson());
+    }
+
+    /**
+     * Performs search for locations.
+     *
+     * @param $platformCountry
+     * @param $postalZone
+     * @param $query
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function searchLocations($platformCountry, $postalZone, $query)
+    {
+        $url = 'locations/postalcodes?' . http_build_query(array(
+                'platform_country' => $platformCountry,
+                'postalzone' => $postalZone,
+                'q' => $query
+            ));
+
+        $response = $this->call(self::HTTP_METHOD_GET, $url);
+
+        return LocationInfo::fromArrayBatch($response->decodeBodyAsJson());
     }
 
     /**
