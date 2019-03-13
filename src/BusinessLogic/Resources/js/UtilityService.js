@@ -10,6 +10,7 @@ var Packlink = window.Packlink || {};
         this.hideSpinner = hideSpinner;
         this.cloneObject = cloneObject;
         this.showFlashMessage = showFlashMessage;
+        this.debounce = debounce;
 
         /**
          * Adds proper event listeners to input fields in order to allow input filed label translation.
@@ -98,6 +99,27 @@ var Packlink = window.Packlink || {};
          */
         function cloneObject(obj) {
             return JSON.parse(JSON.stringify(obj));
+        }
+
+        /**
+         * Debounces function.
+         *
+         * @param {number} delay
+         * @param {function} target
+         * @return {Function}
+         */
+        function debounce(delay, target) {
+            let timerId;
+            return function (...args) {
+                if (timerId) {
+                    clearTimeout(timerId);
+                }
+
+                timerId = setTimeout(function () {
+                    target(...args);
+                    timerId = null;
+                }, delay);
+            }
         }
 
         /** PRIVATE METHODS **/

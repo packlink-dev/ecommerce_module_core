@@ -7,8 +7,6 @@ var Packlink = window.Packlink || {};
             'name',
             'surname',
             'company',
-            'city',
-            'postal_code',
             'address',
             'phone',
             'email'
@@ -18,7 +16,6 @@ var Packlink = window.Packlink || {};
             'alias',
             'name',
             'surname',
-            'postal_code',
             'address',
             'phone',
             'email'
@@ -31,6 +28,13 @@ var Packlink = window.Packlink || {};
         let page;
 
         let country;
+
+        let currentPostalCode = '';
+        let currentCity = '';
+
+        let searchTerm = '';
+
+        let postalCodeInput = null;
 
         //Register public methods and variables.
         this.display = display;
@@ -55,13 +59,22 @@ var Packlink = window.Packlink || {};
 
             for (let field of warehouseFields) {
                 let input = templateService.getComponent(`pl-default-warehouse-${field}`, page);
-                if (input) {
-                    input.addEventListener('blur', onBlurHandler, true);
-                    if (response[field]) {
-                        input.value = response[field];
-                    }
+                input.addEventListener('blur', onBlurHandler, true);
+                if (response[field]) {
+                    input.value = response[field];
                 }
             }
+
+            postalCodeInput = templateService.getComponent('pl-default-warehouse-postal_code', page);
+            if (response['postal_code'] && response['city']) {
+                currentPostalCode = response['postal_code'];
+                currentCity = response['city'];
+                postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+            }
+
+            postalCodeInput.addEventListener('focus', onPostalCodeFocus);
+            postalCodeInput.addEventListener('blur', onPostalCodeBlur);
+            postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
 
             let submitButton = templateService.getComponent(
                 'pl-default-warehouse-submit-btn',
@@ -71,6 +84,98 @@ var Packlink = window.Packlink || {};
             submitButton.addEventListener('click', handleSubmitButtonClicked, true);
             utilityService.configureInputElements();
             utilityService.hideSpinner();
+        }
+
+        function onPostalCodeFocus() {
+            postalCodeInput.value = searchTerm;
+        }
+
+        function onPostalCodeBlur() {
+            searchTerm = '';
+            let autocompleteList = templateService.getComponent('pl-postal-codes-autocomplete', page);
+            if (autocompleteList) {
+                setTimeout(function () {
+                    postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+                    autocompleteList.remove();
+                }, 100);
+            } else {
+                postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+            }
+
+            templateService.removeError(postalCodeInput);
+        }
+
+        function onPostalCodeSearch(event) {
+            searchTerm = event.target.value;
+            if (searchTerm.length < 3) {
+                return;
+            }
+
+            ajaxService.post(configuration.searchPostalCodesUrl, {query: searchTerm}, renderPostalCodesAutocomplete);
+        }
+
+        function renderPostalCodesAutocomplete(response) {
+            let oldAutocomplete = templateService.getComponent('pl-postal-codes-autocomplete', page);
+
+            if (oldAutocomplete) {
+                oldAutocomplete.remove();
+            }
+
+            let newAutoComplete = createAutoCompleteNode();
+
+            createAutoCompleteListElements(newAutoComplete, response);
+
+            postalCodeInput.after(newAutoComplete);
+        }
+
+        function createAutoCompleteNode() {
+            let node = document.createElement('ul');
+            node.classList.add('pl-autocomplete-list');
+            node.setAttribute('id', 'pl-postal-codes-autocomplete');
+
+            return node;
+        }
+
+        function createAutoCompleteListElements(autoCompleteList, data) {
+            for (let elem of data) {
+                let listElement = document.createElement('li');
+
+                listElement.classList.add('pl-autocomplete-element');
+                listElement.setAttribute('data-pl-postal_code', elem['zipcode']);
+                listElement.setAttribute('data-pl-city', elem['city']);
+
+                listElement.innerHTML = elem['zipcode'] + ' - ' + elem['city'];
+
+                listElement.addEventListener('mouseover', function (event) {
+                    onAutoCompleteFocusChange(event, autoCompleteList);
+                });
+
+                listElement.addEventListener('click', onPostalCodeSelected);
+
+                autoCompleteList.appendChild(listElement);
+            }
+
+            let firstElem = autoCompleteList.firstChild;
+            if (firstElem) {
+                firstElem.classList.add('focus');
+            }
+        }
+
+        function onAutoCompleteFocusChange(event, autoCompleteList) {
+            for (let listElement of autoCompleteList.childNodes) {
+                if (listElement.classList && listElement.classList.contains('focus')) {
+                    listElement.classList.remove('focus');
+                }
+            }
+
+            event.target.classList.add('focus');
+        }
+
+        function onPostalCodeSelected(event) {
+            currentCity = event.target.getAttribute('data-pl-city');
+            currentPostalCode = event.target.getAttribute('data-pl-postal_code');
+
+            postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
         }
 
         /**
@@ -116,9 +221,19 @@ var Packlink = window.Packlink || {};
                 }
             }
 
+            if (!currentCity || !currentPostalCode) {
+                isValid = false;
+                templateService.setError(postalCodeInput, Packlink.errorMsgs.required);
+            } else {
+                templateService.removeError(postalCodeInput);
+            }
+
             if (isValid) {
                 utilityService.showSpinner();
                 model['country'] = country;
+                model['postal_code'] = currentPostalCode;
+                model['city'] = currentCity;
+
                 ajaxService.post(
                     configuration.submitUrl,
                     model,

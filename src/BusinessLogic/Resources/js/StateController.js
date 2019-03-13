@@ -14,7 +14,8 @@ var Packlink = window.Packlink || {};
             },
             'default-warehouse': {
                 getUrl: configuration.defaultWarehouseGetUrl,
-                submitUrl: configuration.defaultWarehouseSubmitUrl
+                submitUrl: configuration.defaultWarehouseSubmitUrl,
+                searchPostalCodesUrl: configuration.defaultWarehouseSearchPostalCodesUrl
             },
             'shipping-methods': {
                 getStatusUrl: configuration.dashboardGetStatusUrl,
