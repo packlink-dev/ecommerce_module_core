@@ -39,14 +39,15 @@ var Packlink = window.Packlink || {};
          *
          * @param {array} locations Array of Drop-Off locations.
          * @param {function} selectLocationCallback callback that is called when user selects location.
+         * @param {int | null} selectedId Set id of selected location. Set NULL if no location is selected.
          * @param {string} [language] Translation language code. Defaults to 'en' for English.
          */
-        function display(locations, selectLocationCallback, language) {
+        function display(locations, selectLocationCallback, selectedId, language) {
             templateContainer = document.getElementById('template-container');
             lang = typeof language === 'undefined' ? 'en' : language;
             selectCallback = selectLocationCallback;
             initializeSearchBox();
-            renderLocations(locations);
+            renderLocations(locations, selectedId);
         }
 
 
@@ -54,15 +55,16 @@ var Packlink = window.Packlink || {};
          * Message receiver.
          *
          * @param {object} payload
+         * @param {int | null} selectedId
          */
-        function renderLocations(payload) {
+        function renderLocations(payload, selectedId) {
             renderedLocations = [];
             for (let loc of payload) {
                 locations[loc.id] = loc;
                 renderedLocations.push(loc.id);
             }
 
-            addLocations();
+            addLocations(selectedId);
         }
 
         /**
@@ -108,7 +110,7 @@ var Packlink = window.Packlink || {};
         /**
          * Adds Locations.
          */
-        function addLocations() {
+        function addLocations(selectedId) {
             let locationsNode = getElement(document, 'locations');
 
             while (locationsNode.firstChild) {
@@ -129,6 +131,10 @@ var Packlink = window.Packlink || {};
                 let locationElement = createLocation(location);
                 dropOffs[id] = locationElement;
                 locationsNode.appendChild(locationElement);
+
+                if (selectedId && selectedId === id) {
+                    locationElement.click();
+                }
             }
         }
 
