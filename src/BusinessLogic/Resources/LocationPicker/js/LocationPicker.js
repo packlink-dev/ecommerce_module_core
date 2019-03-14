@@ -39,7 +39,7 @@ var Packlink = window.Packlink || {};
          *
          * @param {array} locations Array of Drop-Off locations.
          * @param {function} selectLocationCallback callback that is called when user selects location.
-         * @param {int | null} selectedId Set id of selected location. Set NULL if no location is selected.
+         * @param {string | null} selectedId Set id of selected location. Set NULL if no location is selected.
          * @param {string} [language] Translation language code. Defaults to 'en' for English.
          */
         function display(locations, selectLocationCallback, selectedId, language) {
@@ -55,7 +55,7 @@ var Packlink = window.Packlink || {};
          * Message receiver.
          *
          * @param {object} payload
-         * @param {int | null} selectedId
+         * @param {string | null} selectedId
          */
         function renderLocations(payload, selectedId) {
             renderedLocations = [];
@@ -109,6 +109,8 @@ var Packlink = window.Packlink || {};
 
         /**
          * Adds Locations.
+         *
+         * {string | null} selectedId
          */
         function addLocations(selectedId) {
             let locationsNode = getElement(document, 'locations');
