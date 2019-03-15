@@ -126,8 +126,8 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $instance->id = 12;
         $instance->name = 'First name test';
         $instance->showLogo = true;
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED;
-        $instance->fixedPricePolicy[] = new FixedPricePolicy(0, 10, 12);
+        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
+        $instance->fixedPriceByWeightPolicy[] = new FixedPricePolicy(0, 10, 12);
 
         $data = $instance->toArray();
 
@@ -136,10 +136,19 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertEquals($instance->name, $data['name']);
         self::assertEquals($instance->showLogo, $data['showLogo']);
         self::assertEquals($instance->pricePolicy, $data['pricePolicy']);
-        self::assertCount(1, $data['fixedPricePolicy']);
-        self::assertEquals(0, $data['fixedPricePolicy'][0]['from']);
-        self::assertEquals(10, $data['fixedPricePolicy'][0]['to']);
-        self::assertEquals(12, $data['fixedPricePolicy'][0]['amount']);
+        self::assertCount(1, $data['fixedPriceByWeightPolicy']);
+        self::assertEquals(0, $data['fixedPriceByWeightPolicy'][0]['from']);
+        self::assertEquals(10, $data['fixedPriceByWeightPolicy'][0]['to']);
+        self::assertEquals(12, $data['fixedPriceByWeightPolicy'][0]['amount']);
+
+        $instance->fixedPriceByValuePolicy[] = new FixedPricePolicy(0, 100, 120);
+        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
+        $data = $instance->toArray();
+
+        self::assertCount(1, $data['fixedPriceByValuePolicy']);
+        self::assertEquals(0, $data['fixedPriceByValuePolicy'][0]['from']);
+        self::assertEquals(100, $data['fixedPriceByValuePolicy'][0]['to']);
+        self::assertEquals(120, $data['fixedPriceByValuePolicy'][0]['amount']);
 
         $instance->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
         $instance->percentPricePolicy = new PercentPricePolicy(false, 10);
@@ -162,8 +171,8 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $instance->logoUrl = 'url';
         $instance->showLogo = false;
         $instance->selected = false;
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED;
-        $instance->fixedPricePolicy[] = new FixedPricePolicy(0, 10, 12);
+        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
+        $instance->fixedPriceByWeightPolicy[] = new FixedPricePolicy(0, 10, 12);
 
         $data = $instance->toArray();
 
@@ -179,10 +188,18 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertEquals($instance->showLogo, $data['showLogo']);
         self::assertEquals($instance->selected, $data['selected']);
         self::assertEquals($instance->pricePolicy, $data['pricePolicy']);
-        self::assertCount(1, $data['fixedPricePolicy']);
-        self::assertEquals(0, $data['fixedPricePolicy'][0]['from']);
-        self::assertEquals(10, $data['fixedPricePolicy'][0]['to']);
-        self::assertEquals(12, $data['fixedPricePolicy'][0]['amount']);
+        self::assertCount(1, $data['fixedPriceByWeightPolicy']);
+        self::assertEquals(0, $data['fixedPriceByWeightPolicy'][0]['from']);
+        self::assertEquals(10, $data['fixedPriceByWeightPolicy'][0]['to']);
+        self::assertEquals(12, $data['fixedPriceByWeightPolicy'][0]['amount']);
+
+        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
+        $instance->fixedPriceByValuePolicy[] = new FixedPricePolicy(0, 100, 120);
+        $data = $instance->toArray();
+        self::assertCount(1, $data['fixedPriceByValuePolicy']);
+        self::assertEquals(0, $data['fixedPriceByValuePolicy'][0]['from']);
+        self::assertEquals(100, $data['fixedPriceByValuePolicy'][0]['to']);
+        self::assertEquals(120, $data['fixedPriceByValuePolicy'][0]['amount']);
 
         $instance->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
         $instance->percentPricePolicy = new PercentPricePolicy(false, 10);
@@ -254,7 +271,10 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
         $this->assertNull($this->controller->save($shipment));
 
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED;
+        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
+        $this->assertNull($this->controller->save($shipment));
+
+        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
         $this->assertNull($this->controller->save($shipment));
     }
 
@@ -287,14 +307,16 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->percentPricePolicy = new PercentPricePolicy(true, 0.1);
         $this->assertNotNull($this->controller->save($shipment));
 
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED;
-        $shipment->fixedPricePolicy = array();
+        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
+        $shipment->fixedPriceByWeightPolicy = array();
+        $shipment->fixedPriceByWeightPolicy[] = new FixedPricePolicy(0, 1, 1);
+        $shipment->fixedPriceByWeightPolicy[] = new FixedPricePolicy(1, 2.5, 1.5);
+        $this->assertNotNull($this->controller->save($shipment));
 
-        $policy = new FixedPricePolicy(0, 1, 1);
-        $shipment->fixedPricePolicy[] = $policy;
-
-        $policy = new FixedPricePolicy(1, 2.5, 1.5);
-        $shipment->fixedPricePolicy[] = $policy;
+        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
+        $shipment->fixedPriceByValuePolicy = array();
+        $shipment->fixedPriceByValuePolicy[] = new FixedPricePolicy(0, 1, 1);
+        $shipment->fixedPriceByValuePolicy[] = new FixedPricePolicy(1, 2.5, 1.5);
         $this->assertNotNull($this->controller->save($shipment));
     }
 

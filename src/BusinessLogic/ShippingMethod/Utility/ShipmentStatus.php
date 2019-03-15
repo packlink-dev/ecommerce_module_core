@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\ShippingMethod\Utility;
 
 /**
- * Class ShipmentStatus
+ * Class ShipmentStatus.
+ *
  * @package Packlink\BusinessLogic\ShippingMethod\Utilitys
  */
 class ShipmentStatus

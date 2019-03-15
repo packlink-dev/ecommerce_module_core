@@ -26,9 +26,17 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
         $this->assertEquals(50, $config2->percentPricePolicy->amount);
         $this->assertEquals(true, $config2->percentPricePolicy->increase);
 
-        $config3 = ShippingMethodConfiguration::fromArray($this->getFixedPriceRawData());
-        $this->assertCount(2, $config3->fixedPricePolicy);
-        $policy = $config3->fixedPricePolicy[1];
+        $config3 = ShippingMethodConfiguration::fromArray($this->getFixedPriceRawData(true));
+        $this->assertCount(2, $config3->fixedPriceByWeightPolicy);
+        $policy = $config3->fixedPriceByWeightPolicy[0];
+        $this->assertInstanceOf('Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy', $policy);
+        $this->assertEquals(0, $policy->from);
+        $this->assertEquals(10, $policy->to);
+        $this->assertEquals(15, $policy->amount);
+
+        $config4 = ShippingMethodConfiguration::fromArray($this->getFixedPriceRawData(false));
+        $this->assertCount(2, $config4->fixedPriceByValuePolicy);
+        $policy = $config4->fixedPriceByValuePolicy[1];
         $this->assertInstanceOf('Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy', $policy);
         $this->assertEquals(10, $policy->from);
         $this->assertEquals(22.5, $policy->to);
@@ -72,16 +80,21 @@ class ShippingMethodConfigurationTest extends BaseTestWithServices
     /**
      * Returns raw data that corresponds to Shipping method configuration with fixed price policy.
      *
+     * @param bool $byWeight
+     *
      * @return array
      */
-    protected function getFixedPriceRawData()
+    protected function getFixedPriceRawData($byWeight)
     {
+        $policy = $byWeight ? 'fixedPriceByWeightPolicy' : 'fixedPriceByValuePolicy';
+        $pricePolicy = $byWeight ? ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT
+            : ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
         return array(
             'id' => 1,
             'name' => 'Test',
             'showLogo' => true,
-            'pricePolicy' => ShippingMethod::PRICING_POLICY_FIXED,
-            'fixedPricePolicy' => array(
+            'pricePolicy' => $pricePolicy,
+            $policy => array(
                 array(
                     'from' => 0,
                     'to' => 10,

@@ -4,20 +4,20 @@ namespace Packlink\BusinessLogic\ShippingMethod\Models;
 
 /**
  * Class FixedPricePolicy.
- * Used for ShippingMethod when fixed price policy is applied.
+ * Used for ShippingMethod when fixed price policy by weight or price is applied.
  *
  * @package Packlink\BusinessLogic\ShippingMethod\Models
  */
 class FixedPricePolicy
 {
     /**
-     * Weight of package in kg from which policy is applied (lower boundary).
+     * Weight of package in kg or cart value in EUR from which policy is applied (lower boundary).
      *
      * @var float
      */
     public $from;
     /**
-     * Weight of package in kg to which policy is applied (upper boundary).
+     * Weight of package in kg or cart value in EUR to which policy is applied (upper boundary).
      *
      * @var float
      */
@@ -32,8 +32,8 @@ class FixedPricePolicy
     /**
      * FixedPricePolicy constructor.
      *
-     * @param float $from Weight of package in kg from which policy is applied (lower boundary).
-     * @param float $to Weight of package in kg to which policy is applied (upper boundary).
+     * @param float $from Weight of package in kg or cart value in EUR from which policy is applied (lower boundary).
+     * @param float $to Weight of package in kg or cart value in EUR to which policy is applied (upper boundary).
      * @param float $amount Price in EUR.
      */
     public function __construct($from, $to, $amount)

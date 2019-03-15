@@ -17,21 +17,22 @@ class PricingPolicyValidator
      * Rules for each policy:
      *   1. 'from' must be equal to 'to' of a previous policy, for first it must be 0
      *   2. 'to' must be greater than 'from'
-     *   3. 'amount' must be a positive number
+     *   3. 'amount' must be a positive number or zero if parameter $allowZeroPrice is set to TRUE
      *
      * @param FixedPricePolicy[] $fixedPricePolicies Policies array to validate.
+     * @param bool $allowZeroPrice Indicates whether amount can be equal to zero.
      *
      * @throws \InvalidArgumentException When range and/or amount are not valid.
      */
-    public static function validateFixedPricePolicy($fixedPricePolicies)
+    public static function validateFixedPricePolicy($fixedPricePolicies, $allowZeroPrice = false)
     {
         if (count($fixedPricePolicies) > 0) {
             $count = count($fixedPricePolicies);
             $previous = $fixedPricePolicies[0];
-            self::validateSingleFixedPricePolicy($previous, 0);
+            self::validateSingleFixedPricePolicy($previous, 0, $allowZeroPrice);
 
             for ($i = 1; $i < $count; $i++) {
-                self::validateSingleFixedPricePolicy($fixedPricePolicies[$i], $previous->to);
+                self::validateSingleFixedPricePolicy($fixedPricePolicies[$i], $previous->to, $allowZeroPrice);
                 $previous = $fixedPricePolicies[$i];
             }
         }
@@ -59,12 +60,17 @@ class PricingPolicyValidator
      *
      * @param FixedPricePolicy $policy Policy to validate.
      * @param float $lowerBoundary Value of 'from' field.
+     * @param bool $allowZeroPrice Indicates whether amount can be equal to zero.
      *
      * @throws \InvalidArgumentException When range and/or amount are not valid.
      */
-    protected static function validateSingleFixedPricePolicy($policy, $lowerBoundary)
+    protected static function validateSingleFixedPricePolicy($policy, $lowerBoundary, $allowZeroPrice = false)
     {
-        if ((float)$policy->from !== (float)$lowerBoundary || $policy->from >= $policy->to || $policy->amount <= 0) {
+        if ((float)$policy->from !== (float)$lowerBoundary
+            || $policy->from >= $policy->to
+            || ($allowZeroPrice && $policy->amount < 0)
+            || (!$allowZeroPrice && $policy->amount <= 0)
+        ) {
             throw new \InvalidArgumentException('Fixed price policies are not valid. Check range and amounts.');
         }
     }

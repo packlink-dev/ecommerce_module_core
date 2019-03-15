@@ -211,12 +211,20 @@ class ShippingMethodService extends BaseService
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param Package[] $packages Array of packages.
+     * @param Package[] $packages Array of packages if calculation is done by weight.
+     * @param float $totalAmount Total cart value if calculation is done by value
      *
      * @return float Calculated shipping cost
      */
-    public function getShippingCost($methodId, $fromCountry, $fromZip, $toCountry, $toZip, array $packages)
-    {
+    public function getShippingCost(
+        $methodId,
+        $fromCountry,
+        $fromZip,
+        $toCountry,
+        $toZip,
+        array $packages,
+        $totalAmount
+    ) {
         $shippingMethod = $this->getShippingMethod($methodId);
         if ($shippingMethod === null || !$shippingMethod->isActivated()) {
             Logger::logWarning(
@@ -233,7 +241,8 @@ class ShippingMethodService extends BaseService
             $fromZip,
             $toCountry,
             $toZip,
-            $packages
+            $packages,
+            $totalAmount
         );
     }
 
@@ -245,7 +254,8 @@ class ShippingMethodService extends BaseService
      * @param string $fromZip Departure zip code.
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
-     * @param Package[] $packages Array of packages.
+     * @param Package[] $packages Array of packages if calculation is done by weight.
+     * @param float $totalAmount Total cart value if calculation is done by value
      *
      * @return array <p>Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
      *  array(
@@ -255,7 +265,7 @@ class ShippingMethodService extends BaseService
      *  )
      * </p>
      */
-    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages)
+    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages, $totalAmount)
     {
         $activeMethods = $this->getActiveMethods();
         if (empty($activeMethods)) {
@@ -268,7 +278,8 @@ class ShippingMethodService extends BaseService
             $fromZip,
             $toCountry,
             $toZip,
-            $packages
+            $packages,
+            $totalAmount
         );
     }
 
@@ -373,7 +384,10 @@ class ShippingMethodService extends BaseService
         $newService = ShippingService::fromServiceDetails($service);
         $set = false;
         foreach ($shippingMethod->getShippingServices() as $currentService) {
-            if ($currentService->serviceId === $newService->serviceId) {
+            if ($currentService->serviceId === $newService->serviceId
+                && $currentService->departureCountry === $newService->departureCountry
+                && $currentService->destinationCountry === $newService->destinationCountry
+            ) {
                 $currentService->serviceName = $newService->serviceName;
                 $currentService->basePrice = $newService->basePrice;
                 $currentService->totalPrice = $newService->totalPrice;

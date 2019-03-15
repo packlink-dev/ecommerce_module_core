@@ -4,7 +4,8 @@ var Packlink = window.Packlink || {};
     function ShippingMethodsController(configuration) {
         const PRICING_POLICY_PACKLINK = 1;
         const PRICING_POLICY_PERCENT = 2;
-        const PRICING_POLICY_FIXED = 3;
+        const PRICING_POLICY_FIXED_BY_WEIGHT = 3;
+        const PRICING_POLICY_FIXED_BY_VALUE = 4;
 
         const STATUSES = [
             'disabled',
@@ -427,8 +428,10 @@ var Packlink = window.Packlink || {};
 
             if (shippingMethod.pricePolicy === PRICING_POLICY_PERCENT) {
                 indicator = 'percent';
-            } else if (shippingMethod.pricePolicy === PRICING_POLICY_FIXED) {
-                indicator = 'fixed';
+            } else if (shippingMethod.pricePolicy === PRICING_POLICY_FIXED_BY_WEIGHT) {
+                indicator = 'fixed-weight';
+            } else if (shippingMethod.pricePolicy === PRICING_POLICY_FIXED_BY_VALUE) {
+                indicator = 'fixed-value';
             }
 
             templateService.getComponent('data-pl-price-indicator', template, indicator).classList.add('selected');
@@ -603,11 +606,11 @@ var Packlink = window.Packlink || {};
                 templateService.getComponent('pl-tax-selector', template).value = methodModel.taxClass;
             }
 
-            if (methodModel.pricePolicy === PRICING_POLICY_FIXED) {
-                displayFixedPricesSubform(false, false, true, true);
-            }
-
-            if (methodModel.pricePolicy === PRICING_POLICY_PERCENT) {
+            if (methodModel.pricePolicy === PRICING_POLICY_FIXED_BY_WEIGHT) {
+                displayFixedPricesSubForm(false, false, true, true, true);
+            } else if (methodModel.pricePolicy === PRICING_POLICY_FIXED_BY_VALUE) {
+                displayFixedPricesSubForm(false, false, true, true, false);
+            } else if (methodModel.pricePolicy === PRICING_POLICY_PERCENT) {
                 displayPercentForm(true);
             }
 
@@ -731,12 +734,18 @@ var Packlink = window.Packlink || {};
                 utilityService.showSpinner();
 
                 if (methodModel.pricePolicy === PRICING_POLICY_PACKLINK) {
-                    delete methodModel.fixedPricePolicy;
+                    delete methodModel.fixedPriceByWeightPolicy;
+                    delete methodModel.fixedPriceByValuePolicy;
                     delete methodModel.percentPricePolicy;
                 } else if (methodModel.pricePolicy === PRICING_POLICY_PERCENT) {
-                    delete methodModel.fixedPricePolicy;
+                    delete methodModel.fixedPriceByWeightPolicy;
+                    delete methodModel.fixedPriceByValuePolicy;
+                } else if (methodModel.pricePolicy === PRICING_POLICY_FIXED_BY_VALUE) {
+                    delete methodModel.percentPricePolicy;
+                    delete methodModel.fixedPriceByWeightPolicy;
                 } else {
                     delete methodModel.percentPricePolicy;
+                    delete methodModel.fixedPriceByValuePolicy;
                 }
 
                 if (configuration.hasTaxConfiguration) {
@@ -753,7 +762,10 @@ var Packlink = window.Packlink || {};
                         renderShippingMethods();
 
                         if (getNumberOfActiveServices() === 1) {
-                            ajaxService.get(configuration.getShopShippingMethodCountUrl, getShopShippingMethodsCountCallback);
+                            ajaxService.get(
+                                configuration.getShopShippingMethodCountUrl,
+                                getShopShippingMethodsCountCallback
+                            );
                         } else {
                             utilityService.hideSpinner();
                         }
@@ -764,7 +776,6 @@ var Packlink = window.Packlink || {};
                         }
 
                         closeConfigForm();
-
                         utilityService.hideSpinner();
                     }
                 );
@@ -804,10 +815,10 @@ var Packlink = window.Packlink || {};
                 }
             }
 
-            if (methodModel.pricePolicy === PRICING_POLICY_FIXED) {
-                if (!isFixedPriceValid(true, true)) {
-                    isValid = false;
-                }
+            if ((methodModel.pricePolicy === PRICING_POLICY_FIXED_BY_WEIGHT && !isFixedPriceValid(true, true, true))
+                || (methodModel.pricePolicy === PRICING_POLICY_FIXED_BY_VALUE && !isFixedPriceValid(true, true, false))
+            ) {
+                isValid = false;
             }
 
             return isValid;
@@ -824,54 +835,56 @@ var Packlink = window.Packlink || {};
             if (pricingPolicy === PRICING_POLICY_PACKLINK) {
                 methodModel.pricePolicy = PRICING_POLICY_PACKLINK;
                 templateService.setTemplate('', 'pl-pricing-extension-point');
-            }
-
-            if (pricingPolicy === PRICING_POLICY_FIXED) {
-                displayFixedPricesSubform(false, false, true, true);
-            }
-
-            if (pricingPolicy === PRICING_POLICY_PERCENT) {
+            } else if (pricingPolicy === PRICING_POLICY_FIXED_BY_WEIGHT) {
+                displayFixedPricesSubForm(false, false, true, true, true);
+            } else if (pricingPolicy === PRICING_POLICY_FIXED_BY_VALUE) {
+                displayFixedPricesSubForm(false, false, true, true, false);
+            } else if (pricingPolicy === PRICING_POLICY_PERCENT) {
                 displayPercentForm(true);
             }
         }
 
-
         /**
-         * Displays fixed prices subform.
+         * Displays fixed prices sub-form.
          *
          * @param {boolean} validateLastAmount
          * @param {boolean} validateLastTo
          * @param {boolean} rerenderForm
          * @param {boolean} shouldFocus
+         * @param {boolean} byWeight
          */
-        function displayFixedPricesSubform(validateLastAmount, validateLastTo, rerenderForm, shouldFocus) {
+        function displayFixedPricesSubForm(validateLastAmount, validateLastTo, rerenderForm, shouldFocus, byWeight) {
+            let policy = getFixedPricePolicy(byWeight);
             if (rerenderForm) {
                 let point = templateService.setTemplate(
-                    'pl-fixed-prices-template',
+                    byWeight ? 'pl-fixed-prices-by-weight-template' : 'pl-fixed-prices-by-value-template',
                     'pl-pricing-extension-point'
                 );
 
                 let addButton = templateService.getComponent('pl-fixed-price-add', point);
-                addButton.addEventListener('click', addFixedPriceCriteria, true);
+                addButton.addEventListener(
+                    'click',
+                    byWeight ? addFixedPriceByWeightCriteria : addFixedPriceByValueCriteria,
+                    true
+                );
 
-                methodModel.pricePolicy = PRICING_POLICY_FIXED;
-
-                if (!methodModel.fixedPricePolicy || methodModel.fixedPricePolicy.length === 0) {
-                    methodModel.fixedPricePolicy = [];
-                    methodModel.fixedPricePolicy.push({from: 0, to: '', amount: ''});
+                methodModel.pricePolicy = byWeight ? PRICING_POLICY_FIXED_BY_WEIGHT : PRICING_POLICY_FIXED_BY_VALUE;
+                if (!methodModel[policy] || methodModel[policy].length === 0) {
+                    methodModel[policy] = [];
+                    methodModel[policy].push({from: 0, to: '', amount: ''});
                 }
 
                 let addedPricePoint = templateService.getComponent('pl-fixed-price-criteria-extension-point', point);
-                for (let i = 0; i < methodModel.fixedPricePolicy.length; i++) {
-                    constructFixedPrice(methodModel.fixedPricePolicy[i], i, addedPricePoint);
+                for (let i = 0; i < methodModel[policy].length; i++) {
+                    constructFixedPrice(methodModel[policy], i, addedPricePoint, byWeight);
 
-                    if (shouldFocus && (i === methodModel.fixedPricePolicy.length -1)) {
+                    if (shouldFocus && (i === methodModel[policy].length - 1)) {
                         templateService.getComponent('data-pl-to-id', extensionPoint, i).focus();
                     }
                 }
             }
 
-            isFixedPriceValid(validateLastAmount, validateLastTo);
+            isFixedPriceValid(validateLastAmount, validateLastTo, byWeight);
 
             utilityService.configureInputElements();
         }
@@ -881,50 +894,77 @@ var Packlink = window.Packlink || {};
          *
          * @param event
          */
-        function addFixedPriceCriteria(event) {
-            let index = methodModel.fixedPricePolicy.length - 1;
-            let currentCriteria = methodModel.fixedPricePolicy[index];
+        function addFixedPriceByWeightCriteria(event) {
+            addFixedPriceCriteria(event, true);
+        }
 
-            if (
-                currentCriteria.to &&
-                typeof currentCriteria.to === 'number' &&
-                currentCriteria.to > currentCriteria.from &&
-                currentCriteria.amount &&
-                typeof currentCriteria.amount === 'number' &&
-                currentCriteria.amount > 0
+        /**
+         * Handles fixed price criteria added event.
+         *
+         * @param event
+         */
+        function addFixedPriceByValueCriteria(event) {
+            addFixedPriceCriteria(event, false);
+        }
+
+        /**
+         * Handles fixed price criteria added event.
+         *
+         * @param event
+         * @param {boolean} byWeight
+         */
+        function addFixedPriceCriteria(event, byWeight) {
+            let policy = getFixedPricePolicy(byWeight);
+            let index = methodModel[policy].length - 1;
+            let currentCriteria = methodModel[policy][index];
+
+            if (currentCriteria.to
+                && typeof currentCriteria.to === 'number'
+                && currentCriteria.to > currentCriteria.from
+                && currentCriteria.amount
+                && typeof currentCriteria.amount === 'number'
+                && currentCriteria.amount > 0
             ) {
-                methodModel.fixedPricePolicy.push({from: currentCriteria.to, to: '', amount: ''});
-                displayFixedPricesSubform(false, false, true, true);
+                methodModel[policy].push({from: currentCriteria.to, to: '', amount: ''});
+                displayFixedPricesSubForm(false, false, true, true, byWeight);
+
                 return;
             }
 
-            displayFixedPricesSubform(true, true, false, false);
+            displayFixedPricesSubForm(true, true, false, false, byWeight);
         }
 
         /**
          * Fills already added fixed price policy.
          * Attaches event handler to remove button.
          *
-         * @param {object} policy
+         * @param {object} policies
          * @param {int} id
          * @param {Element} point
+         * @param {boolean} byWeight
          */
-        function constructFixedPrice(policy, id, point) {
-            let template = templateService.getTemplate('pl-fixed-price-criteria-template')[0];
+        function constructFixedPrice(policies, id, point, byWeight) {
+            let template = templateService.getTemplate(
+                byWeight ? 'pl-fixed-price-by-weight-criteria-template' : 'pl-fixed-price-by-value-criteria-template'
+            )[0];
 
             template.setAttribute('data-pl-row', id);
 
-            if (methodModel.fixedPricePolicy.length === 1) {
+            if (policies.length === 1) {
                 template.classList.add('first');
             } else {
                 template.classList.remove('first');
             }
 
-            initializeCriteriaFields(policy, id, template);
+            initializeCriteriaFields(policies[id], id, template, byWeight);
 
             let removeBtn = templateService.getComponent('data-pl-remove', template, 'criteria');
 
-            removeBtn.addEventListener('click', handleFixedPriceCriteriaRemoved, true);
+            removeBtn.addEventListener(
+                'click',
+                byWeight ? handleFixedPriceByWeightCriteriaRemoved : handleFixedPriceByValueCriteriaRemoved,
+                true
+            );
             removeBtn.setAttribute('data-pl-criteria-id', id);
 
             point.appendChild(template);
@@ -936,8 +976,9 @@ var Packlink = window.Packlink || {};
          * @param {object} policy
          * @param {int} id
          * @param {Element} template
+         * @param {boolean} byWeight
          */
-        function initializeCriteriaFields(policy, id, template) {
+        function initializeCriteriaFields(policy, id, template, byWeight) {
             let fields = [
                 'from',
                 'to',
@@ -950,12 +991,19 @@ var Packlink = window.Packlink || {};
                 input.setAttribute(`data-pl-${field}-id`, id);
 
                 if (field === 'to') {
-                    input.addEventListener('blur', onFixedPriceToBlur, true);
+                    input.addEventListener(
+                        'blur',
+                        byWeight ? onFixedPriceByWeightToBlur : onFixedPriceByValueToBlur, true
+                    );
                     input.setAttribute('tabindex', id * 2 + 1);
                 }
 
                 if (field === 'amount') {
-                    input.addEventListener('blur', onFixedPriceAmountBlur, true);
+                    input.addEventListener(
+                        'blur',
+                        byWeight ? onFixedPriceByWeightAmountBlur : onFixedPriceByValueAmountBlur,
+                        true
+                    );
                     input.setAttribute('tabindex', id * 2 + 2);
                 }
             }
@@ -966,22 +1014,42 @@ var Packlink = window.Packlink || {};
          *
          * @param event
          */
-        function onFixedPriceToBlur(event) {
+        function onFixedPriceByWeightToBlur(event) {
+            onFixedPriceToBlur(event, true);
+        }
+
+        /**
+         * Handles blur event on to input field.
+         *
+         * @param event
+         */
+        function onFixedPriceByValueToBlur(event) {
+            onFixedPriceToBlur(event, false);
+        }
+
+        /**
+         * Handles blur event on to input field.
+         *
+         * @param event
+         * @param {boolean} byWeight
+         */
+        function onFixedPriceToBlur(event, byWeight) {
+            let policy = getFixedPricePolicy(byWeight);
             let index = parseInt(event.target.getAttribute('data-pl-to-id'));
             let value = event.target.value;
             let numericValue = parseFloat(value);
-            methodModel.fixedPricePolicy[index].to = event.target.value == numericValue ? numericValue : value;
+            methodModel[policy][index].to = event.target.value == numericValue ? numericValue : value;
 
             if (value !== '' && !isNaN(value)) {
-                if (index < methodModel.fixedPricePolicy.length - 1) {
-                    let successor = methodModel.fixedPricePolicy[index + 1];
-                    let isSuccessorLast = index + 1 === methodModel.fixedPricePolicy.length - 1;
+                if (index < methodModel[policy].length - 1) {
+                    let successor = methodModel[policy][index + 1];
+                    let isSuccessorLast = index + 1 === methodModel[policy].length - 1;
 
-                    if (
-                        typeof successor.to === 'number' && (successor.to > numericValue || (isSuccessorLast)) ||
-                        typeof successor.to !== 'number'
+                    if (typeof successor.to === 'number'
+                        && (successor.to > numericValue || isSuccessorLast)
+                        || typeof successor.to !== 'number'
                     ) {
-                        successor.from = methodModel.fixedPricePolicy[index].to;
+                        successor.from = methodModel[policy][index].to;
                         let fromInput = templateService.getComponent('data-pl-from-id', extensionPoint, index + 1);
                         fromInput.value = successor.from;
                         if ((isSuccessorLast) && typeof successor.to === 'number' && successor.to <= successor.from) {
@@ -992,7 +1060,7 @@ var Packlink = window.Packlink || {};
             }
 
             templateService.removeError(event.target);
-            displayFixedPricesSubform(false, index === methodModel.fixedPricePolicy.length - 1, false, false);
+            displayFixedPricesSubForm(false, index === methodModel[policy].length - 1, false, false, byWeight);
         }
 
         /**
@@ -1000,12 +1068,33 @@ var Packlink = window.Packlink || {};
          *
          * @param event
          */
-        function onFixedPriceAmountBlur(event) {
+        function onFixedPriceByWeightAmountBlur(event) {
+            onFixedPriceAmountBlur(event, true);
+        }
+
+        /**
+         * Handles fixed price criteria amount blur event.
+         *
+         * @param event
+         */
+        function onFixedPriceByValueAmountBlur(event) {
+            onFixedPriceAmountBlur(event, false);
+        }
+
+        /**
+         * Handles fixed price criteria amount blur event.
+         *
+         * @param event
+         * @param {boolean} byWeight
+         */
+        function onFixedPriceAmountBlur(event, byWeight) {
+            let policy = getFixedPricePolicy(byWeight);
             let index = parseInt(event.target.getAttribute('data-pl-amount-id'));
             let numeric = parseFloat(event.target.value);
-            methodModel.fixedPricePolicy[index].amount = event.target.value == numeric ? numeric : event.target.value;
+
+            methodModel[policy][index].amount = event.target.value == numeric ? numeric : event.target.value;
             templateService.removeError(event.target);
-            displayFixedPricesSubform(index === methodModel.fixedPricePolicy.length - 1, false, false, false);
+            displayFixedPricesSubForm(index === methodModel[policy].length - 1, false, false, false, byWeight);
         }
 
         /**
@@ -1013,51 +1102,31 @@ var Packlink = window.Packlink || {};
          *
          * @param validateLastAmount
          * @param validateLastTo
+         * @param {boolean} byWeight
          *
          * @return {boolean}
          */
-        function isFixedPriceValid(validateLastAmount, validateLastTo) {
-            if (!isFixedPriceInputTypeValid()) {
-                return false;
-            }
-
-            if (!isFixedPriceAmountValid()) {
-                return false;
-            }
-
-            if (!isFixedPriceRangeValid()) {
-                return false;
-            }
-
-            if (!isFixedPriceNumberOfDecimalPlacesValid()) {
+        function isFixedPriceValid(validateLastAmount, validateLastTo, byWeight) {
+            if (!isFixedPriceInputTypeValid(byWeight)
+                || !isFixedPriceAmountValid(byWeight)
+                || !isFixedPriceRangeValid(byWeight)
+                || !isFixedPriceNumberOfDecimalPlacesValid(byWeight)
+            ) {
                 return false;
             }
 
             if (validateLastAmount || validateLastTo) {
                 let result = true;
-                let index = methodModel.fixedPricePolicy.length - 1;
+                let policies = methodModel[getFixedPricePolicy(byWeight)];
+                let index = policies.length - 1;
+                let last = policies[index];
 
-                let last = methodModel.fixedPricePolicy[index];
                 if (validateLastTo) {
-                    let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, index);
-                    if (last.to === '' || isNaN(last.to) || typeof last.to !== 'number' || last.to <= last.from ||
-                        last.to != parseFloat(last.to.toFixed(2))) {
-                        result = false;
-                        templateService.setError(input, Packlink.errorMsgs.invalid);
-                    } else {
-                        templateService.removeError(input);
-                    }
+                    result = validateFixedPriceField('to', last, index, last.from);
                 }
 
                 if (validateLastAmount) {
-                    let input = templateService.getComponent('data-pl-amount-id', tableExtensionPoint, index);
-                    if (last.amount === '' || isNaN(last.amount) || typeof last.amount !== 'number' || last.amount <= 0 ||
-                        last.amount != parseFloat(last.amount.toFixed(2))) {
-                        result = false;
-                        templateService.setError(input, Packlink.errorMsgs.invalid);
-                    } else {
-                        templateService.removeError(input);
-                    }
+                    result = validateFixedPriceField('amount', last, index, byWeight ? 0.001 : 0);
                 }
 
                 return result;
@@ -1066,16 +1135,35 @@ var Packlink = window.Packlink || {};
             return true;
         }
 
+        function validateFixedPriceField(fieldName, last, index, lowerBound) {
+            let input = templateService.getComponent('data-pl-' + fieldName + '-id', tableExtensionPoint, index);
+            let result = true;
+            if (last[fieldName] === ''
+                || isNaN(last[fieldName])
+                || typeof last[fieldName] !== 'number'
+                || last[fieldName] < lowerBound
+                || last[fieldName] != parseFloat(last[fieldName].toFixed(2))
+            ) {
+                result = false;
+                templateService.setError(input, Packlink.errorMsgs.invalid);
+            } else {
+                templateService.removeError(input);
+            }
+
+            return result;
+        }
+
         /**
          * Validates fixed price input type.
          */
-        function isFixedPriceInputTypeValid() {
+        function isFixedPriceInputTypeValid(byWeight) {
+            let policies = methodModel[getFixedPricePolicy(byWeight)];
             let fields = ['amount', 'to'];
             let result = true;
 
-            for (let i = 0; i < methodModel.fixedPricePolicy.length - 1; i++) {
+            for (let i = 0; i < policies.length - 1; i++) {
                 for (let field of fields) {
-                    let value = methodModel.fixedPricePolicy[i][field];
+                    let value = policies[i][field];
                     if (value === '' || isNaN(value) || typeof value !== 'number') {
                         let input = templateService.getComponent(`data-pl-${field}-id`, tableExtensionPoint, i);
                         templateService.setError(input, Packlink.errorMsgs.numeric);
@@ -1092,11 +1180,13 @@ var Packlink = window.Packlink || {};
          *
          * @return {boolean}
          */
-        function isFixedPriceAmountValid() {
+        function isFixedPriceAmountValid(byWeight) {
             let result = true;
+            let boundary = byWeight ? 0.0001 : 0;
+            let policies = methodModel[getFixedPricePolicy(byWeight)];
 
-            for (let i = 0; i < methodModel.fixedPricePolicy.length - 1; i++) {
-                if (methodModel.fixedPricePolicy[i]['amount'] <= 0) {
+            for (let i = 0; i < policies.length - 1; i++) {
+                if (policies[i]['amount'] < boundary) {
                     let input = templateService.getComponent('data-pl-amount-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.invalid);
                     result = false;
@@ -1111,11 +1201,13 @@ var Packlink = window.Packlink || {};
          *
          * @return {boolean}
          */
-        function isFixedPriceRangeValid() {
+        function isFixedPriceRangeValid(byWeight) {
+            let policies = methodModel[getFixedPricePolicy(byWeight)];
             let result = true;
-            for (let i = 0; i < methodModel.fixedPricePolicy.length - 1; i++) {
-                let current = methodModel.fixedPricePolicy[i];
-                let successor = methodModel.fixedPricePolicy[i + 1];
+
+            for (let i = 0; i < policies.length - 1; i++) {
+                let current = policies[i];
+                let successor = policies[i + 1];
                 if (current.from >= current.to || successor.from && current.to > successor.from) {
                     let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.invalid);
@@ -1129,11 +1221,12 @@ var Packlink = window.Packlink || {};
         /**
          * Validates fixed price number of decimal places.
          */
-        function isFixedPriceNumberOfDecimalPlacesValid() {
+        function isFixedPriceNumberOfDecimalPlacesValid(byWeight) {
+            let policies = methodModel[getFixedPricePolicy(byWeight)];
             let result = true;
 
-            for (let i = 0; i < methodModel.fixedPricePolicy.length - 1; i++) {
-                let current = methodModel.fixedPricePolicy[i];
+            for (let i = 0; i < policies.length - 1; i++) {
+                let current = policies[i];
                 if (current.to != current.to.toFixed(2)) {
                     let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.numberOfDecimalPlaces);
@@ -1155,18 +1248,42 @@ var Packlink = window.Packlink || {};
          *
          * @param event
          */
-        function handleFixedPriceCriteriaRemoved(event) {
-            let index = parseInt(event.target.getAttribute('data-pl-criteria-id'));
-            if (index !== methodModel.fixedPricePolicy.length - 1) {
-                methodModel.fixedPricePolicy[index + 1].from = methodModel.fixedPricePolicy[index].from;
-            }
-
-            methodModel.fixedPricePolicy.splice(index, 1);
-            displayFixedPricesSubform(false, false, true, true);
+        function handleFixedPriceByWeightCriteriaRemoved(event) {
+            handleFixedPriceCriteriaRemoved(event, true);
         }
 
         /**
-         * Displays packlink percent subform.
+         * Handles removal of fixed price criteria.
+         *
+         * @param event
+         */
+        function handleFixedPriceByValueCriteriaRemoved(event) {
+            handleFixedPriceCriteriaRemoved(event, false);
+        }
+
+        /**
+         * Handles removal of fixed price criteria.
+         *
+         * @param event
+         * @param {boolean} byWeight
+         */
+        function handleFixedPriceCriteriaRemoved(event, byWeight) {
+            let policies = methodModel[getFixedPricePolicy(byWeight)];
+            let index = parseInt(event.target.getAttribute('data-pl-criteria-id'));
+            if (index !== policies.length - 1) {
+                policies[index + 1].from = policies[index].from;
+            }
+
+            policies.splice(index, 1);
+            displayFixedPricesSubForm(false, false, true, true, byWeight);
+        }
+
+        function getFixedPricePolicy(byWeight) {
+            return byWeight ? 'fixedPriceByWeightPolicy' : 'fixedPriceByValuePolicy';
+        }
+
+        /**
+         * Displays packlink percent sub-form.
          *
          * @param {boolean} [shouldFocusInput]
          */

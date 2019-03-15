@@ -45,11 +45,17 @@ class ShippingMethodConfiguration extends BaseDto
      */
     public $percentPricePolicy;
     /**
-     * Fixed price policy.
+     * Fixed price package weight policy.
      *
      * @var FixedPricePolicy[]
      */
-    public $fixedPricePolicy = array();
+    public $fixedPriceByWeightPolicy = array();
+    /**
+     * Fixed price by cart value policy.
+     *
+     * @var FixedPricePolicy[]
+     */
+    public $fixedPriceByValuePolicy = array();
     /**
      * Shop tax class.
      *
@@ -76,11 +82,16 @@ class ShippingMethodConfiguration extends BaseDto
             $result['percentPricePolicy'] = $this->percentPricePolicy->toArray();
         }
 
-        if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED && $this->fixedPricePolicy) {
-            $result['fixedPricePolicy'] = array();
-            foreach ($this->fixedPricePolicy as $item) {
-                $result['fixedPricePolicy'][] = $item->toArray();
-            }
+        if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT
+            && $this->fixedPriceByWeightPolicy
+        ) {
+            $this->setFixedPricePolicyToArray($result, 'fixedPriceByWeightPolicy');
+        }
+
+        if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE
+            && $this->fixedPriceByValuePolicy
+        ) {
+            $this->setFixedPricePolicyToArray($result, 'fixedPriceByValuePolicy');
         }
 
         return $result;
@@ -95,7 +106,7 @@ class ShippingMethodConfiguration extends BaseDto
      */
     public static function fromArray(array $raw)
     {
-        $result = new self();
+        $result = new static();
 
         $result->id = $raw['id'];
         $result->name = $raw['name'];
@@ -109,14 +120,48 @@ class ShippingMethodConfiguration extends BaseDto
             $result->percentPricePolicy = PercentPricePolicy::fromArray($value);
         }
 
-        if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED) {
-            $value = $raw['fixedPricePolicy'];
-            $result->fixedPricePolicy = array();
-            foreach ($value as $policy) {
-                $result->fixedPricePolicy[] = FixedPricePolicy::fromArray($policy);
-            }
+        if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT) {
+            self::setFixedPricingPolicyFromArray($result, $raw, 'fixedPriceByWeightPolicy');
+        }
+
+        if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE) {
+            self::setFixedPricingPolicyFromArray($result, $raw, 'fixedPriceByValuePolicy');
         }
 
         return $result;
+    }
+
+    /**
+     * Transforms fixed price policy to array and sets it to the given array.
+     *
+     * @param array $result Resulting array
+     * @param string $type Type of the pricing policy
+     */
+    protected function setFixedPricePolicyToArray(array &$result, $type)
+    {
+        $result[$type] = array();
+        /** @var FixedPricePolicy $item */
+        foreach ($this->$type as $item) {
+            $result[$type][] = $item->toArray();
+        }
+    }
+
+    /**
+     * Transforms fixed price policy from array and sets it to the given instance.
+     *
+     * @param static $result
+     * @param array $raw
+     * @param string $type
+     */
+    protected static function setFixedPricingPolicyFromArray($result, array $raw, $type)
+    {
+        $values = array();
+        if (array_key_exists($type, $raw)) {
+            foreach ($raw[$type] as $policy) {
+                $values[] = FixedPricePolicy::fromArray($policy);
+            }
+        }
+
+        $result->$type = $values;
     }
 }

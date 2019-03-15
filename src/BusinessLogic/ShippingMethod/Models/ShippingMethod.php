@@ -27,9 +27,13 @@ class ShippingMethod extends Entity
      */
     const PRICING_POLICY_PERCENT = 2;
     /**
-     * Indicates that fixed price pricing policy is used.
+     * Indicates that fixed price by weight range pricing policy is used.
      */
-    const PRICING_POLICY_FIXED = 3;
+    const PRICING_POLICY_FIXED_PRICE_BY_WEIGHT = 3;
+    /**
+     * Indicates that fixed price by value range pricing policy is used.
+     */
+    const PRICING_POLICY_FIXED_PRICE_BY_VALUE = 4;
     /**
      * Array of field names.
      *
@@ -124,11 +128,17 @@ class ShippingMethod extends Entity
      */
     protected $pricingPolicy = self::PRICING_POLICY_PACKLINK;
     /**
-     * Array of fixed price policy data.
+     * Array of fixed price by weight policy data.
      *
      * @var FixedPricePolicy[]
      */
-    protected $fixedPricePolicy;
+    protected $fixedPriceByWeightPolicy;
+    /**
+     * Array of fixed price by value policy data.
+     *
+     * @var FixedPricePolicy[]
+     */
+    protected $fixedPriceByValuePolicy;
     /**
      * Percent price policy data.
      *
@@ -161,13 +171,12 @@ class ShippingMethod extends Entity
             $this->pricingPolicy = static::PRICING_POLICY_PACKLINK;
         }
 
-        if (!empty($data['fixedPricePolicy'])) {
-            $policies = array();
-            foreach ($data['fixedPricePolicy'] as $fixedPricePolicy) {
-                $policies[] = FixedPricePolicy::fromArray($fixedPricePolicy);
-            }
+        if (!empty($data['fixedPriceByWeightPolicy'])) {
+            $this->setFixedPriceByWeightPolicy($this->inflateFixedPricePolicy($data, 'fixedPriceByWeightPolicy'));
+        }
 
-            $this->setFixedPricePolicy($policies);
+        if (!empty($data['fixedPriceByValuePolicy'])) {
+            $this->setFixedPriceByValuePolicy($this->inflateFixedPricePolicy($data, 'fixedPriceByValuePolicy'));
         }
 
         if (!empty($data['percentPricePolicy'])) {
@@ -190,10 +199,15 @@ class ShippingMethod extends Entity
     {
         $data = parent::toArray();
 
-        if ($this->fixedPricePolicy) {
-            $policy = $this->fixedPricePolicy;
-            foreach ($policy as $fixedPricePolicy) {
-                $data['fixedPricePolicy'][] = $fixedPricePolicy->toArray();
+        if ($this->fixedPriceByWeightPolicy) {
+            foreach ($this->fixedPriceByWeightPolicy as $fixedPricePolicy) {
+                $data['fixedPriceByWeightPolicy'][] = $fixedPricePolicy->toArray();
+            }
+        }
+
+        if ($this->fixedPriceByValuePolicy) {
+            foreach ($this->fixedPriceByValuePolicy as $fixedPricePolicy) {
+                $data['fixedPriceByValuePolicy'][] = $fixedPricePolicy->toArray();
             }
         }
 
@@ -497,36 +511,61 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Sets data for fixed price policy.
+     * Sets data for fixed price by weight policy.
      *
      * @param FixedPricePolicy[] $fixedPricePolicy
      *
      * @throws \InvalidArgumentException
      */
-    public function setFixedPricePolicy($fixedPricePolicy)
+    public function setFixedPriceByWeightPolicy($fixedPricePolicy)
     {
-        usort(
-            $fixedPricePolicy,
-            function (FixedPricePolicy $first, FixedPricePolicy $second) {
-                return $first->from > $second->from;
-            }
-        );
+        $fixedPricePolicy = $this->sortFixedPricePolicy($fixedPricePolicy);
 
         PricingPolicyValidator::validateFixedPricePolicy($fixedPricePolicy);
 
         $this->percentPricePolicy = null;
-        $this->fixedPricePolicy = $fixedPricePolicy;
-        $this->pricingPolicy = self::PRICING_POLICY_FIXED;
+        $this->fixedPriceByWeightPolicy = $fixedPricePolicy;
+        $this->fixedPriceByValuePolicy = null;
+        $this->pricingPolicy = self::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
     }
 
     /**
-     * Gets Fixed price policy data.
+     * Gets Fixed price by weight policy data.
      *
      * @return FixedPricePolicy[] FixedPricePolicy array.
      */
-    public function getFixedPricePolicy()
+    public function getFixedPriceByWeightPolicy()
     {
-        return $this->fixedPricePolicy;
+        return $this->fixedPriceByWeightPolicy;
+    }
+
+    /**
+     * Sets data for fixed price by value policy.
+     *
+     * @param FixedPricePolicy[] $fixedPricePolicy
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setFixedPriceByValuePolicy($fixedPricePolicy)
+    {
+        $fixedPricePolicy = $this->sortFixedPricePolicy($fixedPricePolicy);
+
+        PricingPolicyValidator::validateFixedPricePolicy($fixedPricePolicy, true);
+
+        $this->percentPricePolicy = null;
+        $this->fixedPriceByWeightPolicy = null;
+        $this->fixedPriceByValuePolicy = $fixedPricePolicy;
+        $this->pricingPolicy = self::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
+    }
+
+    /**
+     * Gets Fixed price by value policy data.
+     *
+     * @return FixedPricePolicy[] FixedPricePolicy array.
+     */
+    public function getFixedPriceByValuePolicy()
+    {
+        return $this->fixedPriceByValuePolicy;
     }
 
     /**
@@ -539,7 +578,8 @@ class ShippingMethod extends Entity
         PricingPolicyValidator::validatePercentPricePolicy($percentPricePolicy);
 
         $this->percentPricePolicy = $percentPricePolicy;
-        $this->fixedPricePolicy = null;
+        $this->fixedPriceByWeightPolicy = null;
+        $this->fixedPriceByValuePolicy = null;
         $this->pricingPolicy = self::PRICING_POLICY_PERCENT;
     }
 
@@ -559,7 +599,8 @@ class ShippingMethod extends Entity
     public function setPacklinkPricePolicy()
     {
         $this->percentPricePolicy = null;
-        $this->fixedPricePolicy = null;
+        $this->fixedPriceByWeightPolicy = null;
+        $this->fixedPriceByValuePolicy = null;
         $this->pricingPolicy = self::PRICING_POLICY_PACKLINK;
     }
 
@@ -581,5 +622,42 @@ class ShippingMethod extends Entity
     public function setTaxClass($taxClass)
     {
         $this->taxClass = $taxClass;
+    }
+
+    /**
+     * Sorts fixed price policies by ranges.
+     *
+     * @param FixedPricePolicy[] $fixedPricePolicy
+     *
+     * @return FixedPricePolicy[] Sorted array.
+     */
+    protected function sortFixedPricePolicy($fixedPricePolicy)
+    {
+        usort(
+            $fixedPricePolicy,
+            function (FixedPricePolicy $first, FixedPricePolicy $second) {
+                return $first->from > $second->from;
+            }
+        );
+
+        return $fixedPricePolicy;
+    }
+
+    /**
+     * Inflates fixed price policies from array.
+     *
+     * @param array $data Source array.
+     * @param string $type Type of fixed price policy as a key for the source array.
+     *
+     * @return FixedPricePolicy[]
+     */
+    protected function inflateFixedPricePolicy($data, $type)
+    {
+        $policies = array();
+        foreach ($data[$type] as $fixedPricePolicy) {
+            $policies[] = FixedPricePolicy::fromArray($fixedPricePolicy);
+        }
+
+        return $policies;
     }
 }

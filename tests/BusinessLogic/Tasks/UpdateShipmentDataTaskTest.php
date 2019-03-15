@@ -16,6 +16,7 @@ use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
@@ -125,6 +126,29 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $order = $orderRepository->getOrder('test');
 
         $this->assertEquals(15.85, $order->getBasePrice());
+    }
+
+    public function testShipmentStatus()
+    {
+        self::assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus('AWAITING_COMPLETION'));
+        self::assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus('READY_TO_PURCHASE'));
+
+        self::assertEquals(ShipmentStatus::STATUS_READY, ShipmentStatus::getStatus('READY_TO_PRINT'));
+        self::assertEquals(ShipmentStatus::STATUS_READY, ShipmentStatus::getStatus('READY_FOR_COLLECTION'));
+        self::assertEquals(ShipmentStatus::STATUS_READY, ShipmentStatus::getStatus('COMPLETED'));
+        self::assertEquals(ShipmentStatus::STATUS_READY, ShipmentStatus::getStatus('CARRIER_OK'));
+
+        self::assertEquals(ShipmentStatus::STATUS_ACCEPTED, ShipmentStatus::getStatus('CARRIER_KO'));
+        self::assertEquals(ShipmentStatus::STATUS_ACCEPTED, ShipmentStatus::getStatus('LABELS_KO'));
+        self::assertEquals(ShipmentStatus::STATUS_ACCEPTED, ShipmentStatus::getStatus('INTEGRATION_KO'));
+        self::assertEquals(ShipmentStatus::STATUS_ACCEPTED, ShipmentStatus::getStatus('PURCHASE_SUCCESS'));
+        self::assertEquals(ShipmentStatus::STATUS_ACCEPTED, ShipmentStatus::getStatus('CARRIER_PENDING'));
+        self::assertEquals(ShipmentStatus::STATUS_ACCEPTED, ShipmentStatus::getStatus('RETRY'));
+
+        self::assertEquals(ShipmentStatus::STATUS_IN_TRANSIT, ShipmentStatus::getStatus('IN_TRANSIT'));
+
+        self::assertEquals(ShipmentStatus::STATUS_DELIVERED, ShipmentStatus::getStatus('DELIVERED'));
+        self::assertEquals(ShipmentStatus::STATUS_DELIVERED, ShipmentStatus::getStatus('RETURNED_TO_SENDER'));
     }
 
     /**

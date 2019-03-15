@@ -6,13 +6,12 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
-use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy as FixedPricePolicyModel;
-use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy as PercentPricePolicyModel;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
- * Class ShippingMethodController
+ * Class ShippingMethodController.
+ *
  * @package Packlink\BusinessLogic\Controllers
  */
 class ShippingMethodController
@@ -57,7 +56,8 @@ class ShippingMethodController
     private static $policies = array(
         ShippingMethod::PRICING_POLICY_PACKLINK,
         ShippingMethod::PRICING_POLICY_PERCENT,
-        ShippingMethod::PRICING_POLICY_FIXED,
+        ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT,
+        ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE,
     );
     /**
      * Shipping method service.
@@ -171,17 +171,10 @@ class ShippingMethodController
         $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::PICKUP;
         $shippingMethod->taxClass = $item->getTaxClass();
 
-        $pricingPolicy = $item->getPricingPolicy();
-        $percentPolicy = $item->getPercentPricePolicy();
-        $shippingMethod->pricePolicy = $pricingPolicy;
-        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PERCENT && $percentPolicy) {
-            $shippingMethod->percentPricePolicy = $percentPolicy;
-        }
-
-        $fixedPolicy = $item->getFixedPricePolicy();
-        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED && !empty($fixedPolicy)) {
-            $shippingMethod->fixedPricePolicy = $fixedPolicy;
-        }
+        $shippingMethod->pricePolicy = $item->getPricingPolicy();
+        $shippingMethod->percentPricePolicy = $item->getPercentPricePolicy();
+        $shippingMethod->fixedPriceByWeightPolicy = $item->getFixedPriceByWeightPolicy();
+        $shippingMethod->fixedPriceByValuePolicy = $item->getFixedPriceByValuePolicy();
 
         return $shippingMethod;
     }
@@ -195,23 +188,13 @@ class ShippingMethodController
      */
     private function isValid(ShippingMethodConfiguration $data)
     {
-        if (!isset($data->id, $data->name, $data->showLogo, $data->pricePolicy)) {
-            return false;
-        }
-
-        if (!is_bool($data->showLogo) || !in_array($data->pricePolicy, static::$policies, false)) {
-            return false;
-        }
-
-        if ($data->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && !isset($data->percentPricePolicy)) {
-            return false;
-        }
-
-        if ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED && empty($data->fixedPricePolicy)) {
-            return false;
-        }
-
-        return true;
+        return !(!isset($data->id, $data->name, $data->showLogo, $data->pricePolicy)
+            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && !isset($data->percentPricePolicy))
+            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT
+                && empty($data->fixedPriceByWeightPolicy))
+            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE
+                && empty($data->fixedPriceByValuePolicy))
+            || (!is_bool($data->showLogo) || !in_array($data->pricePolicy, static::$policies, false)));
     }
 
     /**
@@ -230,20 +213,13 @@ class ShippingMethodController
                 $model->setPacklinkPricePolicy();
                 break;
             case ShippingMethod::PRICING_POLICY_PERCENT:
-                $model->setPercentPricePolicy(
-                    new PercentPricePolicyModel(
-                        $configuration->percentPricePolicy->increase,
-                        $configuration->percentPricePolicy->amount
-                    )
-                );
+                $model->setPercentPricePolicy($configuration->percentPricePolicy);
                 break;
-            case ShippingMethod::PRICING_POLICY_FIXED:
-                $policies = array();
-                foreach ($configuration->fixedPricePolicy as $item) {
-                    $policies[] = new FixedPricePolicyModel($item->from, $item->to, $item->amount);
-                }
-
-                $model->setFixedPricePolicy($policies);
+            case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT:
+                $model->setFixedPriceByWeightPolicy($configuration->fixedPriceByWeightPolicy);
+                break;
+            case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE:
+                $model->setFixedPriceByWeightPolicy($configuration->fixedPriceByValuePolicy);
                 break;
         }
     }

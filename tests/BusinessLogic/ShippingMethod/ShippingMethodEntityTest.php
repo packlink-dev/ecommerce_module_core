@@ -89,23 +89,40 @@ class ShippingMethodEntityTest extends TestCase
     {
         $method = new ShippingMethod();
 
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
+        self::assertEmpty($method->getFixedPriceByValuePolicy());
         self::assertEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PACKLINK, $method->getPricingPolicy());
     }
 
-    public function testFixedPricingPolicyOneValid()
+    public function testFixedPricingByWeightPolicyOneValid()
     {
         $method = new ShippingMethod();
 
         /** @var FixedPricePolicy[] $fixedPricePolicies */
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
 
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
 
-        self::assertNotEmpty($method->getFixedPricePolicy());
+        self::assertNotEmpty($method->getFixedPriceByWeightPolicy());
         self::assertEmpty($method->getPercentPricePolicy());
-        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED, $method->getPricingPolicy());
+        self::assertEmpty($method->getFixedPriceByValuePolicy());
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT, $method->getPricingPolicy());
+    }
+
+    public function testFixedPricingByValuePolicyOneValid()
+    {
+        $method = new ShippingMethod();
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
+
+        $method->setFixedPriceByValuePolicy($fixedPricePolicies);
+
+        self::assertNotEmpty($method->getFixedPriceByValuePolicy());
+        self::assertEmpty($method->getPercentPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE, $method->getPricingPolicy());
     }
 
     /**
@@ -119,7 +136,7 @@ class ShippingMethodEntityTest extends TestCase
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 0);
 
         // amount must be set
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
     }
 
     /**
@@ -133,7 +150,7 @@ class ShippingMethodEntityTest extends TestCase
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, -10);
 
         // amount must be positive
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
     }
 
     /**
@@ -147,7 +164,7 @@ class ShippingMethodEntityTest extends TestCase
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 0);
 
         // amount must be positive
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
     }
 
     /**
@@ -161,48 +178,7 @@ class ShippingMethodEntityTest extends TestCase
         $fixedPricePolicies[] = new FixedPricePolicy(3, 10, 10);
 
         // from for first policy must be 0
-        $method->setFixedPricePolicy($fixedPricePolicies);
-    }
-
-    public function testFixedPricingPolicyValidationValidTwoPolicies()
-    {
-        $method = new ShippingMethod();
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 13, 10);
-
-        $method->setFixedPricePolicy($fixedPricePolicies);
-        self::assertNotEmpty($method->getFixedPricePolicy());
-        self::assertCount(2, $method->getFixedPricePolicy());
-    }
-
-    public function testFixedPricingPolicyValidationValidDifferentOrder()
-    {
-        $method = new ShippingMethod();
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 13, 10);
-        $fixedPricePolicies[] = new FixedPricePolicy(13, 50, 6);
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-
-        $method->setFixedPricePolicy($fixedPricePolicies);
-        $policies = $method->getFixedPricePolicy();
-        self::assertNotEmpty($policies);
-        self::assertCount(3, $policies);
-    }
-
-    public function testFixedPricingPolicyValidationValidTwoPoliciesSecondWithoutUpperBound()
-    {
-        $method = new ShippingMethod();
-
-        /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
-        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
-
-        $method->setFixedPricePolicy($fixedPricePolicies);
-        self::assertNotEmpty($method->getFixedPricePolicy());
-        self::assertCount(2, $method->getFixedPricePolicy());
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
     }
 
     /**
@@ -217,7 +193,7 @@ class ShippingMethodEntityTest extends TestCase
         $fixedPricePolicies[] = new FixedPricePolicy(11, 13, 10);
 
         // second policy must have "from" bigger from previous for exactly 0.001
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
     }
 
     /**
@@ -232,7 +208,73 @@ class ShippingMethodEntityTest extends TestCase
         $fixedPricePolicies[] = new FixedPricePolicy(10, 13, -10);
 
         // second policy must have amount bigger than 0
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
+    }
+
+    public function testFixedPricingPolicyValidationValidZeroAmountOnFirst()
+    {
+        $method = new ShippingMethod();
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 0);
+
+        $method->setFixedPriceByValuePolicy($fixedPricePolicies);
+        self::assertNotEmpty($method->getFixedPriceByValuePolicy());
+        self::assertCount(1, $method->getFixedPriceByValuePolicy());
+    }
+
+    public function testFixedPricingPolicyValidationValidZeroAmountOnLast()
+    {
+        $method = new ShippingMethod();
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 10);
+        $fixedPricePolicies[] = new FixedPricePolicy(10, 100, 0);
+
+        $method->setFixedPriceByValuePolicy($fixedPricePolicies);
+        self::assertNotEmpty($method->getFixedPriceByValuePolicy());
+        self::assertCount(2, $method->getFixedPriceByValuePolicy());
+    }
+
+    public function testFixedPricingByWeightPolicyValidationValidTwoPolicies()
+    {
+        $method = new ShippingMethod();
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
+        $fixedPricePolicies[] = new FixedPricePolicy(10, 13, 10);
+
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
+        self::assertNotEmpty($method->getFixedPriceByWeightPolicy());
+        self::assertCount(2, $method->getFixedPriceByWeightPolicy());
+    }
+
+    public function testFixedPricingByWeightPolicyValidationValidDifferentOrder()
+    {
+        $method = new ShippingMethod();
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(10, 13, 10);
+        $fixedPricePolicies[] = new FixedPricePolicy(13, 50, 6);
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
+
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
+        $policies = $method->getFixedPriceByWeightPolicy();
+        self::assertNotEmpty($policies);
+        self::assertCount(3, $policies);
+    }
+
+    public function testFixedPricingByWeightPolicyValidationValidTwoPoliciesSecondWithoutUpperBound()
+    {
+        $method = new ShippingMethod();
+
+        /** @var FixedPricePolicy[] $fixedPricePolicies */
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
+        $fixedPricePolicies[] = new FixedPricePolicy(10, 20, 10);
+
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
+        self::assertNotEmpty($method->getFixedPriceByWeightPolicy());
+        self::assertCount(2, $method->getFixedPriceByWeightPolicy());
     }
 
     public function testFixedPricingPolicyValidationValidBulk()
@@ -250,8 +292,8 @@ class ShippingMethodEntityTest extends TestCase
             );
         }
 
-        $method->setFixedPricePolicy($fixedPricePolicies);
-        self::assertCount(100, $method->getFixedPricePolicy());
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
+        self::assertCount(100, $method->getFixedPriceByWeightPolicy());
     }
 
     public function testPercentPricingPolicy()
@@ -263,7 +305,7 @@ class ShippingMethodEntityTest extends TestCase
 
         self::assertNotEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PERCENT, $method->getPricingPolicy());
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
 
         $policy = new PercentPricePolicy(false, 10);
         $method->setPercentPricePolicy($policy);
@@ -326,17 +368,17 @@ class ShippingMethodEntityTest extends TestCase
 
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
 
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
 
-        self::assertNotEmpty($method->getFixedPricePolicy());
+        self::assertNotEmpty($method->getFixedPriceByWeightPolicy());
         self::assertEmpty($method->getPercentPricePolicy());
-        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED, $method->getPricingPolicy());
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT, $method->getPricingPolicy());
 
         $method->setPercentPricePolicy(new PercentPricePolicy(true, 10));
 
         self::assertNotEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PERCENT, $method->getPricingPolicy());
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
     }
 
     public function testFixedPricingPolicyAfterPercentPricePolicy()
@@ -349,13 +391,13 @@ class ShippingMethodEntityTest extends TestCase
 
         self::assertNotEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PERCENT, $method->getPricingPolicy());
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
 
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
 
-        self::assertNotEmpty($method->getFixedPricePolicy());
+        self::assertNotEmpty($method->getFixedPriceByWeightPolicy());
         self::assertEmpty($method->getPercentPricePolicy());
-        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED, $method->getPricingPolicy());
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT, $method->getPricingPolicy());
     }
 
     public function testResetAfterFixedPricingPolicy()
@@ -364,14 +406,14 @@ class ShippingMethodEntityTest extends TestCase
 
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
 
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
 
-        self::assertNotEmpty($method->getFixedPricePolicy());
+        self::assertNotEmpty($method->getFixedPriceByWeightPolicy());
         self::assertEmpty($method->getPercentPricePolicy());
-        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED, $method->getPricingPolicy());
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT, $method->getPricingPolicy());
 
         $method->setPacklinkPricePolicy();
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
         self::assertEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PACKLINK, $method->getPricingPolicy());
     }
@@ -383,10 +425,10 @@ class ShippingMethodEntityTest extends TestCase
 
         self::assertNotEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PERCENT, $method->getPricingPolicy());
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
 
         $method->setPacklinkPricePolicy();
-        self::assertEmpty($method->getFixedPricePolicy());
+        self::assertEmpty($method->getFixedPriceByWeightPolicy());
         self::assertEmpty($method->getPercentPricePolicy());
         self::assertEquals(ShippingMethod::PRICING_POLICY_PACKLINK, $method->getPricingPolicy());
     }
@@ -409,19 +451,34 @@ class ShippingMethodEntityTest extends TestCase
         self::assertEquals($policy->amount, $result['percentPricePolicy']['amount']);
     }
 
-    public function testToArrayFixedPricingPolicy()
+    public function testToArrayFixedPricingByWeightPolicy()
     {
         $method = $this->assertBasicDataToArray();
 
         $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
         $fixedPricePolicies[] = new FixedPricePolicy(10, 13, 10);
-        $method->setFixedPricePolicy($fixedPricePolicies);
+        $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
 
         $result = $method->toArray();
-        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED, $result['pricingPolicy']);
-        self::assertCount(2, $result['fixedPricePolicy']);
-        self::assertEquals(0, $result['fixedPricePolicy'][0]['from']);
-        self::assertEquals(10, $result['fixedPricePolicy'][1]['from']);
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT, $result['pricingPolicy']);
+        self::assertCount(2, $result['fixedPriceByWeightPolicy']);
+        self::assertEquals(0, $result['fixedPriceByWeightPolicy'][0]['from']);
+        self::assertEquals(10, $result['fixedPriceByWeightPolicy'][1]['from']);
+    }
+
+    public function testToArrayFixedPricingByValuePolicy()
+    {
+        $method = $this->assertBasicDataToArray();
+
+        $fixedPricePolicies[] = new FixedPricePolicy(0, 10, 12);
+        $fixedPricePolicies[] = new FixedPricePolicy(10, 13, 10);
+        $method->setFixedPriceByValuePolicy($fixedPricePolicies);
+
+        $result = $method->toArray();
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE, $result['pricingPolicy']);
+        self::assertCount(2, $result['fixedPriceByValuePolicy']);
+        self::assertEquals(0, $result['fixedPriceByValuePolicy'][0]['from']);
+        self::assertEquals(10, $result['fixedPriceByValuePolicy'][1]['from']);
     }
 
     public function testFromArrayShippingCosts()
@@ -456,6 +513,10 @@ class ShippingMethodEntityTest extends TestCase
         self::assertEquals(3, $costs[0]->totalPrice);
         self::assertEquals(2, $costs[0]->basePrice);
         self::assertEquals(1, $costs[0]->taxPrice);
+
+        $method->setShippingServices($costs);
+        $costs = $method->getShippingServices();
+        self::assertCount(1, $costs);
     }
 
     public function testFromArrayPacklinkPricingPolicy()
@@ -502,23 +563,45 @@ class ShippingMethodEntityTest extends TestCase
         ShippingMethod::fromArray($data);
     }
 
-    public function testFromArrayFixedPricingPolicy()
+    public function testFromArrayFixedPricingByWeightPolicy()
     {
         $data = $this->getShippingMethodData();
-        $data['fixedPricePolicy'][0] = array(
+        $data['fixedPriceByWeightPolicy'][0] = array(
             'from' => 10,
             'to' => 20,
             'amount' => 100,
         );
-        $data['fixedPricePolicy'][1] = array(
+        $data['fixedPriceByWeightPolicy'][1] = array(
             'from' => 0,
             'to' => 10,
             'amount' => 120,
         );
 
         $method = ShippingMethod::fromArray($data);
-        $policy = $method->getFixedPricePolicy();
-        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED, $method->getPricingPolicy());
+        $policy = $method->getFixedPriceByWeightPolicy();
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT, $method->getPricingPolicy());
+        self::assertCount(2, $policy);
+        self::assertEquals(0, $policy[0]->from);
+        self::assertEquals(10, $policy[1]->from);
+    }
+
+    public function testFromArrayFixedPricingByValuePolicy()
+    {
+        $data = $this->getShippingMethodData();
+        $data['fixedPriceByValuePolicy'][0] = array(
+            'from' => 10,
+            'to' => 20,
+            'amount' => 100,
+        );
+        $data['fixedPriceByValuePolicy'][1] = array(
+            'from' => 0,
+            'to' => 10,
+            'amount' => 120,
+        );
+
+        $method = ShippingMethod::fromArray($data);
+        $policy = $method->getFixedPriceByValuePolicy();
+        self::assertEquals(ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE, $method->getPricingPolicy());
         self::assertCount(2, $policy);
         self::assertEquals(0, $policy[0]->from);
         self::assertEquals(10, $policy[1]->from);
@@ -530,12 +613,12 @@ class ShippingMethodEntityTest extends TestCase
     public function testFromArrayInvalidFixedPricingPolicy()
     {
         $data = $this->getShippingMethodData();
-        $data['fixedPricePolicy'][0] = array(
+        $data['fixedPriceByWeightPolicy'][0] = array(
             'from' => 10,
             'to' => 20,
             'amount' => 100,
         );
-        $data['fixedPricePolicy'][1] = array(
+        $data['fixedPriceByWeightPolicy'][1] = array(
             'from' => 0,
             'to' => 5,
             'amount' => 120,
