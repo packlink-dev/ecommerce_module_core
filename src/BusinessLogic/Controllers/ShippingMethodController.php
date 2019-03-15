@@ -219,7 +219,7 @@ class ShippingMethodController
                 $model->setFixedPriceByWeightPolicy($configuration->fixedPriceByWeightPolicy);
                 break;
             case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE:
-                $model->setFixedPriceByWeightPolicy($configuration->fixedPriceByValuePolicy);
+                $model->setFixedPriceByValuePolicy($configuration->fixedPriceByValuePolicy);
                 break;
         }
     }
