@@ -61,7 +61,7 @@ var LocationPickerTranslations = {
         workingHoursLabel: 'Montrer les heures de travail',
         hideWorkingHoursLabel: "Cacher les heures d'ouverture",
         searchLabel: 'Chercher par lieu, nom, id ou adresse',
-        showOnMapTitle: 'Show on map'
+        showOnMapTitle: 'Montrer sur la carte'
     },
     it: {
         days: {
