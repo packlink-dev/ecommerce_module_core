@@ -74,7 +74,7 @@ class WebHookEventHandler extends BaseService
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
         } catch (OrderNotFound $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId, 'labels' => $labels));
+            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $referenceId, 'labels' => $labels));
         }
     }
 
@@ -95,7 +95,7 @@ class WebHookEventHandler extends BaseService
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
         } catch (OrderNotFound $e) {
-            Logger::logError(
+            Logger::logInfo(
                 $e->getMessage(),
                 'Core',
                 array('referenceId' => $referenceId, 'shipment' => $shipment ? $shipment->toArray() : 'NONE')
@@ -132,7 +132,7 @@ class WebHookEventHandler extends BaseService
                 $trackingAsArray[] = $item->toArray();
             }
 
-            Logger::logError(
+            Logger::logInfo(
                 $e->getMessage(),
                 'Core',
                 array('referenceId' => $referenceId, 'trackingHistory' => $trackingAsArray)
