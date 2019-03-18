@@ -775,7 +775,6 @@ var Packlink = window.Packlink || {};
                             utilityService.showFlashMessage(response.message, 'danger');
                         }
 
-                        closeConfigForm();
                         utilityService.hideSpinner();
                     }
                 );
@@ -1107,9 +1106,9 @@ var Packlink = window.Packlink || {};
          * @return {boolean}
          */
         function isFixedPriceValid(validateLastAmount, validateLastTo, byWeight) {
-            if (!isFixedPriceInputTypeValid(byWeight)
+            if (!isFixedPriceRangeValid(byWeight)
+                || !isFixedPriceInputTypeValid(byWeight)
                 || !isFixedPriceAmountValid(byWeight)
-                || !isFixedPriceRangeValid(byWeight)
                 || !isFixedPriceNumberOfDecimalPlacesValid(byWeight)
             ) {
                 return false;
@@ -1161,7 +1160,7 @@ var Packlink = window.Packlink || {};
             let fields = ['amount', 'to'];
             let result = true;
 
-            for (let i = 0; i < policies.length - 1; i++) {
+            for (let i = 0; i < policies.length; i++) {
                 for (let field of fields) {
                     let value = policies[i][field];
                     if (value === '' || isNaN(value) || typeof value !== 'number') {
@@ -1185,7 +1184,7 @@ var Packlink = window.Packlink || {};
             let boundary = byWeight ? 0.0001 : 0;
             let policies = methodModel[getFixedPricePolicy(byWeight)];
 
-            for (let i = 0; i < policies.length - 1; i++) {
+            for (let i = 0; i < policies.length; i++) {
                 if (policies[i]['amount'] < boundary) {
                     let input = templateService.getComponent('data-pl-amount-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.invalid);
@@ -1205,10 +1204,10 @@ var Packlink = window.Packlink || {};
             let policies = methodModel[getFixedPricePolicy(byWeight)];
             let result = true;
 
-            for (let i = 0; i < policies.length - 1; i++) {
+            for (let i = 0; i < policies.length; i++) {
                 let current = policies[i];
-                let successor = policies[i + 1];
-                if (current.from >= current.to || successor.from && current.to > successor.from) {
+                let successor = policies.length < i + 1 ? policies[i + 1] : null;
+                if (current.from >= current.to || (successor && successor.from && current.to > successor.from)) {
                     let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.invalid);
                     result = false;
@@ -1225,15 +1224,15 @@ var Packlink = window.Packlink || {};
             let policies = methodModel[getFixedPricePolicy(byWeight)];
             let result = true;
 
-            for (let i = 0; i < policies.length - 1; i++) {
+            for (let i = 0; i < policies.length; i++) {
                 let current = policies[i];
-                if (current.to != current.to.toFixed(2)) {
+                if (current.to && current.to != current.to.toFixed(2)) {
                     let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.numberOfDecimalPlaces);
                     result = false;
                 }
 
-                if (current.amount != current.amount.toFixed(2)) {
+                if (current.amount && current.amount != current.amount.toFixed(2)) {
                     let input = templateService.getComponent('data-pl-amount-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.numberOfDecimalPlaces);
                     result = false;
