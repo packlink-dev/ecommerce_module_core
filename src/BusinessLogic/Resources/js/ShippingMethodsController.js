@@ -94,11 +94,6 @@ var Packlink = window.Packlink || {};
                 tableRowExtensionPoint
             );
 
-            templateService.getComponent('pl-disable-methods-modal-wrapper').addEventListener(
-                'click',
-                hideDisableShopShippingMethodsModal
-            );
-
             templateService.getComponent('pl-disable-methods-modal-cancel').addEventListener(
                 'click',
                 hideDisableShopShippingMethodsModal
