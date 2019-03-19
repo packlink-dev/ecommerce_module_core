@@ -80,6 +80,11 @@ var Packlink = window.Packlink || {};
             document.addEventListener('click', onPostalCodeBlur);
             postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
 
+            templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener('click', function (event) {
+                event.stopPropagation();
+                postalCodeInput.focus();
+            });
+
             let submitButton = templateService.getComponent(
                 'pl-default-warehouse-submit-btn',
                 page
@@ -88,6 +93,10 @@ var Packlink = window.Packlink || {};
             submitButton.addEventListener('click', handleSubmitButtonClicked, true);
             utilityService.configureInputElements();
             utilityService.hideSpinner();
+
+            postalCodeInput.onfocusout = function (event) {
+                postalCodeInput.value = ' ';
+            }
         }
 
         function onPostalCodeFocus() {
