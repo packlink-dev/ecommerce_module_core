@@ -60,6 +60,7 @@ var Packlink = window.Packlink || {};
             for (let field of warehouseFields) {
                 let input = templateService.getComponent(`pl-default-warehouse-${field}`, page);
                 input.addEventListener('blur', onBlurHandler, true);
+                input.addEventListener('focus', onPostalCodeBlur);
                 if (response[field]) {
                     input.value = response[field];
                 }
@@ -73,7 +74,10 @@ var Packlink = window.Packlink || {};
             }
 
             postalCodeInput.addEventListener('focus', onPostalCodeFocus);
-            postalCodeInput.addEventListener('blur', onPostalCodeBlur);
+            postalCodeInput.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+            document.addEventListener('click', onPostalCodeBlur);
             postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
 
             let submitButton = templateService.getComponent(
@@ -90,19 +94,18 @@ var Packlink = window.Packlink || {};
             postalCodeInput.value = searchTerm;
         }
 
-        function onPostalCodeBlur() {
+        function onPostalCodeBlur(event) {
+            event.stopPropagation();
             searchTerm = '';
             let autocompleteList = templateService.getComponent('pl-postal-codes-autocomplete', page);
+
             if (autocompleteList) {
-                setTimeout(function () {
-                    postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
-                    autocompleteList.remove();
-                }, 100);
-            } else {
-                postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+                autocompleteList.remove();
             }
 
+            postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
             templateService.removeError(postalCodeInput);
+            utilityService.configureInputElements();
         }
 
         function onPostalCodeSearch(event) {
