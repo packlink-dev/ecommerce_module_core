@@ -79,6 +79,7 @@ var Packlink = window.Packlink || {};
             });
             document.addEventListener('click', onPostalCodeBlur);
             postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
+            postalCodeInput.addEventListener('keyup', autocompleteNavigate);
 
             templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener('click', function (event) {
                 event.stopPropagation();
@@ -100,11 +101,14 @@ var Packlink = window.Packlink || {};
         }
 
         function onPostalCodeFocus() {
-            postalCodeInput.value = searchTerm;
+            postalCodeInput.value = searchTerm = '';
         }
 
         function onPostalCodeBlur(event) {
-            event.stopPropagation();
+            if (event) {
+                event.stopPropagation();
+            }
+
             searchTerm = '';
             let autocompleteList = templateService.getComponent('pl-postal-codes-autocomplete', page);
 
@@ -119,7 +123,7 @@ var Packlink = window.Packlink || {};
 
         function onPostalCodeSearch(event) {
             searchTerm = event.target.value;
-            if (searchTerm.length < 3) {
+            if (searchTerm.length < 3 || [13, 27, 38, 40].indexOf(event.keyCode) !== -1) {
                 return;
             }
 
@@ -192,6 +196,65 @@ var Packlink = window.Packlink || {};
             currentPostalCode = event.target.getAttribute('data-pl-postal_code');
 
             postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+        }
+
+        function autocompleteNavigate(event) {
+            //esc
+            if (event.keyCode === 27) {
+                postalCodeInput.blur();
+                page.click();
+
+                return true;
+            }
+
+            let autocomplete = templateService.getComponent('pl-postal-codes-autocomplete', page);
+            if (!autocomplete) {
+                return true;
+            }
+
+            let focused = autocomplete.querySelector('.focus');
+
+            if (!focused) {
+                return true;
+            }
+
+            //enter
+            if (event.keyCode === 13) {
+                postalCodeInput.blur();
+                focused.click();
+
+                return true;
+            }
+
+            // up arrow
+            if (event.keyCode === 38) {
+                let prevSibling = focused.previousSibling;
+                if (prevSibling) {
+                    prevSibling.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                    prevSibling.classList.add('focus');
+                    focused.classList.remove('focus');
+                }
+
+                return true;
+            }
+
+            // down arrow
+            if (event.keyCode === 40) {
+                let nextSibling = focused.nextSibling;
+                if (nextSibling) {
+                    nextSibling.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                    nextSibling.classList.add('focus');
+                    focused.classList.remove('focus');
+                }
+            }
         }
 
         /**
