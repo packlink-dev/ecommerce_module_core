@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
@@ -631,15 +632,21 @@ class ShippingMethodEntityTest extends TestCase
     {
         $method = $this->assertBasicDataToArray();
         $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 4, 1));
+        $packages = array(Package::defaultPackage());
 
         self::assertEquals(
             4,
-            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->basePrice
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->basePrice
         );
         $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 3, 1));
         self::assertEquals(
             3,
-            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->basePrice
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->basePrice
+        );
+        $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 5, 0));
+        self::assertEquals(
+            3,
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->basePrice
         );
     }
 
@@ -649,19 +656,20 @@ class ShippingMethodEntityTest extends TestCase
     public function testCheapestServiceWrongDestination()
     {
         $method = $this->assertBasicDataToArray();
+        $packages = array(Package::defaultPackage());
 
         self::assertEquals(
             4,
-            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->basePrice
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->basePrice
         );
     }
 
     public function testCheapestServiceProxyResponse()
     {
         $method = $this->assertBasicDataToArray();
+        $packages = array(Package::defaultPackage());
 
         $method->addShippingService(new ShippingService(213, '', 'IT', 'DE', 5, 1, 1));
-        $method->addShippingService(new ShippingService(214, '', 'IT', 'DE', 5, 1.5, 1));
         $method->addShippingService(new ShippingService(214, '', 'IT', 'DE', 5, 1.5, 1));
         $method->addShippingService(new ShippingService(20615, '', 'IT', 'DE', 5, 8.37, 1));
         $method->addShippingService(new ShippingService(20616, '', 'IT', 'DE', 5, 2, 1));
@@ -672,7 +680,7 @@ class ShippingMethodEntityTest extends TestCase
 
         $this->assertEquals(
             20616,
-            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234')->serviceId
+            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->serviceId
         );
     }
 

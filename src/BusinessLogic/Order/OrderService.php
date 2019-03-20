@@ -7,6 +7,8 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
+use Packlink\BusinessLogic\Http\DTO\Package;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
@@ -97,35 +99,11 @@ class OrderService extends BaseService
         $draft->contentValue = $order->getTotalPrice();
         $draft->priority = $order->isHighPriority();
         $draft->source = $this->configuration->getDraftSource();
+        $this->addPackages($order, $draft);
 
         $methodId = $order->getShippingMethodId();
         if ($methodId !== null) {
-            /** @var ShippingMethodService $shippingService */
-            $shippingService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
-            $shippingMethod = $shippingService->getShippingMethod($methodId);
-            if ($shippingMethod !== null) {
-                try {
-                    /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
-                    $warehouse = $this->configuration->getDefaultWarehouse();
-                    $address = $order->getShippingAddress();
-                    $service = ShippingCostCalculator::getCheapestShippingService(
-                        $shippingMethod,
-                        $warehouse->country,
-                        $warehouse->postalCode,
-                        $address->getCountry(),
-                        $address->getZipCode()
-                    );
-                    $draft->serviceId = $service->serviceId;
-                    $draft->serviceName = $shippingMethod->getTitle();
-                    $draft->carrierName = $shippingMethod->getCarrierName();
-                } catch (\InvalidArgumentException $e) {
-                    Logger::logWarning(
-                        "Invalid service method $methodId selected for order " . $order->getId()
-                        . ' because this method does not support order\'s destination country.'
-                        . ' Sending order without selected method.'
-                    );
-                }
-            }
+            $this->addServiceDetails($draft, $order, $methodId);
         }
 
         $draft->dropOffPointId = $order->getShippingDropOffId();
@@ -136,9 +114,46 @@ class OrderService extends BaseService
         $this->addDepartureAddress($draft);
         $this->addDestinationAddress($order, $draft);
         $this->addAdditionalData($order, $draft);
-        $this->addPackages($order, $draft);
 
         return $draft;
+    }
+
+    /**
+     * Adds shipping service details to draft.
+     *
+     * @param Draft $draft Draft object to set data to.
+     * @param Order $order Order object to get data from.
+     * @param int $methodId Id of the shipping method.
+     */
+    private function addServiceDetails(Draft $draft, Order $order, $methodId)
+    {
+        /** @var ShippingMethodService $shippingService */
+        $shippingService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
+        $shippingMethod = $shippingService->getShippingMethod($methodId);
+        if ($shippingMethod !== null) {
+            try {
+                /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+                $warehouse = $this->configuration->getDefaultWarehouse();
+                $address = $order->getShippingAddress();
+                $service = ShippingCostCalculator::getCheapestShippingService(
+                    $shippingMethod,
+                    $warehouse->country,
+                    $warehouse->postalCode,
+                    $address->getCountry(),
+                    $address->getZipCode(),
+                    $draft->packages
+                );
+                $draft->serviceId = $service->serviceId;
+                $draft->serviceName = $shippingMethod->getTitle();
+                $draft->carrierName = $shippingMethod->getCarrierName();
+            } catch (\InvalidArgumentException $e) {
+                Logger::logWarning(
+                    "Invalid service method $methodId selected for order " . $order->getId()
+                    . ' because this method does not support order\'s destination country.'
+                    . ' Sending order without selected method.'
+                );
+            }
+        }
     }
 
     /**
@@ -217,17 +232,18 @@ class OrderService extends BaseService
      */
     private function addPackages(Order $order, Draft $draft)
     {
+        $defaultParcel = $this->configuration->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $draft->content = array();
         $draft->packages = array();
         foreach ($order->getItems() as $item) {
             $quantity = $item->getQuantity() ?: 1;
             $draft->content[] = $quantity . ' ' . $item->getTitle();
             for ($i = 0; $i < $quantity; $i++) {
-                $draft->packages[] = new \Packlink\BusinessLogic\Http\DTO\Package(
-                    $item->getWeight(),
-                    $item->getWidth(),
-                    $item->getHeight(),
-                    $item->getLength()
+                $draft->packages[] = new Package(
+                    $item->getWeight() ?: $defaultParcel->weight,
+                    $item->getWidth() ?: $defaultParcel->width,
+                    $item->getHeight() ?: $defaultParcel->height,
+                    $item->getLength() ?: $defaultParcel->length
                 );
             }
         }

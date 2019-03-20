@@ -7,6 +7,8 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\Http\DTO\Package;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
@@ -77,15 +79,21 @@ class LocationService extends BaseService
      * @param int $shippingMethodId Shipping method identifier.
      * @param string $toCountry Country code to where package is shipped.
      * @param string $toPostCode Post code to where package is shipped.
+     * @param array $packages Packages for which to find service.
      *
      * @return array Locations.
      */
-    public function getLocations($shippingMethodId, $toCountry, $toPostCode)
+    public function getLocations($shippingMethodId, $toCountry, $toPostCode, array $packages = array())
     {
         $warehouse = $this->configuration->getDefaultWarehouse();
         $method = $this->shippingMethodService->getShippingMethod($shippingMethodId);
         if ($warehouse === null || $method === null) {
             return array();
+        }
+
+        if (empty($packages)) {
+            $parcel = $this->configuration->getDefaultParcel() ?: ParcelInfo::defaultParcel();
+            $packages = array(new Package($parcel->weight, $parcel->width, $parcel->height, $parcel->length));
         }
 
         try {
@@ -94,7 +102,8 @@ class LocationService extends BaseService
                 $warehouse->country,
                 $warehouse->postalCode,
                 $toCountry,
-                $toPostCode
+                $toPostCode,
+                $packages
             );
 
             $locations = $this->proxy->getLocations($cheapestService->serviceId, $toCountry, $toPostCode);

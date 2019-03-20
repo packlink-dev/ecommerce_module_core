@@ -5,11 +5,11 @@ namespace Packlink\BusinessLogic\ShippingMethod;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
-use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 
 /**
  * Class ShippingCostCalculator.
@@ -115,18 +115,19 @@ class ShippingCostCalculator
      * @param string $fromZip From zip code.
      * @param string $toCountry To country code.
      * @param string $toZip To zip code.
+     * @param Package[] $packages Packages for which to find service.
      *
-     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService Cheapest service.
+     * @return ShippingService Cheapest service.
      */
     public static function getCheapestShippingService(
         ShippingMethod $method,
         $fromCountry,
         $fromZip,
         $toCountry,
-        $toZip
+        $toZip,
+        array $packages
     ) {
-        $package = Package::fromArray(ParcelInfo::defaultParcel()->toArray());
-        $searchParams = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, array($package));
+        $searchParams = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
 
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
@@ -136,9 +137,8 @@ class ShippingCostCalculator
             $services = array();
         }
 
-        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $result */
+        /** @var ShippingService $result */
         $result = null;
-
         if (!empty($services)) {
             foreach ($services as $service) {
                 foreach ($method->getShippingServices() as $methodService) {
@@ -165,7 +165,9 @@ class ShippingCostCalculator
         }
 
         throw new \InvalidArgumentException(
-            'No service is available for given destination country ' . $toCountry
+            'No service is available for shipping method '
+            . $method->getId() . ' for given destination country ' . $toCountry
+            . ' and given packages ' . json_encode($packages)
         );
     }
 

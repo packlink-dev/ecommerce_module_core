@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Tasks;
 
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -81,6 +82,11 @@ class SendDraftTask extends Task
         $this->reportProgress(35);
 
         $reference = $this->getProxy()->sendDraft($draft);
+        Logger::logInfo(
+            'Sent draft shipment for order ' . $this->orderId
+            . '. Created reference: ' . $reference
+            . '. Draft details: ' . json_encode($draft->toArray())
+        );
         $this->reportProgress(85);
 
         $this->getOrderService()->setReference($this->orderId, $reference);
