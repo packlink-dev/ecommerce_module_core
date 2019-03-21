@@ -4,13 +4,10 @@ namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
-use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
-use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
-use Packlink\BusinessLogic\WebHook\Events\ShipmentStatusChangedEvent;
-use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
+use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
 /**
  * Class UpdateShipmentDataTask
@@ -32,17 +29,17 @@ class UpdateShipmentDataTask extends Task
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        /** @var EventBus $eventBus */
-        $eventBus = ServiceRegister::getService(EventBus::CLASS_NAME);
         $orderReferences = $orderRepository->getIncompleteOrderReferences();
 
         foreach ($orderReferences as $orderReference) {
             $shipment = $proxy->getShipment($orderReference);
-            $eventBus->fire(new ShipmentLabelEvent($orderReference, false));
-            $eventBus->fire(new TrackingInfoEvent($orderReference, false));
+            $webhookHandler = WebHookEventHandler::getInstance();
+            $webhookHandler->handleShipmentLabelEvent($orderReference);
+            $webhookHandler->handleTrackingInfoEvent($orderReference);
             if ($shipment !== null) {
-                $eventBus->fire(
-                    new ShipmentStatusChangedEvent($orderReference, ShipmentStatus::getStatus($shipment->status))
+                $webhookHandler->handleShippingStatusEvent(
+                    $orderReference,
+                    ShipmentStatus::getStatus($shipment->status)
                 );
                 $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
             }

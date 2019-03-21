@@ -5,16 +5,12 @@ namespace Logeecom\Tests\BusinessLogic\WebHook;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
-use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
-use Packlink\BusinessLogic\WebHook\Events\ShipmentStatusChangedEvent;
-use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
 use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
@@ -58,7 +54,6 @@ class WebHookHandlerTest extends BaseTestWithServices
 
     protected function tearDown()
     {
-        EventBus::resetInstance();
         WebHookEventHandler::resetInstance();
         parent::tearDown();
     }
@@ -69,9 +64,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     public function testHandleShipmentLabelEvent()
     {
         $this->httpClient->setMockResponses($this->getMockLabelResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentLabelEvent('test'));
+        WebHookEventHandler::getInstance()->handleShipmentLabelEvent('test');
 
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
@@ -88,9 +81,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     public function testHandleShipmentLabelEventHttpError()
     {
         $this->httpClient->setMockResponses($this->getErrorMockResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentLabelEvent('test'));
+        WebHookEventHandler::getInstance()->handleShipmentLabelEvent('test');
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         /** @var \Logeecom\Infrastructure\Logger\LogData $logData */
@@ -112,9 +103,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $orderRepository->shouldThrowException(true);
 
         $this->httpClient->setMockResponses($this->getMockLabelResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentLabelEvent('test'));
+        WebHookEventHandler::getInstance()->handleShipmentLabelEvent('test');
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[0]->getMessage());
@@ -126,9 +115,10 @@ class WebHookHandlerTest extends BaseTestWithServices
     public function testHandleShippingStatusEvent()
     {
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatus::STATUS_DELIVERED));
+        WebHookEventHandler::getInstance()->handleShippingStatusEvent(
+            'test',
+            ShipmentStatus::STATUS_DELIVERED
+        );
 
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
@@ -144,9 +134,10 @@ class WebHookHandlerTest extends BaseTestWithServices
     public function testHandleShippingStatusEventHttpError()
     {
         $this->httpClient->setMockResponses($this->getErrorMockResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatus::STATUS_DELIVERED));
+        WebHookEventHandler::getInstance()->handleShippingStatusEvent(
+            'test',
+            ShipmentStatus::STATUS_DELIVERED
+        );
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         /** @var \Logeecom\Infrastructure\Logger\LogData $logData */
@@ -168,9 +159,10 @@ class WebHookHandlerTest extends BaseTestWithServices
         $orderRepository->shouldThrowException(true);
 
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new ShipmentStatusChangedEvent('test', ShipmentStatus::STATUS_ACCEPTED));
+        WebHookEventHandler::getInstance()->handleShippingStatusEvent(
+            'test',
+            ShipmentStatus::STATUS_ACCEPTED
+        );
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[0]->getMessage());
@@ -184,9 +176,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses(
             array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())
         );
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new TrackingInfoEvent('test'));
+        WebHookEventHandler::getInstance()->handleTrackingInfoEvent('test');
 
         /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
@@ -206,9 +196,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     public function testHandleShippingTrackingEventHttpError()
     {
         $this->httpClient->setMockResponses($this->getErrorMockResponse());
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new TrackingInfoEvent('test'));
+        WebHookEventHandler::getInstance()->handleTrackingInfoEvent('test');
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         /** @var \Logeecom\Infrastructure\Logger\LogData $logData */
@@ -232,9 +220,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses(
             array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())
         );
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new TrackingInfoEvent('test'));
+        WebHookEventHandler::getInstance()->handleTrackingInfoEvent('test');
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[0]->getMessage());
@@ -251,9 +237,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->httpClient->setMockResponses(
             array_merge($this->get404ErrorResponse(), $this->get404ErrorResponse())
         );
-        /** @var EventBus $bus */
-        $bus = ServiceRegister::getService(EventBus::CLASS_NAME);
-        $bus->fire(new TrackingInfoEvent('test'));
+        WebHookEventHandler::getInstance()->handleTrackingInfoEvent('test');
 
         $this->assertEmpty($orderRepository->getOrder('test')->getShipment()->getTrackingHistory());
     }

@@ -14,10 +14,6 @@ use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\BusinessLogic\WebHook\Events\ShipmentLabelEvent;
-use Packlink\BusinessLogic\WebHook\Events\ShipmentStatusChangedEvent;
-use Packlink\BusinessLogic\WebHook\Events\TrackingInfoEvent;
-use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
 /**
  * Class BootstrapComponent.
@@ -104,30 +100,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             function () {
                 $handler = new ScheduleTickHandler();
                 $handler->handle();
-            }
-        );
-
-        // subscribe web hook shipment label listener
-        $eventBuss->when(
-            ShipmentLabelEvent::CLASS_NAME,
-            function (ShipmentLabelEvent $event) {
-                WebHookEventHandler::getInstance()->handleShipmentLabelEvent($event);
-            }
-        );
-
-        // subscribe web hook shipment status listener
-        $eventBuss->when(
-            ShipmentStatusChangedEvent::CLASS_NAME,
-            function (ShipmentStatusChangedEvent $event) {
-                WebHookEventHandler::getInstance()->handleShippingStatusEvent($event);
-            }
-        );
-
-        // subscribe web hook tracking info listener
-        $eventBuss->when(
-            TrackingInfoEvent::CLASS_NAME,
-            function (TrackingInfoEvent $event) {
-                WebHookEventHandler::getInstance()->handleTrackingInfoEvent($event);
             }
         );
     }
