@@ -34,10 +34,10 @@ class UpdateShipmentDataTask extends Task
 
         foreach ($orderReferences as $orderReference) {
             $shipment = $proxy->getShipment($orderReference);
-            $orderService->handleShipmentLabelEvent($orderReference);
-            $orderService->handleTrackingInfoEvent($orderReference);
             if ($shipment !== null) {
-                $orderService->handleShippingStatusEvent($orderReference, $shipment->status);
+                $orderService->updateShipmentLabel($orderReference);
+                $orderService->updateTrackingInfo($orderReference, $shipment);
+                $orderService->updateShippingStatus($orderReference, $shipment->status, $shipment);
                 $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
             }
         }

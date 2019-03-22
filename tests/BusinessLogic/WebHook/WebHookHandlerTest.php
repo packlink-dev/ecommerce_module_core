@@ -7,14 +7,15 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
-use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
+use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
+use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
 /**
  * Class WebHookHandlerTest
@@ -33,12 +34,14 @@ class WebHookHandlerTest extends BaseTestWithServices
     protected function setUp()
     {
         parent::setUp();
+
         BootstrapComponent::init();
         $me = $this;
 
         $this->httpClient = new TestHttpClient();
         $orderRepository = new TestOrderRepository();
         $configService = new TestShopConfiguration();
+        $configService->setAuthorizationToken('test');
 
         TestServiceRegister::registerService(
             HttpClient::CLASS_NAME,
@@ -65,6 +68,8 @@ class WebHookHandlerTest extends BaseTestWithServices
     protected function tearDown()
     {
         WebHookEventHandler::resetInstance();
+        OrderService::resetInstance();
+
         parent::tearDown();
     }
 
