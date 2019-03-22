@@ -18,7 +18,6 @@ use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
-use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
 class UpdateShipmentDataTaskTest extends BaseSyncTest
 {
@@ -81,7 +80,6 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      */
     protected function tearDown()
     {
-        WebHookEventHandler::resetInstance();
         OrderService::resetInstance();
 
         parent::tearDown();

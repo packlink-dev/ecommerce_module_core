@@ -6,8 +6,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
-use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
-use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
+use Packlink\BusinessLogic\Order\OrderService;
 
 /**
  * Class UpdateShipmentDataTask
@@ -29,18 +28,16 @@ class UpdateShipmentDataTask extends Task
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        /** @var OrderService $orderService */
+        $orderService = ServiceRegister::getService(OrderService::CLASS_NAME);
         $orderReferences = $orderRepository->getIncompleteOrderReferences();
 
         foreach ($orderReferences as $orderReference) {
             $shipment = $proxy->getShipment($orderReference);
-            $webhookHandler = WebHookEventHandler::getInstance();
-            $webhookHandler->handleShipmentLabelEvent($orderReference);
-            $webhookHandler->handleTrackingInfoEvent($orderReference);
+            $orderService->handleShipmentLabelEvent($orderReference);
+            $orderService->handleTrackingInfoEvent($orderReference);
             if ($shipment !== null) {
-                $webhookHandler->handleShippingStatusEvent(
-                    $orderReference,
-                    ShipmentStatus::getStatus($shipment->status)
-                );
+                $orderService->handleShippingStatusEvent($orderReference, $shipment->status);
                 $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
             }
         }

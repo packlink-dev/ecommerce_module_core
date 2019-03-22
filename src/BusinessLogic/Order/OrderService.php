@@ -2,18 +2,21 @@
 
 namespace Packlink\BusinessLogic\Order;
 
+use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\Package;
-use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class OrderService.
@@ -38,12 +41,6 @@ class OrderService extends BaseService
      * @var Configuration
      */
     private $configuration;
-    /**
-     * Order repository instance.
-     *
-     * @var OrderRepository
-     */
-    private $orderRepository;
 
     /**
      * OrderService constructor.
@@ -53,7 +50,6 @@ class OrderService extends BaseService
         parent::__construct();
 
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $this->orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
     }
 
     /**
@@ -66,7 +62,10 @@ class OrderService extends BaseService
      */
     public function prepareDraft($orderId)
     {
-        $order = $this->orderRepository->getOrderAndShippingData($orderId);
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+
+        $order = $orderRepository->getOrderAndShippingData($orderId);
 
         return $this->convertOrderToDraftDto($order);
     }
@@ -81,7 +80,111 @@ class OrderService extends BaseService
      */
     public function setReference($orderId, $shipmentReference)
     {
-        $this->orderRepository->setReference($orderId, $shipmentReference);
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+
+        $orderRepository->setReference($orderId, $shipmentReference);
+    }
+
+    /**
+     * Handles web hook shipment label event.
+     *
+     * @param string $referenceId Shipment reference identifier.
+     * @param bool $updateShipmentStatus Flag that signifies whether to update shipment status or not.
+     */
+    public function handleShipmentLabelEvent($referenceId, $updateShipmentStatus = false)
+    {
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $labels = array();
+        try {
+            $labels = $proxy->getLabels($referenceId);
+            if (count($labels) > 0) {
+                $orderRepository->setLabelsByReference($referenceId, $labels);
+                if ($updateShipmentStatus) {
+                    $orderRepository->setShippingStatusByReference(
+                        $referenceId,
+                        ShipmentStatus::STATUS_READY
+                    );
+                }
+            }
+        } catch (HttpBaseException $e) {
+            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
+        } catch (OrderNotFound $e) {
+            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $referenceId, 'labels' => $labels));
+        }
+    }
+
+    /**
+     * Handles web hook shipping status update event.
+     *
+     * @param string $referenceId Shipment reference identifier.
+     * @param string $status Shipping status.
+     */
+    public function handleShippingStatusEvent($referenceId, $status)
+    {
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $shipment = null;
+        try {
+            $shipment = $proxy->getShipment($referenceId);
+            if ($shipment !== null) {
+                $orderRepository->setShippingStatusByReference($referenceId, $status);
+            }
+        } catch (HttpBaseException $e) {
+            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
+        } catch (OrderNotFound $e) {
+            Logger::logInfo(
+                $e->getMessage(),
+                'Core',
+                array('referenceId' => $referenceId, 'shipment' => $shipment ? $shipment->toArray() : 'NONE')
+            );
+        }
+    }
+
+    /**
+     * Handles web hook tracking info update event.
+     *
+     * @param string $referenceId Shipment reference identifier.
+     * @param bool $updateShipmentStatus Flag that signifies whether to update shipment status or not.
+     */
+    public function handleTrackingInfoEvent($referenceId, $updateShipmentStatus = false)
+    {
+        /** @var OrderRepository $orderRepository */
+        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $trackingHistory = array();
+        try {
+            $trackingHistory = $proxy->getTrackingInfo($referenceId);
+            $shipment = $proxy->getShipment($referenceId);
+            if ($shipment !== null) {
+                $orderRepository->updateTrackingInfo($referenceId, $trackingHistory, $shipment);
+                if ($updateShipmentStatus) {
+                    $orderRepository->setShippingStatusByReference(
+                        $referenceId,
+                        ShipmentStatus::STATUS_IN_TRANSIT
+                    );
+                }
+            }
+        } catch (HttpBaseException $e) {
+            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
+        } catch (OrderNotFound $e) {
+            $trackingAsArray = array();
+            foreach ($trackingHistory as $item) {
+                $trackingAsArray[] = $item->toArray();
+            }
+
+            Logger::logInfo(
+                $e->getMessage(),
+                'Core',
+                array('referenceId' => $referenceId, 'trackingHistory' => $trackingAsArray)
+            );
+        }
     }
 
     /**

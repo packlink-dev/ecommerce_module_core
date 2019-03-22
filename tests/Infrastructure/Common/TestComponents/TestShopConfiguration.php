@@ -21,6 +21,16 @@ class TestShopConfiguration extends \Logeecom\Infrastructure\Configuration\Confi
     }
 
     /**
+     *  Returns authorization token.
+     *
+     * @return string
+     */
+    public function getAuthorizationToken()
+    {
+        return 'test';
+    }
+
+    /**
      * Returns current system identifier.
      *
      * @return string Current system identifier.
