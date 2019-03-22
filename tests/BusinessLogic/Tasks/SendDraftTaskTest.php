@@ -16,6 +16,7 @@ use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
 /**
@@ -51,6 +52,13 @@ class SendDraftTaskTest extends BaseSyncTest
             OrderService::CLASS_NAME,
             function () {
                 return OrderService::getInstance();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            PackageTransformer::CLASS_NAME,
+            function () {
+                return PackageTransformer::getInstance();
             }
         );
 

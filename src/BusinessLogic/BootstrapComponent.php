@@ -12,6 +12,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\User\UserAccountService;
 
@@ -80,6 +81,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             LocationService::CLASS_NAME,
             function () {
                 return LocationService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            PackageTransformer::CLASS_NAME,
+            function () {
+                return PackageTransformer::getInstance();
             }
         );
     }

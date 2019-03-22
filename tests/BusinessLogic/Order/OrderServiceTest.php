@@ -19,6 +19,7 @@ use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
@@ -66,6 +67,13 @@ class OrderServiceTest extends BaseTestWithServices
             OrderRepository::CLASS_NAME,
             function () use ($me) {
                 return $me->orderRepository;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            PackageTransformer::CLASS_NAME,
+            function () {
+                return PackageTransformer::getInstance();
             }
         );
 

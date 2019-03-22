@@ -17,6 +17,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
@@ -83,6 +84,13 @@ class LocationServiceTest extends BaseTestWithServices
             LocationService::CLASS_NAME,
             function () {
                 return LocationService::getInstance();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            PackageTransformer::CLASS_NAME,
+            function () {
+                return PackageTransformer::getInstance();
             }
         );
 

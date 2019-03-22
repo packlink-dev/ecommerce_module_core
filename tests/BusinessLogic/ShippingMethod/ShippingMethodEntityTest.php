@@ -13,6 +13,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use PHPUnit\Framework\TestCase;
 
@@ -48,6 +49,13 @@ class ShippingMethodEntityTest extends TestCase
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
                 return new Proxy($config->getAuthorizationToken(), $self->httpClient);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            PackageTransformer::CLASS_NAME,
+            function () {
+                return PackageTransformer::getInstance();
             }
         );
     }

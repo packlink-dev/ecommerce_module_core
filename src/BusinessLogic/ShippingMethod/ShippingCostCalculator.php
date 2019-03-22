@@ -81,14 +81,15 @@ class ShippingCostCalculator
         }
 
         $result = array();
-        $params = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
+        $package = self::preparePackages($packages);
+        $params = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, array($package));
         try {
             $response = self::getProxy()->getShippingServicesDeliveryDetails($params);
 
             $result = self::calculateShippingCostsPerShippingMethod(
                 $shippingMethods,
                 $response,
-                $packages,
+                $package->weight,
                 $totalAmount
             );
         } catch (HttpBaseException $e) {
@@ -98,7 +99,7 @@ class ShippingCostCalculator
                     $shippingMethods,
                     $fromCountry,
                     $toCountry,
-                    $packages,
+                    $package->weight,
                     $totalAmount
                 );
             }
@@ -127,7 +128,8 @@ class ShippingCostCalculator
         $toZip,
         array $packages
     ) {
-        $searchParams = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, $packages);
+        $package = self::preparePackages($packages);
+        $searchParams = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, array($package));
 
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
@@ -213,46 +215,6 @@ class ShippingCostCalculator
     }
 
     /**
-     * Prepares raw response data for shipping costs calculation.
-     *
-     * @param ShippingMethod[] $shippingMethods Array of active shipping methods in the system.
-     * @param ShippingServiceDetails[] $shippingServices Array of shipping services delivery details.
-     * @param Package[] $packages Array of packages if calculation is done by weight.
-     * @param float $totalAmount Total value if calculation is done by value
-     *
-     * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
-     */
-    private static function calculateShippingCostsPerShippingMethod(
-        array $shippingMethods,
-        array $shippingServices,
-        array $packages,
-        $totalAmount
-    ) {
-        $shippingCosts = array();
-
-        $totalWeight = self::getTotalWeight($packages);
-
-        /** @var ShippingMethod $method */
-        foreach ($shippingMethods as $method) {
-            $amount = self::getAmountBasedOnPricingPolicy($method, $totalAmount, $totalWeight);
-
-            $cost = PHP_INT_MAX;
-            foreach ($shippingServices as $service) {
-                $baseCost = self::calculateShippingMethodCost($method, $amount, $service->id, $service->basePrice);
-                if ($baseCost !== false) {
-                    $cost = min($cost, $baseCost);
-                }
-            }
-
-            if ($cost !== PHP_INT_MAX) {
-                $shippingCosts[$method->getId()] = $cost;
-            }
-        }
-
-        return $shippingCosts;
-    }
-
-    /**
      * Calculates shipping cost for given shipping method based on its pricing policy.
      *
      * @param ShippingMethod $shippingMethod Method to calculate cost for.
@@ -274,23 +236,6 @@ class ShippingCostCalculator
         }
 
         return round(self::calculateVariableCost($shippingMethod, $baseCost), 2);
-    }
-
-    /**
-     * Calculates total weight of packages.
-     *
-     * @param Package[] $packages Array of packages.
-     *
-     * @return float Total weight.
-     */
-    protected static function getTotalWeight(array $packages)
-    {
-        $totalWeight = 0;
-        foreach ($packages as $package) {
-            $totalWeight += $package->weight;
-        }
-
-        return $totalWeight;
     }
 
     /**
@@ -348,7 +293,7 @@ class ShippingCostCalculator
      *
      * @param string $fromCountry Departure country code.
      * @param string $toCountry Destination country code.
-     * @param Package[] $packages Array of packages if calculation is done by weight.
+     * @param float $totalWeight Package total weight.
      * @param float $totalAmount Total cart value if calculation is done by value
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
@@ -357,11 +302,10 @@ class ShippingCostCalculator
         array $shippingMethods,
         $fromCountry,
         $toCountry,
-        $packages,
+        $totalWeight,
         $totalAmount
     ) {
         $shippingCosts = array();
-        $totalWeight = self::getTotalWeight($packages);
 
         /** @var ShippingMethod $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
@@ -376,6 +320,44 @@ class ShippingCostCalculator
 
             if ($cost !== false) {
                 $shippingCosts[$shippingMethod->getId()] = $cost;
+            }
+        }
+
+        return $shippingCosts;
+    }
+
+    /**
+     * Prepares raw response data for shipping costs calculation.
+     *
+     * @param ShippingMethod[] $shippingMethods Array of active shipping methods in the system.
+     * @param ShippingServiceDetails[] $shippingServices Array of shipping services delivery details.
+     * @param float $totalWeight Package total weight.
+     * @param float $totalAmount Total value if calculation is done by value
+     *
+     * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
+     */
+    private static function calculateShippingCostsPerShippingMethod(
+        array $shippingMethods,
+        array $shippingServices,
+        $totalWeight,
+        $totalAmount
+    ) {
+        $shippingCosts = array();
+
+        /** @var ShippingMethod $method */
+        foreach ($shippingMethods as $method) {
+            $amount = self::getAmountBasedOnPricingPolicy($method, $totalAmount, $totalWeight);
+
+            $cost = PHP_INT_MAX;
+            foreach ($shippingServices as $service) {
+                $baseCost = self::calculateShippingMethodCost($method, $amount, $service->id, $service->basePrice);
+                if ($baseCost !== false) {
+                    $cost = min($cost, $baseCost);
+                }
+            }
+
+            if ($cost !== PHP_INT_MAX) {
+                $shippingCosts[$method->getId()] = $cost;
             }
         }
 
@@ -414,5 +396,20 @@ class ShippingCostCalculator
         }
 
         return $amount;
+    }
+
+    /**
+     * Prepares packages for transmission.
+     *
+     * @param Package[] $packages Packages.
+     *
+     * @return Package Prepared package.
+     */
+    private static function preparePackages(array $packages = array())
+    {
+        /** @var PackageTransformer $transformer */
+        $transformer = ServiceRegister::getService(PackageTransformer::CLASS_NAME);
+
+        return $transformer->transform($packages);
     }
 }

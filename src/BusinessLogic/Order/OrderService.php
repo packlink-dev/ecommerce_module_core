@@ -11,6 +11,7 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -232,20 +233,23 @@ class OrderService extends BaseService
      */
     private function addPackages(Order $order, Draft $draft)
     {
-        $defaultParcel = $this->configuration->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $draft->content = array();
-        $draft->packages = array();
+        $packages = array();
         foreach ($order->getItems() as $item) {
             $quantity = $item->getQuantity() ?: 1;
             $draft->content[] = $quantity . ' ' . $item->getTitle();
             for ($i = 0; $i < $quantity; $i++) {
-                $draft->packages[] = new Package(
-                    $item->getWeight() ?: $defaultParcel->weight,
-                    $item->getWidth() ?: $defaultParcel->width,
-                    $item->getHeight() ?: $defaultParcel->height,
-                    $item->getLength() ?: $defaultParcel->length
+                $packages[] = new Package(
+                    $item->getWeight(),
+                    $item->getWidth(),
+                    $item->getHeight(),
+                    $item->getLength()
                 );
             }
         }
+
+        /** @var PackageTransformer $transformer */
+        $transformer = ServiceRegister::getService(PackageTransformer::CLASS_NAME);
+        $draft->packages = array($transformer->transform($packages));
     }
 }
