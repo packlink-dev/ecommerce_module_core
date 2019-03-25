@@ -19,8 +19,7 @@
     "autoload-dev": {
         "psr-4": {
             "Logeecom\\Tests\\Infrastructure\\": "tests/Infrastructure",
-            "Logeecom\\Tests\\BusinessLogic\\": "tests/BusinessLogic",
-            "Logeecom\\Tests\\Common\\": "tests/Common"
+            "Logeecom\\Tests\\BusinessLogic\\": "tests/BusinessLogic"
         }
     },
     "require-dev": {

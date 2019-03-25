@@ -278,21 +278,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $this->assertNull($this->controller->save($shipment));
     }
 
-    public function testSaveInvalidWrongPricePolicyModel()
-    {
-        $this->importShippingMethods();
-        $all = $this->controller->getAll();
-        $first = $all[0];
-        $shipment = new ShippingMethodConfiguration();
-        $shipment->id = $first->id;
-        $shipment->name = 'First name test';
-        $shipment->showLogo = !$first->showLogo;
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
-        $shipment->percentPricePolicy = new FixedPricePolicy(-1, 0, 0);
-        $this->assertNull($this->controller->save($shipment));
-    }
-
     public function testSaveCorrectPricePolicy()
     {
         $this->importShippingMethods();
