@@ -3,6 +3,7 @@
 namespace Logeecom\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
+use Logeecom\Infrastructure\Logger\Logger;
 
 /**
  * Class CurlHttpClientService. In charge of doing a HTTP request by using cURL library.
@@ -58,7 +59,22 @@ class CurlHttpClient extends HttpClient
         $this->setCurlSessionAndCommonRequestParts($method, $url, $headers, $body);
         $this->setCurlSessionOptionsForAsynchronousRequest();
 
-        return curl_exec($this->curlSession);
+        $result = curl_exec($this->curlSession);
+        $statusCode = curl_getinfo($this->curlSession, CURLINFO_HTTP_CODE);
+
+        if (!in_array($statusCode, array(0, 200), true)) {
+            $curlError = '';
+            if (curl_errno($this->curlSession)) {
+                $curlError = ' cURL error: ' . curl_errno($this->curlSession) . ' => ' . curl_error($this->curlSession);
+            }
+
+            $httpError = $statusCode . ' Message: ' . $result . $curlError;
+            Logger::logError('Async process failed. ERROR: ' . $httpError);
+        }
+
+        curl_close($this->curlSession);
+
+        return $result;
     }
 
     /**
