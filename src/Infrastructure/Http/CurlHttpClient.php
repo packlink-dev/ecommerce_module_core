@@ -74,12 +74,15 @@ class CurlHttpClient extends HttpClient
     {
         $apiResponse = curl_exec($this->curlSession);
         $statusCode = curl_getinfo($this->curlSession, CURLINFO_HTTP_CODE);
-        curl_close($this->curlSession);
 
         if ($apiResponse === false) {
-            throw new HttpCommunicationException('Request ' . $url . ' failed.');
+            $error = curl_errno($this->curlSession) . ' => ' . curl_error($this->curlSession);
+            curl_close($this->curlSession);
+
+            throw new HttpCommunicationException('Request ' . $url . ' failed. ERROR: ' . $error);
         }
 
+        curl_close($this->curlSession);
         $apiResponse = $this->strip100Header($apiResponse);
 
         return new HttpResponse(
