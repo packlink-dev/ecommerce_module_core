@@ -463,8 +463,8 @@ var Packlink = window.Packlink || {};
                 utilityService.showFlashMessage(response.message, 'success');
             }
 
-            if (shippingMethods[selectedId].selected && getNumberOfActiveServices() === 1) {
-                ajaxService.get(configuration.getShopShippingMethodCountUrl, getShopShippingMethodsCountCallback);
+            if (shippingMethods[selectedId].selected && shouldGetShopShippingMethodCount()) {
+                getShopShippingMethodCount();
             } else {
                 utilityService.hideSpinner();
             }
@@ -755,12 +755,8 @@ var Packlink = window.Packlink || {};
                         utilityService.showFlashMessage(Packlink.successMsgs.shippingMethodSaved, 'success');
                         closeConfigForm();
                         renderShippingMethods();
-
-                        if (getNumberOfActiveServices() === 1) {
-                            ajaxService.get(
-                                configuration.getShopShippingMethodCountUrl,
-                                getShopShippingMethodsCountCallback
-                            );
+                        if (shouldGetShopShippingMethodCount()) {
+                            getShopShippingMethodCount();
                         } else {
                             utilityService.hideSpinner();
                         }
@@ -774,6 +770,26 @@ var Packlink = window.Packlink || {};
                     }
                 );
             }
+        }
+
+        /**
+         * Returns whether a call for getting number of shop shipping methods should be made.
+         *
+         * @return {boolean}
+         */
+        function shouldGetShopShippingMethodCount() {
+            return getNumberOfActiveServices() === 1
+                && typeof (configuration.getShopShippingMethodCountUrl) !== 'undefined';
+        }
+
+        /**
+         * Performs an AJAX call for getting number of shop shipping methods, if proper conditions are met.
+         */
+        function getShopShippingMethodCount() {
+            ajaxService.get(
+                configuration.getShopShippingMethodCountUrl,
+                getShopShippingMethodsCountCallback
+            );
         }
 
         /**
