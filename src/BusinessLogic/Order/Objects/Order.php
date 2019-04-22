@@ -116,6 +116,12 @@ class Order
      * @var string[]
      */
     private $packlinkShipmentLabels = array();
+    /**
+     * Is associated shipment on Packlink has been deleted.
+     *
+     * @var bool
+     */
+    private $deleted = false;
 
     /**
      * Returns order unique identifier.
@@ -475,5 +481,25 @@ class Order
     public function setShippingDropOffId($shippingDropOffId)
     {
         $this->shippingDropOffId = $shippingDropOffId;
+    }
+
+    /**
+     * Returns whether associated shipment on Packlink has been deleted.
+     *
+     * @return bool TRUE if shipment has been deleted, otherwise FALSE.
+     */
+    public function isDeleted()
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Sets whether associated shipment on Packlink has been deleted.
+     *
+     * @param bool $deleted TRUE if shipment has been deleted, otherwise FALSE.
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
     }
 }

@@ -208,6 +208,44 @@ class TestOrderRepository implements OrderRepository
     }
 
     /**
+     * Marks shipment identified by provided reference as deleted on Packlink.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function markShipmentDeleted($shipmentReference)
+    {
+        if ($this->throw) {
+            throw new OrderNotFound('Order not found.');
+        }
+
+        $order = $this->getOrder($shipmentReference);
+
+        $order->setDeleted(true);
+    }
+
+    /**
+     * Returns whether shipment identified by provided reference is deleted on Packlink or not.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @return bool Returns TRUE if shipment has been deleted; otherwise returns FALSE.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function isShipmentDeleted($shipmentReference)
+    {
+        if ($this->throw) {
+            throw new OrderNotFound('Order not found.');
+        }
+
+        $order = $this->getOrder($shipmentReference);
+
+        return $order->isDeleted();
+    }
+
+    /**
      * Test method
      *
      * @param $orderId

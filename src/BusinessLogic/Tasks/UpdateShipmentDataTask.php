@@ -33,12 +33,16 @@ class UpdateShipmentDataTask extends Task
         $orderReferences = $orderRepository->getIncompleteOrderReferences();
 
         foreach ($orderReferences as $orderReference) {
-            $shipment = $proxy->getShipment($orderReference);
-            if ($shipment !== null) {
-                $orderService->updateShipmentLabel($orderReference);
-                $orderService->updateTrackingInfo($orderReference, $shipment);
-                $orderService->updateShippingStatus($orderReference, $shipment->status, $shipment);
-                $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
+            if (!$orderRepository->isShipmentDeleted($orderReference)) {
+                $shipment = $proxy->getShipment($orderReference);
+                if ($shipment !== null) {
+                    $orderService->updateShipmentLabel($orderReference);
+                    $orderService->updateTrackingInfo($orderReference, $shipment);
+                    $orderService->updateShippingStatus($orderReference, $shipment->status, $shipment);
+                    $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
+                } else {
+                    $orderRepository->markShipmentDeleted($orderRepository);
+                }
             }
         }
     }

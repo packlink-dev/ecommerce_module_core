@@ -84,4 +84,20 @@ interface OrderRepository
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function setShippingPriceByReference($shipmentReference, $price);
+
+    /**
+     * Marks shipment identified by provided reference as deleted on Packlink.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     */
+    public function markShipmentDeleted($shipmentReference);
+
+    /**
+     * Returns whether shipment identified by provided reference is deleted on Packlink or not.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @return bool Returns TRUE if shipment has been deleted; otherwise returns FALSE.
+     */
+    public function isShipmentDeleted($shipmentReference);
 }
