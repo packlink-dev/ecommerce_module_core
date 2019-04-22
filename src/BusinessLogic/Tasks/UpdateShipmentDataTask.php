@@ -41,7 +41,7 @@ class UpdateShipmentDataTask extends Task
                     $orderService->updateShippingStatus($orderReference, $shipment->status, $shipment);
                     $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
                 } else {
-                    $orderRepository->markShipmentDeleted($orderRepository);
+                    $orderRepository->markShipmentDeleted($orderReference);
                 }
             }
         }
