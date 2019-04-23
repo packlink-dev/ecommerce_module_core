@@ -171,9 +171,9 @@ class Proxy
     /**
      * Performs search for locations.
      *
-     * @param $platformCountry
-     * @param $postalZone
-     * @param $query
+     * @param string $platformCountry Country code to search in.
+     * @param string $postalZone Postal zone to search in.
+     * @param string $query Query to search for.
      *
      * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
      *

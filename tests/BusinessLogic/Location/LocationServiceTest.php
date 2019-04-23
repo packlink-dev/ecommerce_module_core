@@ -177,6 +177,25 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEmpty($locations);
     }
 
+    public function testGetLocationsForNonDropOffService()
+    {
+        $this->initShippingMethod(false);
+        $this->initWarehouse();
+
+        /** @var LocationService $locationService */
+        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
+        $this->httpClient->setMockResponses($this->getMockLocations());
+        $locations = $locationService->getLocations(1, 'FR', '75008');
+
+        $this->assertEmpty($locations);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
+     */
     public function testLocationSearchWithUnsupportedCountry()
     {
         /** @var LocationService $locationService */
@@ -185,6 +204,12 @@ class LocationServiceTest extends BaseTestWithServices
         $locationService->searchLocations('RS', 'Test');
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
+     */
     public function testLocationSearch()
     {
         $this->httpClient->setMockResponses($this->getMockLocationInfo());
@@ -192,7 +217,7 @@ class LocationServiceTest extends BaseTestWithServices
         /** @var LocationService $locationService */
         $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
 
-        $result = $locationService->searchLocations('DE', '3', 'Test');
+        $result = $locationService->searchLocations('DE', '3');
         $this->assertCount(1, $result);
 
         $info = $result[0];
@@ -214,15 +239,15 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEquals($info->text, $asArray['text']);
     }
 
-    private function initShippingMethod()
+    private function initShippingMethod($isDropOff = true)
     {
-        $this->shippingMethodService->add($this->getShippingServiceDetails(1));
-        $this->shippingMethodService->add($this->getShippingServiceDetails(2, 13));
-        $this->shippingMethodService->add($this->getShippingServiceDetails(3, 7.88));
-        $this->shippingMethodService->add($this->getShippingServiceDetails(4, 18.25));
+        $this->shippingMethodService->add($this->getShippingServiceDetails(1, 10.73, $isDropOff));
+        $this->shippingMethodService->add($this->getShippingServiceDetails(2, 13, $isDropOff));
+        $this->shippingMethodService->add($this->getShippingServiceDetails(3, 7.88, $isDropOff));
+        $this->shippingMethodService->add($this->getShippingServiceDetails(4, 18.25, $isDropOff));
     }
 
-    private function getShippingServiceDetails($id, $basePrice = 10.73)
+    private function getShippingServiceDetails($id, $basePrice = 10.73, $isDropOff = true)
     {
         $details = ShippingServiceDetails::fromArray(
             array(
@@ -232,7 +257,7 @@ class LocationServiceTest extends BaseTestWithServices
                 'currency' => 'EUR',
                 'country' => 'FR',
                 'dropoff' => false,
-                'delivery_to_parcelshop' => false,
+                'delivery_to_parcelshop' => $isDropOff,
                 'category' => 'express',
                 'transit_time' => '3 DAYS',
                 'transit_hours' => 72,

@@ -30,7 +30,7 @@ class LocationService extends BaseService
      *
      * @var array
      */
-    protected $postalZoneMap = array(
+    protected static $postalZoneMap = array(
         'DE' => array('3', '248', '249'),
         'ES' => array('65', '68', '69'),
         'IT' => array('113', '114', '115'),
@@ -87,7 +87,7 @@ class LocationService extends BaseService
     {
         $warehouse = $this->configuration->getDefaultWarehouse();
         $method = $this->shippingMethodService->getShippingMethod($shippingMethodId);
-        if ($warehouse === null || $method === null) {
+        if ($warehouse === null || $method === null || !$method->isDestinationDropOff()) {
             return array();
         }
 
@@ -119,8 +119,8 @@ class LocationService extends BaseService
     /**
      * Performs search for locations.
      *
-     * @param $platformCountry
-     * @param $query
+     * @param string $platformCountry Country code to search in.
+     * @param string $query Query to search for.
      *
      * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
      *
@@ -132,13 +132,13 @@ class LocationService extends BaseService
      */
     public function searchLocations($platformCountry, $query)
     {
-        if (!isset($this->postalZoneMap[$platformCountry])) {
+        if (!isset(self::$postalZoneMap[$platformCountry])) {
             throw new PlatformCountryNotSupportedException('Platform country not supported');
         }
 
         $result = array();
 
-        foreach ($this->postalZoneMap[$platformCountry] as $postalZone) {
+        foreach (self::$postalZoneMap[$platformCountry] as $postalZone) {
             $partial = $this->proxy->searchLocations($platformCountry, $postalZone, $query);
 
             if (!empty($partial)) {
