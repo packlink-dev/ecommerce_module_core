@@ -164,11 +164,13 @@ class OrderServiceTest extends BaseTestWithServices
 
         $this->orderService->prepareDraft('test');
 
-        self::assertCount(1, $this->shopLogger->loggedMessages);
+        $logMessages = $this->shopLogger->loggedMessages;
+        self::assertCount(2, $logMessages);
+        self::assertEquals('Missing required search parameter(s).',  $logMessages[0]->getMessage());
         self::assertEquals(
             'Invalid service method ' . $method->getId() . ' selected for order test because this method '
             . 'does not support order\'s destination country. Sending order without selected method.',
-            $this->shopLogger->loggedMessages[0]->getMessage()
+            $logMessages[1]->getMessage()
         );
     }
 

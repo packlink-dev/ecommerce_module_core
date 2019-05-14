@@ -135,4 +135,15 @@ class ShippingServiceSearch extends BaseDto
 
         return $instance;
     }
+
+    /**
+     * Validates if all parameters are valid.
+     *
+     * @return bool Is valid flag.
+     */
+    public function isValid()
+    {
+        return !empty($this->fromCountry) && !empty($this->fromZip) && !empty($this->toCountry)
+            && !empty($this->toZip) && !empty($this->packages);
+    }
 }

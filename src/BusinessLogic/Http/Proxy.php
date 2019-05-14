@@ -226,6 +226,11 @@ class Proxy
      */
     public function getShippingServicesDeliveryDetails(ShippingServiceSearch $params)
     {
+        if (!$params->isValid()) {
+            Logger::logDebug('Missing required search parameter(s).', 'Core', $params->toArray());
+            throw new HttpRequestException('Missing required search parameter(s).', 400);
+        }
+
         $response = $this->call(self::HTTP_METHOD_GET, 'services?' . http_build_query($params->toArray()));
 
         $body = $response->decodeBodyAsJson();
