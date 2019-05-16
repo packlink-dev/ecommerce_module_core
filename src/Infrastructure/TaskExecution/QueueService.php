@@ -103,6 +103,9 @@ class QueueService
 
         $lastUpdateTimestamp = $queueItem->getLastUpdateTimestamp();
 
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $configService->setContext($queueItem->getContext());
+
         $queueItem->setStatus(QueueItem::IN_PROGRESS);
         $queueItem->setStartTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
         $queueItem->setLastUpdateTimestamp($queueItem->getStartTimestamp());

@@ -161,7 +161,7 @@ class UserAccountService extends BaseService
         $this->setDefaultParcel(true);
         $this->setWarehouseInfo(true);
 
-        $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask());
+        $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask(), $this->configuration->getContext());
 
         $this->getProxy()->registerWebHookHandler($this->configuration->getWebHookUrl());
     }
