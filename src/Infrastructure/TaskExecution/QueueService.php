@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Events\BeforeQueueStatusChangeEvent;
 use Logeecom\Infrastructure\TaskExecution\Events\QueueStatusChangedEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
@@ -77,6 +78,7 @@ class QueueService
         $queueItem->setQueueTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
 
         try {
+            $this->reportBeforeStatusChange($queueItem, QueueItem::CREATED);
             $this->save($queueItem);
             $this->reportStatusChange($queueItem, QueueItem::CREATED);
             $this->getTaskRunnerWakeup()->wakeup();
@@ -111,6 +113,8 @@ class QueueService
         $queueItem->setLastUpdateTimestamp($queueItem->getStartTimestamp());
 
         try {
+            $this->reportBeforeStatusChange($queueItem, QueueItem::QUEUED);
+
             $this->save(
                 $queueItem,
                 array('status' => QueueItem::QUEUED, 'lastUpdateTimestamp' => $lastUpdateTimestamp)
@@ -141,6 +145,8 @@ class QueueService
         $queueItem->setProgressBasePoints(10000);
 
         try {
+            $this->reportBeforeStatusChange($queueItem, QueueItem::IN_PROGRESS);
+
             $this->save(
                 $queueItem,
                 array('status' => QueueItem::IN_PROGRESS, 'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp())
@@ -171,6 +177,8 @@ class QueueService
         $queueItem->setLastExecutionProgressBasePoints($queueItem->getProgressBasePoints());
 
         try {
+            $this->reportBeforeStatusChange($queueItem, QueueItem::IN_PROGRESS);
+
             $this->save(
                 $queueItem,
                 array(
@@ -215,6 +223,8 @@ class QueueService
         }
 
         try {
+            $this->reportBeforeStatusChange($queueItem, QueueItem::IN_PROGRESS);
+
             $this->save(
                 $queueItem,
                 array(
@@ -380,6 +390,19 @@ class QueueService
         $queueItem->setId($id);
 
         return $id;
+    }
+
+    /**
+     * Fires event for before status change.
+     *
+     * @param \Logeecom\Infrastructure\TaskExecution\QueueItem $queueItem Queue item with is about to change status.
+     * @param string $previousState Previous state. MUST be one of the states defined as constants in @see QueueItem.
+     */
+    private function reportBeforeStatusChange(QueueItem $queueItem, $previousState)
+    {
+        /** @var EventBus $eventBus */
+        $eventBus = ServiceRegister::getService(EventBus::CLASS_NAME);
+        $eventBus->fire(new BeforeQueueStatusChangeEvent($queueItem, $previousState));
     }
 
     /**
