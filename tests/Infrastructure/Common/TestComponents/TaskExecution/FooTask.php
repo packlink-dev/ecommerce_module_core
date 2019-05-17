@@ -8,7 +8,6 @@ class FooTask extends Task
 {
     private $dependency1;
     private $dependency2;
-
     private $methodsCallCount = array(
         'execute' => 0,
         'reconfigure' => 0,
@@ -27,11 +26,13 @@ class FooTask extends Task
      */
     public function serialize()
     {
-        return serialize(array(
-            'dependency1' => $this->dependency1,
-            'dependency2' => $this->dependency2,
-            'methodsCallCount' => serialize($this->methodsCallCount)
-        ));
+        return serialize(
+            array(
+                'dependency1' => $this->dependency1,
+                'dependency2' => $this->dependency2,
+                'methodsCallCount' => serialize($this->methodsCallCount),
+            )
+        );
     }
 
     /**

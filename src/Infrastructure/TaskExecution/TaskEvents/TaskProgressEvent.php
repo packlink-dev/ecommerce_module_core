@@ -33,7 +33,10 @@ class TaskProgressEvent extends Event
      */
     public function __construct($progressPercentBasePoints)
     {
-        if (!is_int($progressPercentBasePoints) || $progressPercentBasePoints < 0 || 10000 < $progressPercentBasePoints) {
+        if (!is_int($progressPercentBasePoints)
+            || $progressPercentBasePoints < 0
+            || 10000 < $progressPercentBasePoints
+        ) {
             throw new \InvalidArgumentException('Progress percentage must be value between 0 and 10000.');
         }
 

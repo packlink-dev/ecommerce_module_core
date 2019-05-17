@@ -3,15 +3,16 @@
 namespace Logeecom\Tests\Infrastructure\Utility\Events;
 
 use Logeecom\Infrastructure\Utility\Events\Event;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestBarEvent;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestEventEmitter;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestFooEvent;
 use PHPUnit\Framework\TestCase;
 
 class EventEmitterTest extends TestCase
 {
-
     public function testItShouldBePossibleToFireEventWithoutAnySubscribedHandlers()
     {
-        $emitter = new \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestEventEmitter();
+        $emitter = new TestEventEmitter();
 
         try {
             $emitter->fire(new TestFooEvent());
@@ -22,19 +23,21 @@ class EventEmitterTest extends TestCase
 
     public function testItShouldBePossibleToSubscribeMultipleHandlersToSameEvent()
     {
-        $emitter = new \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestEventEmitter();
+        $emitter = new TestEventEmitter();
         $handler1Event = null;
         $handler2Event = null;
-        $emitter->when(TestFooEvent::CLASS_NAME, function (TestFooEvent $event) use (&$handler1Event) {
-            $handler1Event = $event;
-        });
         $emitter->when(
             TestFooEvent::CLASS_NAME,
-            function (
-                \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestFooEvent $event
-            ) use (&$handler2Event) {
-            $handler2Event = $event;
-        });
+            function (TestFooEvent $event) use (&$handler1Event) {
+                $handler1Event = $event;
+            }
+        );
+        $emitter->when(
+            TestFooEvent::CLASS_NAME,
+            function (TestFooEvent $event) use (&$handler2Event) {
+                $handler2Event = $event;
+            }
+        );
 
         $emitter->fire(new TestFooEvent());
 
@@ -44,19 +47,21 @@ class EventEmitterTest extends TestCase
 
     public function testItShouldBePossibleToNotifyOnlySubscribersOnSpecificEvent()
     {
-        $emitter = new \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestEventEmitter();
+        $emitter = new TestEventEmitter();
         $handler1Event = null;
         $handler2Event = null;
         $emitter->when(
-            \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestFooEvent::CLASS_NAME,
+            TestFooEvent::CLASS_NAME,
             function (TestFooEvent $event) use (&$handler1Event) {
-            $handler1Event = $event;
-        });
+                $handler1Event = $event;
+            }
+        );
         $emitter->when(
-            \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestBarEvent::CLASS_NAME,
+            TestBarEvent::CLASS_NAME,
             function (Event $event) use (&$handler2Event) {
-            $handler2Event = $event;
-        });
+                $handler2Event = $event;
+            }
+        );
 
         $emitter->fire(new TestFooEvent());
 
@@ -70,14 +75,16 @@ class EventEmitterTest extends TestCase
      */
     public function testItShouldBePossibleToTriggerExceptionFromInsideHandlerMethod()
     {
-        $emitter = new \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\Events\TestEventEmitter();
-        $emitter->when(TestFooEvent::CLASS_NAME, function () {
-            throw new \RuntimeException('Handler exception');
-        });
+        $emitter = new TestEventEmitter();
+        $emitter->when(
+            TestFooEvent::CLASS_NAME,
+            function () {
+                throw new \RuntimeException('Handler exception');
+            }
+        );
 
         $emitter->fire(new TestFooEvent());
 
         $this->fail('It should be possible to throw exception from event handler code.');
     }
-
 }

@@ -23,5 +23,4 @@ class TestTaskRunner extends TaskRunner
         $this->callHistory['setGuid'][] = array('guid' => $guid);
         parent::setGuid($guid);
     }
-
 }

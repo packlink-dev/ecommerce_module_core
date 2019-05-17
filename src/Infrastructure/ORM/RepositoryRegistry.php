@@ -19,7 +19,6 @@ class RepositoryRegistry
      * @var RepositoryInterface[]
      */
     protected static $instantiated = array();
-
     /**
      * @var array
      */

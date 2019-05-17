@@ -15,35 +15,30 @@ class LogData
      * @var string
      */
     private $integration;
-
     /**
      * Array of LogContextData.
      *
      * @var LogContextData[]
      */
     private $context;
-
     /**
      * Log level.
      *
      * @var int
      */
     private $logLevel;
-
     /**
      * Log timestamp.
      *
      * @var int
      */
     private $timestamp;
-
     /**
      * Name of the component.
      *
      * @var string
      */
     private $component;
-
     /**
      * Log message.
      *
