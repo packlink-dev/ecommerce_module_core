@@ -1,4 +1,7 @@
 <?php
+/** @noinspection PhpDocMissingThrowsInspection */
+
+/** @noinspection PhpUnusedParameterInspection */
 
 namespace Logeecom\Infrastructure\Configuration;
 
@@ -273,8 +276,6 @@ abstract class Configuration extends Singleton
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * Returns configuration entity with provided name.
      *
      * @param string $name Configuration property name.
@@ -286,8 +287,10 @@ abstract class Configuration extends Singleton
         $filter = new QueryFilter();
         /** @noinspection PhpUnhandledExceptionInspection */
         $filter->where('name', '=', $name);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $filter->where('systemId', '=', $this->getCurrentSystemId());
+        if ($this->isSystemSpecific($name)) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $filter->where('systemId', '=', $this->getCurrentSystemId());
+        }
 
         /** @var ConfigEntity $config */
         $config = $this->getRepository()->selectOne($filter);
@@ -307,7 +310,10 @@ abstract class Configuration extends Singleton
     {
         /** @var ConfigEntity $config */
         $config = $this->getConfigEntity($name) ?: new ConfigEntity();
-        $config->setSystemId($this->getCurrentSystemId());
+        if ($this->isSystemSpecific($name)) {
+            $config->setSystemId($this->getCurrentSystemId());
+        }
+
         $config->setValue($value);
         if ($config->getId() === null) {
             $config->setName($name);
@@ -317,6 +323,18 @@ abstract class Configuration extends Singleton
         }
 
         return $config;
+    }
+
+    /**
+     * Determines whether the configuration entry is system specific.
+     *
+     * @param string $name Configuration entry name.
+     *
+     * @return bool
+     */
+    protected function isSystemSpecific($name)
+    {
+        return true;
     }
 
     /** @noinspection PhpDocMissingThrowsInspection */
