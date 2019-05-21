@@ -30,6 +30,7 @@ var Packlink = window.Packlink || {};
                 disableShopShippingMethodsUrl: configuration.shopShippingMethodsDisableUrl,
                 hasTaxConfiguration: configuration.hasTaxConfiguration,
                 getTaxClassesUrl: configuration.shippingMethodsGetTaxClasses,
+                canDisplayCarrierLogos: configuration.canDisplayCarrierLogos
             },
             'order-state-mapping': {
                 getSystemOrderStatusesUrl: configuration.getSystemOrderStatusesUrl,

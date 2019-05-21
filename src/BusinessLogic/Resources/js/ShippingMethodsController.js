@@ -627,9 +627,14 @@ var Packlink = window.Packlink || {};
                 true
             );
 
-            let showLogoCheckbox = templateService.getComponent('pl-show-logo', template);
-            showLogoCheckbox.addEventListener('click', handleShowLogoChanged, true);
-            showLogoCheckbox.checked = methodModel.showLogo;
+            if (
+                typeof configuration.canDisplayCarrierLogos === 'undefined'
+                || configuration.canDisplayCarrierLogos === true
+            ) {
+                let showLogoCheckbox = templateService.getComponent('pl-show-logo', template);
+                showLogoCheckbox.addEventListener('click', handleShowLogoChanged, true);
+                showLogoCheckbox.checked = methodModel.showLogo;
+            }
 
             let pricingPolicySelector = templateService.getComponent('pl-pricing-policy-selector', template);
             pricingPolicySelector.addEventListener('change', handleShippingMethodPricingPolicyChanged, true);
