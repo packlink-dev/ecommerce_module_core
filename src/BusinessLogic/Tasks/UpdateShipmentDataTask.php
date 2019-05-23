@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class UpdateShipmentDataTask
@@ -38,7 +39,10 @@ class UpdateShipmentDataTask extends Task
                 if ($shipment !== null) {
                     $orderService->updateShipmentLabel($orderReference);
                     $orderService->updateTrackingInfo($orderReference, $shipment);
-                    $orderService->updateShippingStatus($orderReference, $shipment->status, $shipment);
+
+                    $shipmentStatus = ShipmentStatus::getStatus($shipment->status);
+                    $orderService->updateShippingStatus($orderReference, $shipmentStatus, $shipment);
+
                     $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
                 } else {
                     $orderRepository->markShipmentDeleted($orderReference);

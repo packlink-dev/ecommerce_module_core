@@ -97,6 +97,19 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $this->assertEquals(15.85, $order->getBasePrice());
     }
 
+    public function testExecuteStatusShipmentDelivered()
+    {
+        $this->httpClient->setMockResponses($this->getMockResponsesDelivered());
+        $this->syncTask->execute();
+
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
+        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
+        $order = $orderRepository->getOrder('test');
+
+        $this->assertEquals(15.85, $order->getBasePrice());
+        $this->assertEquals('delivered', $order->getStatus());
+    }
+
     /**
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
@@ -169,6 +182,26 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
+            ),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
+            ),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/tracking.json')
+            ),
+        );
+    }
+
+    /**
+     * Returns responses for testing updating shipment data.
+     *
+     * @return HttpResponse[] Array of Http responses.
+     */
+    private function getMockResponsesDelivered()
+    {
+        return array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentDelivered.json')
             ),
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')

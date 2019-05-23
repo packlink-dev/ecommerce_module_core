@@ -186,6 +186,7 @@ class TestOrderRepository implements OrderRepository
         $shipment = $order->getShipment() ?: new Shipment();
         $shipment->setStatus($shippingStatus);
 
+        $order->setStatus($shippingStatus);
         $order->setShipment($shipment);
     }
 
