@@ -163,7 +163,10 @@ class UserAccountService extends BaseService
 
         $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask());
 
-        $this->getProxy()->registerWebHookHandler($this->configuration->getWebHookUrl());
+        $webHookUrl = $this->configuration->getWebHookUrl();
+        if (!empty($webHookUrl)) {
+            $this->getProxy()->registerWebHookHandler($webHookUrl);
+        }
     }
 
     /**
