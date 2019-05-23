@@ -126,7 +126,7 @@ abstract class Entity
             return $this->$methodName();
         }
 
-        if (isset($this->$indexKey)) {
+        if (property_exists($this, $indexKey)) {
             return $this->$indexKey;
         }
 

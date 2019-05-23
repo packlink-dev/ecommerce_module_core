@@ -15,7 +15,6 @@ class OptionsDTO
      * @var string
      */
     private $name;
-
     /**
      * Value of the option.
      *

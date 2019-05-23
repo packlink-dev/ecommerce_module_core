@@ -161,6 +161,11 @@ var Packlink = window.Packlink || {};
             showOnMapBtn.href = `https://www.google.com/maps/search/?api=1&query=${location['lat']},${location['long']}`;
             showOnMapBtn.title = getTranslation(lang, ['showOnMapTitle']);
 
+            let showOnMapCompositeBtn = getElement(template, 'composite-show-on-map');
+            showOnMapCompositeBtn.href = `https://www.google.com/maps/search/?api=1&query=${location['lat']},${location['long']}`;
+            showOnMapCompositeBtn.title = getTranslation(lang, ['showOnMapTitle']);
+            showOnMapCompositeBtn.innerHTML = getTranslation(lang, ['showOnMapTitle']);
+
             let showWorkingHoursBtn = getElement(template, 'show-working-hours-btn');
             showWorkingHoursBtn.innerHTML = getTranslation(lang, ['workingHoursLabel']);
             showWorkingHoursBtn.setAttribute('data-id', location['id']);
@@ -170,7 +175,6 @@ var Packlink = window.Packlink || {};
             showCompositeHoursBtn.innerHTML = getTranslation(lang, ['workingHoursLabel']);
             showCompositeHoursBtn.setAttribute('data-id', location['id']);
             showCompositeHoursBtn.addEventListener('click', workingHoursButtonClickHandler);
-
 
             let workingHoursNode = getElement(template, 'working-hours');
             let compositeHoursNode = getElement(template, 'composite-working-hours');
@@ -186,6 +190,12 @@ var Packlink = window.Packlink || {};
             let selectBtn = getElement(template, 'select-btn');
             selectBtn.innerHTML = getTranslation(lang, ['selectLabel']);
             selectBtn.addEventListener('click', function () {
+                selectCallback(location['id']);
+            });
+
+            let selectCompositeBtn = getElement(template, 'composite-select-btn');
+            selectCompositeBtn.innerHTML = getTranslation(lang, ['selectLabel']);
+            selectCompositeBtn.addEventListener('click', function () {
                 selectCallback(location['id']);
             });
 

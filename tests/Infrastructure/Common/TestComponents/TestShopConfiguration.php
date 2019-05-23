@@ -2,7 +2,9 @@
 
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents;
 
-class TestShopConfiguration extends \Logeecom\Infrastructure\Configuration\Configuration
+use Logeecom\Infrastructure\Configuration\Configuration;
+
+class TestShopConfiguration extends Configuration
 {
     private $callbackUrl = 'https://some-shop.test/callback?a=1&b=abc';
     private $servicePointEnabled = true;
@@ -109,6 +111,28 @@ class TestShopConfiguration extends \Logeecom\Infrastructure\Configuration\Confi
     public function setIntegrationName($name)
     {
         $this->saveConfigValue('integrationName', $name);
+    }
+
+    /**
+     * Determines whether the configuration entry is system specific.
+     *
+     * @param string $name Configuration entry name.
+     *
+     * @return bool
+     */
+    public function isSystemSpecific($name)
+    {
+        return $name !== 'maxStartedTasksLimit';
+    }
+
+    /**
+     * Making the method public for testing purposes.
+     *
+     * @inheritDoc
+     */
+    public function getConfigEntity($name)
+    {
+        return parent::getConfigEntity($name);
     }
 
     /**

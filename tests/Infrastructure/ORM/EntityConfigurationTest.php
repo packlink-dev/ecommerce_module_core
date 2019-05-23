@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
  */
 class EntityConfigurationTest extends TestCase
 {
-
     public function testEntityConfiguration()
     {
         $map = new IndexMap();

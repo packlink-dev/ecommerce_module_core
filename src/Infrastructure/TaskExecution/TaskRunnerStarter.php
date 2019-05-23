@@ -102,7 +102,7 @@ class TaskRunnerStarter implements Runnable
                 'Core',
                 array(
                     'ExceptionMessage' => $ex->getMessage(),
-                    'ExceptionTrace' => $ex->getTraceAsString()
+                    'ExceptionTrace' => $ex->getTraceAsString(),
                 )
             );
         } catch (TaskRunnerRunException $ex) {
@@ -119,7 +119,7 @@ class TaskRunnerStarter implements Runnable
                 'Core',
                 array(
                     'ExceptionMessage' => $ex->getMessage(),
-                    'ExceptionTrace' => $ex->getTraceAsString()
+                    'ExceptionTrace' => $ex->getTraceAsString(),
                 )
             );
         }

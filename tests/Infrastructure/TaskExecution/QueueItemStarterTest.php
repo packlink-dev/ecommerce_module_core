@@ -22,6 +22,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepos
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
@@ -57,12 +58,11 @@ class QueueItemStarterTest extends TestCase
 
         new TestServiceRegister(
             array(
-                TimeProvider::CLASS_NAME => function () use($timeProvider) {
+                TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
                 TaskRunnerWakeup::CLASS_NAME => function () {
-                    return new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService(
-                    );
+                    return new TestTaskRunnerWakeupService();
                 },
                 QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
@@ -70,19 +70,20 @@ class QueueItemStarterTest extends TestCase
                 EventBus::CLASS_NAME => function () {
                     return EventBus::getInstance();
                 },
-                DefaultLoggerAdapter::CLASS_NAME => function() {
+                DefaultLoggerAdapter::CLASS_NAME => function () {
                     return new TestDefaultLogger();
                 },
-                ShopLoggerAdapter::CLASS_NAME => function() use ($shopLogger) {
+                ShopLoggerAdapter::CLASS_NAME => function () use ($shopLogger) {
                     return $shopLogger;
                 },
-                Configuration::CLASS_NAME => function() use ($shopConfiguration) {
+                Configuration::CLASS_NAME => function () use ($shopConfiguration) {
                     return $shopConfiguration;
                 },
-                HttpClient::CLASS_NAME => function() {
+                HttpClient::CLASS_NAME => function () {
                     return new TestHttpClient();
-                }
-            ));
+                },
+            )
+        );
 
         // Initialize logger component with new set of log adapters
         Logger::resetInstance();
@@ -102,7 +103,7 @@ class QueueItemStarterTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'test',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $itemStarter = new QueueItemStarter($queueItem->getId());
 
@@ -133,7 +134,7 @@ class QueueItemStarterTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'test',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         /** @var QueueItemStarter $unserializedItemStarter */
@@ -166,7 +167,11 @@ class QueueItemStarterTest extends TestCase
         $itemStarter->run();
 
         // Assert
-        $this->assertSame('test', $this->shopConfiguration->getContext(), 'Item starter must set task context before task execution.');
+        $this->assertSame(
+            'test',
+            $this->shopConfiguration->getContext(),
+            'Item starter must set task context before task execution.'
+        );
     }
 
     /**
@@ -177,7 +182,7 @@ class QueueItemStarterTest extends TestCase
         // Arrange
         $queueItem = $this->queue->enqueue(
             'test',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
+            new FooTask()
         );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         $this->queue->setExceptionResponse(

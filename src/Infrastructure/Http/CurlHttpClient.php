@@ -168,6 +168,10 @@ class CurlHttpClient extends HttpClient
         if ($method === 'PUT') {
             curl_setopt($this->curlSession, CURLOPT_CUSTOMREQUEST, 'PUT');
         }
+
+        if ($method === 'PATCH') {
+            curl_setopt($this->curlSession, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        }
     }
 
     /**

@@ -7,10 +7,8 @@ use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 
 class TestRunnerStatusStorage implements TaskRunnerStatusStorage
 {
-
     /** @var TaskRunnerStatus|null */
     private $status;
-
     private $callHistory = array();
     private $exceptionResponses = array();
 
