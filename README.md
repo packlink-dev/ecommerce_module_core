@@ -3,6 +3,11 @@ Core library for e-commerces (PS, Woo, Magento, etc) modules
 
 ## Commit Procedure
 Before any commit, you **MUST** run all tests and they all MUST pass.
+To run tests on different versions of PHP, go to the root directory and in terminal
+run command:
+```bash
+sh run-tests.sh
+```
 
 You **MUST** run code inspection so standards could be followed. 
 Assuming you are using PHPStorm ([you should](https://www.google.com/search?q=why+should+I+use+phpstorm)), 

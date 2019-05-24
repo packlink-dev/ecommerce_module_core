@@ -191,6 +191,8 @@ class LocationServiceTest extends BaseTestWithServices
     }
 
     /**
+     * @expectedException \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
+     *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
@@ -200,7 +202,6 @@ class LocationServiceTest extends BaseTestWithServices
     {
         /** @var LocationService $locationService */
         $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
-        $this->setExpectedException('\Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException');
         $locationService->searchLocations('RS', 'Test');
     }
 
