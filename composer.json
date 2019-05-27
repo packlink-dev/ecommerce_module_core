@@ -6,9 +6,8 @@
     "license": "proprietary",
     "require": {
         "php": ">=5.3",
-        "zendframework/zend-memory": "2.0.3",
-        "zendframework/zend-stdlib": "2.0.3",
-        "zendframework/zendpdf": "2.0.*@dev"
+        "zendframework/zend-stdlib": "^2.0",
+        "zendframework/zendpdf": "^2.0"
     },
     "autoload": {
         "psr-4": {
