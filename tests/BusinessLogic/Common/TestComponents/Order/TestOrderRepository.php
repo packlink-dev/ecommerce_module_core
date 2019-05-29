@@ -273,4 +273,20 @@ class TestOrderRepository implements OrderRepository
 
         return static::$orders[$orderId];
     }
+
+    /**
+     * Returns whether shipment identified by provided reference has Packlink shipment labels set.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @return bool Returns TRUE if labels are set; otherwise returns FALSE.
+     */
+    public function areLabelsSet($shipmentReference)
+    {
+        $order = $this->getOrder($shipmentReference);
+
+        $packlinkShipmentLabels = $order->getPacklinkShipmentLabels();
+
+        return !empty($packlinkShipmentLabels);
+    }
 }

@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Order;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
@@ -225,6 +226,43 @@ class OrderServiceTest extends BaseTestWithServices
         $orderRepository->shouldThrowException(true);
 
         $this->orderService->setReference('123', '');
+    }
+
+    public function testUpdateShipmentLabel()
+    {
+        $this->httpClient->setMockResponses(array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
+            )
+        ));
+        $this->orderService->updateShipmentLabel('test');
+
+        /** @var TestOrderRepository $orderRepository */
+        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
+        $order = $orderRepository->getOrder('test');
+
+        $this->assertNotEmpty($order->getPacklinkShipmentLabels());
+    }
+
+    public function testUpdateShipmentLabelAlreadySet()
+    {
+        $this->httpClient->setMockResponses(array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
+            ),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
+            ),
+        ));
+
+        // First call
+        $this->orderService->updateShipmentLabel('test');
+
+        // Second call, should not make API call
+        $this->orderService->updateShipmentLabel('test');
+
+        // Only one call to Packlink API
+        $this->assertCount(1, $this->httpClient->getHistory());
     }
 
     private function getShippingServiceDetails($id, $carrierName, $basePrice = 10.76, $toCountry = 'IT')

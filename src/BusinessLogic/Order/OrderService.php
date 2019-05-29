@@ -92,6 +92,10 @@ class OrderService extends BaseService
      */
     public function updateShipmentLabel($referenceId)
     {
+        if ($this->orderRepository->areLabelsSet($referenceId)) {
+            return;
+        }
+
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         $labels = array();

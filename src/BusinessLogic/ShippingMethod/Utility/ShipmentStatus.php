@@ -30,6 +30,13 @@ class ShipmentStatus
      */
     const STATUS_DELIVERED = 'delivered';
 
+    /**
+     * Maps raw shipment status from Packlink to shipment status.
+     *
+     * @param string $shipmentStatus Raw shipment status from Packlink.
+     *
+     * @return string Shipment status.
+     */
     public static function getStatus($shipmentStatus)
     {
         switch ($shipmentStatus) {
@@ -55,5 +62,17 @@ class ShipmentStatus
             default:
                 return self::STATUS_PENDING;
         }
+    }
+
+    /**
+     * Returns whether shipment labels should be fetched.
+     *
+     * @param string $shipmentStatus Raw shipment status from Packlink.
+     *
+     * @return bool Returns TRUE if labels should be fetched; otherwise returns FALSE.
+     */
+    public static function shouldFetchLabels($shipmentStatus)
+    {
+        return in_array($shipmentStatus, array('READY_TO_PRINT', 'READY_FOR_COLLECTION', 'IN_TRANSIT', 'DELIVERED'));
     }
 }

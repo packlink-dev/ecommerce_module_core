@@ -100,4 +100,13 @@ interface OrderRepository
      * @return bool Returns TRUE if shipment has been deleted; otherwise returns FALSE.
      */
     public function isShipmentDeleted($shipmentReference);
+
+    /**
+     * Returns whether shipment identified by provided reference has Packlink shipment labels set.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @return bool Returns TRUE if labels are set; otherwise returns FALSE.
+     */
+    public function areLabelsSet($shipmentReference);
 }
