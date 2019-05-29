@@ -17,6 +17,7 @@ use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class OrderService.
@@ -63,6 +64,7 @@ class OrderService extends BaseService
      * @param string $orderId Unique order id.
      *
      * @return Draft Prepared shipment draft.
+     *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      */
     public function prepareDraft($orderId)
@@ -88,11 +90,14 @@ class OrderService extends BaseService
     /**
      * Updates shipment label from API for order with given shipment reference.
      *
-     * @param string $referenceId Shipment reference identifier.
+     * @param Shipment $shipment Shipment DTO for given reference number.
      */
-    public function updateShipmentLabel($referenceId)
+    public function updateShipmentLabel(Shipment $shipment)
     {
-        if ($this->orderRepository->areLabelsSet($referenceId)) {
+        $referenceId = $shipment->reference;
+        if (!ShipmentStatus::shouldFetchLabels($shipment->status)
+            || $this->orderRepository->isLabelSet($referenceId)
+        ) {
             return;
         }
 
@@ -114,26 +119,18 @@ class OrderService extends BaseService
     /**
      * Updates shipping status from API for order with given shipment reference.
      *
-     * @param string $referenceId Shipment reference identifier.
+     * @param Shipment $shipment Shipment DTO for given reference number.
      * @param string $status Shipping status.
-     * @param Shipment Shipment DTO for given reference number.
      */
-    public function updateShippingStatus($referenceId, $status, $shipment = null)
+    public function updateShippingStatus(Shipment $shipment, $status)
     {
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         try {
-            $shipment = $shipment ?: $proxy->getShipment($referenceId);
-            if ($shipment !== null) {
-                $this->orderRepository->setShippingStatusByReference($referenceId, $status);
-            }
-        } catch (HttpBaseException $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
+            $this->orderRepository->setShippingStatusByReference($shipment->reference, $status);
         } catch (OrderNotFound $e) {
             Logger::logInfo(
                 $e->getMessage(),
                 'Core',
-                array('referenceId' => $referenceId, 'shipment' => $shipment ? $shipment->toArray() : 'NONE')
+                array('referenceId' => $shipment->reference, 'status' => $status)
             );
         }
     }
@@ -141,23 +138,18 @@ class OrderService extends BaseService
     /**
      * Updates tracking info from API for order with given shipment reference.
      *
-     * @param string $referenceId Shipment reference identifier.
-     * @param Shipment Shipment DTO for given reference number.
+     * @param Shipment $shipment Shipment DTO for given reference number.
      */
-    public function updateTrackingInfo($referenceId, $shipment = null)
+    public function updateTrackingInfo(Shipment $shipment)
     {
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         $trackingHistory = array();
         try {
-            $trackingHistory = $proxy->getTrackingInfo($referenceId);
-            $shipment = $shipment ?: $proxy->getShipment($referenceId);
-
-            if ($shipment !== null) {
-                $this->orderRepository->updateTrackingInfo($referenceId, $trackingHistory, $shipment);
-            }
+            $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
+            $this->orderRepository->updateTrackingInfo($shipment, $trackingHistory);
         } catch (HttpBaseException $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
+            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         } catch (OrderNotFound $e) {
             $trackingAsArray = array();
             foreach ($trackingHistory as $item) {
@@ -167,7 +159,7 @@ class OrderService extends BaseService
             Logger::logInfo(
                 $e->getMessage(),
                 'Core',
-                array('referenceId' => $referenceId, 'trackingHistory' => $trackingAsArray)
+                array('referenceId' => $shipment->reference, 'trackingHistory' => $trackingAsArray)
             );
         }
     }

@@ -8,6 +8,7 @@ use Packlink\BusinessLogic\Order\Objects\Order;
 
 /**
  * Interface OrderRepository
+ *
  * @package Packlink\BusinessLogic\Order\Interfaces
  */
 interface OrderRepository
@@ -45,25 +46,24 @@ interface OrderRepository
     public function setReference($orderId, $shipmentReference);
 
     /**
-     * Sets order packlink shipment labels to an order by shipment reference.
+     * Sets order packlink shipping labels to an order by shipment reference.
      *
      * @param string $shipmentReference Packlink shipment reference.
-     * @param string[] $labels Packlink shipment labels.
+     * @param string[] $labels Packlink shipping labels.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function setLabelsByReference($shipmentReference, array $labels);
 
     /**
-     * Sets order packlink shipment tracking history to an order by shipment reference.
+     * Sets order packlink shipment tracking history to an order for given shipment.
      *
-     * @param string $shipmentReference Packlink shipment reference.
+     * @param Shipment $shipment Packlink shipment details.
      * @param Tracking[] $trackingHistory Shipment tracking history.
-     * @param Shipment $shipmentDetails Packlink shipment details.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
-    public function updateTrackingInfo($shipmentReference, array $trackingHistory, Shipment $shipmentDetails);
+    public function updateTrackingInfo(Shipment $shipment, array $trackingHistory);
 
     /**
      * Sets order packlink shipping status to an order by shipment reference.
@@ -102,11 +102,11 @@ interface OrderRepository
     public function isShipmentDeleted($shipmentReference);
 
     /**
-     * Returns whether shipment identified by provided reference has Packlink shipment labels set.
+     * Returns whether shipment identified by provided reference has Packlink shipment label set.
      *
      * @param string $shipmentReference Packlink shipment reference.
      *
-     * @return bool Returns TRUE if labels are set; otherwise returns FALSE.
+     * @return bool Returns TRUE if label is set; otherwise, FALSE.
      */
-    public function areLabelsSet($shipmentReference);
+    public function isLabelSet($shipmentReference);
 }

@@ -13,6 +13,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -235,7 +236,8 @@ class OrderServiceTest extends BaseTestWithServices
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
             )
         ));
-        $this->orderService->updateShipmentLabel('test');
+
+        $this->orderService->updateShipmentLabel($this->getShipment());
 
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
@@ -255,14 +257,31 @@ class OrderServiceTest extends BaseTestWithServices
             ),
         ));
 
+        $shipment = $this->getShipment();
         // First call
-        $this->orderService->updateShipmentLabel('test');
+        $this->orderService->updateShipmentLabel($shipment);
 
         // Second call, should not make API call
-        $this->orderService->updateShipmentLabel('test');
+        $this->orderService->updateShipmentLabel($shipment);
 
         // Only one call to Packlink API
         $this->assertCount(1, $this->httpClient->getHistory());
+    }
+
+    public function testUpdateShipmentLabelWrongStatus()
+    {
+        $this->orderService->updateShipmentLabel($this->getShipment('AWAITING_COMPLETION'));
+
+        $this->assertNull($this->httpClient->getHistory());
+    }
+
+    private function getShipment($status = 'READY_TO_PRINT', $reference = 'test')
+    {
+        $shipment = new Shipment();
+        $shipment->reference = $reference;
+        $shipment->status = $status;
+
+        return $shipment;
     }
 
     private function getShippingServiceDetails($id, $carrierName, $basePrice = 10.76, $toCountry = 'IT')

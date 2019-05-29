@@ -37,13 +37,9 @@ class UpdateShipmentDataTask extends Task
             if (!$orderRepository->isShipmentDeleted($orderReference)) {
                 $shipment = $proxy->getShipment($orderReference);
                 if ($shipment !== null) {
-                    $orderService->updateTrackingInfo($orderReference, $shipment);
-                    if (ShipmentStatus::shouldFetchLabels($shipment->status)) {
-                        $orderService->updateShipmentLabel($orderReference);
-                    }
-
-                    $shipmentStatus = ShipmentStatus::getStatus($shipment->status);
-                    $orderService->updateShippingStatus($orderReference, $shipmentStatus, $shipment);
+                    $orderService->updateTrackingInfo($shipment);
+                    $orderService->updateShipmentLabel($shipment);
+                    $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
 
                     $orderRepository->setShippingPriceByReference($orderReference, (float)$shipment->price);
                 } else {

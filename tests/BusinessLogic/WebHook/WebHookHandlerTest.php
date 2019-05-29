@@ -277,6 +277,9 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         return array(
             new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
+            ),
+            new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
             )
         );
@@ -304,6 +307,9 @@ class WebHookHandlerTest extends BaseTestWithServices
     private function getMockTrackingResponse()
     {
         return array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
+            ),
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/tracking.json')
             )

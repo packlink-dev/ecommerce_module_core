@@ -140,19 +140,18 @@ class TestOrderRepository implements OrderRepository
     /**
      * Sets order packlink shipment tracking history to an order by shipment reference.
      *
-     * @param string $shipmentReference Packlink shipment reference.
-     * @param Tracking[] $trackingHistory Shipment tracking history.
      * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipmentDetails Packlink shipment details.
+     * @param Tracking[] $trackingHistory Shipment tracking history.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
-    public function updateTrackingInfo($shipmentReference, array $trackingHistory, ShipmentDetails $shipmentDetails)
+    public function updateTrackingInfo(ShipmentDetails $shipmentDetails, array $trackingHistory)
     {
         if ($this->throw) {
             throw new OrderNotFound('Order not found.');
         }
 
-        $order = $this->getOrder($shipmentReference);
+        $order = $this->getOrder($shipmentDetails->reference);
         $shipment = $order->getShipment() ?: new Shipment();
         $tracking = array();
         foreach ($trackingHistory as $item) {
@@ -281,7 +280,7 @@ class TestOrderRepository implements OrderRepository
      *
      * @return bool Returns TRUE if labels are set; otherwise returns FALSE.
      */
-    public function areLabelsSet($shipmentReference)
+    public function isLabelSet($shipmentReference)
     {
         $order = $this->getOrder($shipmentReference);
 
