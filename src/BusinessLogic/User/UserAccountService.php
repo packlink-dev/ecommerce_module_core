@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\User;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -58,12 +59,14 @@ class UserAccountService extends BaseService
     }
 
     /**
-     * Logs in user with provided API key.
+     * Validates provided API key and initializes user's data.
      *
      * @param string $apiKey API key.
      *
      * @return bool TRUE if login went successfully; otherwise, FALSE.
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function login($apiKey)
     {
@@ -84,7 +87,9 @@ class UserAccountService extends BaseService
             return false;
         }
 
-        return $this->createSchedules();
+        $this->createSchedules();
+
+        return true;
     }
 
     /**
@@ -172,41 +177,48 @@ class UserAccountService extends BaseService
     /**
      * Creates schedules.
      *
-     * @return bool
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     protected function createSchedules()
     {
         /** @var Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $shippingServicesSchedule = new WeeklySchedule(new UpdateShippingServicesTask());
-        $shipmentDataFullHourSchedule = new HourlySchedule(new UpdateShipmentDataTask());
-        $shipmentDataHalfHourSchedule = new HourlySchedule(new UpdateShipmentDataTask());
 
-        $shippingServicesSchedule->setQueueName($configService->getDefaultQueueName());
+        $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+
+        // Schedule weekly task for updating services
+        $shippingServicesSchedule = new WeeklySchedule(
+            new UpdateShippingServicesTask(),
+            $configService->getDefaultQueueName()
+        );
         $shippingServicesSchedule->setDay(1);
         $shippingServicesSchedule->setHour(2);
         $shippingServicesSchedule->setNextSchedule();
-
-        $shipmentDataFullHourSchedule->setQueueName($configService->getDefaultQueueName());
-        $shipmentDataHalfHourSchedule->setQueueName($configService->getDefaultQueueName());
-        $shipmentDataFullHourSchedule->setMinute(0);
-        $shipmentDataHalfHourSchedule->setMinute(30);
-        $shipmentDataFullHourSchedule->setNextSchedule();
-        $shipmentDataHalfHourSchedule->setNextSchedule();
-
-        try {
-            $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
-        } catch (\Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException $e) {
-            Logger::logError('Schedule repository not registered.', 'Core');
-
-            return false;
-        }
-
         $repository->save($shippingServicesSchedule);
-        $repository->save($shipmentDataFullHourSchedule);
-        $repository->save($shipmentDataHalfHourSchedule);
 
-        return true;
+        // Schedule hourly task for updating shipment info - start at full hour
+        $this->setHourlyTask($configService, $repository, 0);
+
+        // Schedule hourly task for updating shipment info - start at half hour
+        $this->setHourlyTask($configService, $repository, 30);
+    }
+
+    /**
+     * Creates hourly task for updating shipment data.
+     *
+     * @param Configuration $configService Configuration service
+     * @param RepositoryInterface $repository Scheduler repository.
+     * @param int $minute Starting minute for the task.
+     */
+    protected function setHourlyTask(Configuration $configService, RepositoryInterface $repository, $minute)
+    {
+        $shipmentDataHalfHourSchedule = new HourlySchedule(
+            new UpdateShipmentDataTask(),
+            $configService->getDefaultQueueName()
+        );
+        $shipmentDataHalfHourSchedule->setMinute($minute);
+        $shipmentDataHalfHourSchedule->setNextSchedule();
+        $repository->save($shipmentDataHalfHourSchedule);
     }
 
     /**
