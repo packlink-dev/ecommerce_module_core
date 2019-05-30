@@ -32,7 +32,7 @@ class Schedule extends Entity
      *
      * @var array
      */
-    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month');
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'recurring');
     /**
      * Queue name where task should be queued to.
      *
