@@ -69,6 +69,12 @@ class Schedule extends Entity
      * @var Task
      */
     protected $task;
+    /**
+     * Whether schedule should execute repeatedly.
+     *
+     * @var bool
+     */
+    protected $recurring = true;
 
     /**
      * Schedule constructor.
@@ -246,6 +252,26 @@ class Schedule extends Entity
     public function setMonth($month)
     {
         $this->month = $month;
+    }
+
+    /**
+     * Return whether the schedule is recurring.
+     *
+     * @return bool
+     */
+    public function isRecurring()
+    {
+        return $this->recurring;
+    }
+
+    /**
+     * Set whether the schedule is recurring.
+     *
+     * @param bool $recurring
+     */
+    public function setRecurring($recurring)
+    {
+        $this->recurring = $recurring;
     }
 
     /**
