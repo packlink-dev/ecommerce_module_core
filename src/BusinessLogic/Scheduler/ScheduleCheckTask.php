@@ -40,8 +40,12 @@ class ScheduleCheckTask extends Task
             try {
                 $queueService->enqueue($scheduledTask->getQueueName(), $task);
 
-                $scheduledTask->setNextSchedule();
-                $this->getRepository()->update($scheduledTask);
+                if ($scheduledTask->isRecurring()) {
+                    $scheduledTask->setNextSchedule();
+                    $this->getRepository()->update($scheduledTask);
+                } else {
+                    $this->getRepository()->delete($scheduledTask);
+                }
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
                     'Failed to enqueue task ' . $task->getType(),
