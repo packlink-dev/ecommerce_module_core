@@ -2,7 +2,6 @@
     "name": "packlink/integration-core",
     "description": "Packlink integrations core library",
     "type": "library",
-    "version": "1.0.0",
     "license": "proprietary",
     "require": {
         "php": ">=5.3",
