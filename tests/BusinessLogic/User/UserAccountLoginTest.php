@@ -11,12 +11,15 @@ use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\User\UserAccountService;
 
 /**
@@ -67,7 +70,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->assertTrue($this->userAccountService->login('GoodApiKey'));
 
         $this->assertEquals('GoodApiKey', TestShopConfiguration::getInstance()->getAuthorizationToken());
-        $this->assertCount(4, $this->httpClient->getHistory());
+        $this->assertCount(5, $this->httpClient->getHistory());
 
         // check whether parcel info is set
         $parcelInfo = $this->shopConfig->getDefaultParcel();
@@ -100,7 +103,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->httpClient->setMockResponses($this->getMockResponses(false));
 
         $this->assertTrue($this->userAccountService->login('GoodApiKey'));
-        $this->assertCount(4, $this->httpClient->getHistory());
+        $this->assertCount(5, $this->httpClient->getHistory());
 
         // check whether parcel info is set
         $parcelInfo = $this->shopConfig->getDefaultParcel();
@@ -123,7 +126,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->httpClient->setMockResponses($this->getMockResponses(true, false));
 
         $this->assertTrue($this->userAccountService->login('GoodApiKey'));
-        $this->assertCount(4, $this->httpClient->getHistory());
+        $this->assertCount(5, $this->httpClient->getHistory());
 
         // check whether parcel info is set
         $parcelInfo = $this->shopConfig->getDefaultParcel();
@@ -153,6 +156,9 @@ class UserAccountLoginTest extends BaseTestWithServices
             ),
             new HttpResponse(
                 200, array(), $warehouse ? file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json') : ''
+            ),
+            new HttpResponse(
+                200, array(), ''
             ),
             new HttpResponse(
                 200, array(), ''
@@ -254,7 +260,8 @@ class UserAccountLoginTest extends BaseTestWithServices
         /** @noinspection PhpUnhandledExceptionInspection */
         parent::setUp();
 
-        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+        TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+        TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
 
         $this->httpClient = new TestHttpClient();
         $queue = new TestQueueService();
@@ -302,6 +309,8 @@ class UserAccountLoginTest extends BaseTestWithServices
     protected function tearDown()
     {
         UserAccountService::resetInstance();
+        TestRepositoryRegistry::cleanUp();
+
         parent::tearDown();
     }
 }

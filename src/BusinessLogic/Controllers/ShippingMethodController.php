@@ -132,7 +132,13 @@ class ShippingMethodController
      */
     public function activate($id)
     {
-        return $this->shippingMethodService->activate($id);
+        if ($this->shippingMethodService->activate($id)) {
+            AnalyticsController::sendSetupEvent();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

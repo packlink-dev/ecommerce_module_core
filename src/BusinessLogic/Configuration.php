@@ -208,4 +208,22 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     {
         return $this->getConfigValue('orderStatusMappings');
     }
+
+    /**
+     * Sets a flag that module setup is finished.
+     */
+    public function setSetupFinished()
+    {
+        $this->saveConfigValue('setupFinished', true);
+    }
+
+    /**
+     * Gets a flag about finished setup.
+     *
+     * @return bool TRUE if setup is marked as finished; otherwise, FALSE.
+     */
+    public function isSetupFinished()
+    {
+        return $this->getConfigValue('setupFinished') ?: false;
+    }
 }
