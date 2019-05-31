@@ -2,7 +2,6 @@
 
 namespace Logeecom\Tests\BusinessLogic\Order;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
@@ -12,6 +11,7 @@ use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -106,9 +106,10 @@ class OrderServiceTest extends BaseTestWithServices
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($me) {
+                /** @var Configuration $config */
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new Proxy($config->getAuthorizationToken(), $me->httpClient);
+                return new Proxy($config, $me->httpClient);
             }
         );
 

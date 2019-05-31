@@ -2,7 +2,9 @@
 
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents;
 
-class TestShopConfiguration extends \Packlink\BusinessLogic\Configuration
+use Packlink\BusinessLogic\Configuration;
+
+class TestShopConfiguration extends Configuration
 {
     private $callbackUrl = 'https://some-shop.test/callback?a=1&b=abc';
     private $servicePointEnabled = true;
@@ -99,6 +101,30 @@ class TestShopConfiguration extends \Packlink\BusinessLogic\Configuration
     public function getDraftSource()
     {
         return 'module_unknown';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getModuleVersion()
+    {
+        return '1.2.3';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getECommerceName()
+    {
+        return 'test_system';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getECommerceVersion()
+    {
+        return '3.2.1';
     }
 
     /**

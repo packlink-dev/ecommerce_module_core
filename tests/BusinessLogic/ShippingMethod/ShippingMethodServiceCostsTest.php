@@ -81,7 +81,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($me) {
-                return new Proxy($me->shopConfig->getAuthorizationToken(), $me->httpClient);
+                return new Proxy($me->shopConfig, $me->httpClient);
             }
         );
 
@@ -740,6 +740,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     /**
      * @dataProvider wrongParametersProvider
+     *
+     * @param $fromCountry
+     * @param $fromZip
+     * @param $toCountry
+     * @param $toZip
+     * @param $packages
      */
     public function testMissingShippingParameters($fromCountry, $fromZip, $toCountry, $toZip, $packages)
     {

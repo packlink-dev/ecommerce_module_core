@@ -73,7 +73,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($me) {
-                return new Proxy($me->shopConfig->getAuthorizationToken(), $me->httpClient);
+                return new Proxy($me->shopConfig, $me->httpClient);
             }
         );
 

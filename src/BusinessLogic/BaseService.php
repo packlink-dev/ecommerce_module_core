@@ -4,13 +4,14 @@ namespace Packlink\BusinessLogic;
 
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Singleton;
 
 /**
  * Base class for all services. Initializes service as a singleton instance.
  *
  * @package Packlink\BusinessLogic
  */
-abstract class BaseService extends \Logeecom\Infrastructure\Singleton
+abstract class BaseService extends Singleton
 {
     /**
      * @noinspection PhpDocMissingThrowsInspection

@@ -67,7 +67,7 @@ class SendDraftTaskTest extends BaseSyncTest
             /** @var Configuration $config */
             $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-            return new Proxy($config->getAuthorizationToken(), $me->httpClient);
+            return new Proxy($config, $me->httpClient);
         });
 
         $orderRepository = new TestOrderRepository();
@@ -93,7 +93,12 @@ class SendDraftTaskTest extends BaseSyncTest
         parent::tearDown();
     }
 
-
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testExecute()
     {
         $this->httpClient->setMockResponses($this->getMockResponses());
@@ -106,6 +111,12 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals('DE00019732CF', $order->getShipment()->getReferenceNumber());
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testAfterFailure()
     {
         /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */

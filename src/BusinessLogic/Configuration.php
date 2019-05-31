@@ -43,6 +43,28 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     abstract public function getDraftSource();
 
     /**
+     * Gets the current version of the module/integration.
+     *
+     * @return string The version number.
+     */
+    abstract public function getModuleVersion();
+
+    /**
+     * Gets the name of the integrated e-commerce system.
+     * This name is related to Packlink API which can be different from the official system name.
+     *
+     * @return string The e-commerce name.
+     */
+    abstract public function getECommerceName();
+
+    /**
+     * Gets the current version of the integrated e-commerce system.
+     *
+     * @return string The version number.
+     */
+    abstract public function getECommerceVersion();
+
+    /**
      * Returns scheduler time threshold between checks.
      *
      * @return int Threshold in seconds.

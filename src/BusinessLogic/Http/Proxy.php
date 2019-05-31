@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\LocationInfo;
@@ -66,22 +67,20 @@ class Proxy
      */
     private $client;
     /**
-     * Authorization token.
-     *
-     * @var string
+     * @var Configuration
      */
-    private $token;
+    private $configService;
 
     /**
      * Proxy constructor.
      *
-     * @param string $token Authorization token.
+     * @param Configuration $configService Configuration service.
      * @param HttpClient $client System HTTP client.
      */
-    public function __construct($token, HttpClient $client)
+    public function __construct(Configuration $configService, HttpClient $client)
     {
-        $this->token = $token;
         $this->client = $client;
+        $this->configService = $configService;
     }
 
     /**
@@ -470,7 +469,10 @@ class Proxy
         return array(
             'accept' => 'Accept: application/json',
             'content' => 'Content-Type: application/json',
-            'token' => 'Authorization: ' . $this->token,
+            'token' => 'Authorization: ' . $this->configService->getAuthorizationToken(),
+            'Module-Version' => 'X-Module-Version: ' . $this->configService->getModuleVersion(),
+            'Ecommerce-Name' => 'X-Ecommerce-Name: ' . $this->configService->getECommerceName(),
+            'Ecommerce-Version' => 'X-Ecommerce-Version: ' . $this->configService->getECommerceVersion(),
         );
     }
 }
