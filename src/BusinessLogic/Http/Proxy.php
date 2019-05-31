@@ -3,11 +3,13 @@
 namespace Packlink\BusinessLogic\Http;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\LocationInfo;
@@ -182,12 +184,14 @@ class Proxy
      */
     public function searchLocations($platformCountry, $postalZone, $query)
     {
-        $url = 'locations/postalcodes?' . http_build_query(array(
-                'platform' => 'PRO',
-                'platform_country' => $platformCountry,
-                'postalzone' => $postalZone,
-                'q' => $query
-            ));
+        $url = 'locations/postalcodes?' . http_build_query(
+                array(
+                    'platform' => 'PRO',
+                    'platform_country' => $platformCountry,
+                    'postalzone' => $postalZone,
+                    'q' => $query,
+                )
+            );
 
         $response = $this->call(self::HTTP_METHOD_GET, $url);
 
@@ -282,8 +286,13 @@ class Proxy
         $response = $this->call(self::HTTP_METHOD_POST, 'shipments', $draft->toArray());
 
         $result = $response->decodeBodyAsJson();
+        $reference = array_key_exists('reference', $result) ? $result['reference'] : '';
 
-        return array_key_exists('reference', $result) ? $result['reference'] : '';
+        if ($reference) {
+            $this->sendAnalytics(Analytics::EVENT_DRAFT_CREATED);
+        }
+
+        return $reference;
     }
 
     /**
@@ -328,6 +337,7 @@ class Proxy
      * @param string $referenceId Packlink shipment reference identifier.
      *
      * @return Tracking[] Tracking DTO.
+     *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
@@ -337,6 +347,26 @@ class Proxy
         $response = $this->getShipmentData($referenceId, 'track');
 
         return $response !== null ? Tracking::fromArrayBatch($response->decodeBodyAsJson()) : array();
+    }
+
+    /**
+     * Sends the analytics data. Includes current integrated system name and version.
+     *
+     * @param string $eventName The name of the event to send.
+     */
+    public function sendAnalytics($eventName)
+    {
+        $data = new Analytics(
+            $eventName,
+            $this->configService->getECommerceName(),
+            $this->configService->getECommerceVersion()
+        );
+
+        try {
+            $this->call(self::HTTP_METHOD_POST, 'analytics', $data->toArray());
+        } catch (HttpBaseException $e) {
+            Logger::logWarning('Could not send analytics data. Exception: ' . $e->getMessage());
+        }
     }
 
     /**

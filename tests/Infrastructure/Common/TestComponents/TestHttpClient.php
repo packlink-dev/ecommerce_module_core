@@ -120,7 +120,7 @@ class TestHttpClient extends HttpClient
      */
     public function getLastRequest()
     {
-        return reset($this->history);
+        return end($this->history);
     }
 
     /**
@@ -131,6 +131,14 @@ class TestHttpClient extends HttpClient
     public function getHistory()
     {
         return $this->history;
+    }
+
+    /**
+     * Resets the history call stack.
+     */
+    public function resetHistory()
+    {
+        $this->history = null;
     }
 
     /**

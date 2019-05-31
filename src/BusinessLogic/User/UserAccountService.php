@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
@@ -172,6 +173,8 @@ class UserAccountService extends BaseService
         if (!empty($webHookUrl)) {
             $this->getProxy()->registerWebHookHandler($webHookUrl);
         }
+
+        $this->getProxy()->sendAnalytics(Analytics::EVENT_CONFIGURATION);
     }
 
     /**
@@ -181,15 +184,12 @@ class UserAccountService extends BaseService
      */
     protected function createSchedules()
     {
-        /** @var Configuration $configService */
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-
         $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
 
         // Schedule weekly task for updating services
         $shippingServicesSchedule = new WeeklySchedule(
             new UpdateShippingServicesTask(),
-            $configService->getDefaultQueueName()
+            $this->configuration->getDefaultQueueName()
         );
         $shippingServicesSchedule->setDay(1);
         $shippingServicesSchedule->setHour(2);
@@ -197,24 +197,23 @@ class UserAccountService extends BaseService
         $repository->save($shippingServicesSchedule);
 
         // Schedule hourly task for updating shipment info - start at full hour
-        $this->setHourlyTask($configService, $repository, 0);
+        $this->setHourlyTask($repository, 0);
 
         // Schedule hourly task for updating shipment info - start at half hour
-        $this->setHourlyTask($configService, $repository, 30);
+        $this->setHourlyTask($repository, 30);
     }
 
     /**
      * Creates hourly task for updating shipment data.
      *
-     * @param Configuration $configService Configuration service
      * @param RepositoryInterface $repository Scheduler repository.
      * @param int $minute Starting minute for the task.
      */
-    protected function setHourlyTask(Configuration $configService, RepositoryInterface $repository, $minute)
+    protected function setHourlyTask(RepositoryInterface $repository, $minute)
     {
         $shipmentDataHalfHourSchedule = new HourlySchedule(
             new UpdateShipmentDataTask(),
-            $configService->getDefaultQueueName()
+            $this->configuration->getDefaultQueueName()
         );
         $shipmentDataHalfHourSchedule->setMinute($minute);
         $shipmentDataHalfHourSchedule->setNextSchedule();
