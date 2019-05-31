@@ -2,12 +2,12 @@
 
 namespace Logeecom\Tests\BusinessLogic\Location;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\Proxy;
 
@@ -35,9 +35,10 @@ class PostalCodeEntityTest extends BaseTestWithServices
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($self) {
+                /** @var Configuration $config */
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new Proxy($config->getAuthorizationToken(), $self->httpClient);
+                return new Proxy($config, $self->httpClient);
             }
         );
     }

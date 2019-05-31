@@ -2,11 +2,11 @@
 
 namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
@@ -46,9 +46,10 @@ class ShippingMethodEntityTest extends TestCase
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($self) {
+                /** @var \Packlink\BusinessLogic\Configuration $config */
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new Proxy($config->getAuthorizationToken(), $self->httpClient);
+                return new Proxy($config, $self->httpClient);
             }
         );
 

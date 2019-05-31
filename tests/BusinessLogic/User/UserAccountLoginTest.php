@@ -42,6 +42,7 @@ class UserAccountLoginTest extends BaseTestWithServices
      * Tests when empty value is provided for API key.
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testEmptyApiKey()
     {
@@ -92,6 +93,7 @@ class UserAccountLoginTest extends BaseTestWithServices
      * Tests user login and user initialization
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testLoginNoParcel()
     {
@@ -114,6 +116,7 @@ class UserAccountLoginTest extends BaseTestWithServices
      * Tests user login and user initialization
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testLoginNoWarehouse()
     {
@@ -159,6 +162,7 @@ class UserAccountLoginTest extends BaseTestWithServices
 
     /**
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testLoginBadHttp()
     {
@@ -288,7 +292,7 @@ class UserAccountLoginTest extends BaseTestWithServices
                 /** @var Configuration $config */
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new Proxy($config->getAuthorizationToken(), $self->httpClient);
+                return new Proxy($config, $self->httpClient);
             }
         );
 

@@ -38,7 +38,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 /** @var HttpClient $client */
                 $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
 
-                return new Proxy($config->getAuthorizationToken(), $client);
+                return new Proxy($config, $client);
             }
         );
 

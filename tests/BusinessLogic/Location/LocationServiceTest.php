@@ -59,9 +59,10 @@ class LocationServiceTest extends BaseTestWithServices
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($self) {
+                /** @var Configuration $config */
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new Proxy($config->getAuthorizationToken(), $self->httpClient);
+                return new Proxy($config, $self->httpClient);
             }
         );
 

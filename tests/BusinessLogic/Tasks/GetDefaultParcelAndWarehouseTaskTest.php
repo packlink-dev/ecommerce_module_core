@@ -53,7 +53,7 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
             /** @var Configuration $config */
             $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
 
-            return new Proxy($config->getAuthorizationToken(), $me->httpClient);
+            return new Proxy($config, $me->httpClient);
         });
     }
 
