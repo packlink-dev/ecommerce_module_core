@@ -6,6 +6,8 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
+use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
@@ -24,6 +26,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
+use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
@@ -169,6 +172,54 @@ class ScheduleCheckTaskTest extends TestCase
         $this->assertCount(2, $queueItems);
         $this->assertEquals('queueForDailyFoo', $queueItems[0]->getQueueName());
         $this->assertEquals('queueForWeeklyFoo', $queueItems[1]->getQueueName());
+    }
+
+    /**
+     * Tests execution of a delayed task.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    public function testDelayedTask()
+    {
+        $timestamp = strtotime('+5 minutes');
+
+        $delayedTask = new HourlySchedule(new FooTask(), 'delayedQueue');
+        $delayedTask->setMonth((int)date('m', $timestamp));
+        $delayedTask->setDay((int)date('d', $timestamp));
+        $delayedTask->setHour((int)date('H', $timestamp));
+        $delayedTask->setMinute((int)date('i', $timestamp));
+        $delayedTask->setRecurring(false);
+        $delayedTask->setNextSchedule();
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $scheduleRepository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+        $id = $scheduleRepository->save($delayedTask);
+
+        // Test that schedule exists.
+        $filter = new QueryFilter();
+        $filter->where('id', Operators::EQUALS, $id);
+        $task = $scheduleRepository->selectOne($filter);
+
+        self::assertNotNull($task);
+
+        $newTimestamp = strtotime('+7 minutes');
+        $newTime = $this->timeProvider->getDateTime($newTimestamp);
+        $this->timeProvider->setCurrentLocalTime($newTime);
+
+        $this->syncTask->execute();
+
+        // Test that schedule has been deleted after one execution.
+        $task = $scheduleRepository->selectOne($filter);
+
+        self::assertNull($task);
+
+        // Test that scheduled task exists.
+        $filter = new QueryFilter();
+        $filter->where('queueName', Operators::EQUALS, 'delayedQueue');
+
+        $queuedTask = $this->queueStorage->selectOne($filter);
+        self::assertNotNull($queuedTask);
     }
 
     /**
