@@ -31,6 +31,7 @@ class HourlySchedule extends Schedule
         'endHour',
         'endMinute',
         'interval',
+        'context',
     );
     /**
      * Start hour of the interval.
