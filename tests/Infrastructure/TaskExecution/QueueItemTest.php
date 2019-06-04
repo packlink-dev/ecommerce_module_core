@@ -38,7 +38,7 @@ class QueueItemTest extends TestCase
      */
     public function testWhenQueueItemIsCreatedItShouldBeInCreatedStatus()
     {
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask();
+        $task = new FooTask();
         $queueItem = new QueueItem($task);
 
         $this->assertEquals(
@@ -109,7 +109,7 @@ class QueueItemTest extends TestCase
      */
     public function testQueueItemShouldThrowExceptionWhenSerializationFails()
     {
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask('test task', 123);
+        $task = new FooTask('test task', 123);
         $queueItem = new QueueItem();
 
         $queueItem->setSerializedTask('invalid serialized task content');
@@ -126,9 +126,7 @@ class QueueItemTest extends TestCase
     public function testItShouldUpdateTaskWhenSettingSerializedTask()
     {
         $newTask = new FooTask('new task', 123);
-        $queueItem = new QueueItem(
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask('initial task', 1)
-        );
+        $queueItem = new QueueItem(new FooTask('initial task', 1));
 
         $queueItem->setSerializedTask(serialize($newTask));
 
@@ -250,7 +248,7 @@ class QueueItemTest extends TestCase
      */
     public function testQueueItemIdToTask()
     {
-        $task = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask('test task', 123);
+        $task = new FooTask('test task', 123);
         $queueItem = new QueueItem($task);
         $queueItem->setId(27);
 

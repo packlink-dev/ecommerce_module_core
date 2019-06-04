@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
@@ -8,6 +9,7 @@ use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
@@ -61,7 +63,7 @@ class TaskRunnerWakeupTest extends TestCase
         new TestServiceRegister(
             array(
                 AsyncProcessService::CLASS_NAME => function () {
-                    return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
+                    return AsyncProcessStarterService::getInstance();
                 },
                 TaskRunnerStatusStorage::CLASS_NAME => function () use ($runnerStatusStorage) {
                     return $runnerStatusStorage;
@@ -89,7 +91,7 @@ class TaskRunnerWakeupTest extends TestCase
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
+        $this->asyncProcessStarter = AsyncProcessStarterService::getInstance();
         $this->runnerStatusStorage = $runnerStatusStorage;
         $this->timeProvider = $timeProvider;
         $this->guidProvider = $guidProvider;
@@ -100,7 +102,7 @@ class TaskRunnerWakeupTest extends TestCase
     protected function tearDown()
     {
         MemoryStorage::reset();
-        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::resetInstance();
+        AsyncProcessStarterService::resetInstance();
         parent::tearDown();
     }
 

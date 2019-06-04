@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
@@ -179,6 +180,7 @@ class ScheduleCheckTaskTest extends TestCase
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testDelayedTask()
     {

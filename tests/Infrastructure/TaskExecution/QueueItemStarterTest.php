@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 

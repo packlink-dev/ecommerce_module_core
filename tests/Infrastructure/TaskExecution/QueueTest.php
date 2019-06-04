@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
@@ -17,6 +18,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -42,8 +44,7 @@ class QueueTest extends TestCase
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 
         $timeProvider = new TestTimeProvider();
-        $taskRunnerStarter = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService(
-        );
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
 
         new TestServiceRegister(
             array(

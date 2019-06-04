@@ -5,6 +5,7 @@ namespace Logeecom\Infrastructure\Logger;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\Singleton;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
@@ -12,7 +13,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
  *
  * @package Logeecom\Infrastructure\Logger
  */
-class Logger extends \Logeecom\Infrastructure\Singleton
+class Logger extends Singleton
 {
     /**
      * Error type of log.

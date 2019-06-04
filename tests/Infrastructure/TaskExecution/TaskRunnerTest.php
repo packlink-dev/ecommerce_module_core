@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
@@ -9,6 +10,7 @@ use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -81,7 +83,7 @@ class TaskRunnerTest extends TestCase
         new TestServiceRegister(
             array(
                 AsyncProcessService::CLASS_NAME => function () {
-                    return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
+                    return AsyncProcessStarterService::getInstance();
                 },
                 TaskRunnerWakeup::CLASS_NAME => function () use ($taskRunnerStarter) {
                     return $taskRunnerStarter;
@@ -118,7 +120,7 @@ class TaskRunnerTest extends TestCase
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
+        $this->asyncProcessStarter = AsyncProcessStarterService::getInstance();
         $this->taskRunnerStarter = $taskRunnerStarter;
         $this->runnerStatusStorage = $runnerStatusStorage;
         $this->queueStorage = RepositoryRegistry::getQueueItemRepository();
@@ -138,7 +140,7 @@ class TaskRunnerTest extends TestCase
     protected function tearDown()
     {
         MemoryStorage::reset();
-        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::resetInstance();
+        AsyncProcessStarterService::resetInstance();
         parent::tearDown();
     }
 
@@ -151,17 +153,11 @@ class TaskRunnerTest extends TestCase
         // Arrange
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
         $earliestQueue1Item = $this->queue->enqueue('queue1', new FooTask());
-        $earliestQueue2Item = $this->queue->enqueue(
-            'queue2',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
-        );
+        $earliestQueue2Item = $this->queue->enqueue('queue2', new FooTask());
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
         $this->queue->generateRunningQueueItem('queue3', new FooTask());
-        $this->queue->enqueue(
-            'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
-        );
+        $this->queue->enqueue('queue1', new FooTask());
         $this->queue->enqueue('queue2', new FooTask());
         $this->queue->enqueue('queue3', new FooTask());
 
@@ -199,10 +195,7 @@ class TaskRunnerTest extends TestCase
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -5 days'));
         $earliestQueue2Item = $this->queue->enqueue('queue2', new FooTask());
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -6 days'));
-        $earliestQueue1Item = $this->queue->enqueue(
-            'queue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
-        );
+        $earliestQueue1Item = $this->queue->enqueue('queue1', new FooTask());
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -7 days'));
         $this->queue->generateRunningQueueItem('runningQueue1', new FooTask());
@@ -363,10 +356,7 @@ class TaskRunnerTest extends TestCase
     {
         // Arrange
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -7 days'));
-        $this->queue->generateRunningQueueItem(
-            'runningQueue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
-        );
+        $this->queue->generateRunningQueueItem('runningQueue1', new FooTask());
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
         $currentTimestamp = $this->timeProvider->getCurrentLocalTime()->getTimestamp();
@@ -402,10 +392,7 @@ class TaskRunnerTest extends TestCase
     {
         // Arrange
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -7 days'));
-        $this->queue->generateRunningQueueItem(
-            'runningQueue1',
-            new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask()
-        );
+        $this->queue->generateRunningQueueItem('runningQueue1', new FooTask());
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime());
         $this->queue->enqueue('queue', new FooTask());

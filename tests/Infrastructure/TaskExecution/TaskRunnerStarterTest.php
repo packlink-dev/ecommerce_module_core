@@ -5,6 +5,7 @@ namespace Logeecom\Tests\Infrastructure\TaskExecution;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
@@ -18,6 +19,7 @@ use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunner;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
@@ -174,13 +176,13 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
         RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
 
         $runnerStatusStorage = new TestRunnerStatusStorage();
-        $taskRunner = new \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunner();
+        $taskRunner = new TestTaskRunner();
         $guidProvider = TestGuidProvider::getInstance();
 
         TestServiceRegister::registerService(
             AsyncProcessService::CLASS_NAME,
             function () {
-                return \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
+                return AsyncProcessStarterService::getInstance();
             }
         );
         TestServiceRegister::registerService(
@@ -216,7 +218,7 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
 
         Logger::resetInstance();
 
-        $this->asyncProcessStarter = \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::getInstance();
+        $this->asyncProcessStarter = AsyncProcessStarterService::getInstance();
         $this->runnerStatusStorage = $runnerStatusStorage;
         $this->taskRunner = $taskRunner;
         $this->guidProvider = $guidProvider;
@@ -232,7 +234,7 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
      */
     protected function tearDown()
     {
-        \Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService::resetInstance();
+        AsyncProcessStarterService::resetInstance();
         MemoryStorage::reset();
         parent::tearDown();
     }

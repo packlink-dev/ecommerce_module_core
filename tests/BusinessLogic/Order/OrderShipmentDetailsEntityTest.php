@@ -27,29 +27,29 @@ class OrderShipmentDetailsEntityTest extends TestCase
     public function testFromArray()
     {
         $orderDetails = OrderShipmentDetails::fromArray(
-            [
+            array(
                 'orderId' => 5,
                 'reference' => 'DE2019PRO0000309473',
                 'dropOffId' => 23,
-                'shipmentLabels' => [
-                    [
+                'shipmentLabels' => array(
+                    array(
                         'link' => 'test1.dev',
                         'printed' => true,
                         'createTime' => 1554192735,
-                    ],
-                    [
+                    ),
+                    array(
                         'link' => 'test2.dev',
                         'printed' => false,
                         'createTime' => 1554192735,
-                    ],
-                ],
+                    ),
+                ),
                 'status' => 'pending',
                 'lastStatusUpdateTime' => 1554192735,
                 'carrierTrackingNumbers' => $this->getTestTrackingNumbers(),
                 'carrierTrackingUrl' => 'https://www.ups.com/track?loc=it_IT&requester=WT/',
                 'shippingCost' => 12.99,
                 'taskId' => 312,
-            ]
+            )
         );
 
         $this->validateOrderDetails($orderDetails);
@@ -66,7 +66,9 @@ class OrderShipmentDetailsEntityTest extends TestCase
         self::assertEquals(5, $orderDetailsArray['orderId']);
         self::assertEquals('DE2019PRO0000309473', $orderDetailsArray['reference']);
         self::assertEquals(23, $orderDetailsArray['dropOffId']);
+
         $labels = $orderDetailsArray['shipmentLabels'];
+
         self::assertCount(2, $labels);
         self::assertThat($labels[0], self::arrayHasKey('link'));
         self::assertEquals('test1.dev', $labels[0]['link']);
@@ -95,7 +97,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         $orderDetails->setOrderId(5);
         $orderDetails->setReference('DE2019PRO0000309473');
         $orderDetails->setDropOffId(23);
-        $orderDetails->setShipmentLabels(['test1.dev', 'test2.dev']);
+        $orderDetails->setShipmentLabels(array('test1.dev', 'test2.dev'));
         $orderDetails->setShippingStatus('pending', 1554192735);
         $orderDetails->setCarrierTrackingNumbers($this->getTestTrackingNumbers());
         $orderDetails->setCarrierTrackingUrl('https://www.ups.com/track?loc=it_IT&requester=WT/');
@@ -115,7 +117,9 @@ class OrderShipmentDetailsEntityTest extends TestCase
         self::assertEquals(5, $orderDetails->getOrderId());
         self::assertEquals('DE2019PRO0000309473', $orderDetails->getReference());
         self::assertEquals(23, $orderDetails->getDropOffId());
+
         $labels = $orderDetails->getShipmentLabels();
+
         self::assertCount(2, $labels);
         self::assertEquals('test1.dev', $labels[0]->getLink());
         self::assertEquals('test2.dev', $labels[1]->getLink());
@@ -137,10 +141,10 @@ class OrderShipmentDetailsEntityTest extends TestCase
      */
     private function getTestTrackingNumbers()
     {
-        return [
+        return array(
             '1Z204E380338943508',
             '1ZXF38300382722839',
             '1ZW6897XYW00098770',
-        ];
+        );
     }
 }

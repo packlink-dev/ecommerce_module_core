@@ -4,13 +4,14 @@ namespace Logeecom\Infrastructure\Logger;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\Singleton;
 
 /**
  * Class Configuration.
  *
  * @package Logeecom\Infrastructure\Logger
  */
-class LoggerConfiguration extends \Logeecom\Infrastructure\Singleton
+class LoggerConfiguration extends Singleton
 {
     /**
      * Default minimum level for logging.

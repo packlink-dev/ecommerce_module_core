@@ -5,6 +5,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use PHPUnit\Framework\TestCase;
 
 /***
@@ -19,16 +20,10 @@ class RepositoryRegistryTest extends TestCase
      */
     public function testRegisterRepository()
     {
-        RepositoryRegistry::registerRepository(
-            'test',
-            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName()
-        );
+        RepositoryRegistry::registerRepository('test', MemoryRepository::getClassName());
 
         $repository = RepositoryRegistry::getRepository('test');
-        $this->assertInstanceOf(
-            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName(),
-            $repository
-        );
+        $this->assertInstanceOf(MemoryRepository::getClassName(), $repository);
     }
 
     /**
@@ -40,10 +35,7 @@ class RepositoryRegistryTest extends TestCase
         RepositoryRegistry::registerRepository('test', MemoryQueueItemRepository::getClassName());
 
         $repository = RepositoryRegistry::getRepository('test');
-        $this->assertNotEquals(
-            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName(),
-            $repository
-        );
+        $this->assertNotEquals(MemoryRepository::getClassName(), $repository);
     }
 
     /**
@@ -80,10 +72,7 @@ class RepositoryRegistryTest extends TestCase
      */
     public function testGetQueueItemRepositoryException()
     {
-        RepositoryRegistry::registerRepository(
-            QueueItem::getClassName(),
-            \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository::getClassName()
-        );
+        RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryRepository::getClassName());
 
         RepositoryRegistry::getQueueItemRepository();
     }
