@@ -14,10 +14,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Support for sending analytics based on certain events in the shop (CR Set 14-02).
 Modules have to call methods from `AnalyticsController::sendOtherServicesDisabledEvent` if a user chooses to 
 disable other shipping methods upon activating the first Packlink service.
+- `OrderShipmentDetails` entity is added to the core. It holds the information about Packlink shipment for a 
+specific shop order.
 
 ### Changed
 - `Schedule` now had additional property for marking it recurrent (true by default). 
 This enables creating one-time schedules.
+- `Schedule` now has a context so that its tasks can hold the context data
 - `Proxy::__contruct` has changed parameters since configuration service is now needed.
 - Tests updated to follow new implementations.
 
