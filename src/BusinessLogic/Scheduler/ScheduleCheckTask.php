@@ -34,17 +34,17 @@ class ScheduleCheckTask extends Task
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
-        /** @var Schedule $scheduledTask */
-        foreach ($this->getScheduledTasks() as $scheduledTask) {
-            $task = $scheduledTask->getTask();
+        /** @var Schedule $schedule */
+        foreach ($this->getSchedules() as $schedule) {
+            $task = $schedule->getTask();
             try {
-                $queueService->enqueue($scheduledTask->getQueueName(), $task);
+                $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext());
 
-                if ($scheduledTask->isRecurring()) {
-                    $scheduledTask->setNextSchedule();
-                    $this->getRepository()->update($scheduledTask);
+                if ($schedule->isRecurring()) {
+                    $schedule->setNextSchedule();
+                    $this->getRepository()->update($schedule);
                 } else {
-                    $this->getRepository()->delete($scheduledTask);
+                    $this->getRepository()->delete($schedule);
                 }
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
@@ -77,12 +77,12 @@ class ScheduleCheckTask extends Task
 
     /** @noinspection PhpDocMissingThrowsInspection */
     /**
-     * Returns an array of Scheduled tasks that are due for execution
+     * Returns an array of Schedules that are due for execution
      *
      * @return \Logeecom\Infrastructure\ORM\Entity[]
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
-    private function getScheduledTasks()
+    private function getSchedules()
     {
         $queryFilter = new QueryFilter();
         /** @noinspection PhpUnhandledExceptionInspection */

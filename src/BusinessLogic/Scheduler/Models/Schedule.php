@@ -32,7 +32,7 @@ class Schedule extends Entity
      *
      * @var array
      */
-    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'recurring');
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'recurring', 'context');
     /**
      * Queue name where task should be queued to.
      *
@@ -75,17 +75,25 @@ class Schedule extends Entity
      * @var bool
      */
     protected $recurring = true;
+    /**
+     * Schedule context.
+     *
+     * @var string
+     */
+    protected $context;
 
     /**
      * Schedule constructor.
      *
      * @param Task $task Task that is to be queued for execution
      * @param string $queueName Queue name in which task should be queued into
+     * @param string $context Schedule context.
      */
-    public function __construct(Task $task = null, $queueName = null)
+    public function __construct(Task $task = null, $queueName = null, $context = '')
     {
         $this->task = $task;
         $this->queueName = $queueName;
+        $this->context = $context;
     }
 
     /**
@@ -272,6 +280,26 @@ class Schedule extends Entity
     public function setRecurring($recurring)
     {
         $this->recurring = $recurring;
+    }
+
+    /**
+     * Returns schedule context.
+     *
+     * @return string
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * Sets schedule context.
+     *
+     * @param string $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
     }
 
     /**
