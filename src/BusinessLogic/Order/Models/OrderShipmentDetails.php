@@ -118,7 +118,7 @@ class OrderShipmentDetails extends Entity
         $map->addStringIndex('reference');
         $map->addStringIndex('status');
 
-        return new EntityConfiguration($map, 'ShopOrderDetails');
+        return new EntityConfiguration($map, 'OrderShipmentDetails');
     }
 
     /**
