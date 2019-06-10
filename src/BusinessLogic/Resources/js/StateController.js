@@ -3,7 +3,27 @@ var Packlink = window.Packlink || {};
 (function () {
     function StateController(configuration) {
         let pageControllerFactory = Packlink.pageControllerFactory;
-        let sidebarController = new Packlink.SidebarController(navigate);
+
+        let sidebarButtons = [
+            'shipping-methods',
+            'basic-settings',
+        ];
+
+        if (typeof configuration.sidebarButtons !== 'undefined') {
+            sidebarButtons = sidebarButtons.concat(configuration.sidebarButtons);
+        }
+
+        let submenuItems = [
+            'order-state-mapping',
+            'default-parcel',
+            'default-warehouse',
+        ];
+
+        if (typeof configuration.submenuItems !== 'undefined') {
+            submenuItems = submenuItems.concat(configuration.submenuItems);
+        }
+
+        let sidebarController = new Packlink.SidebarController(navigate, sidebarButtons, submenuItems);
         let utilityService = Packlink.utilityService;
         let context = '';
 
@@ -42,6 +62,11 @@ var Packlink = window.Packlink || {};
                 setStatusUrl: configuration.debugSetStatusUrl
             }
         };
+
+        if (typeof configuration.pageConfiguration !== 'undefined') {
+            pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration}
+        }
+
         this.startStep = startStep;
         this.stepFinished = stepFinished;
         this.display = display;

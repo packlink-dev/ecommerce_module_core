@@ -1,18 +1,7 @@
 var Packlink = window.Packlink || {};
 
 (function () {
-    function SidebarController(sidebarNavigationCallback) {
-        const sidebarButtons = [
-            'shipping-methods',
-            'basic-settings',
-        ];
-
-        const submenuItems = [
-            'order-state-mapping',
-            'default-parcel',
-            'default-warehouse',
-        ];
-
+    function SidebarController(sidebarNavigationCallback, sidebarButtons, submenuItems) {
         let templateService = Packlink.templateService;
         let navigationCallback = sidebarNavigationCallback;
         let currentState = 'shipping-methods';
