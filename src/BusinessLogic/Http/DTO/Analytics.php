@@ -31,6 +31,12 @@ class Analytics extends BaseDto
      * @var string
      */
     public $eCommerceVersion;
+    /**
+     * The version of the module.
+     *
+     * @var string
+     */
+    private $moduleVersion;
 
     /**
      * Analytics constructor.
@@ -38,12 +44,14 @@ class Analytics extends BaseDto
      * @param string $eventName The name of the event.
      * @param string $eCommerceName The name of the integrated e-commerce system.
      * @param string $eCommerceVersion The version of the integrated e-commerce system.
+     * @param string $moduleVersion The version of the module.
      */
-    public function __construct($eventName, $eCommerceName, $eCommerceVersion)
+    public function __construct($eventName, $eCommerceName, $eCommerceVersion, $moduleVersion)
     {
         $this->eventName = $eventName;
         $this->eCommerceName = $eCommerceName;
         $this->eCommerceVersion = $eCommerceVersion;
+        $this->moduleVersion = $moduleVersion;
     }
 
     /**
@@ -57,6 +65,7 @@ class Analytics extends BaseDto
             'event' => $this->eventName,
             'ecommerce' => $this->eCommerceName,
             'ecommerce_version' => $this->eCommerceVersion,
+            'module_version' => $this->moduleVersion,
         );
     }
 }

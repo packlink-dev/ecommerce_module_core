@@ -359,7 +359,8 @@ class Proxy
         $data = new Analytics(
             $eventName,
             $this->configService->getECommerceName(),
-            $this->configService->getECommerceVersion()
+            $this->configService->getECommerceVersion(),
+            $this->configService->getModuleVersion()
         );
 
         try {
