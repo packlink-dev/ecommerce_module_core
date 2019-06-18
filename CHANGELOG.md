@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/logeecom/pl_module_core/compare/master...dev)
 
+## [v1.2.1](https://github.com/logeecom/pl_module_core/compare/v1.2.1...v1.2.0) - 2019-06-18
+### Changed
+- Analytics endpoint now adds module version as well
+- JS `StateController` now supports additional configuration options in the `configuration` parameter:
+  - `configuration.sidebarButtons`: can contain an array of keys for additional sidebar buttons
+  - `configuration.submenuItems`: can contain specific settings submenu items (keys)
+  - `configuration.pageConfiguration`: contains specific configuration for additional pages added 
+in `configuration.sidebarButtons`. See `StateController.js` for the details of the implementation.
+
 ## [v1.2.0](https://github.com/logeecom/pl_module_core/compare/v1.2.0...v1.1.0) - 2019-05-31
 **BREAKING CHANGES**:
 ### Added
