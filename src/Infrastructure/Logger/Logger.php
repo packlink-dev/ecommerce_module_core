@@ -2,78 +2,71 @@
 
 namespace Logeecom\Infrastructure\Logger;
 
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\Singleton;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
- * Class Logger
+ * Class Logger.
+ *
  * @package Logeecom\Infrastructure\Logger
  */
-class Logger
+class Logger extends Singleton
 {
-
-    const ERROR = 0;
-    const WARNING = 1;
-    const INFO = 2;
-    const DEBUG = 3;
-
-    private static $instance;
-
     /**
-     * Shop logger
+     * Error type of log.
+     */
+    const ERROR = 0;
+    /**
+     * Warning type of log.
+     */
+    const WARNING = 1;
+    /**
+     * Info type of log.
+     */
+    const INFO = 2;
+    /**
+     * Debug type of log.
+     */
+    const DEBUG = 3;
+    /**
+     * Singleton instance of this class.
+     *
+     * @var static
+     */
+    protected static $instance;
+    /**
+     * Shop logger.
      *
      * @var ShopLoggerAdapter
      */
     private $shopLogger;
-
     /**
-     * Default logger
+     * Time provider.
      *
-     * @var DefaultLoggerAdapter
-     */
-    private $defaultLogger;
-
-    /**
      * @var TimeProvider
      */
     private $timeProvider;
 
     /**
-     * Getting logger component instance.
-     *
-     * @return self Instance of Logger.
-     *
+     * Logger constructor. Hidden.
      */
-    public static function getInstance()
+    protected function __construct()
     {
-        if (self::$instance === null) {
-            self::$instance = new Logger();
-        }
+        parent::__construct();
 
-        return self::$instance;
-    }
-
-    /**
-     * Logger constructor.
-     *
-     */
-    public function __construct() {
-        $this->defaultLogger = ServiceRegister::getService(DefaultLoggerAdapter::CLASS_NAME);
         $this->shopLogger = ServiceRegister::getService(ShopLoggerAdapter::CLASS_NAME);
         $this->timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
-
-        self::$instance = $this;
     }
 
     /**
-     * Logging error message
+     * Logs error message.
      *
-     * @param string $message
-     * @param string $component
-     * @param array $context
-     *
+     * @param string $message Message to log.
+     * @param string $component Component for which to log message.
+     * @param LogContextData[] $context Additional context data.
      */
     public static function logError($message, $component = 'Core', array $context = array())
     {
@@ -81,12 +74,11 @@ class Logger
     }
 
     /**
-     * Logging warning message
+     * Logs warning message.
      *
-     * @param string $message
-     * @param string $component
-     * @param array $context
-     *
+     * @param string $message Message to log.
+     * @param string $component Component for which to log message.
+     * @param LogContextData[] $context Additional context data.
      */
     public static function logWarning($message, $component = 'Core', array $context = array())
     {
@@ -94,12 +86,11 @@ class Logger
     }
 
     /**
-     * Logging info message
+     * Logs info message.
      *
-     * @param string $message
-     * @param string $component
-     * @param array $context
-     *
+     * @param string $message Message to log.
+     * @param string $component Component for which to log message.
+     * @param LogContextData[] $context Additional context data.
      */
     public static function logInfo($message, $component = 'Core', array $context = array())
     {
@@ -107,12 +98,11 @@ class Logger
     }
 
     /**
-     * Logging debug message
+     * Logs debug message.
      *
-     * @param string $message
-     * @param string $component
-     * @param array $context
-     *
+     * @param string $message Message to log.
+     * @param string $component Component for which to log message.
+     * @param LogContextData[] $context Additional context data.
      */
     public static function logDebug($message, $component = 'Core', array $context = array())
     {
@@ -120,16 +110,16 @@ class Logger
     }
 
     /**
-     * Logging message
+     * Logs message.
      *
-     * @param int $level
-     * @param string $message
-     * @param string $component
-     * @param LogContextData[] $context
+     * @param int $level Log level.
+     * @param string $message Message to log.
+     * @param string $component Component for which to log message.
+     * @param LogContextData[] $context Additional context data.
      */
     private function logMessage($level, $message, $component, array $context = array())
     {
-        $config = Configuration::getInstance();
+        $config = LoggerConfiguration::getInstance();
         $logData = new LogData(
             $config->getIntegrationName(),
             $level,
@@ -141,9 +131,10 @@ class Logger
 
         // If default logger is turned on and message level is lower or equal than set in configuration
         if ($config->isDefaultLoggerEnabled() && $level <= $config->getMinLogLevel()) {
-            $this->defaultLogger->logMessage($logData);
+            $defaultLogger = ServiceRegister::getService(DefaultLoggerAdapter::CLASS_NAME);
+            $defaultLogger->logMessage($logData);
         }
-        
+
         $this->shopLogger->logMessage($logData);
     }
 }

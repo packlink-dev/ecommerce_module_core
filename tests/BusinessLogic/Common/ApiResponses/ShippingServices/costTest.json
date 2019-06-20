@@ -1,0 +1,140 @@
+[
+  {
+    "currency": "EUR",
+    "carrier_name": "UPS",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "economy",
+    "dropoff": true,
+    "labels_required": true,
+    "delivery_to_parcelshop": true,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20615,
+    "carrier_product_id": "IT_UPS_ACCESS_POINT_PRO_4",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      },
+      {
+        "text": "Access point: Ritiro e Consegna non a domicilio",
+        "icon": "dropoff"
+      }
+    ],
+    "price": {
+      "total_price": 10.13,
+      "tax_price": 1.76,
+      "base_price": 8.37
+    },
+    "first_estimated_delivery_date": "2019/01/02",
+    "customs_required": false,
+    "name": "Standard",
+    "transit_time": "2 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "48",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 18:00]",
+      "2018/12/28": "[09:00 , 18:00]",
+      "2019/01/10": "[09:00 , 18:00]",
+      "2018/12/27": "[09:00 , 18:00]",
+      "2019/01/09": "[09:00 , 18:00]",
+      "2019/01/08": "[09:00 , 18:00]",
+      "2019/01/07": "[09:00 , 18:00]",
+      "2019/01/11": "[09:00 , 18:00]",
+      "2019/01/04": "[09:00 , 18:00]",
+      "2019/01/03": "[09:00 , 18:00]",
+      "2019/01/02": "[09:00 , 18:00]",
+      "2019/01/01": "[09:00 , 18:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "8.37"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "UPS",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "economy",
+    "dropoff": true,
+    "labels_required": true,
+    "delivery_to_parcelshop": true,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20616,
+    "carrier_product_id": "IT_UPS_ACCESS_POINT_PRO_4",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      },
+      {
+        "text": "Access point: Ritiro e Consegna non a domicilio",
+        "icon": "dropoff"
+      }
+    ],
+    "price": {
+      "total_price": 10.13,
+      "tax_price": 1.76,
+      "base_price": 2
+    },
+    "first_estimated_delivery_date": "2019/01/02",
+    "customs_required": false,
+    "name": "Standard",
+    "transit_time": "2 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "48",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 18:00]",
+      "2018/12/28": "[09:00 , 18:00]",
+      "2019/01/10": "[09:00 , 18:00]",
+      "2018/12/27": "[09:00 , 18:00]",
+      "2019/01/09": "[09:00 , 18:00]",
+      "2019/01/08": "[09:00 , 18:00]",
+      "2019/01/07": "[09:00 , 18:00]",
+      "2019/01/11": "[09:00 , 18:00]",
+      "2019/01/04": "[09:00 , 18:00]",
+      "2019/01/03": "[09:00 , 18:00]",
+      "2019/01/02": "[09:00 , 18:00]",
+      "2019/01/01": "[09:00 , 18:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "8.37"
+  }
+]

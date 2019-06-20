@@ -2,77 +2,35 @@
 
 namespace Logeecom\Tests\Infrastructure\logger;
 
-use Logeecom\Tests\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Configuration as ConfigInterface;
-use Logeecom\Infrastructure\Interfaces\required\ShopLoggerAdapter;
-use Logeecom\Infrastructure\Logger\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
+use Logeecom\Infrastructure\Logger\LoggerConfiguration;
+use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
-class LoggerTest extends TestCase
+class LoggerTest extends BaseInfrastructureTestWithServices
 {
     /**
-     * @var TimeProvider
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
-    private $timeProvider;
-    /**
-     * @var TestDefaultLogger
-     */
-    private $defaultLogger;
-    /**
-     * @var TestShopLogger
-     */
-    private $shopLogger;
-    /**
-     * @var TestShopConfiguration
-     */
-    private $shopConfiguration;
-    /**
-     * @var TestHttpClient
-     */
-    private $httpClient;
+    public $httpClient;
 
-    protected function setUp()
+    public function setUp()
     {
-        Configuration::resetInstance();
-        $this->defaultLogger = new TestDefaultLogger();
-        $this->shopLogger = new TestShopLogger();
+        parent::setUp();
+
+        $this->shopConfig->setIntegrationName('Shop1');
+        $this->shopConfig->setDefaultLoggerEnabled(true);
+
+        $me = $this;
         $this->httpClient = new TestHttpClient();
-        $this->timeProvider = TimeProvider::getInstance();
-        $this->shopConfiguration = new TestShopConfiguration();
-        $this->shopConfiguration->setIntegrationName('Shop1');
-        $this->shopConfiguration->setDefaultLoggerEnabled(true);
-
-        $componentInstance = $this;
-
-        new TestServiceRegister(
-            array(
-                TimeProvider::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->timeProvider;
-                },
-                DefaultLoggerAdapter::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->defaultLogger;
-                },
-                ShopLoggerAdapter::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->shopLogger;
-                },
-                ConfigInterface::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->shopConfiguration;
-                },
-                HttpClient::CLASS_NAME => function () use ($componentInstance) {
-                    return $componentInstance->httpClient;
-                },
-            )
+        TestServiceRegister::registerService(
+            HttpClient::CLASS_NAME,
+            function () use ($me) {
+                return $me->httpClient;
+            }
         );
-
-        new Logger();
     }
 
     /**
@@ -143,7 +101,7 @@ class LoggerTest extends TestCase
      */
     public function testNotLoggingToDefaultLoggerWhenItIsOff()
     {
-        Configuration::setDefaultLoggerEnabled(false);
+        LoggerConfiguration::setDefaultLoggerEnabled(false);
         Logger::logInfo('Some data');
         $this->assertFalse($this->httpClient->calledAsync, 'Default logger should not send log when it is off.');
     }
@@ -153,7 +111,7 @@ class LoggerTest extends TestCase
      */
     public function testLoggingToDefaultLoggerWhenItIsOn()
     {
-        Configuration::setDefaultLoggerEnabled(true);
+        LoggerConfiguration::setDefaultLoggerEnabled(true);
         Logger::logInfo('Some data');
         $this->assertTrue($this->httpClient->calledAsync, 'Default logger should send log when it is on.');
     }
@@ -173,7 +131,7 @@ class LoggerTest extends TestCase
      */
     public function testLoggingToDefaultLoggerWhenLogLevelIsLowerThanMinLogLevel()
     {
-        Configuration::getInstance()->setMinLogLevel(Logger::INFO);
+        LoggerConfiguration::getInstance()->setMinLogLevel(Logger::INFO);
         Logger::logWarning('Some data');
         $this->assertTrue(
             $this->httpClient->calledAsync,
@@ -186,7 +144,7 @@ class LoggerTest extends TestCase
      */
     public function testNotLoggingToDefaultLoggerWhenLogLevelIsHigherThanMinLogLevel()
     {
-        Configuration::getInstance()->setMinLogLevel(Logger::ERROR);
+        LoggerConfiguration::getInstance()->setMinLogLevel(Logger::ERROR);
         Logger::logWarning('Some data');
         $this->assertFalse(
             $this->httpClient->calledAsync,

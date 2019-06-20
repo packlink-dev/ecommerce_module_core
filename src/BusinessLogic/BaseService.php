@@ -2,38 +2,29 @@
 
 namespace Packlink\BusinessLogic;
 
+use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Singleton;
+
 /**
  * Base class for all services. Initializes service as a singleton instance.
  *
  * @package Packlink\BusinessLogic
  */
-class BaseService
+abstract class BaseService extends Singleton
 {
     /**
-     * Singleton instance of this class.
+     * @noinspection PhpDocMissingThrowsInspection
      *
-     * @var static
-     */
-    protected static $instance;
-
-    /**
-     * Hidden constructor.
-     */
-    protected function __construct()
-    {
-    }
-
-    /**
-     * Returns singleton instance of EventBus.
+     * Returns an instance of repository for entity.
      *
-     * @return static Instance of EventBus class.
+     * @param string $entityClass Name of entity class.
+     *
+     * @return RepositoryInterface Instance of a repository.
      */
-    public static function getInstance()
+    protected function getRepository($entityClass)
     {
-        if (static::$instance === null) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return RepositoryRegistry::getRepository($entityClass);
     }
 }

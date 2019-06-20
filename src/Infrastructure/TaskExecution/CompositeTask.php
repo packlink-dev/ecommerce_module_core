@@ -201,6 +201,7 @@ abstract class CompositeTask extends Task
      */
     protected function registerSubTaskEvents(Task $task)
     {
+        $task->setExecutionId($this->getExecutionId());
         $this->registerReportAliveEvent($task);
         $this->registerReportProgressEvent($task);
     }

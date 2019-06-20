@@ -2,7 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM\Entity;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Configuration\Index;
+use Logeecom\Infrastructure\ORM\Entity;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,37 +47,33 @@ abstract class GenericEntityTest extends TestCase
     {
         $config = $entity->getConfig();
 
-        $code = $config->getCode();
-        $this->assertNotEmpty($code);
-        $this->assertInternalType('string', $code);
-
         $type = $config->getType();
         $this->assertNotEmpty($type);
         $this->assertInternalType('string', $type);
 
         $indexMap = $config->getIndexMap();
         $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\IndexMap", $indexMap);
-        $class = $this->getEntityClass();
         /**
          * @var string $key
-         * @var \Logeecom\Infrastructure\ORM\Configuration\Indexes\Index $item
+         * @var \Logeecom\Infrastructure\ORM\Configuration\Index $item
          */
         foreach ($indexMap->getIndexes() as $key => $item) {
             $this->assertNotEmpty($item, "Index configuration for $key must not be empty.");
-            $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\Indexes\Index", $item);
+            $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\Index", $item);
 
-            $this->assertObjectHasAttribute(
-                $key,
-                $entity,
-                "Entity $class, must have declared property $key, because it is used as index."
-            );
-
-            $this->assertInternalType('int', $item->getIndex(), 'Index value must be of integer type');
             $this->assertContains(
                 $item->getType(),
                 self::$ALLOWED_INDEX_TYPES,
                 "Index type '{$item->getType()}' for field $key is not supported."
             );
         }
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidIndexType()
+    {
+        new Index('type', 'name');
     }
 }

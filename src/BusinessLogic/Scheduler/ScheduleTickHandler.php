@@ -4,7 +4,8 @@ namespace Packlink\BusinessLogic\Scheduler;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\Configuration;
 
 /**
@@ -19,8 +20,8 @@ class ScheduleTickHandler
      */
     public function handle()
     {
-        /** @var Queue $queueService */
-        $queueService = ServiceRegister::getService(Queue::CLASS_NAME);
+        /** @var QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
         /** @var Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $task = $queueService->findLatestByType('ScheduleCheckTask');
@@ -30,7 +31,7 @@ class ScheduleTickHandler
             $task = new ScheduleCheckTask();
             try {
                 $queueService->enqueue($configService->getSchedulerQueueName(), $task);
-            } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
                     'Failed to enqueue task ' . $task->getType(),
                     'Core',

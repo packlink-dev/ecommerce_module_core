@@ -2,7 +2,6 @@
 
 namespace Logeecom\Infrastructure;
 
-use Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException;
 use Logeecom\Infrastructure\Exceptions\ServiceNotRegisteredException;
 
 /**
@@ -37,12 +36,7 @@ class ServiceRegister
     {
         if (!empty($services)) {
             foreach ($services as $type => $service) {
-                try {
-                    $this->register($type, $service);
-                } catch (ServiceAlreadyRegisteredException $e) {
-                    // this cannot happen in constructor because it cannot be that array of services
-                    // has 2 keys that are the same
-                }
+                $this->register($type, $service);
             }
         }
 
@@ -86,8 +80,6 @@ class ServiceRegister
      * @param string $type Type of service. Should be fully qualified class name.
      * @param callable $delegate Delegate that will give instance of registered service.
      *
-     * @throws \Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException
-     *  In case service for specified type is already registered.
      * @throws \InvalidArgumentException
      *  In case delegate is not a callable.
      */
@@ -102,17 +94,11 @@ class ServiceRegister
      * @param string $type Type of service. Should be fully qualified class name.
      * @param callable $delegate Delegate that will give instance of registered service.
      *
-     * @throws \Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException
-     *  In case service for specified type is already registered.
      * @throws \InvalidArgumentException
      *  In case delegate is not a callable.
      */
     protected function register($type, $delegate)
     {
-        if (!empty($this->services[$type])) {
-            throw new ServiceAlreadyRegisteredException($type);
-        }
-
         if (!is_callable($delegate)) {
             throw new \InvalidArgumentException("$type delegate is not callable.");
         }

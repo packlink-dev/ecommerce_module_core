@@ -190,7 +190,7 @@ class IntermediateObject
         if ($index >= 1 && $index <= 6) {
             $methodName = 'getIndex' . $index;
             $value = $this->$methodName();
-        } else if (array_key_exists('index_' . $index, $this->otherIndexes)) {
+        } elseif (array_key_exists('index_' . $index, $this->otherIndexes)) {
             $value = $this->otherIndexes['index_' . $index];
         }
 

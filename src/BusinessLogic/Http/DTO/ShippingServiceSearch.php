@@ -17,79 +17,133 @@ class ShippingServiceSearch extends BaseDto
      */
     public $serviceId;
     /**
-     * 2 letter country code.
+     * Departure country 2 letter code.
      *
      * @var string
      */
     public $fromCountry;
     /**
-     * Postal code.
+     * Departure country postal/zip code.
      *
      * @var string
      */
     public $fromZip;
     /**
-     * 2 letter country code.
+     * Destination country 2 letter code.
      *
      * @var string
      */
     public $toCountry;
     /**
-     * Postal code.
+     * Destination country postal/zip code.
      *
      * @var string
      */
     public $toZip;
     /**
-     * Package width in cm.
+     * Array of packages.
      *
-     * @var float
+     * @var \Packlink\BusinessLogic\Http\DTO\Package[]
      */
-    public $packageWidth;
-    /**
-     * Package height in cm.
-     *
-     * @var float
-     */
-    public $packageHeight;
-    /**
-     * Package length in cm.
-     *
-     * @var float
-     */
-    public $packageLength;
-    /**
-     * Package weight in kg.
-     *
-     * @var float
-     */
-    public $packageWeight;
+    public $packages;
 
     /**
-     * @inheritdoc
+     * ShippingServiceSearch constructor.
+     *
+     * @param int $serviceId Service Id.
+     * @param string $fromCountry Departure country 2-letter code.
+     * @param string $fromZip Departure country postal/zip code.
+     * @param string $toCountry Destination country 2-letter code.
+     * @param string $toZip Destination country postal/zip code.
+     * @param Package[] $packages Array of packages.
+     */
+    public function __construct(
+        $serviceId = null,
+        $fromCountry = '',
+        $fromZip = '',
+        $toCountry = '',
+        $toZip = '',
+        $packages = array()
+    ) {
+        $this->serviceId = $serviceId;
+        $this->fromCountry = $fromCountry;
+        $this->fromZip = $fromZip;
+        $this->toCountry = $toCountry;
+        $this->toZip = $toZip;
+        $this->packages = $packages;
+    }
+
+    /**
+     * Transforms DTO to its array format suitable for http client.
+     *
+     * @return array DTO in array format.
      */
     public function toArray()
     {
-        return array(
-            'service_id' => $this->serviceId,
+        $data = array(
             'from[country]' => $this->fromCountry,
             'from[zip]' => $this->fromZip,
             'to[country]' => $this->toCountry,
             'to[zip]' => $this->toZip,
-            'packages[0][height]' => $this->packageHeight,
-            'packages[0][width]' => $this->packageWidth,
-            'packages[0][length]' => $this->packageLength,
-            'packages[0][weight]' => $this->packageWeight,
             'source' => 'PRO',
         );
+
+        if ($this->serviceId) {
+            $data['serviceId'] = $this->serviceId;
+        }
+
+        foreach ($this->packages as $index => $package) {
+            $data["packages[$index][height]"] = (int)ceil($package->height);
+            $data["packages[$index][width]"] = (int)ceil($package->width);
+            $data["packages[$index][length]"] = (int)ceil($package->length);
+            $data["packages[$index][weight]"] = $package->weight;
+        }
+
+        return $data;
     }
 
     /**
-     * @inheritdoc
+     * Transforms raw array data to object.
+     *
+     * @param array $raw Raw array data.
+     *
+     * @return static Transformed DTO object.
      */
     public static function fromArray(array $raw)
     {
-        // this class is not intent to be built from array
-        return new static();
+        $instance = new static();
+
+        $instance->serviceId = self::getValue($raw, 'service_id', null);
+        $instance->fromCountry = self::getValue($raw, 'from[country]');
+        $instance->fromZip = self::getValue($raw, 'from[zip]');
+        $instance->toCountry = self::getValue($raw, 'to[country]');
+        $instance->toZip = self::getValue($raw, 'to[zip]');
+        $instance->packages = array();
+
+        $index = 0;
+        while (array_key_exists("packages[$index][height]", $raw)) {
+            $package = new Package();
+
+            $package->height = self::getValue($raw, "packages[$index][height]");
+            $package->width = self::getValue($raw, "packages[$index][width]");
+            $package->length = self::getValue($raw, "packages[$index][length]");
+            $package->weight = self::getValue($raw, "packages[$index][weight]");
+
+            $instance->packages[] = $package;
+            $index++;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Validates if all parameters are valid.
+     *
+     * @return bool Is valid flag.
+     */
+    public function isValid()
+    {
+        return !empty($this->fromCountry) && !empty($this->fromZip) && !empty($this->toCountry)
+            && !empty($this->toZip) && !empty($this->packages);
     }
 }

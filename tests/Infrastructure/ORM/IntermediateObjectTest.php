@@ -48,7 +48,7 @@ class IntermediateObjectTest extends TestCase
 
     public function testSetData()
     {
-        $data = serialize(array(1, 'a'=>5, 6));
+        $data = serialize(array(1, 'a' => 5, 6));
         $object = new IntermediateObject();
         $object->setData($data);
         $this->assertEquals($data, $object->getData());

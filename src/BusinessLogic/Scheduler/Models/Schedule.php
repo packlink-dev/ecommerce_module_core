@@ -3,9 +3,8 @@
 namespace Packlink\BusinessLogic\Scheduler\Models;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use Logeecom\Infrastructure\ORM\Configuration\Indexes\DateTimeIndex;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -23,87 +22,122 @@ class Schedule extends Entity
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * Date and time of next schedule
+     * Date and time of next schedule.
      *
      * @var \DateTime
      */
     public $nextSchedule;
     /**
-     * Queue name where task should be queued to
+     * Array of field names.
+     *
+     * @var array
+     */
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'recurring', 'context');
+    /**
+     * Queue name where task should be queued to.
      *
      * @var string
      */
     protected $queueName;
     /**
-     * Schedule minute
+     * Schedule minute.
      *
      * @var int
      */
     protected $minute = 0;
     /**
-     * Schedule hour
+     * Schedule hour.
      *
      * @var int
      */
     protected $hour = 0;
     /**
-     * Schedule day
+     * Schedule day.
      *
      * @var int
      */
     protected $day = 1;
     /**
-     * Schedule month
+     * Schedule month.
      *
      * @var int
      */
     protected $month = 1;
     /**
-     * Task that is to be queued for execution
+     * Task that is to be queued for execution.
      *
      * @var Task
      */
     protected $task;
+    /**
+     * Whether schedule should execute repeatedly.
+     *
+     * @var bool
+     */
+    protected $recurring = true;
+    /**
+     * Schedule context.
+     *
+     * @var string
+     */
+    protected $context;
 
     /**
      * Schedule constructor.
      *
      * @param Task $task Task that is to be queued for execution
      * @param string $queueName Queue name in which task should be queued into
+     * @param string $context Schedule context.
      */
-    public function __construct(Task $task = null, $queueName = null)
+    public function __construct(Task $task = null, $queueName = null, $context = '')
     {
         $this->task = $task;
         $this->queueName = $queueName;
+        $this->context = $context;
     }
 
     /**
-     * Calculates next schedule time
+     * Transforms raw array data to this entity instance.
      *
-     * @return \DateTime Next schedule date
+     * @param array $data Raw array data.
      */
-    public function calculateNextSchedule()
+    public function inflate(array $data)
     {
-        return $this->now();
+        parent::inflate($data);
+
+        $this->task = unserialize($data['task']);
     }
 
     /**
-     * Returns entity configuration object
+     * Transforms entity to its array format representation.
      *
-     * @return EntityConfiguration Entity configuration with index
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        $data = parent::toArray();
+        $data['task'] = serialize($this->task);
+
+        return $data;
+    }
+
+    /**
+     * Returns entity configuration object.
+     *
+     * @return EntityConfiguration Entity configuration with index.
      */
     public function getConfig()
     {
         $map = new IndexMap();
-        $map->addIndex(new DateTimeIndex('nextSchedule', 1));
+        $map->addDateTimeIndex('nextSchedule');
 
-        return new EntityConfiguration($map, 'Schedule', 'Schedule');
+        return new EntityConfiguration($map, 'Schedule');
     }
 
     /**
-     * Returns task
+     * Returns task.
      *
-     * @return Task Task for schedule
+     * @return Task Task for schedule.
      */
     public function getTask()
     {
@@ -111,9 +145,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns queue name
+     * Returns queue name.
      *
-     * @return string Queue name
+     * @return string Queue name.
      */
     public function getQueueName()
     {
@@ -121,9 +155,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets queue name
+     * Sets queue name.
      *
-     * @param string $queueName Queue name in which task is scheduled
+     * @param string $queueName Queue name in which task is scheduled.
      */
     public function setQueueName($queueName)
     {
@@ -131,9 +165,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns next schedule date
+     * Returns next schedule date.
      *
-     * @return \DateTime Next schedule
+     * @return \DateTime Next schedule.
      */
     public function getNextSchedule()
     {
@@ -141,19 +175,17 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets next schedule date
-     *
-     * @param \DateTime $nextSchedule
+     * Sets next schedule datetime.
      */
-    public function setNextSchedule(\DateTime $nextSchedule)
+    public function setNextSchedule()
     {
-        $this->nextSchedule = $nextSchedule;
+        $this->nextSchedule = $this->calculateNextSchedule();
     }
 
     /**
-     * Returns schedule minute
+     * Returns schedule minute.
      *
-     * @return int Schedule minute
+     * @return int Schedule minute.
      */
     public function getMinute()
     {
@@ -161,9 +193,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets schedule minute
+     * Sets schedule minute.
      *
-     * @param int $minute Schedule minute
+     * @param int $minute Schedule minute.
      */
     public function setMinute($minute)
     {
@@ -171,9 +203,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule hour
+     * Returns schedule hour.
      *
-     * @return int Schedule hour
+     * @return int Schedule hour.
      */
     public function getHour()
     {
@@ -181,9 +213,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets schedule hour
+     * Sets schedule hour.
      *
-     * @param int $hour Schedule hour
+     * @param int $hour Schedule hour.
      */
     public function setHour($hour)
     {
@@ -191,9 +223,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule day
+     * Returns schedule day.
      *
-     * @return int Schedule day
+     * @return int Schedule day.
      */
     public function getDay()
     {
@@ -201,9 +233,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule day
+     * Returns schedule day.
      *
-     * @param int $day Schedule day
+     * @param int $day Schedule day.
      */
     public function setDay($day)
     {
@@ -211,9 +243,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns schedule month
+     * Returns schedule month.
      *
-     * @return int Month number, starting from 1 for January ending with 12 for December
+     * @return int Month number, starting from 1 for January ending with 12 for December.
      */
     public function getMonth()
     {
@@ -221,9 +253,9 @@ class Schedule extends Entity
     }
 
     /**
-     * Sets schedule month
+     * Sets schedule month.
      *
-     * @param int $month Month number, starting from 1 for January ending with 12 for December
+     * @param int $month Month number, starting from 1 for January ending with 12 for December.
      */
     public function setMonth($month)
     {
@@ -231,9 +263,59 @@ class Schedule extends Entity
     }
 
     /**
-     * Returns current date and time
+     * Return whether the schedule is recurring.
      *
-     * @return \DateTime Date and time
+     * @return bool
+     */
+    public function isRecurring()
+    {
+        return $this->recurring;
+    }
+
+    /**
+     * Set whether the schedule is recurring.
+     *
+     * @param bool $recurring
+     */
+    public function setRecurring($recurring)
+    {
+        $this->recurring = $recurring;
+    }
+
+    /**
+     * Returns schedule context.
+     *
+     * @return string
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * Sets schedule context.
+     *
+     * @param string $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+    /**
+     * Calculates next schedule time.
+     *
+     * @return \DateTime Next schedule date.
+     */
+    protected function calculateNextSchedule()
+    {
+        return $this->now();
+    }
+
+    /**
+     * Returns current date and time.
+     *
+     * @return \DateTime Date and time.
      */
     protected function now()
     {

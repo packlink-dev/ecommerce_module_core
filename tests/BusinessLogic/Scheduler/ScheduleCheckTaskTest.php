@@ -1,28 +1,33 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
-use Logeecom\Infrastructure\Configuration;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\TaskQueueStorage;
+use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
+use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\InMemoryTestQueueStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueue;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeup;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
+use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
@@ -36,37 +41,44 @@ use PHPUnit\Framework\TestCase;
 class ScheduleCheckTaskTest extends TestCase
 {
     /**
-     * @var TestTimeProvider
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
      */
-    protected $timeProvider;
+    public $timeProvider;
     /**
      * @var TestShopConfiguration
      */
-    protected $shopConfig;
+    public $shopConfig;
     /**
      * @var TestShopLogger
      */
-    protected $shopLogger;
+    public $shopLogger;
     /**
      * @var array
      */
-    protected $eventHistory;
+    public $eventHistory;
     /**
      * @var Task
      */
-    protected $syncTask;
+    public $syncTask;
     /**
-     * QueueStorage instance\
+     * QueueItem repository instance
      *
-     * @var InMemoryTestQueueStorage
+     * @var MemoryQueueItemRepository
      */
-    private $queueStorage;
+    public $queueStorage;
+    /**
+     * @var string
+     */
+    private $oldTimeZone;
 
     /**
      * @throws \Exception
      */
     public function setUp()
     {
+        $this->oldTimeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
         $taskInstance = $this;
 
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -78,9 +90,10 @@ class ScheduleCheckTaskTest extends TestCase
         $timeProvider->setCurrentLocalTime($nowDateTime);
         $this->shopConfig = new TestShopConfiguration();
         $this->shopLogger = new TestShopLogger();
-        $queue = new TestQueue();
-        $taskRunnerStarter = new TestTaskRunnerWakeup();
-        $queueStorage = new InMemoryTestQueueStorage();
+        $queue = new TestQueueService();
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
+
+        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
 
         new TestServiceRegister(
             array(
@@ -96,39 +109,52 @@ class ScheduleCheckTaskTest extends TestCase
                 ShopLoggerAdapter::CLASS_NAME => function () use ($taskInstance) {
                     return $taskInstance->shopLogger;
                 },
-                TaskQueueStorage::CLASS_NAME => function () use ($queueStorage) {
-                    return $queueStorage;
-                },
                 TaskRunnerWakeup::CLASS_NAME => function () use ($taskRunnerStarter) {
                     return $taskRunnerStarter;
                 },
-                Queue::CLASS_NAME => function () use ($queue) {
+                QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
+                },
+                EventBus::CLASS_NAME => function () {
+                    return EventBus::getInstance();
                 },
             )
         );
 
-        new Logger();
+        Logger::resetInstance();
 
         $this->syncTask = new ScheduleCheckTask();
-        $this->queueStorage = $queueStorage;
         $this->timeProvider = $timeProvider;
+        $this->queueStorage = RepositoryRegistry::getQueueItemRepository();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
     }
 
     /**
-     * Tests when there are no scheduled tasks
+     * @inheritdoc
+     */
+    public function tearDown()
+    {
+        date_default_timezone_set($this->oldTimeZone);
+        parent::tearDown();
+    }
+
+    /**
+     * Tests when there are no scheduled tasks.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testEmptyExecution()
     {
         $this->syncTask->execute();
-        $this->assertEmpty($this->queueStorage->findAll());
+        $this->assertEmpty($this->queueStorage->select());
     }
 
     /**
-     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testSchedulingTasks()
     {
@@ -142,11 +168,60 @@ class ScheduleCheckTaskTest extends TestCase
         $this->syncTask->execute();
 
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->findAll();
+        $queueItems = $this->queueStorage->select();
         $this->assertNotEmpty($queueItems);
         $this->assertCount(2, $queueItems);
         $this->assertEquals('queueForDailyFoo', $queueItems[0]->getQueueName());
         $this->assertEquals('queueForWeeklyFoo', $queueItems[1]->getQueueName());
+    }
+
+    /**
+     * Tests execution of a delayed task.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testDelayedTask()
+    {
+        $timestamp = strtotime('+5 minutes');
+
+        $delayedTask = new HourlySchedule(new FooTask(), 'delayedQueue');
+        $delayedTask->setMonth((int)date('m', $timestamp));
+        $delayedTask->setDay((int)date('d', $timestamp));
+        $delayedTask->setHour((int)date('H', $timestamp));
+        $delayedTask->setMinute((int)date('i', $timestamp));
+        $delayedTask->setRecurring(false);
+        $delayedTask->setNextSchedule();
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $scheduleRepository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+        $id = $scheduleRepository->save($delayedTask);
+
+        // Test that schedule exists.
+        $filter = new QueryFilter();
+        $filter->where('id', Operators::EQUALS, $id);
+        $task = $scheduleRepository->selectOne($filter);
+
+        self::assertNotNull($task);
+
+        $newTimestamp = strtotime('+7 minutes');
+        $newTime = $this->timeProvider->getDateTime($newTimestamp);
+        $this->timeProvider->setCurrentLocalTime($newTime);
+
+        $this->syncTask->execute();
+
+        // Test that schedule has been deleted after one execution.
+        $task = $scheduleRepository->selectOne($filter);
+
+        self::assertNull($task);
+
+        // Test that scheduled task exists.
+        $filter = new QueryFilter();
+        $filter->where('queueName', Operators::EQUALS, 'delayedQueue');
+
+        $queuedTask = $this->queueStorage->selectOne($filter);
+        self::assertNotNull($queuedTask);
     }
 
     /**
@@ -159,21 +234,21 @@ class ScheduleCheckTaskTest extends TestCase
         $daily = new DailySchedule(new FooTask(), 'queueForDailyFoo');
         $daily->setHour(13);
         $daily->setMinute(40);
-        $daily->setDaysOfWeek(array(1,2,3,4,5));
+        $daily->setDaysOfWeek(array(1, 2, 3, 4, 5));
         /** @noinspection PhpUnhandledExceptionInspection */
-        $daily->setNextSchedule($daily->calculateNextSchedule());
+        $daily->setNextSchedule();
 
         $weekly = new WeeklySchedule(new FooTask(), 'queueForWeeklyFoo');
         $weekly->setDay(4);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $weekly->setNextSchedule($weekly->calculateNextSchedule());
+        $weekly->setNextSchedule();
 
         $monthly = new MonthlySchedule(new FooTask(), 'queueForMonthlyFoo');
         $monthly->setDay(21);
         $monthly->setHour(13);
         $monthly->setMinute(42);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $monthly->setNextSchedule($monthly->calculateNextSchedule());
+        $monthly->setNextSchedule();
 
         $repository->save($daily);
         $repository->save($weekly);

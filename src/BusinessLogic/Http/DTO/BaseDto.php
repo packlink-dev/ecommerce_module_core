@@ -3,8 +3,6 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Prophecy\Exception\Doubler\MethodNotFoundException;
-
 /**
  * Base class for all DTOs.
  *
@@ -12,10 +10,6 @@ use Prophecy\Exception\Doubler\MethodNotFoundException;
  */
 abstract class BaseDto
 {
-    /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
     /**
      * Transforms DTO to its array format suitable for http client.
      *
@@ -34,7 +28,9 @@ abstract class BaseDto
      */
     public static function fromArray(array $raw)
     {
-        throw new MethodNotFoundException('Method "fromArray" not implemented!', static::CLASS_NAME, 'fromArray');
+        throw new \BadMethodCallException(
+            'Method "fromArray" not implemented! Given array: ' . print_r($raw, true)
+        );
     }
 
     /**

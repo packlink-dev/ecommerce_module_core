@@ -2,7 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 
 /**
  * Class MemoryGenericStudentRepositoryTest.
@@ -24,5 +25,6 @@ class MemoryGenericStudentRepositoryTest extends AbstractGenericStudentRepositor
      */
     public function cleanUpStorage()
     {
+        MemoryStorage::reset();
     }
 }

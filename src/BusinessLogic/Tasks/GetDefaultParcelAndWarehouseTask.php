@@ -14,6 +14,8 @@ class GetDefaultParcelAndWarehouseTask extends Task
 {
     /**
      * Runs task logic.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      */
     public function execute()
     {

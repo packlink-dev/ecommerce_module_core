@@ -3,8 +3,8 @@
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
 use PHPUnit\Framework\TestCase;
 
@@ -18,12 +18,12 @@ class MonthlyScheduleTest extends TestCase
      * Monthly schedule instance
      * @var \Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule
      */
-    private $monthlySchedule;
+    public $monthlySchedule;
     /**
      * Current Date time
      * @var \DateTime
      */
-    private $nowTime;
+    public $nowTime;
 
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -64,10 +64,12 @@ class MonthlyScheduleTest extends TestCase
     public function testNextScheduleOnNextMonth()
     {
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 4, 15);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
-        $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
+        $this->monthlySchedule->setNextSchedule();
+        $nextSchedule = $this->monthlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -78,10 +80,12 @@ class MonthlyScheduleTest extends TestCase
     {
         $this->nowTime->setDate(2018, 2, 1);
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 2, 15);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
-        $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
+        $this->monthlySchedule->setNextSchedule();
+        $nextSchedule = $this->monthlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -94,10 +98,12 @@ class MonthlyScheduleTest extends TestCase
         $this->monthlySchedule->setDay(31);
 
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 2, 28);
-        $expected->setTime(3, 0, 0);
+        $expected->setTime(3, 0);
 
-        $nextSchedule = $this->monthlySchedule->calculateNextSchedule();
+        $this->monthlySchedule->setNextSchedule();
+        $nextSchedule = $this->monthlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

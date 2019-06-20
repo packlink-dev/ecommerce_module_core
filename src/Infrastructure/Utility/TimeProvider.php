@@ -88,4 +88,38 @@ class TimeProvider
     {
         sleep($sleepTime);
     }
+
+    /**
+     * Converts serialized string time to DateTime object.
+     *
+     * @param string $dateTime DateTime in string format.
+     * @param string $format DateTime string format.
+     *
+     * @return \DateTime | null Date or null.
+     */
+    public function deserializeDateString($dateTime, $format = null)
+    {
+        if ($dateTime === null) {
+            return null;
+        }
+
+        return \DateTime::createFromFormat($format ?: DATE_ATOM, $dateTime);
+    }
+
+    /**
+     * Serializes date time object to its string format.
+     *
+     * @param \DateTime|null $dateTime Date time object to be serialized.
+     * @param string $format DateTime string format.
+     *
+     * @return string|null String serialized date.
+     */
+    public function serializeDate(\DateTime $dateTime = null, $format = null)
+    {
+        if ($dateTime === null) {
+            return null;
+        }
+
+        return $dateTime->format($format ?: DATE_ATOM);
+    }
 }

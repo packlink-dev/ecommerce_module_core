@@ -7,7 +7,7 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
@@ -31,17 +31,21 @@ class ScheduleCheckTask extends Task
      */
     public function execute()
     {
-        /** @var Queue $queueService */
-        $queueService = ServiceRegister::getService(Queue::CLASS_NAME);
+        /** @var QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
-        /** @var Schedule $scheduledTask */
-        foreach ($this->getScheduledTasks() as $scheduledTask) {
-            $task = $scheduledTask->getTask();
+        /** @var Schedule $schedule */
+        foreach ($this->getSchedules() as $schedule) {
+            $task = $schedule->getTask();
             try {
-                $queueService->enqueue($scheduledTask->getQueueName(), $task);
+                $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext());
 
-                $scheduledTask->setNextSchedule($scheduledTask->calculateNextSchedule());
-                $this->getRepository()->update($scheduledTask);
+                if ($schedule->isRecurring()) {
+                    $schedule->setNextSchedule();
+                    $this->getRepository()->update($schedule);
+                } else {
+                    $this->getRepository()->delete($schedule);
+                }
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
                     'Failed to enqueue task ' . $task->getType(),
@@ -54,6 +58,8 @@ class ScheduleCheckTask extends Task
                 );
             }
         }
+
+        $this->reportProgress(100);
     }
 
     /**
@@ -71,12 +77,12 @@ class ScheduleCheckTask extends Task
 
     /** @noinspection PhpDocMissingThrowsInspection */
     /**
-     * Returns an array of Scheduled tasks that are due for execution
+     * Returns an array of Schedules that are due for execution
      *
-     * @return \Logeecom\Infrastructure\ORM\Entities\Entity[]
+     * @return \Logeecom\Infrastructure\ORM\Entity[]
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
-    private function getScheduledTasks()
+    private function getSchedules()
     {
         $queryFilter = new QueryFilter();
         /** @noinspection PhpUnhandledExceptionInspection */

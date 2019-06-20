@@ -2,9 +2,11 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\QueueItem;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -69,16 +71,16 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
         /** @var QueueItem $queueItem */
         $queueItem = $repository->selectOne($queryFilter);
 
-        $id = $queueItem->id;
-        $queueItem->taskType = 'Test' . $queueItem->taskType;
+        $id = $queueItem->getId();
+        $queueItem->setQueueName('Test' . $queueItem->getQueueName());
         $repository->update($queueItem);
 
         $queryFilter = new QueryFilter();
-        $queryFilter->where('taskType', '=', 'TestFooTask');
+        $queryFilter->where('queueName', '=', $queueItem->getQueueName());
         $queueItem = $repository->selectOne($queryFilter);
         $this->assertEquals($id, $queueItem->getId());
 
-        $queueItem->taskType = 'FooTask';
+        $queueItem->setQueueName(substr($queueItem->getQueueName(), 4));
         $repository->update($queueItem);
     }
 
@@ -123,10 +125,17 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('progress', '<', 10000);
-        $queryFilter->where('progress', '>', 0);
+        $queryFilter->where('lastExecutionProgress', '>', 0);
 
-        $this->assertCount(50, $repository->select($queryFilter));
+        $this->assertCount(23, $repository->select($queryFilter));
+
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('lastExecutionProgress', '<', 10000);
+
+        $this->assertCount(37, $repository->select($queryFilter));
+
+        $queryFilter->where('lastExecutionProgress', '>', 0);
+        $this->assertCount(10, $repository->select($queryFilter));
     }
 
     /**
@@ -139,8 +148,8 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('queueTimestamp', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
-        $queryFilter->orderBy('queueTimestamp', 'DESC');
+        $queryFilter->where('queueTime', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
+        $queryFilter->orderBy('queueTime', 'DESC');
 
         $results = $repository->select($queryFilter);
         $this->assertCount(10, $results);
@@ -156,7 +165,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('queueTimestamp', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
+        $queryFilter->where('queueTime', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
         $queryFilter->setLimit(5);
 
         $results = $repository->select($queryFilter);
@@ -172,8 +181,23 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     {
         $repository = RepositoryRegistry::getQueueItemRepository();
 
-        $this->assertCount(2, $repository->findOldestQueuedItems(10));
+        $this->assertCount(2, $repository->findOldestQueuedItems());
         $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testInvalidQueryFilter()
+    {
+        $repository = RepositoryRegistry::getQueueItemRepository();
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('progress', '=', 20);
+
+        $repository->select($queryFilter);
     }
 
     /**
@@ -200,48 +224,33 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     protected function readQueueItemsFromFile()
     {
         $queueItems = array();
-        $json = file_get_contents(__DIR__ . '/../../Common/EntityData/QueueItems.json');
+        $json = file_get_contents(__DIR__ . '/../Common/EntityData/QueueItems.json');
         $queueItemsRaw = json_decode($json, true);
         foreach ($queueItemsRaw as $item) {
+            if ($item['taskType'] === 'FooTask') {
+                $task = new FooTask($item['serializedTask'], $item['progress']);
+            } else {
+                $task = new BarTask();
+            }
+
             $queueItem = new QueueItem();
-            $queueItem->status = $item['status'];
-            $queueItem->taskType = $item['taskType'];
-            $queueItem->queueName = $item['queueName'];
-            $queueItem->progress = $item['progress'];
-            $queueItem->lastExecutionProgress = $item['lastExecutionProgress'];
-            $queueItem->retries = $item['retries'];
-            $queueItem->failureDescription = $item['failureDescription'];
-            $queueItem->serializedTask = $item['serializedTask'];
-            $queueItem->createTimestamp = $this->createDateTime($item['createTimestamp']);
-            $queueItem->queueTimestamp = $this->createDateTime($item['queueTimestamp']);
-            $queueItem->startTimestamp = $this->createDateTime($item['startTimestamp']);
-            $queueItem->lastUpdateTimestamp = $this->createDateTime($item['lastUpdateTimestamp']);
-            $queueItem->finishTimestamp = $this->createDateTime($item['finishTimestamp']);
-            $queueItem->failTimestamp = $this->createDateTime($item['failTimestamp']);
+            $queueItem->setStatus($item['status']);
+            $queueItem->setQueueName($item['queueName']);
+            $queueItem->setProgressBasePoints($item['progress']);
+            $queueItem->setLastExecutionProgressBasePoints($item['lastExecutionProgress']);
+            $queueItem->setRetries($item['retries']);
+            $queueItem->setFailureDescription($item['failureDescription']);
+            $queueItem->setSerializedTask(serialize($task));
+            $queueItem->setCreateTimestamp($item['createTimestamp']);
+            $queueItem->setQueueTimestamp($item['queueTimestamp']);
+            $queueItem->setStartTimestamp($item['startTimestamp']);
+            $queueItem->setLastUpdateTimestamp($item['lastUpdateTimestamp']);
+            $queueItem->setFinishTimestamp($item['finishTimestamp']);
+            $queueItem->setFailTimestamp($item['failTimestamp']);
 
             $queueItems[] = $queueItem;
         }
 
         return $queueItems;
-    }
-
-    /**
-     * @param int $ts
-     *
-     * @return \DateTime | null
-     */
-    private function createDateTime($ts)
-    {
-        $dateTime = null;
-        if ($ts) {
-            try {
-                $dateTime = new \DateTime();
-            } catch (\Exception $e) {
-                return null;
-            }
-            $dateTime->setTimestamp($ts);
-        }
-
-        return $dateTime;
     }
 }

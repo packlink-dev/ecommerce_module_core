@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
-use Logeecom\Infrastructure\ORM\Entities\QueueItem;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use PHPUnit\Framework\TestCase;
 
 /***

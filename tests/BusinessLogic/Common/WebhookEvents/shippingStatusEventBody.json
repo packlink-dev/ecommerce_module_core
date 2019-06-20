@@ -1,0 +1,8 @@
+{
+  "event": "shipment.delivered",
+  "datetime": "2015-01-01 15:55:23",
+  "data": {
+    "shipment_custom_reference": "test",
+    "shipment_reference": "test"
+  }
+}

@@ -3,8 +3,8 @@
 namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
-use Logeecom\Tests\Common\TestServiceRegister;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use PHPUnit\Framework\TestCase;
 
@@ -14,12 +14,11 @@ use PHPUnit\Framework\TestCase;
  */
 class HourlyScheduleTest extends TestCase
 {
-
     /**
      * Hourly schedule instance
      * @var \Packlink\BusinessLogic\Scheduler\Models\HourlySchedule
      */
-    private $hourlySchedule;
+    public $hourlySchedule;
 
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -62,10 +61,12 @@ class HourlyScheduleTest extends TestCase
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 21);
-        $expected->setTime(14, 15, 0);
+        $expected->setTime(14, 15);
 
-        $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -78,10 +79,12 @@ class HourlyScheduleTest extends TestCase
         $this->hourlySchedule->setEndMinute(0);
 
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 22);
-        $expected->setTime(8, 15, 0);
+        $expected->setTime(8, 15);
 
-        $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
@@ -94,10 +97,30 @@ class HourlyScheduleTest extends TestCase
         $this->hourlySchedule->setEndMinute(15);
 
         $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 21);
-        $expected->setTime(14, 15, 0);
+        $expected->setTime(14, 15);
 
-        $nextSchedule = $this->hourlySchedule->calculateNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
+        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+    }
+
+    /**
+     * @throws \Exception Throws this exception when unable to create DateTime object
+     */
+    public function testEveryHourAtSpecificMinute()
+    {
+        $this->hourlySchedule->setStartMinute(0);
+        $this->hourlySchedule->setMinute(27);
+
+        $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
+        $expected->setDate(2018, 3, 21);
+        $expected->setTime(14, 27);
+
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

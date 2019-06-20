@@ -3,19 +3,24 @@
 namespace Packlink\BusinessLogic\Scheduler\Models;
 
 /**
- * Class MonthlySchedule
+ * Class MonthlySchedule.
+ *
  * @package Logeecom\Infrastructure\Scheduler\Models
  */
 class MonthlySchedule extends Schedule
 {
+    /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
 
     /**
-     * Calculates next schedule time
+     * Calculates next schedule time.
      *
-     * @return \DateTime Next schedule date
-     * @throws \Exception Emits Exception in case of an error while creating DateTime instance
+     * @return \DateTime Next schedule date.
+     * @throws \Exception Emits Exception in case of an error while creating DateTime instance.
      */
-    public function calculateNextSchedule()
+    protected function calculateNextSchedule()
     {
         $now = $this->now();
         $shouldExecuteOn = $this->now();

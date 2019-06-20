@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\Utility\IndexHelper;
-use Logeecom\Tests\Common\TestComponents\ORM\Entity\FooEntity;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\FooEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 class IndexHelperTest extends TestCase
 {
     /**
-     * @var FooEntity
+     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\FooEntity
      */
     protected $entity;
 

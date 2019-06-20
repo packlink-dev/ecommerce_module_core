@@ -1,0 +1,51 @@
+[
+  {
+    "province": {
+      "isoCode": "ES-M",
+      "id": "1385",
+      "name": "Madrid",
+      "phonePrefix": "+34"
+    },
+    "city": {
+      "isoCode": "ES-M",
+      "id": "pc_es_65",
+      "name": "Madrid",
+      "phonePrefix": "+34"
+    },
+    "utc": "UTC+1",
+    "country": {
+      "isoCode": "ES",
+      "id": "256",
+      "name": "Espa\u00f1a",
+      "phonePrefix": "+34"
+    },
+    "postalZone": {
+      "phonePrefix": "+34",
+      "name": "Espa\u00f1a - Peninsular",
+      "hasPostalCodes": null,
+      "translations": {
+        "de_DE": "Spanien",
+        "es_ES": "Espa\u00f1a - Peninsular",
+        "it_IT": "Spagna- Penisola",
+        "fr_FR": "Espagne"
+      },
+      "translationKey": "espana-peninsular",
+      "orderGroup": null,
+      "isoCode": "ES",
+      "id": "65"
+    },
+    "longitude": "-3.69783",
+    "zipcode": "28041",
+    "zipcodeCity": "28041 - Madrid",
+    "state": {
+      "isoCode": "ES",
+      "id": "1342",
+      "name": "Comunidad de Madrid",
+      "phonePrefix": "+34"
+    },
+    "latitude": "40.35704",
+    "timeZone": "Europe/Madrid",
+    "postalZoneId": 65,
+    "id": "pc_es_18359"
+  }
+]

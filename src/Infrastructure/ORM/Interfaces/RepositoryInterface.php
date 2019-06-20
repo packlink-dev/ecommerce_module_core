@@ -2,7 +2,7 @@
 
 namespace Logeecom\Infrastructure\ORM\Interfaces;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 
 /**
@@ -36,7 +36,7 @@ interface RepositoryInterface
      *
      * @param QueryFilter $filter Filter for query.
      *
-     * @return Entity[] A list of found entities.
+     * @return Entity[] A list of found entities ot empty array.
      */
     public function select(QueryFilter $filter = null);
 
@@ -75,4 +75,13 @@ interface RepositoryInterface
      * @return bool TRUE if operation succeeded; otherwise, FALSE.
      */
     public function delete(Entity $entity);
+
+    /**
+     * Counts records that match filter criteria.
+     *
+     * @param QueryFilter $filter Filter for query.
+     *
+     * @return int Number of records that match filter criteria.
+     */
+    public function count(QueryFilter $filter = null);
 }

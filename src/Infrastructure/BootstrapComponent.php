@@ -2,6 +2,14 @@
 
 namespace Logeecom\Infrastructure;
 
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\RunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\TaskRunner;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -15,19 +23,16 @@ class BootstrapComponent
 {
     /**
      * Initializes infrastructure components.
-     *
-     * @throws \Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException
      */
     public static function init()
     {
         static::initServices();
+        static::initRepositories();
         static::initEvents();
     }
 
     /**
-     * Initializes infrastructure services and utilities.
-     *
-     * @throws \Logeecom\Infrastructure\Exceptions\ServiceAlreadyRegisteredException
+     * Initializes services and utilities.
      */
     protected static function initServices()
     {
@@ -49,10 +54,47 @@ class BootstrapComponent
                 return EventBus::getInstance();
             }
         );
+        ServiceRegister::registerService(
+            AsyncProcessService::CLASS_NAME,
+            function () {
+                return AsyncProcessStarterService::getInstance();
+            }
+        );
+        ServiceRegister::registerService(
+            QueueService::CLASS_NAME,
+            function () {
+                return new QueueService();
+            }
+        );
+        ServiceRegister::registerService(
+            TaskRunnerWakeup::CLASS_NAME,
+            function () {
+                return new TaskRunnerWakeupService();
+            }
+        );
+        ServiceRegister::registerService(
+            TaskRunner::CLASS_NAME,
+            function () {
+                return new TaskRunner();
+            }
+        );
+        ServiceRegister::registerService(
+            TaskRunnerStatusStorage::CLASS_NAME,
+            function () {
+                return new RunnerStatusStorage();
+            }
+        );
     }
 
     /**
-     * Initializes infrastructure events.
+     * Initializes repositories.
+     */
+    protected static function initRepositories()
+    {
+    }
+
+    /**
+     * Initializes events.
      */
     protected static function initEvents()
     {

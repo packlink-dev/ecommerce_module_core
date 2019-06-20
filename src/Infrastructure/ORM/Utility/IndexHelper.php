@@ -2,7 +2,7 @@
 
 namespace Logeecom\Infrastructure\ORM\Utility;
 
-use Logeecom\Infrastructure\ORM\Entities\Entity;
+use Logeecom\Infrastructure\ORM\Entity;
 
 /**
  * Class IndexHelper.
@@ -22,11 +22,9 @@ class IndexHelper
     {
         $result = array();
         $config = $entity->getConfig();
-        /**
-         * @var \Logeecom\Infrastructure\ORM\Configuration\Indexes\Index $item
-         */
+        $index = 1;
         foreach ($config->getIndexMap()->getIndexes() as $item) {
-            $result[$item->getProperty()] = $item->getIndex();
+            $result[$item->getProperty()] = $index++;
         }
 
         return $result;
@@ -43,10 +41,10 @@ class IndexHelper
     {
         $result = array();
         $config = $entity->getConfig();
-        /** @var \Logeecom\Infrastructure\ORM\Configuration\Indexes\Index $item */
+        $index = 1;
         foreach ($config->getIndexMap()->getIndexes() as $item) {
             $field = $item->getProperty();
-            $result[$item->getIndex()] = static::castFieldValue($entity->$field, $item->getType());
+            $result[$index++] = static::castFieldValue($entity->getIndexValue($field), $item->getType());
         }
 
         return $result;

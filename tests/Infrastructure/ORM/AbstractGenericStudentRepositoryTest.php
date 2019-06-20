@@ -2,9 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
+use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Tests\Common\TestComponents\ORM\Entity\StudentEntity;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\StudentEntity;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractGenericStudentRepositoryTest extends TestCase
 {
     protected $femaleStudents = 2;
+    protected $maleStudents = 8;
     protected $studentCount = 10;
 
     /**
@@ -41,7 +43,6 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testRegisteredRepositories
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testStudentMassInsert()
@@ -55,19 +56,19 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testStudentMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testStudentUpdate()
     {
+        $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->where('email', '=', 'Brandon.Adair@powerschool.com');
-        /** @var StudentEntity $student */
+        /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\StudentEntity $student */
         $student = $repository->selectOne($queryFilter);
 
-        $studentId = $student->id;
+        $studentId = $student->getId();
         $student->email = 'Test' . $student->email;
         $repository->update($student);
 
@@ -81,23 +82,23 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testStudentMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryAllStudents()
     {
+        $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
 
         $this->assertCount($this->studentCount, $repository->select());
     }
 
     /**
-     * @depends testStudentMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryWithFiltersString()
     {
+        $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->where('gender', '=', 'F');
@@ -110,12 +111,12 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testStudentMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testQueryWithFiltersInt()
     {
+        $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->where('localId', '<', 20);
@@ -125,19 +126,19 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testStudentMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testQueryWithFiltersAndSort()
     {
+        $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
-        $queryFilter->where('gender', '=', 'F');
+        $queryFilter->where('gender', Operators::EQUALS, 'M');
         $queryFilter->orderBy('email');
 
         $entities = $repository->select($queryFilter);
-        $this->assertCount($this->femaleStudents, $entities);
+        $this->assertCount($this->maleStudents, $entities);
         $emails = array();
         /** @var StudentEntity $item */
         foreach ($entities as $item) {
@@ -150,12 +151,69 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testStudentMassInsert
+     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    public function testQueryWithUnknownFieldSort()
+    {
+        $this->testStudentMassInsert();
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+        $queryFilter->orderBy('some_field', QueryFilter::ORDER_DESC);
+
+        $repository->select($queryFilter);
+    }
+
+    /**
+     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    public function testQueryWithUnIndexedFieldSort()
+    {
+        $this->testStudentMassInsert();
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+        $queryFilter->orderBy('contact', QueryFilter::ORDER_DESC);
+
+        $repository->select($queryFilter);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithIdFieldSort()
+    {
+        $this->testStudentMassInsert();
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('gender', Operators::EQUALS, 'M');
+        $queryFilter->orderBy('id', QueryFilter::ORDER_DESC);
+
+        $entities = $repository->select($queryFilter);
+        $ids = array();
+        /** @var StudentEntity $item */
+        foreach ($entities as $item) {
+            $ids[] = $item->getId();
+        }
+
+        $sortedIds = $ids;
+        sort($sortedIds);
+        $sortedIds = array_reverse($sortedIds);
+        $this->assertEquals($sortedIds, $ids);
+    }
+
+    /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryWithFiltersAndLimit()
     {
+        $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->where('gender', '=', 'M');
@@ -192,8 +250,10 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     protected function readStudentsFromFile()
     {
         $students = array();
-        $json = file_get_contents(__DIR__ . '/../../Common/EntityData/Students.json');
+        $json = file_get_contents(__DIR__ . '/../Common/EntityData/Students.json');
         $studentsRaw = json_decode($json, true);
+        $this->femaleStudents = 0;
+        $this->maleStudents = 0;
         foreach ($studentsRaw as $item) {
             $student = new StudentEntity();
             $student->localId = $item['local_id'];
@@ -210,6 +270,8 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
 
             if ($student->gender === 'F') {
                 $this->femaleStudents++;
+            } elseif ($student->gender === 'M') {
+                $this->maleStudents++;
             }
 
             $students[] = $student;

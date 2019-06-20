@@ -1,0 +1,392 @@
+[
+  {
+    "currency": "EUR",
+    "carrier_name": "STARPACK",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 21279,
+    "carrier_product_id": "IT_SKYNET_3",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 24.65,
+      "tax_price": 0,
+      "base_price": 24.65
+    },
+    "first_estimated_delivery_date": "2019/01/09",
+    "customs_required": true,
+    "name": "Economy Air Courier",
+    "transit_time": "8 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "192",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 20:00]",
+      "2018/12/28": "[09:00 , 20:00]",
+      "2019/01/10": "[09:00 , 20:00]",
+      "2018/12/27": "[09:00 , 20:00]",
+      "2019/01/09": "[09:00 , 20:00]",
+      "2019/01/08": "[09:00 , 20:00]",
+      "2019/01/07": "[09:00 , 20:00]",
+      "2019/01/11": "[09:00 , 20:00]",
+      "2019/01/04": "[09:00 , 20:00]",
+      "2019/01/03": "[09:00 , 20:00]",
+      "2019/01/02": "[09:00 , 20:00]",
+      "2019/01/01": "[09:00 , 20:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "24.65"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "STARPACK",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 21103,
+    "carrier_product_id": "IT_SKYNET_1",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 34.64,
+      "tax_price": 0,
+      "base_price": 34.64
+    },
+    "first_estimated_delivery_date": "2019/01/02",
+    "customs_required": true,
+    "name": "Air Courier",
+    "transit_time": "3 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "72",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 20:00]",
+      "2018/12/28": "[09:00 , 20:00]",
+      "2019/01/10": "[09:00 , 20:00]",
+      "2018/12/27": "[09:00 , 20:00]",
+      "2019/01/09": "[09:00 , 20:00]",
+      "2019/01/08": "[09:00 , 20:00]",
+      "2019/01/07": "[09:00 , 20:00]",
+      "2019/01/11": "[09:00 , 20:00]",
+      "2019/01/04": "[09:00 , 20:00]",
+      "2019/01/03": "[09:00 , 20:00]",
+      "2019/01/02": "[09:00 , 20:00]",
+      "2019/01/01": "[09:00 , 20:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "34.64"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "UPS",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "express",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20937,
+    "carrier_product_id": "IT_UPS_6",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 37.67,
+      "tax_price": 0,
+      "base_price": 37.67
+    },
+    "first_estimated_delivery_date": "2018/12/28",
+    "customs_required": true,
+    "name": "Express Saver",
+    "transit_time": "1 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "24",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 17:00]",
+      "2018/12/28": "[09:00 , 17:00]",
+      "2019/01/10": "[09:00 , 17:00]",
+      "2018/12/27": "[09:00 , 17:00]",
+      "2019/01/09": "[09:00 , 17:00]",
+      "2019/01/08": "[09:00 , 17:00]",
+      "2019/01/07": "[09:00 , 17:00]",
+      "2019/01/11": "[09:00 , 17:00]",
+      "2019/01/04": "[09:00 , 17:00]",
+      "2019/01/03": "[09:00 , 17:00]",
+      "2019/01/02": "[09:00 , 17:00]",
+      "2019/01/01": "[09:00 , 17:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "37.67"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "Poste Italiane",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20329,
+    "carrier_product_id": "IT_POSTEITALIANE_6",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 38.54,
+      "tax_price": 0,
+      "base_price": 38.54
+    },
+    "first_estimated_delivery_date": "2019/01/04",
+    "customs_required": true,
+    "name": "Crono Internazionale",
+    "transit_time": "5 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "120",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 18:30]",
+      "2018/12/28": "[09:00 , 18:30]",
+      "2019/01/10": "[09:00 , 18:30]",
+      "2018/12/27": "[09:00 , 18:30]",
+      "2019/01/09": "[09:00 , 18:30]",
+      "2019/01/08": "[09:00 , 18:30]",
+      "2019/01/07": "[09:00 , 18:30]",
+      "2019/01/11": "[09:00 , 18:30]",
+      "2019/01/04": "[09:00 , 18:30]",
+      "2019/01/03": "[09:00 , 18:30]",
+      "2019/01/02": "[09:00 , 18:30]",
+      "2019/01/01": "[09:00 , 18:30]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "38.54"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "TNT",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20255,
+    "carrier_product_id": "IT_TNT_4_PRO",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 45.7,
+      "tax_price": 0,
+      "base_price": 45.7
+    },
+    "first_estimated_delivery_date": "2019/01/03",
+    "customs_required": true,
+    "name": "Express",
+    "transit_time": "4 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "96",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 18:00]",
+      "2018/12/28": "[09:00 , 18:00]",
+      "2019/01/10": "[09:00 , 18:00]",
+      "2018/12/27": "[09:00 , 18:00]",
+      "2019/01/09": "[09:00 , 18:00]",
+      "2019/01/08": "[09:00 , 18:00]",
+      "2019/01/07": "[09:00 , 18:00]",
+      "2019/01/11": "[09:00 , 18:00]",
+      "2019/01/04": "[09:00 , 18:00]",
+      "2019/01/03": "[09:00 , 18:00]",
+      "2019/01/02": "[09:00 , 18:00]",
+      "2019/01/01": "[09:00 , 18:00]"
+    },
+    "url_terms_and_conditions": "https://www.tnt.com/express/it_it/site/home/Condizioni-generali-trasporto.html",
+    "base_price": "45.70"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "TNT",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 21051,
+    "carrier_product_id": "IT_TNT_1_PRO",
+    "service_info": [
+      {
+        "text": "Richiede Stampante",
+        "icon": "printer"
+      },
+      {
+        "text": "Non prevede contrassegno",
+        "icon": "no-cash-on-delivery"
+      }
+    ],
+    "price": {
+      "total_price": 58.09,
+      "tax_price": 0,
+      "base_price": 58.09
+    },
+    "first_estimated_delivery_date": "2019/01/04",
+    "customs_required": true,
+    "name": "Economy Express",
+    "transit_time": "5 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 14,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "120",
+    "available_dates": {
+      "2019/01/14": "[09:00 , 18:00]",
+      "2018/12/28": "[09:00 , 18:00]",
+      "2019/01/10": "[09:00 , 18:00]",
+      "2018/12/27": "[09:00 , 18:00]",
+      "2019/01/09": "[09:00 , 18:00]",
+      "2019/01/08": "[09:00 , 18:00]",
+      "2019/01/07": "[09:00 , 18:00]",
+      "2019/01/11": "[09:00 , 18:00]",
+      "2019/01/04": "[09:00 , 18:00]",
+      "2019/01/03": "[09:00 , 18:00]",
+      "2019/01/02": "[09:00 , 18:00]",
+      "2019/01/01": "[09:00 , 18:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "58.09"
+  }
+]

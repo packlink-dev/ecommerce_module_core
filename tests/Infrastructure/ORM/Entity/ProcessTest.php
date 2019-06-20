@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM\Entity;
 
-use Logeecom\Infrastructure\ORM\Entities\Process;
+use Logeecom\Infrastructure\TaskExecution\Process;
 
 /**
  * Class ProcessTest.

@@ -1,88 +1,95 @@
 <?php
+/** @noinspection PhpDuplicateArrayKeysInspection */
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
-use Logeecom\Tests\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
-use Logeecom\Infrastructure\Interfaces\DefaultLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Exposed\TaskRunnerWakeup;
-use Logeecom\Infrastructure\Configuration;
+use Logeecom\Infrastructure\Configuration\ConfigEntity;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Interfaces\Required\ShopLoggerAdapter;
-use Logeecom\Infrastructure\Interfaces\Required\TaskQueueStorage;
+use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
+use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
-use Logeecom\Infrastructure\TaskExecution\Queue;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Common\TestComponents\Logger\TestDefaultLogger;
-use Logeecom\Tests\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Common\TestComponents\Logger\TestShopLogger;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\InMemoryTestQueueStorage;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestQueue;
-use Logeecom\Tests\Common\TestComponents\TaskExecution\TestTaskRunnerWakeup;
-use Logeecom\Tests\Common\TestComponents\TestHttpClient;
-use Logeecom\Tests\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use PHPUnit\Framework\TestCase;
 
 class QueueItemStarterTest extends TestCase
 {
-    /** @var TestQueue */
-    private $queue;
-    /** @var InMemoryTestQueueStorage */
-    private $queueStorage;
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService */
+    public $queue;
+    /** @var MemoryQueueItemRepository */
+    public $queueStorage;
     /** @var TestTimeProvider */
-    private $timeProvider;
-    /** @var TestShopLogger */
-    private $logger;
+    public $timeProvider;
+    /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger */
+    public $logger;
     /** @var Configuration */
-    private $shopConfiguration;
+    public $shopConfiguration;
 
     /**
      * @throws \Exception
      */
     public function setUp()
     {
-        $queueStorage = new InMemoryTestQueueStorage();
+        RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+        RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
+
         $timeProvider = new TestTimeProvider();
-        $queue = new TestQueue();
+        $queue = new TestQueueService();
         $shopLogger = new TestShopLogger();
         $shopConfiguration = new TestShopConfiguration();
         $shopConfiguration->setIntegrationName('Shop1');
 
         new TestServiceRegister(
             array(
-                TaskQueueStorage::CLASS_NAME => function () use($queueStorage) {
-                    return $queueStorage;
-                },
-                TimeProvider::CLASS_NAME => function () use($timeProvider) {
+                TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
                 TaskRunnerWakeup::CLASS_NAME => function () {
-                    return new TestTaskRunnerWakeup();
+                    return new TestTaskRunnerWakeupService();
                 },
-                Queue::CLASS_NAME => function () use($queue) {
+                QueueService::CLASS_NAME => function () use ($queue) {
                     return $queue;
                 },
-                DefaultLoggerAdapter::CLASS_NAME => function() {
+                EventBus::CLASS_NAME => function () {
+                    return EventBus::getInstance();
+                },
+                DefaultLoggerAdapter::CLASS_NAME => function () {
                     return new TestDefaultLogger();
                 },
-                ShopLoggerAdapter::CLASS_NAME => function() use ($shopLogger) {
+                ShopLoggerAdapter::CLASS_NAME => function () use ($shopLogger) {
                     return $shopLogger;
                 },
-                Configuration::CLASS_NAME => function() use ($shopConfiguration) {
+                Configuration::CLASS_NAME => function () use ($shopConfiguration) {
                     return $shopConfiguration;
                 },
-                HttpClient::CLASS_NAME => function() {
+                HttpClient::CLASS_NAME => function () {
                     return new TestHttpClient();
-                }
-            ));
+                },
+            )
+        );
 
         // Initialize logger component with new set of log adapters
-        new Logger();
+        Logger::resetInstance();
 
-        $this->queueStorage = $queueStorage;
+        $this->queueStorage = RepositoryRegistry::getQueueItemRepository();
         $this->timeProvider = $timeProvider;
         $this->queue = $queue;
         $this->logger = $shopLogger;
@@ -95,7 +102,10 @@ class QueueItemStarterTest extends TestCase
     public function testRunningItemStarter()
     {
         // Arrange
-        $queueItem = $this->queue->enqueue('test', new FooTask());
+        $queueItem = $this->queue->enqueue(
+            'test',
+            new FooTask()
+        );
         $itemStarter = new QueueItemStarter($queueItem->getId());
 
         // Act
@@ -123,7 +133,10 @@ class QueueItemStarterTest extends TestCase
     public function testItemStarterMustBeRunnableAfterDeserialization()
     {
         // Arrange
-        $queueItem = $this->queue->enqueue('test', new FooTask());
+        $queueItem = $this->queue->enqueue(
+            'test',
+            new FooTask()
+        );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         /** @var QueueItemStarter $unserializedItemStarter */
         $unserializedItemStarter = unserialize(serialize($itemStarter));
@@ -145,7 +158,7 @@ class QueueItemStarterTest extends TestCase
     /**
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
-    public function testItemsStarterMustSetTaskExecutionContextInConfiguraion()
+    public function testItemsStarterMustSetTaskExecutionContextInConfiguration()
     {
         // Arrange
         $queueItem = $this->queue->enqueue('test', new FooTask(), 'test');
@@ -155,7 +168,11 @@ class QueueItemStarterTest extends TestCase
         $itemStarter->run();
 
         // Assert
-        $this->assertSame('test', $this->shopConfiguration->getContext(), 'Item starter must set task context before task execution.');
+        $this->assertSame(
+            'test',
+            $this->shopConfiguration->getContext(),
+            'Item starter must set task context before task execution.'
+        );
     }
 
     /**
@@ -164,7 +181,10 @@ class QueueItemStarterTest extends TestCase
     public function testItemsStarterExceptionHandling()
     {
         // Arrange
-        $queueItem = $this->queue->enqueue('test', new FooTask());
+        $queueItem = $this->queue->enqueue(
+            'test',
+            new FooTask()
+        );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         $this->queue->setExceptionResponse(
             'start',
