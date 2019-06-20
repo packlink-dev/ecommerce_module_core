@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/logeecom/pl_module_core/compare/master...dev)
 
+## [v1.2.2](https://github.com/logeecom/pl_module_core/compare/v1.2.2...v1.2.1) - 2019-06-20
+### Added
+- Added support for some PHP functions (e.g. `array_column`) that are not natively supported by
+PHP versions prior to 5.5 by requiring Symfony packages that add this support.
+
 ## [v1.2.1](https://github.com/logeecom/pl_module_core/compare/v1.2.1...v1.2.0) - 2019-06-18
 ### Changed
 - Analytics endpoint now adds module version as well
