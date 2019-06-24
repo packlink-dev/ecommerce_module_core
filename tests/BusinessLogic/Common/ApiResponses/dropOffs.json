@@ -1,0 +1,24 @@
+[
+  {
+    "commerce_name": "PARIS BANGLA INTERTIONAL",
+    "city": "PARIS",
+    "address": "86. RUE DE LA CONDAMINE",
+    "opening_times": {
+      "opening_times": {
+        "saturday": "11:00-14:00, 16:00-19:00",
+        "tuesday": "11:00-14:00, 16:00-19:00",
+        "wednesday": "11:00-14:00, 16:00-19:00",
+        "thursday": "11:00-14:00, 16:00-19:00",
+        "friday": "11:00-14:00, 16:00-19:00"
+      }
+    },
+    "zip": "75017",
+    "country": "FR",
+    "long": 2.319819927,
+    "lat": 48.88465881,
+    "phone": "",
+    "state": null,
+    "type": "",
+    "id": "164047"
+  }
+]

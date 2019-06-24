@@ -1,0 +1,24 @@
+{
+  "carrier_name": "Poste Italiane",
+  "service_name": "Crono Internazionale",
+  "service_logo": "https://pro.packlink.it/private/assets/images/carriers/it/poste-italiane_crono-internazionale_door-door_it.png",
+  "service_id": "20329",
+  "enabled": true,
+  "departure_type": "pick-up",
+  "destination_type": "home",
+  "service_details": [
+    "TRANSITO STIMATO dal lunedì al venerdì, festivi nazionali o locali esclusi.",
+    "Ritiro a carico di SDA entro le 18. Consegna nell'intero arco della giornata.",
+    "Uno/due tentativi di consegna, a seconda del Paese di destinazione a carico delle Poste Locali.",
+    "Svincolo giacenza a carico del destinatario contattando le poste locali.",
+    "Peso massimo: 30 kg. Dimensioni massime: Lunghezza max 100 cm. Somma dei tre lati non superiore a 225 cm."
+  ],
+  "packlink_info": [
+    "Le date di ritiro e consegna possono subire variazioni.",
+    "Il transito indicato non include la maggiorazione di 48-96 ore da/per le isole, Calabria, zone remote.",
+    "Traccia le spedizioni su \"Ricerca spedizione\" o dalla web del corriere.",
+    "Attenzione al cliente Packlink disponibile dal lunedi al venerdi dalle 9 alle 18, festivi esclusi.",
+    "POD a pagamento su richiesta. Non disponibile per spedizioni consegnate all'ufficio postale."
+  ],
+  "service_type": "standard"
+}

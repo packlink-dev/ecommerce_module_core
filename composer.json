@@ -1,9 +1,29 @@
 {
+    "name": "packlink/integration-core",
+    "description": "Packlink integrations core library",
+    "type": "library",
+    "license": "proprietary",
     "require": {
-
+        "php": ">=5.3",
+        "zendframework/zend-stdlib": "^2.0",
+        "zendframework/zendpdf": "^2.0",
+        "symfony/polyfill-php54": "^1.11",
+        "symfony/polyfill-php55": "^1.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Logeecom\\Infrastructure\\": "src/Infrastructure",
+            "Packlink\\BusinessLogic\\": "src/BusinessLogic"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Logeecom\\Tests\\Infrastructure\\": "tests/Infrastructure",
+            "Logeecom\\Tests\\BusinessLogic\\": "tests/BusinessLogic"
+        }
     },
     "require-dev": {
-    	"phpunit/phpunit": "^4.8.35",
+        "phpunit/phpunit": "^4.8.35",
         "codacy/coverage": "dev-master"
     }
 }
