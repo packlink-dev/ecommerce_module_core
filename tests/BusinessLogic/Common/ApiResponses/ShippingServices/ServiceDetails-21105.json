@@ -1,0 +1,24 @@
+{
+  "carrier_name": "STARPACK",
+  "service_name": "Road Express",
+  "service_logo": "https://pro.packlink.it/private/assets/images/carriers/it/starpack_road-express_door-door_it.png",
+  "service_id": "21105",
+  "enabled": true,
+  "departure_type": "pick-up",
+  "destination_type": "home",
+  "service_details": [
+    "TRANSITO STIMATO dal lunedì al venerdì, festivi nazionali o locali esclusi.",
+    "Ritiro a carico di TNT nell'intero arco della giornata.",
+    "Obbligo di stampa doppia etichetta (TNT + Skynet).",
+    "Due tentativi di consegna. Giacenza max 3 gg. Svincolo su richiesta contattando l'assistenza.",
+    "Trasporto camionistico terrestre."
+  ],
+  "packlink_info": [
+    "Le date di ritiro e consegna possono subire variazioni.",
+    "Il transito indicato non include la maggiorazione di 48-96 ore da/per le isole, Calabria, zone remote.",
+    "Traccia le spedizioni direttamente dalla web del corriere.",
+    "Attenzione al cliente Packlink disponibile dal lunedi al venerdi dalle 9 alle 18, festivi esclusi.",
+    "POD gratuita su richiesta."
+  ],
+  "service_type": "standard"
+}

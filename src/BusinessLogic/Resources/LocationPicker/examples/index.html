@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <!-- INCLUDE LOCATION PICKER CSS -->
+    <link rel="stylesheet" href="./../css/locationPicker.css">
+
+    <!-- INCLUDE LOCATION PICKER JS -->
+    <script src="./../js/LocationPicker.js"></script>
+    <script src="./../js/Translations.js"></script>
+
+    <title>Location picker example</title>
+</head>
+<body>
+    <div style="height: 700px; width: 1200px">
+        <location-picker>
+            <div class="lp-content" data-lp-id="content">
+                <div class="lp-locations">
+                    <div class="lp-input-wrapper">
+                        <div class="input">
+                            <input type="text" title="" required data-lp-id="search-box">
+                            <span class="label" data-lp-id="search-box-label"></span>
+                        </div>
+                    </div>
+
+                    <div data-lp-id="locations"></div>
+                </div>
+            </div>
+        </location-picker>
+    </div>
+
+    <h1 id="select-display"></h1>
+
+    <location-picker-template>
+        <div class="lp-template" id="template-container">
+            <div data-lp-id="working-hours-template" class="lp-hour-wrapper">
+                <div class="day" data-lp-id="day">
+                </div>
+                <div class="hours" data-lp-id="hours">
+                </div>
+            </div>
+
+            <div class="lp-location-wrapper" data-lp-id="location-template">
+                <div class="radio-button lp-collapse">
+                    <div class="lp-radio"></div>
+                </div>
+                <div class="composite lp-expand">
+                    <div class="street-name uppercase" data-lp-id="composite-address"></div>
+                    <div class="lp-working-hours-btn excluded" data-lp-composite data-lp-id="show-composite-working-hours-btn"></div>
+                    <div data-lp-id="composite-working-hours" class="lp-working-hours">
+
+                    </div>
+                </div>
+                <div class="name uppercase lp-collapse" data-lp-id="location-name"></div>
+                <div class="street lp-collapse">
+                    <div class="street-name uppercase" data-lp-id="location-street"></div>
+                    <div class="lp-working-hours-btn excluded" data-lp-id="show-working-hours-btn"></div>
+                    <div data-lp-id="working-hours" class="lp-working-hours">
+
+                    </div>
+                </div>
+                <div class="city uppercase lp-collapse" data-lp-id="location-city">
+                </div>
+                <div class="lp-select-column">
+                    <div class="lp-select-button excluded" data-lp-id="select-btn"></div>
+                </div>
+                <a class="excluded" href="#" data-lp-id="show-on-map" target="_blank">
+                    <div class="lp-show-on-map-btn excluded"></div>
+                </a>
+            </div>
+        </div>
+    </location-picker-template>
+
+    <script>
+        let locations = [
+            {
+                id: '1',
+                name: 'This is location name',
+                zip: '11000',
+                address: 'Ulica Sima Simica 25',
+                city: 'Belgrade',
+                lat: 44.7866,
+                long: 20.4489,
+                workingHours: {
+                    friday: '10:30-12:30, 14:00:16:00',
+                    thursday: '10:30-12:30, 14:00:16:00',
+                    wednesday: '10:30-12:30, 14:00:16:00',
+                    monday: '10:30-12:30, 14:00:16:00',
+                    tuesday: '10:30-12:30, 14:00:16:00'
+                }
+            },
+            {
+                id: '2',
+                name: 'This is another name',
+                zip: '179832',
+                address: 'Ulica Jova Jovanovica 25',
+                city: 'Paris',
+                lat: 44.6866,
+                long: 20.3489,
+                workingHours: {
+                    friday: '10:30-12:30, 14:00:16:00',
+                    thursday: '10:30-12:30, 14:00:16:00',
+                    wednesday: '10:30-12:30, 14:00:16:00',
+                    monday: '10:30-12:30, 14:00:16:00',
+                    tuesday: '10:30-12:30, 14:00:16:00'
+                }
+            },
+            {
+                id: '3',
+                name: 'This is third name',
+                zip: '12456',
+                address: 'Ulica Marka Markovica 25',
+                lat: 44.8866,
+                long: 20.4489,
+                city: 'Berlin',
+                workingHours: {
+                    friday: '10:30-12:30, 14:00:16:00',
+                    thursday: '10:30-12:30, 14:00:16:00',
+                    wednesday: '10:30-12:30, 14:00:16:00',
+                    monday: '10:30-12:30, 14:00:16:00',
+                    tuesday: '10:30-12:30, 14:00:16:00'
+                }
+            }
+        ];
+
+        Packlink.locationPicker.display(locations, function (id) {
+            document.getElementById('select-display').innerHTML = 'Selected: ' + id;
+        }, null, 'en');
+    </script>
+</body>
+</html>

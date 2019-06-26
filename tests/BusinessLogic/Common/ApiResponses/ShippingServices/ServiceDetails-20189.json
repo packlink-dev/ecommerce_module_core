@@ -1,0 +1,24 @@
+{
+  "carrier_name": "SDA",
+  "service_name": "Extra Large",
+  "service_logo": "https://pro.packlink.it/private/assets/images/carriers/it/sda_extra-large_door-door_it.png",
+  "service_id": "20189",
+  "enabled": true,
+  "departure_type": "pick-up",
+  "destination_type": "home",
+  "service_details": [
+    "TRANSITO STIMATO dal lunedì al venerdì, festivi nazionali o locali esclusi.",
+    "Ritiro dalle 9 alle 18. Consegna nell'intero arco della giornata.",
+    "Due tentativi di consegna, il secondo su richiesta. Possibilità di fermo deposito (1 gg).",
+    "Giacenza max 5 gg. Giacenza gratuita fino a 3 gg. Svincolo contattando l'assistenza.",
+    "Peso massimo: 70 kg. Dimensioni massime: Somma tre lati 450 cm. Due lati non eccedenti rispettivamente 280 e 170 cm."
+  ],
+  "packlink_info": [
+    "Le date di ritiro e consegna possono subire variazioni.",
+    "Il transito indicato non include la maggiorazione di 48-96 ore da/per le isole, Calabria, zone remote.",
+    "Traccia le spedizioni su \"Ricerca spedizione\" o dalla web del corriere.",
+    "Attenzione al cliente Packlink disponibile dal lunedi al venerdi dalle 9 alle 18, festivi esclusi.",
+    "POD a pagamento su richiesta."
+  ],
+  "service_type": "express"
+}
