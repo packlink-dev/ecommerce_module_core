@@ -122,11 +122,6 @@ class ProxyTest extends BaseTestWithServices
         self::assertEmpty($this->getProxy()->getLabels('asdf'));
     }
 
-    public function testAsyncCall()
-    {
-
-    }
-
     /**
      * @return Proxy
      */
