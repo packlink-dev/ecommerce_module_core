@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4bae9176ed5a6234bff93120e04c2e61",
+    "content-hash": "e23c2abc6fc4e33b3c1a1124b452c8e4",
     "packages": [],
     "packages-dev": [
         {
@@ -209,7 +209,7 @@
                     "email": "mike.vanriel@naenius.com"
                 }
             ],
-            "time": "2017-11-10T14:09:06+00:00"
+            "time": "2016-01-25T08:17:30+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -1402,7 +1402,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2019-03-25T07:48:46+00:00"
+            "time": "2018-11-11T11:18:13+00:00"
         }
     ],
     "aliases": [],
@@ -1415,5 +1415,8 @@
     "platform": {
         "php": ">=5.3"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "5.3.29"
+    }
 }
