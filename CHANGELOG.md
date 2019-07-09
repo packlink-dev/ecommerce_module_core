@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+### Removed
+**BREAKING CHANGES**
+- Removed Zend framework PDF library since it creates a lot of dependencies and might conflict with 
+other systems. Because of this, utility `PdfMerge` is removed!
+To use PDF merging for shipping labels, do `composer require iio/libmergepdf:3.0.0`. 
+Then, in your code add the following:
+    ```
+    $merger = new \iio\libmergepdf\Merger();
+    $merger->addIterator($paths);
+    $file = $merger->merge();
+    ```
+    where `$paths` is the array of local paths of the files. 
+    `$file` will be a string representation of the resulting PDF file.
+- Removed symfony php 5.4 and 5.5 utilities since they are not needed. Added only custom implementation
+of `array_column` in class `Packlink\BusinessLogic\Utility\Php\Php55`.
+- Removed `Proxy::callAsync` method as it is not used nor needed.
+
 ## [v1.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.2...v1.2.1) - 2019-06-20
 ### Added
 - Added support for some PHP functions (e.g. `array_column`) that are not natively supported by

@@ -4,312 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-  "content-hash": "92f104eaf090bd731f8179a8e0417265",
-    "packages": [
-        {
-          "name": "ircmaxell/password-compat",
-          "version": "v1.0.4",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/ircmaxell/password_compat.git",
-            "reference": "5c5cde8822a69545767f7c7f3058cb15ff84614c"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/5c5cde8822a69545767f7c7f3058cb15ff84614c",
-            "reference": "5c5cde8822a69545767f7c7f3058cb15ff84614c",
-            "shasum": ""
-          },
-          "require-dev": {
-            "phpunit/phpunit": "4.*"
-          },
-          "type": "library",
-          "autoload": {
-            "files": [
-              "lib/password.php"
-            ]
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "authors": [
-            {
-              "name": "Anthony Ferrara",
-              "email": "ircmaxell@php.net",
-              "homepage": "http://blog.ircmaxell.com"
-            }
-          ],
-          "description": "A compatibility library for the proposed simplified password hashing algorithm: https://wiki.php.net/rfc/password_hash",
-          "homepage": "https://github.com/ircmaxell/password_compat",
-          "keywords": [
-            "hashing",
-            "password"
-          ],
-          "time": "2014-11-20T16:49:30+00:00"
-        },
-      {
-        "name": "symfony/polyfill-php54",
-        "version": "v1.11.0",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/symfony/polyfill-php54.git",
-          "reference": "2964b17ddc32dba7bcba009d5501c84d3fba1452"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/symfony/polyfill-php54/zipball/2964b17ddc32dba7bcba009d5501c84d3fba1452",
-          "reference": "2964b17ddc32dba7bcba009d5501c84d3fba1452",
-          "shasum": ""
-        },
-        "require": {
-          "php": ">=5.3.3"
-        },
-        "type": "library",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.11-dev"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "Symfony\\Polyfill\\Php54\\": ""
-          },
-          "files": [
-            "bootstrap.php"
-          ],
-          "classmap": [
-            "Resources/stubs"
-          ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "MIT"
-        ],
-        "authors": [
-          {
-            "name": "Nicolas Grekas",
-            "email": "p@tchwork.com"
-          },
-          {
-            "name": "Symfony Community",
-            "homepage": "https://symfony.com/contributors"
-          }
-        ],
-        "description": "Symfony polyfill backporting some PHP 5.4+ features to lower PHP versions",
-        "homepage": "https://symfony.com",
-        "keywords": [
-          "compatibility",
-          "polyfill",
-          "portable",
-          "shim"
-        ],
-        "time": "2019-02-06T07:57:58+00:00"
-      },
-      {
-        "name": "symfony/polyfill-php55",
-        "version": "v1.11.0",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/symfony/polyfill-php55.git",
-          "reference": "96fa25cef405ea452919559a0025d5dc16e30e4c"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/symfony/polyfill-php55/zipball/96fa25cef405ea452919559a0025d5dc16e30e4c",
-          "reference": "96fa25cef405ea452919559a0025d5dc16e30e4c",
-          "shasum": ""
-        },
-        "require": {
-          "ircmaxell/password-compat": "~1.0",
-          "php": ">=5.3.3"
-        },
-        "type": "library",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.11-dev"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "Symfony\\Polyfill\\Php55\\": ""
-          },
-          "files": [
-            "bootstrap.php"
-          ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "MIT"
-        ],
-        "authors": [
-          {
-            "name": "Nicolas Grekas",
-            "email": "p@tchwork.com"
-          },
-          {
-            "name": "Symfony Community",
-            "homepage": "https://symfony.com/contributors"
-          }
-        ],
-        "description": "Symfony polyfill backporting some PHP 5.5+ features to lower PHP versions",
-        "homepage": "https://symfony.com",
-        "keywords": [
-          "compatibility",
-          "polyfill",
-          "portable",
-          "shim"
-        ],
-        "time": "2019-02-06T07:57:58+00:00"
-      },
-      {
-            "name": "zendframework/zend-memory",
-            "version": "2.2.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-memory.git",
-                "reference": "e19c0fe0fa85f8ed00e710d03f77c0246c049444"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-memory/zipball/e19c0fe0fa85f8ed00e710d03f77c0246c049444",
-                "reference": "e19c0fe0fa85f8ed00e710d03f77c0246c049444",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "1.7.*",
-                "phpunit/phpunit": "~4.0",
-                "satooshi/php-coveralls": "dev-master",
-                "zendframework/zend-cache": "self.version"
-            },
-            "suggest": {
-                "zendframework/zend-cache": "To support swap the memory objects"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.2-dev",
-                    "dev-develop": "2.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Memory\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "homepage": "https://github.com/zendframework/zend-memory",
-            "keywords": [
-                "memory",
-                "zf2"
-            ],
-            "time": "2014-03-05T17:29:35+00:00"
-        },
-        {
-            "name": "zendframework/zend-stdlib",
-            "version": "2.2.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-stdlib.git",
-                "reference": "b42d784bd142e916058a9d68eeafcc10ff63c12e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-stdlib/zipball/b42d784bd142e916058a9d68eeafcc10ff63c12e",
-                "reference": "b42d784bd142e916058a9d68eeafcc10ff63c12e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "1.7.*",
-                "phpunit/phpunit": "~4.0",
-                "satooshi/php-coveralls": "dev-master",
-                "zendframework/zend-eventmanager": "self.version",
-                "zendframework/zend-filter": "self.version",
-                "zendframework/zend-serializer": "self.version",
-                "zendframework/zend-servicemanager": "self.version"
-            },
-            "suggest": {
-                "zendframework/zend-eventmanager": "To support aggregate hydrator usage",
-                "zendframework/zend-filter": "To support naming strategy hydrator usage",
-                "zendframework/zend-serializer": "Zend\\Serializer component",
-                "zendframework/zend-servicemanager": "To support hydrator plugin manager usage"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.2-dev",
-                    "dev-develop": "2.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Stdlib\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "homepage": "https://github.com/zendframework/zend-stdlib",
-            "keywords": [
-                "stdlib",
-                "zf2"
-            ],
-            "time": "2014-03-05T17:29:35+00:00"
-        },
-        {
-            "name": "zendframework/zendpdf",
-            "version": "2.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/ZendPdf.git",
-                "reference": "041f90c339cff63a3c4d03a28ef1ea5188059793"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/ZendPdf/zipball/041f90c339cff63a3c4d03a28ef1ea5188059793",
-                "reference": "041f90c339cff63a3c4d03a28ef1ea5188059793",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "zendframework/zend-memory": ">=2.0.0",
-                "zendframework/zend-stdlib": ">=2.0.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "ZendPdf\\": "library/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Zend Pdf Component",
-            "homepage": "http://packages.zendframework.com/",
-            "keywords": [
-                "pdf",
-                "zf2"
-            ],
-            "abandoned": true,
-            "time": "2012-11-16T11:16:01+00:00"
-        }
-    ],
+    "content-hash": "e23c2abc6fc4e33b3c1a1124b452c8e4",
+    "packages": [],
     "packages-dev": [
         {
             "name": "codacy/coverage",
@@ -464,7 +160,7 @@
             ],
             "description": "Library for accessing git",
             "homepage": "http://gitonomy.com",
-            "time": "2018-04-22T19:55:36+00:00"
+            "time": "2019-06-23T09:49:01+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -517,16 +213,16 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.8.0",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06"
+                "reference": "1927e75f4ed19131ec9bcc3b002e07fb1173ee76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
-                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/1927e75f4ed19131ec9bcc3b002e07fb1173ee76",
+                "reference": "1927e75f4ed19131ec9bcc3b002e07fb1173ee76",
                 "shasum": ""
             },
             "require": {
@@ -547,8 +243,8 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Prophecy\\": "src/"
+                "psr-4": {
+                    "Prophecy\\": "src/Prophecy"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -576,7 +272,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2018-08-05T17:53:17+00:00"
+            "time": "2019-06-13T12:50:23+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1433,7 +1129,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-20T15:55:20+00:00"
+            "time": "2019-06-05T11:33:52+00:00"
         },
         {
             "name": "symfony/debug",
@@ -1490,7 +1186,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-11T11:18:13+00:00"
+            "time": "2019-06-18T21:26:03+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -1656,7 +1352,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-11T11:18:13+00:00"
+            "time": "2019-05-30T15:47:52+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -1719,5 +1415,8 @@
     "platform": {
         "php": ">=5.3"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "5.3.29"
+    }
 }

@@ -22,6 +22,7 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
+use Packlink\BusinessLogic\Utility\Php\Php55;
 
 /**
  * Class Proxy. In charge for communication with Packlink API.
@@ -434,28 +435,6 @@ class Proxy
     }
 
     /**
-     * Makes asynchronous HTTP call.
-     *
-     * @param string $method HTTP method (GET, POST, PUT, etc.).
-     * @param string $endpoint Endpoint resource on remote API.
-     * @param array $body Request payload body.
-     */
-    protected function callAsync($method, $endpoint, $body = array())
-    {
-        $bodyStringToSend = '';
-        if (in_array(strtoupper($method), array(self::HTTP_METHOD_POST, self::HTTP_METHOD_PUT), true)) {
-            $bodyStringToSend = json_encode($body);
-        }
-
-        $this->client->requestAsync(
-            $method,
-            static::BASE_URL . static::API_VERSION . ltrim($endpoint, '/'),
-            $this->getRequestHeaders(),
-            $bodyStringToSend
-        );
-    }
-
-    /**
      * Validates HTTP response.
      *
      * @param HttpResponse $response HTTP response returned from API call.
@@ -471,7 +450,7 @@ class Proxy
             if (is_array($error)) {
                 $message = '';
                 if (isset($error['messages']) && is_array($error['messages'])) {
-                    $message = implode("\n", array_column($error['messages'], 'message'));
+                    $message = implode("\n", Php55::arrayColumn($error['messages'], 'message'));
                 } elseif (isset($error['message'])) {
                     $message = $error['message'];
                 }
