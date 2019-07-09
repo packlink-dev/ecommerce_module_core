@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 /**
- * Class Shipment
+ * Class Shipment.
+ *
  * @package Packlink\BusinessLogic\Http\DTO
  */
 class Shipment extends BaseDto
@@ -74,6 +75,7 @@ class Shipment extends BaseDto
      * @var \DateTime
      */
     public $orderDate;
+
     /**
      * Transforms DTO to its array format suitable for http client.
      *
@@ -92,7 +94,7 @@ class Shipment extends BaseDto
             'price' => array(
                 'base_price' => $this->price,
             ),
-            'order_date' => $this->orderDate->format('Y-m-d'),
+            'order_date' => $this->orderDate ? $this->orderDate->format('Y-m-d') : '',
             'tracking_url' => $this->carrierTrackingUrl,
             'service_id' => $this->serviceId,
         );
