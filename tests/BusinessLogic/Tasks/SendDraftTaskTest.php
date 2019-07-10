@@ -121,7 +121,7 @@ class SendDraftTaskTest extends BaseSyncTest
     {
         /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowException(true);
+        $orderRepository->shouldThrowOrderNotFoundException(true);
         $serialized = '';
         try {
             $this->syncTask->execute();
@@ -130,7 +130,7 @@ class SendDraftTaskTest extends BaseSyncTest
         }
 
         $this->httpClient->setMockResponses($this->getMockResponses());
-        $orderRepository->shouldThrowException();
+        $orderRepository->shouldThrowOrderNotFoundException(false);
         /** @var SendDraftTask $task */
         $task = unserialize($serialized);
         $task->execute();

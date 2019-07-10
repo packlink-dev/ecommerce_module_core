@@ -119,7 +119,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowException(true);
+        $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->httpClient->setMockResponses($this->getMockLabelResponse());
         $webhookHandler = WebHookEventHandler::getInstance();
@@ -175,7 +175,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowException(true);
+        $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
         $webhookHandler = WebHookEventHandler::getInstance();
@@ -237,7 +237,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     {
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowException(true);
+        $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->httpClient->setMockResponses(
             array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())

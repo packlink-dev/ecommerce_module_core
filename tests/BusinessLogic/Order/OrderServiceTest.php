@@ -198,7 +198,7 @@ class OrderServiceTest extends BaseTestWithServices
     {
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowException(true);
+        $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->orderService->prepareDraft('123');
     }
@@ -225,7 +225,7 @@ class OrderServiceTest extends BaseTestWithServices
     {
         /** @var TestOrderRepository $orderRepository */
         $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowException(true);
+        $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->orderService->setReference('123', '');
     }
