@@ -26,15 +26,25 @@ class TestOrderRepository implements OrderRepository
      */
     private static $orders;
     /**
-     * Flag to throw exception.
+     * Flag to throw OrderNotFound exception.
      *
      * @var bool
      */
-    private $throw = false;
+    private $throwOrderNotFoundException = false;
+    /**
+     * Flag to throw generic exception.
+     *
+     * @var bool
+     */
+    private $throwGenericException = false;
     /**
      * @var int
      */
     private $shippingMethodId;
+    /**
+     * @var array
+     */
+    private $incompleteOrderReferences = array('test');
 
     /**
      * TestOrderRepository constructor.
@@ -45,13 +55,23 @@ class TestOrderRepository implements OrderRepository
     }
 
     /**
-     * Sets if exception should be thrown.
+     * Sets if OrderNotFound exception should be thrown.
      *
      * @param bool $throw Throw flag.
      */
-    public function shouldThrowException($throw = false)
+    public function shouldThrowOrderNotFoundException($throw)
     {
-        $this->throw = $throw;
+        $this->throwOrderNotFoundException = $throw;
+    }
+
+    /**
+     * Sets if generic exception should be thrown.
+     *
+     * @param bool $throw Throw flag.
+     */
+    public function shouldThrowGenericException($throw)
+    {
+        $this->throwGenericException = $throw;
     }
 
     /**
@@ -78,10 +98,26 @@ class TestOrderRepository implements OrderRepository
      * Returns shipment references of the orders that have not yet been completed.
      *
      * @return array Array of shipment references.
+     *
+     * @throws \RuntimeException
      */
     public function getIncompleteOrderReferences()
     {
-        return array('test');
+        if ($this->throwGenericException) {
+            throw new \RuntimeException('Error');
+        }
+
+        return $this->incompleteOrderReferences;
+    }
+
+    /**
+     * Sets IncompleteOrderReferences.
+     *
+     * @param array $incompleteOrderReferences IncompleteOrderReferences.
+     */
+    public function setIncompleteOrderReferences($incompleteOrderReferences)
+    {
+        $this->incompleteOrderReferences = $incompleteOrderReferences;
     }
 
     /**
@@ -94,7 +130,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function getOrderAndShippingData($orderId)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -111,7 +147,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function setReference($orderId, $shipmentReference)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -129,7 +165,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function setLabelsByReference($shipmentReference, array $labels)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -147,7 +183,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function updateTrackingInfo(ShipmentDetails $shipmentDetails, array $trackingHistory)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -177,7 +213,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function setShippingStatusByReference($shipmentReference, $shippingStatus)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -199,7 +235,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function setShippingPriceByReference($shipmentReference, $price)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -216,7 +252,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function markShipmentDeleted($shipmentReference)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -236,7 +272,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function isShipmentDeleted($shipmentReference)
     {
-        if ($this->throw) {
+        if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
@@ -246,17 +282,23 @@ class TestOrderRepository implements OrderRepository
     }
 
     /**
-     * Test method
+     * Gets order with given ID.
      *
-     * @param $orderId
+     * @param string $orderId
      *
-     * @param $shippingMethodId
-     * @param $destinationCountry
+     * @param int $shippingMethodId
+     * @param string $destinationCountry
+     *
+     * @param bool|null $throw
      *
      * @return Order
      */
-    public function getOrder($orderId, $shippingMethodId = 0, $destinationCountry = '')
+    public function getOrder($orderId, $shippingMethodId = 0, $destinationCountry = '', $throw = null)
     {
+        if ($throw === null && $this->throwOrderNotFoundException) {
+            throw new OrderNotFound('Order not found.');
+        }
+
         if (!isset(static::$orders[$orderId])) {
             $order = new Order();
             $order->setId($orderId);
@@ -282,7 +324,7 @@ class TestOrderRepository implements OrderRepository
      */
     public function isLabelSet($shipmentReference)
     {
-        $order = $this->getOrder($shipmentReference);
+        $order = $this->getOrder($shipmentReference, 0, '', false);
 
         $packlinkShipmentLabels = $order->getPacklinkShipmentLabels();
 

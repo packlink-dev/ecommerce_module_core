@@ -31,6 +31,7 @@ interface OrderRepository
      * @param string $orderId $orderId Unique order id.
      *
      * @return Order Order object.
+     *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      */
     public function getOrderAndShippingData($orderId);
@@ -89,6 +90,8 @@ interface OrderRepository
      * Marks shipment identified by provided reference as deleted on Packlink.
      *
      * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function markShipmentDeleted($shipmentReference);
 
@@ -98,6 +101,8 @@ interface OrderRepository
      * @param string $shipmentReference Packlink shipment reference.
      *
      * @return bool Returns TRUE if shipment has been deleted; otherwise returns FALSE.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function isShipmentDeleted($shipmentReference);
 
