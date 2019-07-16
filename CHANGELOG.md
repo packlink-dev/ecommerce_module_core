@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...1.3.0) - 2019-07-16
+### Changed
+  - Fixed sending draft full address.
+
 ## [v1.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.0...1.2.2) - 2019-07-10
 ### Changed
   - Updated task for updating shipment data to report the progress and handle base errors.
