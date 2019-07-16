@@ -33,14 +33,15 @@ abstract class BaseSyncTest extends BaseTestWithServices
         parent::setUp();
 
         $this->syncTask = $this->createSyncTaskInstance();
-        $me = $this;
-        $this->syncTask->when(
-            TaskProgressEvent::CLASS_NAME,
-            function (TaskProgressEvent $event) use (&$me) {
-                $me->eventHistory[] = $event;
-            }
-        );
+        $this->attachProgressEventListener();
     }
+
+    /**
+     * Creates new instance of task that is being tested.
+     *
+     * @return Task
+     */
+    abstract protected function createSyncTaskInstance();
 
     /**
      * Validates whether tasks finished with 100%.
@@ -59,9 +60,16 @@ abstract class BaseSyncTest extends BaseTestWithServices
     }
 
     /**
-     * Creates new instance of task that is being tested.
-     *
-     * @return Task
+     * Attaches event listener to the sync task.
      */
-    abstract protected function createSyncTaskInstance();
+    protected function attachProgressEventListener()
+    {
+        $me = $this;
+        $this->syncTask->when(
+            TaskProgressEvent::CLASS_NAME,
+            function (TaskProgressEvent $event) use (&$me) {
+                $me->eventHistory[] = $event;
+            }
+        );
+    }
 }
