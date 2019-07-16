@@ -84,6 +84,7 @@ class Address extends BaseDto
             'surname' => $this->surname,
             'company' => $this->company,
             'street1' => $this->street1,
+            'street2' => $this->street2,
             'zip_code' => $this->zipCode,
             'city' => $this->city,
             'country' => $this->country,
