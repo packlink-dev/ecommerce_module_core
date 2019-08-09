@@ -186,6 +186,71 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
+     * @depends testQueueItemMassInsert
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
+     */
+    public function testSaveWithCondition()
+    {
+        $repository = RepositoryRegistry::getQueueItemRepository();
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('lastUpdateTimestamp', '=', 1493851325);
+
+        /** @var QueueItem $item */
+        $item = $repository->selectOne($queryFilter);
+        $this->assertNotNull($item);
+
+        $item->setLastUpdateTimestamp(99999999);
+        $id = $repository->saveWithCondition($item, array('lastUpdateTimestamp' => 1493851325));
+
+        $this->assertEquals($item->getId(), $id);
+
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('lastUpdateTimestamp', '=', 99999999);
+
+        /** @var QueueItem $item */
+        $item = $repository->selectOne($queryFilter);
+        $this->assertNotNull($item);
+
+        $this->setExpectedException('\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException');
+        $item->setLastUpdateTimestamp(88888888);
+        $repository->saveWithCondition($item, array('lastUpdateTimestamp' => 1493851325));
+    }
+
+    /**
+     * @depends testQueueItemMassInsert
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
+     */
+    public function testSaveWithConditionWithNull()
+    {
+        $repository = RepositoryRegistry::getQueueItemRepository();
+        $queryFilter = new QueryFilter();
+        $queryFilter->where('lastUpdateTimestamp', '=', 1518325751);
+
+        /** @var QueueItem $item */
+        $item = $repository->selectOne($queryFilter);
+        $this->assertNotNull($item);
+
+        $item->setLastUpdateTimestamp(null);
+
+        $id = $repository->saveWithCondition($item, array('status' => 'created', 'lastUpdateTimestamp' => 1518325751));
+        $this->assertEquals($item->getId(), $id);
+
+        $id = $repository->saveWithCondition($item, array('status' => 'created', 'lastUpdateTimestamp' => null));
+        $this->assertEquals($item->getId(), $id);
+
+        $this->setExpectedException('\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException');
+        $repository->saveWithCondition($item, array('status' => 'created', 'lastUpdateTimestamp' => 1518325751));
+    }
+
+    /**
      * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException

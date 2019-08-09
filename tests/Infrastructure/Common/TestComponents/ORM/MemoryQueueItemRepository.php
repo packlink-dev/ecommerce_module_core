@@ -3,6 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents\ORM;
 
 use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
+use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
@@ -82,6 +83,8 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
      *                               UPDATE queue_storage_table SET .... WHERE .... AND status => 'queued'
      *
      * @return int Id of saved queue item
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
      */
     public function saveWithCondition(QueueItem $queueItem, array $additionalWhere = array())
@@ -91,11 +94,43 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
         }
 
         if ($queueItem->getId()) {
-            $this->update($queueItem);
+            $this->updateQueueItem($queueItem, $additionalWhere);
 
             return $queueItem->getId();
         }
 
         return $this->save($queueItem);
+    }
+
+    /**
+     * Updates queue item.
+     *
+     * @param \Logeecom\Infrastructure\TaskExecution\QueueItem $queueItem
+     * @param array $additionalWhere
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
+     */
+    protected function updateQueueItem(QueueItem $queueItem, array $additionalWhere)
+    {
+        $filter = new QueryFilter();
+        $filter->where('id', Operators::EQUALS, $queueItem->getId());
+
+        foreach ($additionalWhere as $name => $value) {
+            if ($value === null) {
+                $filter->where($name, Operators::NULL);
+            } else {
+                $filter->where($name, Operators::EQUALS, $value);
+            }
+        }
+
+        /** @var QueueItem $item */
+        $item = $this->selectOne($filter);
+        if ($item === null) {
+            throw new QueueItemSaveException("Cannot update queue item with id {$queueItem->getId()}.");
+        }
+
+        $this->update($queueItem);
     }
 }
