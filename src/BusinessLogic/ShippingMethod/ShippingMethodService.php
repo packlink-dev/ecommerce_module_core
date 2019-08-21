@@ -135,12 +135,11 @@ class ShippingMethodService extends BaseService
     {
         if ($shippingMethod->getId()) {
             $this->shippingMethodRepository->update($shippingMethod);
+            if ($shippingMethod->isActivated()) {
+                $this->shopShippingMethodService->update($shippingMethod);
+            }
         } else {
             $this->shippingMethodRepository->save($shippingMethod);
-        }
-
-        if ($shippingMethod->isActivated()) {
-            $this->shopShippingMethodService->update($shippingMethod);
         }
     }
 
