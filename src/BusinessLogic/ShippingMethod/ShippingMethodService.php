@@ -361,7 +361,10 @@ class ShippingMethodService extends BaseService
         $result = $this->shopShippingMethodService->add($shippingMethod);
 
         if ($result && !$this->isAnyMethodActive()) {
-            $result = $this->shopShippingMethodService->addBackupShippingMethod($shippingMethod);
+            // New instance has to be used to avoid propagating any changes made in addBackupShippingMethod
+            // to original shipping method instance.
+            $newInstance = ShippingMethod::fromArray($shippingMethod->toArray());
+            $result = $this->shopShippingMethodService->addBackupShippingMethod($newInstance);
         }
 
         return $result;
