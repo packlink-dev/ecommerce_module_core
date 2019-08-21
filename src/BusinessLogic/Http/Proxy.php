@@ -22,6 +22,7 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
+use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
 use Packlink\BusinessLogic\Utility\Php\Php55;
 
 /**
@@ -289,9 +290,20 @@ class Proxy
         $result = $response->decodeBodyAsJson();
         $reference = array_key_exists('reference', $result) ? $result['reference'] : '';
 
-        if ($reference) {
-            $this->sendAnalytics(Analytics::EVENT_DRAFT_CREATED);
+        if (!$reference) {
+            Logger::logError(
+                'Draft reference not returned by Packlink API.',
+                'Core',
+                array(
+                    'Draft data' => $draft->toArray(),
+                    'Response' => $response,
+                )
+            );
+
+            throw new DraftNotCreatedException('Draft reference not returned by Packlink API.');
         }
+
+        $this->sendAnalytics(Analytics::EVENT_DRAFT_CREATED);
 
         return $reference;
     }
