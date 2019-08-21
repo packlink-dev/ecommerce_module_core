@@ -5,11 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 ### Added
-- Tests for `AbstracGenericStudentRepository` and `AbastractGenericQueueItemRepository` have been improved.
+- Tests for `AbstracGenericStudentRepository` and `AbastractGenericQueueItemRepository` have been improved
+to support multiple conditions in filters for select.
 
 ### Changed
 **BREAKING CHANGES**
 - `ShopShippingMethodService` has been extended with methods for adding and deleting backup carrier.
+- `Proxy::sendDraft()` method will now throw an exception if the draft response does not contain the reference.
 
 ## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...1.3.0) - 2019-07-16
 ### Changed

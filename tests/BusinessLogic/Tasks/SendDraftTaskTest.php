@@ -9,7 +9,6 @@ use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
@@ -63,12 +62,12 @@ class SendDraftTaskTest extends BaseSyncTest
         );
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(Proxy::CLASS_NAME, function () use ($me) {
-            /** @var Configuration $config */
-            $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-            return new Proxy($config, $me->httpClient);
-        });
+        TestServiceRegister::registerService(
+            Proxy::CLASS_NAME,
+            function () use ($me) {
+                return new Proxy($me->shopConfig, $me->httpClient);
+            }
+        );
 
         $orderRepository = new TestOrderRepository();
 
@@ -109,6 +108,20 @@ class SendDraftTaskTest extends BaseSyncTest
         $order = $orderRepository->getOrder('test');
 
         $this->assertEquals('DE00019732CF', $order->getShipment()->getReferenceNumber());
+    }
+
+    /**
+     * @expectedException \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testExecuteBadResponse()
+    {
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '{}')));
+        $this->syncTask->execute();
     }
 
     /**
