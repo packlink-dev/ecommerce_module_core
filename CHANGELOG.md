@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
+### Added
+- Tests for `AbstracGenericStudentRepository` and `AbastractGenericQueueItemRepository` have been improved.
+
+### Changed
+**BREAKING CHANGES**
+- `ShopShippingMethodService` has been extended with methods for adding and deleting backup carrier.
 
 ## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...1.3.0) - 2019-07-16
 ### Changed

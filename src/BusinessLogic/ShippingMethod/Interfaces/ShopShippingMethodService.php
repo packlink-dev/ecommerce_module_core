@@ -40,4 +40,20 @@ interface ShopShippingMethodService
      * @return bool TRUE if deletion succeeded; otherwise, FALSE.
      */
     public function delete(ShippingMethod $shippingMethod);
+
+    /**
+     * Adds backup shipping method based on provided shipping method.
+     *
+     * @param ShippingMethod $shippingMethod
+     *
+     * @return bool TRUE if backup shipping method is added; otherwise, FALSE.
+     */
+    public function addBackupShippingMethod(ShippingMethod $shippingMethod);
+
+    /**
+     * Deletes backup shipping method.
+     *
+     * @return bool TRUE if backup shipping method is deleted; otherwise, FALSE.
+     */
+    public function deleteBackupShippingMethod();
 }
