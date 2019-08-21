@@ -156,7 +156,7 @@ class ShippingMethodService extends BaseService
         $result = !$shippingMethod->isActivated();
 
         if ($shippingMethod->isActivated()) {
-            $result = $this->shopShippingMethodService->delete($shippingMethod);
+            $result = $this->deleteShopShippingMethod($shippingMethod);
         }
 
         if ($result) {
@@ -197,9 +197,7 @@ class ShippingMethodService extends BaseService
      */
     public function isAnyMethodActive()
     {
-        $filter = $this->setFilterCondition(new QueryFilter(), 'activated', Operators::EQUALS, true);
-
-        return $this->shippingMethodRepository->count($filter) > 0;
+        return $this->getNumberOfActiveShippingMethods() > 0;
     }
 
     /**
@@ -346,10 +344,46 @@ class ShippingMethodService extends BaseService
     protected function setActivationStateInShop($activated, ShippingMethod $method)
     {
         if ($activated) {
-            return $this->shopShippingMethodService->add($method);
+            return $this->addShopShippingMethod($method);
         }
 
-        return $this->shopShippingMethodService->delete($method);
+        return $this->deleteShopShippingMethod($method);
+    }
+
+    /**
+     * Adds shop shipping method.
+     *
+     * @param ShippingMethod $shippingMethod
+     *
+     * @return bool TRUE if adding shop shipping method succeeds; FALSE otherwise.
+     */
+    protected function addShopShippingMethod(ShippingMethod $shippingMethod)
+    {
+        $result = $this->shopShippingMethodService->add($shippingMethod);
+
+        if ($result && !$this->isAnyMethodActive()) {
+            $result = $this->shopShippingMethodService->addBackupShippingMethod($shippingMethod);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Deletes shop shipping method.
+     *
+     * @param ShippingMethod $shippingMethod
+     *
+     * @return bool TRUE if deleting shop shipping method succeeds; FALSE otherwise.
+     */
+    protected function deleteShopShippingMethod(ShippingMethod $shippingMethod)
+    {
+        $result = $this->shopShippingMethodService->delete($shippingMethod);
+
+        if ($result && $this->getNumberOfActiveShippingMethods() === 1) {
+            $result = $this->shopShippingMethodService->deleteBackupShippingMethod();
+        }
+
+        return $result;
     }
 
     /**
@@ -401,6 +435,18 @@ class ShippingMethodService extends BaseService
         if (!$set) {
             $shippingMethod->addShippingService($newService);
         }
+    }
+
+    /**
+     * Retrieves number of active shipping methods.
+     *
+     * @return int Number of active shipping methods.
+     */
+    protected function getNumberOfActiveShippingMethods()
+    {
+        $filter = $this->setFilterCondition(new QueryFilter(), 'activated', Operators::EQUALS, true);
+
+        return $this->shippingMethodRepository->count($filter);
     }
 
     /**

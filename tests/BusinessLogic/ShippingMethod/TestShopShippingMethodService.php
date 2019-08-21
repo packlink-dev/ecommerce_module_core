@@ -68,4 +68,26 @@ class TestShopShippingMethodService implements ShopShippingMethodService
 
         return true;
     }
+
+    public function addBackupShippingMethod(ShippingMethod $shippingMethod)
+    {
+        if ($this->returnFalse) {
+            return false;
+        }
+
+        $this->callHistory['addBackup'][] = $shippingMethod;
+
+        return true;
+    }
+
+    public function deleteBackupShippingMethod()
+    {
+        if ($this->returnFalse) {
+            return false;
+        }
+
+        $this->callHistory['deleteBackup'][] = 'called';
+
+        return true;
+    }
 }
