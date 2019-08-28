@@ -12,18 +12,14 @@ var Packlink = window.Packlink || {};
             'processing',
             'readyForShipping',
             'inTransit',
-            'delivered',
+            'delivered'
         ];
 
         let page;
         let mappings = {};
-
         let binaryGate = false;
 
-        // Register public methods and variables.
-        this.display = display;
-
-        function display() {
+        this.display = function () {
             utilityService.showSpinner();
 
             page = templateService.setTemplate('pl-order-state-mapping-template');
@@ -32,7 +28,7 @@ var Packlink = window.Packlink || {};
 
             ajaxService.get(configuration.getSystemOrderStatusesUrl, getSystemOrderStatusesSuccessHandler);
             ajaxService.get(configuration.getUrl, getMappingsSuccessfulHandler);
-        }
+        };
 
         /**
          * Attaches event handlers to form components.
@@ -71,14 +67,14 @@ var Packlink = window.Packlink || {};
             ajaxService.post(
                 configuration.saveUrl,
                 mappings,
-                function (response) {
+                function () {
                     utilityService.hideSpinner();
 
                     if (configuration.fromStep) {
                         state.stepFinished();
                     }
                 }
-            )
+            );
         }
 
         /**
