@@ -6,20 +6,20 @@ var Packlink = window.Packlink || {};
             'weight',
             'width',
             'length',
-            'height',
+            'height'
         ];
 
         const numericInputs = [
             'weight',
             'width',
             'length',
-            'height',
+            'height'
         ];
 
         const integers = [
             'width',
             'length',
-            'height',
+            'height'
         ];
 
         let templateService = Packlink.templateService;
@@ -30,16 +30,13 @@ var Packlink = window.Packlink || {};
         let parcelData;
         let page;
 
-        //Register public methods and variables.
-        this.display = display;
-
         /**
          * Displays page content.
          */
-        function display() {
+        this.display = function () {
             utilityService.showSpinner();
             ajaxService.get(configuration.getUrl, constructPage);
-        }
+        };
 
         /**
          * Constructs default parcel page by filling form fields
@@ -52,7 +49,7 @@ var Packlink = window.Packlink || {};
             page = templateService.setTemplate('pl-default-parcel-template');
 
             for (let field of defaultParcelFields) {
-                let input = templateService.getComponent(`pl-default-parcel-${field}`, page);
+                let input = templateService.getComponent('pl-default-parcel-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
                 if (parcelData[field]) {
                     input.value = parcelData[field];
@@ -76,27 +73,7 @@ var Packlink = window.Packlink || {};
          * @param event
          */
         function onBlurHandler(event) {
-            let value = event.target.value;
-            let field = event.target.id.substr('pl-default-parcel-'.length);
-
-            if (value === '') {
-                templateService.setError(event.target, Packlink.errorMsgs.required);
-            } else if (numericInputs.indexOf(field) !== -1) {
-                let numericValue = parseFloat(value);
-                if (value == numericValue) {
-                    if (numericValue <= 0) {
-                        templateService.setError(event.target, Packlink.errorMsgs.greaterThanZero);
-                    } else if (integers.indexOf(field) !== -1 && numericValue != parseInt(value)) {
-                        templateService.setError(event.target, Packlink.errorMsgs.integer);
-                    } else {
-                        templateService.removeError(event.target);
-                    }
-                } else {
-                    templateService.setError(event.target, Packlink.errorMsgs.numeric);
-                }
-            } else {
-                templateService.removeError(event.target);
-            }
+            validateField(event.target.id.substr('pl-default-parcel-'.length), event.target.value, event.target);
         }
 
         /**
@@ -113,7 +90,7 @@ var Packlink = window.Packlink || {};
                     isValid = false;
                 } else {
                     templateService.removeError(
-                        templateService.getComponent(`pl-default-parcel-${field}`, page)
+                        templateService.getComponent('pl-default-parcel-' + field, page)
                     );
                 }
             }
@@ -123,7 +100,7 @@ var Packlink = window.Packlink || {};
                 ajaxService.post(
                     configuration.submitUrl,
                     model,
-                    function (response) {
+                    function () {
                         utilityService.hideSpinner();
 
                         if (configuration.fromStep) {
@@ -133,7 +110,7 @@ var Packlink = window.Packlink || {};
                     function (response) {
                         for (let field in response) {
                             if (response.hasOwnProperty(field)) {
-                                let input = templateService.getComponent(`pl-default-parcel-${field}`, page);
+                                let input = templateService.getComponent('pl-default-parcel-' + field, page);
                                 if (input) {
                                     templateService.setError(input, response[field]);
                                 }
@@ -154,46 +131,11 @@ var Packlink = window.Packlink || {};
             let model = {};
 
             for (let field of defaultParcelFields) {
-                let value = getInputValue(`pl-default-parcel-${field}`);
-                let isValid = true;
+                let value = getInputValue('pl-default-parcel-' + field),
+                    element = templateService.getComponent('pl-default-parcel-' + field, page),
+                    error = validateField(field, value, element);
 
-                if (value === '') {
-                    isValid = false;
-                    templateService.setError(
-                        templateService.getComponent(`pl-default-parcel-${field}`, page),
-                        Packlink.errorMsgs.required
-                    );
-                } else if (numericInputs.indexOf(field) !== -1) {
-                    let numericValue = parseFloat(value);
-                    if (value == numericValue) {
-                        if (numericValue <= 0) {
-                            isValid = false;
-                            templateService.setError(
-                                templateService.getComponent(`pl-default-parcel-${field}`, page),
-                                Packlink.errorMsgs.greaterThanZero
-                            );
-                        } else if (integers.indexOf(field) !== -1 && numericValue != parseInt(value)) {
-                            isValid = false;
-                            templateService.setError(
-                                templateService.getComponent(`pl-default-parcel-${field}`, page),
-                                Packlink.errorMsgs.integer
-                            );
-                        } else {
-                            templateService.removeError(templateService.getComponent(`pl-default-parcel-${field}`, page));
-                        }
-                    } else {
-                        isValid = false;
-                        templateService.setError(
-                            templateService.getComponent(`pl-default-parcel-${field}`, page),
-                            Packlink.errorMsgs.numeric
-                        );
-                    }
-                } else {
-                    templateService.removeError(templateService.getComponent(`pl-default-parcel-${field}`, page));
-                }
-
-
-                model[field] = isValid ? value : null;
+                model[field] = error ? null : value;
             }
 
             return model;
@@ -207,6 +149,45 @@ var Packlink = window.Packlink || {};
          */
         function getInputValue(input) {
             return templateService.getComponent(input, page).value;
+        }
+
+        /**
+         * Validates if the field value is correct and displays the error on element.
+         *
+         * @param {string} field The name of the field to validate.
+         * @param {string} value The value to validate.
+         * @param {Element} element The element to display error on.
+         * @returns {string}
+         */
+        function validateField(field, value, element) {
+            let error = '';
+
+            if (value === '') {
+                error = Packlink.errorMsgs.required;
+            } else if (numericInputs.indexOf(field) !== -1) {
+                let numericValue = parseFloat(value);
+                // noinspection EqualityComparisonWithCoercionJS Because it checks parsing.
+                if (value == numericValue) {
+                    if (numericValue <= 0) {
+                        error = Packlink.errorMsgs.greaterThanZero;
+                    } else {
+                        // noinspection EqualityComparisonWithCoercionJS Cannot compare float and int with !==.
+                        if (integers.indexOf(field) !== -1 && numericValue != parseInt(value)) {
+                            error = Packlink.errorMsgs.integer;
+                        }
+                    }
+                } else {
+                    error = Packlink.errorMsgs.numeric;
+                }
+            }
+
+            if (error) {
+                templateService.setError(element, error);
+            } else {
+                templateService.removeError(element);
+            }
+
+            return error;
         }
     }
 

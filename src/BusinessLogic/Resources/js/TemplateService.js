@@ -2,21 +2,13 @@ var Packlink = window.Packlink || {};
 
 (function () {
     function TemplateService() {
-        this.getComponent = getComponent;
-        this.getTemplate = getTemplate;
-        this.getComponentsByAttribute = getComponentsByAttribute;
-        this.setTemplate = setTemplate;
-        this.clearComponent = clearComponent;
-        this.setError = setError;
-        this.removeError = removeError;
-
         /**
          * Retrieves template children by template id.
          *
          * @param {string} template
          * @return {HTMLCollection | null}
          */
-        function getTemplate(template) {
+        this.getTemplate = function (template) {
             let temp = document.getElementById(template);
 
             if (!temp) {
@@ -26,7 +18,7 @@ var Packlink = window.Packlink || {};
             let clone = temp.cloneNode(true);
 
             return clone.children;
-        }
+        };
 
         /**
          * Retrieves component by it's id or attribute.
@@ -37,17 +29,17 @@ var Packlink = window.Packlink || {};
          *
          * @return {Element}
          */
-        function getComponent(component, element, attribute) {
+        this.getComponent = function (component, element, attribute) {
             if (typeof element === 'undefined') {
                 return document.getElementById(component);
             }
 
             if (typeof attribute === 'undefined') {
-                return element.querySelector(`#${component}`);
+                return element.querySelector('#' + component);
             }
 
-            return element.querySelector(`[${component}="${attribute}"]`);
-        }
+            return element.querySelector('[' + component + '="' + attribute + '"]');
+        };
 
         /**
          * Retrieves all nodes with specified attribute.
@@ -57,15 +49,15 @@ var Packlink = window.Packlink || {};
          *
          * @return {NodeListOf<Element>}
          */
-        function getComponentsByAttribute(attribute, element) {
+        this.getComponentsByAttribute = function (attribute, element) {
             let selector = '[' + attribute + ']';
 
-            if (typeof element === "undefined") {
+            if (typeof element === 'undefined') {
                 return document.querySelectorAll(selector);
             }
 
             return element.querySelectorAll(selector);
-        }
+        };
 
         /**
          * Changes currently active page.
@@ -76,7 +68,7 @@ var Packlink = window.Packlink || {};
          *
          * @return {Element}
          */
-        function setTemplate(template, extensionPointIdentifier, clearExtensionPoint) {
+        this.setTemplate = function (template, extensionPointIdentifier, clearExtensionPoint) {
             if (typeof extensionPointIdentifier === 'undefined') {
                 extensionPointIdentifier = 'pl-content-extension-point';
             }
@@ -85,30 +77,30 @@ var Packlink = window.Packlink || {};
                 clearExtensionPoint = true;
             }
 
-            let extensionPoint = getComponent(extensionPointIdentifier);
+            let extensionPoint = this.getComponent(extensionPointIdentifier);
 
             if (clearExtensionPoint) {
-                clearComponent(extensionPoint);
+                this.clearComponent(extensionPoint);
             }
 
-            let templateElements = getTemplate(template);
+            let templateElements = this.getTemplate(template);
             while (templateElements && templateElements.length) {
                 extensionPoint.appendChild(templateElements[0]);
             }
 
             return extensionPoint;
-        }
+        };
 
         /**
          * Removes component's children.
          *
          * @param {Element} component
          */
-        function clearComponent(component) {
+        this.clearComponent = function (component) {
             while (component.firstChild) {
                 component.removeChild(component.firstChild);
             }
-        }
+        };
 
         /**
          * Sets error for input.
@@ -116,28 +108,29 @@ var Packlink = window.Packlink || {};
          * @param {Element} input
          * @param {string} message
          */
-        function setError(input, message) {
-            removeError(input);
+        this.setError = function (input, message) {
+            this.removeError(input);
 
-            let errorTemplate = getTemplate('pl-error-template')[0];
-            let msgField = getComponent('pl-error-text', errorTemplate);
+            let errorTemplate = this.getTemplate('pl-error-template')[0];
+            let msgField = this.getComponent('pl-error-text', errorTemplate);
             msgField.innerHTML = message;
             input.after(errorTemplate);
             input.classList.add('pl-error');
-        }
+        };
 
         /**
          * Removes error from input element.
          *
-         * @param input
+         * @param {Element} input
          */
-        function removeError(input) {
+        this.removeError = function (input) {
             let firstSibling = input.nextSibling;
             if (firstSibling && firstSibling.getAttribute && firstSibling.getAttribute('data-pl-element') === 'error') {
                 firstSibling.remove();
             }
+
             input.classList.remove('pl-error');
-        }
+        };
     }
 
     Packlink.templateService = new TemplateService();

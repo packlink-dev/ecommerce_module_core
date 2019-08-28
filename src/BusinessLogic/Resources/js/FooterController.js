@@ -12,10 +12,7 @@ var Packlink = window.Packlink || {};
 
         let debugStatus = false;
 
-        // Register public functions and methods.
-        this.display = display;
-
-        function display() {
+        this.display = function () {
             footer = templateService.getComponent('pl-footer-extension-point');
             let templateComponents = templateService.getTemplate('pl-footer-template');
             for (let component of templateComponents) {
@@ -38,7 +35,7 @@ var Packlink = window.Packlink || {};
             debugModeCheckbox.addEventListener('click', debugModeCheckboxClickedHandler);
 
             ajaxService.get(config.getDebugStatusUrl, getDebugStatusHandler);
-        }
+        };
 
         /**
          * Handles retrieving debug status.

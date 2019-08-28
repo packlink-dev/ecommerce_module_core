@@ -2,60 +2,49 @@ var Packlink = window.Packlink || {};
 
 (function () {
     function UtilityService() {
-
-        this.configureInputElements = configureInputElements;
-        this.enableInputMask = enableInputMask;
-        this.disableInputMask = disableInputMask;
-        this.showSpinner = showSpinner;
-        this.hideSpinner = hideSpinner;
-        this.cloneObject = cloneObject;
-        this.showFlashMessage = showFlashMessage;
-        this.debounce = debounce;
-        this.pad = pad;
-
         /**
          * Adds proper event listeners to input fields in order to allow input filed label translation.
          */
-        function configureInputElements() {
-            let inputContainers = document.getElementsByClassName("pl-text-input");
+        this.configureInputElements = function () {
+            let inputContainers = document.getElementsByClassName('pl-text-input');
 
             for (let container of inputContainers) {
-                let input = container.getElementsByTagName("input")[0];
+                let input = container.getElementsByTagName('input')[0];
                 textInputTransformLabel(input);
-                input.addEventListener("focus", textInputFocusHandler, true);
-                input.addEventListener("focusout", textInputFocusHandler, true);
+                input.addEventListener('focus', textInputFocusHandler, true);
+                input.addEventListener('focusout', textInputFocusHandler, true);
             }
-        }
+        };
 
         /**
          * Enables input mask. This mask disables input fields, buttons, checkboxes etc.
          * Mask has z-index of 100, therefore an element that has to be excluded from input mask
          * has to have z-index greater than 100;
          */
-        function enableInputMask() {
+        this.enableInputMask = function () {
             document.getElementById('pl-input-mask').classList.add('enabled');
-        }
+        };
 
         /**
          * Disables input mask.
          */
-        function disableInputMask() {
+        this.disableInputMask = function () {
             document.getElementById('pl-input-mask').classList.remove('enabled');
-        }
+        };
 
         /**
          * Enables loading spinner.
          */
-        function showSpinner() {
+        this.showSpinner = function () {
             document.getElementById('pl-spinner').classList.add('enabled');
-        }
+        };
 
         /**
          * Hides loading spinner.
          */
-        function hideSpinner() {
+        this.hideSpinner = function () {
             document.getElementById('pl-spinner').classList.remove('enabled');
-        }
+        };
 
         /**
          * Shows flash message.
@@ -65,11 +54,11 @@ var Packlink = window.Packlink || {};
          * @param {string} message
          * @param {'danger' | 'warning' | 'success'} status
          */
-        function showFlashMessage(message, status) {
+        this.showFlashMessage = function (message, status) {
             let statuses = [
                 'warning',
                 'danger',
-                'success',
+                'success'
             ];
 
             let messageNode = document.getElementById('pl-flash-message');
@@ -87,7 +76,7 @@ var Packlink = window.Packlink || {};
             closeButton.addEventListener('click', hideHandler, true);
 
             messageNode.style.display = 'flex';
-        }
+        };
 
         /**
          * Creates deep clone of an object with object's properties.
@@ -98,9 +87,9 @@ var Packlink = window.Packlink || {};
          * @param {object} obj
          * @return {object}
          */
-        function cloneObject(obj) {
+        this.cloneObject = function (obj) {
             return JSON.parse(JSON.stringify(obj));
-        }
+        };
 
         /**
          * Debounces function.
@@ -109,7 +98,7 @@ var Packlink = window.Packlink || {};
          * @param {function} target
          * @return {Function}
          */
-        function debounce(delay, target) {
+        this.debounce = function (delay, target) {
             let timerId;
             return function (...args) {
                 if (timerId) {
@@ -120,8 +109,8 @@ var Packlink = window.Packlink || {};
                     target(...args);
                     timerId = null;
                 }, delay);
-            }
-        }
+            };
+        };
 
         /**
          * Adds given character as a prefix to the given input so that result always has the same string length.
@@ -136,24 +125,33 @@ var Packlink = window.Packlink || {};
          *
          * @returns {string} Padded string.
          */
-        function pad(input, length, character) {
+        this.pad = function (input, length, character) {
             let prefix = '';
             for (let i = 0; i < length; i++) {
                 prefix += character ? character : '0';
             }
 
             return (prefix + input).slice(length * -1);
-        }
+        };
 
         /** PRIVATE METHODS **/
-
+        /**
+         * @param {Event} event
+         */
         function textInputFocusHandler(event) {
-            textInputTransformLabel(event.target)
+            textInputTransformLabel(event.target);
         }
 
+        /**
+         * @param input
+         */
         function textInputTransformLabel(input) {
-            let isSelected = document.activeElement === input || input.value;
-            input.parentNode.getElementsByTagName("span")[0].className = 'pl-text-input-label' + (isSelected ? ' selected' : '');
+            let isSelected = document.activeElement === input || input.value,
+                spans = input.parentNode.getElementsByTagName('span');
+
+            if (spans && spans.length > 0) {
+                spans[0].className = 'pl-text-input-label' + (isSelected ? ' selected' : '');
+            }
         }
     }
 

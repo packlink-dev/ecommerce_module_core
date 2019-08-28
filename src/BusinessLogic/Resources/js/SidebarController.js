@@ -7,21 +7,12 @@ var Packlink = window.Packlink || {};
         let currentState = 'shipping-methods';
         let basicSettingsSubmenuDisplayed = false;
 
-        //Register public methods and variables.
-        this.setState = setState;
-
-        init();
-
-        function init() {
-            addEventHandlersToSidebarButtons(navigationCallback);
-        }
-
         /**
          * Sets currently selected button on dashboard.
          *
          * @param {string} state
          */
-        function setState(state) {
+        this.setState = function (state) {
             if (state === 'basic-settings') {
                 handleBasicSettingsMenuAction();
             } else {
@@ -34,7 +25,7 @@ var Packlink = window.Packlink || {};
 
                 currentState = state;
             }
-        }
+        };
 
         function handleBasicSettingsMenuAction() {
             if (!basicSettingsSubmenuDisplayed) {
@@ -45,7 +36,6 @@ var Packlink = window.Packlink || {};
                 }
             }
         }
-
 
         /**
          * Removes "selected" class from target button.
@@ -119,8 +109,10 @@ var Packlink = window.Packlink || {};
          * @return {string}
          */
         function getButtonId(name) {
-            return `pl-sidebar-${name}-btn`;
+            return 'pl-sidebar-' + name + '-btn';
         }
+
+        addEventHandlersToSidebarButtons(navigationCallback);
     }
 
     Packlink.SidebarController = SidebarController;

@@ -36,17 +36,14 @@ var Packlink = window.Packlink || {};
 
         let postalCodeInput = null;
 
-        //Register public methods and variables.
-        this.display = display;
-
         /**
          * Displays page content.
          */
-        function display() {
+        this.display = function () {
             page = templateService.setTemplate('pl-default-warehouse-template');
             utilityService.showSpinner();
             ajaxService.get(configuration.getUrl, constructPage);
-        }
+        };
 
         /**
          * Attaches event handler to submit button.
@@ -58,7 +55,7 @@ var Packlink = window.Packlink || {};
             country = response['country'];
 
             for (let field of warehouseFields) {
-                let input = templateService.getComponent(`pl-default-warehouse-${field}`, page);
+                let input = templateService.getComponent('pl-default-warehouse-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
                 input.addEventListener('focus', onPostalCodeBlur);
                 if (response[field]) {
@@ -74,17 +71,23 @@ var Packlink = window.Packlink || {};
             }
 
             postalCodeInput.addEventListener('focus', onPostalCodeFocus);
-            postalCodeInput.addEventListener('click', function (event) {
-                event.stopPropagation();
-            });
+            postalCodeInput.addEventListener(
+                'click',
+                function (event) {
+                    event.stopPropagation();
+                }
+            );
             document.addEventListener('click', onPostalCodeBlur);
             postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
             postalCodeInput.addEventListener('keyup', autocompleteNavigate);
 
-            templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener('click', function (event) {
-                event.stopPropagation();
-                postalCodeInput.focus();
-            });
+            templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener(
+                'click',
+                function (event) {
+                    event.stopPropagation();
+                    postalCodeInput.focus();
+                }
+            );
 
             let submitButton = templateService.getComponent(
                 'pl-default-warehouse-submit-btn',
@@ -95,13 +98,17 @@ var Packlink = window.Packlink || {};
             utilityService.configureInputElements();
             utilityService.hideSpinner();
 
-            postalCodeInput.onfocusout = function (event) {
-                postalCodeInput.value = ' ';
-            }
+            postalCodeInput.addEventListener(
+                'focusout',
+                function () {
+                    postalCodeInput.value = ' ';
+                },
+                true);
         }
 
         function onPostalCodeFocus() {
-            postalCodeInput.value = searchTerm = '';
+            postalCodeInput.value = '';
+            searchTerm = '';
         }
 
         function onPostalCodeBlur(event) {
@@ -291,12 +298,12 @@ var Packlink = window.Packlink || {};
             for (let field of warehouseFields) {
                 if (model[field] === null) {
                     templateService.setError(
-                        templateService.getComponent(`pl-default-warehouse-${field}`, page),
+                        templateService.getComponent('pl-default-warehouse-' + field, page),
                         Packlink.errorMsgs.required
                     );
                     isValid = false;
                 } else {
-                    templateService.removeError(templateService.getComponent(`pl-default-warehouse-${field}`, page));
+                    templateService.removeError(templateService.getComponent('pl-default-warehouse-' + field, page));
                 }
             }
 
@@ -326,7 +333,7 @@ var Packlink = window.Packlink || {};
                     function (response) {
                         for (let field in response) {
                             if (response.hasOwnProperty(field)) {
-                                let input = templateService.getComponent(`pl-default-warehouse-${field}`, page);
+                                let input = templateService.getComponent('pl-default-warehouse-' + field, page);
                                 if (input) {
                                     templateService.setError(input, response[field]);
                                 }
@@ -347,7 +354,7 @@ var Packlink = window.Packlink || {};
             let model = {};
 
             for (let field of warehouseFields) {
-                let value = getInputValue(`pl-default-warehouse-${field}`);
+                let value = getInputValue('pl-default-warehouse-' + field);
                 if (value === '' && requiredFields.indexOf(field) !== -1) {
                     value = null;
                 }
