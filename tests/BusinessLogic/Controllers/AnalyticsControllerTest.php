@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpMissingDocCommentInspection */
 
 namespace Logeecom\Tests\BusinessLogic\Controllers;
 
@@ -10,7 +11,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegist
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\AnalyticsController;
-use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
@@ -26,10 +26,6 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
  */
 class AnalyticsControllerTest extends BaseTestWithServices
 {
-    /**
-     * @var ShippingMethodController
-     */
-    public $controller;
     /**
      * @var ShippingMethodService
      */

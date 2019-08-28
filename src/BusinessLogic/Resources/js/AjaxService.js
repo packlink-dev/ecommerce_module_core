@@ -1,20 +1,23 @@
 var Packlink = window.Packlink || {};
 
 (function () {
+    /**
+     * Ajax service. Methods are make public so that they could be overridden in the integrations that
+     * require different mechanisms for AJAX requests.
+     *
+     * @constructor
+     */
     function AjaxService() {
-        this.get = get;
-        this.post = post;
-
         /**
          * Performs GET ajax request.
          *
          * @param {string} url
-         * @param {function} onSuccess
-         * @param {[function]} onError
+         * @param {function} [onSuccess]
+         * @param {function} [onError]
          */
-        function get(url, onSuccess, onError) {
-            call('GET', url, {}, onSuccess, onError)
-        }
+        this.get = function (url, onSuccess, onError) {
+            this.call('GET', url, {}, onSuccess, onError)
+        };
 
         /**
          * Performs POST ajax request.
@@ -23,23 +26,23 @@ var Packlink = window.Packlink || {};
          *
          * @param {string} url
          * @param {object} data
-         * @param {function} onSuccess
-         * @param {[function]} onError
+         * @param {function} [onSuccess]
+         * @param {function} [onError]
          */
-        function post(url, data, onSuccess, onError) {
-            call('POST', url, data, onSuccess, onError)
-        }
+        this.post = function (url, data, onSuccess, onError) {
+            this.call('POST', url, data, onSuccess, onError)
+        };
 
         /**
          * Performs ajax call.
          *
-         * @param {'GET' | 'POST'} method
+         * @param {string} method 'GET' or 'POST'.
          * @param {string} url
          * @param {object} data
-         * @param {function} onSuccess
-         * @param {[function]} onError
+         * @param {function} [onSuccess]
+         * @param {function} [onError]
          */
-        function call(method, url, data, onSuccess, onError) {
+        this.call = function (method, url, data, onSuccess, onError) {
             let request = getRequest();
             request.open(method, url, true);
 
@@ -49,19 +52,35 @@ var Packlink = window.Packlink || {};
                         onSuccess(JSON.parse(this.responseText || '{}'));
                     } else {
                         if (typeof onError !== 'undefined') {
-                            onError(JSON.parse(this.responseText || '{}'));
+                            let response = this.responseText;
+                            try {
+                                response = JSON.parse(this.responseText || '{}')
+                            } catch (e) {
+                            }
+
+                            onError(response);
                         }
                     }
                 }
             };
 
             if (method === 'POST') {
-                request.setRequestHeader("Content-Type", "application/json");
-                request.send(JSON.stringify(data));
+                this.internalPerformPost(request, data);
             } else {
                 request.send();
             }
-        }
+        };
+
+        /**
+         * Extension point for executing the POST request with the given data.
+         *
+         * @param {XMLHttpRequest | ActiveXObject} request
+         * @param {object} data
+         */
+        this.internalPerformPost = function (request, data) {
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.send(JSON.stringify(data));
+        };
 
         /**
          * Creates instance of request.
