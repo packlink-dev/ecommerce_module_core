@@ -2,9 +2,11 @@
 
 namespace Logeecom\Infrastructure\Http;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ServiceRegister;
 
 /**
  * Class HttpClient.
@@ -17,6 +19,56 @@ abstract class HttpClient
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+    /**
+     * Unauthorized HTTP status code.
+     */
+    const HTTP_STATUS_CODE_UNAUTHORIZED = 401;
+    /**
+     * Forbidden HTTP status code.
+     */
+    const HTTP_STATUS_CODE_FORBIDDEN = 403;
+    /**
+     * Not found HTTP status code.
+     */
+    const HTTP_STATUS_CODE_NOT_FOUND = 404;
+    /**
+     * HTTP GET method.
+     */
+    const HTTP_METHOD_GET = 'GET';
+    /**
+     * HTTP POST method.
+     */
+    const HTTP_METHOD_POST = 'POST';
+    /**
+     * HTTP PUT method.
+     */
+    const HTTP_METHOD_PUT = 'PUT';
+    /**
+     * HTTP DELETE method.
+     */
+    const HTTP_METHOD_DELETE = 'DELETE';
+    /**
+     * HTTP PATCH method.
+     */
+    const HTTP_METHOD_PATCH = 'PATCH';
+    /**
+     * Indicates if the instance is currently in the auto-configuration mode.
+     *
+     * @var bool
+     */
+    protected $autoConfigurationMode = false;
+    /**
+     * Configuration service.
+     *
+     * @var Configuration
+     */
+    private $configService;
+    /**
+     * An array of additional HTTP configuration options.
+     *
+     * @var array
+     */
+    private $httpConfigurationOptions;
 
     /**
      * Create, log and send request.
@@ -97,21 +149,26 @@ abstract class HttpClient
      */
     public function autoConfigure($method, $url, $headers = array(), $body = '')
     {
-        $passed = $this->isRequestSuccessful($method, $url, $headers, $body);
-        if ($passed) {
+        $this->autoConfigurationMode = true;
+        if ($this->isRequestSuccessful($method, $url, $headers, $body)) {
             return true;
         }
 
-        $combinations = $this->getAdditionalOptionsCombinations();
+        $domain = parse_url($url, PHP_URL_HOST);
+        $combinations = $this->getAutoConfigurationOptionsCombinations($method, $url);
         foreach ($combinations as $combination) {
-            $this->setAdditionalOptions($combination);
-            $passed = $this->isRequestSuccessful($method, $url, $headers, $body);
-            if ($passed) {
+            $this->setAdditionalOptions($domain, $combination);
+            if ($this->isRequestSuccessful($method, $url, $headers, $body)) {
+                $this->autoConfigurationMode = false;
+
                 return true;
             }
 
-            $this->resetAdditionalOptions();
+            // if request is not successful, reset options combination.
+            $this->resetAdditionalOptions($domain);
         }
+
+        $this->autoConfigurationMode = false;
 
         return false;
     }
@@ -142,36 +199,62 @@ abstract class HttpClient
     abstract protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '');
 
     /**
-     * Get additional options combinations for request.
+     * Get additional options combinations for specified method and url.
+     *
+     * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
+     * @param string $url Request URL.
      *
      * @return array
-     *  Array of additional options combinations. Each array item should be an array of OptionsDTO instance.
+     *  Array of additional options combinations. Each array item should be an array of OptionsDTO instances.
      */
-    protected function getAdditionalOptionsCombinations()
+    protected function getAutoConfigurationOptionsCombinations($method, $url)
     {
-        // Left blank intentionally so integrations can override this method,
-        // in order to return all possible combinations for additional curl options
+        // Left blank intentionally so specific implementations can override this method,
+        // in order to return all possible combinations for additional HTTP options
         return array();
     }
 
     /**
      * Save additional options for request.
      *
-     * @param OptionsDTO[] $options Additional option to add to HTTP request.
+     * @param string $domain A domain for which to set configuration options.
+     * @param OptionsDTO[] $options Additional options to add to HTTP request.
      */
-    protected function setAdditionalOptions($options)
+    protected function setAdditionalOptions($domain, $options)
     {
-        // Left blank intentionally so integrations can override this method,
-        // in order to save combination to some persisted array which HttpClient can use it later while creating request
+        $this->httpConfigurationOptions = null;
+        $this->getConfigService()->setHttpConfigurationOptions($domain, $options);
     }
 
     /**
      * Reset additional options for request to default value.
+     *
+     * @param string $domain A domain for which to reset configuration options.
      */
-    protected function resetAdditionalOptions()
+    protected function resetAdditionalOptions($domain)
     {
-        // Left blank intentionally so integrations can override this method,
-        // in order to reset to its default values persisted array which `HttpClient` uses later while creating request
+        $this->httpConfigurationOptions = null;
+        $this->getConfigService()->setHttpConfigurationOptions($domain, array());
+    }
+
+    /**
+     * Gets HTTP options array from the configuration and transforms it to the key-value array.
+     *
+     * @param string $domain A domain for which to get configuration options.
+     *
+     * @return array A key-value array of HTTP configuration options.
+     */
+    protected function getAdditionalOptions($domain)
+    {
+        if (!$this->httpConfigurationOptions) {
+            $options = $this->getConfigService()->getHttpConfigurationOptions($domain);
+            $this->httpConfigurationOptions = array();
+            foreach ($options as $option) {
+                $this->httpConfigurationOptions[$option->getName()] = $option->getValue();
+            }
+        }
+
+        return $this->httpConfigurationOptions;
     }
 
     /**
@@ -194,5 +277,19 @@ abstract class HttpClient
         }
 
         return $response !== null && $response->isSuccessful();
+    }
+
+    /**
+     * Gets the configuration service.
+     *
+     * @return Configuration Configuration service instance.
+     */
+    protected function getConfigService()
+    {
+        if (empty($this->configService)) {
+            $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        }
+
+        return $this->configService;
     }
 }

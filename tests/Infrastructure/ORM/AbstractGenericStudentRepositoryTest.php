@@ -126,6 +126,74 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithOr()
+    {
+        $this->testStudentMassInsert();
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+
+        $queryFilter->where('localId', '=', 3)
+            ->orWhere('localId', '=', 4);
+
+        $entities = $repository->select($queryFilter);
+        $this->assertCount(2, $entities);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithAndAndOr()
+    {
+        $this->testStudentMassInsert();
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $queryFilter = new QueryFilter();
+
+        $queryFilter->where('localId', '=', 3)
+            ->where('gender', '=', 'M')
+            ->orWhere('localId', '=', 4);
+
+        $entities = $repository->select($queryFilter);
+        $this->assertCount(2, $entities);
+
+        $queryFilter = new QueryFilter();
+
+        $queryFilter->where('localId', '=', 3)
+            ->where('gender', '!=', 'M')
+            ->orWhere('localId', '=', 4);
+
+        $entities = $repository->select($queryFilter);
+        $this->assertCount(1, $entities);
+
+        $queryFilter = new QueryFilter();
+
+        $queryFilter->where('localId', '=', 3)
+            ->where('gender', '!=', 'M')
+            ->orWhere('localId', '=', 4)
+            ->where('gender', '=', 'F');
+
+        $entities = $repository->select($queryFilter);
+        $this->assertCount(0, $entities);
+
+        $queryFilter = new QueryFilter();
+
+        $queryFilter->where('localId', '=', 3)
+            ->where('gender', '!=', 'M')
+            ->orWhere('localId', '=', 4)
+            ->where('gender', '=', 'F')
+            ->orWhere('localId', '=', 5);
+
+        $entities = $repository->select($queryFilter);
+        $this->assertCount(1, $entities);
+        /** @var StudentEntity $student */
+        $student = $entities[0];
+        $this->assertEquals(5, $student->localId);
+    }
+
+    /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */

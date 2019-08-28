@@ -11,6 +11,7 @@ var Packlink = window.Packlink || {};
         this.cloneObject = cloneObject;
         this.showFlashMessage = showFlashMessage;
         this.debounce = debounce;
+        this.pad = pad;
 
         /**
          * Adds proper event listeners to input fields in order to allow input filed label translation.
@@ -120,6 +121,28 @@ var Packlink = window.Packlink || {};
                     timerId = null;
                 }, delay);
             }
+        }
+
+        /**
+         * Adds given character as a prefix to the given input so that result always has the same string length.
+         * If the input is "56", length is 4 and character is "0", resulting string will be "0056".
+         * If the input is "P", length is 2 and character is "-" resulting string will be "-4".
+         * If the input is "40", length is 2, resulting string will be "40".
+         * If the input is "TEXT", length is 2, resulting string will be "TEXT".
+         *
+         * @param input A string or number to pad.
+         * @param {number} length Total length of the final string.
+         * @param {string} character The character to pad to the beginning. Defaults to "0".
+         *
+         * @returns {string} Padded string.
+         */
+        function pad(input, length, character) {
+            let prefix = '';
+            for (let i = 0; i < length; i++) {
+                prefix += character ? character : '0';
+            }
+
+            return (prefix + input).slice(length * -1);
         }
 
         /** PRIVATE METHODS **/

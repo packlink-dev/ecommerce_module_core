@@ -32,10 +32,12 @@ var Packlink = window.Packlink || {};
                 closeSystemInfo
             );
 
+            document.addEventListener('keydown', closeSystemInfoOnEscape);
+
             debugModeCheckbox = templateService.getComponent('pl-debug-mode-checkbox', footer);
             debugModeCheckbox.addEventListener('click', debugModeCheckboxClickedHandler);
 
-            ajaxService.get(config.getStatusUrl, getDebugStatusHandler);
+            ajaxService.get(config.getDebugStatusUrl, getDebugStatusHandler);
         }
 
         /**
@@ -54,7 +56,7 @@ var Packlink = window.Packlink || {};
             systemInfoPanel.classList.add('loading');
             debugStatus = !debugStatus;
 
-            ajaxService.post(config.setStatusUrl, {status: debugStatus}, function (response) {
+            ajaxService.post(config.setDebugStatusUrl, {status: debugStatus}, function (response) {
                 debugStatus = response.status;
                 debugModeCheckbox.checked = debugStatus;
                 systemInfoPanel.classList.remove('loading');
@@ -62,12 +64,23 @@ var Packlink = window.Packlink || {};
         }
 
         /**
-         * Opens system info panel.
+         * Closes system info panel.
          */
         function closeSystemInfo() {
             if (isSystemInfoOpen) {
                 systemInfoPanel.classList.add('hidden');
                 isSystemInfoOpen = false;
+            }
+        }
+
+        /**
+         * Closes system info panel.
+         *
+         * @var {Event} event
+         */
+        function closeSystemInfoOnEscape(event) {
+            if (event.key === 'Escape') {
+                closeSystemInfo();
             }
         }
 

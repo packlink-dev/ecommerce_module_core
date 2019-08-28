@@ -5,6 +5,7 @@
 
 namespace Logeecom\Infrastructure\Configuration;
 
+use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Singleton;
@@ -258,6 +259,92 @@ abstract class Configuration extends Singleton
     public function getDefaultQueueName()
     {
         return $this->getConfigValue('defaultQueueName', static::DEFAULT_QUEUE_NAME);
+    }
+
+    /**
+     * Gets current auto-configuration state.
+     *
+     * @return string Current state.
+     */
+    public function getAutoConfigurationState()
+    {
+        return $this->getConfigValue('autoConfigurationState', '');
+    }
+
+    /**
+     * Gets auto-configuration controller URL.
+     *
+     * @return string Auto-configuration URL.
+     */
+    public function getAutoConfigurationUrl()
+    {
+        return $this->getAsyncProcessUrl('auto-configure');
+    }
+
+    /**
+     * Sets current auto-configuration state.
+     *
+     * @param string $state Current state.
+     */
+    public function setAutoConfigurationState($state)
+    {
+        $this->saveConfigValue('autoConfigurationState', $state);
+    }
+
+    /**
+     * Gets current HTTP configuration options for given domain.
+     *
+     * @param string $domain A domain for which to return configuration options.
+     *
+     * @return \Logeecom\Infrastructure\Http\DTO\OptionsDTO[]
+     */
+    public function getHttpConfigurationOptions($domain)
+    {
+        $data = json_decode($this->getConfigValue('httpConfigurationOptions', '[]'), true);
+        if (isset($data[$domain])) {
+            return OptionsDTO::fromArrayBatch($data[$domain]);
+        }
+
+        return array();
+    }
+
+    /**
+     * Sets HTTP configuration options for given domain.
+     *
+     * @param string $domain A domain for which to save configuration options.
+     *
+     * @param OptionsDTO[] $options HTTP configuration options
+     */
+    public function setHttpConfigurationOptions($domain, array $options)
+    {
+        // get all current options and append new ones for given domain
+        $data = json_decode($this->getConfigValue('httpConfigurationOptions', '[]'), true);
+        $data[$domain] = array();
+        foreach ($options as $option) {
+            $data[$domain][] = $option->toArray();
+        }
+
+        $this->saveConfigValue('httpConfigurationOptions', json_encode($data));
+    }
+
+    /**
+     * Sets the auto-test mode flag.
+     *
+     * @param bool $status
+     */
+    public function setAutoTestMode($status)
+    {
+        $this->saveConfigValue('autoTestMode', $status);
+    }
+
+    /**
+     * Returns whether the auto-test mode is active.
+     *
+     * @return bool TRUE if the auto-test mode is active; otherwise, FALSE.
+     */
+    public function isAutoTestMode()
+    {
+        return (bool)$this->getConfigValue('autoTestMode', false);
     }
 
     /**
