@@ -4,14 +4,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
+
+## [v1.4.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.0...1.3.1) - 2019-08-28
 ### Added
 - Tests for `AbstracGenericStudentRepository` and `AbastractGenericQueueItemRepository` have been improved
 to support multiple conditions in filters for select.
+- Auto-Test and Auto-Configuration features (CR-12)
+- `UpdateShippingServicesTaskStatusController` for checking the current status of the `UpdateShippingServicesTask`.
+- `TranslationMessages.js` is added to give an example of what should be provided by integrations. This does not need 
+to be included on any page.
 
 ### Changed
-**BREAKING CHANGES**
-- `ShopShippingMethodService` has been extended with methods for adding and deleting backup carrier.
+This version contains several **BREAKING CHANGES**, so please review the log.
+
+JS changes:
+- `AjaxService.js` is now easily extendable so integrations can adjust the calls.
+- `FooterController.js` now listens to the Escape key to close the debug popup.
+- `ShippingMethodsController.js` is adjusted to support auto-configuration feature if the integration supports it.
+Also, behavior for getting shipping services is changed. Now, controller expects a status check URL (given as the
+`shippingMethodsGetStatusUrl` parameter of the State controller constructor config object) and it first
+checks the status of the task for getting shipping services task. For this, new 
+`UpdateShippingServicesTaskStatusController` can be used in integrations. If task completed, shipping services will be 
+retrieved.
+- `UtilityService.js` is extended with new method `pad`.
+
+Other changes:
+- `ShopShippingMethodService` has been extended with methods for adding and deleting backup carrier. They have to be
+implemented in the integration.
 - `Proxy::sendDraft()` method will now throw an exception if the draft response does not contain the reference.
+- `Infrastructure/Configuration/Configuration` class is extended to support the auto-configuration feature.
+- `HttpClient` is adjusted for the auto-configuration. Check the diff to see the method signature changes.
+- `CurlHttpClient` is changed to support easier extendability. It is adjusted to the changes in `HttpClient`. It now
+supports: 
+  - a timeout on synchronous requests (60 seconds by default)
+  - auto-redirect feature if the FOLLOW_LOCATION cannot be set
+  - adjustments of the cURL parameters based on the custom HTTP options set in the configuration
+  - some functions are renamed and signature changed - review the diff
+  - it supports a single extension point in the method `executeCurlRequest`. This is called for
+  both sync and async calls.
+- `Logger\LogData` is converted to entity. This does not break current integrations.
 
 ## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...1.3.0) - 2019-07-16
 ### Changed
