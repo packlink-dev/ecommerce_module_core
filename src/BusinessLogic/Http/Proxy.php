@@ -45,26 +45,6 @@ class Proxy
      */
     const API_VERSION = 'v1/';
     /**
-     * Unauthorized HTTP status code.
-     */
-    const HTTP_STATUS_CODE_UNAUTHORIZED = 401;
-    /**
-     * HTTP GET method
-     */
-    const HTTP_METHOD_GET = 'GET';
-    /**
-     * HTTP POST method
-     */
-    const HTTP_METHOD_POST = 'POST';
-    /**
-     * HTTP PUT method
-     */
-    const HTTP_METHOD_PUT = 'PUT';
-    /**
-     * HTTP DELETE method
-     */
-    const HTTP_METHOD_DELETE = 'DELETE';
-    /**
      * HTTP Client.
      *
      * @var HttpClient
@@ -98,7 +78,7 @@ class Proxy
      */
     public function getUsersParcelInfo()
     {
-        $response = $this->call(self::HTTP_METHOD_GET, 'users/parcels');
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, 'users/parcels');
         $data = $response->decodeBodyAsJson();
 
         return ParcelInfo::fromArrayBatch($data ?: array());
@@ -115,7 +95,7 @@ class Proxy
      */
     public function getUsersWarehouses()
     {
-        $response = $this->call(self::HTTP_METHOD_GET, 'clients/warehouses');
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, 'clients/warehouses');
         $data = $response->decodeBodyAsJson();
 
         return Warehouse::fromArrayBatch($data ?: array());
@@ -132,7 +112,7 @@ class Proxy
      */
     public function getUserData()
     {
-        $response = $this->call(self::HTTP_METHOD_GET, 'clients');
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, 'clients');
 
         return User::fromArray($response->decodeBodyAsJson());
     }
@@ -148,7 +128,7 @@ class Proxy
      */
     public function registerWebHookHandler($webHookUrl)
     {
-        $this->call(self::HTTP_METHOD_POST, 'shipments/callback', array('url' => $webHookUrl));
+        $this->call(HttpClient::HTTP_METHOD_POST, 'shipments/callback', array('url' => $webHookUrl));
     }
 
     /**
@@ -166,7 +146,7 @@ class Proxy
      */
     public function getLocations($serviceId, $countryCode, $postalCode)
     {
-        $response = $this->call(self::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
 
         return DropOff::fromArrayBatch($response->decodeBodyAsJson());
     }
@@ -195,7 +175,7 @@ class Proxy
                 )
             );
 
-        $response = $this->call(self::HTTP_METHOD_GET, $url);
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
 
         return LocationInfo::fromArrayBatch($response->decodeBodyAsJson());
     }
@@ -213,7 +193,7 @@ class Proxy
      */
     public function getPostalCodes($countryCode, $zipCode)
     {
-        $response = $this->call(self::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
 
         return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
     }
@@ -236,7 +216,7 @@ class Proxy
             throw new HttpRequestException('Missing required search parameter(s).', 400);
         }
 
-        $response = $this->call(self::HTTP_METHOD_GET, 'services?' . http_build_query($params->toArray()));
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, 'services?' . http_build_query($params->toArray()));
 
         $body = $response->decodeBodyAsJson();
         if (empty($body)) {
@@ -267,7 +247,7 @@ class Proxy
      */
     public function getShippingServiceDetails($id)
     {
-        $response = $this->call(self::HTTP_METHOD_GET, "services/available/$id/details");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, "services/available/$id/details");
 
         return ShippingService::fromArray($response->decodeBodyAsJson());
     }
@@ -285,7 +265,7 @@ class Proxy
      */
     public function sendDraft(Draft $draft)
     {
-        $response = $this->call(self::HTTP_METHOD_POST, 'shipments', $draft->toArray());
+        $response = $this->call(HttpClient::HTTP_METHOD_POST, 'shipments', $draft->toArray());
 
         $result = $response->decodeBodyAsJson();
         $reference = array_key_exists('reference', $result) ? $result['reference'] : '';
@@ -377,7 +357,7 @@ class Proxy
         );
 
         try {
-            $this->call(self::HTTP_METHOD_POST, 'analytics', $data->toArray());
+            $this->call(HttpClient::HTTP_METHOD_POST, 'analytics', $data->toArray());
         } catch (HttpBaseException $e) {
             Logger::logWarning('Could not send analytics data. Exception: ' . $e->getMessage());
         }
@@ -402,7 +382,7 @@ class Proxy
         }
 
         try {
-            $response = $this->call(self::HTTP_METHOD_GET, "shipments/{$reference}{$endpoint}");
+            $response = $this->call(HttpClient::HTTP_METHOD_GET, "shipments/{$reference}{$endpoint}");
         } catch (HttpRequestException $e) {
             if ($e->getCode() === 404) {
                 return null;
@@ -430,7 +410,7 @@ class Proxy
     protected function call($method, $endpoint, array $body = array())
     {
         $bodyStringToSend = '';
-        if (in_array(strtoupper($method), array(self::HTTP_METHOD_POST, self::HTTP_METHOD_PUT), true)) {
+        if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
             $bodyStringToSend = json_encode($body);
         }
 
@@ -468,12 +448,12 @@ class Proxy
                 }
             }
 
-            if ($httpCode === 404) {
+            if ($httpCode === HttpClient::HTTP_STATUS_CODE_NOT_FOUND) {
                 $message = '404 Not found.';
             }
 
             Logger::logInfo($message);
-            if ($httpCode === self::HTTP_STATUS_CODE_UNAUTHORIZED) {
+            if ($httpCode === HttpClient::HTTP_STATUS_CODE_UNAUTHORIZED) {
                 throw new HttpAuthenticationException($message, $httpCode);
             }
 

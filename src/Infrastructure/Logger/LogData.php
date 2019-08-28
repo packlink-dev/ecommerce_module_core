@@ -2,49 +2,63 @@
 
 namespace Logeecom\Infrastructure\Logger;
 
+use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
+use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
+use Logeecom\Infrastructure\ORM\Entity;
+
 /**
  * Class LogData.
  *
  * @package Logeecom\Infrastructure\Logger
  */
-class LogData
+class LogData extends Entity
 {
+    /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
     /**
      * Name of the integration.
      *
      * @var string
      */
-    private $integration;
+    protected $integration;
     /**
      * Array of LogContextData.
      *
      * @var LogContextData[]
      */
-    private $context;
+    protected $context;
     /**
      * Log level.
      *
      * @var int
      */
-    private $logLevel;
+    protected $logLevel;
     /**
      * Log timestamp.
      *
      * @var int
      */
-    private $timestamp;
+    protected $timestamp;
     /**
      * Name of the component.
      *
      * @var string
      */
-    private $component;
+    protected $component;
     /**
      * Log message.
      *
      * @var string
      */
-    private $message;
+    protected $message;
+    /**
+     * Array of field names.
+     *
+     * @var array
+     */
+    protected $fields = array('id', 'integration', 'logLevel', 'timestamp', 'component', 'message');
 
     /**
      * LogData constructor.
@@ -56,8 +70,14 @@ class LogData
      * @param string $message Log message.
      * @param array $context Log contexts as an array of @see LogContextData or as key value entries.
      */
-    public function __construct($integration, $logLevel, $timestamp, $component, $message, array $context = array())
-    {
+    public function __construct(
+        $integration = '',
+        $logLevel = 0,
+        $timestamp = 0,
+        $component = '',
+        $message = '',
+        array $context = array()
+    ) {
         $this->integration = $integration;
         $this->logLevel = $logLevel;
         $this->component = $component;
@@ -72,6 +92,55 @@ class LogData
 
             $this->context[] = $item;
         }
+    }
+
+    /**
+     * Returns entity configuration object.
+     *
+     * @return EntityConfiguration Configuration object.
+     */
+    public function getConfig()
+    {
+        $map = new IndexMap();
+        $map->addStringIndex('integration')
+            ->addIntegerIndex('logLevel')
+            ->addIntegerIndex('timestamp')
+            ->addStringIndex('component');
+
+        return new EntityConfiguration($map, 'LogData');
+    }
+
+    /**
+     * Transforms raw array data to this entity instance.
+     *
+     * @param array $data Raw array data.
+     */
+    public function inflate(array $data)
+    {
+        parent::inflate($data);
+
+        $context = !empty($data['context']) ? $data['context'] : array();
+        $this->context = array();
+        foreach ($context as $key => $value) {
+            $item = new LogContextData($key, $value);
+            $this->context[] = $item;
+        }
+    }
+
+    /**
+     * Transforms entity to its array format representation.
+     *
+     * @return array Entity in array format.
+     */
+    public function toArray()
+    {
+        $data = parent::toArray();
+
+        foreach ($this->context as $item) {
+            $data['context'][$item->getName()] = $item->getValue();
+        }
+
+        return $data;
     }
 
     /**

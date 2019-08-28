@@ -2,8 +2,11 @@
 
 namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 
+use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
@@ -32,6 +35,8 @@ class ShippingMethodEntityTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
+
+        RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 
         $this->httpClient = new TestHttpClient();
         $self = $this;

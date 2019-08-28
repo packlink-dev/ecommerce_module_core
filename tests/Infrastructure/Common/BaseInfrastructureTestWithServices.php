@@ -16,6 +16,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +37,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
      */
     public $shopLogger;
     /**
-     * @var TimeProvider
+     * @var TestTimeProvider
      */
     public $timeProvider;
     /**
@@ -89,6 +90,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
         Logger::resetInstance();
         LoggerConfiguration::resetInstance();
         MemoryStorage::reset();
+        TestRepositoryRegistry::cleanUp();
 
         parent::tearDown();
     }

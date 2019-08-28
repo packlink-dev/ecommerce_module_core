@@ -1,4 +1,7 @@
 <?php
+/** @noinspection PhpUnused */
+
+/** @noinspection PhpMissingDocCommentInspection */
 
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents;
 
@@ -21,6 +24,10 @@ class TestHttpClient extends HttpClient
      * @var array
      */
     private $history;
+    /**
+     * @var array
+     */
+    private $autoConfigurationCombinations = array();
 
     /**
      * @inheritdoc
@@ -77,28 +84,48 @@ class TestHttpClient extends HttpClient
     /**
      * @inheritdoc
      */
-    protected function getAdditionalOptionsCombinations()
+    protected function getAutoConfigurationOptionsCombinations($method, $url)
     {
-        $combinations = array();
-        $combinations[] = array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4));
-        $combinations[] = array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6));
+        if (empty($this->autoConfigurationCombinations)) {
+            $this->setAdditionalOptionsCombinations(
+                array(
+                    array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4)),
+                    array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6)),
+                )
+            );
+        }
 
-        return $combinations;
+        return $this->autoConfigurationCombinations;
     }
 
     /**
-     * @inheritdoc
+     * Sets the additional HTTP options combinations.
+     *
+     * @param array $combinations
      */
-    protected function setAdditionalOptions($options)
+    protected function setAdditionalOptionsCombinations(array $combinations)
+    {
+        $this->autoConfigurationCombinations = $combinations;
+    }
+
+    /**
+     * Save additional options for request.
+     *
+     * @param string $domain A domain for which to reset configuration options.
+     * @param OptionsDTO[] $options Additional option to add to HTTP request.
+     */
+    protected function setAdditionalOptions($domain, $options)
     {
         $this->setAdditionalOptionsCallHistory[] = $options;
         $this->additionalOptions = $options;
     }
 
     /**
-     * @inheritdoc
+     * Reset additional options for request to default value.
+     *
+     * @param string $domain A domain for which to reset configuration options.
      */
-    protected function resetAdditionalOptions()
+    protected function resetAdditionalOptions($domain)
     {
         $this->additionalOptions = array();
     }
@@ -124,7 +151,7 @@ class TestHttpClient extends HttpClient
     }
 
     /**
-     * Return call count.
+     * Return call history.
      *
      * @return array
      */

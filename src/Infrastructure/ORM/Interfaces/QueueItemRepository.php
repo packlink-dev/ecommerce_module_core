@@ -11,7 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
  *
  * @package Logeecom\Infrastructure\ORM\Interfaces
  * @method QueueItem[] select(QueryFilter $filter = null)
- * @method QueueItem selectOne(QueryFilter $filter = null)
+ * @method QueueItem|null selectOne(QueryFilter $filter = null)
  */
 interface QueueItemRepository extends RepositoryInterface
 {

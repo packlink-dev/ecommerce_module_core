@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Tests\Infrastructure\TaskExecution;
+namespace Logeecom\Tests\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
 use Logeecom\Infrastructure\Http\HttpClient;

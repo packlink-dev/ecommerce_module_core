@@ -33,7 +33,7 @@ var Packlink = window.Packlink || {};
          *
          * @param {string} component
          * @param {Element} [element]
-         * @param {string} [attribute]
+         * @param {string|int} [attribute]
          *
          * @return {Element}
          */
