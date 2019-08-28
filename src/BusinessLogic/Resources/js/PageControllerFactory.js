@@ -2,17 +2,13 @@ var Packlink = window.Packlink || {};
 
 (function () {
     function PageControllerFactory() {
-
-        //Register public methods
-        this.getInstance = getInstance;
-
         /**
          * Instantiates page controller;
          *
          * @param {string} controller
          * @param {object} configuration
          */
-        function getInstance(controller, configuration) {
+        this.getInstance = function (controller, configuration) {
             let parts = controller.split('-');
             let name = '';
             for (let part of parts) {
@@ -23,7 +19,7 @@ var Packlink = window.Packlink || {};
             name += 'Controller';
 
             return new Packlink[name](configuration);
-        }
+        };
     }
 
     Packlink.pageControllerFactory = new PageControllerFactory();

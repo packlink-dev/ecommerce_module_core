@@ -10,7 +10,7 @@ var Packlink = window.Packlink || {};
         const STATUSES = [
             'disabled',
             'in-progress',
-            'completed',
+            'completed'
         ];
 
         let templateService = Packlink.templateService;
@@ -42,7 +42,7 @@ var Packlink = window.Packlink || {};
             title: [],
             deliveryType: [],
             parcelOrigin: [],
-            parcelDestination: [],
+            parcelDestination: []
         };
 
         // Element in DOM where shipping methods page content is inserted.
@@ -63,13 +63,10 @@ var Packlink = window.Packlink || {};
 
         let autoConfigureInitialized = false;
 
-        // Register public methods and variables.
-        this.display = display;
-
         /**
          * Displays page content.
          */
-        function display() {
+        this.display = function () {
             utilityService.showSpinner();
 
             extensionPoint = templateService.setTemplate('pl-shipping-methods-page-template');
@@ -128,7 +125,7 @@ var Packlink = window.Packlink || {};
                 getStatusHandler(response);
                 ajaxService.get(configuration.getMethodsStatusUrl, getShippingMethodsStatusHandler);
             });
-        }
+        };
 
         /**
          * Get status of getting shipping methods task.
@@ -378,18 +375,23 @@ var Packlink = window.Packlink || {};
             renderedShippingMethods = result[filterTypes[0]];
             // Finds intersection of results;
             for (let i = 1; i < filterTypes.length; i++) {
-                renderedShippingMethods = renderedShippingMethods.filter(function (item) {
-                    return result[filterTypes[i]].indexOf(item) !== -1;
-                })
+                renderedShippingMethods = renderedShippingMethods.filter(
+                    function (item) {
+                        return result[filterTypes[i]].indexOf(item) !== -1;
+                    }
+                );
             }
 
             // Take only unique values. Rendered shipping methods variable has to behave like a set.
             // Also take current selection tab into consideration.
-            renderedShippingMethods = renderedShippingMethods.filter(function (r, index, set) {
-                let shippingMethod = shippingMethods[r];
-                let selectRequired = currentNavTab === 'selected';
-                return (set.indexOf(r) === index) && (selectRequired && shippingMethod.selected || !selectRequired);
-            });
+            renderedShippingMethods = renderedShippingMethods.filter(
+                function (r, index, set) {
+                    let shippingMethod = shippingMethods[r];
+                    let selectRequired = currentNavTab === 'selected';
+
+                    return (set.indexOf(r) === index) && (selectRequired && shippingMethod.selected || !selectRequired);
+                }
+            );
         }
 
         /**
@@ -405,6 +407,7 @@ var Packlink = window.Packlink || {};
 
             return methods.filter(function (method) {
                 let shippingMethod = shippingMethods[method];
+
                 return (shippingMethod[type] === filter);
             });
         }
@@ -498,9 +501,7 @@ var Packlink = window.Packlink || {};
                 templateService.getComponent('pl-method-title', template).classList.add('pl-national');
             }
 
-
             templateService.getComponent('pl-delivery-type', template).innerHTML = shippingMethod.deliveryDescription;
-
 
             initPriceIndicators(shippingMethod, template);
         }
@@ -573,7 +574,6 @@ var Packlink = window.Packlink || {};
          */
         function getNumberOfActiveServices() {
             let result = 0;
-
             let serviceIds = Object.keys(shippingMethods);
 
             for (let id of serviceIds) {
@@ -772,7 +772,7 @@ var Packlink = window.Packlink || {};
             if (value === '') {
                 templateService.setError(event.target, Packlink.errorMsgs.required);
             } else if (configuration.maxTitleLength && value.length > configuration.maxTitleLength) {
-                templateService.setError(event.target, Packlink.errorMsgs.titleLength)
+                templateService.setError(event.target, Packlink.errorMsgs.titleLength);
             } else {
                 templateService.removeError(event.target);
             }
@@ -1089,13 +1089,13 @@ var Packlink = window.Packlink || {};
             let fields = [
                 'from',
                 'to',
-                'amount',
+                'amount'
             ];
 
             for (let field of fields) {
                 let input = templateService.getComponent('data-pl-fixed-price', template, field);
                 input.value = policy[field];
-                input.setAttribute(`data-pl-${field}-id`, id.toString());
+                input.setAttribute('data-pl-' + field + '-id', id.toString());
 
                 if (field === 'to') {
                     input.addEventListener(
@@ -1275,7 +1275,7 @@ var Packlink = window.Packlink || {};
                 for (let field of fields) {
                     let value = policies[i][field];
                     if (value === '' || isNaN(value) || typeof value !== 'number') {
-                        let input = templateService.getComponent(`data-pl-${field}-id`, tableExtensionPoint, i);
+                        let input = templateService.getComponent('data-pl-' + field + '-id', tableExtensionPoint, i);
                         templateService.setError(input, Packlink.errorMsgs.numeric);
                         result = false;
                     }
@@ -1425,7 +1425,7 @@ var Packlink = window.Packlink || {};
 
             if (!methodModel.percentPricePolicy) {
                 methodModel.percentPricePolicy = {
-                    increase: true,
+                    increase: true
                 };
             } else {
                 if (methodModel.percentPricePolicy.amount) {

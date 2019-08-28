@@ -16,7 +16,7 @@ var Packlink = window.Packlink || {};
          * @param {function} [onError]
          */
         this.get = function (url, onSuccess, onError) {
-            this.call('GET', url, {}, onSuccess, onError)
+            this.call('GET', url, {}, onSuccess, onError);
         };
 
         /**
@@ -30,7 +30,7 @@ var Packlink = window.Packlink || {};
          * @param {function} [onError]
          */
         this.post = function (url, data, onSuccess, onError) {
-            this.call('POST', url, data, onSuccess, onError)
+            this.call('POST', url, data, onSuccess, onError);
         };
 
         /**
@@ -47,6 +47,7 @@ var Packlink = window.Packlink || {};
             request.open(method, url, true);
 
             request.onreadystatechange = function () {
+                // "this" is XMLHttpRequest
                 if (this.readyState === 4) {
                     if (this.status >= 200 && this.status < 300) {
                         onSuccess(JSON.parse(this.responseText || '{}'));
@@ -54,7 +55,7 @@ var Packlink = window.Packlink || {};
                         if (typeof onError !== 'undefined') {
                             let response = this.responseText;
                             try {
-                                response = JSON.parse(this.responseText || '{}')
+                                response = JSON.parse(this.responseText || '{}');
                             } catch (e) {
                             }
 
@@ -88,20 +89,20 @@ var Packlink = window.Packlink || {};
          * @return {XMLHttpRequest | ActiveXObject}
          */
         function getRequest() {
+            let versions = [
+                    'MSXML2.XmlHttp.6.0',
+                    'MSXML2.XmlHttp.5.0',
+                    'MSXML2.XmlHttp.4.0',
+                    'MSXML2.XmlHttp.3.0',
+                    'MSXML2.XmlHttp.2.0',
+                    'Microsoft.XmlHttp'
+                ],
+                xhr;
+
             if (typeof XMLHttpRequest !== 'undefined') {
                 return new XMLHttpRequest();
             }
 
-            let versions = [
-                'MSXML2.XmlHttp.6.0',
-                'MSXML2.XmlHttp.5.0',
-                'MSXML2.XmlHttp.4.0',
-                'MSXML2.XmlHttp.3.0',
-                'MSXML2.XmlHttp.2.0',
-                'Microsoft.XmlHttp',
-            ];
-
-            let xhr;
             for (let version of versions) {
                 try {
                     xhr = new ActiveXObject(version);

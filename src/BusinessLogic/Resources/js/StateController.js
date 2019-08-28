@@ -1,12 +1,47 @@
 var Packlink = window.Packlink || {};
 
 (function () {
+    /**
+     * Main controller of the application.
+     *
+     * @param {{
+     *      sidebarButtons: array,
+     *      submenuItems: array,
+     *      pageConfiguration: array,
+     *      scrollConfiguration: {scrollOffset: number, rowHeight: number},
+     *      hasTaxConfiguration: boolean,
+     *      canDisplayCarrierLogos: boolean,
+     *      shippingServiceMaxTitleLength: number,
+     *      autoConfigureStartUrl: string,
+     *      dashboardGetStatusUrl: string,
+     *      defaultParcelGetUrl: string,
+     *      defaultParcelSubmitUrl: string,
+     *      defaultWarehouseGetUrl: string,
+     *      defaultWarehouseSubmitUrl: string,
+     *      defaultWarehouseSearchPostalCodesUrl: string,
+     *      debugGetStatusUrl: string,
+     *      debugSetStatusUrl: string,
+     *      shippingMethodsGetAllUrl: string,
+     *      shippingMethodsGetStatusUrl: string,
+     *      shippingMethodsGetTaxClassesUrl: string,
+     *      shippingMethodsSaveUrl: string,
+     *      shippingMethodsActivateUrl: string,
+     *      shippingMethodsDeactivateUrl: string,
+     *      shopShippingMethodCountGetUrl: string,
+     *      shopShippingMethodsDisableUrl: string,
+     *      getSystemOrderStatusesUrl: string,
+     *      orderStatusMappingsSaveUrl: string,
+     *      orderStatusMappingsGetUrl: string
+     * }} configuration
+     *
+     * @constructor
+     */
     function StateController(configuration) {
         let pageControllerFactory = Packlink.pageControllerFactory;
 
         let sidebarButtons = [
             'shipping-methods',
-            'basic-settings',
+            'basic-settings'
         ];
 
         if (typeof configuration.sidebarButtons !== 'undefined') {
@@ -16,7 +51,7 @@ var Packlink = window.Packlink || {};
         let submenuItems = [
             'order-state-mapping',
             'default-parcel',
-            'default-warehouse',
+            'default-warehouse'
         ];
 
         if (typeof configuration.submenuItems !== 'undefined') {
@@ -51,7 +86,7 @@ var Packlink = window.Packlink || {};
                 disableShopShippingMethodsUrl: configuration.shopShippingMethodsDisableUrl,
                 autoConfigureStartUrl: configuration.autoConfigureStartUrl,
                 hasTaxConfiguration: configuration.hasTaxConfiguration,
-                getTaxClassesUrl: configuration.shippingMethodsGetTaxClasses,
+                getTaxClassesUrl: configuration.shippingMethodsGetTaxClassesUrl,
                 canDisplayCarrierLogos: configuration.canDisplayCarrierLogos
             },
             'order-state-mapping': {
@@ -66,15 +101,10 @@ var Packlink = window.Packlink || {};
         };
 
         if (typeof configuration.pageConfiguration !== 'undefined') {
-            pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration}
+            pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration};
         }
 
-        this.startStep = startStep;
-        this.stepFinished = stepFinished;
-        this.display = display;
-        this.getContext = getContext;
-
-        function display() {
+        this.display = function () {
             pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
             let dp = pageControllerFactory.getInstance(
@@ -82,7 +112,34 @@ var Packlink = window.Packlink || {};
                 getControllerConfiguration('shipping-methods')
             );
             dp.display();
-        }
+        };
+
+        /**
+         * Opens configuration page that corresponds to particular step.
+         *
+         * @param {string} step
+         */
+        this.startStep = function (step) {
+            utilityService.disableInputMask();
+            let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
+            controller.display();
+        };
+
+        /**
+         * Called when configuration step is finished.
+         */
+        this.stepFinished = function () {
+            pageControllerFactory.getInstance(
+                'shipping-methods',
+                getControllerConfiguration('shipping-methods')).display();
+        };
+
+        /**
+         * Returns context.
+         */
+        this.getContext = function () {
+            return context;
+        };
 
         /**
          * Navigation callback.
@@ -101,31 +158,7 @@ var Packlink = window.Packlink || {};
             }
         }
 
-        /**
-         * Opens configuration page that corresponds to particular step.
-         *
-         * @param {string} step
-         */
-        function startStep(step) {
-            utilityService.disableInputMask();
-            let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
-            controller.display();
-        }
-
-        /**
-         * Called when configuration step is finished.
-         */
-        function stepFinished() {
-            pageControllerFactory.getInstance(
-                'shipping-methods',
-                getControllerConfiguration('shipping-methods')).display();
-        }
-
         function getControllerConfiguration(controller, fromStep) {
-            if (typeof fromStep === "undefined") {
-                fromStep = false;
-            }
-
             let config = utilityService.cloneObject(pageConfiguration[controller]);
 
             setContext();
@@ -143,13 +176,6 @@ var Packlink = window.Packlink || {};
          */
         function setContext() {
             context = Math.random().toString(36);
-        }
-
-        /**
-         * Returns context.
-         */
-        function getContext() {
-            return context;
         }
     }
 

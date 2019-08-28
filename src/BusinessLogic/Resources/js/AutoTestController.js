@@ -1,3 +1,5 @@
+var Packlink = window.Packlink || {};
+
 (function () {
     /**
      * AutoTest controller constructor.
@@ -9,13 +11,9 @@
      */
     function AutoTestController(startTestUrl, checkStatusUrl) {
         let startButton = document.getElementById('pl-auto-test-start');
-        if (!startButton) {
-            console.log('Start button not found! Cannot start the auto-test.');
-
-            return;
+        if (startButton) {
+            startButton.addEventListener('click', startTestButtonClicked, true);
         }
-
-        startButton.addEventListener('click', startTestButtonClicked, true);
 
         /**
          * Event handler for start button click event.
@@ -30,31 +28,39 @@
             logPanel.style.display = 'block';
             Packlink.utilityService.showSpinner();
 
-            Packlink.ajaxService.get(startTestUrl, function startTest(response) {
-                if (response.success) {
-                    setTimeout(updateStatus, 1000);
-                } else {
-                    document.getElementById('pl-auto-test-log-panel').innerHTML = response.error;
+            Packlink.ajaxService.get(
+                startTestUrl,
+                /** @param {{success: boolean, error: string}} response */
+                function startTest(response) {
+                    if (response.success) {
+                        setTimeout(updateStatus, 1000);
+                    } else {
+                        document.getElementById('pl-auto-test-log-panel').innerHTML = response.error;
+                    }
                 }
-            });
+            );
         }
 
         /**
          * Gets the current status of the test and updates log messages in the log panel.
          */
         function updateStatus() {
-            Packlink.ajaxService.get(checkStatusUrl, function (response) {
-                let logPanel = document.getElementById('pl-auto-test-log-panel');
+            Packlink.ajaxService.get(
+                checkStatusUrl,
+                /** @param {{logs: array, finished: boolean}} response */
+                function (response) {
+                    let logPanel = document.getElementById('pl-auto-test-log-panel');
 
-                logPanel.innerHTML = '';
-                for (let log of response.logs) {
-                    logPanel.innerHTML += writeLogMessage(log);
+                    logPanel.innerHTML = '';
+                    for (let log of response.logs) {
+                        logPanel.innerHTML += writeLogMessage(log);
+                    }
+
+                    logPanel.scrollIntoView();
+                    logPanel.scrollTop = logPanel.scrollHeight;
+                    response.finished ? finishTest(response) : setTimeout(updateStatus, 1000);
                 }
-
-                logPanel.scrollIntoView();
-                logPanel.scrollTop = logPanel.scrollHeight;
-                response.finished ? finishTest(response) : setTimeout(updateStatus, 1000);
-            });
+            );
         }
 
         /**
