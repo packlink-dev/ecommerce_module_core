@@ -65,7 +65,15 @@ class AutoConfiguration
             throw new BaseException('Configuration service is not set to return auto-configuration URL');
         }
 
+        $this->configService->setAsyncProcessCallHttpMethod(HttpClient::HTTP_METHOD_POST);
         $result = $this->httpClient->autoConfigure(HttpClient::HTTP_METHOD_POST, $url);
+
+        if (!$result) {
+            $result = $this->httpClient->autoConfigure(HttpClient::HTTP_METHOD_GET, $url);
+            if ($result) {
+                $this->configService->setAsyncProcessCallHttpMethod(HttpClient::HTTP_METHOD_GET);
+            }
+        }
 
         $this->configService->setAutoConfigurationState($result ? self::STATE_SUCCEEDED : self::STATE_FAILED);
 
