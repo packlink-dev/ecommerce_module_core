@@ -181,12 +181,6 @@ var Packlink = window.Packlink || {};
 
             hideGettingShippingMethodsMessage();
             renderShippingMethods();
-
-            if (spinnerBarrier === spinnerBarrierCount) {
-                utilityService.hideSpinner();
-            } else {
-                spinnerBarrierCount++;
-            }
         }
 
         /**
@@ -294,10 +288,8 @@ var Packlink = window.Packlink || {};
                 }
             );
 
-            if (spinnerBarrier === spinnerBarrierCount) {
+            if (spinnerBarrier === ++spinnerBarrierCount) {
                 utilityService.hideSpinner();
-            } else {
-                spinnerBarrierCount++;
             }
         }
 
@@ -1523,10 +1515,8 @@ var Packlink = window.Packlink || {};
 
             taxSelector.value = response[0]['value'];
 
-            if (spinnerBarrier === spinnerBarrierCount) {
+            if (spinnerBarrier === ++spinnerBarrierCount) {
                 utilityService.hideSpinner();
-            } else {
-                spinnerBarrierCount++;
             }
         }
 
