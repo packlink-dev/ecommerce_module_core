@@ -74,12 +74,15 @@ class TaskRunnerStatusStorageTest extends TestCase
         $taskRunnerStatusStorage = new RunnerStatusStorage();
         $this->configuration->setTaskRunnerStatus('guid', 123456789);
         $taskStatus = new TaskRunnerStatus('guid', 123456789);
+        $ex = null;
 
         try {
             $taskRunnerStatusStorage->setStatus($taskStatus);
         } catch (\Exception $ex) {
             $this->fail('Set task runner status storage should not throw exception.');
         }
+
+        $this->assertEmpty($ex);
     }
 
     /**

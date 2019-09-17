@@ -13,12 +13,15 @@ class EventEmitterTest extends TestCase
     public function testItShouldBePossibleToFireEventWithoutAnySubscribedHandlers()
     {
         $emitter = new TestEventEmitter();
+        $ex = null;
 
         try {
             $emitter->fire(new TestFooEvent());
         } catch (\Exception $ex) {
             $this->fail('It should be possible to fire event without any subscribers.');
         }
+
+        $this->assertEmpty($ex);
     }
 
     public function testItShouldBePossibleToSubscribeMultipleHandlersToSameEvent()
