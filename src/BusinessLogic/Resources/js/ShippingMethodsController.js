@@ -1510,7 +1510,7 @@ var Packlink = window.Packlink || {};
                 option.value = taxClass['value'];
                 option.innerHTML = taxClass['label'];
                 taxSelector.appendChild(option);
-                taxClasses.push(option['value']);
+                taxClasses.push(taxClass['value']);
             }
 
             taxSelector.value = response[0]['value'];
