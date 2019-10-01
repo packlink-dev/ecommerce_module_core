@@ -10,6 +10,8 @@ use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Logger\LoggerConfiguration;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
@@ -48,6 +50,10 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
      * @var array
      */
     public $eventHistory;
+    /**
+     * @var \Logeecom\Infrastructure\Serializer\Serializer
+     */
+    public $serializer;
 
     /**
      * @throws \Exception
@@ -63,6 +69,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
         $this->shopConfig = new TestShopConfiguration();
         $this->shopLogger = new TestShopLogger();
         $this->defaultLogger = new TestDefaultLogger();
+        $this->serializer = new NativeSerializer();
 
         new TestServiceRegister(
             array(
@@ -81,6 +88,9 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
                 EventBus::CLASS_NAME => function () {
                     return EventBus::getInstance();
                 },
+                Serializer::CLASS_NAME => function () use ($me) {
+                    return $me->serializer;
+                }
             )
         );
     }

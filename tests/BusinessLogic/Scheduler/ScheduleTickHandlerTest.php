@@ -5,6 +5,8 @@ namespace Logeecom\Tests\BusinessLogic\Scheduler;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -86,6 +88,9 @@ class ScheduleTickHandlerTest extends TestCase
                 EventBus::CLASS_NAME => function () {
                     return EventBus::getInstance();
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 

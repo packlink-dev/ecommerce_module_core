@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -54,11 +55,44 @@ class UpdateShipmentDataTask extends Task
     private $proxy;
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        $entity = new static();
+
+        $entity->progress = $array['progress'];
+        $entity->progressStep = $array['progress_step'];
+        $entity->references = $array['references'];
+
+        return $entity;
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return  array(
+            'progress' => $this->progress,
+            'progress_step' => $this->progressStep,
+            'references' => $this->references,
+        );
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()
     {
-        return serialize(
+        return Serializer::serialize(
             array(
                 $this->references,
                 $this->progress,
@@ -72,7 +106,7 @@ class UpdateShipmentDataTask extends Task
      */
     public function unserialize($serialized)
     {
-        list($this->references, $this->progress, $this->progressStep) = unserialize($serialized);
+        list($this->references, $this->progress, $this->progressStep) = Serializer::unserialize($serialized);
     }
 
     /**

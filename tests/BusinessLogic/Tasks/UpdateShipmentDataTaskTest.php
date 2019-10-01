@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
@@ -18,6 +19,11 @@ use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 
+/**
+ * Class UpdateShipmentDataTaskTest
+ *
+ * @package Logeecom\Tests\BusinessLogic\Tasks
+ */
 class UpdateShipmentDataTaskTest extends BaseSyncTest
 {
     /**
@@ -133,7 +139,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $this->httpClient->setMockResponses($this->getMockResponses());
         $orderRepository->shouldThrowGenericException(false);
 
-        $this->syncTask = unserialize($serialized);
+        $this->syncTask = Serializer::unserialize($serialized);
         $this->attachProgressEventListener();
         $this->syncTask->execute();
         $this->validate100Progress();
@@ -163,7 +169,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
 
         // second execute of the same task should not do anything after unserialize
         // because references that are done should be removed from the list
-        $this->syncTask = unserialize(serialize($this->syncTask));
+        $this->syncTask = Serializer::unserialize(Serializer::serialize($this->syncTask));
         $this->attachProgressEventListener();
         $this->syncTask->execute();
         $this->validate100Progress();
@@ -195,7 +201,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertEquals(500, $event->getProgressBasePoints());
 
         // second execute of the same task should take only the third reference and execute it correctly
-        $this->syncTask = unserialize(serialize($this->syncTask));
+        $this->syncTask = unserialize(Serializer::serialize($this->syncTask));
         $this->attachProgressEventListener();
 
         $this->httpClient->setMockResponses(

@@ -9,6 +9,8 @@ use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
@@ -32,6 +34,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class TaskRunnerWakeupTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class TaskRunnerWakeupTest extends TestCase
 {
     /** @var AsyncProcessService */
@@ -86,6 +93,9 @@ class TaskRunnerWakeupTest extends TestCase
                 HttpClient::CLASS_NAME => function () {
                     return new TestHttpClient();
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 

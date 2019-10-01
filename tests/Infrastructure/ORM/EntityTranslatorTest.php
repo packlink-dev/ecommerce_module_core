@@ -30,7 +30,10 @@ class EntityTranslatorTest extends BaseInfrastructureTestWithServices
         $entity->setFinishTimestamp(time());
 
         $intermediate = new IntermediateObject();
-        $intermediate->setData(serialize($entity));
+        $data = $entity->toArray();
+        $data['class_name'] = $entity::getClassName();
+        $data = json_encode($data);
+        $intermediate->setData($data);
 
         $translator = new EntityTranslator();
         $translator->init(QueueItem::getClassName());

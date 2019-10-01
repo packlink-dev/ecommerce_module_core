@@ -4,6 +4,8 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
@@ -78,6 +80,13 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
+        TestServiceRegister::registerService(
+            Serializer::CLASS_NAME,
+            function() {
+                return new NativeSerializer();
+            }
+        );
+
         $this->shopConfig->setDefaultParcel(new ParcelInfo());
         $this->shopConfig->setDefaultWarehouse(new Warehouse());
         $this->shopConfig->setUserInfo(new User());
@@ -139,13 +148,13 @@ class SendDraftTaskTest extends BaseSyncTest
         try {
             $this->syncTask->execute();
         } catch (\Exception $e) {
-            $serialized = serialize($this->syncTask);
+            $serialized = Serializer::serialize($this->syncTask);
         }
 
         $this->httpClient->setMockResponses($this->getMockResponses());
         $orderRepository->shouldThrowOrderNotFoundException(false);
         /** @var SendDraftTask $task */
-        $task = unserialize($serialized);
+        $task = Serializer::unserialize($serialized);
         $task->execute();
 
         $order = $orderRepository->getOrder('test');

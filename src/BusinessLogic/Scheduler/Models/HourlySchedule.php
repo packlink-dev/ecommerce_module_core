@@ -21,6 +21,7 @@ class HourlySchedule extends Schedule
      */
     protected $fields = array(
         'id',
+        'recurring',
         'queueName',
         'minute',
         'hour',

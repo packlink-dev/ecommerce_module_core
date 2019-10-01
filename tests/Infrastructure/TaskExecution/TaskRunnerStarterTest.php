@@ -5,6 +5,7 @@ namespace Logeecom\Tests\Infrastructure\TaskExecution;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
@@ -25,6 +26,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
+/**
+ * Class TaskRunnerStarterTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
 {
     /** @var AsyncProcessService */
@@ -151,7 +157,7 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
     {
         // Arrange
         /** @var TaskRunnerStarter $unserializedRunnerStarter */
-        $unserializedRunnerStarter = unserialize(serialize($this->runnerStarter));
+        $unserializedRunnerStarter = Serializer::unserialize(Serializer::serialize($this->runnerStarter));
 
         // Act
         $unserializedRunnerStarter->run();

@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -44,13 +45,36 @@ class SendDraftTask extends Task
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static($array['order_id']);
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array('order_id' => $this->orderId);
+    }
+
+    /**
      * String representation of object
      *
      * @return string the string representation of the object or null
      */
     public function serialize()
     {
-        return serialize(array('orderId' => $this->orderId));
+        return Serializer::serialize(array($this->orderId));
     }
 
     /**
@@ -64,8 +88,7 @@ class SendDraftTask extends Task
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
-        $this->orderId = $data['orderId'];
+        list($this->orderId) = Serializer::unserialize($serialized);
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Serializer\Interfaces\Serializable;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
@@ -13,7 +15,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
  * Class Task
  * @package Logeecom\Infrastructure\TaskExecution
  */
-abstract class Task extends EventEmitter implements \Serializable
+abstract class Task extends EventEmitter implements Serializable
 {
     /**
      * Max inactivity period for a task in seconds
@@ -52,7 +54,7 @@ abstract class Task extends EventEmitter implements \Serializable
      */
     public function serialize()
     {
-        return serialize(array());
+        return Serializer::serialize(array());
     }
 
     /**

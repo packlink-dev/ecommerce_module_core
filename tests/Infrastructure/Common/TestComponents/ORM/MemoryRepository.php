@@ -159,9 +159,18 @@ class MemoryRepository implements RepositoryInterface
         $this->entityClass = $entityClass;
     }
 
+    /**
+     * Saves entity to the database.
+     *
+     * @param \Logeecom\Infrastructure\ORM\Entity $entity Entity to be saved
+     */
     private function saveEntityToStorage(Entity $entity)
     {
         $indexes = IndexHelper::transformFieldsToIndexes($entity);
+        $data = $entity->toArray();
+        $data['class_name'] = $entity::getClassName();
+        $data = json_encode($data);
+
         $storageItem = array(
             'id' => $entity->getId(),
             'type' => $entity->getConfig()->getType(),
@@ -175,7 +184,7 @@ class MemoryRepository implements RepositoryInterface
             'index_8' => null,
             'index_9' => null,
             'index_10' => null,
-            'data' => serialize($entity),
+            'data' => $data,
         );
 
         foreach ($indexes as $index => $value) {

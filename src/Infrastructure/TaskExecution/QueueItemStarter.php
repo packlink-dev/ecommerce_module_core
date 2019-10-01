@@ -4,6 +4,7 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
 
@@ -43,11 +44,34 @@ class QueueItemStarter implements Runnable
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static($array['queue_item_id']);
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array('queue_item_id' => $this->queueItemId);
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()
     {
-        return serialize(array($this->queueItemId));
+        return Serializer::serialize(array($this->queueItemId));
     }
 
     /**
@@ -55,7 +79,7 @@ class QueueItemStarter implements Runnable
      */
     public function unserialize($serialized)
     {
-        list($this->queueItemId) = unserialize($serialized);
+        list($this->queueItemId) = Serializer::unserialize($serialized);
     }
 
     /**

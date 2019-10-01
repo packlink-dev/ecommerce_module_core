@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Scheduler;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -38,7 +39,7 @@ class ScheduleTickHandler
                     array(
                         'ExceptionMessage' => $ex->getMessage(),
                         'ExceptionTrace' => $ex->getTraceAsString(),
-                        'TaskData' => serialize($task),
+                        'TaskData' => Serializer::serialize($task),
                     )
                 );
             }

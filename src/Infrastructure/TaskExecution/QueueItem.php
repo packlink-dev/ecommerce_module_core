@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
@@ -420,7 +421,7 @@ class QueueItem extends Entity
             return $this->serializedTask;
         }
 
-        return serialize($this->task);
+        return Serializer::serialize($this->task);
     }
 
     /**

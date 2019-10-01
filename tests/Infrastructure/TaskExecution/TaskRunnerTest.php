@@ -10,6 +10,8 @@ use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
@@ -39,6 +41,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class TaskRunnerTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class TaskRunnerTest extends TestCase
 {
     /** @var AsyncProcessService */
@@ -115,6 +122,9 @@ class TaskRunnerTest extends TestCase
                 HttpClient::CLASS_NAME => function () {
                     return new TestHttpClient();
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 
@@ -419,6 +429,14 @@ class TaskRunnerTest extends TestCase
         );
     }
 
+    /**
+     * Checks wheter queue item is in call history.
+     *
+     * @param \Logeecom\Infrastructure\TaskExecution\QueueItem $needle
+     * @param array $callHistory
+     *
+     * @return bool
+     */
     private function isQueueItemInStartCallHistory(QueueItem $needle, array $callHistory)
     {
         /** @var QueueItem $queueItem */

@@ -40,6 +40,29 @@ class UpdateShippingServicesTask extends Task
     );
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static();
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array();
+    }
+
+    /**
      * Gets all local methods and remote services and synchronizes data.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException

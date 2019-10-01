@@ -2,6 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
@@ -9,6 +11,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class QueueItemTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class QueueItemTest extends TestCase
 {
     /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider */
@@ -26,6 +33,9 @@ class QueueItemTest extends TestCase
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 

@@ -8,6 +8,7 @@ use Logeecom\Infrastructure\ORM\IntermediateObject;
 
 /**
  * Class EntityTranslator
+ *
  * @package Logeecom\Infrastructure\ORM\Utility
  */
 class EntityTranslator
@@ -63,8 +64,15 @@ class EntityTranslator
      */
     private function translateOne(IntermediateObject $intermediateObject)
     {
+        $data = json_decode($intermediateObject->getData(), true);
+
+        if (!$data['class_name']) {
+            throw new EntityClassException('Entity has not provided class name.');
+        }
+
         /** @var Entity $entity */
-        $entity = unserialize($intermediateObject->getData());
+        $entity = new $data['class_name'];
+        $entity->inflate($data);
         if (!($entity instanceof $this->entityClass)) {
             throw new EntityClassException("Unserialized entity is not of class {$this->entityClass}");
         }

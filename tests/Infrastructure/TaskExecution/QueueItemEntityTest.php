@@ -2,6 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
@@ -21,6 +23,8 @@ class QueueItemEntityTest extends TestCase
      */
     protected $timeProvider;
 
+    protected $serializer;
+
     /**
      * @throws \Exception
      */
@@ -29,12 +33,16 @@ class QueueItemEntityTest extends TestCase
         parent::setUp();
 
         $timeProvider = $this->timeProvider = new TestTimeProvider();
+        $serializer = $this->serializer = new NativeSerializer();
 
         new TestServiceRegister(
             array(
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
+                Serializer::CLASS_NAME => function () use ($serializer) {
+                    return $serializer;
+                }
             )
         );
     }
@@ -57,7 +65,7 @@ class QueueItemEntityTest extends TestCase
         $entity->setId(1234);
         $entity->setStatus(QueueItem::COMPLETED);
         $entity->setContext('context');
-        $entity->setSerializedTask(serialize(new FooTask()));
+        $entity->setSerializedTask(Serializer::serialize(new FooTask()));
         $entity->setQueueName('queue');
         $entity->setLastExecutionProgressBasePoints(2541);
         $entity->setProgressBasePoints(458);
@@ -122,7 +130,7 @@ class QueueItemEntityTest extends TestCase
             'id' => 123,
             'status' => QueueItem::COMPLETED,
             'context' => 'context',
-            'serializedTask' => serialize(new FooTask()),
+            'serializedTask' => Serializer::serialize(new FooTask()),
             'queueName' => 'queue',
             'lastExecutionProgressBasePoints' => 1234,
             'progressBasePoints' => 7345,
