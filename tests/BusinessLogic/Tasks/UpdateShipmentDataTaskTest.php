@@ -133,7 +133,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         try {
             $this->syncTask->execute();
         } catch (\Exception $e) {
-            $serialized = serialize($this->syncTask);
+            $serialized = Serializer::serialize($this->syncTask);
         }
 
         $this->httpClient->setMockResponses($this->getMockResponses());
@@ -201,7 +201,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertEquals(500, $event->getProgressBasePoints());
 
         // second execute of the same task should take only the third reference and execute it correctly
-        $this->syncTask = unserialize(Serializer::serialize($this->syncTask));
+        $this->syncTask = Serializer::unserialize(Serializer::serialize($this->syncTask));
         $this->attachProgressEventListener();
 
         $this->httpClient->setMockResponses(

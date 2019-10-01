@@ -3,6 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\IntermediateObject;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -48,7 +49,7 @@ class IntermediateObjectTest extends TestCase
 
     public function testSetData()
     {
-        $data = serialize(array(1, 'a' => 5, 6));
+        $data = Serializer::serialize(array(1, 'a' => 5, 6));
         $object = new IntermediateObject();
         $object->setData($data);
         $this->assertEquals($data, $object->getData());

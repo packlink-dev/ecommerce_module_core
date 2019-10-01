@@ -4,6 +4,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\Utility\EntityTranslator;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
@@ -69,7 +70,7 @@ class EntityTranslatorTest extends BaseInfrastructureTestWithServices
         $entity = new TaskRunnerStatus('Test', 123);
 
         $intermediate = new IntermediateObject();
-        $intermediate->setData(serialize($entity));
+        $intermediate->setData(Serializer::serialize($entity));
 
         $translator = new EntityTranslator();
         $translator->init(QueueItem::getClassName());

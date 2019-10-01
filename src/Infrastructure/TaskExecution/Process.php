@@ -46,7 +46,7 @@ class Process extends Entity
 
         parent::inflate($data);
         $this->setGuid($data['guid']);
-        $this->setRunner(unserialize($data['runner']));
+        $this->setRunner(Serializer::unserialize($data['runner']));
     }
 
     /**

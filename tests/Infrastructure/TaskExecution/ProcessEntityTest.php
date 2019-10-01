@@ -36,7 +36,7 @@ class ProcessEntityTest extends BaseInfrastructureTestWithServices
             'class_name' => Process::CLASS_NAME,
             'id' => 123,
             'guid' => 'guid',
-            'runner' => serialize($runner),
+            'runner' => Serializer::serialize($runner),
         );
 
         $entity = Process::fromArray($data);
@@ -56,7 +56,7 @@ class ProcessEntityTest extends BaseInfrastructureTestWithServices
         $runner = new QueueItemStarter(1234);
         $data = array(
             'id' => 123,
-            'runner' => serialize($runner),
+            'runner' => Serializer::serialize($runner),
         );
 
         Process::fromArray($data);

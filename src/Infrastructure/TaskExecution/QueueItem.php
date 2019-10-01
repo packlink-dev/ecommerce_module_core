@@ -390,7 +390,7 @@ class QueueItem extends Entity
     public function getTask()
     {
         if ($this->task === null) {
-            $this->task = @unserialize($this->serializedTask);
+            $this->task = Serializer::unserialize($this->serializedTask);
             if (empty($this->task)) {
                 throw new QueueItemDeserializationException(
                     json_encode(
