@@ -2,8 +2,6 @@
 
 namespace Logeecom\Infrastructure;
 
-use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
-use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
@@ -38,12 +36,6 @@ class BootstrapComponent
      */
     protected static function initServices()
     {
-        ServiceRegister::registerService(
-            Serializer::CLASS_NAME,
-            function () {
-                return new NativeSerializer();
-            }
-        );
         ServiceRegister::registerService(
             TimeProvider::CLASS_NAME,
             function () {
