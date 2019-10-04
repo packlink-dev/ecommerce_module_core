@@ -734,7 +734,7 @@ var Packlink = window.Packlink || {};
             let scroller = templateService.getComponent('pl-table-scroll', extensionPoint);
 
             if (scroller) {
-                let rowIndex = renderedShippingMethods.indexOf(methodId);
+                let rowIndex = renderedShippingMethods.indexOf(methodId + '');
                 scroller.scrollTo({
                     smooth: true,
                     left: 0,
