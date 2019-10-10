@@ -22,6 +22,11 @@ use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
+/**
+ * Class ShippingMethodServiceCostsTest
+ *
+ * @package Packlink\Tests\BusinessLogic\Tasks
+ */
 class ShippingMethodServiceCostsTest extends BaseTestWithServices
 {
     /**
@@ -416,6 +421,30 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         self::assertEquals(12, $cost, 'Calculated cost is wrong!');
     }
 
+    public function testCalculateFixedPricingPolicyOutOfBounds()
+    {
+        $shippingMethod = $this->prepareFixedPricePolicyShippingMethod(
+            1,
+            array(
+                new FixedPricePolicy(10, 20, 12),
+                new FixedPricePolicy(5, 10, 12),
+                )
+        );
+
+        $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
+        $cost = $this->shippingMethodService->getShippingCost(
+            $shippingMethod->getId(),
+            'IT',
+            '00127',
+            'IT',
+            '00127',
+            array(Package::defaultPackage()),
+            2
+        );
+
+        $this->assertEmpty($cost);
+    }
+
     public function testCalculateCostsFixedPricingByWeightPolicy()
     {
         $this->calculateCostsFixedPricingPolicy(true);
@@ -426,6 +455,11 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $this->calculateCostsFixedPricingPolicy(false);
     }
 
+    /**
+     * Calculates fixed price cost.
+     *
+     * @param float $byWeight
+     */
     private function calculateCostsFixedPricingPolicy($byWeight)
     {
         $serviceId = 20339;
@@ -839,6 +873,19 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         return $shippingMethod;
     }
 
+    /**
+     * Retrieves shipping service details.
+     *
+     * @param int $id
+     * @param string $carrierName
+     * @param string $fromCountry
+     * @param string $toCountry
+     * @param bool $originDropOff
+     * @param bool $destinationDropOff
+     * @param float $basePrice
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     */
     private function getShippingServiceDetails(
         $id,
         $carrierName,
@@ -876,6 +923,13 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         return $details;
     }
 
+    /**
+     * Retrieves invalid response.
+     *
+     * @param int $number
+     *
+     * @return array
+     */
     private function getBadHttpResponses($number)
     {
         $responses = array();
@@ -886,6 +940,11 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         return $responses;
     }
 
+    /**
+     * Retrieves parcel with wrong parameters.
+     *
+     * @return array
+     */
     public function wrongParametersProvider()
     {
         return array(

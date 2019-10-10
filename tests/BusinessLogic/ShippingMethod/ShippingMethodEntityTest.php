@@ -32,6 +32,9 @@ class ShippingMethodEntityTest extends TestCase
      */
     public $httpClient;
 
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -185,12 +188,12 @@ class ShippingMethodEntityTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testFixedPricingPolicyValidationFromNotZeroOnFirst()
+    public function testFixedPricingPolicyValidationFromNegative()
     {
         $method = new ShippingMethod();
 
         /** @var FixedPricePolicy[] $fixedPricePolicies */
-        $fixedPricePolicies[] = new FixedPricePolicy(3, 10, 10);
+        $fixedPricePolicies[] = new FixedPricePolicy(-3, 10, 10);
 
         // from for first policy must be 0
         $method->setFixedPriceByWeightPolicy($fixedPricePolicies);
@@ -698,6 +701,11 @@ class ShippingMethodEntityTest extends TestCase
         );
     }
 
+    /**
+     * Asserts basic shipping method data.
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
     private function assertBasicDataToArray()
     {
         $data = $this->getShippingMethodData();
