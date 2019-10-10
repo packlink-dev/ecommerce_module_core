@@ -13,6 +13,7 @@ to support multiple conditions in filters for select.
 - `UpdateShippingServicesTaskStatusController` for checking the current status of the `UpdateShippingServicesTask`.
 - `TranslationMessages.js` is added to give an example of what should be provided by integrations. This does not need 
 to be included on any page.
+- `DraftController` for creating a new draft
 
 ### Changed
 This version contains several **BREAKING CHANGES**, so please review the log.
@@ -43,6 +44,8 @@ supports:
   - it supports a single extension point in the method `executeCurlRequest`. This is called for
   both sync and async calls.
 - `Logger\LogData` is converted to entity. This does not break current integrations.
+- Advanced serialization mechanism has been implemented.`NativeSerializer` and `JsonSerializer` have been introduced.
+This is a *breaking* change and each integration should register preferred serializer in bootstrap.
 
 ## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...1.3.0) - 2019-07-16
 ### Changed
