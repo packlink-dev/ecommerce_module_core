@@ -1089,6 +1089,16 @@ var Packlink = window.Packlink || {};
                 input.value = policy[field];
                 input.setAttribute('data-pl-' + field + '-id', id.toString());
 
+                if (field === 'from') {
+                    if (id === 0) {
+                        input.addEventListener('blur', function (event) {
+                            onFixedPriceFromBlur(event, byWeight);
+                        }, true);
+                    } else {
+                        input.disabled = true;
+                    }
+                }
+
                 if (field === 'to') {
                     input.addEventListener(
                         'blur',
@@ -1106,6 +1116,30 @@ var Packlink = window.Packlink || {};
                     input.setAttribute('tabindex', id * 2 + 2);
                 }
             }
+        }
+
+        /**
+         * Handles on Fixed Price From input field blur event.
+         *
+         * @param event
+         * @param {boolean} byWeight
+         */
+        function onFixedPriceFromBlur(event, byWeight) {
+            let policy = getFixedPricePolicy(byWeight);
+            let index = parseInt(event.target.getAttribute('data-pl-from-id'));
+
+            if (index !== 0) {
+                return;
+            }
+
+            let value = event.target.value;
+            let numericValue = parseFloat(value);
+            // noinspection EqualityComparisonWithCoercionJS
+            methodModel[policy][index].from = event.target.value == numericValue ? numericValue : value;
+
+            templateService.removeError(event.target);
+
+            displayFixedPricesSubForm(index === methodModel[policy].length - 1, false, false, false, byWeight)
         }
 
         /**
@@ -1260,7 +1294,7 @@ var Packlink = window.Packlink || {};
          */
         function isFixedPriceInputTypeValid(byWeight) {
             let policies = methodModel[getFixedPricePolicy(byWeight)];
-            let fields = ['amount', 'to'];
+            let fields = ['from', 'amount', 'to'];
             let result = true;
 
             for (let i = 0; i < policies.length; i++) {
@@ -1310,6 +1344,13 @@ var Packlink = window.Packlink || {};
             for (let i = 0; i < policies.length; i++) {
                 let current = policies[i];
                 let successor = policies.length < i + 1 ? policies[i + 1] : null;
+
+                if (current.from < 0) {
+                    let input = templateService.getComponent('data-pl-from-id', tableExtensionPoint, i);
+                    templateService.setError(input, Packlink.errorMsgs.invalid);
+                    result = false;
+                }
+
                 if (current.from >= current.to || (successor && successor.from && current.to > successor.from)) {
                     let input = templateService.getComponent('data-pl-to-id', tableExtensionPoint, i);
                     templateService.setError(input, Packlink.errorMsgs.invalid);

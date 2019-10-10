@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 **BREAKING CHANGES**
 
+- The lowest boundary in fixed price can be higher than zero. *NOTICE* Each integration for from input field must
+remove "disabled" directive in template file as disabling from input field is now handled by js library.
+
 - Advanced serialization mechanism has been implemented.`NativeSerializer` and `JsonSerializer` have been introduced.
 This is a *breaking* change and each integration should register preferred serializer in bootstrap.
 
