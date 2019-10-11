@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - `DraftController` for creating a new draft
 
 ### Changed
+**NON-BREAKING CHANGES**
+- `SendDraftTask` is now idempotent.
+
 **BREAKING CHANGES**
 
 - The lowest boundary in fixed price can be higher than zero. *NOTICE* Each integration for from input field must

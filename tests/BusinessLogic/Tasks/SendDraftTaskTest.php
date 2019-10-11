@@ -9,6 +9,8 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
@@ -16,7 +18,9 @@ use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
@@ -46,6 +50,13 @@ class SendDraftTaskTest extends BaseSyncTest
             HttpClient::CLASS_NAME,
             function () use ($me) {
                 return $me->httpClient;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            OrderShipmentDetailsService::CLASS_NAME,
+            function () {
+                return OrderShipmentDetailsService::getInstance();
             }
         );
 
@@ -87,6 +98,11 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
+        TestRepositoryRegistry::registerRepository(
+            OrderShipmentDetails::getClassName(),
+            MemoryRepository::getClassName()
+        );
+
         $this->shopConfig->setDefaultParcel(new ParcelInfo());
         $this->shopConfig->setDefaultWarehouse(new Warehouse());
         $this->shopConfig->setUserInfo(new User());
@@ -106,6 +122,7 @@ class SendDraftTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testExecute()
     {
@@ -126,6 +143,7 @@ class SendDraftTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testExecuteBadResponse()
     {
@@ -138,6 +156,7 @@ class SendDraftTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testAfterFailure()
     {
