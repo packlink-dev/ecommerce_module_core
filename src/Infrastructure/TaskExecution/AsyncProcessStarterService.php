@@ -138,7 +138,10 @@ class AsyncProcessStarterService extends Singleton implements AsyncProcessServic
     private function startRunnerAsynchronously($guid)
     {
         try {
-            $this->httpClient->requestAsync('POST', $this->configuration->getAsyncProcessUrl($guid));
+            $this->httpClient->requestAsync(
+                $this->configuration->getAsyncProcessCallHttpMethod(),
+                $this->configuration->getAsyncProcessUrl($guid)
+            );
         } catch (\Exception $e) {
             Logger::logError($e->getMessage(), 'Integration');
             throw new HttpRequestException($e->getMessage(), 0, $e);

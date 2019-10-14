@@ -181,12 +181,6 @@ var Packlink = window.Packlink || {};
 
             hideGettingShippingMethodsMessage();
             renderShippingMethods();
-
-            if (spinnerBarrier === spinnerBarrierCount) {
-                utilityService.hideSpinner();
-            } else {
-                spinnerBarrierCount++;
-            }
         }
 
         /**
@@ -294,10 +288,8 @@ var Packlink = window.Packlink || {};
                 }
             );
 
-            if (spinnerBarrier === spinnerBarrierCount) {
+            if (spinnerBarrier === ++spinnerBarrierCount) {
                 utilityService.hideSpinner();
-            } else {
-                spinnerBarrierCount++;
             }
         }
 
@@ -1518,15 +1510,13 @@ var Packlink = window.Packlink || {};
                 option.value = taxClass['value'];
                 option.innerHTML = taxClass['label'];
                 taxSelector.appendChild(option);
-                taxClasses.push(option['value']);
+                taxClasses.push(taxClass['value']);
             }
 
             taxSelector.value = response[0]['value'];
 
-            if (spinnerBarrier === spinnerBarrierCount) {
+            if (spinnerBarrier === ++spinnerBarrierCount) {
                 utilityService.hideSpinner();
-            } else {
-                spinnerBarrierCount++;
             }
         }
 

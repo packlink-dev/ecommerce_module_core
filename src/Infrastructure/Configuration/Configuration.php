@@ -35,6 +35,10 @@ abstract class Configuration extends Singleton
      */
     const DEFAULT_QUEUE_NAME = 'default';
     /**
+     * Default HTTP method to use for async call.
+     */
+    const ASYNC_CALL_METHOD = 'POST';
+    /**
      * System user context.
      *
      * @var string
@@ -345,6 +349,26 @@ abstract class Configuration extends Singleton
     public function isAutoTestMode()
     {
         return (bool)$this->getConfigValue('autoTestMode', false);
+    }
+
+    /**
+     * Sets the HTTP method to be used for the async call.
+     *
+     * @param string $method Http method (GET or POST).
+     */
+    public function setAsyncProcessCallHttpMethod($method)
+    {
+        $this->saveConfigValue('asyncProcessCallHttpMethod', $method);
+    }
+
+    /**
+     * Returns current HTTP method used for the async call.
+     *
+     * @return string The async call HTTP method (GET or POST).
+     */
+    public function getAsyncProcessCallHttpMethod()
+    {
+        return $this->getConfigValue('asyncProcessCallHttpMethod', static::ASYNC_CALL_METHOD);
     }
 
     /**

@@ -163,9 +163,9 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
         $this->assertCount(
-            7,
+            14,
             $this->httpClient->setAdditionalOptionsCallHistory['example.com'],
-            'Set additional options should be called seven times'
+            'Set additional options should be called 14 times'
         );
         $this->assertEmpty(
             $this->getHttpConfigurationOptions(),
@@ -183,9 +183,9 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
         $this->assertCount(
-            7,
+            14,
             $this->httpClient->setAdditionalOptionsCallHistory['example.com'],
-            'Set additional options should be called seven times'
+            'Set additional options should be called 14 times'
         );
         $this->assertEmpty(
             $this->getHttpConfigurationOptions(),

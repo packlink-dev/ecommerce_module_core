@@ -115,7 +115,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
         $this->assertCount(
-            2,
+            4,
             $this->httpClient->setAdditionalOptionsCallHistory,
             'Set additional options should be called twice'
         );
@@ -135,13 +135,41 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
         $this->assertCount(
-            2,
+            4,
             $this->httpClient->setAdditionalOptionsCallHistory,
-            'Set additional options should be called twice'
+            'Set additional options should be called 4 times'
         );
         $this->assertEmpty(
             $this->httpClient->additionalOptions,
             'Reset additional options method should be called and additional options should be empty.'
+        );
+    }
+
+    /**
+     * Test auto-configure to be successful with some combination options set
+     */
+    public function testAutoConfigurePassesWithGet()
+    {
+        $responses = array(
+            new HttpResponse(400, array(), '{}'),
+            new HttpResponse(400, array(), '{}'),
+            new HttpResponse(400, array(), '{}'),
+            new HttpResponse(200, array(), '{}'),
+        );
+        $this->httpClient->setMockResponses($responses);
+
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $success = $controller->start();
+
+        $this->assertTrue($success, 'Auto-configure must pass for GET request if POST failed.');
+        $this->assertEmpty(
+            $this->httpClient->additionalOptions,
+            'Reset additional options method should be called and additional options should be empty.'
+        );
+        $this->assertEquals(
+            HttpClient::HTTP_METHOD_GET,
+            $this->shopConfig->getAsyncProcessCallHttpMethod(),
+            'Second call should be GET.'
         );
     }
 }
