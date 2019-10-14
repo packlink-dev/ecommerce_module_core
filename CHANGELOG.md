@@ -6,7 +6,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
 ### Added
-- `DraftController` for creating a new draft
 
 ### Changed
 **NON-BREAKING CHANGES**
@@ -16,9 +15,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 - The lowest boundary in fixed price can be higher than zero. *NOTICE* Each integration for from input field must
 remove "disabled" directive in template file as disabling from input field is now handled by js library.
-
 - Advanced serialization mechanism has been implemented.`NativeSerializer` and `JsonSerializer` have been introduced.
 This is a *breaking* change and each integration should register preferred serializer in bootstrap.
+
+## [v1.4.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.1...1.4.0) - 2019-10-14
+### Added
+- `DraftController` is added to decrease the code in integrations related to creation of the draft
+- `ConfigurationService` is extended with a flag whether to run async process with POST or GET call, defaults to POST.
+Integration can just override this constant and the task runner service will use that. Also, if integration has a 
+validation in async process controller whether the call is a POST call, it should be removed if this flag is changed.
+
+### Changed
+- Fixed double spinner problem in shipping services page.
+- Fixed tax selector bug - using the already selected value.
+- Fixed some tests.
 
 ## [v1.4.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.0...1.3.1) - 2019-08-28
 ### Added
