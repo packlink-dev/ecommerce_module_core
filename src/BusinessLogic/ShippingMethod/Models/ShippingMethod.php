@@ -54,6 +54,8 @@ class ShippingMethod extends Entity
         'national',
         'pricingPolicy',
         'taxClass',
+        'isShipToAllCountries',
+        'shippingCountries',
     );
     /**
      * Carrier name.
@@ -157,6 +159,18 @@ class ShippingMethod extends Entity
      * @var ShippingService[]
      */
     protected $shippingServices = array();
+    /**
+     * Flag that denotes whether is shipping to all countries allowed.
+     *
+     * @var boolean
+     */
+    protected $isShipToAllCountries;
+    /**
+     * If `isShipToAllCountries` set to FALSe than this array contains list of countries where shipping is allowed.
+     *
+     * @var array
+     */
+    protected $shippingCountries;
 
     /**
      * Transforms raw array data to this entity instance.
@@ -166,6 +180,9 @@ class ShippingMethod extends Entity
     public function inflate(array $data)
     {
         parent::inflate($data);
+
+        $this->isShipToAllCountries = isset($data['isShipToAllCountries']) ? $data['isShipToAllCountries'] : false;
+        $this->shippingCountries = isset($data['shippingCountries']) ? $data['shippingCountries'] : array();
 
         if (!$this->getPricingPolicy()) {
             $this->pricingPolicy = static::PRICING_POLICY_PACKLINK;

@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 **NON-BREAKING CHANGES**
 - `SendDraftTask` is now idempotent.
+- `ShippingMethodConfiguration` DTO and `ShippingMethod` model are modified to enable setting list of allowed
+destination countries for a shipping method.
 
 **BREAKING CHANGES**
 

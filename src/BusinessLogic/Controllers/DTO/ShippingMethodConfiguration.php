@@ -62,6 +62,18 @@ class ShippingMethodConfiguration extends BaseDto
      * @var mixed
      */
     public $taxClass;
+    /**
+     * Flag that denotes whether is shipping to all countries allowed.
+     *
+     * @var boolean
+     */
+    public $isShipToAllCountries;
+    /**
+     * If `isShipToAllCountries` set to FALSe than this array contains list of countries where shipping is allowed.
+     *
+     * @var array
+     */
+    public $shippingCountries;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -76,6 +88,8 @@ class ShippingMethodConfiguration extends BaseDto
             'pricePolicy' => $this->pricePolicy,
             'showLogo' => $this->showLogo,
             'taxClass' => $this->taxClass,
+            'isShipToAllCountries' => $this->isShipToAllCountries,
+            'shippingCountries' => $this->shippingCountries,
         );
 
         if ($this->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && $this->percentPricePolicy) {
@@ -114,6 +128,8 @@ class ShippingMethodConfiguration extends BaseDto
         $result->pricePolicy = $raw['pricePolicy'];
 
         $result->taxClass = isset($raw['taxClass']) ? $raw['taxClass'] : null;
+        $result->isShipToAllCountries = isset($raw['isShipToAllCountries']) ? $raw['isShipToAllCountries'] : false;
+        $result->shippingCountries = isset($raw['shippingCountries']) ? $raw['shippingCountries'] : array();
 
         if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT) {
             $value = $raw['percentPricePolicy'];
