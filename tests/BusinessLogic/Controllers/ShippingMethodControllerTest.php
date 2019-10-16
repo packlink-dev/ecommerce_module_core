@@ -109,6 +109,8 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->name = 'First name test';
         $shipment->showLogo = !$first->showLogo;
         $shipment->pricePolicy = $first->pricePolicy;
+        $shipment->isShipToAllCountries = true;
+        $shipment->shippingCountries = array();
 
         $model = $this->controller->save($shipment);
 
@@ -287,6 +289,8 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->id = $first->id;
         $shipment->name = 'First name test';
         $shipment->showLogo = !$first->showLogo;
+        $shipment->isShipToAllCountries = true;
+        $shipment->shippingCountries = array();
 
         $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
         $shipment->percentPricePolicy = new PercentPricePolicy(true, 0.1);
