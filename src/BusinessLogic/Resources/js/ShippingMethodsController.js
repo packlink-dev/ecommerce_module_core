@@ -151,7 +151,7 @@ var Packlink = window.Packlink || {};
             }
 
             if (response.status === 'failed') {
-                hideDashboardModal();
+                hideDashboardModal(true);
                 showNoShippingMethodsMessage();
 
                 return;
@@ -180,7 +180,7 @@ var Packlink = window.Packlink || {};
             }
 
             if (response.length === 0) {
-                hideDashboardModal();
+                hideDashboardModal(true);
                 showNoShippingMethodsMessage();
 
                 return;
@@ -1786,9 +1786,15 @@ var Packlink = window.Packlink || {};
 
         /**
          * Hides dashboard modal.
+         *
+         * @param {boolean} [isAutoconfigure]
          */
-        function hideDashboardModal() {
-            if (!dashboardData.parcelSet || !dashboardData.warehouseSet) {
+        function hideDashboardModal(isAutoconfigure) {
+            if (typeof isAutoconfigure !== 'boolean') {
+                isAutoconfigure = false;
+            }
+
+            if (!isAutoconfigure && (!dashboardData.parcelSet || !dashboardData.warehouseSet)) {
                 return;
             }
 
