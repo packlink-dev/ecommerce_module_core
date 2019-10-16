@@ -181,8 +181,17 @@ class ShippingMethod extends Entity
     {
         parent::inflate($data);
 
-        $this->isShipToAllCountries = isset($data['isShipToAllCountries']) ? $data['isShipToAllCountries'] : false;
-        $this->shippingCountries = isset($data['shippingCountries']) ? $data['shippingCountries'] : array();
+        if (isset($data['isShipToAllCountries']) && is_bool($data['isShipToAllCountries'])) {
+            $this->isShipToAllCountries = $data['isShipToAllCountries'];
+        } else {
+            $this->isShipToAllCountries = true;
+        }
+
+        if (isset($data['isShipToAllCountries']) && is_array($data['isShipToAllCountries'])) {
+            $this->shippingCountries = $data['shippingCountries'];
+        } else {
+            $this->shippingCountries = array();
+        }
 
         if (!$this->getPricingPolicy()) {
             $this->pricingPolicy = static::PRICING_POLICY_PACKLINK;
@@ -639,6 +648,45 @@ class ShippingMethod extends Entity
     public function setTaxClass($taxClass)
     {
         $this->taxClass = $taxClass;
+    }
+
+    /**
+     * Sets list of allowed destination countries.
+     *
+     * @param array $shippingCountries List of allowed destination countries.
+     */
+    public function setShippingCountries(array $shippingCountries) {
+        $this->shippingCountries = $shippingCountries;
+    }
+
+    /**
+     * Retrieves list of allowed destination countries.
+     *
+     * @return array List of allowed destination countries.
+     */
+    public function getShippingCountries()
+    {
+        return $this->shippingCountries;
+    }
+
+    /**
+     * Retrieves flag that denotes whether shipping to all countries is enabled.
+     *
+     * @return bool Flag that denotes whether shipping to all countries is enabled.
+     */
+    public function isShipToAllCountries()
+    {
+        return $this->isShipToAllCountries;
+    }
+
+    /**
+     * Sets flag that denotes whether shipping to all countries is enabled.
+     *
+     * @param boolean $isShipToAllCountries Flag that denotes whether shipping to all countries is enabled.
+     */
+    public function setShipToAllCountries($isShipToAllCountries)
+    {
+        $this->isShipToAllCountries = $isShipToAllCountries;
     }
 
     /**

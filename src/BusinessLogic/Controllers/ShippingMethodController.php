@@ -12,7 +12,7 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 /**
  * Class ShippingMethodController.
  *
- * @package Packlink\BusinessLogic\Controllers
+ * @package Packlink\PacklinkPro\IntegrationCore\BusinessLogic\Controllers
  */
 class ShippingMethodController
 {
@@ -176,6 +176,8 @@ class ShippingMethodController
         $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::HOME;
         $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::PICKUP;
         $shippingMethod->taxClass = $item->getTaxClass();
+        $shippingMethod->shippingCountries = $item->getShippingCountries();
+        $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
 
         $shippingMethod->pricePolicy = $item->getPricingPolicy();
         $shippingMethod->percentPricePolicy = $item->getPercentPricePolicy();
@@ -214,6 +216,8 @@ class ShippingMethodController
         $model->setTitle($configuration->name);
         $model->setDisplayLogo($configuration->showLogo);
         $model->setTaxClass($configuration->taxClass);
+        $model->setShipToAllCountries($configuration->isShipToAllCountries);
+        $model->setShippingCountries($configuration->shippingCountries);
         switch ($configuration->pricePolicy) {
             case ShippingMethod::PRICING_POLICY_PACKLINK:
                 $model->setPacklinkPricePolicy();

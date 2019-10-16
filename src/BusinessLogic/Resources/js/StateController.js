@@ -10,6 +10,7 @@ var Packlink = window.Packlink || {};
      *      pageConfiguration: array,
      *      scrollConfiguration: {scrollOffset: number, rowHeight: number},
      *      hasTaxConfiguration: boolean,
+     *      hasCountryConfiguration: boolean,
      *      canDisplayCarrierLogos: boolean,
      *      shippingServiceMaxTitleLength: number,
      *      autoConfigureStartUrl: string,
@@ -31,7 +32,8 @@ var Packlink = window.Packlink || {};
      *      shopShippingMethodsDisableUrl: string,
      *      getSystemOrderStatusesUrl: string,
      *      orderStatusMappingsSaveUrl: string,
-     *      orderStatusMappingsGetUrl: string
+     *      orderStatusMappingsGetUrl: string,
+     *      getShippingCountriesUrl: string
      * }} configuration
      *
      * @constructor
@@ -87,7 +89,9 @@ var Packlink = window.Packlink || {};
                 autoConfigureStartUrl: configuration.autoConfigureStartUrl,
                 hasTaxConfiguration: configuration.hasTaxConfiguration,
                 getTaxClassesUrl: configuration.shippingMethodsGetTaxClassesUrl,
-                canDisplayCarrierLogos: configuration.canDisplayCarrierLogos
+                canDisplayCarrierLogos: configuration.canDisplayCarrierLogos,
+                getShippingCountries: configuration.getShippingCountriesUrl,
+                hasCountryConfiguration: configuration.hasCountryConfiguration
             },
             'order-state-mapping': {
                 getSystemOrderStatusesUrl: configuration.getSystemOrderStatusesUrl,

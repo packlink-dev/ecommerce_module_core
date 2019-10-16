@@ -128,8 +128,18 @@ class ShippingMethodConfiguration extends BaseDto
         $result->pricePolicy = $raw['pricePolicy'];
 
         $result->taxClass = isset($raw['taxClass']) ? $raw['taxClass'] : null;
-        $result->isShipToAllCountries = isset($raw['isShipToAllCountries']) ? $raw['isShipToAllCountries'] : false;
-        $result->shippingCountries = isset($raw['shippingCountries']) ? $raw['shippingCountries'] : array();
+
+        if (isset($raw['isShipToAllCountries']) && is_bool($raw['isShipToAllCountries'])) {
+            $result->isShipToAllCountries = $raw['isShipToAllCountries'];
+        } else {
+            $result->isShipToAllCountries = true;
+        }
+
+        if (isset($raw['shippingCountries']) && is_array($raw['shippingCountries'])) {
+            $result->shippingCountries = $raw['shippingCountries'];
+        } else {
+            $result->shippingCountries = array();
+        }
 
         if ($result->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT) {
             $value = $raw['percentPricePolicy'];
