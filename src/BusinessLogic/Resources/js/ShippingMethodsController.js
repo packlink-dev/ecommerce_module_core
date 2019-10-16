@@ -898,6 +898,8 @@ var Packlink = window.Packlink || {};
                 if (configuration.hasCountryConfiguration) {
                     methodModel.isShipToAllCountries = countrySelector.isShipToAllCountries;
                     methodModel.shippingCountries = countrySelector.shippingCountries;
+
+                    countrySelector = {};
                 }
 
                 ajaxService.post(

@@ -187,7 +187,7 @@ class ShippingMethod extends Entity
             $this->isShipToAllCountries = true;
         }
 
-        if (isset($data['isShipToAllCountries']) && is_array($data['isShipToAllCountries'])) {
+        if (isset($data['shippingCountries']) && is_array($data['shippingCountries'])) {
             $this->shippingCountries = $data['shippingCountries'];
         } else {
             $this->shippingCountries = array();
