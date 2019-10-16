@@ -4,10 +4,6 @@ var Packlink = window.Packlink || {};
     /**
      * Controller that displays shipping country selector pop up.
      *
-     * @param {array} availableCountries List of available countries in system.
-     * @param {array} selectedCountries List of selected countries.
-     * @param {function} saveCallback callback when save button is clicked.
-     * @param {function} cancelCallback callback when cancel button is clicked.
      * @constructor
      */
     function CountrySelectorController() {
@@ -17,6 +13,14 @@ var Packlink = window.Packlink || {};
         this.display = display;
         this.destroy = destroy;
 
+        /**
+         * Displays country selector.
+         *
+         * @param {array} availableCountries List of available countries in system.
+         * @param {array} selectedCountries List of selected countries.
+         * @param {function} saveCallback callback when save button is clicked.
+         * @param {function} cancelCallback callback when cancel button is clicked.
+         */
         function display(availableCountries, selectedCountries, saveCallback, cancelCallback) {
             templateService.setTemplate('pl-allowed-countries-modal-template', 'pl-allowed-shipping-countries-ep', true);
 
