@@ -127,7 +127,7 @@ class UpdateShipmentDataTask extends Task
     {
         $original = Serializer::unserialize($serialized);
 
-        if (count($serialized) === 3) {
+        if (count($original) === 3) {
             list($this->references, $this->progress, $this->progressStep) = $original;
         } else {
             list($this->references, $this->progress, $this->progressStep, $this->orderStatuses) = $original;
