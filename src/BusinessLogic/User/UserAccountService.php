@@ -41,7 +41,7 @@ class UserAccountService extends BaseService
      *
      * @var Configuration
      */
-    private $configuration;
+    protected $configuration;
     /**
      * Proxy instance.
      *
@@ -104,6 +104,10 @@ class UserAccountService extends BaseService
     {
         $parcelInfo = $this->configuration->getDefaultParcel();
         if ($parcelInfo === null || $force) {
+            if ($this->setParcelInfoInternal()) {
+                return;
+            }
+
             $parcels = $this->getProxy()->getUsersParcelInfo();
             foreach ($parcels as $parcel) {
                 if ($parcel->default) {
@@ -129,6 +133,10 @@ class UserAccountService extends BaseService
     {
         $warehouse = $this->configuration->getDefaultWarehouse();
         if ($warehouse === null || $force) {
+            if ($this->setWarehouseInfoInternal()) {
+                return;
+            }
+
             $usersWarehouses = $this->getProxy()->getUsersWarehouses();
             foreach ($usersWarehouses as $usersWarehouse) {
                 if ($usersWarehouse->default) {
@@ -175,6 +183,28 @@ class UserAccountService extends BaseService
         }
 
         $this->getProxy()->sendAnalytics(Analytics::EVENT_CONFIGURATION);
+    }
+
+    /**
+     * Internal method for setting warehouse info in integrations.
+     * If integration set it, Core will not fetch the info from Packlink API.
+     *
+     * @return bool
+     */
+    protected function setWarehouseInfoInternal()
+    {
+        return false;
+    }
+
+    /**
+     * Internal method for setting default parcel info in integrations.
+     * If integration set it, Core will not fetch the info from Packlink API.
+     *
+     * @return bool
+     */
+    protected function setParcelInfoInternal()
+    {
+        return false;
     }
 
     /**
