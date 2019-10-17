@@ -33,7 +33,8 @@ var Packlink = window.Packlink || {};
         /**
          * @var {{id, name, title, logoUrl, taxClass, deliveryDescription, showLogo, deliveryType,
          * parcelDestination, parcelOrigin, selected,
-         * pricePolicy, fixedPriceByWeightPolicy, fixedPriceByValuePolicy, percentPricePolicy}} methodModel
+         * pricePolicy, fixedPriceByWeightPolicy, fixedPriceByValuePolicy, percentPricePolicy,
+         * isShipToAllCountries, shippingCountries}} methodModel
          */
         let methodModel = {};
         let taxClasses = [];
@@ -740,7 +741,7 @@ var Packlink = window.Packlink || {};
          * Initializes shipping country selector
          *
          * @param {object} method
-         * @param {Node} template
+         * @param {Element} template
          */
         function initializeCountryCountrySelector(method, template) {
             let checkbox = templateService.getComponent('pl-country-selector-checkbox', template);

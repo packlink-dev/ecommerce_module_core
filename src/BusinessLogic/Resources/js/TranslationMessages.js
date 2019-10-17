@@ -8,7 +8,8 @@ Packlink.errorMsgs = {
     titleLength: 'Title can have at most 64 characters.',
     greaterThanZero: 'Value must be greater than 0.',
     numberOfDecimalPlaces: 'Field must have 2 decimal places.',
-    integer: 'Field must be an integer.'
+    integer: 'Field must be an integer.',
+    invalidCountryList: 'You must select destination countries.'
 };
 
 Packlink.successMsgs = {
