@@ -13,9 +13,11 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
@@ -231,6 +233,9 @@ class UserAccountService extends BaseService
 
         // Schedule hourly task for updating shipment info - start at half hour
         $this->setHourlyTask($repository, 30);
+
+        // Schedule daily task for updating shipment info - start at 11:00 UTC hour
+        $this->setDailyTask($repository, 11);
     }
 
     /**
@@ -241,13 +246,45 @@ class UserAccountService extends BaseService
      */
     protected function setHourlyTask(RepositoryInterface $repository, $minute)
     {
+        $hourlyStatuses = array(
+            ShipmentStatus::STATUS_PENDING,
+        );
+
         $shipmentDataHalfHourSchedule = new HourlySchedule(
-            new UpdateShipmentDataTask(),
+            new UpdateShipmentDataTask($hourlyStatuses),
             $this->configuration->getDefaultQueueName()
         );
         $shipmentDataHalfHourSchedule->setMinute($minute);
         $shipmentDataHalfHourSchedule->setNextSchedule();
         $repository->save($shipmentDataHalfHourSchedule);
+    }
+
+    /**
+     * Schedules daily shipment data update task.
+     *
+     * @param RepositoryInterface $repository Schedule repository.
+     * @param int $hour Hour of the day when schedule should be executed.
+     */
+    protected function setDailyTask(RepositoryInterface $repository, $hour)
+    {
+        $dailyStatuses = array(
+            ShipmentStatus::STATUS_IN_TRANSIT,
+            ShipmentStatus::STATUS_READY,
+            ShipmentStatus::STATUS_ACCEPTED,
+        );
+
+        $dailyShipmentDataSchedule = new DailySchedule(
+            new UpdateShipmentDataTask(
+                $dailyStatuses
+            ),
+            $this->configuration->getDefaultQueueName(),
+            $this->configuration->getContext()
+        );
+
+        $dailyShipmentDataSchedule->setHour($hour);
+        $dailyShipmentDataSchedule->setNextSchedule();
+
+        $repository->save($dailyShipmentDataSchedule);
     }
 
     /**

@@ -46,6 +46,8 @@ class TestOrderRepository implements OrderRepository
      */
     private $incompleteOrderReferences = array('test');
 
+    private $ordersInStatuses = array('test');
+
     /**
      * TestOrderRepository constructor.
      */
@@ -329,5 +331,21 @@ class TestOrderRepository implements OrderRepository
         $packlinkShipmentLabels = $order->getPacklinkShipmentLabels();
 
         return !empty($packlinkShipmentLabels);
+    }
+
+    /**
+     * Retrieves list of order references where order is in one of the provided statuses.
+     *
+     * @param array $statuses List of order statuses.
+     *
+     * @return string[] Array of shipment references.
+     */
+    public function getOrderReferencesWithStatus(array $statuses)
+    {
+        if ($this->throwGenericException) {
+            throw new \RuntimeException('Error');
+        }
+
+        return $this->ordersInStatuses;
     }
 }

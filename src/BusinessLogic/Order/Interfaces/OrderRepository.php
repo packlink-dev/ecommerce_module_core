@@ -26,6 +26,15 @@ interface OrderRepository
     public function getIncompleteOrderReferences();
 
     /**
+     * Retrieves list of order references where order is in one of the provided statuses.
+     *
+     * @param array $statuses List of order statuses.
+     *
+     * @return string[] Array of shipment references.
+     */
+    public function getOrderReferencesWithStatus(array $statuses);
+
+    /**
      * Fetches and returns system order by its unique identifier.
      *
      * @param string $orderId $orderId Unique order id.

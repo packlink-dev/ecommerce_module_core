@@ -256,6 +256,20 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
     }
 
     /**
+     * Tests execute with order statuses provided.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     */
+    public function testWithOrderStatusesProvided()
+    {
+        $this->syncTask = new UpdateShipmentDataTask(array(ShipmentStatus::STATUS_IN_TRANSIT));
+        $this->attachProgressEventListener();
+        $this->httpClient->setMockResponses($this->getMockResponses());
+        $this->syncTask->execute();
+        self::assertCount(3, $this->eventHistory);
+    }
+
+    /**
      * Creates new instance of task that is being tested.
      *
      * @return UpdateShipmentDataTask
