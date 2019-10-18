@@ -7,13 +7,7 @@ var Packlink = window.Packlink || {};
         let ajaxService = Packlink.ajaxService;
         let state = Packlink.state;
 
-        const statuses = [
-            'pending',
-            'processing',
-            'readyForShipping',
-            'inTransit',
-            'delivered'
-        ];
+        let statuses = [];
 
         let page;
         let mappings = {};
@@ -23,6 +17,11 @@ var Packlink = window.Packlink || {};
             utilityService.showSpinner();
 
             page = templateService.setTemplate('pl-order-state-mapping-template');
+
+            let statusElements = templateService.getComponentsByAttribute('data-pl-status', page);
+            for (let statusElement of statusElements) {
+                statuses.push(statusElement.getAttribute('data-pl-status'));
+            }
 
             attachEventHandlers();
 
