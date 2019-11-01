@@ -194,6 +194,315 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
+     * Tests repository implementation with NOT_EQUALS operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithNotEquals()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $count = count($this->readStudentsFromFile());
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::NOT_EQUALS, 4);
+
+        $students = $repository->select($query);
+        $this->assertCount($count - 1, $students);
+
+        $query->where('localId', Operators::EQUALS, 4);
+
+        $students = $repository->select($query);
+        $this->assertCount(0, $students);
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::NOT_EQUALS, 4);
+        $query->orWhere('localId', Operators::NOT_EQUALS, 7);
+
+        $students = $repository->select($query);
+        $this->assertCount($count, $students);
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::NOT_EQUALS, 4);
+        $query->where('localId', Operators::NOT_EQUALS, 7);
+
+        $students = $repository->select($query);
+        $this->assertCount($count - 2, $students);
+    }
+
+    /**
+     * Test base repository with GREATER_THAN operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithGreaterThan()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::GREATER_THAN, 5);
+
+        $students = $repository->select($query);
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertGreaterThan(5, $student->localId);
+        }
+
+        $query->where('localId', Operators::GREATER_THAN, 7);
+        $students = $repository->select($query);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertGreaterThan(7, $student->localId);
+        }
+
+        $query->orWhere('localId', Operators::GREATER_THAN, 4);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertGreaterThan(4, $student->localId);
+        }
+    }
+
+    /**
+     * Tests repository with LESS_THAN operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithLessThan()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::LESS_THAN, 7);
+
+        $students = $repository->select($query);
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThan(7, $student->localId);
+        }
+
+        $query->where('localId', Operators::LESS_THAN, 5);
+        $students = $repository->select($query);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThan(5, $student->localId);
+        }
+
+        $query->orWhere('localId', Operators::LESS_THAN, 4);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThan(5, $student->localId);
+        }
+    }
+
+    /**
+     * Tests repository with GREATER_THAN_OR_EQUAL_THAN operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithGreaterEqualThan()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::GREATER_OR_EQUAL_THAN, 5);
+
+        $students = $repository->select($query);
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertGreaterThanOrEqual(5, $student->localId);
+        }
+
+        $query->where('localId', Operators::GREATER_OR_EQUAL_THAN, 7);
+        $students = $repository->select($query);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertGreaterThanOrEqual(7, $student->localId);
+        }
+
+        $query->orWhere('localId', Operators::GREATER_OR_EQUAL_THAN, 4);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertGreaterThanOrEqual(4, $student->localId);
+        }
+    }
+
+    /**
+     * Tests repository with LEST_OR_EQUAL_THAN_OPERATOR
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithLessOrEqualThan()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::LESS_OR_EQUAL_THAN, 7);
+
+        $students = $repository->select($query);
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThanOrEqual(7, $student->localId);
+        }
+
+        $query->where('localId', Operators::LESS_OR_EQUAL_THAN, 5);
+        $students = $repository->select($query);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThanOrEqual(5, $student->localId);
+        }
+
+        $query->orWhere('localId', Operators::LESS_OR_EQUAL_THAN, 4);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThanOrEqual(5, $student->localId);
+        }
+    }
+
+    /**
+     * Test repository with combined comparison operators.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithCombinedComparisonOperators()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::LESS_OR_EQUAL_THAN, 7);
+        $query->where('localId', Operators::GREATER_THAN, 4);
+
+        $students = $repository->select($query);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertLessThanOrEqual(7, $student->localId);
+            $this->assertGreaterThan(4, $student->localId);
+        }
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::GREATER_THAN, 7);
+        $query->orWhere('localId', Operators::LESS_THAN, 5);
+
+        $students = $repository->select($query);
+        foreach ($students as $student) {
+            $this->assertAttributeNotEquals(6, 'localId', $student);
+        }
+    }
+
+    /**
+     * Tests repository with IN operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithInOperator()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::IN, array(5, 6, 7));
+
+        $students = $repository->select($query);
+        $this->assertCount(3, $students);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertContains($student->localId, array(5, 6, 7));
+        }
+
+        $query->where('localId', Operators::IN, array(5));
+        $students = $repository->select($query);
+        $this->assertCount(1, $students);
+        $student = $students[0];
+        $this->assertEquals(5, $student->localId);
+
+        $query->orWhere('localId', Operators::IN, array(9));
+        $students = $repository->select($query);
+        $this->assertCount(2, $students);
+
+        $query->where('localId', Operators::IN, array(8));
+        $students = $repository->select($query);
+        $this->assertCount(1, $students);
+
+        $student = $students[0];
+        $this->assertEquals(5, $student->localId);
+    }
+
+    /**
+     * Tests repository with NOT_IN operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithNotInOperator()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $count = count($this->readStudentsFromFile());
+
+        $query = new QueryFilter();
+        $query->where('localId', Operators::NOT_IN, array(5, 6, 7));
+
+        $students = $repository->select($query);
+        $this->assertCount($count - 3, $students);
+
+        /** @var StudentEntity $student */
+        foreach ($students as $student) {
+            $this->assertNotContains($student->localId, array(5, 6, 7));
+        }
+    }
+
+    /**
+     * Tests repository with LIKE operator.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function testQueryWithLikeOperator()
+    {
+        $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
+        $this->testStudentMassInsert();
+
+        $count = count($this->readStudentsFromFile());
+
+        $query = new QueryFilter();
+        $query->where('username', Operators::LIKE, '%g1stu%');
+
+        $students = $repository->select($query);
+
+        $this->assertCount($count, $students);
+
+        $query->where('username', Operators::LIKE, '%9');
+        $students = $repository->select($query);
+        $this->assertCount(1, $students);
+        /** @var StudentEntity $student */
+        $student = $students[0];
+        $this->assertStringEndsWith('9', $student->username);
+    }
+
+    /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */

@@ -12,9 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - `SendDraftTask` is now idempotent.
 - `ShippingMethodConfiguration` DTO and `ShippingMethod` model are modified to enable setting list of allowed
 destination countries for a shipping method.
-- UpdateShipmentDataTask checks for update with different frequencies for orders with different statuses.
-*NOTICE* For existing users delete old scheduled UpdateShipmentDataTasks and schedule new ones in the same manner as 
+- `UpdateShipmentDataTask` checks for update with different frequencies for orders with different statuses.
+*NOTICE* For existing users delete old scheduled `UpdateShipmentDataTasks` and schedule new ones in the same manner as 
 they are scheduled in core.
+- `AbstractGenericStudentRepositoryTest` extended to cover every ORM operator.
 
 **BREAKING CHANGES**
 

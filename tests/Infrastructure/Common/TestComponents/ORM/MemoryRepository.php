@@ -64,6 +64,10 @@ class MemoryRepository implements RepositoryInterface
             $result = array_merge($result, $groupResult);
         }
 
+        if (is_array($result) && !empty($result)) {
+            $result = $this->unique($result);
+        }
+
         if ($filter) {
             $this->sortResults($result, $filter, $fieldIndexMap);
             $result = $this->sliceResults($filter, $result);
@@ -375,6 +379,29 @@ class MemoryRepository implements RepositoryInterface
         }
 
         return $translator->translate($intermediates);
+    }
+
+    /**
+     * Removes duplicate values from an array.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    private function unique(array $array)
+    {
+        $result = array();
+        $occurrences = array();
+
+        foreach ($array as $item) {
+            $fingerprint = md5(serialize($item));
+            if (!in_array($fingerprint, $occurrences, true)) {
+                $result[] = $item;
+                $occurrences[] = $fingerprint;
+            }
+        }
+
+        return $result;
     }
 
     /**
