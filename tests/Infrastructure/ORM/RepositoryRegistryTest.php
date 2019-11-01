@@ -67,6 +67,18 @@ class RepositoryRegistryTest extends TestCase
     }
 
     /**
+     * Test isRegistered method.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     */
+    public function testIsRegistered()
+    {
+        RepositoryRegistry::registerRepository('test', MemoryRepository::getClassName());
+        $this->assertTrue(RepositoryRegistry::isRegistered('test'));
+        $this->assertFalse(RepositoryRegistry::isRegistered('test2'));
+    }
+
+    /**
      * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */

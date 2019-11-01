@@ -69,6 +69,18 @@ class RepositoryRegistry
     }
 
     /**
+     * Checks whether repository has been registered for a particular entity.
+     *
+     * @param string $entityClass Entity for which check has to be performed.
+     *
+     * @return boolean Returns TRUE if repository has been registered; FALSE otherwise.
+     */
+    public static function isRegistered($entityClass)
+    {
+        return isset(self::$repositories[$entityClass]);
+    }
+
+    /**
      * Returns queue item repository.
      *
      * @return QueueItemRepository

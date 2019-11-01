@@ -3,10 +3,12 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 
@@ -109,7 +111,8 @@ class SendDraftTask extends Task
      */
     public function execute()
     {
-        if ($this->isDraftCreated($this->orderId)) {
+        $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
+        if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
             Logger::logWarning("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
             $this->reportProgress(100);
             return;

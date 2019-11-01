@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- `isRegistered` method in `RepositoryRegistry`.
+
 ### Changed
 **NON-BREAKING CHANGES**
 - `SendDraftTask` is now idempotent.
