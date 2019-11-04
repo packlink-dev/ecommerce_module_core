@@ -192,8 +192,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         }
 
         self::assertNotEmpty($e);
-        self::assertCount(1, $this->shopLogger->loggedMessages);
-        self::assertEquals('No response', $this->shopLogger->loggedMessages[0]->getMessage());
+        self::assertCount(0, $this->shopLogger->loggedMessages);
         self::assertCount(2, $this->eventHistory);
         /** @var \Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent $event */
         $event = $this->eventHistory[0];
@@ -224,7 +223,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertCount(4, $this->eventHistory);
 
         // no new messages
-        self::assertCount(1, $this->shopLogger->loggedMessages);
+        self::assertCount(0, $this->shopLogger->loggedMessages);
 
         $this->validate100Progress();
     }

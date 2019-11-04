@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
@@ -197,10 +198,11 @@ class UpdateShipmentDataTask extends Task
             $shipment = $this->getProxy()->getShipment($reference);
             if ($shipment !== null) {
                 $orderService = $this->getOrderService();
-                $orderService->updateTrackingInfo($shipment);
-                $orderService->updateShipmentLabel($shipment);
-                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
+                if ($this->isTrackingInfoUpdatable($shipment)) {
+                    $orderService->updateTrackingInfo($shipment);
+                }
 
+                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
                 $orderRepository->setShippingPriceByReference($reference, (float)$shipment->price);
             } else {
                 $orderRepository->markShipmentDeleted($reference);
@@ -248,5 +250,23 @@ class UpdateShipmentDataTask extends Task
         }
 
         return $this->orderService;
+    }
+
+    /**
+     * Checks if tracking info should be updated.
+     *
+     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipment Shipment instance to be checked for updatability.
+     *
+     * @return bool TRUE if tracking info should be update; FALSE otherwise.
+     */
+    protected function isTrackingInfoUpdatable(Shipment $shipment)
+    {
+        $allowedUpdateStatuses = array(
+            ShipmentStatus::STATUS_ACCEPTED,
+            ShipmentStatus::STATUS_READY,
+            ShipmentStatus::STATUS_IN_TRANSIT,
+        );
+
+        return in_array(ShipmentStatus::getStatus($shipment->status), $allowedUpdateStatuses, true);
     }
 }
