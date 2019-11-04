@@ -74,63 +74,6 @@ class WebHookHandlerTest extends BaseTestWithServices
     }
 
     /**
-     * Tests setting of shipment labels
-     */
-    public function testHandleShipmentLabelEvent()
-    {
-        $this->httpClient->setMockResponses($this->getMockLabelResponse());
-        $webhookHandler = WebHookEventHandler::getInstance();
-        $input = $this->getShipmentLabelEventBody();
-        $webhookHandler->handle($input);
-
-        /** @var TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
-
-        $this->assertNotNull($order);
-        $this->assertNotEmpty($order->getPacklinkShipmentLabels());
-        $this->assertCount(1, $order->getPacklinkShipmentLabels());
-    }
-
-    /**
-     * Tests when API fails
-     */
-    public function testHandleShipmentLabelEventHttpError()
-    {
-        $this->httpClient->setMockResponses($this->getErrorMockResponse());
-        $webhookHandler = WebHookEventHandler::getInstance();
-        $input = $this->getShipmentLabelEventBody();
-        $webhookHandler->handle($input);
-
-        $this->assertNotEmpty($this->shopLogger->loggedMessages);
-        /** @var \Logeecom\Infrastructure\Logger\LogData $logData */
-        $logData = end($this->shopLogger->loggedMessages);
-        $this->assertNotEmpty($logData);
-        $logContextData = $logData->getContext();
-        $this->assertNotEmpty($logContextData);
-        $this->assertEquals('referenceId', $logContextData[0]->getName());
-        $this->assertEquals('test', $logContextData[0]->getValue());
-    }
-
-    /**
-     * Tests when order fetch fails
-     */
-    public function testHandleShipmentLabelEventNoOrder()
-    {
-        /** @var TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowOrderNotFoundException(true);
-
-        $this->httpClient->setMockResponses($this->getMockLabelResponse());
-        $webhookHandler = WebHookEventHandler::getInstance();
-        $input = $this->getShipmentLabelEventBody();
-        $webhookHandler->handle($input);
-
-        $this->assertNotEmpty($this->shopLogger->loggedMessages);
-        $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[1]->getMessage());
-    }
-
-    /**
      * Tests setting of shipping status
      */
     public function testHandleShippingStatusEvent()

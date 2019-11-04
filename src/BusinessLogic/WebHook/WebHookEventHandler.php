@@ -126,9 +126,6 @@ class WebHookEventHandler extends BaseService
             case 'shipment.delivered':
                 $orderService->updateShippingStatus($shipment, ShipmentStatus::STATUS_DELIVERED);
                 break;
-            case 'shipment.label.ready':
-                $orderService->updateShipmentLabel($shipment);
-                break;
             case 'shipment.tracking.update':
                 $orderService->updateTrackingInfo($shipment);
                 break;

@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 - `isRegistered` method in `RepositoryRegistry`.
 
+### Removed
+
+- `OrderService::updateShipmentLabel` method.
+
 ### Changed
 **NON-BREAKING CHANGES**
 - `SendDraftTask` is now idempotent.
@@ -27,6 +31,7 @@ remove "disabled" directive in template file as disabling from input field is no
 This is a *breaking* change and each integration should register preferred serializer in bootstrap.
 - `OrderRepository` introduced new method `getOrderReferencesWithStatus`. This method must be implemented in each
 integration.
+- Removed `OrderRepository::setLabelsByReference` method.
 
 ## [v1.4.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.1...1.4.0) - 2019-10-14
 ### Added

@@ -56,16 +56,6 @@ interface OrderRepository
     public function setReference($orderId, $shipmentReference);
 
     /**
-     * Sets order packlink shipping labels to an order by shipment reference.
-     *
-     * @param string $shipmentReference Packlink shipment reference.
-     * @param string[] $labels Packlink shipping labels.
-     *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
-     */
-    public function setLabelsByReference($shipmentReference, array $labels);
-
-    /**
      * Sets order packlink shipment tracking history to an order for given shipment.
      *
      * @param Shipment $shipment Packlink shipment details.
