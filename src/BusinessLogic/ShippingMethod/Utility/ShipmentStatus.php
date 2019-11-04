@@ -29,6 +29,10 @@ class ShipmentStatus
      * Status when shipment is completed.
      */
     const STATUS_DELIVERED = 'delivered';
+    /**
+     * Status when shipment is cancelled.
+     */
+    const STATUS_CANCELLED = 'cancelled';
 
     /**
      * Maps raw shipment status from Packlink to shipment status.
