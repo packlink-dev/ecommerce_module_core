@@ -104,13 +104,4 @@ interface OrderRepository
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function isShipmentDeleted($shipmentReference);
-
-    /**
-     * Returns whether shipment identified by provided reference has Packlink shipment label set.
-     *
-     * @param string $shipmentReference Packlink shipment reference.
-     *
-     * @return bool Returns TRUE if label is set; otherwise, FALSE.
-     */
-    public function isLabelSet($shipmentReference);
 }

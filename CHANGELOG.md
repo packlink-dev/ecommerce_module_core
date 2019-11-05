@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Removed
 
 - `OrderService::updateShipmentLabel` method.
+- `OrderRepository::isLabelSet` method.
+- `OrderRepository::setLabelsByReference` method.
 
 ### Changed
 **NON-BREAKING CHANGES**
