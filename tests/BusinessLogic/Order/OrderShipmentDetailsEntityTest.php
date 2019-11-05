@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Order;
 
+use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use PHPUnit\Framework\TestCase;
 
@@ -97,7 +98,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         $orderDetails->setOrderId(5);
         $orderDetails->setReference('DE2019PRO0000309473');
         $orderDetails->setDropOffId(23);
-        $orderDetails->setShipmentLabels(array('test1.dev', 'test2.dev'));
+        $orderDetails->setShipmentLabels(array(new ShipmentLabel('test1.dev'), new ShipmentLabel('test2.dev')));
         $orderDetails->setShippingStatus('pending', 1554192735);
         $orderDetails->setCarrierTrackingNumbers($this->getTestTrackingNumbers());
         $orderDetails->setCarrierTrackingUrl('https://www.ups.com/track?loc=it_IT&requester=WT/');

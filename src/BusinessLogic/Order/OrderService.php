@@ -18,6 +18,7 @@ use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class OrderService.
@@ -159,6 +160,26 @@ class OrderService extends BaseService
         }
 
         return $labels;
+    }
+
+    /**
+     * Checks whether shipment labels are available.
+     *
+     * @param string $status
+     *
+     * @return bool TRUE if shipment labels are available; FALSE otherwise.
+     */
+    public function isReadyToFetchShipmentLabels($status)
+    {
+        return in_array(
+            $status,
+            array(
+                ShipmentStatus::STATUS_READY,
+                ShipmentStatus::STATUS_IN_TRANSIT,
+                ShipmentStatus::STATUS_DELIVERED,
+            ),
+            true
+        );
     }
 
     /**
