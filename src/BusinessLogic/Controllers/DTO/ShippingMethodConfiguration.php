@@ -67,13 +67,13 @@ class ShippingMethodConfiguration extends BaseDto
      *
      * @var boolean
      */
-    public $isShipToAllCountries;
+    public $isShipToAllCountries = true;
     /**
      * If `isShipToAllCountries` set to FALSe than this array contains list of countries where shipping is allowed.
      *
      * @var array
      */
-    public $shippingCountries;
+    public $shippingCountries = array();
 
     /**
      * Transforms DTO to its array format suitable for http client.
