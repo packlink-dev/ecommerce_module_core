@@ -35,7 +35,7 @@ class RepositoryRegistry
      */
     public static function getRepository($entityClass)
     {
-        if (!array_key_exists($entityClass, self::$repositories)) {
+        if (!self::isRegistered($entityClass)) {
             throw new RepositoryNotRegisteredException("Repository for entity $entityClass not found or registered.");
         }
 
