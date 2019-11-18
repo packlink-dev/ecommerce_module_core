@@ -8,6 +8,7 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 
@@ -201,11 +202,15 @@ class ShippingCostCalculator
                 || ($methodService->departureCountry === $fromCountry
                     && $methodService->destinationCountry === $toCountry)
             ) {
-                $baseCost = self::calculateCostForShippingMethod(
-                    $shippingMethod,
-                    $basePrice ?: $methodService->basePrice,
-                    $totalAmount
-                );
+                try {
+                    $baseCost = self::calculateCostForShippingMethod(
+                        $shippingMethod,
+                        $basePrice ?: $methodService->basePrice,
+                        $totalAmount
+                    );
+                } catch (FixedPriceValueOutOfBoundsException $e) {
+                    return false;
+                }
 
                 $cost = min($cost, $baseCost);
             }
@@ -222,6 +227,8 @@ class ShippingCostCalculator
      * @param float $totalAmount Total amount (weight or value).
      *
      * @return float Calculated shipping cost.
+     *
+     * @throws \Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException
      */
     protected static function calculateCostForShippingMethod(
         ShippingMethod $shippingMethod,
@@ -245,12 +252,20 @@ class ShippingCostCalculator
      * @param float $total Total weight or value.
      *
      * @return float Calculated fixed price cost.
+     *
+     * @throws \Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException
      */
     protected static function calculateFixedPriceCost(ShippingMethod $shippingMethod, $total)
     {
         $fixedPricePolicies = $shippingMethod->getFixedPriceByWeightPolicy();
         if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE) {
             $fixedPricePolicies = $shippingMethod->getFixedPriceByValuePolicy();
+        }
+
+        self::sortFixedPricePolicy($fixedPricePolicies);
+
+        if ($total < $fixedPricePolicies[0]->from) {
+            throw new FixedPriceValueOutOfBoundsException('Fixed price value out of bounds.');
         }
 
         foreach ($fixedPricePolicies as $fixedPricePolicy) {
@@ -411,5 +426,25 @@ class ShippingCostCalculator
         $transformer = ServiceRegister::getService(PackageTransformer::CLASS_NAME);
 
         return $transformer->transform($packages);
+    }
+
+    /**
+     * Sorts fixed price policies.
+     *
+     * @param \Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy[] $fixedPricePolicies
+     *      Reference to an fixed price policy array.
+     */
+    private static function sortFixedPricePolicy(&$fixedPricePolicies)
+    {
+        usort(
+            $fixedPricePolicies,
+            function ($a, $b) {
+                if ($a->from === $b->from) {
+                    return 0;
+                }
+
+                return $a->from < $b->from ? -1 : 1;
+            }
+        );
     }
 }

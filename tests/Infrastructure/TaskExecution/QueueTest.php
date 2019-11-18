@@ -7,6 +7,8 @@ use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -24,6 +26,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class QueueTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class QueueTest extends TestCase
 {
     /** @var QueueService */
@@ -60,6 +67,9 @@ class QueueTest extends TestCase
                 EventBus::CLASS_NAME => function () {
                     return EventBus::getInstance();
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 
@@ -1278,6 +1288,14 @@ class QueueTest extends TestCase
         return $queueItem;
     }
 
+    /**
+     * Checks whether queue item is in array.
+     *
+     * @param \Logeecom\Infrastructure\TaskExecution\QueueItem $needle
+     * @param array $haystack
+     *
+     * @return bool
+     */
     private function inArrayQueueItem(QueueItem $needle, array $haystack)
     {
         /** @var QueueItem $queueItem */

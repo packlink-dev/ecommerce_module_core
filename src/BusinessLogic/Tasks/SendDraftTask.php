@@ -3,10 +3,14 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 
 /**
  * Class UploadDraftTask
@@ -32,6 +36,12 @@ class SendDraftTask extends Task
      * @var Proxy
      */
     private $proxy;
+    /**
+     * OrderShipmentDetailsService instance.
+     *
+     * @var OrderShipmentDetailsService
+     */
+    private $orderShipmentDetailsService;
 
     /**
      * UploadDraftTask constructor.
@@ -44,13 +54,36 @@ class SendDraftTask extends Task
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static($array['order_id']);
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array('order_id' => $this->orderId);
+    }
+
+    /**
      * String representation of object
      *
      * @return string the string representation of the object or null
      */
     public function serialize()
     {
-        return serialize(array('orderId' => $this->orderId));
+        return Serializer::serialize(array($this->orderId));
     }
 
     /**
@@ -64,8 +97,7 @@ class SendDraftTask extends Task
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
-        $this->orderId = $data['orderId'];
+        list($this->orderId) = Serializer::unserialize($serialized);
     }
 
     /**
@@ -75,9 +107,17 @@ class SendDraftTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function execute()
     {
+        $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
+        if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
+            Logger::logWarning("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
+            $this->reportProgress(100);
+            return;
+        }
+
         $draft = $this->getOrderService()->prepareDraft($this->orderId);
         $this->reportProgress(35);
 
@@ -91,6 +131,28 @@ class SendDraftTask extends Task
 
         $this->getOrderService()->setReference($this->orderId, $reference);
         $this->reportProgress(100);
+    }
+
+    /**
+     * Checks whether draft has already been created for a particular order.
+     *
+     * @param string $orderId Order id in an integrated system.
+     *
+     * @return boolean Returns TRUE if draft has been created; FALSE otherwise.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    private function isDraftCreated($orderId)
+    {
+        $draft = $this->getOrderShipmentDetailsService()->getDetailsByOrderId($orderId);
+
+        if ($draft === null) {
+            return false;
+        }
+
+        $reference = $draft->getReference();
+
+        return !empty($reference);
     }
 
     /**
@@ -119,5 +181,19 @@ class SendDraftTask extends Task
         }
 
         return $this->orderService;
+    }
+
+    /**
+     * Retrieves order-shipment details service.
+     *
+     * @return OrderShipmentDetailsService Service instance.
+     */
+    private function getOrderShipmentDetailsService()
+    {
+        if ($this->orderShipmentDetailsService === null) {
+            $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+        }
+
+        return $this->orderShipmentDetailsService;
     }
 }

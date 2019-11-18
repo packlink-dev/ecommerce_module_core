@@ -29,7 +29,7 @@ class PricingPolicyValidator
         if (count($fixedPricePolicies) > 0) {
             $count = count($fixedPricePolicies);
             $previous = $fixedPricePolicies[0];
-            self::validateSingleFixedPricePolicy($previous, 0, $allowZeroPrice);
+            self::validateSingleFixedPricePolicy($previous, $previous->from, $allowZeroPrice);
 
             for ($i = 1; $i < $count; $i++) {
                 self::validateSingleFixedPricePolicy($fixedPricePolicies[$i], $previous->to, $allowZeroPrice);
@@ -66,7 +66,8 @@ class PricingPolicyValidator
      */
     protected static function validateSingleFixedPricePolicy($policy, $lowerBoundary, $allowZeroPrice = false)
     {
-        if ((float)$policy->from !== (float)$lowerBoundary
+        if ((float) $lowerBoundary < 0
+            || (float)$policy->from !== (float)$lowerBoundary
             || $policy->from >= $policy->to
             || ($allowZeroPrice && $policy->amount < 0)
             || (!$allowZeroPrice && $policy->amount <= 0)

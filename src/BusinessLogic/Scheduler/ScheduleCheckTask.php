@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Scheduler;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -23,6 +24,29 @@ class ScheduleCheckTask extends Task
      * @var \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface
      */
     private $repository;
+
+    /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static();
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array();
+    }
 
     /**
      * Runs task logic.
@@ -53,7 +77,7 @@ class ScheduleCheckTask extends Task
                     array(
                         'ExceptionMessage' => $ex->getMessage(),
                         'ExceptionTrace' => $ex->getTraceAsString(),
-                        'TaskData' => serialize($task),
+                        'TaskData' => Serializer::serialize($task),
                     )
                 );
             }

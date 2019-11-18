@@ -35,7 +35,7 @@ class RepositoryRegistry
      */
     public static function getRepository($entityClass)
     {
-        if (!array_key_exists($entityClass, self::$repositories)) {
+        if (!self::isRegistered($entityClass)) {
             throw new RepositoryNotRegisteredException("Repository for entity $entityClass not found or registered.");
         }
 
@@ -66,6 +66,18 @@ class RepositoryRegistry
 
         unset(self::$instantiated[$entityClass]);
         self::$repositories[$entityClass] = $repositoryClass;
+    }
+
+    /**
+     * Checks whether repository has been registered for a particular entity.
+     *
+     * @param string $entityClass Entity for which check has to be performed.
+     *
+     * @return boolean Returns TRUE if repository has been registered; FALSE otherwise.
+     */
+    public static function isRegistered($entityClass)
+    {
+        return isset(self::$repositories[$entityClass]);
     }
 
     /**

@@ -64,6 +64,10 @@ class MemoryRepository implements RepositoryInterface
             $result = array_merge($result, $groupResult);
         }
 
+        if (is_array($result) && !empty($result)) {
+            $result = $this->unique($result);
+        }
+
         if ($filter) {
             $this->sortResults($result, $filter, $fieldIndexMap);
             $result = $this->sliceResults($filter, $result);
@@ -159,9 +163,18 @@ class MemoryRepository implements RepositoryInterface
         $this->entityClass = $entityClass;
     }
 
+    /**
+     * Saves entity to the database.
+     *
+     * @param \Logeecom\Infrastructure\ORM\Entity $entity Entity to be saved
+     */
     private function saveEntityToStorage(Entity $entity)
     {
         $indexes = IndexHelper::transformFieldsToIndexes($entity);
+        $data = $entity->toArray();
+        $data['class_name'] = $entity::getClassName();
+        $data = json_encode($data);
+
         $storageItem = array(
             'id' => $entity->getId(),
             'type' => $entity->getConfig()->getType(),
@@ -175,7 +188,7 @@ class MemoryRepository implements RepositoryInterface
             'index_8' => null,
             'index_9' => null,
             'index_10' => null,
-            'data' => serialize($entity),
+            'data' => $data,
         );
 
         foreach ($indexes as $index => $value) {
@@ -366,6 +379,29 @@ class MemoryRepository implements RepositoryInterface
         }
 
         return $translator->translate($intermediates);
+    }
+
+    /**
+     * Removes duplicate values from an array.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    private function unique(array $array)
+    {
+        $result = array();
+        $occurrences = array();
+
+        foreach ($array as $item) {
+            $fingerprint = md5(serialize($item));
+            if (!in_array($fingerprint, $occurrences, true)) {
+                $result[] = $item;
+                $occurrences[] = $fingerprint;
+            }
+        }
+
+        return $result;
     }
 
     /**

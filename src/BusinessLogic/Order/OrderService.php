@@ -10,6 +10,7 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
+use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
@@ -88,35 +89,6 @@ class OrderService extends BaseService
     }
 
     /**
-     * Updates shipment label from API for order with given shipment reference.
-     *
-     * @param Shipment $shipment Shipment DTO for given reference number.
-     */
-    public function updateShipmentLabel(Shipment $shipment)
-    {
-        $referenceId = $shipment->reference;
-        if (!ShipmentStatus::shouldFetchLabels($shipment->status)
-            || $this->orderRepository->isLabelSet($referenceId)
-        ) {
-            return;
-        }
-
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        $labels = array();
-        try {
-            $labels = $proxy->getLabels($referenceId);
-            if (count($labels) > 0) {
-                $this->orderRepository->setLabelsByReference($referenceId, $labels);
-            }
-        } catch (HttpBaseException $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $referenceId));
-        } catch (OrderNotFound $e) {
-            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $referenceId, 'labels' => $labels));
-        }
-    }
-
-    /**
      * Updates shipping status from API for order with given shipment reference.
      *
      * @param Shipment $shipment Shipment DTO for given reference number.
@@ -162,6 +134,52 @@ class OrderService extends BaseService
                 array('referenceId' => $shipment->reference, 'trackingHistory' => $trackingAsArray)
             );
         }
+    }
+
+    /**
+     * Retrieves list of order labels.
+     *
+     * @param string $reference Order reference.
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\ShipmentLabel[] List of shipment labels for an order defined by
+     *      the provided reference.
+     */
+    public function getShipmentLabels($reference)
+    {
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $labels = array();
+
+        try {
+            $links = $proxy->getLabels($reference);
+            foreach ($links as $link) {
+                $labels[] = new ShipmentLabel($link);
+            }
+        } catch (\Exception $e) {
+            Logger::logError("Failed to retrieve labels for order [$reference] because: {$e->getMessage()}");
+        }
+
+        return $labels;
+    }
+
+    /**
+     * Checks whether shipment labels are available.
+     *
+     * @param string $status
+     *
+     * @return bool TRUE if shipment labels are available; FALSE otherwise.
+     */
+    public function isReadyToFetchShipmentLabels($status)
+    {
+        return in_array(
+            $status,
+            array(
+                ShipmentStatus::STATUS_READY,
+                ShipmentStatus::STATUS_IN_TRANSIT,
+                ShipmentStatus::STATUS_DELIVERED,
+            ),
+            true
+        );
     }
 
     /**

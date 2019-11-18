@@ -2,6 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
@@ -9,6 +11,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class QueueItemTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class QueueItemTest extends TestCase
 {
     /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider */
@@ -26,6 +33,9 @@ class QueueItemTest extends TestCase
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 
@@ -69,7 +79,7 @@ class QueueItemTest extends TestCase
             'When created queue item must set failure description to empty string.'
         );
         $this->assertEquals(
-            serialize($task),
+            Serializer::serialize($task),
             $queueItem->getSerializedTask(),
             'When created queue item must record given task.'
         );
@@ -96,7 +106,7 @@ class QueueItemTest extends TestCase
         $task = new FooTask('test task', 123);
         $queueItem = new QueueItem();
 
-        $queueItem->setSerializedTask(serialize($task));
+        $queueItem->setSerializedTask(Serializer::serialize($task));
 
         /** @var FooTask $actualTask */
         $actualTask = $queueItem->getTask();
@@ -128,7 +138,7 @@ class QueueItemTest extends TestCase
         $newTask = new FooTask('new task', 123);
         $queueItem = new QueueItem(new FooTask('initial task', 1));
 
-        $queueItem->setSerializedTask(serialize($newTask));
+        $queueItem->setSerializedTask(Serializer::serialize($newTask));
 
         /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
         $actualTask = $queueItem->getTask();
@@ -268,7 +278,7 @@ class QueueItemTest extends TestCase
         $queueItem = new QueueItem();
         $queueItem->setId(27);
 
-        $queueItem->setSerializedTask(serialize($task));
+        $queueItem->setSerializedTask(Serializer::serialize($task));
 
         /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
         $actualTask = $queueItem->getTask();

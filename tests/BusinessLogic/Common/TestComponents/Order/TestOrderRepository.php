@@ -46,6 +46,8 @@ class TestOrderRepository implements OrderRepository
      */
     private $incompleteOrderReferences = array('test');
 
+    private $ordersInStatuses = array('test');
+
     /**
      * TestOrderRepository constructor.
      */
@@ -316,18 +318,18 @@ class TestOrderRepository implements OrderRepository
     }
 
     /**
-     * Returns whether shipment identified by provided reference has Packlink shipment labels set.
+     * Retrieves list of order references where order is in one of the provided statuses.
      *
-     * @param string $shipmentReference Packlink shipment reference.
+     * @param array $statuses List of order statuses.
      *
-     * @return bool Returns TRUE if labels are set; otherwise returns FALSE.
+     * @return string[] Array of shipment references.
      */
-    public function isLabelSet($shipmentReference)
+    public function getOrderReferencesWithStatus(array $statuses)
     {
-        $order = $this->getOrder($shipmentReference, 0, '', false);
+        if ($this->throwGenericException) {
+            throw new \RuntimeException('Error');
+        }
 
-        $packlinkShipmentLabels = $order->getPacklinkShipmentLabels();
-
-        return !empty($packlinkShipmentLabels);
+        return $this->ordersInStatuses;
     }
 }

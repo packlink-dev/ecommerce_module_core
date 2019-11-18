@@ -3,7 +3,6 @@
 namespace Logeecom\Tests\BusinessLogic\Order;
 
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
@@ -13,7 +12,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
-use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -169,7 +167,7 @@ class OrderServiceTest extends BaseTestWithServices
 
         $logMessages = $this->shopLogger->loggedMessages;
         self::assertCount(2, $logMessages);
-        self::assertEquals('Missing required search parameter(s).',  $logMessages[0]->getMessage());
+        self::assertEquals('Missing required search parameter(s).', $logMessages[0]->getMessage());
         self::assertEquals(
             'Invalid service method ' . $method->getId() . ' selected for order test because this method '
             . 'does not support order\'s destination country. Sending order without selected method.',
@@ -228,61 +226,6 @@ class OrderServiceTest extends BaseTestWithServices
         $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->orderService->setReference('123', '');
-    }
-
-    public function testUpdateShipmentLabel()
-    {
-        $this->httpClient->setMockResponses(array(
-            new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
-            )
-        ));
-
-        $this->orderService->updateShipmentLabel($this->getShipment());
-
-        /** @var TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
-
-        $this->assertNotEmpty($order->getPacklinkShipmentLabels());
-    }
-
-    public function testUpdateShipmentLabelAlreadySet()
-    {
-        $this->httpClient->setMockResponses(array(
-            new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
-            ),
-            new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
-            ),
-        ));
-
-        $shipment = $this->getShipment();
-        // First call
-        $this->orderService->updateShipmentLabel($shipment);
-
-        // Second call, should not make API call
-        $this->orderService->updateShipmentLabel($shipment);
-
-        // Only one call to Packlink API
-        $this->assertCount(1, $this->httpClient->getHistory());
-    }
-
-    public function testUpdateShipmentLabelWrongStatus()
-    {
-        $this->orderService->updateShipmentLabel($this->getShipment('AWAITING_COMPLETION'));
-
-        $this->assertNull($this->httpClient->getHistory());
-    }
-
-    private function getShipment($status = 'READY_TO_PRINT', $reference = 'test')
-    {
-        $shipment = new Shipment();
-        $shipment->reference = $reference;
-        $shipment->status = $status;
-
-        return $shipment;
     }
 
     private function getShippingServiceDetails($id, $carrierName, $basePrice = 10.76, $toCountry = 'IT')

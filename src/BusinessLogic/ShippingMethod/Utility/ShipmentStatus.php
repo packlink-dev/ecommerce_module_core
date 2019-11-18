@@ -29,6 +29,10 @@ class ShipmentStatus
      * Status when shipment is completed.
      */
     const STATUS_DELIVERED = 'delivered';
+    /**
+     * Status when shipment is cancelled.
+     */
+    const STATUS_CANCELLED = 'cancelled';
 
     /**
      * Maps raw shipment status from Packlink to shipment status.
@@ -62,17 +66,5 @@ class ShipmentStatus
             default:
                 return self::STATUS_PENDING;
         }
-    }
-
-    /**
-     * Returns whether shipment labels should be fetched.
-     *
-     * @param string $shipmentStatus Raw shipment status from Packlink.
-     *
-     * @return bool Returns TRUE if labels should be fetched; otherwise returns FALSE.
-     */
-    public static function shouldFetchLabels($shipmentStatus)
-    {
-        return in_array($shipmentStatus, array('READY_TO_PRINT', 'READY_FOR_COLLECTION', 'IN_TRANSIT', 'DELIVERED'));
     }
 }

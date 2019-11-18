@@ -3,6 +3,7 @@
 namespace Logeecom\Infrastructure\AutoTest;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Task;
 
 /**
@@ -30,13 +31,36 @@ class AutoTestTask extends Task
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static($array['data']);
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array('data' => $this->data);
+    }
+
+    /**
      * String representation of object.
      *
      * @return string The string representation of the object or null.
      */
     public function serialize()
     {
-        return serialize(array('data' => $this->data));
+        return Serializer::serialize(array($this->data));
     }
 
     /**
@@ -48,8 +72,7 @@ class AutoTestTask extends Task
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
-        $this->data = $data['data'];
+        list($this->data) = Serializer::unserialize($serialized);
     }
 
     /**

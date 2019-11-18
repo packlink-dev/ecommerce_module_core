@@ -11,6 +11,7 @@ use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -88,6 +89,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             PackageTransformer::CLASS_NAME,
             function () {
                 return PackageTransformer::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            OrderShipmentDetailsService::CLASS_NAME,
+            function () {
+                return OrderShipmentDetailsService::getInstance();
             }
         );
     }

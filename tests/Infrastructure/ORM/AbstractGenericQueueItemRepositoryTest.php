@@ -4,6 +4,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
@@ -307,7 +308,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
             $queueItem->setLastExecutionProgressBasePoints($item['lastExecutionProgress']);
             $queueItem->setRetries($item['retries']);
             $queueItem->setFailureDescription($item['failureDescription']);
-            $queueItem->setSerializedTask(serialize($task));
+            $queueItem->setSerializedTask(Serializer::serialize($task));
             $queueItem->setCreateTimestamp($item['createTimestamp']);
             $queueItem->setQueueTimestamp($item['queueTimestamp']);
             $queueItem->setStartTimestamp($item['startTimestamp']);

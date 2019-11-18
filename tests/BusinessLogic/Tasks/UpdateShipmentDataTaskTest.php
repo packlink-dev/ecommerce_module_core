@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
@@ -18,6 +19,11 @@ use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 
+/**
+ * Class UpdateShipmentDataTaskTest
+ *
+ * @package Logeecom\Tests\BusinessLogic\Tasks
+ */
 class UpdateShipmentDataTaskTest extends BaseSyncTest
 {
     /**
@@ -127,13 +133,13 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         try {
             $this->syncTask->execute();
         } catch (\Exception $e) {
-            $serialized = serialize($this->syncTask);
+            $serialized = Serializer::serialize($this->syncTask);
         }
 
         $this->httpClient->setMockResponses($this->getMockResponses());
         $orderRepository->shouldThrowGenericException(false);
 
-        $this->syncTask = unserialize($serialized);
+        $this->syncTask = Serializer::unserialize($serialized);
         $this->attachProgressEventListener();
         $this->syncTask->execute();
         $this->validate100Progress();
@@ -163,7 +169,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
 
         // second execute of the same task should not do anything after unserialize
         // because references that are done should be removed from the list
-        $this->syncTask = unserialize(serialize($this->syncTask));
+        $this->syncTask = Serializer::unserialize(Serializer::serialize($this->syncTask));
         $this->attachProgressEventListener();
         $this->syncTask->execute();
         $this->validate100Progress();
@@ -186,8 +192,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         }
 
         self::assertNotEmpty($e);
-        self::assertCount(1, $this->shopLogger->loggedMessages);
-        self::assertEquals('No response', $this->shopLogger->loggedMessages[0]->getMessage());
+        self::assertCount(0, $this->shopLogger->loggedMessages);
         self::assertCount(2, $this->eventHistory);
         /** @var \Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent $event */
         $event = $this->eventHistory[0];
@@ -195,7 +200,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertEquals(500, $event->getProgressBasePoints());
 
         // second execute of the same task should take only the third reference and execute it correctly
-        $this->syncTask = unserialize(serialize($this->syncTask));
+        $this->syncTask = Serializer::unserialize(Serializer::serialize($this->syncTask));
         $this->attachProgressEventListener();
 
         $this->httpClient->setMockResponses(
@@ -218,7 +223,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertCount(4, $this->eventHistory);
 
         // no new messages
-        self::assertCount(1, $this->shopLogger->loggedMessages);
+        self::assertCount(0, $this->shopLogger->loggedMessages);
 
         $this->validate100Progress();
     }
@@ -247,6 +252,20 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
 
         self::assertEquals(ShipmentStatus::STATUS_DELIVERED, ShipmentStatus::getStatus('DELIVERED'));
         self::assertEquals(ShipmentStatus::STATUS_DELIVERED, ShipmentStatus::getStatus('RETURNED_TO_SENDER'));
+    }
+
+    /**
+     * Tests execute with order statuses provided.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     */
+    public function testWithOrderStatusesProvided()
+    {
+        $this->syncTask = new UpdateShipmentDataTask(array(ShipmentStatus::STATUS_IN_TRANSIT));
+        $this->attachProgressEventListener();
+        $this->httpClient->setMockResponses($this->getMockResponses());
+        $this->syncTask->execute();
+        self::assertCount(3, $this->eventHistory);
     }
 
     /**

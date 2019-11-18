@@ -7,7 +7,7 @@ namespace Logeecom\Infrastructure\ORM\QueryFilter;
  *
  * @package Logeecom\Infrastructure\ORM\QueryFilter
  */
-final class Operators
+class Operators
 {
     const EQUALS = '=';
     const NOT_EQUALS = '!=';

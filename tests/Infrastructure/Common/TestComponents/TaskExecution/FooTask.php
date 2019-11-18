@@ -2,8 +2,14 @@
 
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Task;
 
+/**
+ * Class FooTask
+ *
+ * @package Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution
+ */
 class FooTask extends Task
 {
     private $dependency1;
@@ -20,17 +26,50 @@ class FooTask extends Task
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        $entity = new static();
+
+        $entity->dependency1 = $array['dependency_1'];
+        $entity->dependency2 = $array['dependency_2'];
+        $entity->methodsCallCount = $array['method_call_count'];
+
+        return $entity;
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array(
+            'dependency_1' => $this->dependency1,
+            'dependency_2' => $this->dependency2,
+            'method_call_count' => $this->methodsCallCount,
+        );
+    }
+
+    /**
      * String representation of object
      *
      * @return string the string representation of the object or null
      */
     public function serialize()
     {
-        return serialize(
+        return Serializer::serialize(
             array(
                 'dependency1' => $this->dependency1,
                 'dependency2' => $this->dependency2,
-                'methodsCallCount' => serialize($this->methodsCallCount),
+                'methodsCallCount' => Serializer::serialize($this->methodsCallCount),
             )
         );
     }
@@ -46,10 +85,10 @@ class FooTask extends Task
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
+        $data = Serializer::unserialize($serialized);
         $this->dependency1 = $data['dependency1'];
         $this->dependency2 = $data['dependency2'];
-        $this->methodsCallCount = unserialize($data['methodsCallCount']);
+        $this->methodsCallCount = Serializer::unserialize($data['methodsCallCount']);
     }
 
     public function execute()

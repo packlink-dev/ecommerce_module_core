@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+### Added
+
+- `isRegistered` method in `RepositoryRegistry`.
+- `isShipmentLabelsAvailable` method in `OrderService`
+
+### Removed
+
+- `OrderService::updateShipmentLabel` method.
+- `OrderRepository::isLabelSet` method.
+- `OrderRepository::setLabelsByReference` method.
+
+### Changed
+**NON-BREAKING CHANGES**
+- `SendDraftTask` is now idempotent.
+- `ShippingMethodConfiguration` DTO and `ShippingMethod` model are modified to enable setting list of allowed
+destination countries for a shipping method.
+- `UpdateShipmentDataTask` checks for update with different frequencies for orders with different statuses.
+*NOTICE* For existing users delete old scheduled `UpdateShipmentDataTasks` and schedule new ones in the same manner as 
+they are scheduled in core.
+- `AbstractGenericStudentRepositoryTest` extended to cover every ORM operator.
+
+**BREAKING CHANGES**
+
+- The lowest boundary in fixed price can be higher than zero. *NOTICE* Each integration for from input field must
+remove "disabled" directive in template file as disabling from input field is now handled by js library.
+- Advanced serialization mechanism has been implemented.`NativeSerializer` and `JsonSerializer` have been introduced.
+This is a *breaking* change and each integration should register preferred serializer in bootstrap.
+- `OrderRepository` introduced new method `getOrderReferencesWithStatus`. This method must be implemented in each
+integration.
+- Removed `OrderRepository::setLabelsByReference` method.
+
 ## [v1.4.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.1...1.4.0) - 2019-10-14
 ### Added
 - `DraftController` is added to decrease the code in integrations related to creation of the draft

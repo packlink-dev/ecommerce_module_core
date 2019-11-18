@@ -26,6 +26,15 @@ interface OrderRepository
     public function getIncompleteOrderReferences();
 
     /**
+     * Retrieves list of order references where order is in one of the provided statuses.
+     *
+     * @param array $statuses List of order statuses.
+     *
+     * @return string[] Array of shipment references.
+     */
+    public function getOrderReferencesWithStatus(array $statuses);
+
+    /**
      * Fetches and returns system order by its unique identifier.
      *
      * @param string $orderId $orderId Unique order id.
@@ -45,16 +54,6 @@ interface OrderRepository
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      */
     public function setReference($orderId, $shipmentReference);
-
-    /**
-     * Sets order packlink shipping labels to an order by shipment reference.
-     *
-     * @param string $shipmentReference Packlink shipment reference.
-     * @param string[] $labels Packlink shipping labels.
-     *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
-     */
-    public function setLabelsByReference($shipmentReference, array $labels);
 
     /**
      * Sets order packlink shipment tracking history to an order for given shipment.
@@ -105,13 +104,4 @@ interface OrderRepository
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function isShipmentDeleted($shipmentReference);
-
-    /**
-     * Returns whether shipment identified by provided reference has Packlink shipment label set.
-     *
-     * @param string $shipmentReference Packlink shipment reference.
-     *
-     * @return bool Returns TRUE if label is set; otherwise, FALSE.
-     */
-    public function isLabelSet($shipmentReference);
 }

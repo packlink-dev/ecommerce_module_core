@@ -3,8 +3,10 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
@@ -37,6 +39,12 @@ class UpdateShipmentDataTask extends Task
      */
     protected $references = array();
     /**
+     * List of order statuses that should be used when retrieving references to check for updates.
+     *
+     * @var array
+     */
+    protected $orderStatuses = array();
+    /**
      * @var \Packlink\BusinessLogic\Order\Interfaces\OrderRepository
      */
     private $orderRepository;
@@ -54,15 +62,61 @@ class UpdateShipmentDataTask extends Task
     private $proxy;
 
     /**
+     * UpdateShipmentDataTask constructor.
+     *
+     * @param array $orderStatuses
+     */
+    public function __construct(array $orderStatuses = array())
+    {
+        $this->orderStatuses = $orderStatuses;
+    }
+
+    /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        $entity = new static();
+
+        $entity->progress = $array['progress'];
+        $entity->progressStep = $array['progress_step'];
+        $entity->references = $array['references'];
+        $entity->orderStatuses = isset($array['order_statues']) ? $array['order_statues'] : array();
+
+        return $entity;
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return  array(
+            'progress' => $this->progress,
+            'progress_step' => $this->progressStep,
+            'references' => $this->references,
+            'order_statuses' => $this->orderStatuses,
+        );
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()
     {
-        return serialize(
+        return Serializer::serialize(
             array(
                 $this->references,
                 $this->progress,
                 $this->progressStep,
+                $this->orderStatuses,
             )
         );
     }
@@ -72,7 +126,13 @@ class UpdateShipmentDataTask extends Task
      */
     public function unserialize($serialized)
     {
-        list($this->references, $this->progress, $this->progressStep) = unserialize($serialized);
+        $original = Serializer::unserialize($serialized);
+
+        if (count($original) === 3) {
+            list($this->references, $this->progress, $this->progressStep) = $original;
+        } else {
+            list($this->references, $this->progress, $this->progressStep, $this->orderStatuses) = $original;
+        }
     }
 
     /**
@@ -83,7 +143,7 @@ class UpdateShipmentDataTask extends Task
     public function execute()
     {
         if (empty($this->references) && $this->progress === 0) {
-            $this->initializeState();
+            $this->initializeState($this->orderStatuses);
         }
 
         while (!empty($this->references)) {
@@ -103,10 +163,16 @@ class UpdateShipmentDataTask extends Task
 
     /**
      * Initializes needed parameters for the task execution.
+     *
+     * @param array $orderStatuses List of order statuses.
      */
-    protected function initializeState()
+    protected function initializeState(array $orderStatuses = array())
     {
-        $this->references = $this->getOrderRepository()->getIncompleteOrderReferences();
+        if (empty($orderStatuses)) {
+            $this->references = $this->getOrderRepository()->getIncompleteOrderReferences();
+        } else {
+            $this->references = $this->getOrderRepository()->getOrderReferencesWithStatus($orderStatuses);
+        }
 
         $this->progress = 5;
         $this->reportProgress($this->progress);
@@ -132,10 +198,11 @@ class UpdateShipmentDataTask extends Task
             $shipment = $this->getProxy()->getShipment($reference);
             if ($shipment !== null) {
                 $orderService = $this->getOrderService();
-                $orderService->updateTrackingInfo($shipment);
-                $orderService->updateShipmentLabel($shipment);
-                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
+                if ($this->isTrackingInfoUpdatable($shipment)) {
+                    $orderService->updateTrackingInfo($shipment);
+                }
 
+                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
                 $orderRepository->setShippingPriceByReference($reference, (float)$shipment->price);
             } else {
                 $orderRepository->markShipmentDeleted($reference);
@@ -183,5 +250,23 @@ class UpdateShipmentDataTask extends Task
         }
 
         return $this->orderService;
+    }
+
+    /**
+     * Checks if tracking info should be updated.
+     *
+     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipment Shipment instance to be checked for updatability.
+     *
+     * @return bool TRUE if tracking info should be update; FALSE otherwise.
+     */
+    protected function isTrackingInfoUpdatable(Shipment $shipment)
+    {
+        $allowedUpdateStatuses = array(
+            ShipmentStatus::STATUS_ACCEPTED,
+            ShipmentStatus::STATUS_READY,
+            ShipmentStatus::STATUS_IN_TRANSIT,
+        );
+
+        return in_array(ShipmentStatus::getStatus($shipment->status), $allowedUpdateStatuses, true);
     }
 }

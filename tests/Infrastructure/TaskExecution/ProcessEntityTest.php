@@ -2,16 +2,17 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 
 /**
  * Class ProcessEntityTest.
  *
  * @package Logeecom\Tests\Infrastructure\TaskExecution
  */
-class ProcessEntityTest extends TestCase
+class ProcessEntityTest extends BaseInfrastructureTestWithServices
 {
     public function testToArray()
     {
@@ -25,7 +26,7 @@ class ProcessEntityTest extends TestCase
 
         self::assertEquals($data['id'], $entity->getId());
         self::assertEquals($data['guid'], $entity->getGuid());
-        self::assertEquals($data['runner'], serialize($entity->getRunner()));
+        self::assertEquals($data['runner'], Serializer::serialize($entity->getRunner()));
     }
 
     public function testFromArrayAndToJSON()
@@ -35,7 +36,7 @@ class ProcessEntityTest extends TestCase
             'class_name' => Process::CLASS_NAME,
             'id' => 123,
             'guid' => 'guid',
-            'runner' => serialize($runner),
+            'runner' => Serializer::serialize($runner),
         );
 
         $entity = Process::fromArray($data);
@@ -55,7 +56,7 @@ class ProcessEntityTest extends TestCase
         $runner = new QueueItemStarter(1234);
         $data = array(
             'id' => 123,
-            'runner' => serialize($runner),
+            'runner' => Serializer::serialize($runner),
         );
 
         Process::fromArray($data);

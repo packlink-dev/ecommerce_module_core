@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Scheduler\Models;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -105,7 +106,7 @@ class Schedule extends Entity
     {
         parent::inflate($data);
 
-        $this->task = unserialize($data['task']);
+        $this->task = Serializer::unserialize($data['task']);
     }
 
     /**
@@ -116,7 +117,7 @@ class Schedule extends Entity
     public function toArray()
     {
         $data = parent::toArray();
-        $data['task'] = serialize($this->task);
+        $data['task'] = Serializer::serialize($this->task);
 
         return $data;
     }

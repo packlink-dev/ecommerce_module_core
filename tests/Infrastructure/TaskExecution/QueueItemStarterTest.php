@@ -10,6 +10,8 @@ use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
@@ -30,6 +32,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class QueueItemStarterTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class QueueItemStarterTest extends TestCase
 {
     /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService */
@@ -56,6 +63,7 @@ class QueueItemStarterTest extends TestCase
         $shopLogger = new TestShopLogger();
         $shopConfiguration = new TestShopConfiguration();
         $shopConfiguration->setIntegrationName('Shop1');
+        $serializer = new NativeSerializer();
 
         new TestServiceRegister(
             array(
@@ -83,6 +91,9 @@ class QueueItemStarterTest extends TestCase
                 HttpClient::CLASS_NAME => function () {
                     return new TestHttpClient();
                 },
+                Serializer::CLASS_NAME => function () use ($serializer) {
+                    return $serializer;
+                }
             )
         );
 
@@ -139,7 +150,7 @@ class QueueItemStarterTest extends TestCase
         );
         $itemStarter = new QueueItemStarter($queueItem->getId());
         /** @var QueueItemStarter $unserializedItemStarter */
-        $unserializedItemStarter = unserialize(serialize($itemStarter));
+        $unserializedItemStarter = Serializer::unserialize(Serializer::serialize($itemStarter));
 
         // Act
         $unserializedItemStarter->run();

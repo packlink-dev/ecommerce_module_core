@@ -3,6 +3,7 @@
 namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerRunException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
@@ -55,13 +56,36 @@ class TaskRunnerStarter implements Runnable
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static($array['guid']);
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array('guid' => $this->guid);
+    }
+
+    /**
      * String representation of object.
      *
      * @inheritdoc
      */
     public function serialize()
     {
-        return serialize(array($this->guid));
+        return Serializer::serialize(array($this->guid));
     }
 
     /**
@@ -71,7 +95,7 @@ class TaskRunnerStarter implements Runnable
      */
     public function unserialize($serialized)
     {
-        list($this->guid) = unserialize($serialized);
+        list($this->guid) = Serializer::unserialize($serialized);
     }
 
     /**

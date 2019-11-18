@@ -54,6 +54,8 @@ class ShippingMethod extends Entity
         'national',
         'pricingPolicy',
         'taxClass',
+        'isShipToAllCountries',
+        'shippingCountries',
     );
     /**
      * Carrier name.
@@ -157,6 +159,18 @@ class ShippingMethod extends Entity
      * @var ShippingService[]
      */
     protected $shippingServices = array();
+    /**
+     * Flag that denotes whether is shipping to all countries allowed.
+     *
+     * @var boolean
+     */
+    protected $isShipToAllCountries;
+    /**
+     * If `isShipToAllCountries` set to FALSe than this array contains list of countries where shipping is allowed.
+     *
+     * @var array
+     */
+    protected $shippingCountries;
 
     /**
      * Transforms raw array data to this entity instance.
@@ -166,6 +180,18 @@ class ShippingMethod extends Entity
     public function inflate(array $data)
     {
         parent::inflate($data);
+
+        if (isset($data['isShipToAllCountries']) && is_bool($data['isShipToAllCountries'])) {
+            $this->isShipToAllCountries = $data['isShipToAllCountries'];
+        } else {
+            $this->isShipToAllCountries = true;
+        }
+
+        if (isset($data['shippingCountries']) && is_array($data['shippingCountries'])) {
+            $this->shippingCountries = $data['shippingCountries'];
+        } else {
+            $this->shippingCountries = array();
+        }
 
         if (!$this->getPricingPolicy()) {
             $this->pricingPolicy = static::PRICING_POLICY_PACKLINK;
@@ -622,6 +648,45 @@ class ShippingMethod extends Entity
     public function setTaxClass($taxClass)
     {
         $this->taxClass = $taxClass;
+    }
+
+    /**
+     * Sets list of allowed destination countries.
+     *
+     * @param array $shippingCountries List of allowed destination countries.
+     */
+    public function setShippingCountries(array $shippingCountries) {
+        $this->shippingCountries = $shippingCountries;
+    }
+
+    /**
+     * Retrieves list of allowed destination countries.
+     *
+     * @return array List of allowed destination countries.
+     */
+    public function getShippingCountries()
+    {
+        return $this->shippingCountries;
+    }
+
+    /**
+     * Retrieves flag that denotes whether shipping to all countries is enabled.
+     *
+     * @return bool Flag that denotes whether shipping to all countries is enabled.
+     */
+    public function isShipToAllCountries()
+    {
+        return $this->isShipToAllCountries;
+    }
+
+    /**
+     * Sets flag that denotes whether shipping to all countries is enabled.
+     *
+     * @param boolean $isShipToAllCountries Flag that denotes whether shipping to all countries is enabled.
+     */
+    public function setShipToAllCountries($isShipToAllCountries)
+    {
+        $this->isShipToAllCountries = $isShipToAllCountries;
     }
 
     /**

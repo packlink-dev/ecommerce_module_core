@@ -13,6 +13,29 @@ use Packlink\BusinessLogic\User\UserAccountService;
 class GetDefaultParcelAndWarehouseTask extends Task
 {
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        return new static();
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        return array();
+    }
+
+    /**
      * Runs task logic.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException

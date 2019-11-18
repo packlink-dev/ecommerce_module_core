@@ -2,6 +2,7 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 
@@ -62,11 +63,55 @@ abstract class CompositeTask extends Task
     }
 
     /**
+     * Transforms array into an serializable object,
+     *
+     * @param array $array Data that is used to instantiate serializable object.
+     *
+     * @return \Logeecom\Infrastructure\Serializer\Interfaces\Serializable
+     *      Instance of serialized object.
+     */
+    public static function fromArray(array $array)
+    {
+        $tasks = array();
+
+        foreach ($array['tasks'] as $task) {
+            $tasks[] = Serializer::unserialize($task);
+        }
+
+        $entity = new static($tasks, $array['initial_progress']);
+        $entity->taskProgressMap = $array['task_progress_map'];
+        $entity->tasksProgressShare = $array['tasks_progress_share'];
+
+        return $entity;
+    }
+
+    /**
+     * Transforms serializable object into an array.
+     *
+     * @return array Array representation of a serializable object.
+     */
+    public function toArray()
+    {
+        $tasks = array();
+
+        foreach ($this->tasks as $task) {
+            $tasks[] = Serializer::serialize($task);
+        }
+
+        return array(
+            'initial_progress' => $this->initialProgress,
+            'task_progress_map' => $this->taskProgressMap,
+            'tasks_progress_share' => $this->tasksProgressShare,
+            'tasks' => $tasks
+        );
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()
     {
-        return serialize(
+        return Serializer::serialize(
             array(
                 'initialProgress' => $this->initialProgress,
                 'taskProgress' => $this->taskProgressMap,
@@ -81,7 +126,7 @@ abstract class CompositeTask extends Task
      */
     public function unserialize($serialized)
     {
-        $unserializedStateData = unserialize($serialized);
+        $unserializedStateData = Serializer::unserialize($serialized);
 
         $this->initialProgress = $unserializedStateData['initialProgress'];
         $this->taskProgressMap = $unserializedStateData['taskProgress'];

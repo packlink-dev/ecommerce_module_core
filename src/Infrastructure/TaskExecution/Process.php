@@ -5,6 +5,7 @@ namespace Logeecom\Infrastructure\TaskExecution;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
 
 /**
@@ -45,7 +46,7 @@ class Process extends Entity
 
         parent::inflate($data);
         $this->setGuid($data['guid']);
-        $this->setRunner(unserialize($data['runner']));
+        $this->setRunner(Serializer::unserialize($data['runner']));
     }
 
     /**
@@ -57,7 +58,7 @@ class Process extends Entity
     {
         $data = parent::toArray();
         $data['guid'] = $this->getGuid();
-        $data['runner'] = serialize($this->getRunner());
+        $data['runner'] = Serializer::serialize($this->getRunner());
 
         return $data;
     }

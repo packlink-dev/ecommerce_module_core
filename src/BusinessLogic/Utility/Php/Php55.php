@@ -29,7 +29,7 @@ namespace Packlink\BusinessLogic\Utility\Php;
  *
  * @internal
  */
-final class Php55
+class Php55
 {
     /**
      * Return the values from a single column in the input array.

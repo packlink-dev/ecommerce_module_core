@@ -2,6 +2,8 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
+use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -10,6 +12,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class TaskTest
+ *
+ * @package Logeecom\Tests\Infrastructure\TaskExecution
+ */
 class TaskTest extends TestCase
 {
     /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider */
@@ -27,6 +34,9 @@ class TaskTest extends TestCase
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
+                Serializer::CLASS_NAME => function() {
+                    return new NativeSerializer();
+                }
             )
         );
 
@@ -56,7 +66,7 @@ class TaskTest extends TestCase
         $task = new FooTask('test dependency', 123);
 
         /** @var FooTask $unserializedTask */
-        $unserializedTask = unserialize(serialize($task));
+        $unserializedTask = Serializer::unserialize(Serializer::serialize($task));
 
         $this->assertInstanceOf('\Serializable', $unserializedTask);
         $this->assertSame('test dependency', $unserializedTask->getDependency1());
