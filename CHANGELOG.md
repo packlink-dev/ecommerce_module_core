@@ -5,13 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
-### Added
+## [v1.5.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.0...v1.5.1) - 2019-11-28
+### Changed
+- `AjaxService.js:call` method now removes the protocol from the URL in order to use the current page's protocol/.
 
+## [v1.5.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.1...v1.5.0) - 2019-11-18
+### Added
 - `isRegistered` method in `RepositoryRegistry`.
 - `isShipmentLabelsAvailable` method in `OrderService`
 
 ### Removed
-
 - `OrderService::updateShipmentLabel` method.
 - `OrderRepository::isLabelSet` method.
 - `OrderRepository::setLabelsByReference` method.
@@ -36,7 +39,7 @@ This is a *breaking* change and each integration should register preferred seria
 integration.
 - Removed `OrderRepository::setLabelsByReference` method.
 
-## [v1.4.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.1...1.4.0) - 2019-10-14
+## [v1.4.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.0...v1.4.1) - 2019-10-14
 ### Added
 - `DraftController` is added to decrease the code in integrations related to creation of the draft
 - `ConfigurationService` is extended with a flag whether to run async process with POST or GET call, defaults to POST.
@@ -48,7 +51,7 @@ validation in async process controller whether the call is a POST call, it shoul
 - Fixed tax selector bug - using the already selected value.
 - Fixed some tests.
 
-## [v1.4.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.0...1.3.1) - 2019-08-28
+## [v1.4.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...v1.4.0) - 2019-08-28
 ### Added
 - Tests for `AbstracGenericStudentRepository` and `AbastractGenericQueueItemRepository` have been improved
 to support multiple conditions in filters for select.
@@ -87,11 +90,11 @@ supports:
   both sync and async calls.
 - `Logger\LogData` is converted to entity. This does not break current integrations.
 
-## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.1...1.3.0) - 2019-07-16
+## [v1.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.0...v1.3.1) - 2019-07-16
 ### Changed
   - Fixed sending draft full address.
 
-## [v1.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.3.0...1.2.2) - 2019-07-10
+## [v1.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.2...v1.3.0) - 2019-07-10
 ### Changed
   - Updated task for updating shipment data to report the progress and handle base errors.
 
@@ -112,12 +115,12 @@ Then, in your code add the following:
 of `array_column` in class `Packlink\BusinessLogic\Utility\Php\Php55`.
 - Removed `Proxy::callAsync` method as it is not used nor needed.
 
-## [v1.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.2...v1.2.1) - 2019-06-20
+## [v1.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.1...v1.2.2) - 2019-06-20
 ### Added
 - Added support for some PHP functions (e.g. `array_column`) that are not natively supported by
 PHP versions prior to 5.5 by requiring Symfony packages that add this support.
 
-## [v1.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.1...v1.2.0) - 2019-06-18
+## [v1.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.0...v1.2.1) - 2019-06-18
 ### Changed
 - Analytics endpoint now adds module version as well
 - JS `StateController` now supports additional configuration options in the `configuration` parameter:
@@ -126,7 +129,7 @@ PHP versions prior to 5.5 by requiring Symfony packages that add this support.
   - `configuration.pageConfiguration`: contains specific configuration for additional pages added 
 in `configuration.sidebarButtons`. See `StateController.js` for the details of the implementation.
 
-## [v1.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.2.0...v1.1.0) - 2019-05-31
+## [v1.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.1.0...v1.2.0) - 2019-05-31
 **BREAKING CHANGES**:
 ### Added
 - Business logic `ConfigurationService` has new abstract methods 
@@ -145,7 +148,7 @@ This enables creating one-time schedules.
 - `Proxy::__contruct` has changed parameters since configuration service is now needed.
 - Tests updated to follow new implementations.
 
-## [v1.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.1.0...v1.0.0) - 2019-05-29
+## [v1.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.0.0...v1.1.0) - 2019-05-29
 **BREAKING CHANGES**:
 ### Added
 - `OrderRepository` interface has a new method `isLabelSet($shipmentReference)`.
