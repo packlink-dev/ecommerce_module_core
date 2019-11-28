@@ -44,6 +44,10 @@ var Packlink = window.Packlink || {};
          */
         this.call = function (method, url, data, onSuccess, onError) {
             let request = getRequest();
+
+            url = url.replace('https:', '');
+            url = url.replace('http:', '');
+
             request.open(method, url, true);
 
             request.onreadystatechange = function () {
