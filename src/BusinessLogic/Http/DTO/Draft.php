@@ -234,6 +234,6 @@ class Draft extends BaseDto
 
         $content = implode(', ', $this->content);
 
-        return substr(str_replace($forbiddenCharacters, '', $content), 0, 60);
+        return mb_substr(str_replace($forbiddenCharacters, '', $content), 0, 60);
     }
 }

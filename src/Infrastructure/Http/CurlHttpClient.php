@@ -184,8 +184,8 @@ class CurlHttpClient extends HttpClient
     {
         $delimiter = "\r\n\r\n";
         $needle = 'HTTP/1.1 100';
-        if (strpos($response, $needle) === 0) {
-            return substr($response, strpos($response, $delimiter) + 4);
+        if (mb_strpos($response, $needle) === 0) {
+            return mb_substr($response, mb_strpos($response, $delimiter) + 4);
         }
 
         return $response;
@@ -335,7 +335,7 @@ class CurlHttpClient extends HttpClient
     {
         $headers = array();
         $headersBodyDelimiter = "\r\n\r\n";
-        $headerText = substr($response, 0, strpos($response, $headersBodyDelimiter));
+        $headerText = mb_substr($response, 0, mb_strpos($response, $headersBodyDelimiter));
         $headersDelimiter = "\r\n";
 
         foreach (explode($headersDelimiter, $headerText) as $i => $line) {
@@ -362,7 +362,7 @@ class CurlHttpClient extends HttpClient
         $headersBodyDelimiter = "\r\n\r\n";
         $bodyStartingPositionOffset = 4; // number of special signs in delimiter;
 
-        return substr($response, strpos($response, $headersBodyDelimiter) + $bodyStartingPositionOffset);
+        return mb_substr($response, mb_strpos($response, $headersBodyDelimiter) + $bodyStartingPositionOffset);
     }
 
     /**
@@ -417,7 +417,7 @@ class CurlHttpClient extends HttpClient
         $domain = parse_url($url, PHP_URL_HOST);
         $options = $this->getAdditionalOptions($domain);
         if (!empty($options[self::SWITCH_PROTOCOL])) {
-            if (strpos($url, 'http:') === 0) {
+            if (mb_strpos($url, 'http:') === 0) {
                 $url = str_replace('http:', 'https:', $url);
             } else {
                 $url = str_replace('https:', 'http:', $url);

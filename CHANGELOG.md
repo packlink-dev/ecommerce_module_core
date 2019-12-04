@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04
+### Changed
+- Replaced `substr` with `mb_substring` to prevent cutting the string in the middle of the special unicode character.
+
 ## [v1.5.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.0...v1.5.1) - 2019-11-28
 ### Changed
-- `AjaxService.js:call` method now removes the protocol from the URL in order to use the current page's protocol/.
+- `AjaxService.js:call` method now removes the protocol from the URL in order to use the current page's protocol.
 
 ## [v1.5.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.4.1...v1.5.0) - 2019-11-18
 ### Added
