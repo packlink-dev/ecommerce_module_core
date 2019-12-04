@@ -263,7 +263,7 @@ class MemoryRepository implements RepositoryInterface
 
                         // %SEARCH
                         if ($firstP === 0 && $firstP === $lastP) {
-                            return $position !== false && $position + strlen($b) === strlen($a);
+                            return $position !== false && $position + mb_strlen($b) === mb_strlen($a);
                         }
 
                         return false;
