@@ -66,7 +66,7 @@ class EntityTranslator
     {
         $data = json_decode($intermediateObject->getData(), true);
 
-        if (!$data['class_name']) {
+        if (empty($data['class_name'])) {
             throw new EntityClassException('Entity has not provided class name.');
         }
 
