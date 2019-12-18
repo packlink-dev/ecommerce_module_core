@@ -217,7 +217,7 @@ class QueueTest extends TestCase
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Exception
      */
-    public function testFinOldestQueuedItems()
+    public function testFindOldestQueuedItems()
     {
         // Arrange
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));

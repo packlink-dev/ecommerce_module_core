@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
@@ -17,7 +18,9 @@ use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
+use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
@@ -218,54 +221,70 @@ class UserAccountService extends BaseService
     {
         $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
 
-        // Schedule weekly task for updating services
-        $shippingServicesSchedule = new WeeklySchedule(
-            new UpdateShippingServicesTask(),
-            $this->configuration->getDefaultQueueName()
-        );
-        $shippingServicesSchedule->setDay(1);
-        $shippingServicesSchedule->setHour(2);
-        $shippingServicesSchedule->setNextSchedule();
-        $repository->save($shippingServicesSchedule);
+        $this->scheduleUpdateShipmentServicesTask($repository);
 
         // Schedule hourly task for updating shipment info - start at full hour
-        $this->setHourlyTask($repository, 0);
+        $this->scheduleUpdatePendingShipmentsData($repository, 0);
 
         // Schedule hourly task for updating shipment info - start at half hour
-        $this->setHourlyTask($repository, 30);
+        $this->scheduleUpdatePendingShipmentsData($repository, 30);
 
         // Schedule daily task for updating shipment info - start at 11:00 UTC hour
-        $this->setDailyTask($repository, 11);
+        $this->scheduleUpdateInProgressShipments($repository, 11);
+
+        // schedule hourly queue cleanup
+        $this->scheduleTaskCleanup($repository);
     }
 
     /**
-     * Creates hourly task for updating shipment data.
+     * @param \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface $repository
+     *
+     */
+    protected function scheduleUpdateShipmentServicesTask(RepositoryInterface $repository)
+    {
+        // Schedule weekly task for updating services
+        $schedule = new WeeklySchedule(
+            new UpdateShippingServicesTask(),
+            $this->configuration->getDefaultQueueName(),
+            $this->configuration->getContext()
+        );
+
+        $schedule->setDay(1);
+        $schedule->setHour(2);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+    }
+
+    /**
+     * Creates hourly task for updating shipment data for pending shipments.
      *
      * @param RepositoryInterface $repository Scheduler repository.
      * @param int $minute Starting minute for the task.
      */
-    protected function setHourlyTask(RepositoryInterface $repository, $minute)
+    protected function scheduleUpdatePendingShipmentsData(RepositoryInterface $repository, $minute)
     {
         $hourlyStatuses = array(
             ShipmentStatus::STATUS_PENDING,
         );
 
-        $shipmentDataHalfHourSchedule = new HourlySchedule(
+        $schedule = new HourlySchedule(
             new UpdateShipmentDataTask($hourlyStatuses),
-            $this->configuration->getDefaultQueueName()
+            $this->configuration->getDefaultQueueName(),
+            $this->configuration->getContext()
         );
-        $shipmentDataHalfHourSchedule->setMinute($minute);
-        $shipmentDataHalfHourSchedule->setNextSchedule();
-        $repository->save($shipmentDataHalfHourSchedule);
+
+        $schedule->setMinute($minute);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
     }
 
     /**
-     * Schedules daily shipment data update task.
+     * Creates daily task for updating shipment data for shipments in progress.
      *
      * @param RepositoryInterface $repository Schedule repository.
      * @param int $hour Hour of the day when schedule should be executed.
      */
-    protected function setDailyTask(RepositoryInterface $repository, $hour)
+    protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour)
     {
         $dailyStatuses = array(
             ShipmentStatus::STATUS_IN_TRANSIT,
@@ -273,18 +292,34 @@ class UserAccountService extends BaseService
             ShipmentStatus::STATUS_ACCEPTED,
         );
 
-        $dailyShipmentDataSchedule = new DailySchedule(
-            new UpdateShipmentDataTask(
-                $dailyStatuses
-            ),
+        $schedule = new DailySchedule(
+            new UpdateShipmentDataTask($dailyStatuses),
             $this->configuration->getDefaultQueueName(),
             $this->configuration->getContext()
         );
 
-        $dailyShipmentDataSchedule->setHour($hour);
-        $dailyShipmentDataSchedule->setNextSchedule();
+        $schedule->setHour($hour);
+        $schedule->setNextSchedule();
 
-        $repository->save($dailyShipmentDataSchedule);
+        $repository->save($schedule);
+    }
+
+    /**
+     * Creates hourly task for cleaning up the database queue for completed items.
+     *
+     * @param RepositoryInterface $repository Scheduler repository.
+     */
+    protected function scheduleTaskCleanup(RepositoryInterface $repository)
+    {
+        $schedule = new HourlySchedule(
+            new TaskCleanupTask(ScheduleCheckTask::getClassName(), array(QueueItem::COMPLETED), 3600),
+            $this->configuration->getDefaultQueueName(),
+            $this->configuration->getContext()
+        );
+
+        $schedule->setMinute(10);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
     }
 
     /**

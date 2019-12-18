@@ -19,7 +19,13 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
+use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
+use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
+use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
 /**
@@ -88,8 +94,47 @@ class UserAccountLoginTest extends BaseTestWithServices
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
         $queueItems = $queueStorage->select();
         $this->assertCount(1, $queueItems);
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->assertEquals('UpdateShippingServicesTask', $queueItems[0]->getTaskType());
+
+        /** @var MemoryRepository $scheduleRepository */
+        $scheduleRepository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+        /** @var Schedule[] $allSchedules */
+        $allSchedules = $scheduleRepository->select();
+
+        $this->assertCount(5, $allSchedules);
+
+        $expectedSchedules = array(
+            WeeklySchedule::getClassName() => array(
+                UpdateShippingServicesTask::getClassName() => 1,
+            ),
+            HourlySchedule::getClassName() => array(
+                // 2 hourly schedules, starting every 30 minutes
+                UpdateShipmentDataTask::getClassName() => 2,
+                TaskCleanupTask::getClassName() => 1,
+            ),
+            DailySchedule::getClassName() => array(
+                UpdateShipmentDataTask::getClassName() => 1,
+            ),
+        );
+
+        foreach ($allSchedules as $schedule) {
+            $scheduleClass = get_class($schedule);
+            $taskClass = explode('\\', get_class($schedule->getTask()));
+            $taskClass = end($taskClass);
+            $this->assertArrayHasKey($scheduleClass, $expectedSchedules);
+            $this->assertArrayHasKey($taskClass, $expectedSchedules[$scheduleClass]);
+
+            $expectedSchedules[$scheduleClass][$taskClass]--;
+            if ($expectedSchedules[$scheduleClass][$taskClass] === 0) {
+                unset($expectedSchedules[$scheduleClass][$taskClass]);
+            }
+
+            if (empty($expectedSchedules[$scheduleClass])) {
+                unset($expectedSchedules[$scheduleClass]);
+            }
+        }
+
+        $this->assertEmpty($expectedSchedules);
     }
 
     /**
