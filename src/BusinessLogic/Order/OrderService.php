@@ -13,8 +13,10 @@ use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
-use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -44,9 +46,13 @@ class OrderService extends BaseService
      */
     private $configuration;
     /**
-     * @var OrderRepository
+     * @var ShopOrderService
      */
-    private $orderRepository;
+    private $shopOrderService;
+    /**
+     * @var OrderShipmentDetailsService
+     */
+    private $orderShipmentDetailsService;
 
     /**
      * OrderService constructor.
@@ -55,7 +61,8 @@ class OrderService extends BaseService
     {
         parent::__construct();
 
-        $this->orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        $this->shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 
@@ -70,7 +77,7 @@ class OrderService extends BaseService
      */
     public function prepareDraft($orderId)
     {
-        $order = $this->orderRepository->getOrderAndShippingData($orderId);
+        $order = $this->shopOrderService->getOrderAndShippingData($orderId);
 
         return $this->convertOrderToDraftDto($order);
     }
@@ -85,7 +92,7 @@ class OrderService extends BaseService
      */
     public function setReference($orderId, $shipmentReference)
     {
-        $this->orderRepository->setReference($orderId, $shipmentReference);
+        $this->orderShipmentDetailsService->setReference($orderId, $shipmentReference);
     }
 
     /**
@@ -97,9 +104,10 @@ class OrderService extends BaseService
     public function updateShippingStatus(Shipment $shipment, $status)
     {
         try {
-            $this->orderRepository->setShippingStatusByReference($shipment->reference, $status);
+            $this->orderShipmentDetailsService->setShippingStatus($shipment->reference, $status);
+            $this->shopOrderService->updateShipmentStatus($shipment->reference, $status);
         } catch (OrderNotFound $e) {
-            Logger::logInfo(
+            Logger::logWarning(
                 $e->getMessage(),
                 'Core',
                 array('referenceId' => $shipment->reference, 'status' => $status)
@@ -116,23 +124,21 @@ class OrderService extends BaseService
     {
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        $trackingHistory = array();
         try {
+            $this->orderShipmentDetailsService->setTrackingInfo(
+                $shipment->reference,
+                $shipment->carrierTrackingUrl,
+                $shipment->trackingCodes
+            );
+
             $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
-            $this->orderRepository->updateTrackingInfo($shipment, $trackingHistory);
+            $this->shopOrderService->handleUpdatedTrackingInfo($shipment->reference, $trackingHistory);
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
+        } catch (OrderShipmentDetailsNotFound $e) {
+            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         } catch (OrderNotFound $e) {
-            $trackingAsArray = array();
-            foreach ($trackingHistory as $item) {
-                $trackingAsArray[] = $item->toArray();
-            }
-
-            Logger::logInfo(
-                $e->getMessage(),
-                'Core',
-                array('referenceId' => $shipment->reference, 'trackingHistory' => $trackingAsArray)
-            );
+            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         }
     }
 

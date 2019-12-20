@@ -6,7 +6,9 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
@@ -14,8 +16,10 @@ use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
+use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 
@@ -23,6 +27,7 @@ use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
  * Class UpdateShipmentDataTaskTest
  *
  * @package Logeecom\Tests\BusinessLogic\Tasks
+ * @property UpdateShipmentDataTask $syncTask
  */
 class UpdateShipmentDataTaskTest extends BaseSyncTest
 {
@@ -30,6 +35,10 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      * @var TestHttpClient
      */
     public $httpClient;
+    /**
+     * @var \Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService
+     */
+    public $orderShipmentDetailsService;
 
     /**
      * @inheritdoc
@@ -40,6 +49,11 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
 
         $me = $this;
 
+        TestRepositoryRegistry::registerRepository(
+            OrderShipmentDetails::getClassName(),
+            MemoryRepository::getClassName()
+        );
+
         $this->httpClient = new TestHttpClient();
         TestServiceRegister::registerService(
             HttpClient::CLASS_NAME,
@@ -48,14 +62,6 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
             }
         );
 
-        TestServiceRegister::registerService(
-            OrderService::CLASS_NAME,
-            function () {
-                return OrderService::getInstance();
-            }
-        );
-
-        /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($me) {
@@ -66,12 +72,28 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
             }
         );
 
-        $orderRepository = new TestOrderRepository();
+        TestServiceRegister::registerService(
+            OrderService::CLASS_NAME,
+            function () {
+                return OrderService::getInstance();
+            }
+        );
+
+        $this->orderShipmentDetailsService = OrderShipmentDetailsService::getInstance();
 
         TestServiceRegister::registerService(
-            OrderRepository::CLASS_NAME,
-            function () use ($orderRepository) {
-                return $orderRepository;
+            OrderShipmentDetailsService::CLASS_NAME,
+            function () use ($me) {
+                return $me->orderShipmentDetailsService;
+            }
+        );
+
+        $shopOrderService = new TestShopOrderService();
+
+        TestServiceRegister::registerService(
+            ShopOrderService::CLASS_NAME,
+            function () use ($shopOrderService) {
+                return $shopOrderService;
             }
         );
 
@@ -92,30 +114,32 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
 
     public function testExecute()
     {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
         $this->httpClient->setMockResponses($this->getMockResponses());
         $this->syncTask->execute();
         self::assertCount(3, $this->eventHistory);
         $this->validate100Progress();
 
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService $shopOrderService */
+        $shopOrderService = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $order = $shopOrderService->getOrder('test_order_id');
 
-        self::assertEquals(15.85, $order->getBasePrice());
+        self::assertEquals(15.85, $order->getShippingPrice());
     }
 
     public function testExecuteStatusShipmentDelivered()
     {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
         $this->httpClient->setMockResponses($this->getMockResponsesDelivered());
         $this->syncTask->execute();
         $this->validate100Progress();
 
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
+        /** @var TestShopOrderService $shopOrderService */
+        $shopOrderService = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $order = $shopOrderService->getOrder('test_order_id');
 
-        self::assertEquals(15.85, $order->getBasePrice());
-        self::assertEquals('delivered', $order->getStatus());
+        self::assertEquals(15.85, $order->getShippingPrice());
+        self::assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getStatus());
     }
 
     /**
@@ -126,9 +150,11 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      */
     public function testAfterInitialFailure()
     {
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowGenericException(true);
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
+
+        /** @var TestShopOrderService $shopOrderService */
+        $shopOrderService = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $shopOrderService->shouldThrowGenericException(true);
         $serialized = '';
         try {
             $this->syncTask->execute();
@@ -137,16 +163,16 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         }
 
         $this->httpClient->setMockResponses($this->getMockResponses());
-        $orderRepository->shouldThrowGenericException(false);
+        $shopOrderService->shouldThrowGenericException(false);
 
         $this->syncTask = Serializer::unserialize($serialized);
         $this->attachProgressEventListener();
         $this->syncTask->execute();
         $this->validate100Progress();
 
-        $order = $orderRepository->getOrder('test');
-
-        self::assertEquals(15.85, $order->getBasePrice());
+        // when the task breaks for a specific reference, that reference will not be updated again.
+        $order = $shopOrderService->getOrder('test_order_id');
+        self::assertNull($order->getShippingPrice());
     }
 
     /**
@@ -157,14 +183,15 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      */
     public function testAfterOrderNotFoundFailure()
     {
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowOrderNotFoundException(true);
-        $orderRepository->setIncompleteOrderReferences(array('test1', 'test2'));
+        $this->orderShipmentDetailsService->setReference('test_order_1', 'test');
+        $this->httpClient->setMockResponses($this->getMockResponses());
+
+        /** @var TestShopOrderService $shopOrderService */
+        $shopOrderService = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $shopOrderService->shouldThrowOrderNotFoundException(true);
         $this->syncTask->execute();
-        // there should be 2 order not found messages
+
         self::assertCount(2, $this->shopLogger->loggedMessages);
-        self::assertEquals('Order not found.', $this->shopLogger->loggedMessages[0]->getMessage());
         self::assertEquals('Order not found.', $this->shopLogger->loggedMessages[1]->getMessage());
 
         // second execute of the same task should not do anything after unserialize
@@ -179,9 +206,9 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
 
     public function testAfterProxyFailure()
     {
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->setIncompleteOrderReferences(array('test1', 'test2', 'test3'));
+        $this->orderShipmentDetailsService->setReference('test_order_1', 'test');
+        $this->orderShipmentDetailsService->setReference('test_order_2', 'test2');
+        $this->orderShipmentDetailsService->setReference('test_order_3', 'test');
         // this sets response only for the first order
         $this->httpClient->setMockResponses($this->getMockResponses());
 
@@ -261,6 +288,8 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      */
     public function testWithOrderStatusesProvided()
     {
+        $this->orderShipmentDetailsService->setReference('test_order_1', 'test');
+        $this->orderShipmentDetailsService->setShippingStatus('test', ShipmentStatus::STATUS_IN_TRANSIT);
         $this->syncTask = new UpdateShipmentDataTask(array(ShipmentStatus::STATUS_IN_TRANSIT));
         $this->attachProgressEventListener();
         $this->httpClient->setMockResponses($this->getMockResponses());

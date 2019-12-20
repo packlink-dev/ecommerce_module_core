@@ -3,7 +3,8 @@
 namespace Packlink\BusinessLogic\Order\Objects;
 
 /**
- * Class TrackingHistory
+ * Class TrackingHistory.
+ *
  * @package Packlink\BusinessLogic\Order\Objects
  */
 class TrackingHistory
@@ -26,6 +27,23 @@ class TrackingHistory
      * @var string
      */
     private $city;
+
+    /**
+     * Creates a new instance from the raw array of data.
+     *
+     * @param array $raw
+     *
+     * @return TrackingHistory
+     */
+    public static function fromArray(array $raw)
+    {
+        $result = new static();
+        $result->setCity($raw['city']);
+        $result->setDescription($raw['description']);
+        $result->setTimestamp($raw['timestamp']);
+
+        return $result;
+    }
 
     /**
      * Returns timestamp.
