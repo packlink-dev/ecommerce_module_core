@@ -8,6 +8,8 @@ use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\DraftShipment\DraftShipmentService;
+use Packlink\BusinessLogic\DraftShipment\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
@@ -96,6 +98,20 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             OrderShipmentDetailsService::CLASS_NAME,
             function () {
                 return OrderShipmentDetailsService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            OrderSendDraftTaskMapService::CLASS_NAME,
+            function () {
+                return OrderSendDraftTaskMapService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            DraftShipmentService::CLASS_NAME,
+            function () {
+                return DraftShipmentService::getInstance();
             }
         );
     }

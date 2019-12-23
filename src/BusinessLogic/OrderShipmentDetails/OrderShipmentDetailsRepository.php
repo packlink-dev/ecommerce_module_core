@@ -10,7 +10,7 @@ use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
- * Class OrderShipmentDetailsRepository
+ * Class OrderShipmentDetailsRepository.
  *
  * @package Packlink\BusinessLogic\OrderShipmentDetails
  */
@@ -32,7 +32,7 @@ class OrderShipmentDetailsRepository
     }
 
     /**
-     * Retrieves order shipment details.
+     * Retrieves order shipment details for provided order ID.
      *
      * @param string | int $orderId Order id in an integration system.
      *
@@ -52,7 +52,7 @@ class OrderShipmentDetailsRepository
     }
 
     /**
-     * Retrieves order shipment details by shipment reference.
+     * Retrieves order shipment details for provided shipment reference.
      *
      * @param string $reference Shipment reference.
      *
@@ -109,11 +109,11 @@ class OrderShipmentDetailsRepository
     }
 
     /**
-     * Sets order packlink shipping status to an order by shipment reference.
+     * Persists the entity to the database.
      *
-     * @param OrderShipmentDetails $details
+     * @param OrderShipmentDetails $details The entity.
      *
-     * @return bool
+     * @return bool The operation success.
      */
     public function persist(OrderShipmentDetails $details)
     {

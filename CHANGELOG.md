@@ -22,6 +22,8 @@ Most notably, they now call either `OrderShipmentDetailsService` or `ShopOrderSe
 only responsibility of this service is to work with an order in the shop/integration.
 Most of the methods are removed.
 - `OrderShipmentDetails` entity does not contain a reference to a task anymore.
+- `DraftController` is renamed to `DraftShipmentService` and handles both immediate and delayed 
+SendDraftTask enqueueing. It provides a method for getting current status of the SendDraftTask for specific order.
 
 ## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04
 ### Changed
