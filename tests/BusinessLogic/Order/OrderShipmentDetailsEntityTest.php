@@ -3,7 +3,8 @@
 namespace Logeecom\Tests\BusinessLogic\Order;
 
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -44,7 +45,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
                         'createTime' => 1554192735,
                     ),
                 ),
-                'status' => 'pending',
+                'status' => ShipmentStatus::STATUS_PENDING,
                 'lastStatusUpdateTime' => 1554192735,
                 'carrierTrackingNumbers' => $this->getTestTrackingNumbers(),
                 'carrierTrackingUrl' => 'https://www.ups.com/track?loc=it_IT&requester=WT/',
@@ -75,7 +76,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         self::assertEquals('test1.dev', $labels[0]['link']);
         self::assertThat($labels[1], self::arrayHasKey('link'));
         self::assertEquals('test2.dev', $labels[1]['link']);
-        self::assertEquals('pending', $orderDetailsArray['status']);
+        self::assertEquals(ShipmentStatus::STATUS_PENDING, $orderDetailsArray['status']);
         self::assertEquals(1554192735, $orderDetailsArray['lastStatusUpdateTime']);
         self::assertEquals($this->getTestTrackingNumbers(), $orderDetailsArray['carrierTrackingNumbers']);
         self::assertEquals(
@@ -83,7 +84,6 @@ class OrderShipmentDetailsEntityTest extends TestCase
             $orderDetailsArray['carrierTrackingUrl']
         );
         self::assertEquals(12.99, $orderDetailsArray['shippingCost']);
-        self::assertEquals(312, $orderDetailsArray['taskId']);
     }
 
     /**
@@ -99,11 +99,10 @@ class OrderShipmentDetailsEntityTest extends TestCase
         $orderDetails->setReference('DE2019PRO0000309473');
         $orderDetails->setDropOffId(23);
         $orderDetails->setShipmentLabels(array(new ShipmentLabel('test1.dev'), new ShipmentLabel('test2.dev')));
-        $orderDetails->setShippingStatus('pending', 1554192735);
+        $orderDetails->setShippingStatus(ShipmentStatus::STATUS_PENDING, 1554192735);
         $orderDetails->setCarrierTrackingNumbers($this->getTestTrackingNumbers());
         $orderDetails->setCarrierTrackingUrl('https://www.ups.com/track?loc=it_IT&requester=WT/');
         $orderDetails->setShippingCost(12.99);
-        $orderDetails->setTaskId(312);
 
         return $orderDetails;
     }
@@ -124,7 +123,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         self::assertCount(2, $labels);
         self::assertEquals('test1.dev', $labels[0]->getLink());
         self::assertEquals('test2.dev', $labels[1]->getLink());
-        self::assertEquals('pending', $orderDetails->getShippingStatus());
+        self::assertEquals(ShipmentStatus::STATUS_PENDING, $orderDetails->getShippingStatus());
         self::assertEquals(1554192735, $orderDetails->getLastStatusUpdateTime()->getTimestamp());
         self::assertEquals($this->getTestTrackingNumbers(), $orderDetails->getCarrierTrackingNumbers());
         self::assertEquals(
@@ -132,7 +131,6 @@ class OrderShipmentDetailsEntityTest extends TestCase
             $orderDetails->getCarrierTrackingUrl()
         );
         self::assertEquals(12.99, $orderDetails->getShippingCost());
-        self::assertEquals(312, $orderDetails->getTaskId());
     }
 
     /**

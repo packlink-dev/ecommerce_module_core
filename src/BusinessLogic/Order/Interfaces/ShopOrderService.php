@@ -33,6 +33,8 @@ interface ShopOrderService
      *
      * @param string $shipmentReference Shipment reference.
      * @param Tracking[] $trackings Shipment tracking history.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order for provided reference is not found.
      */
     public function handleUpdatedTrackingInfo($shipmentReference, array $trackings);
 
@@ -42,7 +44,7 @@ interface ShopOrderService
      * @param string $shipmentReference Packlink shipment reference.
      * @param string $shippingStatus Packlink shipping status.
      *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order for provided reference is not found.
      */
     public function updateShipmentStatus($shipmentReference, $shippingStatus);
 }

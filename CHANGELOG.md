@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+**BREAKING CHANGES**
+This release contains several breaking changes. Check in detail when updating to this version.
+Contains implementation of the "*Core Enhancements 1*" set of features. 
+Check the documentation for more info.
+
+### Added
+- Added a `TaskClenupTask` for removing unnecessary queue items (tasks) from the database.
+- `OrderShipmentDetailsService` is added. This service is in charge of working with the `OrderShipmentDetails` entity.
+- `OrderShipmentDetailsRepository` is added for getting and storing the `OrderShipmentDetails` entity.
+- `SendDraftTask` and `UpdateShipmentDataTaks` tasks were updated to reflect the above changes.
+Most notably, they now call either `OrderShipmentDetailsService` or `ShopOrderService` separately where needed.
+
+### Changed
+- `OrderRepository` interface is changed. It is renamed to `ShopOrderService` and now the 
+only responsibility of this service is to work with an order in the shop/integration.
+Most of the methods are removed.
+- `OrderShipmentDetails` entity does not contain a reference to a task anymore.
+
 ## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04
 ### Changed
 - Replaced `substr` with `mb_substring` to prevent cutting the string in the middle of the special unicode character.

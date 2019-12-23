@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Order\Models;
+namespace Packlink\BusinessLogic\OrderShipmentDetails\Models;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
@@ -10,7 +10,8 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 
 /**
- * Class OrderShipmentDetails
+ * Class OrderShipmentDetails.
+ *
  * @package Packlink\BusinessLogic\Order\Models
  */
 class OrderShipmentDetails extends Entity
@@ -35,7 +36,6 @@ class OrderShipmentDetails extends Entity
         'carrierTrackingNumbers',
         'carrierTrackingUrl',
         'shippingCost',
-        'taskId',
         'deleted',
     );
     /**
@@ -92,12 +92,6 @@ class OrderShipmentDetails extends Entity
      * @var float
      */
     private $shippingCost;
-    /**
-     * Identifier of corresponding SendDraftTask.
-     *
-     * @var int
-     */
-    private $taskId;
     /**
      * If order has been deleted on the system.
      *
@@ -366,26 +360,6 @@ class OrderShipmentDetails extends Entity
     public function setCarrierTrackingUrl($carrierTrackingUrl)
     {
         $this->carrierTrackingUrl = $carrierTrackingUrl;
-    }
-
-    /**
-     * Returns identifier of corresponding SendDraftTask.
-     *
-     * @return int
-     */
-    public function getTaskId()
-    {
-        return $this->taskId;
-    }
-
-    /**
-     * Sets identifier of corresponding SendDraftTask.
-     *
-     * @param int $taskId
-     */
-    public function setTaskId($taskId)
-    {
-        $this->taskId = $taskId;
     }
 
     /**

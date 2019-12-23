@@ -4,8 +4,8 @@ namespace Packlink\BusinessLogic\OrderShipmentDetails;
 
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
@@ -235,7 +235,7 @@ class OrderShipmentDetailsService extends BaseService
      * @param string $shipmentReference
      * @param bool $throwException Specifies whether to throw an exception if details are not found.
      *
-     * @return \Packlink\BusinessLogic\Order\Models\OrderShipmentDetails|null
+     * @return OrderShipmentDetails|null
      * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     protected function getDetailsByReferenceInternal($shipmentReference, $throwException = true)

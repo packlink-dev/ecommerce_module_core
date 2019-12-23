@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
@@ -111,7 +111,7 @@ class OrderShipmentDetailsRepository
     /**
      * Sets order packlink shipping status to an order by shipment reference.
      *
-     * @param \Packlink\BusinessLogic\Order\Models\OrderShipmentDetails $details
+     * @param OrderShipmentDetails $details
      *
      * @return bool
      */

@@ -9,7 +9,7 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
 /**
@@ -62,7 +62,7 @@ class DraftController
             // reference has been set, so we don't delete it here.
             $orderDetails = static::getOrderDetailsByOrderId($orderId);
             if ($orderDetails !== null) {
-                $orderDetails->setTaskId($draftTask->getExecutionId());
+                // $orderDetails->setTaskId($draftTask->getExecutionId());
                 static::getOrderDetailsRepository()->update($orderDetails);
             }
         }
