@@ -46,6 +46,8 @@ abstract class Task extends EventEmitter implements Serializable
 
     /**
      * Runs task logic.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     abstract public function execute();
 

@@ -16,6 +16,8 @@ Check the documentation for more info.
 - `OrderShipmentDetailsRepository` is added for getting and storing the `OrderShipmentDetails` entity.
 - `SendDraftTask` and `UpdateShipmentDataTaks` tasks were updated to reflect the above changes.
 Most notably, they now call either `OrderShipmentDetailsService` or `ShopOrderService` separately where needed.
+- Added task abortion functionality. If needed, throw `AbortTaskExecutionException` from the task to abort it.
+Aborted tasks will not be restarted by the queue service.
 
 ### Changed
 - `OrderRepository` interface is changed. It is renamed to `ShopOrderService` and now the 

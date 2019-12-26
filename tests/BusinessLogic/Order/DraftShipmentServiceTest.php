@@ -256,7 +256,7 @@ class DraftShipmentServiceTest extends BaseTestWithServices
         $draftStatus = $this->draftShipmentService->getDraftStatus('test');
 
         $this->assertEquals(QueueItem::FAILED, $draftStatus->status);
-        $this->assertEquals('Error in task.', $draftStatus->message);
+        $this->assertEquals('Attempt 7: Error in task.', $draftStatus->message);
     }
 
     /**
