@@ -9,7 +9,6 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Events\BeforeQueueStatusChangeEvent;
 use Logeecom\Infrastructure\TaskExecution\Events\QueueStatusChangedEvent;
-use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -92,6 +91,7 @@ class QueueService
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function start(QueueItem $queueItem)
     {
@@ -112,11 +112,7 @@ class QueueService
             QueueItem::QUEUED
         );
 
-        try {
-            $queueItem->getTask()->execute();
-        } catch (AbortTaskExecutionException $exception) {
-            $this->abort($queueItem, $exception->getMessage());
-        }
+        $queueItem->getTask()->execute();
     }
 
     /**

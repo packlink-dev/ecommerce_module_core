@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
@@ -48,11 +49,15 @@ class QueueTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
+
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 
         $timeProvider = new TestTimeProvider();
         $taskRunnerStarter = new TestTaskRunnerWakeupService();
+        $this->queue = new QueueService();
+        $me = $this;
 
         new TestServiceRegister(
             array(
@@ -70,6 +75,9 @@ class QueueTest extends TestCase
                 },
                 Serializer::CLASS_NAME => function () {
                     return new NativeSerializer();
+                },
+                QueueService::CLASS_NAME => function () use ($me) {
+                    return $me->queue;
                 },
             )
         );
@@ -895,7 +903,10 @@ class QueueTest extends TestCase
     public function testAbortingQueueItemFromTask()
     {
         $queueItem = $this->queue->enqueue('testQueue', new AbortTask());
-        $this->queue->start($queueItem);
+        $itemStarter = new QueueItemStarter($queueItem->getId());
+        $itemStarter->run();
+
+        $queueItem = $this->queue->find($queueItem->getId());
 
         $this->assertEquals(
             QueueItem::ABORTED,
