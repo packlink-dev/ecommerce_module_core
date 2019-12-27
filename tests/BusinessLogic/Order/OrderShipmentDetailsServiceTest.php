@@ -64,4 +64,49 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
         $this->assertEquals('test', $shipmentDetailsByRef->getOrderId());
         $this->assertEquals($shipmentDetailsById->getId(), $shipmentDetailsByRef->getId());
     }
+
+    /**
+     * Test setting labels.
+     */
+    public function testSetLabels()
+    {
+        $this->orderShipmentDetailsService->setReference('test', 'test_reference');
+        $this->orderShipmentDetailsService->setLabelsByReference('test_reference', array('label1', 'label2'));
+
+        $shipmentDetailsByRef = $this->orderShipmentDetailsService->getDetailsByReference('test_reference');
+
+        $labels = $shipmentDetailsByRef->getShipmentLabels();
+        $this->assertCount(2, $labels, 'Shipment labels must be set.');
+        $this->assertEquals('label1', $labels[0]->getLink(), 'A link for shipment label must be set');
+        $this->assertEquals('label2', $labels[1]->getLink(), 'A link for shipment label must be set');
+        $this->assertFalse($labels[0]->isPrinted());
+    }
+
+    /**
+     * @expectedException \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testSetLabelsUnknownReference()
+    {
+        $this->orderShipmentDetailsService->setReference('test', 'test_reference');
+        $this->orderShipmentDetailsService->setLabelsByReference('some reference', array('label1', 'label2'));
+
+        $this->fail('Exception must be thrown if shipment reference is not found.');
+    }
+
+    /**
+     * Test marking labels printed.
+     */
+    public function testMarkLabelPrinted()
+    {
+        $this->orderShipmentDetailsService->setReference('test', 'test_reference');
+        $this->orderShipmentDetailsService->setLabelsByReference('test_reference', array('label1', 'label2'));
+        $this->orderShipmentDetailsService->markLabelPrinted('test_reference', 'label2');
+
+        $shipmentDetailsByRef = $this->orderShipmentDetailsService->getDetailsByReference('test_reference');
+
+        $labels = $shipmentDetailsByRef->getShipmentLabels();
+        $this->assertCount(2, $labels, 'Shipment labels must be set.');
+        $this->assertFalse($labels[0]->isPrinted());
+        $this->assertTrue($labels[1]->isPrinted());
+    }
 }

@@ -154,11 +154,6 @@ class OrderShipmentDetailsService extends BaseService
     {
         /** @var OrderShipmentDetails $orderDetails */
         $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
-        if ($orderDetails === null) {
-            throw new OrderShipmentDetailsNotFound(
-                'Order details not found for reference: ' . $shipmentReference . '.'
-            );
-        }
 
         $orderDetails->setShippingStatus($shippingStatus);
 
@@ -184,13 +179,38 @@ class OrderShipmentDetailsService extends BaseService
      * Sets packlink shipment labels.
      *
      * @param string $shipmentReference Shipment reference.
-     * @param string[] $labels Packlink shipment labels.
+     * @param string[] $labels Packlink shipment labels as a list of URLs.
      */
     public function setLabelsByReference($shipmentReference, array $labels)
     {
+        $labelsPrepared = array();
+        foreach ($labels as $labelLink) {
+            $labelsPrepared[] = new ShipmentLabel($labelLink);
+        }
+
         /** @var OrderShipmentDetails $orderDetails */
         $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
-        $orderDetails->setShipmentLabels(ShipmentLabel::fromArrayBatch($labels));
+        $orderDetails->setShipmentLabels($labelsPrepared);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Sets label identified by order ID and link to PDF to have been printed.
+     *
+     * @param string $shipmentReference Shipment reference.
+     * @param string $link Link to PDF.
+     */
+    public function markLabelPrinted($shipmentReference, $link)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+
+        foreach ($orderDetails->getShipmentLabels() as $label) {
+            if ($label->getLink() === $link) {
+                $label->setPrinted(true);
+            }
+        }
 
         $this->repository->persist($orderDetails);
     }
