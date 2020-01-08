@@ -65,7 +65,7 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
      */
     public function toArray()
     {
-        $result = array_merge(
+        return array_merge(
             parent::toArray(),
             array(
                 'title' => $this->title,
@@ -78,7 +78,5 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
                 'selected' => $this->selected,
             )
         );
-
-        return $result;
     }
 }

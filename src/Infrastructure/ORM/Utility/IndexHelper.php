@@ -56,7 +56,7 @@ class IndexHelper
      * @param mixed $value Raw value
      * @param string $type Type of the value
      *
-     * @return string | null
+     * @return array|string|null
      */
     public static function castFieldValue($value, $type)
     {
