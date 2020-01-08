@@ -1,32 +1,32 @@
 <?php
 
-namespace Packlink\BusinessLogic\DraftShipment\Objects;
+namespace Packlink\BusinessLogic\ShipmentDraft\Objects;
 
 use Packlink\BusinessLogic\Http\DTO\BaseDto;
 
 /**
- * Class DraftShipmentStatus.
+ * Class ShipmentDraftStatus.
  *
- * @package Packlink\BusinessLogic\DraftShipment\Objects
+ * @package Packlink\BusinessLogic\ShipmentDraft\Objects
  */
-class DraftShipmentStatus extends BaseDto
+class ShipmentDraftStatus extends BaseDto
 {
     /**
-     * Represents the status where send draft shipment task is not created.
+     * Represents the status where create shipment draft task is not created.
      */
     const NOT_QUEUED = 'NOT_QUEUED';
     /**
-     * Represents the status where send draft shipment task is created but delayed.
+     * Represents the status where create shipment draft task is created but delayed.
      */
     const DELAYED = 'DELAYED';
     /**
-     * A status of the draft shipment.
+     * A status of the shipment draft.
      *
      * @var string
      */
     public $status;
     /**
-     * A latest message related to the draft shipment. Usually, an error message.
+     * A latest message related to the shipment draft. Usually, an error message.
      *
      * @var string
      */

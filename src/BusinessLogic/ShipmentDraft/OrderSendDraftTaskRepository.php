@@ -1,17 +1,17 @@
 <?php
 
-namespace Packlink\BusinessLogic\DraftShipment;
+namespace Packlink\BusinessLogic\ShipmentDraft;
 
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Packlink\BusinessLogic\DraftShipment\Models\OrderSendDraftTaskMap;
+use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 
 /**
  * Class OrderSendDraftTaskRepository.
  *
- * @package Packlink\BusinessLogic\DraftShipment
+ * @package Packlink\BusinessLogic\ShipmentDraft
  */
 class OrderSendDraftTaskRepository
 {

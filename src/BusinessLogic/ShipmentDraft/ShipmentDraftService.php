@@ -1,24 +1,25 @@
 <?php
 
-namespace Packlink\BusinessLogic\DraftShipment;
+namespace Packlink\BusinessLogic\ShipmentDraft;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\DraftShipment\Objects\DraftShipmentStatus;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\ShipmentDraft\Objects\ShipmentDraftStatus;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
 /**
- * Class DraftShipmentService.
+ * Class ShipmentDraftService.
  *
- * @package Packlink\BusinessLogic\DraftShipment
+ * @package Packlink\BusinessLogic\ShipmentDraft
  */
-class DraftShipmentService extends BaseService
+class ShipmentDraftService extends BaseService
 {
     /**
      * Fully qualified name of this class.
@@ -32,13 +33,14 @@ class DraftShipmentService extends BaseService
     protected static $instance;
 
     /**
-     * Creates draft task for provided shop order id.
+     * Enqueues the task for creating shipment draft for provided order id.
+     * Ensures proper mapping between the order and the created task are persisted.
      *
      * @param string $orderId Shop order id.
-     *
-     * @param bool $isDelayed Indicates if the creation of the task should be delayed.
+     * @param bool $isDelayed Indicates if the execution of the task should be delayed.
+     * @param int $delayInterval Interval in minutes to delay the execution.
      */
-    public function createDraftShipmentTask($orderId, $isDelayed = false)
+    public function enqueueCreateShipmentDraftTask($orderId, $isDelayed = false, $delayInterval = 5)
     {
         /** @var OrderSendDraftTaskMapService $draftTaskMapService */
         $draftTaskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
@@ -48,20 +50,20 @@ class DraftShipmentService extends BaseService
 
         $draftTaskMapService->createOrderTaskMap($orderId);
 
-        /** @var QueueService $queue */
-        $queue = ServiceRegister::getService(QueueService::CLASS_NAME);
         /** @var Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
 
         $sendDraftTask = new SendDraftTask($orderId);
         if (!$isDelayed) {
+            /** @var QueueService $queue */
+            $queue = ServiceRegister::getService(QueueService::CLASS_NAME);
             $queue->enqueue($configService->getDefaultQueueName(), $sendDraftTask, $configService->getContext());
 
             if ($sendDraftTask->getExecutionId() !== null) {
                 $draftTaskMapService->setExecutionId($orderId, $sendDraftTask->getExecutionId());
             }
         } else {
-            $this->enqueueDelayedSendDraftTask($sendDraftTask, $configService);
+            $this->enqueueDelayedTask($sendDraftTask, $delayInterval);
         }
     }
 
@@ -70,43 +72,50 @@ class DraftShipmentService extends BaseService
      *
      * @param string $orderId The Order ID.
      *
-     * @return DraftShipmentStatus Entity with correct status and optional failure message.
+     * @return ShipmentDraftStatus Entity with correct status and optional failure message.
      */
     public function getDraftStatus($orderId)
     {
         /** @var OrderSendDraftTaskMapService $taskMapService */
         $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
-        $draftShipmentStatus = new DraftShipmentStatus();
+        $status = new ShipmentDraftStatus();
         $taskMap = $taskMapService->getOrderTaskMap($orderId);
 
         if ($taskMap === null) {
-            $draftShipmentStatus->status = DraftShipmentStatus::NOT_QUEUED;
+            $status->status = ShipmentDraftStatus::NOT_QUEUED;
         } elseif ($taskMap->getExecutionId() === null) {
-            $draftShipmentStatus->status = DraftShipmentStatus::DELAYED;
+            $status->status = ShipmentDraftStatus::DELAYED;
         } else {
             /** @var QueueService $queue */
             $queue = ServiceRegister::getService(QueueService::CLASS_NAME);
             $task = $queue->find($taskMap->getExecutionId());
             if ($task !== null) {
-                $draftShipmentStatus->status = $task->getStatus();
-                $draftShipmentStatus->message = $task->getFailureDescription();
+                $status->status = $task->getStatus();
+                $status->message = $task->getFailureDescription();
             } else {
-                $draftShipmentStatus->status = QueueItem::FAILED;
+                $status->status = QueueItem::FAILED;
             }
         }
 
-        return $draftShipmentStatus;
+        return $status;
     }
 
     /**
      * Enqueues delayed send draft task.
      *
      * @param SendDraftTask $task Task to be executed.
-     * @param Configuration $configService Configuration service.
+     * @param int $delayInterval Interval in minutes to delay the execution.
      */
-    protected function enqueueDelayedSendDraftTask(SendDraftTask $task, Configuration $configService)
+    protected function enqueueDelayedTask(SendDraftTask $task, $delayInterval)
     {
-        $timestamp = strtotime('+5 minutes');
+        /** @var Configuration $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        /** @var TimeProvider $timeProvider */
+        $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
+        $timestamp = $timeProvider->getCurrentLocalTime()
+            ->add(new \DateInterval('PT' . $delayInterval . 'M'))
+            ->getTimestamp();
 
         $schedule = new HourlySchedule($task, $configService->getDefaultQueueName(), $configService->getContext());
         $schedule->setMonth((int)date('m', $timestamp));

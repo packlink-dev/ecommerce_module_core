@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\DraftShipment\Models;
+namespace Packlink\BusinessLogic\ShipmentDraft\Models;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
@@ -9,7 +9,7 @@ use Logeecom\Infrastructure\ORM\Entity;
 /**
  * Class OrderSendTaskDraftMap.
  *
- * @package Packlink\BusinessLogic\DraftShipment\Models
+ * @package Packlink\BusinessLogic\ShipmentDraft\Models
  */
 class OrderSendDraftTaskMap extends Entity
 {

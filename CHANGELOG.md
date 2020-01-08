@@ -14,7 +14,7 @@ Check the documentation for more info.
 - Added a `TaskClenupTask` for removing unnecessary queue items (tasks) from the database.
 - `OrderShipmentDetailsService` is added. This service is in charge of working with the `OrderShipmentDetails` entity.
 - `OrderShipmentDetailsRepository` is added for getting and storing the `OrderShipmentDetails` entity.
-- `SendDraftTask` and `UpdateShipmentDataTaks` tasks were updated to reflect the above changes.
+- `SendDraftTask` and `UpdateShipmentDataTask` tasks were updated to reflect the above changes.
 Most notably, they now call either `OrderShipmentDetailsService` or `ShopOrderService` separately where needed.
 - Added task abortion functionality. If needed, throw `AbortTaskExecutionException` from the task to abort it.
 Aborted tasks will not be restarted by the queue service.
@@ -24,7 +24,7 @@ Aborted tasks will not be restarted by the queue service.
 only responsibility of this service is to work with an order in the shop/integration.
 Most of the methods are removed.
 - `OrderShipmentDetails` entity does not contain a reference to a task anymore.
-- `DraftController` is renamed to `DraftShipmentService` and handles both immediate and delayed 
+- `DraftController` is renamed to `ShipmentDraftService` and handles both immediate and delayed 
 SendDraftTask enqueueing. It provides a method for getting current status of the SendDraftTask for specific order.
 
 ## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04

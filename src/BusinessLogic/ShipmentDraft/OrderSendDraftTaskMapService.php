@@ -1,16 +1,16 @@
 <?php
 
-namespace Packlink\BusinessLogic\DraftShipment;
+namespace Packlink\BusinessLogic\ShipmentDraft;
 
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\DraftShipment\Exceptions\DraftTaskMapExists;
-use Packlink\BusinessLogic\DraftShipment\Exceptions\DraftTaskMapNotFound;
-use Packlink\BusinessLogic\DraftShipment\Models\OrderSendDraftTaskMap;
+use Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists;
+use Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound;
+use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 
 /**
  * Class OrderSendDraftTaskMapService.
  *
- * @package Packlink\BusinessLogic\DraftShipment
+ * @package Packlink\BusinessLogic\ShipmentDraft
  */
 class OrderSendDraftTaskMapService extends BaseService
 {
@@ -61,7 +61,7 @@ class OrderSendDraftTaskMapService extends BaseService
      * @param string $orderId Order ID.
      * @param string $executionId Task execution ID.
      *
-     * @throws \Packlink\BusinessLogic\DraftShipment\Exceptions\DraftTaskMapExists
+     * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
      */
     public function createOrderTaskMap($orderId, $executionId = null)
     {
@@ -82,7 +82,7 @@ class OrderSendDraftTaskMapService extends BaseService
      * @param string $orderId Order ID.
      * @param string $executionId Task execution ID.
      *
-     * @throws \Packlink\BusinessLogic\DraftShipment\Exceptions\DraftTaskMapNotFound
+     * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound
      */
     public function setExecutionId($orderId, $executionId)
     {
