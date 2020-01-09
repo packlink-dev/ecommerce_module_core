@@ -92,6 +92,9 @@ class AnalyticsControllerTest extends BaseTestWithServices
         parent::tearDown();
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testSendSetupEvent()
     {
         AnalyticsController::sendSetupEvent();
@@ -109,7 +112,7 @@ class AnalyticsControllerTest extends BaseTestWithServices
         AnalyticsController::sendSetupEvent();
         $this->assertNull($this->httpClient->getHistory());
 
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
+        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
 
         AnalyticsController::sendSetupEvent();
         $this->assertCount(1, $this->httpClient->getHistory());

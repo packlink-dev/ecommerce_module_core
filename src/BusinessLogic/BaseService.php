@@ -14,13 +14,12 @@ use Logeecom\Infrastructure\Singleton;
 abstract class BaseService extends Singleton
 {
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * Returns an instance of repository for entity.
      *
      * @param string $entityClass Name of entity class.
      *
      * @return RepositoryInterface Instance of a repository.
+     * @noinspection PhpDocMissingThrowsInspection
      */
     protected function getRepository($entityClass)
     {

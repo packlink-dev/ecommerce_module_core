@@ -24,6 +24,8 @@ class OrderSendDraftTaskRepository
 
     /**
      * OrderSendDraftTaskRepository constructor.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function __construct()
     {
@@ -36,8 +38,8 @@ class OrderSendDraftTaskRepository
      * @param string | int $orderId Order id in an integration system.
      *
      * @return OrderSendDraftTaskMap|null An entity for the specified order id, if found.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @noinspection PhpUnhandledExceptionInspection
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function selectByOrderId($orderId)
     {
@@ -57,7 +59,8 @@ class OrderSendDraftTaskRepository
      *
      * @return OrderSendDraftTaskMap|null Instance for the specified reference, if found.
      *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @noinspection PhpUnhandledExceptionInspection
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function selectByExecutionId($executionId)
     {

@@ -64,6 +64,8 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Tests user login and user initialization
      *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
@@ -81,7 +83,6 @@ class UserAccountLoginTest extends BaseTestWithServices
         // check whether parcel info is set
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertNotNull($parcelInfo);
-        $this->assertEquals('parcel test 1', $parcelInfo->name);
 
         // check whether warehouse info is set
         $warehouse = $this->shopConfig->getDefaultWarehouse();
@@ -245,7 +246,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertCount(1, $this->httpClient->getHistory());
         $this->assertNotNull($parcelInfo);
-        $this->assertEquals('parcel test 1', $parcelInfo->name);
+        $this->assertEquals(6, $parcelInfo->height);
     }
 
     /**
@@ -313,7 +314,6 @@ class UserAccountLoginTest extends BaseTestWithServices
         $taskRunnerStarter = new TestTaskRunnerWakeupService();
         $self = $this;
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(
             QueueService::CLASS_NAME,
             function () use ($queue) {
@@ -321,7 +321,6 @@ class UserAccountLoginTest extends BaseTestWithServices
             }
         );
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(
             TaskRunnerWakeup::CLASS_NAME,
             function () use ($taskRunnerStarter) {
@@ -329,7 +328,6 @@ class UserAccountLoginTest extends BaseTestWithServices
             }
         );
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(
             HttpClient::CLASS_NAME,
             function () use ($self) {
@@ -337,7 +335,6 @@ class UserAccountLoginTest extends BaseTestWithServices
             }
         );
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($self) {

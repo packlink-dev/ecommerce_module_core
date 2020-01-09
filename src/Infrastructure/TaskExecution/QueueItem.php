@@ -262,7 +262,8 @@ class QueueItem extends Entity
         )) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Invalid QueueItem status: "%s". Status must be one of "%s", "%s", "%s", "%s", "%s" or "%s" values.',
+                    'Invalid QueueItem status: "%s". '
+                    . 'Status must be one of "%s", "%s", "%s", "%s", "%s" or "%s" values.',
                     $status,
                     self::CREATED,
                     self::QUEUED,

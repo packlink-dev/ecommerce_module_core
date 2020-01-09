@@ -8,9 +8,9 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
@@ -157,7 +157,7 @@ class UpdateShipmentDataTask extends Task
             $orderReference = array_shift($this->references);
             try {
                 $this->updateOrderShipmentData($orderReference);
-            } catch (OrderNotFound $e) {
+            } catch (OrderShipmentDetailsNotFound $e) {
                 Logger::logWarning($e->getMessage());
             }
 
@@ -196,7 +196,7 @@ class UpdateShipmentDataTask extends Task
      * @param string $reference Shipment reference
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     protected function updateOrderShipmentData($reference)
     {

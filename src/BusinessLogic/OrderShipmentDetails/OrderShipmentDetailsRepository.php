@@ -25,6 +25,8 @@ class OrderShipmentDetailsRepository
 
     /**
      * OrderShipmentDetailsRepository constructor.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function __construct()
     {
@@ -37,12 +39,12 @@ class OrderShipmentDetailsRepository
      * @param string | int $orderId Order id in an integration system.
      *
      * @return OrderShipmentDetails|null Instance for the specified order id, if found.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function selectByOrderId($orderId)
     {
         $query = new QueryFilter();
+        /** @noinspection PhpUnhandledExceptionInspection */
         $query->where('orderId', Operators::EQUALS, $orderId);
 
         /** @var OrderShipmentDetails | null $entity */
@@ -57,12 +59,12 @@ class OrderShipmentDetailsRepository
      * @param string $reference Shipment reference.
      *
      * @return OrderShipmentDetails|null Instance for the specified reference, if found.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function selectByReference($reference)
     {
         $query = new QueryFilter();
+        /** @noinspection PhpUnhandledExceptionInspection */
         $query->where('reference', Operators::EQUALS, $reference);
 
         /** @var OrderShipmentDetails | null $entity */
@@ -77,15 +79,14 @@ class OrderShipmentDetailsRepository
      * @param array $statuses List of order statuses.
      *
      * @return string[] Array of shipment references.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function selectByStatus(array $statuses)
     {
         $filter = new QueryFilter();
 
         foreach ($statuses as $status) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $filter->orWhere('status', Operators::EQUALS, $status);
         }
 
@@ -96,13 +97,12 @@ class OrderShipmentDetailsRepository
      * Returns shipment references of the orders that have not yet been completed.
      *
      * @return array Array of shipment references.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getIncomplete()
     {
         $filter = new QueryFilter();
+        /** @noinspection PhpUnhandledExceptionInspection */
         $filter->where('status', Operators::NOT_EQUALS, ShipmentStatus::STATUS_DELIVERED);
 
         return $this->getShipmentsReferences($filter);

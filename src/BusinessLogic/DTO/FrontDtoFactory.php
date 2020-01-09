@@ -17,7 +17,7 @@ class FrontDtoFactory
      *
      * @var array
      */
-    protected static $registry;
+    protected static $registry = array();
 
     /**
      * DtoFactory constructor.
@@ -51,6 +51,10 @@ class FrontDtoFactory
      * @param array $payload Data to fill in the instantiated DTO.
      *
      * @return FrontDto Instantiated DTO.
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     *  When DTO class is not registered for given key.
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     *  When fields are not registered for DTO class or payload contains unknown fields.
      */
     public static function get($key, array $payload)
     {
@@ -62,6 +66,27 @@ class FrontDtoFactory
         $className = self::$registry[$key];
 
         return $className::fromArray($payload);
+    }
+
+    /**
+     * Gets the array of instances of DTO.
+     *
+     * @param string $key A key for the DTO type.
+     * @param array $payload Data to fill in the instantiated DTO.
+     *
+     * @return FrontDto[] Instantiated DTOs.
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     */
+    public static function getFromBatch($key, array $payload)
+    {
+        if (!self::isRegistered($key)) {
+            throw new DtoNotRegisteredException("DTO class is not registered for key $key.");
+        }
+
+        /** @var FrontDto $className Actually, it is a string, but this is for code completion purpose. */
+        $className = self::$registry[$key];
+
+        return $className::fromArrayBatch($payload);
     }
 
     /**

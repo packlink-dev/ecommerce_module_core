@@ -97,8 +97,8 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
             }
         );
 
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
+        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
+        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
         $this->shopConfig->setUserInfo(new User());
     }
 
@@ -112,6 +112,10 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         parent::tearDown();
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testExecute()
     {
         $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
@@ -127,6 +131,10 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertEquals(15.85, $order->getShippingPrice());
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
     public function testExecuteStatusShipmentDelivered()
     {
         $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
@@ -143,9 +151,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
     }
 
     /**
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testAfterInitialFailure()
@@ -176,10 +182,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
     }
 
     /**
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      */
     public function testAfterOrderNotFoundFailure()
     {
@@ -204,6 +207,9 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         self::assertCount(2, $this->shopLogger->loggedMessages);
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     */
     public function testAfterProxyFailure()
     {
         $this->orderShipmentDetailsService->setReference('test_order_1', 'test');
@@ -285,6 +291,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      * Tests execute with order statuses provided.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function testWithOrderStatusesProvided()
     {

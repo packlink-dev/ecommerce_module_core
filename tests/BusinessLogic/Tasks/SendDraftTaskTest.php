@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
@@ -103,8 +104,8 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
+        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
+        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
         $this->shopConfig->setUserInfo(new User());
     }
 

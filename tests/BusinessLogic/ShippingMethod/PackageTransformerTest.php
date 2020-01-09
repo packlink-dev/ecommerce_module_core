@@ -33,11 +33,15 @@ class PackageTransformerTest extends BaseTestWithServices
 
         $this->transformer = PackageTransformer::getInstance();
 
-        $this->defaultParcel = new ParcelInfo();
-        $this->defaultParcel->weight = self::WEIGHT;
-        $this->defaultParcel->width = self::WIDTH;
-        $this->defaultParcel->height = self::HEIGHT;
-        $this->defaultParcel->length = self::LENGTH;
+        $this->defaultParcel = ParcelInfo::fromArray(
+            array(
+                'weight' => self::WEIGHT,
+                'width' => self::WIDTH,
+                'height' => self::HEIGHT,
+                'length' => self::LENGTH,
+            )
+        );
+
         $this->shopConfig->setDefaultParcel($this->defaultParcel);
     }
 

@@ -106,8 +106,8 @@ class SendDraftTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function execute()
     {
@@ -140,8 +140,6 @@ class SendDraftTask extends Task
      * @param string $orderId Order id in an integrated system.
      *
      * @return boolean Returns TRUE if draft has been created; FALSE otherwise.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     private function isDraftCreated($orderId)
     {

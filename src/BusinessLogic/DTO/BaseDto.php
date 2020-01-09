@@ -17,13 +17,12 @@ abstract class BaseDto
     abstract public function toArray();
 
     /**
-     * @noinspection PhpDocSignatureInspection
-     *
      * Transforms raw array data to its DTO.
      *
      * @param array $raw Raw array data.
      *
      * @return static Transformed DTO object.
+     * @noinspection PhpDocSignatureInspection
      */
     public static function fromArray(array $raw)
     {

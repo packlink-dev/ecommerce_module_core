@@ -4,6 +4,11 @@ namespace Packlink\BusinessLogic\Http\DTO;
 
 use Packlink\BusinessLogic\DTO\BaseDto;
 
+/**
+ * Class PostalCode.
+ *
+ * @package Packlink\BusinessLogic\Http\DTO
+ */
 class PostalCode extends BaseDto
 {
     /**

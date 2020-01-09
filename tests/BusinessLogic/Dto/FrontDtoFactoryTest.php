@@ -1,24 +1,18 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Logeecom\Tests\BusinessLogic\Dto;
 
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\FooDto;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\NonFrontDto;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Class FrontDtoFactoryTest.
  *
  * @package Logeecom\Tests\BusinessLogic\Dto
  */
-class FrontDtoFactoryTest extends TestCase
+class FrontDtoFactoryTest extends BaseDtoTest
 {
-    protected function setUp()
-    {
-        TestFrontDtoFactory::reset();
-    }
-
     public function testRegister()
     {
         TestFrontDtoFactory::register('foo', FooDto::CLASS_NAME);
@@ -29,12 +23,38 @@ class FrontDtoFactoryTest extends TestCase
         $this->assertSame('bar_value', $instance->bar, 'Front DTO Factory did not create instance properly.');
     }
 
+    public function testGetBatch()
+    {
+        TestFrontDtoFactory::register('foo', FooDto::CLASS_NAME);
+        $instances = TestFrontDtoFactory::getFromBatch(
+            'foo',
+            array(
+                array('foo' => 'foo_value', 'bar' => 'bar_value'),
+                array('foo' => 'foo_value2', 'bar' => 'bar_value2'),
+            )
+        );
+
+        $this->assertCount(2, $instances, '2 instances should be created.');
+        $this->assertSame('foo_value', $instances[0]->foo, 'Front DTO Factory did not create instance properly.');
+        $this->assertSame('bar_value', $instances[0]->bar, 'Front DTO Factory did not create instance properly.');
+        $this->assertSame('foo_value2', $instances[1]->foo, 'Front DTO Factory did not create instance properly.');
+        $this->assertSame('bar_value2', $instances[1]->bar, 'Front DTO Factory did not create instance properly.');
+    }
+
     /**
      * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
      */
     public function testNotRegistered()
     {
         TestFrontDtoFactory::get('foo', array());
+    }
+
+    /**
+     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     */
+    public function testNotRegisteredBatch()
+    {
+        TestFrontDtoFactory::getFromBatch('foo', array());
     }
 
     /**
@@ -51,6 +71,6 @@ class FrontDtoFactoryTest extends TestCase
     public function testGetWrongPayload()
     {
         TestFrontDtoFactory::register('foo', FooDto::CLASS_NAME);
-        TestFrontDtoFactory::get('foo', array('foo' => 'something'));
+        TestFrontDtoFactory::get('foo', array('foo' => 'something', 'whatever' => 123));
     }
 }

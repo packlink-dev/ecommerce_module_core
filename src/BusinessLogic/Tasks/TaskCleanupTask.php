@@ -104,7 +104,11 @@ class TaskCleanupTask extends Task
     }
 
     /**
-     * @inheritDoc
+     * Runs task logic.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function execute()
     {
@@ -124,6 +128,10 @@ class TaskCleanupTask extends Task
      * @param array $taskStatuses The list of queue item statuses.
      * @param string $taskAge The min age of the task.
      * @param int $progressPart Progress report part of the overall task.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     private function cleanupTasks($taskType, array $taskStatuses, $taskAge, $progressPart)
     {
@@ -131,6 +139,7 @@ class TaskCleanupTask extends Task
         $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
         $time = $timeProvider->getCurrentLocalTime()->getTimestamp();
         $filter = new QueryFilter();
+        /** @noinspection PhpUnhandledExceptionInspection */
         $filter->where('taskType', Operators::EQUALS, $taskType)
             ->where('status', Operators::IN, $taskStatuses)
             ->where('lastUpdateTimestamp', Operators::LESS_OR_EQUAL_THAN, $time - $taskAge);

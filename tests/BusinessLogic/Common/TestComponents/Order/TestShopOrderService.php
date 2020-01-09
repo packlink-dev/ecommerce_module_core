@@ -122,6 +122,7 @@ class TestShopOrderService implements ShopOrderService
      * @param string[] $labels Packlink shipment labels.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function setLabelsByReference($shipmentReference, array $labels)
     {
@@ -143,6 +144,9 @@ class TestShopOrderService implements ShopOrderService
      *
      * @param string $shipmentReference Shipment reference.
      * @param Tracking[] $trackings Shipment tracking history.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function handleUpdatedTrackingInfo($shipmentReference, array $trackings)
     {
@@ -173,6 +177,7 @@ class TestShopOrderService implements ShopOrderService
      * @param string $shipmentReference Packlink shipment reference.
      * @param string $shippingStatus Packlink shipping status.
      *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function updateShipmentStatus($shipmentReference, $shippingStatus)
@@ -208,6 +213,7 @@ class TestShopOrderService implements ShopOrderService
      * @param bool|null $throw
      *
      * @return Order
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function getOrder($orderId, $shippingMethodId = 0, $destinationCountry = '', $throw = null)
     {

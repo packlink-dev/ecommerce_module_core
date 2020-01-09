@@ -257,7 +257,7 @@ var Packlink = window.Packlink || {};
          */
         function workingHoursButtonClickHandler(event) {
             let id = event.target.getAttribute('data-id');
-            let workingHoursNode = null;
+            let workingHoursNode;
 
             if (event.target.hasAttribute('data-lp-composite')) {
                 workingHoursNode = getElement(dropOffs[id], 'composite-working-hours');

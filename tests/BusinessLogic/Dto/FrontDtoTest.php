@@ -5,15 +5,17 @@ namespace Logeecom\Tests\BusinessLogic\Dto;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\EmptyFrontDto;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\FooDto;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Class FrontDtoTest.
  *
  * @package Logeecom\Tests\BusinessLogic\Dto
  */
-class FrontDtoTest extends TestCase
+class FrontDtoTest extends BaseDtoTest
 {
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testFromArray()
     {
         $instance = FooDto::fromArray(array('foo' => 'foo_value', 'bar' => 'bar_value'));
@@ -21,6 +23,9 @@ class FrontDtoTest extends TestCase
         $this->assertSame('bar_value', $instance->bar, 'From array did not create instance properly.');
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testToArray()
     {
         $instance = FooDto::fromArray(array('foo' => 'foo_value', 'bar' => 'bar_value'));
@@ -52,13 +57,13 @@ class FrontDtoTest extends TestCase
         /** @var \Packlink\BusinessLogic\DTO\ValidationError[] $errors */
         $errors = array();
         try {
-            FooDto::fromArray(array());
+            FooDto::fromArray(array('foo' => 'something', 'whatever' => 123, 'again' => 'bad'));
         } catch (FrontDtoValidationException $exception) {
             $errors = $exception->getValidationErrors();
         }
 
         $this->assertCount(2, $errors, 'All missing fields should be added to validation errors.');
-        $this->assertEquals('foo', $errors[0]->field);
-        $this->assertEquals('bar', $errors[1]->field);
+        $this->assertEquals('whatever', $errors[0]->field);
+        $this->assertEquals('again', $errors[1]->field);
     }
 }

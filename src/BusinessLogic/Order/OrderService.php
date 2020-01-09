@@ -87,8 +87,6 @@ class OrderService extends BaseService
      *
      * @param string $orderId Unique order id.
      * @param string $shipmentReference Packlink shipment reference.
-     *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      */
     public function setReference($orderId, $shipmentReference)
     {
@@ -103,10 +101,15 @@ class OrderService extends BaseService
      */
     public function updateShippingStatus(Shipment $shipment, $status)
     {
+        $e = null;
         try {
             $this->orderShipmentDetailsService->setShippingStatus($shipment->reference, $status);
             $this->shopOrderService->updateShipmentStatus($shipment->reference, $status);
         } catch (OrderNotFound $e) {
+        } catch (OrderShipmentDetailsNotFound $e) {
+        }
+
+        if ($e !== null) {
             Logger::logWarning(
                 $e->getMessage(),
                 'Core',

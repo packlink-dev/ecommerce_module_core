@@ -1,4 +1,4 @@
-<?php /** @noinspection MoreThanThreeArgumentsInspection */
+<?php
 
 namespace Packlink\BusinessLogic\ShippingMethod;
 

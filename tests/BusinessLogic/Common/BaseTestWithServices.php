@@ -3,9 +3,13 @@
 namespace Logeecom\Tests\BusinessLogic\Common;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\Warehouse;
 
 /**
  * Class BaseTest.
@@ -36,5 +40,16 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 return $instance->shopConfig;
             }
         );
+
+        TestFrontDtoFactory::register('warehouse', Warehouse::CLASS_NAME);
+        TestFrontDtoFactory::register('parcel', ParcelInfo::CLASS_NAME);
+        TestFrontDtoFactory::register('validation_error', ValidationError::CLASS_NAME);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        TestFrontDtoFactory::reset();
     }
 }

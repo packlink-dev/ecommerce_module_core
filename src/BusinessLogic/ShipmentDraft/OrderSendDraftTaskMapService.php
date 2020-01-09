@@ -47,8 +47,6 @@ class OrderSendDraftTaskMapService extends BaseService
      * @param string | int $orderId Order id in an integration system.
      *
      * @return OrderSendDraftTaskMap|null An entity for the specified order id, if found.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function getOrderTaskMap($orderId)
     {

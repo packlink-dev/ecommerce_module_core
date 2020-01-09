@@ -138,6 +138,8 @@ abstract class CompositeTask extends Task
 
     /**
      * Runs task logic. Executes each task sequentially.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function execute()
     {

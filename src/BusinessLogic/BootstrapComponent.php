@@ -8,6 +8,10 @@ use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
@@ -26,6 +30,16 @@ use Packlink\BusinessLogic\User\UserAccountService;
  */
 class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
 {
+    /**
+     * Initializes infrastructure components.
+     */
+    public static function init()
+    {
+        parent::init();
+
+        static::initDtoRegistry();
+    }
+
     /**
      * Initializes services and utilities.
      */
@@ -134,5 +148,16 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $handler->handle();
             }
         );
+    }
+
+    /**
+     * Initializes the registry of DTO classes.
+     * @noinspection PhpUnhandledExceptionInspection
+     */
+    protected static function initDtoRegistry()
+    {
+        FrontDtoFactory::register('validation_error', ValidationError::CLASS_NAME);
+        FrontDtoFactory::register('warehouse', Warehouse::CLASS_NAME);
+        FrontDtoFactory::register('parcel', ParcelInfo::CLASS_NAME);
     }
 }

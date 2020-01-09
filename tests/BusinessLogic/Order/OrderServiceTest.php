@@ -123,8 +123,8 @@ class OrderServiceTest extends BaseTestWithServices
         );
 
         $this->orderService = OrderService::getInstance();
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
+        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
+        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
     }
 
     /**

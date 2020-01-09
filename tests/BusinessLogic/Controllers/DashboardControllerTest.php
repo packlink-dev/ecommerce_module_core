@@ -101,10 +101,13 @@ class DashboardControllerTest extends BaseTestWithServices
         $this->assertFalse($asArray['shippingMethodSet']);
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testGetStatusShippingNotSet()
     {
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
+        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
+        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
 
         $status = $this->dashboardController->getStatus();
 
@@ -114,6 +117,10 @@ class DashboardControllerTest extends BaseTestWithServices
         $this->assertFalse($status->isShippingMethodSet);
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testGetStatusAllSet()
     {
         $shippingMethod = new ShippingMethod();
@@ -127,8 +134,8 @@ class DashboardControllerTest extends BaseTestWithServices
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME)->save($shippingMethod);
 
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
+        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
+        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
 
         $status = $this->dashboardController->getStatus();
 

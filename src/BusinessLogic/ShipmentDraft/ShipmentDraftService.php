@@ -39,6 +39,11 @@ class ShipmentDraftService extends BaseService
      * @param string $orderId Shop order id.
      * @param bool $isDelayed Indicates if the execution of the task should be delayed.
      * @param int $delayInterval Interval in minutes to delay the execution.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
+     * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound
      */
     public function enqueueCreateShipmentDraftTask($orderId, $isDelayed = false, $delayInterval = 5)
     {
@@ -105,6 +110,8 @@ class ShipmentDraftService extends BaseService
      *
      * @param SendDraftTask $task Task to be executed.
      * @param int $delayInterval Interval in minutes to delay the execution.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     protected function enqueueDelayedTask(SendDraftTask $task, $delayInterval)
     {
@@ -113,6 +120,7 @@ class ShipmentDraftService extends BaseService
 
         /** @var TimeProvider $timeProvider */
         $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
+        /** @noinspection PhpUnhandledExceptionInspection */
         $timestamp = $timeProvider->getCurrentLocalTime()
             ->add(new \DateInterval('PT' . $delayInterval . 'M'))
             ->getTimestamp();

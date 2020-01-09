@@ -48,8 +48,6 @@ class OrderShipmentDetailsService extends BaseService
      * @param string | int $orderId Order id in an integration system.
      *
      * @return OrderShipmentDetails|null Instance for the specified order id, if found.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function getDetailsByOrderId($orderId)
     {
@@ -62,11 +60,11 @@ class OrderShipmentDetailsService extends BaseService
      * @param string $shipmentReference Shipment reference.
      *
      * @return OrderShipmentDetails|null Instance for the specified reference, if found.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getDetailsByReference($shipmentReference)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getDetailsByReferenceInternal($shipmentReference, false);
     }
 
@@ -74,9 +72,6 @@ class OrderShipmentDetailsService extends BaseService
      * Returns shipment references of the orders that have not yet been completed.
      *
      * @return array Array of shipment references.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function getIncompleteOrderReferences()
     {
@@ -89,9 +84,6 @@ class OrderShipmentDetailsService extends BaseService
      * @param array $statuses List of order statuses.
      *
      * @return string[] Array of shipment references.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function getOrderReferencesWithStatus(array $statuses)
     {
@@ -103,10 +95,6 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string $orderId Unique order id.
      * @param string $shipmentReference Packlink shipment reference.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function setReference($orderId, $shipmentReference)
     {
@@ -129,6 +117,8 @@ class OrderShipmentDetailsService extends BaseService
      * @param string $shipmentReference
      * @param string $trackingUrl
      * @param array $trackingNumbers
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function setTrackingInfo($shipmentReference, $trackingUrl, array $trackingNumbers)
     {
@@ -147,8 +137,7 @@ class OrderShipmentDetailsService extends BaseService
      * @param string $shipmentReference Packlink shipment reference.
      * @param string $shippingStatus Packlink shipping status.
      *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function setShippingStatus($shipmentReference, $shippingStatus)
     {
@@ -165,6 +154,8 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string $shipmentReference Packlink shipment reference.
      * @param float $price Shipment price.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function setShippingPrice($shipmentReference, $price)
     {
@@ -180,6 +171,8 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string $shipmentReference Shipment reference.
      * @param string[] $labels Packlink shipment labels as a list of URLs.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function setLabelsByReference($shipmentReference, array $labels)
     {
@@ -200,6 +193,8 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string $shipmentReference Shipment reference.
      * @param string $link Link to PDF.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function markLabelPrinted($shipmentReference, $link)
     {
@@ -219,9 +214,6 @@ class OrderShipmentDetailsService extends BaseService
      * Marks shipment identified by provided reference as deleted on Packlink.
      *
      * @param string $shipmentReference Packlink shipment reference.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function markShipmentDeleted($shipmentReference)
     {
@@ -238,8 +230,6 @@ class OrderShipmentDetailsService extends BaseService
      * @param string $shipmentReference Packlink shipment reference.
      *
      * @return bool Returns TRUE if shipment has been deleted; otherwise returns FALSE.
-     *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
     public function isShipmentDeleted($shipmentReference)
     {

@@ -48,7 +48,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
             }
         );
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         TestServiceRegister::registerService(Proxy::CLASS_NAME, function () use ($me) {
             /** @var Configuration $config */
             $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
@@ -66,6 +65,9 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
         parent::tearDown();
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
     public function testExecute()
     {
         $this->httpClient->setMockResponses($this->getMockResponses());
@@ -75,7 +77,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
 
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertNotNull($parcelInfo);
-        $this->assertEquals('parcel test 1', $parcelInfo->name);
 
         $warehouse = $this->shopConfig->getDefaultWarehouse();
         $this->assertNotNull($warehouse);
