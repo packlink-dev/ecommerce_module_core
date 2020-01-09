@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http\DTO\Draft;
 
-use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\DTO\BaseDto;
 
 /**
  * Class DraftPrice

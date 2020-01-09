@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\ShipmentDraft\Objects;
 
-use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\DTO\BaseDto;
 
 /**
  * Class ShipmentDraftStatus.

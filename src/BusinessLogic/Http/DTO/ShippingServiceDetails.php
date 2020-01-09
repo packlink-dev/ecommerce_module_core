@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\BaseDto;
+
 /**
  * Class ShippingServiceDetails holds information about delivery details for specific shipping service
  * and for specific departure and destination.

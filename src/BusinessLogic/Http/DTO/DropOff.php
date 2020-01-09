@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\BaseDto;
+
 /**
  * Class DropOff.
  *
@@ -83,7 +85,6 @@ class DropOff extends BaseDto
      * @var array
      */
     public $workingHours;
-
 
     /**
      * Transforms DTO to its array format suitable for http client.

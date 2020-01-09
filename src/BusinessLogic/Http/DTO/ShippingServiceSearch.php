@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\BaseDto;
+
 /**
  * This class holds search parameters that are used when searching for services
  * for specific source and destination location information and specific parcel.

@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\BaseDto;
+
 /**
  * Class Warehouse
  * @package Packlink\BusinessLogic\Http\DTO

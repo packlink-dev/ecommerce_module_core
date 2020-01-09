@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Http\DTO;
 
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Packlink\BusinessLogic\DTO\BaseDto;
 
 /**
  * Class ShipmentLabel

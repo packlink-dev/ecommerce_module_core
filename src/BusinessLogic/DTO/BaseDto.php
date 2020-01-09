@@ -1,17 +1,16 @@
 <?php
-/** @noinspection PhpUnusedParameterInspection */
 
-namespace Packlink\BusinessLogic\Http\DTO;
+namespace Packlink\BusinessLogic\DTO;
 
 /**
- * Base class for all DTOs.
+ * Base class for all data transfer objects.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
 abstract class BaseDto
 {
     /**
-     * Transforms DTO to its array format suitable for http client.
+     * Transforms DTO to its array format.
      *
      * @return array DTO in array format.
      */

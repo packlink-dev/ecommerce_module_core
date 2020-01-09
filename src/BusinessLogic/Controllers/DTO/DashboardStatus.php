@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
-use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\DTO\BaseDto;
 
 /**
  * Class DashboardStatus
