@@ -16,8 +16,11 @@ Check the documentation for more info.
 - `OrderShipmentDetailsRepository` is added for getting and storing the `OrderShipmentDetails` entity.
 - `SendDraftTask` and `UpdateShipmentDataTask` tasks were updated to reflect the above changes.
 Most notably, they now call either `OrderShipmentDetailsService` or `ShopOrderService` separately where needed.
-- Added task abortion functionality. If needed, throw `AbortTaskExecutionException` from the task to abort it.
+- Added task abortion functionality. If needed, a task should throw `AbortTaskExecutionException` to abort it.
 Aborted tasks will not be restarted by the queue service.
+- `FrontDTO` and associated factory `FrontDtoFactory` is added. Now, any frontend DTO should be instantiated 
+only through the factory method. If input data is not correct, a `FrontDtoValidationException` will be thrown
+containing `ValidationError` array.
 
 ### Changed
 - `OrderRepository` interface is changed. It is renamed to `ShopOrderService` and now the 
@@ -25,7 +28,8 @@ only responsibility of this service is to work with an order in the shop/integra
 Most of the methods are removed.
 - `OrderShipmentDetails` entity does not contain a reference to a task anymore.
 - `DraftController` is renamed to `ShipmentDraftService` and handles both immediate and delayed 
-SendDraftTask enqueueing. It provides a method for getting current status of the SendDraftTask for specific order.
+`SendDraftTask` enqueueing. It provides a method for getting current status of the SendDraftTask for specific order.
+- `DashboardStatus` is now a frontend DTO and a signature for the generated array is changed.
 
 ## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04
 ### Changed

@@ -5,10 +5,12 @@ namespace Packlink\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
 /**
- * Class DashboardController
+ * Class DashboardController.
+ *
  * @package Packlink\BusinessLogic\Controllers
  */
 class DashboardController
@@ -43,14 +45,19 @@ class DashboardController
      * Returns Dashboard status object with configuration flags.
      *
      * @return DashboardStatus Dashboard status.
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function getStatus()
     {
-        $dashboardDto = new DashboardStatus();
-        $dashboardDto->isParcelSet = (bool)$this->configuration->getDefaultParcel();
-        $dashboardDto->isWarehouseSet = (bool)$this->configuration->getDefaultWarehouse();
-        $dashboardDto->isShippingMethodSet = $this->shippingMethodService->isAnyMethodActive();
-
-        return $dashboardDto;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return FrontDtoFactory::get(
+            'dashboard_status',
+            array(
+                'isParcelSet' => $this->configuration->getDefaultParcel() !== null,
+                'isWarehouseSet' => $this->configuration->getDefaultWarehouse() !== null,
+                'isShippingMethodSet' => $this->shippingMethodService->isAnyMethodActive(),
+            )
+        );
     }
 }

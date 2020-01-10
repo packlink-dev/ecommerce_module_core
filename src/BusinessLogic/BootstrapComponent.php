@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
+use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
@@ -159,5 +160,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         FrontDtoFactory::register('validation_error', ValidationError::CLASS_NAME);
         FrontDtoFactory::register('warehouse', Warehouse::CLASS_NAME);
         FrontDtoFactory::register('parcel', ParcelInfo::CLASS_NAME);
+        FrontDtoFactory::register('dashboard_status', DashboardStatus::CLASS_NAME);
     }
 }
