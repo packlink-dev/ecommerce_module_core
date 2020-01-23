@@ -186,7 +186,7 @@ class Warehouse extends FrontDto
             $phoneError = !preg_match($regex, $payload['phone']);
 
             $digits = '/\d/m';
-            $match = preg_match_all($digits, $payload['phone']);
+            $match = preg_match_all($digits, $payload['phone'], $matches);
             $phoneError |= $match === false || $match < 3;
 
             if ($phoneError) {
