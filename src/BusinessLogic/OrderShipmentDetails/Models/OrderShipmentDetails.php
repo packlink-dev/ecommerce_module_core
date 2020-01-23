@@ -41,7 +41,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Shop order ID.
      *
-     * @var int
+     * @var string
      */
     private $orderId;
     /**
@@ -108,7 +108,7 @@ class OrderShipmentDetails extends Entity
     {
         $map = new IndexMap();
 
-        $map->addIntegerIndex('orderId');
+        $map->addStringIndex('orderId');
         $map->addStringIndex('reference');
         $map->addStringIndex('status');
 
@@ -165,7 +165,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Returns order ID.
      *
-     * @return int
+     * @return string
      */
     public function getOrderId()
     {
@@ -175,7 +175,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Sets order ID.
      *
-     * @param int $orderId ID of the order.
+     * @param string $orderId ID of the order.
      */
     public function setOrderId($orderId)
     {
