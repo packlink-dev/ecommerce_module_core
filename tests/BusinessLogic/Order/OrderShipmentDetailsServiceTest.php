@@ -67,6 +67,8 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
 
     /**
      * Test setting labels.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function testSetLabels()
     {
@@ -95,6 +97,8 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
 
     /**
      * Test marking labels printed.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function testMarkLabelPrinted()
     {

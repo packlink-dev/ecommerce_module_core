@@ -16,6 +16,10 @@ class DashboardStatus extends FrontDto
      */
     const CLASS_NAME = __CLASS__;
     /**
+     * Unique class key.
+     */
+    const CLASS_KEY = 'dashboard_status';
+    /**
      * Shipping method set flag.
      *
      * @var bool

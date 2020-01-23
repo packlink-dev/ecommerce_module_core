@@ -57,13 +57,13 @@ class FrontDtoTest extends BaseDtoTest
         /** @var \Packlink\BusinessLogic\DTO\ValidationError[] $errors */
         $errors = array();
         try {
-            FooDto::fromArray(array('foo' => 'something', 'whatever' => 123, 'again' => 'bad'));
+            FooDto::fromArray(array('whatever' => 123, 'again' => 'bad'));
         } catch (FrontDtoValidationException $exception) {
             $errors = $exception->getValidationErrors();
         }
 
         $this->assertCount(2, $errors, 'All missing fields should be added to validation errors.');
-        $this->assertEquals('whatever', $errors[0]->field);
-        $this->assertEquals('again', $errors[1]->field);
+        $this->assertEquals('foo', $errors[0]->field);
+        $this->assertEquals('bar', $errors[1]->field);
     }
 }

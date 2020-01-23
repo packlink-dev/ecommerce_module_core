@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Http\DTO;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\DTO\ValidationError;
 
 /**
  * Class ParcelInfo.
@@ -16,6 +17,10 @@ class ParcelInfo extends FrontDto
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+    /**
+     * Unique class key.
+     */
+    const CLASS_KEY = 'parcel';
     /**
      * Weight of the parcel.
      *
@@ -52,15 +57,11 @@ class ParcelInfo extends FrontDto
      * @var array
      */
     protected static $fields = array(
-        'id',
-        'name',
         'weight',
         'width',
         'length',
         'height',
         'default',
-        'created_at',
-        'updated_at',
     );
 
     /**
@@ -74,7 +75,7 @@ class ParcelInfo extends FrontDto
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
         return FrontDtoFactory::get(
-            'parcel',
+            static::CLASS_KEY,
             array(
                 'weight' => 1,
                 'width' => 10,
@@ -83,5 +84,49 @@ class ParcelInfo extends FrontDto
                 'default' => true,
             )
         );
+    }
+
+    /**
+     * Generates validation errors for the payload.
+     *
+     * @param array $payload The payload in key-value format.
+     *
+     * @return ValidationError[] An array of validation errors, if any.
+     */
+    protected static function validatePayload(array $payload)
+    {
+        $validationErrors = parent::validatePayload($payload);
+        foreach (array('weight', 'width', 'length', 'height') as $field) {
+            if (empty($payload[$field])) {
+                $validationErrors[] = static::getValidationError(
+                    ValidationError::ERROR_REQUIRED_FIELD,
+                    $field,
+                    'Field is required.'
+                );
+            }
+        }
+
+        $options = array('options' => array('min_range' => 0));
+        foreach (array('width', 'length', 'height') as $field) {
+            if (!empty($payload[$field]) && filter_var($payload[$field], FILTER_VALIDATE_INT, $options) === false) {
+                $validationErrors[] = static::getValidationError(
+                    ValidationError::ERROR_INVALID_FIELD,
+                    $field,
+                    ucfirst($field) . ' must be a positive integer.'
+                );
+            }
+        }
+
+        if (!empty($payload['weight'])
+            && (filter_var($payload['weight'], FILTER_VALIDATE_FLOAT) === false || $payload['weight'] <= 0)
+        ) {
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'weight',
+                'Weight must be a positive decimal number.'
+            );
+        }
+
+        return $validationErrors;
     }
 }

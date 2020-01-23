@@ -2,20 +2,16 @@
 
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -31,10 +27,6 @@ use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
  */
 class UpdateShipmentDataTaskTest extends BaseSyncTest
 {
-    /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
     /**
      * @var \Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService
      */
@@ -52,24 +44,6 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         TestRepositoryRegistry::registerRepository(
             OrderShipmentDetails::getClassName(),
             MemoryRepository::getClassName()
-        );
-
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $me->httpClient);
-            }
         );
 
         TestServiceRegister::registerService(
@@ -97,8 +71,8 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
             }
         );
 
-        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
-        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
+        $this->shopConfig->setDefaultParcel(new ParcelInfo());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
     }
 

@@ -15,13 +15,13 @@ use PHPUnit\Framework\TestCase;
 class BaseDtoTest extends TestCase
 {
     /**
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoFactoryRegistrationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
      */
     protected function setUp()
     {
         parent::setUp();
 
-        TestFrontDtoFactory::register('validation_error', ValidationError::CLASS_NAME);
+        TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
     }
 
     protected function tearDown()

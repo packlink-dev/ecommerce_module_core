@@ -2,7 +2,6 @@
 
 namespace Logeecom\Tests\BusinessLogic\User;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -15,10 +14,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
@@ -29,17 +25,45 @@ use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
 /**
- * Class UserAccountTest
+ * Class UserAccountTest.
+ *
  * @package Logeecom\Tests\BusinessLogic\User
  */
 class UserAccountLoginTest extends BaseTestWithServices
 {
     /**
-     * Http client instance.
-     *
-     * @var TestHttpClient
+     * Sets up the fixture, for example, open a network connection.
+     * This method is called before a test is executed.
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    public $httpClient;
+    protected function setUp()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        parent::setUp();
+
+        TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+        TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
+
+        $queue = new TestQueueService();
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
+
+        TestServiceRegister::registerService(
+            QueueService::CLASS_NAME,
+            function () use ($queue) {
+                return $queue;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerWakeup::CLASS_NAME,
+            function () use ($taskRunnerStarter) {
+                return $taskRunnerStarter;
+            }
+        );
+
+        $this->userAccountService = UserAccountService::getInstance();
+    }
+
     /**
      * User account service instance.
      *
@@ -294,58 +318,6 @@ class UserAccountLoginTest extends BaseTestWithServices
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
             ),
         );
-    }
-
-    /**
-     * Sets up the fixture, for example, open a network connection.
-     * This method is called before a test is executed.
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
-     */
-    protected function setUp()
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        parent::setUp();
-
-        TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
-        TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
-
-        $this->httpClient = new TestHttpClient();
-        $queue = new TestQueueService();
-        $taskRunnerStarter = new TestTaskRunnerWakeupService();
-        $self = $this;
-
-        TestServiceRegister::registerService(
-            QueueService::CLASS_NAME,
-            function () use ($queue) {
-                return $queue;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            TaskRunnerWakeup::CLASS_NAME,
-            function () use ($taskRunnerStarter) {
-                return $taskRunnerStarter;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($self) {
-                return $self->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($self) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $self->httpClient);
-            }
-        );
-
-        $this->userAccountService = UserAccountService::getInstance();
     }
 
     protected function tearDown()

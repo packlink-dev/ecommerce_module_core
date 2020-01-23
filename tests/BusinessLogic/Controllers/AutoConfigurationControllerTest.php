@@ -94,7 +94,12 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * Test auto-configure to be successful with default options
+     * Test auto-configure to be successful with default options.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testAutoConfigureSuccessfullyWithEnqueuedTask()
     {
@@ -111,6 +116,11 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
 
     /**
      * Test auto-configure to be started, but task expired.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testAutoConfigureEnqueuedTaskExpired()
     {
@@ -129,6 +139,11 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
 
     /**
      * Test auto-configure to be started, but task failed.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testAutoConfigureEnqueuedTaskFailed()
     {
@@ -138,6 +153,11 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
 
     /**
      * Test auto-configure to be started and task completed.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testAutoConfigureEnqueuedTaskCompleted()
     {
@@ -159,6 +179,16 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $this->assertFalse($success);
     }
 
+    /**
+     * @param string $taskStatus
+     *
+     * @return string
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     */
     private function startAutoConfigureAndSetTaskStatus($taskStatus)
     {
         $response = $this->getResponse(200);

@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
@@ -21,11 +22,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -143,24 +141,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
-        $httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($httpClient) {
-                return $httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($httpClient) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $httpClient);
-            }
-        );
-
         TestServiceRegister::registerService(
             OrderService::CLASS_NAME,
             function () {
@@ -168,8 +148,8 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
-        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
-        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
+        $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
     }
 

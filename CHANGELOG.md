@@ -21,6 +21,10 @@ Aborted tasks will not be restarted by the queue service.
 - `FrontDTO` and associated factory `FrontDtoFactory` is added. Now, any frontend DTO should be instantiated 
 only through the factory method. If input data is not correct, a `FrontDtoValidationException` will be thrown
 containing `ValidationError` array.
+- `ShopShippingMethodService` interface has a new method `getCarrierLogoFilePath`.
+- `WarehouseService` is introduced to manipulate the data for default warehouse. 
+This service should be used to fetch and save warehouse data instead of direct call to 
+the `ConfigurationService`.
 
 ### Changed
 - `OrderRepository` interface is changed. It is renamed to `ShopOrderService` and now the 
@@ -30,6 +34,8 @@ Most of the methods are removed.
 - `DraftController` is renamed to `ShipmentDraftService` and handles both immediate and delayed 
 `SendDraftTask` enqueueing. It provides a method for getting current status of the SendDraftTask for specific order.
 - `DashboardStatus` is now a frontend DTO and a signature for the generated array is changed.
+- `Warehouse` DTO changed namespace.
+- `ShippingMethodsController` now adds logo URL to the ShippingMethod, so integrations do not need to set it.
 
 ## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04
 ### Changed

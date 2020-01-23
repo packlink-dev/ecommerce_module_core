@@ -2,18 +2,15 @@
 
 namespace Packlink\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
@@ -38,10 +35,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
      */
     public $testShopShippingMethodService;
     /**
-     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
-     */
-    public $httpClient;
-    /**
      * @var array
      */
     protected $serviceIds = array(20203, 20945, 20189);
@@ -59,14 +52,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $me = $this;
         $this->shopConfig->setAuthorizationToken('test_token');
 
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
-
         $this->testShopShippingMethodService = new TestShopShippingMethodService();
         TestServiceRegister::registerService(
             ShopShippingMethodService::CLASS_NAME,
@@ -80,13 +65,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             ShippingMethodService::CLASS_NAME,
             function () use ($me) {
                 return $me->shippingMethodService;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
             }
         );
 
@@ -428,7 +406,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             array(
                 new FixedPricePolicy(10, 20, 12),
                 new FixedPricePolicy(5, 10, 12),
-                )
+            )
         );
 
         $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
@@ -784,7 +762,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     public function testMissingShippingParameters($fromCountry, $fromZip, $toCountry, $toZip, $packages)
     {
         $result = $this->shippingMethodService->getShippingCosts(
-            $fromCountry, $fromZip, $toCountry, $toZip, $packages,10
+            $fromCountry,
+            $fromZip,
+            $toCountry,
+            $toZip,
+            $packages,
+            10
         );
 
         $this->assertEmpty($result);

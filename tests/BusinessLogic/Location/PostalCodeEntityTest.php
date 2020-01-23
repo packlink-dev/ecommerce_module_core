@@ -2,47 +2,19 @@
 
 namespace Logeecom\Tests\BusinessLogic\Location;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
 use Packlink\BusinessLogic\Http\Proxy;
 
+/**
+ * Class PostalCodeEntityTest.
+ *
+ * @package Logeecom\Tests\BusinessLogic\Location
+ */
 class PostalCodeEntityTest extends BaseTestWithServices
 {
-    /**
-     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
-     */
-    public $httpClient;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->httpClient = new TestHttpClient();
-        $self = $this;
-
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($self) {
-                return $self->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($self) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $self->httpClient);
-            }
-        );
-    }
-
     public function testRetrievingPostalCodes()
     {
         $this->httpClient->setMockResponses($this->getSuccessfulResponses());

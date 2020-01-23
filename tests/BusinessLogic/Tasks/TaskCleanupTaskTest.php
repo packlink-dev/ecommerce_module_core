@@ -64,6 +64,13 @@ class TaskCleanupTaskTest extends BaseTestWithServices
 
     /**
      * Tests default removing of queue items.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testCleaningQueueItemsPerAge()
     {
@@ -90,6 +97,13 @@ class TaskCleanupTaskTest extends BaseTestWithServices
 
     /**
      * Tests default removing of queue items.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testCleaningQueueItemsPerStatus()
     {
@@ -126,6 +140,13 @@ class TaskCleanupTaskTest extends BaseTestWithServices
 
     /**
      * Tests default removing of queue items.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testCleaningQueueItemsPerTaskType()
     {
@@ -161,6 +182,12 @@ class TaskCleanupTaskTest extends BaseTestWithServices
 
     /**
      * Tests default removing of queue items.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testSelfCleanup()
     {

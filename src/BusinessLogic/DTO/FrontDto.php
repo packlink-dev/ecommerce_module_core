@@ -23,13 +23,6 @@ abstract class FrontDto extends BaseDto
     protected static $fields = array();
 
     /**
-     * FrontDto constructor.
-     */
-    protected function __construct()
-    {
-    }
-
-    /**
      * Transforms raw array data to its DTO.
      *
      * @param array $raw Raw array data.
@@ -76,7 +69,22 @@ abstract class FrontDto extends BaseDto
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      *  When fields are not registered for DTO class or payload contains unknown fields.
      */
-    protected static function validate(array $payload)
+    final protected static function validate(array $payload)
+    {
+        $validationErrors = static::validatePayload($payload);
+        if (!empty($validationErrors)) {
+            throw new FrontDtoValidationException($validationErrors);
+        }
+    }
+
+    /**
+     * Generates validation errors for the payload.
+     *
+     * @param array $payload The payload in key-value format.
+     *
+     * @return ValidationError[] An array of validation errors, if any.
+     */
+    protected static function validatePayload(array $payload)
     {
         $validationErrors = array();
         if (empty(static::$fields)) {
@@ -87,15 +95,7 @@ abstract class FrontDto extends BaseDto
             );
         }
 
-        foreach (array_keys($payload) as $field) {
-            if (!in_array($field, static::$fields, true)) {
-                $validationErrors[] = static::getValidationError('unknown_field', $field, 'Unknown field.');
-            }
-        }
-
-        if (!empty($validationErrors)) {
-            throw new FrontDtoValidationException($validationErrors);
-        }
+        return $validationErrors;
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class FrontDto extends BaseDto
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
         return FrontDtoFactory::get(
-            'validation_error',
+            ValidationError::CLASS_KEY,
             array('code' => $code, 'field' => $field, 'message' => $message)
         );
     }

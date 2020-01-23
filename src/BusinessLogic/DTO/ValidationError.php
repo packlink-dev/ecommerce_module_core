@@ -14,6 +14,18 @@ class ValidationError extends FrontDto
      */
     const CLASS_NAME = __CLASS__;
     /**
+     * Unique class key.
+     */
+    const CLASS_KEY = 'validation_error';
+    /**
+     * Error code when required field is missing.
+     */
+    const ERROR_REQUIRED_FIELD = 'required_field';
+    /**
+     * Error code when field has an invalid value.
+     */
+    const ERROR_INVALID_FIELD = 'invalid_field';
+    /**
      * Error code.
      *
      * @var string

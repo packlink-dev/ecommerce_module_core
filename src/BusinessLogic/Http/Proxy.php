@@ -22,9 +22,9 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
 use Packlink\BusinessLogic\Utility\Php\Php55;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
  * Class Proxy. In charge for communication with Packlink API.
@@ -85,7 +85,7 @@ class Proxy
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
-        return FrontDtoFactory::getFromBatch('parcel', $data);
+        return FrontDtoFactory::getFromBatch(ParcelInfo::CLASS_KEY, $data);
     }
 
     /**
@@ -105,7 +105,7 @@ class Proxy
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
-        return FrontDtoFactory::getFromBatch('warehouse', $data);
+        return FrontDtoFactory::getFromBatch(Warehouse::CLASS_KEY, $data);
     }
 
     /**

@@ -2,14 +2,11 @@
 
 namespace Logeecom\Tests\BusinessLogic\Proxy;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
@@ -20,41 +17,20 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
  */
 class ProxyTest extends BaseTestWithServices
 {
-    /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
-
     public function setUp()
     {
         parent::setUp();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
-
-        $this->httpClient = new TestHttpClient();
-        $self = $this;
-
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($self) {
-                return $self->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($self) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $self->httpClient);
-            }
-        );
     }
 
     /**
      * Tests successful response.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function testSuccessfulResponse()
     {
@@ -73,6 +49,10 @@ class ProxyTest extends BaseTestWithServices
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Error message 1
      * Error message 2.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function testBadResponseListOfMessages()
     {
@@ -88,6 +68,10 @@ class ProxyTest extends BaseTestWithServices
      * @expectedException \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Error message 1
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function testBadResponseMessage()
     {
@@ -103,6 +87,10 @@ class ProxyTest extends BaseTestWithServices
      * @expectedException \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @expectedExceptionCode 401
      * @expectedExceptionMessage Auth error
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function test401()
     {
@@ -114,6 +102,10 @@ class ProxyTest extends BaseTestWithServices
 
     /**
      * Tests the case when API returns a 404 error.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function test404()
     {

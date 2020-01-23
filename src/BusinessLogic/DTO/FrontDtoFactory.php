@@ -2,8 +2,8 @@
 
 namespace Packlink\BusinessLogic\DTO;
 
-use Packlink\BusinessLogic\DTO\Exceptions\DtoFactoryRegistrationException;
-use Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 
 /**
  * Class DtoFactory.
@@ -32,13 +32,13 @@ class FrontDtoFactory
      * @param string $key A key for the DTO type.
      * @param string $class A class to be instantiated.
      *
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoFactoryRegistrationException If type is not a subclass of
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException If type is not a subclass of
      *     FrontDto.
      */
     public static function register($key, $class)
     {
         if (!is_subclass_of($class, FrontDto::CLASS_NAME)) {
-            throw new DtoFactoryRegistrationException("Class $class is not implementation of FrontDto.");
+            throw new FrontDtoFactoryRegistrationException("Class $class is not implementation of FrontDto.");
         }
 
         self::$registry[$key] = $class;
@@ -51,7 +51,7 @@ class FrontDtoFactory
      * @param array $payload Data to fill in the instantiated DTO.
      *
      * @return FrontDto Instantiated DTO.
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      *  When DTO class is not registered for given key.
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      *  When fields are not registered for DTO class or payload contains unknown fields.
@@ -59,7 +59,7 @@ class FrontDtoFactory
     public static function get($key, array $payload)
     {
         if (!self::isRegistered($key)) {
-            throw new DtoNotRegisteredException("DTO class is not registered for key $key.");
+            throw new FrontDtoNotRegisteredException("DTO class is not registered for key $key.");
         }
 
         /** @var FrontDto $className Actually, it is a string, but this is for completion. */
@@ -75,12 +75,12 @@ class FrontDtoFactory
      * @param array $payload Data to fill in the instantiated DTO.
      *
      * @return FrontDto[] Instantiated DTOs.
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public static function getFromBatch($key, array $payload)
     {
         if (!self::isRegistered($key)) {
-            throw new DtoNotRegisteredException("DTO class is not registered for key $key.");
+            throw new FrontDtoNotRegisteredException("DTO class is not registered for key $key.");
         }
 
         /** @var FrontDto $className Actually, it is a string, but this is for code completion purpose. */

@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
+use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -183,6 +184,10 @@ class ShippingMethodController
         $shippingMethod->percentPricePolicy = $item->getPercentPricePolicy();
         $shippingMethod->fixedPriceByWeightPolicy = $item->getFixedPriceByWeightPolicy();
         $shippingMethod->fixedPriceByValuePolicy = $item->getFixedPriceByValuePolicy();
+
+        /** @var ShopShippingMethodService $shopShippingMethodService */
+        $shopShippingMethodService = ServiceRegister::getService(ShopShippingMethodService::CLASS_NAME);
+        $shippingMethod->logoUrl = $shopShippingMethodService->getCarrierLogoFilePath($shippingMethod->carrierName);
 
         return $shippingMethod;
     }

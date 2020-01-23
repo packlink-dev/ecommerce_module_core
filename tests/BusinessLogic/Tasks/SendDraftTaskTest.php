@@ -3,21 +3,18 @@
 
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -34,30 +31,15 @@ use Packlink\BusinessLogic\Tasks\SendDraftTask;
 class SendDraftTaskTest extends BaseSyncTest
 {
     /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
-
-    /**
      * @inheritdoc
      */
     public function setUp()
     {
         parent::setUp();
 
-        $me = $this;
-
         TestRepositoryRegistry::registerRepository(
             OrderShipmentDetails::getClassName(),
             MemoryRepository::getClassName()
-        );
-
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
         );
 
         TestServiceRegister::registerService(
@@ -81,13 +63,6 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
-            }
-        );
-
         $shopOrderService = new TestShopOrderService();
 
         TestServiceRegister::registerService(
@@ -104,8 +79,8 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
-        $this->shopConfig->setDefaultParcel(ParcelInfo::fromArray(array()));
-        $this->shopConfig->setDefaultWarehouse(Warehouse::fromArray(array()));
+        $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
     }
 
@@ -123,7 +98,7 @@ class SendDraftTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      */
     public function testExecute()
     {

@@ -240,7 +240,7 @@ class OrderService extends BaseService
         $shippingMethod = $shippingService->getShippingMethod($methodId);
         if ($shippingMethod !== null) {
             try {
-                /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+                /** @var \Packlink\BusinessLogic\Warehouse\Warehouse $warehouse */
                 $warehouse = $this->configuration->getDefaultWarehouse();
                 $address = $order->getShippingAddress();
                 $service = ShippingCostCalculator::getCheapestShippingService(
@@ -293,7 +293,7 @@ class OrderService extends BaseService
      */
     private function addDepartureAddress(Draft $draft)
     {
-        /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+        /** @var \Packlink\BusinessLogic\Warehouse\Warehouse $warehouse */
         $warehouse = $this->configuration->getDefaultWarehouse();
         $draft->from = new Draft\Address();
         $draft->from->country = $warehouse->country;

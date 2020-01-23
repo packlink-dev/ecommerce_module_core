@@ -14,9 +14,21 @@ use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
  */
 class PackageTransformerTest extends BaseTestWithServices
 {
+    /**
+     * Default weight.
+     */
     const WEIGHT = 10.5;
+    /**
+     * Default width.
+     */
     const WIDTH = 20;
+    /**
+     * Default height.
+     */
     const HEIGHT = 20;
+    /**
+     * Default length.
+     */
     const LENGTH = 20;
     /**
      * @var PackageTransformer
@@ -71,6 +83,9 @@ class PackageTransformerTest extends BaseTestWithServices
         $this->assertEquals($expected->length, $package->length);
     }
 
+    /**
+     * @return array
+     */
     public function packagesProvider()
     {
         return array(

@@ -45,14 +45,14 @@ class DashboardController
      * Returns Dashboard status object with configuration flags.
      *
      * @return DashboardStatus Dashboard status.
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function getStatus()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return FrontDtoFactory::get(
-            'dashboard_status',
+            DashboardStatus::CLASS_KEY,
             array(
                 'isParcelSet' => $this->configuration->getDefaultParcel() !== null,
                 'isWarehouseSet' => $this->configuration->getDefaultWarehouse() !== null,

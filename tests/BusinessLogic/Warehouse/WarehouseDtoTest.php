@@ -1,10 +1,11 @@
 <?php
 
-namespace BusinessLogic\Dto;
+namespace Logeecom\Tests\BusinessLogic\Warehouse;
 
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Dto\BaseDtoTest;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
  * Class WarehouseDtoTest.
@@ -14,16 +15,16 @@ use Packlink\BusinessLogic\Http\DTO\Warehouse;
 class WarehouseDtoTest extends BaseDtoTest
 {
     /**
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoFactoryRegistrationException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public function testFromArray()
     {
-        TestFrontDtoFactory::register('warehouse', Warehouse::CLASS_NAME);
+        TestFrontDtoFactory::register(Warehouse::CLASS_KEY, Warehouse::CLASS_NAME);
         $data = json_decode(file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json'), true);
 
-        /** @var Warehouse[] $warehouses */
-        $warehouses = TestFrontDtoFactory::getFromBatch('warehouse', $data);
+        /** @var \Packlink\BusinessLogic\Warehouse\Warehouse[] $warehouses */
+        $warehouses = TestFrontDtoFactory::getFromBatch(Warehouse::CLASS_KEY, $data);
 
         $this->assertCount(2, $warehouses);
 
@@ -37,23 +38,16 @@ class WarehouseDtoTest extends BaseDtoTest
         $this->assertEquals(true, $warehouses[0]->default);
         $this->assertEquals('example2@email.com', $warehouses[0]->email);
         $this->assertEquals('MyWarehouse2', $warehouses[0]->alias);
-        $this->assertEquals('28045', $warehouses[0]->postalCode);
+        $this->assertEquals('28041', $warehouses[0]->postalCode);
         $this->assertEquals('MyAddress2', $warehouses[0]->address);
         $this->assertEquals('222459d5e4b0ed5488fe91544', $warehouses[0]->id);
 
         $this->assertEquals('5be459d5e4b0ed5488fe9159', $warehouses[1]->id);
     }
 
-    /**
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\DtoFactoryRegistrationException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     */
     public function testToArray()
     {
-        TestFrontDtoFactory::register('warehouse', Warehouse::CLASS_NAME);
-        $warehouse = Warehouse::fromArray(
-            array('name' => 'default', 'postal_code' => '12', 'default_selection' => true)
-        );
+        $warehouse = new TestWarehouse();
 
         $data = $warehouse->toArray();
         $this->assertArrayHasKey('default_selection', $data);

@@ -2,7 +2,6 @@
 
 namespace Logeecom\Tests\BusinessLogic\WebHook;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -10,7 +9,6 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderServic
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
@@ -27,10 +25,6 @@ use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
  */
 class WebHookHandlerTest extends BaseTestWithServices
 {
-    /**
-     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
-     */
-    public $httpClient;
     /**
      * @var \Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService
      */
@@ -60,17 +54,9 @@ class WebHookHandlerTest extends BaseTestWithServices
             }
         );
 
-        $this->httpClient = new TestHttpClient();
         $orderRepository = new TestShopOrderService();
         $configService = new TestShopConfiguration();
         $configService->setAuthorizationToken('test');
-
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
 
         TestServiceRegister::registerService(
             ShopOrderService::CLASS_NAME,

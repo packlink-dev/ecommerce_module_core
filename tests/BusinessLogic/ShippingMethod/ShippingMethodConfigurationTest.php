@@ -6,6 +6,11 @@ use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
+/**
+ * Class ShippingMethodConfigurationTest.
+ *
+ * @package Logeecom\Tests\BusinessLogic\ShippingMethod
+ */
 class ShippingMethodConfigurationTest extends BaseTestWithServices
 {
     public function testShippingMethodFromArray()

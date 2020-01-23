@@ -5,10 +5,10 @@ namespace Packlink\BusinessLogic\DTO\Exceptions;
 use Logeecom\Infrastructure\Exceptions\BaseException;
 
 /**
- * Class DtoFactoryRegistrationException.
+ * Class FrontDtoNotRegisteredException.
  *
  * @package Packlink\BusinessLogic\DTO\Exceptions
  */
-class DtoFactoryRegistrationException extends BaseException
+class FrontDtoNotRegisteredException extends BaseException
 {
 }

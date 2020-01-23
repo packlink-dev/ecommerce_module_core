@@ -2,18 +2,14 @@
 
 namespace Logeecom\Tests\BusinessLogic\Location;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -26,10 +22,6 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
  */
 class LocationServiceTest extends BaseTestWithServices
 {
-    /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
     /**
      * @var TestShopShippingMethodService
      */
@@ -46,25 +38,7 @@ class LocationServiceTest extends BaseTestWithServices
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
 
-        $this->httpClient = new TestHttpClient();
         $self = $this;
-
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($self) {
-                return $self->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($self) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $self->httpClient);
-            }
-        );
 
         $this->testShopShippingMethodService = new TestShopShippingMethodService();
         TestServiceRegister::registerService(
@@ -145,7 +119,7 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEquals('PARIS', $dropOffs['city']);
         $this->assertEquals('86. RUE DE LA CONDAMINE', $dropOffs['address']);
         $this->assertEquals(48.88465881, $dropOffs['lat']);
-        $this->assertEquals( 2.319819927, $dropOffs['long']);
+        $this->assertEquals(2.319819927, $dropOffs['long']);
         $this->assertEquals('', $dropOffs['phone']);
 
         $this->assertCount(5, $dropOffs['workingHours']);
@@ -241,6 +215,9 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEquals($info->text, $asArray['text']);
     }
 
+    /**
+     * @param bool $isDropOff
+     */
     private function initShippingMethod($isDropOff = true)
     {
         $this->shippingMethodService->add($this->getShippingServiceDetails(1, 10.73, $isDropOff));
@@ -249,6 +226,13 @@ class LocationServiceTest extends BaseTestWithServices
         $this->shippingMethodService->add($this->getShippingServiceDetails(4, 18.25, $isDropOff));
     }
 
+    /**
+     * @param int $id
+     * @param float $basePrice
+     * @param bool $isDropOff
+     *
+     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     */
     private function getShippingServiceDetails($id, $basePrice = 10.73, $isDropOff = true)
     {
         $details = ShippingServiceDetails::fromArray(
@@ -282,11 +266,15 @@ class LocationServiceTest extends BaseTestWithServices
 
     private function initWarehouse()
     {
-        $this->shopConfig->setDefaultWarehouse(
-            Warehouse::fromArray(array('country' => 'FR', 'postal_code' => '75008'))
-        );
+        $warehouse = new TestWarehouse();
+        $warehouse->country = 'FR';
+        $warehouse->postalCode = '75008';
+        $this->shopConfig->setDefaultWarehouse($warehouse);
     }
 
+    /**
+     * @return array
+     */
     private function getMockLocations()
     {
         $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/dropOffs.json');
@@ -297,6 +285,9 @@ class LocationServiceTest extends BaseTestWithServices
         );
     }
 
+    /**
+     * @return array
+     */
     private function getMockLocationInfo()
     {
         $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/locationInfo.json');
@@ -304,10 +295,13 @@ class LocationServiceTest extends BaseTestWithServices
         return array(
             new HttpResponse(200, array(), '[]'),
             new HttpResponse(200, array(), $response),
-            new HttpResponse(200, array(), '[]')
+            new HttpResponse(200, array(), '[]'),
         );
     }
 
+    /**
+     * @return array
+     */
     private function getBadLocations()
     {
         return array(

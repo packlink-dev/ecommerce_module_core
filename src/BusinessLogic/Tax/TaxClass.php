@@ -16,6 +16,10 @@ class TaxClass extends FrontDto
      */
     const CLASS_NAME = __CLASS__;
     /**
+     * Unique class key.
+     */
+    const CLASS_KEY = 'tax_class';
+    /**
      * Display label.
      *
      * @var string
