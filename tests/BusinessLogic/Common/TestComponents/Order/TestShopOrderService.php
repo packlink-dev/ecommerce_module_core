@@ -140,29 +140,20 @@ class TestShopOrderService implements ShopOrderService
     }
 
     /**
-     * Handles updated tracking info for shipment with given reference.
+     * Handles updated tracking info for order with a given ID.
      *
-     * @param string $shipmentReference Shipment reference.
+     * @param string $orderId Shop order ID.
      * @param Tracking[] $trackings Shipment tracking history.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
-    public function handleUpdatedTrackingInfo($shipmentReference, array $trackings)
+    public function handleUpdatedTrackingInfo($orderId, array $trackings)
     {
         if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
-        $shippingDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipmentReference);
-        if ($shippingDetails === null) {
-            throw new OrderShipmentDetailsNotFound('Order details not found for reference: ' . $shipmentReference);
-        }
-
-        $order = $this->getOrder($shippingDetails->getOrderId());
-        $order->setShippingPrice($shippingDetails->getShippingCost());
-        $trackingNumbers = $shippingDetails->getCarrierTrackingNumbers() ?: array();
-        $order->getShipment()->setTrackingNumber(reset($trackingNumbers));
+        $order = $this->getOrder($orderId);
         $trackingHistory = array();
         foreach ($trackings as $item) {
             $trackingHistory[] = TrackingHistory::fromArray($item->toArray());
@@ -172,33 +163,20 @@ class TestShopOrderService implements ShopOrderService
     }
 
     /**
-     * Sets order packlink shipping status to an order by shipment reference.
+     * Sets order packlink shipping status to an order with a given ID.
      *
-     * @param string $shipmentReference Packlink shipment reference.
+     * @param string $orderId Shop order ID.
      * @param string $shippingStatus Packlink shipping status.
      *
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
      */
-    public function updateShipmentStatus($shipmentReference, $shippingStatus)
+    public function updateShipmentStatus($orderId, $shippingStatus)
     {
         if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
         }
 
-        $shippingDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipmentReference);
-        if ($shippingDetails === null) {
-            throw new OrderShipmentDetailsNotFound('Order details not found for reference: ' . $shipmentReference);
-        }
-
-        $order = $this->getOrder($shippingDetails->getOrderId());
-        $order->setShippingPrice($shippingDetails->getShippingCost());
-        $shipment = $order->getShipment() ?: new Shipment();
-        if ($shipment->getReferenceNumber() === null) {
-            $shipment->setReferenceNumber($shipmentReference);
-            $shipment->setStatus($shippingStatus);
-        }
-
+        $order = $this->getOrder($orderId);
         $order->setStatus($shippingStatus);
     }
 

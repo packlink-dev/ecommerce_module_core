@@ -83,6 +83,7 @@ class WebHookHandlerTest extends BaseTestWithServices
 
     /**
      * Tests setting of shipping status
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testHandleShippingStatusEvent()
     {
@@ -97,7 +98,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $order = $shopOrderService->getOrder('test_order_id');
 
         $this->assertNotNull($order);
-        $this->assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getShipment()->getStatus());
+        $this->assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getStatus());
     }
 
     /**
@@ -141,6 +142,7 @@ class WebHookHandlerTest extends BaseTestWithServices
 
     /**
      * Tests setting of shipping tracking
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testHandleShippingTrackingEvent()
     {
@@ -205,6 +207,7 @@ class WebHookHandlerTest extends BaseTestWithServices
 
     /**
      * Tests when reference has no tracking info associated with it.
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testHandleShippingTrackingEventWhen404IsThrown()
     {

@@ -102,7 +102,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $shopOrderService = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $order = $shopOrderService->getOrder('test_order_id');
 
-        self::assertEquals(15.85, $order->getShippingPrice());
+        self::assertEquals(ShipmentStatus::STATUS_READY, $order->getStatus());
     }
 
     /**
@@ -120,7 +120,6 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $shopOrderService = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $order = $shopOrderService->getOrder('test_order_id');
 
-        self::assertEquals(15.85, $order->getShippingPrice());
         self::assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getStatus());
     }
 

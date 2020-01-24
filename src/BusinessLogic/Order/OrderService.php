@@ -103,8 +103,16 @@ class OrderService extends BaseService
     {
         $e = null;
         try {
+            $orderShipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipment->reference);
+
+            if ($orderShipmentDetails === null) {
+                throw new OrderShipmentDetailsNotFound(
+                    'Order details not found for reference "' . $shipment->reference . '".'
+                );
+            }
+
             $this->orderShipmentDetailsService->setShippingStatus($shipment->reference, $status);
-            $this->shopOrderService->updateShipmentStatus($shipment->reference, $status);
+            $this->shopOrderService->updateShipmentStatus($orderShipmentDetails->getOrderId(), $status);
         } catch (OrderNotFound $e) {
         } catch (OrderShipmentDetailsNotFound $e) {
         }
@@ -128,6 +136,14 @@ class OrderService extends BaseService
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         try {
+            $orderShipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipment->reference);
+
+            if ($orderShipmentDetails === null) {
+                throw new OrderShipmentDetailsNotFound(
+                    'Order details not found for reference "' . $shipment->reference . '".'
+                );
+            }
+
             $this->orderShipmentDetailsService->setTrackingInfo(
                 $shipment->reference,
                 $shipment->carrierTrackingUrl,
@@ -135,7 +151,7 @@ class OrderService extends BaseService
             );
 
             $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
-            $this->shopOrderService->handleUpdatedTrackingInfo($shipment->reference, $trackingHistory);
+            $this->shopOrderService->handleUpdatedTrackingInfo($orderShipmentDetails->getOrderId(), $trackingHistory);
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         } catch (OrderShipmentDetailsNotFound $e) {

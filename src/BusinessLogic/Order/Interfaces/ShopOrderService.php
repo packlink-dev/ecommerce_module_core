@@ -29,24 +29,23 @@ interface ShopOrderService
     public function getOrderAndShippingData($orderId);
 
     /**
-     * Handles updated tracking info for shipment with given reference.
+     * Handles updated tracking info for order with a given ID.
      *
-     * @param string $shipmentReference Shipment reference.
+     * @param string $orderId Shop order ID.
      * @param Tracking[] $trackings Shipment tracking history.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order for provided reference is not found.
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      *  When local order shipment details are not found.
      */
-    public function handleUpdatedTrackingInfo($shipmentReference, array $trackings);
+    public function handleUpdatedTrackingInfo($orderId, array $trackings);
 
     /**
-     * Sets order packlink shipping status to an order by shipment reference.
+     * Sets order Packlink shipping status to an order with a given ID.
      *
-     * @param string $shipmentReference Packlink shipment reference.
+     * @param string $orderId Shop order ID.
      * @param string $shippingStatus Packlink shipping status.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order for provided reference is not found.
      */
-    public function updateShipmentStatus($shipmentReference, $shippingStatus);
+    public function updateShipmentStatus($orderId, $shippingStatus);
 }
