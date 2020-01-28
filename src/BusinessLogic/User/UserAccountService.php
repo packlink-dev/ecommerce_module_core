@@ -55,16 +55,6 @@ class UserAccountService extends BaseService
     private $proxy;
 
     /**
-     * UserAccountService constructor.
-     */
-    protected function __construct()
-    {
-        parent::__construct();
-
-        $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-    }
-
-    /**
      * Validates provided API key and initializes user's data.
      *
      * @param string $apiKey API key.
@@ -81,13 +71,13 @@ class UserAccountService extends BaseService
         }
 
         // set token before calling API
-        $this->configuration->setAuthorizationToken($apiKey);
+        $this->getConfigService()->setAuthorizationToken($apiKey);
 
         try {
             $userDto = $this->getProxy()->getUserData();
             $this->initializeUser($userDto);
         } catch (HttpBaseException $e) {
-            $this->configuration->resetAuthorizationCredentials();
+            $this->getConfigService()->resetAuthorizationCredentials();
             Logger::logError($e->getMessage());
 
             return false;
@@ -107,7 +97,7 @@ class UserAccountService extends BaseService
      */
     public function setDefaultParcel($force)
     {
-        $parcelInfo = $this->configuration->getDefaultParcel();
+        $parcelInfo = $this->getConfigService()->getDefaultParcel();
         if ($parcelInfo === null || $force) {
             if ($this->setParcelInfoInternal()) {
                 return;
@@ -122,7 +112,7 @@ class UserAccountService extends BaseService
             }
 
             if ($parcelInfo !== null) {
-                $this->configuration->setDefaultParcel($parcelInfo);
+                $this->getConfigService()->setDefaultParcel($parcelInfo);
             }
         }
     }
@@ -136,7 +126,7 @@ class UserAccountService extends BaseService
      */
     public function setWarehouseInfo($force)
     {
-        $warehouse = $this->configuration->getDefaultWarehouse();
+        $warehouse = $this->getConfigService()->getDefaultWarehouse();
         if ($warehouse === null || $force) {
             if ($this->setWarehouseInfoInternal()) {
                 return;
@@ -150,13 +140,13 @@ class UserAccountService extends BaseService
                 }
             }
 
-            $userInfo = $this->configuration->getUserInfo();
+            $userInfo = $this->getConfigService()->getUserInfo();
             if ($userInfo === null) {
                 $userInfo = $this->getProxy()->getUserData();
             }
 
             if ($warehouse !== null && $userInfo !== null && $warehouse->country === $userInfo->country) {
-                $this->configuration->setDefaultWarehouse($warehouse);
+                $this->getConfigService()->setDefaultWarehouse($warehouse);
             }
         }
     }
@@ -171,8 +161,8 @@ class UserAccountService extends BaseService
      */
     protected function initializeUser(User $user)
     {
-        $this->configuration->setUserInfo($user);
-        $defaultQueueName = $this->configuration->getDefaultQueueName();
+        $this->getConfigService()->setUserInfo($user);
+        $defaultQueueName = $this->getConfigService()->getDefaultQueueName();
 
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
@@ -180,9 +170,13 @@ class UserAccountService extends BaseService
         $this->setDefaultParcel(true);
         $this->setWarehouseInfo(true);
 
-        $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask(), $this->configuration->getContext());
+        $queueService->enqueue(
+            $defaultQueueName,
+            new UpdateShippingServicesTask(),
+            $this->getConfigService()->getContext()
+        );
 
-        $webHookUrl = $this->configuration->getWebHookUrl();
+        $webHookUrl = $this->getConfigService()->getWebHookUrl();
         if (!empty($webHookUrl)) {
             $this->getProxy()->registerWebHookHandler($webHookUrl);
         }
@@ -245,8 +239,8 @@ class UserAccountService extends BaseService
         // Schedule weekly task for updating services
         $schedule = new WeeklySchedule(
             new UpdateShippingServicesTask(),
-            $this->configuration->getDefaultQueueName(),
-            $this->configuration->getContext()
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
         );
 
         $schedule->setDay(1);
@@ -269,8 +263,8 @@ class UserAccountService extends BaseService
 
         $schedule = new HourlySchedule(
             new UpdateShipmentDataTask($hourlyStatuses),
-            $this->configuration->getDefaultQueueName(),
-            $this->configuration->getContext()
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
         );
 
         $schedule->setMinute($minute);
@@ -294,8 +288,8 @@ class UserAccountService extends BaseService
 
         $schedule = new DailySchedule(
             new UpdateShipmentDataTask($dailyStatuses),
-            $this->configuration->getDefaultQueueName(),
-            $this->configuration->getContext()
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
         );
 
         $schedule->setHour($hour);
@@ -313,8 +307,8 @@ class UserAccountService extends BaseService
     {
         $schedule = new HourlySchedule(
             new TaskCleanupTask(ScheduleCheckTask::getClassName(), array(QueueItem::COMPLETED), 3600),
-            $this->configuration->getDefaultQueueName(),
-            $this->configuration->getContext()
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
         );
 
         $schedule->setMinute(10);
@@ -335,4 +329,19 @@ class UserAccountService extends BaseService
 
         return $this->proxy;
     }
+
+    /**
+     * Returns an instance of configuration service.
+     *
+     * @return \Packlink\BusinessLogic\Configuration Configuration service.
+     */
+    protected function getConfigService()
+    {
+        if ($this->configuration === null) {
+            $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+        }
+
+        return $this->configuration;
+    }
 }
+
