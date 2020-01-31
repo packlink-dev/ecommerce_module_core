@@ -120,6 +120,7 @@ class ShippingMethodService extends BaseService
         }
 
         $this->setShippingMethodDetails($method, $serviceDetails);
+        $method->setLogoUrl($this->shopShippingMethodService->getCarrierLogoFilePath($method->getCarrierName()));
 
         $this->save($method);
 
@@ -404,6 +405,8 @@ class ShippingMethodService extends BaseService
         $shippingMethod->setDeliveryTime($serviceDetails->transitTime);
         $shippingMethod->setExpressDelivery($serviceDetails->expressDelivery);
         $shippingMethod->setNational($serviceDetails->departureCountry === $serviceDetails->destinationCountry);
+        $logoUrl = $this->shopShippingMethodService->getCarrierLogoFilePath($serviceDetails->carrierName);
+        $shippingMethod->setLogoUrl($logoUrl);
         $shippingMethod->setEnabled(true);
 
         $this->setShippingService($shippingMethod, $serviceDetails);
@@ -480,12 +483,17 @@ class ShippingMethodService extends BaseService
      */
     protected function select($filter = null)
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->shippingMethodRepository->select($filter);
+        /** @var ShippingMethod[] $methods */
+        $methods = $this->shippingMethodRepository->select($filter);
+        foreach ($methods as $method) {
+            $method->setLogoUrl($this->shopShippingMethodService->getCarrierLogoFilePath($method->getCarrierName()));
+        }
+
+        return $methods;
     }
 
     /**
-     * Executes select query.
+     * Executes select one query.
      *
      * @param QueryFilter $filter Filter for query.
      *
@@ -493,7 +501,13 @@ class ShippingMethodService extends BaseService
      */
     protected function selectOne($filter)
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->shippingMethodRepository->selectOne($filter);
+        /** @var ShippingMethod $method */
+        $method = $this->shippingMethodRepository->selectOne($filter);
+
+        if ($method) {
+            $this->shopShippingMethodService->getCarrierLogoFilePath($method->getCarrierName());
+        }
+
+        return $method;
     }
 }
