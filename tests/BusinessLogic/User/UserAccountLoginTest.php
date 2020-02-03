@@ -74,8 +74,10 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Tests when empty value is provided for API key.
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testEmptyApiKey()
     {
@@ -94,6 +96,8 @@ class UserAccountLoginTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLogin()
     {
@@ -165,8 +169,10 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Tests user login and user initialization
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLoginNoParcel()
     {
@@ -188,8 +194,10 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Tests user login and user initialization
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLoginNoWarehouse()
     {
@@ -237,8 +245,10 @@ class UserAccountLoginTest extends BaseTestWithServices
     }
 
     /**
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLoginBadHttp()
     {
@@ -288,7 +298,13 @@ class UserAccountLoginTest extends BaseTestWithServices
     }
 
     /**
-     * Tests setting of default warehouse
+     * Tests setting of default warehouse.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testSettingWarehouseInfo()
     {
@@ -298,9 +314,30 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->userAccountService->setWarehouseInfo(true);
 
         $warehouse = $this->shopConfig->getDefaultWarehouse();
-        $this->assertCount(2, $this->httpClient->getHistory());
+        $this->assertCount(1, $this->httpClient->getHistory());
         $this->assertNotNull($warehouse);
         $this->assertEquals('222459d5e4b0ed5488fe91544', $warehouse->id);
+    }
+
+    /**
+     * Tests setting a warehouse from unsupported country.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function testSettingUnsupportedWarehouse()
+    {
+        $this->httpClient->setMockResponses($this->getUnsupportedWarehouseMockResponse());
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->userAccountService->setWarehouseInfo(true);
+
+        $warehouse = $this->shopConfig->getDefaultWarehouse();
+
+        $this->assertNull($warehouse);
     }
 
     /**
@@ -313,10 +350,21 @@ class UserAccountLoginTest extends BaseTestWithServices
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json')
-            ),
+            )
+        );
+    }
+
+    /**
+     * Returns response for unsupported warehouse.
+     *
+     * @return HttpResponse[] Array of Http responses.
+     */
+    private function getUnsupportedWarehouseMockResponse()
+    {
+        return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
-            ),
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/unsupportedWarehouse.json')
+            )
         );
     }
 

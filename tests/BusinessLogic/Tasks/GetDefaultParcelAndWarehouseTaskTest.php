@@ -47,7 +47,7 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
         $this->httpClient->setMockResponses($this->getMockResponses());
         $this->syncTask->execute();
 
-        $this->assertCount(3, $this->httpClient->getHistory());
+        $this->assertCount(2, $this->httpClient->getHistory());
 
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertNotNull($parcelInfo);
@@ -80,9 +80,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
             ),
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json')
-            ),
-            new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
             ),
         );
     }

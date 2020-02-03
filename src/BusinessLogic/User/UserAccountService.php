@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -61,8 +62,10 @@ class UserAccountService extends BaseService
      *
      * @return bool TRUE if login went successfully; otherwise, FALSE.
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function login($apiKey)
     {
@@ -122,7 +125,11 @@ class UserAccountService extends BaseService
      *
      * @param bool $force Force retrieval of warehouse info from Packlink API.
      *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function setWarehouseInfo($force)
     {
@@ -140,13 +147,21 @@ class UserAccountService extends BaseService
                 }
             }
 
-            $userInfo = $this->getConfigService()->getUserInfo();
-            if ($userInfo === null) {
-                $userInfo = $this->getProxy()->getUserData();
-            }
+            if ($warehouse !== null) {
+                /** @var CountryService $countryService */
+                $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+                $supportedCountries = $countryService->getSupportedCountries();
 
-            if ($warehouse !== null && $userInfo !== null && $warehouse->country === $userInfo->country) {
-                $this->getConfigService()->setDefaultWarehouse($warehouse);
+                $supportedCountryCodes = array_map(
+                    function ($country) {
+                        return $country->code;
+                    },
+                    $supportedCountries
+                );
+
+                if (in_array($warehouse->country, $supportedCountryCodes, true)) {
+                    $this->getConfigService()->setDefaultWarehouse($warehouse);
+                }
             }
         }
     }
@@ -156,8 +171,13 @@ class UserAccountService extends BaseService
      *
      * @param User $user User data.
      *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     protected function initializeUser(User $user)
     {
@@ -344,4 +364,3 @@ class UserAccountService extends BaseService
         return $this->configuration;
     }
 }
-
