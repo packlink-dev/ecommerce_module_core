@@ -175,6 +175,8 @@ class LocationServiceTest extends BaseTestWithServices
      */
     public function testLocationSearchWithUnsupportedCountry()
     {
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '[]')));
+
         /** @var LocationService $locationService */
         $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
         $locationService->searchLocations('RS', 'Test');
@@ -188,7 +190,7 @@ class LocationServiceTest extends BaseTestWithServices
      */
     public function testLocationSearch()
     {
-        $this->httpClient->setMockResponses($this->getMockLocationInfo());
+        $this->httpClient->setMockResponses($this->getMockLocationSearchResponses());
 
         /** @var LocationService $locationService */
         $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
@@ -288,14 +290,16 @@ class LocationServiceTest extends BaseTestWithServices
     /**
      * @return array
      */
-    private function getMockLocationInfo()
+    private function getMockLocationSearchResponses()
     {
-        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/locationInfo.json');
-
         return array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/postalZones.json')
+            ),
             new HttpResponse(200, array(), '[]'),
-            new HttpResponse(200, array(), $response),
-            new HttpResponse(200, array(), '[]'),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/locationInfo.json')
+            ),
         );
     }
 

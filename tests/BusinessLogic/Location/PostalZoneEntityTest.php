@@ -22,21 +22,21 @@ class PostalZoneEntityTest extends BaseTestWithServices
         $proxy = TestServiceRegister::getService(Proxy::CLASS_NAME);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $postalZones = $proxy->getPostalZones('ES', 'en');
+        $postalZones = $proxy->getPostalZones('ES');
 
         self::assertCount(2, $postalZones);
 
-        self::assertEquals('65', $postalZones[0]->id);
-        self::assertEquals('ES', $postalZones[0]->isoCode);
+        self::assertEquals('3', $postalZones[0]->id);
+        self::assertEquals('DE', $postalZones[0]->isoCode);
         self::assertEquals(true, $postalZones[0]->hasPostalCodes);
-        self::assertEquals('Spain - Mainland', $postalZones[0]->name);
-        self::assertEquals('+34', $postalZones[0]->phonePrefix);
+        self::assertEquals('Germany', $postalZones[0]->name);
+        self::assertEquals('+49', $postalZones[0]->phonePrefix);
 
-        self::assertEquals('68', $postalZones[1]->id);
-        self::assertEquals('ES', $postalZones[1]->isoCode);
+        self::assertEquals('248', $postalZones[1]->id);
+        self::assertEquals('DE', $postalZones[1]->isoCode);
         self::assertEquals(true, $postalZones[1]->hasPostalCodes);
-        self::assertEquals('Spain - Balearic Islands', $postalZones[1]->name);
-        self::assertEquals('+34', $postalZones[1]->phonePrefix);
+        self::assertEquals('Germany - Helgoland', $postalZones[1]->name);
+        self::assertEquals('+49', $postalZones[1]->phonePrefix);
     }
 
     /**
@@ -51,7 +51,7 @@ class PostalZoneEntityTest extends BaseTestWithServices
         $proxy = TestServiceRegister::getService(Proxy::CLASS_NAME);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $proxy->getPostalZones('ES', 'en');
+        $proxy->getPostalZones('DE');
     }
 
     public function testCreatingPostalZoneFromArray()
@@ -61,7 +61,7 @@ class PostalZoneEntityTest extends BaseTestWithServices
         $proxy = TestServiceRegister::getService(Proxy::CLASS_NAME);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $postalZones = $proxy->getPostalZones('ES', 'en');
+        $postalZones = $proxy->getPostalZones('DE');
 
         $model = $postalZones[0];
         $copy = PostalZone::fromArray($model->toArray());

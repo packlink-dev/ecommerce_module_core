@@ -26,17 +26,6 @@ class LocationService extends BaseService
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * Postal zone map.
-     *
-     * @var array
-     */
-    protected static $postalZoneMap = array(
-        'DE' => array('3', '248', '249'),
-        'ES' => array('65', '68', '69'),
-        'IT' => array('113', '114', '115'),
-        'FR' => array('76', '77'),
-    );
-    /**
      * Singleton instance of this class.
      *
      * @var static
@@ -133,13 +122,15 @@ class LocationService extends BaseService
      */
     public function searchLocations($country, $query)
     {
-        if (!isset(self::$postalZoneMap[$country])) {
+        $postalZones = $this->proxy->getPostalZones($country);
+
+        if (empty($postalZones)) {
             throw new PlatformCountryNotSupportedException('Platform country not supported');
         }
 
         $result = array();
-        foreach (self::$postalZoneMap[$country] as $postalZone) {
-            $partial = $this->proxy->searchLocations($country, $postalZone, $query);
+        foreach ($postalZones as $postalZone) {
+            $partial = $this->proxy->searchLocations($country, $postalZone->id, $query);
 
             if (!empty($partial)) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */

@@ -1,16 +1,16 @@
 [
   {
-    "id": "65",
-    "isoCode": "ES",
+    "id": "3",
+    "isoCode": "DE",
     "hasPostalCodes": true,
-    "name": "Spain - Mainland",
-    "phonePrefix": "+34"
+    "name": "Germany",
+    "phonePrefix": "+49"
   },
   {
-    "id": "68",
-    "isoCode": "ES",
+    "id": "248",
+    "isoCode": "DE",
     "hasPostalCodes": true,
-    "name": "Spain - Balearic Islands",
-    "phonePrefix": "+34"
+    "name": "Germany - Helgoland",
+    "phonePrefix": "+49"
   }
 ]

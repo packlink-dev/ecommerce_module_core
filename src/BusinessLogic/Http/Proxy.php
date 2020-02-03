@@ -218,9 +218,9 @@ class Proxy
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
-    public function getPostalZones($countryCode, $lang)
+    public function getPostalZones($countryCode, $lang = 'en')
     {
-        $url = 'locations/postalzones/origins?' . http_build_query(
+        $url = 'locations/postalzones/destinations?' . http_build_query(
                 array(
                     'platform' => 'PRO',
                     'platform_country' => $countryCode,
