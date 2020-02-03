@@ -1,0 +1,16 @@
+[
+  {
+    "id": "65",
+    "isoCode": "ES",
+    "hasPostalCodes": true,
+    "name": "Spain - Mainland",
+    "phonePrefix": "+34"
+  },
+  {
+    "id": "68",
+    "isoCode": "ES",
+    "hasPostalCodes": true,
+    "name": "Spain - Balearic Islands",
+    "phonePrefix": "+34"
+  }
+]

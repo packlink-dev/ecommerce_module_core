@@ -24,57 +24,57 @@ class CountryService extends BaseService
     private static $supportedCountries = array(
         'es' => array(
             'name' => 'Spain',
-            'code' => 'es',
+            'code' => 'ES',
             'postal_code' => '28001',
         ),
         'de' => array(
             'name' => 'Germany',
-            'code' => 'de',
+            'code' => 'DE',
             'postal_code' => '10115',
         ),
         'fr' => array(
             'name' => 'France',
-            'code' => 'fr',
+            'code' => 'FR',
             'postal_code' => '75000',
         ),
         'it' => array(
             'name' => 'Italy',
-            'code' => 'it',
+            'code' => 'IT',
             'postal_code' => '00100',
         ),
         'at' => array(
             'name' => 'Austria',
-            'code' => 'at',
+            'code' => 'AT',
             'postal_code' => '1010',
         ),
         'nl' => array(
             'name' => 'Netherlands',
-            'code' => 'nl',
+            'code' => 'NL',
             'postal_code' => '1011',
         ),
         'be' => array(
             'name' => 'Belgium',
-            'code' => 'be',
+            'code' => 'BE',
             'postal_code' => '1000',
         ),
         'pt' => array(
             'name' => 'Portugal',
-            'code' => 'pl',
+            'code' => 'PL',
             'postal_code' => '1000-017',
         ),
         'tr' => array(
             'name' => 'Turkey',
-            'code' => 'tr',
+            'code' => 'TR',
             'postal_code' => '06010',
         ),
         'ie' => array(
             'name' => 'Ireland',
-            'code' => 'ie',
+            'code' => 'IE',
             'postal_code' => 'D1',
         ),
         'uk' => array(
             'name' => 'United Kingdom',
-            'code' => 'uk',
+            'code' => 'UK',
             'postal_code' => 'N0L 1E0',
         ),
     );

@@ -25,12 +25,12 @@ class CountryDtoTest extends BaseDtoTest
         $data = array(
             'de' => array(
                 'name' => 'Germany',
-                'code' => 'de',
+                'code' => 'DE',
                 'postal_code' => '10115',
             ),
             'nl' => array(
                 'name' => 'Netherlands',
-                'code' => 'nl',
+                'code' => 'NL',
                 'postal_code' => '1011',
             ),
         );
@@ -40,11 +40,11 @@ class CountryDtoTest extends BaseDtoTest
         $this->assertCount(2, $countries);
 
         $this->assertEquals('Germany', $countries[0]->name);
-        $this->assertEquals('de', $countries[0]->code);
+        $this->assertEquals('DE', $countries[0]->code);
         $this->assertEquals('10115', $countries[0]->postalCode);
 
         $this->assertEquals('Netherlands', $countries[1]->name);
-        $this->assertEquals('nl', $countries[1]->code);
+        $this->assertEquals('NL', $countries[1]->code);
         $this->assertEquals('1011', $countries[1]->postalCode);
     }
 

@@ -27,7 +27,7 @@ class CountryServiceTest extends BaseTestWithServices
         $this->assertNotEmpty($countries);
         $this->assertCount(11, $countries);
         $this->assertEquals('Spain', $countries[0]->name);
-        $this->assertEquals('es', $countries[0]->code);
+        $this->assertEquals('ES', $countries[0]->code);
         $this->assertEquals('28001', $countries[0]->postalCode);
     }
 }

@@ -16,6 +16,7 @@ use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\LocationInfo;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
+use Packlink\BusinessLogic\Http\DTO\PostalZone;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -203,6 +204,33 @@ class Proxy
         $response = $this->call(HttpClient::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
 
         return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
+    }
+
+    /**
+     * Returns array of PostalZone objects by specified country.
+     *
+     * @param string $countryCode
+     * @param string $lang
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\PostalZone[]
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getPostalZones($countryCode, $lang)
+    {
+        $url = 'locations/postalzones/origins?' . http_build_query(
+                array(
+                    'platform' => 'PRO',
+                    'platform_country' => $countryCode,
+                    'language' => $lang,
+                )
+            );
+
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
+
+        return PostalZone::fromArrayBatch($response->decodeBodyAsJson());
     }
 
     /**
