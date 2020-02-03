@@ -9,6 +9,8 @@ use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\Country\Country;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
@@ -137,6 +139,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 return WarehouseService::getInstance();
             }
         );
+
+        ServiceRegister::registerService(
+            CountryService::CLASS_NAME,
+            function () {
+                return CountryService::getInstance();
+            }
+        );
     }
 
     /**
@@ -170,5 +179,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         FrontDtoFactory::register(Warehouse::CLASS_KEY, Warehouse::CLASS_NAME);
         FrontDtoFactory::register(ParcelInfo::CLASS_KEY, ParcelInfo::CLASS_NAME);
         FrontDtoFactory::register(DashboardStatus::CLASS_KEY, DashboardStatus::CLASS_NAME);
+        FrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
     }
 }
