@@ -5,6 +5,8 @@ namespace Packlink\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Country\Country;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -21,24 +23,6 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
  */
 class UpdateShippingServicesTask extends Task
 {
-    /**
-     * Mapping between country and main zip code of country's capital city.
-     *
-     * @var array
-     */
-    protected static $countryParams = array(
-        // Rome
-        'IT' => '00118',
-        // Madrid
-        'ES' => '28001',
-        // Berlin
-        'DE' => '10115',
-        // Paris
-        'FR' => '75001',
-        // New York
-        'US' => '10001',
-    );
-
     /**
      * Transforms array into an serializable object,
      *
@@ -68,6 +52,8 @@ class UpdateShippingServicesTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function execute()
     {
@@ -88,36 +74,55 @@ class UpdateShippingServicesTask extends Task
      * Gets all available services for current user.
      *
      * @return array
-     *  Key is service Id and value is @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
+     *  Key is service Id and value is @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
+     *
+     * @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
+     *
      */
     protected function getRemoteServices()
     {
         /** @var Configuration $config */
         $config = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-        /** @var \Packlink\BusinessLogic\Http\DTO\User $user */
-        $user = $config->getUserInfo();
-        if (!array_key_exists($user->country, static::$countryParams)) {
-            throw new \InvalidArgumentException('User country is not supported: ' . $user->country);
+        $warehouse = $config->getDefaultWarehouse();
+        if ($warehouse !== null) {
+            $sourceCountryCode = $warehouse->country;
+        } else {
+            $sourceCountryCode = $config->getUserInfo()->country;
         }
+
+        /** @var CountryService $countryService */
+        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        $supportedCountries = $countryService->getSupportedCountries();
+        $supportedCountries[] = Country::fromArray(
+            array(
+                'name' => 'United States',
+                'code' => 'US',
+                'postal_code' => '10001',
+            )
+        );
+
+        $sourceCountry = $supportedCountries[$sourceCountryCode];
 
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $package = Package::fromArray($parcel->toArray());
 
         $allServices = array();
-        foreach (static::$countryParams as $country => $zip) {
+        foreach ($supportedCountries as $country) {
             $this->setServices(
                 $allServices,
                 new ShippingServiceSearch(
                     null,
-                    $user->country,
-                    static::$countryParams[$user->country],
-                    $country,
-                    $zip,
+                    $sourceCountry->code,
+                    $sourceCountry->postalCode,
+                    $country->code,
+                    $country->postalCode,
                     array($package)
                 )
             );

@@ -150,16 +150,8 @@ class UserAccountService extends BaseService
             if ($warehouse !== null) {
                 /** @var CountryService $countryService */
                 $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
-                $supportedCountries = $countryService->getSupportedCountries();
 
-                $supportedCountryCodes = array_map(
-                    function ($country) {
-                        return $country->code;
-                    },
-                    $supportedCountries
-                );
-
-                if (in_array($warehouse->country, $supportedCountryCodes, true)) {
+                if ($countryService->isCountrySupported($warehouse->country)) {
                     $this->getConfigService()->setDefaultWarehouse($warehouse);
                 }
             }

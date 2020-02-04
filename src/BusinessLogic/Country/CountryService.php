@@ -21,63 +21,85 @@ class CountryService extends BaseService
      *
      * @var array
      */
-    private static $supportedCountries = array(
-        'es' => array(
+    protected static $supportedCountries = array(
+        'ES' => array(
             'name' => 'Spain',
             'code' => 'ES',
             'postal_code' => '28001',
         ),
-        'de' => array(
+        'DE' => array(
             'name' => 'Germany',
             'code' => 'DE',
             'postal_code' => '10115',
         ),
-        'fr' => array(
+        'FR' => array(
             'name' => 'France',
             'code' => 'FR',
-            'postal_code' => '75000',
+            'postal_code' => '75001',
         ),
-        'it' => array(
+        'IT' => array(
             'name' => 'Italy',
             'code' => 'IT',
-            'postal_code' => '00100',
+            'postal_code' => '00118',
         ),
-        'at' => array(
+        'AT' => array(
             'name' => 'Austria',
             'code' => 'AT',
             'postal_code' => '1010',
         ),
-        'nl' => array(
+        'NL' => array(
             'name' => 'Netherlands',
             'code' => 'NL',
             'postal_code' => '1011',
         ),
-        'be' => array(
+        'BE' => array(
             'name' => 'Belgium',
             'code' => 'BE',
             'postal_code' => '1000',
         ),
-        'pt' => array(
+        'PT' => array(
             'name' => 'Portugal',
-            'code' => 'PL',
+            'code' => 'PT',
             'postal_code' => '1000-017',
         ),
-        'tr' => array(
+        'TR' => array(
             'name' => 'Turkey',
             'code' => 'TR',
             'postal_code' => '06010',
         ),
-        'ie' => array(
+        'IE' => array(
             'name' => 'Ireland',
             'code' => 'IE',
             'postal_code' => 'D1',
         ),
-        'uk' => array(
+        'GB' => array(
             'name' => 'United Kingdom',
-            'code' => 'UK',
-            'postal_code' => 'N0L 1E0',
+            'code' => 'GB',
+            'postal_code' => 'E1 6AN',
         ),
     );
+
+    /**
+     * Returns whether the country with provided ISO code is in a list of supported countries.
+     *
+     * @param string $isoCode Two-letter country code.
+     *
+     * @return bool
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function isCountrySupported($isoCode)
+    {
+        $supportedCountryCodes = array_map(
+            function ($country) {
+                return $country->code;
+            },
+            $this->getSupportedCountries()
+        );
+
+        return in_array($isoCode, $supportedCountryCodes, true);
+    }
 
     /**
      * Returns a list of supported country DTOs.
@@ -92,7 +114,7 @@ class CountryService extends BaseService
         $countries = array();
 
         foreach (self::$supportedCountries as $country) {
-            $countries[] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
+            $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
         }
 
         return $countries;

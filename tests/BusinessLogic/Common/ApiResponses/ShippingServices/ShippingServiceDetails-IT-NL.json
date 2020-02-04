@@ -1,0 +1,69 @@
+[
+  {
+    "has_adult_signature": false,
+    "currency": "EUR",
+    "carrier_name": "Poste Italiane",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "5000.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "has_proof_of_delivery": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20755,
+    "logo_id": "poste-italiane",
+    "carrier_product_id": "IT_POSTEITALIANE_4",
+    "service_info": [
+      {
+        "text": "service-card.service-info.printer",
+        "icon": "printer"
+      }
+    ],
+    "has_print_in_store": false,
+    "price": {
+      "currency": "EUR",
+      "total_price": 21.96,
+      "tax_price": 3.96,
+      "base_price": 18.0
+    },
+    "first_estimated_delivery_date": "2020/02/07",
+    "max_dimensions_message": null,
+    "customs_required": false,
+    "name": "Crono Internazionale",
+    "transit_time": "3 DAYS",
+    "country": "DE",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 1,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "72",
+    "available_dates": {
+      "2020/02/14": "[09:00 , 18:30]",
+      "2020/02/19": "[09:00 , 18:30]",
+      "2020/02/18": "[09:00 , 18:30]",
+      "2020/02/17": "[09:00 , 18:30]",
+      "2020/02/11": "[09:00 , 18:30]",
+      "2020/02/10": "[09:00 , 18:30]",
+      "2020/02/13": "[09:00 , 18:30]",
+      "2020/02/12": "[09:00 , 18:30]",
+      "2020/02/06": "[09:00 , 18:30]",
+      "2020/02/07": "[09:00 , 18:30]",
+      "2020/02/04": "[09:00 , 18:30]",
+      "2020/02/05": "[09:00 , 18:30]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "18.00"
+  }
+]
