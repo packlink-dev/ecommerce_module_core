@@ -17,6 +17,12 @@ class CountryService extends BaseService
      */
     const CLASS_NAME = __CLASS__;
     /**
+     * Singleton instance of this class.
+     *
+     * @var static
+     */
+    protected static $instance;
+    /**
      * List of supported countries.
      *
      * @var array
