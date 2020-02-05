@@ -64,8 +64,6 @@ class UserAccountService extends BaseService
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function login($apiKey)
     {
@@ -128,8 +126,6 @@ class UserAccountService extends BaseService
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function setWarehouseInfo($force)
     {
@@ -153,6 +149,8 @@ class UserAccountService extends BaseService
 
                 if ($countryService->isCountrySupported($warehouse->country)) {
                     $this->getConfigService()->setDefaultWarehouse($warehouse);
+                } else {
+                    Logger::logWarning('Warehouse country not supported', 'Core');
                 }
             }
         }
@@ -168,8 +166,6 @@ class UserAccountService extends BaseService
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     protected function initializeUser(User $user)
     {
