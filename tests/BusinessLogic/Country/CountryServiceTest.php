@@ -13,10 +13,6 @@ use Packlink\BusinessLogic\Country\CountryService;
  */
 class CountryServiceTest extends BaseTestWithServices
 {
-    /**
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     */
     public function testGetSupportedCountries()
     {
         /** @var CountryService $service */
@@ -30,5 +26,21 @@ class CountryServiceTest extends BaseTestWithServices
         $this->assertEquals('Spain', $countries['ES']->name);
         $this->assertEquals('ES', $countries['ES']->code);
         $this->assertEquals('28001', $countries['ES']->postalCode);
+    }
+
+    public function testSupportedCountry()
+    {
+        /** @var CountryService $service */
+        $service = ServiceRegister::getService(CountryService::CLASS_NAME);
+
+        $this->assertTrue($service->isCountrySupported('ES'));
+    }
+
+    public function testUnsupportedCountry()
+    {
+        /** @var CountryService $service */
+        $service = ServiceRegister::getService(CountryService::CLASS_NAME);
+
+        $this->assertFalse($service->isCountrySupported('RS'));
     }
 }
