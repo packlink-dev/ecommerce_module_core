@@ -53,11 +53,11 @@ class PostalZone extends BaseDto
     {
         $instance = new static();
 
-        $instance->id = !empty($raw['id']) ? $raw['id'] : '';
-        $instance->name = !empty($raw['name']) ? $raw['name'] : '';
-        $instance->hasPostalCodes = !empty($raw['hasPostalCodes']) ? $raw['hasPostalCodes'] : false;
-        $instance->isoCode = !empty($raw['isoCode']) ? $raw['isoCode'] : '';
-        $instance->phonePrefix = !empty($raw['phonePrefix']) ? $raw['phonePrefix'] : '';
+        $instance->id = static::getValue($raw, 'id');
+        $instance->name = static::getValue($raw, 'name');
+        $instance->hasPostalCodes = static::getValue($raw, 'hasPostalCodes');
+        $instance->isoCode = static::getValue($raw, 'isoCode');
+        $instance->phonePrefix = static::getValue($raw, 'phonePrefix');
 
         return $instance;
     }
