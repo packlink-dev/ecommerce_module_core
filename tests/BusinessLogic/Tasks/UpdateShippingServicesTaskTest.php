@@ -82,7 +82,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testNoExecution()
@@ -101,7 +100,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testExecuteAllNew()
@@ -127,7 +125,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testExecuteNew()
@@ -151,7 +148,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testExecuteLocalUpdate()
@@ -181,7 +177,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testExecuteAPIUpdate()
@@ -223,7 +218,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testExecuteNewAndDelete()
@@ -321,7 +315,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     protected function prepareAndExecuteValidTask()

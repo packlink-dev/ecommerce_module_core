@@ -52,7 +52,6 @@ class UpdateShippingServicesTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function execute()
@@ -75,13 +74,9 @@ class UpdateShippingServicesTask extends Task
      *
      * @return array
      *  Key is service Id and value is @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     * @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
-     *
      * @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
      *
      */
