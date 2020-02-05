@@ -91,20 +91,10 @@ class CountryService extends BaseService
      * @param string $isoCode Two-letter country code.
      *
      * @return bool
-     *
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function isCountrySupported($isoCode)
     {
-        $supportedCountryCodes = array_map(
-            function ($country) {
-                return $country->code;
-            },
-            $this->getSupportedCountries()
-        );
-
-        return in_array($isoCode, $supportedCountryCodes, true);
+        return in_array($isoCode, array_keys(self::$supportedCountries), true);
     }
 
     /**
@@ -112,8 +102,8 @@ class CountryService extends BaseService
      *
      * @return \Packlink\BusinessLogic\Country\Country[]
      *
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @noinspection PhpUnhandledExceptionInspection
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getSupportedCountries()
     {
