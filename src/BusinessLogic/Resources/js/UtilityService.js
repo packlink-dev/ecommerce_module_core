@@ -10,9 +10,11 @@ var Packlink = window.Packlink || {};
 
             for (let container of inputContainers) {
                 let input = container.getElementsByTagName('input')[0];
-                textInputTransformLabel(input);
-                input.addEventListener('focus', textInputFocusHandler, true);
-                input.addEventListener('focusout', textInputFocusHandler, true);
+                if (typeof input !== 'undefined') {
+                    textInputTransformLabel(input);
+                    input.addEventListener('focus', textInputFocusHandler, true);
+                    input.addEventListener('focusout', textInputFocusHandler, true);
+                }
             }
         };
 

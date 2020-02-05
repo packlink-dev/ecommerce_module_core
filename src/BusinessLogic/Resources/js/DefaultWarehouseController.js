@@ -8,6 +8,7 @@ var Packlink = window.Packlink || {};
             'surname',
             'company',
             'address',
+            'country',
             'phone',
             'email'
         ];
@@ -17,6 +18,7 @@ var Packlink = window.Packlink || {};
             'name',
             'surname',
             'address',
+            'country',
             'phone',
             'email'
         ];
@@ -27,13 +29,13 @@ var Packlink = window.Packlink || {};
         let state = Packlink.state;
         let page;
 
-        let country;
-
+        let currentCountry;
         let currentPostalCode = '';
         let currentCity = '';
 
         let searchTerm = '';
 
+        let countryInput = null;
         let postalCodeInput = null;
 
         /**
@@ -52,12 +54,13 @@ var Packlink = window.Packlink || {};
          * @param response
          */
         function constructPage(response) {
-            country = response['country'];
+            currentCountry = response['country'];
 
             for (let field of warehouseFields) {
                 let input = templateService.getComponent('pl-default-warehouse-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
                 input.addEventListener('focus', onPostalCodeBlur);
+
                 if (response[field]) {
                     input.value = response[field];
                 }
@@ -104,6 +107,39 @@ var Packlink = window.Packlink || {};
                     postalCodeInput.value = ' ';
                 },
                 true);
+
+            ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
+        }
+
+        /**
+         * Builds a warehouse country dropdown and populates it with all supported countries.
+         *
+         * @param response
+         */
+        function constructCountryDropdown(response) {
+            countryInput = templateService.getComponent('pl-default-warehouse-country', page);
+
+            for (let code in response) {
+                let supportedCountry = response[code],
+                    optionElement = document.createElement('option');
+
+                optionElement.value = supportedCountry.code;
+                optionElement.innerText = supportedCountry.name;
+
+                if (supportedCountry.code === currentCountry) {
+                    optionElement.selected = true;
+                }
+
+                countryInput.appendChild(optionElement);
+            }
+
+            countryInput.addEventListener('change', onCountryChange);
+        }
+
+        function onCountryChange() {
+            currentCountry = countryInput.value;
+            currentPostalCode = '';
+            currentCity = '';
         }
 
         function onPostalCodeFocus() {
@@ -134,7 +170,10 @@ var Packlink = window.Packlink || {};
                 return;
             }
 
-            ajaxService.post(configuration.searchPostalCodesUrl, {query: searchTerm}, renderPostalCodesAutocomplete);
+            ajaxService.post(configuration.searchPostalCodesUrl, {
+                query: searchTerm,
+                country: countryInput.value
+            }, renderPostalCodesAutocomplete);
         }
 
         function renderPostalCodesAutocomplete(response) {
@@ -316,7 +355,7 @@ var Packlink = window.Packlink || {};
 
             if (isValid) {
                 utilityService.showSpinner();
-                model['country'] = country;
+                model['country'] = currentCountry;
                 model['postal_code'] = currentPostalCode;
                 model['city'] = currentCity;
 
