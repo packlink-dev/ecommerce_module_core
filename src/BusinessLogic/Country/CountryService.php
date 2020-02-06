@@ -94,7 +94,7 @@ class CountryService extends BaseService
      */
     public function isCountrySupported($isoCode)
     {
-        return in_array($isoCode, array_keys(self::$supportedCountries), true);
+        return array_key_exists($isoCode, self::$supportedCountries);
     }
 
     /**
