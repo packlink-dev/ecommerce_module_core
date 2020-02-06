@@ -78,14 +78,11 @@ class WarehouseService extends BaseService
 
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $oldWarehouse = $configService->getDefaultWarehouse();
-        $configService->setDefaultWarehouse($warehouse);
+        /** @var \Logeecom\Infrastructure\TaskExecution\QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
-        if ($oldWarehouse && $oldWarehouse->country !== $warehouse->country) {
-            /** @var \Logeecom\Infrastructure\TaskExecution\QueueService $queueService */
-            $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-            $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
-        }
+        $configService->setDefaultWarehouse($warehouse);
+        $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
     }
 
     /**

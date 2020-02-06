@@ -8,7 +8,6 @@ var Packlink = window.Packlink || {};
             'surname',
             'company',
             'address',
-            'country',
             'phone',
             'email'
         ];
@@ -18,7 +17,6 @@ var Packlink = window.Packlink || {};
             'name',
             'surname',
             'address',
-            'country',
             'phone',
             'email'
         ];
@@ -66,10 +64,31 @@ var Packlink = window.Packlink || {};
                 }
             }
 
+            constructPostalCodeInput(response['postal_code'], response['city']);
+
+            let submitButton = templateService.getComponent(
+                'pl-default-warehouse-submit-btn',
+                page
+            );
+
+            submitButton.addEventListener('click', handleSubmitButtonClicked, true);
+            utilityService.configureInputElements();
+            utilityService.hideSpinner();
+
+            ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
+        }
+
+        /**
+         * Constructs postal code input and attaches event handlers to it.
+         *
+         * @param {string} postalCode
+         * @param {string} city
+         */
+        function constructPostalCodeInput(postalCode, city) {
             postalCodeInput = templateService.getComponent('pl-default-warehouse-postal_code', page);
-            if (response['postal_code'] && response['city']) {
-                currentPostalCode = response['postal_code'];
-                currentCity = response['city'];
+            if (postalCode && city) {
+                currentPostalCode = postalCode;
+                currentCity = city;
                 postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
             }
 
@@ -83,6 +102,12 @@ var Packlink = window.Packlink || {};
             document.addEventListener('click', onPostalCodeBlur);
             postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
             postalCodeInput.addEventListener('keyup', autocompleteNavigate);
+            postalCodeInput.addEventListener(
+                'focusout',
+                function () {
+                    postalCodeInput.value = ' ';
+                },
+                true);
 
             templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener(
                 'click',
@@ -91,24 +116,6 @@ var Packlink = window.Packlink || {};
                     postalCodeInput.focus();
                 }
             );
-
-            let submitButton = templateService.getComponent(
-                'pl-default-warehouse-submit-btn',
-                page
-            );
-
-            submitButton.addEventListener('click', handleSubmitButtonClicked, true);
-            utilityService.configureInputElements();
-            utilityService.hideSpinner();
-
-            postalCodeInput.addEventListener(
-                'focusout',
-                function () {
-                    postalCodeInput.value = ' ';
-                },
-                true);
-
-            ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
         }
 
         /**
