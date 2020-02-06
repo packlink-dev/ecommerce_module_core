@@ -55,7 +55,7 @@ class PostalZone extends BaseDto
 
         $instance->id = static::getValue($raw, 'id');
         $instance->name = static::getValue($raw, 'name');
-        $instance->hasPostalCodes = static::getValue($raw, 'hasPostalCodes');
+        $instance->hasPostalCodes = static::getValue($raw, 'hasPostalCodes', false);
         $instance->isoCode = static::getValue($raw, 'isoCode');
         $instance->phonePrefix = static::getValue($raw, 'phonePrefix');
 
