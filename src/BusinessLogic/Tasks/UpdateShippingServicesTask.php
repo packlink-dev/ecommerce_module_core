@@ -72,13 +72,12 @@ class UpdateShippingServicesTask extends Task
     /**
      * Gets all available services for current user.
      *
-     * @return array
-     *  Key is service Id and value is @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @return array Key is service Id and value is @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     * @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
-     *
      */
     protected function getRemoteServices()
     {
