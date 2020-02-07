@@ -32,56 +32,67 @@ class CountryService extends BaseService
             'name' => 'Spain',
             'code' => 'ES',
             'postal_code' => '28001',
+            'registration_link' => 'https://pro.packlink.es/registro',
         ),
         'DE' => array(
             'name' => 'Germany',
             'code' => 'DE',
             'postal_code' => '10115',
+            'registration_link' => 'https://pro.packlink.de/registrieren',
         ),
         'FR' => array(
             'name' => 'France',
             'code' => 'FR',
             'postal_code' => '75001',
+            'registration_link' => 'https://pro.packlink.fr/inscription',
         ),
         'IT' => array(
             'name' => 'Italy',
             'code' => 'IT',
             'postal_code' => '00118',
+            'registration_link' => 'https://pro.packlink.it/registro',
         ),
         'AT' => array(
             'name' => 'Austria',
             'code' => 'AT',
             'postal_code' => '1010',
+            'registration_link' => 'pro.packlink.com/register',
         ),
         'NL' => array(
             'name' => 'Netherlands',
             'code' => 'NL',
             'postal_code' => '1011',
+            'registration_link' => 'pro.packlink.com/register',
         ),
         'BE' => array(
             'name' => 'Belgium',
             'code' => 'BE',
             'postal_code' => '1000',
+            'registration_link' => 'pro.packlink.com/register',
         ),
         'PT' => array(
             'name' => 'Portugal',
             'code' => 'PT',
             'postal_code' => '1000-017',
+            'registration_link' => 'pro.packlink.com/register',
         ),
         'TR' => array(
             'name' => 'Turkey',
             'code' => 'TR',
             'postal_code' => '06010',
+            'registration_link' => 'pro.packlink.com/register',
         ),
         'IE' => array(
             'name' => 'Ireland',
             'code' => 'IE',
             'postal_code' => 'D1',
+            'registration_link' => 'pro.packlink.com/register',
         ),
         'GB' => array(
             'name' => 'United Kingdom',
             'code' => 'GB',
             'postal_code' => 'E1 6AN',
+            'registration_link' => 'pro.packlink.com/register',
         ),
     );
 

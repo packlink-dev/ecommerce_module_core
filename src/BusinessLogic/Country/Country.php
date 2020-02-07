@@ -39,6 +39,12 @@ class Country extends FrontDto
      */
     public $postalCode;
     /**
+     * Registration link for the country.
+     *
+     * @var string
+     */
+    public $registrationLink;
+    /**
      * Fields for this DTO.
      *
      * @var array
@@ -47,6 +53,7 @@ class Country extends FrontDto
         'name',
         'code',
         'postal_code',
+        'registration_link',
     );
 
     /**
@@ -64,6 +71,7 @@ class Country extends FrontDto
             'name',
             'code',
             'postal_code',
+            'registration_link',
         );
 
         foreach ($requiredFields as $field) {
@@ -93,6 +101,7 @@ class Country extends FrontDto
         $instance = parent::fromArray($raw);
 
         $instance->postalCode = static::getValue($raw, 'postal_code');
+        $instance->registrationLink = static::getValue($raw, 'registration_link');
 
         return $instance;
     }
@@ -106,7 +115,10 @@ class Country extends FrontDto
     {
         return array_merge(
             parent::toArray(),
-            array('postal_code' => $this->postalCode)
+            array(
+                'postal_code' => $this->postalCode,
+                'registration_link' => $this->registrationLink,
+            )
         );
     }
 }
