@@ -33,7 +33,7 @@ class CountryDtoTest extends BaseDtoTest
                 'name' => 'Netherlands',
                 'code' => 'NL',
                 'postal_code' => '1011',
-                'registration_link' => 'pro.packlink.com/register',
+                'registration_link' => 'https://pro.packlink.com/register',
             ),
         );
 
@@ -49,7 +49,7 @@ class CountryDtoTest extends BaseDtoTest
         $this->assertEquals('Netherlands', $countries[1]->name);
         $this->assertEquals('NL', $countries[1]->code);
         $this->assertEquals('1011', $countries[1]->postalCode);
-        $this->assertEquals('pro.packlink.com/register', $countries[1]->registrationLink);
+        $this->assertEquals('https://pro.packlink.com/register', $countries[1]->registrationLink);
     }
 
     public function testToArray()
