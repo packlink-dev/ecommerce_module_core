@@ -37,7 +37,7 @@ interface ShopOrderService
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order for provided reference is not found.
      *  When local order shipment details are not found.
      */
-    public function handleUpdatedTrackingInfo($orderId, array $trackings);
+    public function updateTrackingInfo($orderId, array $trackings);
 
     /**
      * Sets order Packlink shipping status to an order with a given ID.

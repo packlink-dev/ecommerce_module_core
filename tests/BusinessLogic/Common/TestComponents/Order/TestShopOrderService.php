@@ -147,7 +147,7 @@ class TestShopOrderService implements ShopOrderService
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
-    public function handleUpdatedTrackingInfo($orderId, array $trackings)
+    public function updateTrackingInfo($orderId, array $trackings)
     {
         if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
