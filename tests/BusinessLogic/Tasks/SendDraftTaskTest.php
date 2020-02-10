@@ -6,6 +6,7 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
@@ -19,6 +20,8 @@ use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
+use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
+use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
@@ -41,6 +44,7 @@ class SendDraftTaskTest extends BaseSyncTest
             OrderShipmentDetails::getClassName(),
             MemoryRepository::getClassName()
         );
+        TestRepositoryRegistry::registerRepository(OrderSendDraftTaskMap::CLASS_NAME, MemoryRepository::getClassName());
 
         TestServiceRegister::registerService(
             OrderShipmentDetailsService::CLASS_NAME,
@@ -79,6 +83,13 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
+        TestServiceRegister::registerService(
+            OrderSendDraftTaskMapService::CLASS_NAME,
+            function () {
+                return OrderSendDraftTaskMapService::getInstance();
+            }
+        );
+
         $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
@@ -112,6 +123,12 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals('DE00019732CF', $shipmentDetails->getReference());
         // there should be an info message that draft is created.
         $this->assertCount(1, $this->shopLogger->loggedMessages);
+
+        /** @var OrderSendDraftTaskMapService $taskMapService */
+        $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
+        $taskMap = $taskMapService->getOrderTaskMap('test');
+        $this->assertNotNull($taskMap, 'Order task map should be created');
+        $this->assertNotEmpty($taskMap->getOrderId(), 'Order ID should be set to the order task map.');
     }
 
     /**
