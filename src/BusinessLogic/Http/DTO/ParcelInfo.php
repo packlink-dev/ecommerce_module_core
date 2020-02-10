@@ -63,6 +63,17 @@ class ParcelInfo extends FrontDto
         'height',
         'default',
     );
+    /**
+     * Required fields for DTO to be valid.
+     *
+     * @var array
+     */
+    protected static $requiredFields = array(
+        'weight',
+        'width',
+        'length',
+        'height',
+    );
 
     /**
      * Gets default parcel details.
@@ -96,15 +107,6 @@ class ParcelInfo extends FrontDto
     protected static function validatePayload(array $payload)
     {
         $validationErrors = parent::validatePayload($payload);
-        foreach (array('weight', 'width', 'length', 'height') as $field) {
-            if (empty($payload[$field])) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
-        }
 
         $options = array('options' => array('min_range' => 0));
         foreach (array('width', 'length', 'height') as $field) {

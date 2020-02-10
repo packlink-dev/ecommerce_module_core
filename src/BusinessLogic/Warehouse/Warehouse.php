@@ -109,6 +109,21 @@ class Warehouse extends FrontDto
         'alias',
         'address',
     );
+    /**
+     * Required fields for DTO to be valid.
+     *
+     * @var array
+     */
+    protected static $requiredFields = array(
+        'alias',
+        'name',
+        'surname',
+        'country',
+        'postal_code',
+        'address',
+        'phone',
+        'email',
+    );
 
     /**
      * Transforms raw array data to its DTO.
@@ -151,27 +166,6 @@ class Warehouse extends FrontDto
     protected static function validatePayload(array $payload)
     {
         $validationErrors = parent::validatePayload($payload);
-
-        $requiredFields = array(
-            'alias',
-            'name',
-            'surname',
-            'country',
-            'postal_code',
-            'address',
-            'phone',
-            'email',
-        );
-
-        foreach ($requiredFields as $field) {
-            if (empty($payload[$field])) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
-        }
 
         if (!empty($payload['email']) && filter_var($payload['email'], FILTER_VALIDATE_EMAIL) === false) {
             $validationErrors[] = static::getValidationError(

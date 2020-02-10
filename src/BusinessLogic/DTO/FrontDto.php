@@ -21,6 +21,12 @@ abstract class FrontDto extends BaseDto
      * @var array
      */
     protected static $fields = array();
+    /**
+     * Required fields for DTO to be valid.
+     *
+     * @var array
+     */
+    protected static $requiredFields = array();
 
     /**
      * Transforms raw array data to its DTO.
@@ -93,6 +99,29 @@ abstract class FrontDto extends BaseDto
                 'fields',
                 'Fields are not registered for class ' . static::CLASS_NAME
             );
+        }
+
+        return array_merge($validationErrors, static::validateRequiredFields($payload));
+    }
+
+    /**
+     * Checks the payload for mandatory fields.
+     *
+     * @param array $payload The payload in key-value format.
+     *
+     * @return ValidationError[] An array of validation errors, if any.
+     */
+    protected static function validateRequiredFields($payload)
+    {
+        $validationErrors = array();
+        foreach (static::$requiredFields as $field) {
+            if (!isset($payload[$field])) {
+                $validationErrors[] = static::getValidationError(
+                    ValidationError::ERROR_REQUIRED_FIELD,
+                    $field,
+                    'Field is required.'
+                );
+            }
         }
 
         return $validationErrors;

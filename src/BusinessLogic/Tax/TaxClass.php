@@ -37,4 +37,10 @@ class TaxClass extends FrontDto
      * @var array
      */
     protected static $fields = array('label', 'value');
+    /**
+     * Required fields for DTO to be valid.
+     *
+     * @var array
+     */
+    protected static $requiredFields = array('label', 'value');
 }

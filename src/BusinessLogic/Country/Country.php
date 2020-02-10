@@ -3,7 +3,6 @@
 namespace Packlink\BusinessLogic\Country;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
-use Packlink\BusinessLogic\DTO\ValidationError;
 
 /**
  * Class Country
@@ -55,37 +54,17 @@ class Country extends FrontDto
         'postal_code',
         'registration_link',
     );
-
     /**
-     * Generates validation errors for the payload.
+     * Required fields for DTO to be valid.
      *
-     * @param array $payload The payload in key-value format.
-     *
-     * @return ValidationError[] An array of validation errors, if any.
+     * @var array
      */
-    protected static function validatePayload(array $payload)
-    {
-        $validationErrors = parent::validatePayload($payload);
-
-        $requiredFields = array(
-            'name',
-            'code',
-            'postal_code',
-            'registration_link',
-        );
-
-        foreach ($requiredFields as $field) {
-            if (empty($payload[$field])) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
-        }
-
-        return $validationErrors;
-    }
+    protected static $requiredFields = array(
+        'name',
+        'code',
+        'postal_code',
+        'registration_link',
+    );
 
     /**
      * Transforms raw array data to its DTO.
