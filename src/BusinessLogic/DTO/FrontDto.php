@@ -77,22 +77,24 @@ abstract class FrontDto extends BaseDto
      */
     final protected static function validate(array $payload)
     {
-        $validationErrors = static::validatePayload($payload);
+        $validationErrors = array();
+
+        static::validateDefinition($validationErrors);
+        static::validateRequiredFields($payload, $validationErrors);
+        static::doValidate($payload, $validationErrors);
+
         if (!empty($validationErrors)) {
             throw new FrontDtoValidationException($validationErrors);
         }
     }
 
     /**
-     * Generates validation errors for the payload.
+     * Validates whether a DTO has a definition of its fields.
      *
-     * @param array $payload The payload in key-value format.
-     *
-     * @return ValidationError[] An array of validation errors, if any.
+     * @param array $validationErrors
      */
-    protected static function validatePayload(array $payload)
+    protected static function validateDefinition(array &$validationErrors)
     {
-        $validationErrors = array();
         if (empty(static::$fields)) {
             $validationErrors[] = static::getValidationError(
                 'fields_not_registered_for_dto_class',
@@ -100,20 +102,16 @@ abstract class FrontDto extends BaseDto
                 'Fields are not registered for class ' . static::CLASS_NAME
             );
         }
-
-        return array_merge($validationErrors, static::validateRequiredFields($payload));
     }
 
     /**
      * Checks the payload for mandatory fields.
      *
      * @param array $payload The payload in key-value format.
-     *
-     * @return ValidationError[] An array of validation errors, if any.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
      */
-    protected static function validateRequiredFields($payload)
+    protected static function validateRequiredFields(array $payload, array &$validationErrors)
     {
-        $validationErrors = array();
         foreach (static::$requiredFields as $field) {
             if (!isset($payload[$field])) {
                 $validationErrors[] = static::getValidationError(
@@ -123,8 +121,16 @@ abstract class FrontDto extends BaseDto
                 );
             }
         }
+    }
 
-        return $validationErrors;
+    /**
+     * Generates validation errors for the payload.
+     *
+     * @param array $payload The payload in key-value format.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
+     */
+    protected static function doValidate(array $payload, array &$validationErrors)
+    {
     }
 
     /**

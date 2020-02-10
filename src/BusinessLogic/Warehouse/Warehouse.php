@@ -160,12 +160,11 @@ class Warehouse extends FrontDto
      * Generates validation errors for the payload.
      *
      * @param array $payload The payload in key-value format.
-     *
-     * @return ValidationError[] An array of validation errors, if any.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
      */
-    protected static function validatePayload(array $payload)
+    protected static function doValidate(array $payload, array &$validationErrors)
     {
-        $validationErrors = parent::validatePayload($payload);
+        parent::doValidate($payload, $validationErrors);
 
         if (!empty($payload['email']) && filter_var($payload['email'], FILTER_VALIDATE_EMAIL) === false) {
             $validationErrors[] = static::getValidationError(
@@ -191,7 +190,5 @@ class Warehouse extends FrontDto
                 );
             }
         }
-
-        return $validationErrors;
     }
 }

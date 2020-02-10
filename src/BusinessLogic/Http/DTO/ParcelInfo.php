@@ -101,12 +101,11 @@ class ParcelInfo extends FrontDto
      * Generates validation errors for the payload.
      *
      * @param array $payload The payload in key-value format.
-     *
-     * @return ValidationError[] An array of validation errors, if any.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
      */
-    protected static function validatePayload(array $payload)
+    protected static function doValidate(array $payload, array &$validationErrors)
     {
-        $validationErrors = parent::validatePayload($payload);
+        parent::doValidate($payload, $validationErrors);
 
         $options = array('options' => array('min_range' => 0));
         foreach (array('width', 'length', 'height') as $field) {
@@ -128,7 +127,5 @@ class ParcelInfo extends FrontDto
                 'Weight must be a positive decimal number.'
             );
         }
-
-        return $validationErrors;
     }
 }
