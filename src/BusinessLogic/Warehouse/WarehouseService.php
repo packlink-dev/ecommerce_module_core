@@ -81,8 +81,14 @@ class WarehouseService extends BaseService
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
+        $oldWarehouse = $configService->getDefaultWarehouse();
+
         $configService->setDefaultWarehouse($warehouse);
-        $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
+        if ($oldWarehouse === null
+            || $oldWarehouse->country !== $warehouse->country
+        ) {
+            $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
+        }
     }
 
     /**
