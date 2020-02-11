@@ -167,7 +167,10 @@ var Packlink = window.Packlink || {};
             }
 
             postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
-            templateService.removeError(postalCodeInput);
+            if (currentPostalCode !== '' && currentCity !== '') {
+                templateService.removeError(postalCodeInput);
+            }
+
             utilityService.configureInputElements();
         }
 
