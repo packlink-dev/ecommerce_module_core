@@ -48,7 +48,7 @@ class WarehouseServiceTest extends BaseTestWithServices
         $service = ServiceRegister::getService(WarehouseService::CLASS_NAME);
 
         $data = json_decode(file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json'), true);
-        $service->setWarehouse($data[0]);
+        $service->updateWarehouseData($data[0]);
 
         $warehouse = $service->getWarehouse(false);
 
@@ -66,7 +66,7 @@ class WarehouseServiceTest extends BaseTestWithServices
         /** @var WarehouseService $service */
         $service = ServiceRegister::getService(WarehouseService::CLASS_NAME);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $service->setWarehouse(array('country' => 'ES', 'name' => 'test'));
+        $service->updateWarehouseData(array('country' => 'ES', 'name' => 'test'));
     }
 
     /**
@@ -81,7 +81,7 @@ class WarehouseServiceTest extends BaseTestWithServices
 
         $data = json_decode(file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json'), true);
         /** @noinspection PhpUnhandledExceptionInspection */
-        $service->setWarehouse($data[0]);
+        $service->updateWarehouseData($data[0]);
     }
 
     /**
@@ -95,7 +95,7 @@ class WarehouseServiceTest extends BaseTestWithServices
         $data = json_decode(file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json'), true);
         $data[0]['postal_code'] = '11111';
         /** @noinspection PhpUnhandledExceptionInspection */
-        $service->setWarehouse($data[0]);
+        $service->updateWarehouseData($data[0]);
     }
 
     /**

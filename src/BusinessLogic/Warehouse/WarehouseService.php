@@ -53,15 +53,17 @@ class WarehouseService extends BaseService
     }
 
     /**
-     * Saves warehouse data.
+     * Updates warehouse data.
      *
      * @param array $payload
+     *
+     * @return \Packlink\BusinessLogic\Warehouse\Warehouse
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
-    public function setWarehouse(array $payload)
+    public function updateWarehouseData(array $payload)
     {
         $validationErrors = array();
         try {
@@ -89,6 +91,8 @@ class WarehouseService extends BaseService
         ) {
             $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
         }
+
+        return $warehouse;
     }
 
     /**
