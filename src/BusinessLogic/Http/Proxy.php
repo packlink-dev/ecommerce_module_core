@@ -230,7 +230,17 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
 
-        return PostalZone::fromArrayBatch($response->decodeBodyAsJson());
+        $postalZones = PostalZone::fromArrayBatch($response->decodeBodyAsJson());
+
+        $postalZones = array_filter(
+            $postalZones,
+            function ($postalZone) use ($countryCode) {
+                /** @var PostalZone $postalZone */
+                return $postalZone->isoCode === $countryCode;
+            }
+        );
+
+        return $postalZones;
     }
 
     /**

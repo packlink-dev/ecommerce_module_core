@@ -22,7 +22,7 @@ class PostalZoneEntityTest extends BaseTestWithServices
         $proxy = TestServiceRegister::getService(Proxy::CLASS_NAME);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $postalZones = $proxy->getPostalZones('ES');
+        $postalZones = $proxy->getPostalZones('DE');
 
         self::assertCount(2, $postalZones);
 
@@ -44,14 +44,14 @@ class PostalZoneEntityTest extends BaseTestWithServices
      * @expectedExceptionCode 404
      * @expectedExceptionMessage 404 Not found.
      */
-    public function testFailedPostalCodesRetrieval()
+    public function testFailedPostalZonesRetrieval()
     {
         $this->httpClient->setMockResponses($this->getFailedResponses());
         /** @var Proxy $proxy */
         $proxy = TestServiceRegister::getService(Proxy::CLASS_NAME);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $proxy->getPostalZones('DE');
+        $proxy->getPostalZones('ES');
     }
 
     public function testCreatingPostalZoneFromArray()
