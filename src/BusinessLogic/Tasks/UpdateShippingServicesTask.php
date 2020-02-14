@@ -24,6 +24,11 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 class UpdateShippingServicesTask extends Task
 {
     /**
+     * @var CountryService
+     */
+    private $countryService;
+
+    /**
      * Transforms array into an serializable object,
      *
      * @param array $array Data that is used to instantiate serializable object.
@@ -91,18 +96,7 @@ class UpdateShippingServicesTask extends Task
             $sourceCountryCode = $config->getUserInfo()->country;
         }
 
-        /** @var CountryService $countryService */
-        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
-        $supportedCountries = $countryService->getSupportedCountries();
-        $supportedCountries[] = Country::fromArray(
-            array(
-                'name' => 'United States',
-                'code' => 'US',
-                'postal_code' => '10001',
-                'registration_link' => 'https://pro.packlink.com/register',
-            )
-        );
-
+        $supportedCountries = $this->getSupportedCountriesForServices();
         $sourceCountry = $supportedCountries[$sourceCountryCode];
 
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
@@ -200,17 +194,47 @@ class UpdateShippingServicesTask extends Task
     }
 
     /**
-     * Checks if task should execute. Gets user info from configuration and returns TRUE if user exists.
-     * Otherwise, tasks should not execute.
+     * Checks if task should be executed.
      *
      * @return bool TRUE if task should execute; otherwise, FALSE.
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     protected function shouldExecute()
     {
         /** @var Configuration $config */
         $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $userInfo = $config->getUserInfo();
 
-        return $config->getUserInfo() !== null;
+        if ($userInfo === null) {
+            return false;
+        }
+
+        $supportedCountries = $this->getSupportedCountriesForServices();
+
+        return $config->getDefaultWarehouse() !== null || array_key_exists($userInfo->country, $supportedCountries);
+    }
+
+    /**
+     * Returns supported countries for available services.
+     *
+     * @return \Packlink\BusinessLogic\Country\Country[]
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    protected function getSupportedCountriesForServices()
+    {
+        $supportedCountries = $this->getCountryService()->getSupportedCountries();
+        $supportedCountries['US'] = Country::fromArray(
+            array(
+                'name' => 'United States',
+                'code' => 'US',
+                'postal_code' => '10001',
+                'registration_link' => 'https://pro.packlink.com/register',
+            )
+        );
+
+        return $supportedCountries;
     }
 
     /**
@@ -256,5 +280,19 @@ class UpdateShippingServicesTask extends Task
             && $service->expressDelivery === $shippingMethod->isExpressDelivery()
             && $service->departureDropOff === $shippingMethod->isDepartureDropOff()
             && $service->destinationDropOff === $shippingMethod->isDestinationDropOff();
+    }
+
+    /**
+     * Returns an instance of country service.
+     *
+     * @return \Packlink\BusinessLogic\Country\CountryService
+     */
+    protected function getCountryService()
+    {
+        if ($this->countryService === null) {
+            $this->countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        }
+
+        return $this->countryService;
     }
 }
