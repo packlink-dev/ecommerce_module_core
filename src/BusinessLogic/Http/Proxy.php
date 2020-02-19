@@ -201,7 +201,7 @@ class Proxy
      */
     public function getPostalCodes($countryCode, $zipCode)
     {
-        $response = $this->call(HttpClient::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("locations/postalcodes/$countryCode/$zipCode"));
 
         return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
     }
