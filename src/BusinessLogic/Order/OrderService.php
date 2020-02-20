@@ -147,7 +147,7 @@ class OrderService extends BaseService
             $this->orderShipmentDetailsService->setTrackingInfo(
                 $shipment->reference,
                 $shipment->carrierTrackingUrl,
-                $shipment->trackingCodes
+                $shipment->trackingCodes ?: array()
             );
 
             $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
