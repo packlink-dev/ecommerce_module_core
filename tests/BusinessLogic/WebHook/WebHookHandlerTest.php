@@ -164,6 +164,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $this->assertEquals(14242322, $trackingHistories[0]->getTimestamp());
         $this->assertEquals('DELIVERED', $trackingHistories[0]->getDescription());
         $this->assertEquals('MIAMI', $trackingHistories[0]->getCity());
+        $this->assertEquals('31016279', $order->getShipment()->getTrackingNumber());
     }
 
     /**

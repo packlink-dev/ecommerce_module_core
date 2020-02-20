@@ -120,6 +120,9 @@ class WebHookEventHandler extends BaseService
         }
 
         switch ($eventName) {
+            case 'shipment.label.ready':
+                $orderService->updateShippingStatus($shipment, ShipmentStatus::STATUS_READY);
+                break;
             case 'shipment.carrier.success':
                 $orderService->updateShippingStatus($shipment, ShipmentStatus::STATUS_ACCEPTED);
                 break;

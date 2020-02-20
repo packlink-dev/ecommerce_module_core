@@ -151,7 +151,11 @@ class OrderService extends BaseService
             );
 
             $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
-            $this->shopOrderService->updateTrackingInfo($orderShipmentDetails->getOrderId(), $trackingHistory);
+            $this->shopOrderService->updateTrackingInfo(
+                $orderShipmentDetails->getOrderId(),
+                $shipment,
+                $trackingHistory
+            );
         } catch (HttpBaseException $e) {
             Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         } catch (OrderShipmentDetailsNotFound $e) {

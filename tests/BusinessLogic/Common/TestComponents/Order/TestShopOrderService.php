@@ -3,6 +3,7 @@
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\Order;
 
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Http\DTO\Shipment as ShipmentDTO;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -143,11 +144,12 @@ class TestShopOrderService implements ShopOrderService
      * Handles updated tracking info for order with a given ID.
      *
      * @param string $orderId Shop order ID.
+     * @param ShipmentDTO $shipment Shipment object containing tracking codes and tracking url.
      * @param Tracking[] $trackings Shipment tracking history.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
-    public function updateTrackingInfo($orderId, array $trackings)
+    public function updateTrackingInfo($orderId, ShipmentDTO $shipment, array $trackings)
     {
         if ($this->throwOrderNotFoundException) {
             throw new OrderNotFound('Order not found.');
@@ -160,6 +162,7 @@ class TestShopOrderService implements ShopOrderService
         }
 
         $order->getShipment()->setTrackingHistory($trackingHistory);
+        $order->getShipment()->setTrackingNumber(!empty($shipment->trackingCodes) ? $shipment->trackingCodes[0] : '');
     }
 
     /**
