@@ -43,7 +43,7 @@ class TaxClass extends FrontDto
      *
      * @var array
      */
-    protected static $requiredFields = array('label');
+    protected static $requiredFields = array('label', 'value');
 
     /**
      * Checks the payload for mandatory fields.
