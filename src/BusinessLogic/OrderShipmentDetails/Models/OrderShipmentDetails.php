@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Order\Models;
+namespace Packlink\BusinessLogic\OrderShipmentDetails\Models;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
@@ -10,7 +10,8 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 
 /**
- * Class OrderShipmentDetails
+ * Class OrderShipmentDetails.
+ *
  * @package Packlink\BusinessLogic\Order\Models
  */
 class OrderShipmentDetails extends Entity
@@ -35,13 +36,12 @@ class OrderShipmentDetails extends Entity
         'carrierTrackingNumbers',
         'carrierTrackingUrl',
         'shippingCost',
-        'taskId',
         'deleted',
     );
     /**
      * Shop order ID.
      *
-     * @var int
+     * @var string
      */
     private $orderId;
     /**
@@ -93,12 +93,6 @@ class OrderShipmentDetails extends Entity
      */
     private $shippingCost;
     /**
-     * Identifier of corresponding SendDraftTask.
-     *
-     * @var int
-     */
-    private $taskId;
-    /**
      * If order has been deleted on the system.
      *
      * @var bool
@@ -114,7 +108,7 @@ class OrderShipmentDetails extends Entity
     {
         $map = new IndexMap();
 
-        $map->addIntegerIndex('orderId');
+        $map->addStringIndex('orderId');
         $map->addStringIndex('reference');
         $map->addStringIndex('status');
 
@@ -171,7 +165,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Returns order ID.
      *
-     * @return int
+     * @return string
      */
     public function getOrderId()
     {
@@ -181,7 +175,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Sets order ID.
      *
-     * @param int $orderId ID of the order.
+     * @param string $orderId ID of the order.
      */
     public function setOrderId($orderId)
     {
@@ -221,7 +215,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Sets order shipment labels from array of links to PDF.
      *
-     * @param ShipmentLabel[] Array of links to PDF.
+     * @param ShipmentLabel[] Array of shipment labels.
      */
     public function setShipmentLabels(array $labels)
     {
@@ -366,26 +360,6 @@ class OrderShipmentDetails extends Entity
     public function setCarrierTrackingUrl($carrierTrackingUrl)
     {
         $this->carrierTrackingUrl = $carrierTrackingUrl;
-    }
-
-    /**
-     * Returns identifier of corresponding SendDraftTask.
-     *
-     * @return int
-     */
-    public function getTaskId()
-    {
-        return $this->taskId;
-    }
-
-    /**
-     * Sets identifier of corresponding SendDraftTask.
-     *
-     * @param int $taskId
-     */
-    public function setTaskId($taskId)
-    {
-        $this->taskId = $taskId;
     }
 
     /**

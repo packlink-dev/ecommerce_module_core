@@ -2,14 +2,10 @@
 
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Tasks\GetDefaultParcelAndWarehouseTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
@@ -20,26 +16,11 @@ use Packlink\BusinessLogic\User\UserAccountService;
 class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
 {
     /**
-     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
-     */
-    public $httpClient;
-
-    /**
      * @inheritdoc
      */
     public function setUp()
     {
         parent::setUp();
-
-        $me = $this;
-
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
 
         TestServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
@@ -47,14 +28,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
                 return UserAccountService::getInstance();
             }
         );
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(Proxy::CLASS_NAME, function () use ($me) {
-            /** @var Configuration $config */
-            $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-            return new Proxy($config, $me->httpClient);
-        });
     }
 
     /**
@@ -66,6 +39,9 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
         parent::tearDown();
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
     public function testExecute()
     {
         $this->httpClient->setMockResponses($this->getMockResponses());
@@ -75,7 +51,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
 
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertNotNull($parcelInfo);
-        $this->assertEquals('parcel test 1', $parcelInfo->name);
 
         $warehouse = $this->shopConfig->getDefaultWarehouse();
         $this->assertNotNull($warehouse);

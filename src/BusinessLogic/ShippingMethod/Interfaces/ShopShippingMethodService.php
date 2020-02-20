@@ -56,4 +56,13 @@ interface ShopShippingMethodService
      * @return bool TRUE if backup shipping method is deleted; otherwise, FALSE.
      */
     public function deleteBackupShippingMethod();
+
+    /**
+     * Gets the carrier logo path based on carrier name.
+     *
+     * @param string $carrierName
+     *
+     * @return string
+     */
+    public function getCarrierLogoFilePath($carrierName);
 }

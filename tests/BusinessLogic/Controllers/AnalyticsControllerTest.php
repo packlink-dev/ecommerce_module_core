@@ -3,18 +3,15 @@
 
 namespace Logeecom\Tests\BusinessLogic\Controllers;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\AnalyticsController;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -34,10 +31,6 @@ class AnalyticsControllerTest extends BaseTestWithServices
      * @var TestShopShippingMethodService
      */
     public $testShopShippingMethodService;
-    /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
 
     /**
      * @inheritdoc
@@ -52,14 +45,6 @@ class AnalyticsControllerTest extends BaseTestWithServices
         $me = $this;
         $me->shopConfig->setAuthorizationToken('test_token');
 
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
-
         $me->testShopShippingMethodService = new TestShopShippingMethodService();
         TestServiceRegister::registerService(
             ShopShippingMethodService::CLASS_NAME,
@@ -73,13 +58,6 @@ class AnalyticsControllerTest extends BaseTestWithServices
             ShippingMethodService::CLASS_NAME,
             function () use ($me) {
                 return $me->shippingMethodService;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
             }
         );
     }
@@ -109,7 +87,7 @@ class AnalyticsControllerTest extends BaseTestWithServices
         AnalyticsController::sendSetupEvent();
         $this->assertNull($this->httpClient->getHistory());
 
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
 
         AnalyticsController::sendSetupEvent();
         $this->assertCount(1, $this->httpClient->getHistory());

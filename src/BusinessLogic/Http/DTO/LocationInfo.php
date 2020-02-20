@@ -2,6 +2,13 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\BaseDto;
+
+/**
+ * Class LocationInfo.
+ *
+ * @package Packlink\BusinessLogic\Http\DTO
+ */
 class LocationInfo extends BaseDto
 {
     /**

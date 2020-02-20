@@ -2,24 +2,22 @@
 
 namespace Logeecom\Tests\BusinessLogic\Order;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
+/**
+ * Class OrderStatusMappingTest.
+ *
+ * @package Logeecom\Tests\BusinessLogic\Order
+ */
 class OrderStatusMappingTest extends BaseTestWithServices
 {
     public function testOrderStatusMappingsConfiguration()
     {
-        /** @var \Packlink\BusinessLogic\Configuration $configService */
-        $configService = TestServiceRegister::getService(
-            Configuration::CLASS_NAME
-        );
+        $this->assertNull($this->shopConfig->getOrderStatusMappings());
 
-        $this->assertNull($configService->getOrderStatusMappings());
+        $this->shopConfig->setOrderStatusMappings($this->getMockData());
 
-        $configService->setOrderStatusMappings($this->getMockData());
-
-        $mappings = $configService->getOrderStatusMappings();
+        $mappings = $this->shopConfig->getOrderStatusMappings();
 
         $this->assertNotEmpty($mappings);
 

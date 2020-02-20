@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
@@ -18,6 +19,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\AbortTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
@@ -47,11 +49,15 @@ class QueueTest extends TestCase
      */
     public function setUp()
     {
+        parent::setUp();
+
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 
         $timeProvider = new TestTimeProvider();
         $taskRunnerStarter = new TestTaskRunnerWakeupService();
+        $this->queue = new QueueService();
+        $me = $this;
 
         new TestServiceRegister(
             array(
@@ -67,9 +73,12 @@ class QueueTest extends TestCase
                 EventBus::CLASS_NAME => function () {
                     return EventBus::getInstance();
                 },
-                Serializer::CLASS_NAME => function() {
+                Serializer::CLASS_NAME => function () {
                     return new NativeSerializer();
-                }
+                },
+                QueueService::CLASS_NAME => function () use ($me) {
+                    return $me->queue;
+                },
             )
         );
 
@@ -217,7 +226,7 @@ class QueueTest extends TestCase
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Exception
      */
-    public function testFinOldestQueuedItems()
+    public function testFindOldestQueuedItems()
     {
         // Arrange
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
@@ -766,8 +775,8 @@ class QueueTest extends TestCase
             $queueItem->getLastExecutionProgressBasePoints(),
             'When failed queue item must NOT reset last execution progress value.'
         );
-        $this->assertSame(
-            'Test failure description',
+        $this->assertStringStartsWith(
+            'Attempt 1: Test failure description',
             $queueItem->getFailureDescription(),
             'When failed queue item must set failure description.'
         );
@@ -824,8 +833,8 @@ class QueueTest extends TestCase
             $queueItem->getRetries(),
             'When failed queue item must increase retries by one up to max retries count.'
         );
-        $this->assertSame(
-            'Test failure description',
+        $this->assertStringStartsWith(
+            'Attempt 1: Test failure description',
             $queueItem->getFailureDescription(),
             'When failed queue item must set failure description.'
         );
@@ -841,6 +850,109 @@ class QueueTest extends TestCase
             'When failed more than max retry times queue item must set fail time.'
         );
         $this->assertQueueItemIsSaved($queueItem);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Exception
+     */
+    public function testFailMessages()
+    {
+        $task = new FooTask();
+
+        $queueItem = $this->queue->enqueue('testQueue', $task);
+        $this->queue->start($queueItem);
+
+        for ($i = 0; $i <= QueueService::MAX_RETRIES; $i++) {
+            $this->queue->fail($queueItem, 'Test' . $i);
+            if ($i < QueueService::MAX_RETRIES) {
+                $this->queue->start($queueItem);
+            }
+        }
+
+        $this->assertEquals(
+            "Attempt 1: Test0\nAttempt 2: Test1\nAttempt 3: Test2\nAttempt 4: Test3\nAttempt 5: Test4\nAttempt 6: Test5",
+            $queueItem->getFailureDescription(),
+            'Failure descriptions must be stacked.'
+        );
+    }
+
+    /**
+     * Test regular task abort.
+     */
+    public function testAbortQueueItemMethod()
+    {
+        $queueItem = $this->queue->enqueue('testQueue', new FooTask());
+        $this->queue->start($queueItem);
+        $this->queue->abort($queueItem, 'Abort message.');
+
+        $this->assertEquals(
+            QueueItem::ABORTED,
+            $queueItem->getStatus(),
+            'The status for an aborted task must be set to "aborted".'
+        );
+
+        $this->assertNotEmpty($queueItem->getFailureDescription(), 'Abort message is missing.');
+        $this->assertNotEmpty($queueItem->getFailTimestamp(), 'Fail timestamp should be set when aborting a task.');
+    }
+
+    /**
+     * Test regular task abort.
+     */
+    public function testAbortingQueueItemFromTask()
+    {
+        $queueItem = $this->queue->enqueue('testQueue', new AbortTask());
+        $itemStarter = new QueueItemStarter($queueItem->getId());
+        $itemStarter->run();
+
+        $queueItem = $this->queue->find($queueItem->getId());
+
+        $this->assertEquals(
+            QueueItem::ABORTED,
+            $queueItem->getStatus(),
+            'The status for an aborted task must be set to "aborted".'
+        );
+
+        $this->assertEquals('Attempt 1: Abort mission!', $queueItem->getFailureDescription(), 'Wrong abort message.');
+        $this->assertNotEmpty($queueItem->getFailTimestamp(), 'Fail timestamp should be set when aborting a task.');
+    }
+
+    /**
+     * Test regular task abort.
+     */
+    public function testAbortingQueueItemAfterFailure()
+    {
+        $queueItem = $this->queue->enqueue('testQueue', new FooTask());
+        $this->queue->start($queueItem);
+        $this->queue->fail($queueItem, 'Fail message.');
+        $this->queue->start($queueItem);
+        $this->queue->abort($queueItem, 'Abort message.');
+
+        $this->assertEquals(
+            QueueItem::ABORTED,
+            $queueItem->getStatus(),
+            'The status for an aborted task must be set to "aborted".'
+        );
+
+        $this->assertEquals(
+            "Attempt 1: Fail message.\nAttempt 2: Abort message.",
+            $queueItem->getFailureDescription(),
+            'Abort message should be appended to the failure message.'
+        );
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testStartingQueueItemAfterAbortion()
+    {
+        $queueItem = $this->queue->enqueue('testQueue', new FooTask());
+        $this->queue->start($queueItem);
+        $this->queue->abort($queueItem, 'Abort message.');
+        $this->queue->start($queueItem);
+
+        $this->fail('Queue item should not be started after abortion.');
     }
 
     /**
@@ -1087,8 +1199,41 @@ class QueueTest extends TestCase
     }
 
     /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Illegal queue item state transition from "queued" to "aborted"
+     */
+    public function testItShouldBeForbiddenToTransitionFromQueuedToAbortedStatus()
+    {
+        $queueItem = $this->queue->enqueue('testQueue', new FooTask());
+
+        $this->queue->abort($queueItem, '');
+
+        $this->fail('Queue item status transition from "Created" to "Aborted" should not be allowed.');
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Illegal queue item state transition from "failed" to "aborted"
+     */
+    public function testItShouldBeForbiddenToTransitionFromFailedToAbortedStatus()
+    {
+        $queueItem = $this->queue->enqueue('testQueue', new FooTask());
+
+        $this->queue->start($queueItem);
+        for ($i = 0; $i <= QueueService::MAX_RETRIES; $i++) {
+            $this->queue->fail($queueItem, 'Test failure description');
+            if ($i < QueueService::MAX_RETRIES) {
+                $this->queue->start($queueItem);
+            }
+        }
+        $this->queue->abort($queueItem, '');
+
+        $this->fail('Queue item status transition from "Failed" to "Aborted" should not be allowed.');
+    }
+
+    /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to enqueue task. Queue storage failed to save item.
+     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      */
     public function testWhenStoringQueueItemFailsEnqueueMethodMustFail()
     {
@@ -1108,7 +1253,7 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to start task. Queue storage failed to save item.
+     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testWhenStoringQueueItemFailsStartMethodMustFail()
@@ -1130,7 +1275,7 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to fail task. Queue storage failed to save item.
+     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testWhenStoringQueueItemFailsFailMethodMustFail()
@@ -1153,7 +1298,7 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to update task progress. Queue storage failed to save item.
+     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testWhenStoringQueueItemProgressFailsProgressMethodMustFail()
@@ -1176,7 +1321,7 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to keep task alive. Queue storage failed to save item.
+     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testWhenStoringQueueItemAliveFailsAliveMethodMustFail()
@@ -1196,7 +1341,7 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to finish task. Queue storage failed to save item.
+     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testWhenStoringQueueItemFailsFinishMethodMustFail()

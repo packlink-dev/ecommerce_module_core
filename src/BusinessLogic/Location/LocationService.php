@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\DTO\BaseDto;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -34,7 +34,7 @@ class LocationService extends BaseService
         'DE' => array('3', '248', '249'),
         'ES' => array('65', '68', '69'),
         'IT' => array('113', '114', '115'),
-        'FR' => array('76', '77')
+        'FR' => array('76', '77'),
     );
     /**
      * Singleton instance of this class.
@@ -96,6 +96,7 @@ class LocationService extends BaseService
             $packages = array(new Package($parcel->weight, $parcel->width, $parcel->height, $parcel->length));
         }
 
+        $result = array();
         try {
             $cheapestService = ShippingCostCalculator::getCheapestShippingService(
                 $method,
@@ -108,18 +109,18 @@ class LocationService extends BaseService
 
             $locations = $this->proxy->getLocations($cheapestService->serviceId, $toCountry, $toPostCode);
 
-            return $this->transformCollectionToResponse($locations);
+            $result = $this->transformCollectionToResponse($locations);
         } catch (\InvalidArgumentException $e) {
-            return array();
         } catch (HttpBaseException $e) {
-            return array();
         }
+
+        return $result;
     }
 
     /**
      * Performs search for locations.
      *
-     * @param string $platformCountry Country code to search in.
+     * @param string $country Country code to search in.
      * @param string $query Query to search for.
      *
      * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
@@ -130,16 +131,15 @@ class LocationService extends BaseService
      *
      * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
      */
-    public function searchLocations($platformCountry, $query)
+    public function searchLocations($country, $query)
     {
-        if (!isset(self::$postalZoneMap[$platformCountry])) {
+        if (!isset(self::$postalZoneMap[$country])) {
             throw new PlatformCountryNotSupportedException('Platform country not supported');
         }
 
         $result = array();
-
-        foreach (self::$postalZoneMap[$platformCountry] as $postalZone) {
-            $partial = $this->proxy->searchLocations($platformCountry, $postalZone, $query);
+        foreach (self::$postalZoneMap[$country] as $postalZone) {
+            $partial = $this->proxy->searchLocations($country, $postalZone, $query);
 
             if (!empty($partial)) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */
@@ -160,7 +160,6 @@ class LocationService extends BaseService
     protected function transformCollectionToResponse($collection)
     {
         $result = array();
-
         foreach ($collection as $element) {
             $result[] = $element->toArray();
         }

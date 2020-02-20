@@ -24,11 +24,30 @@ class QueueItem extends Entity
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+    /**
+     * Indicates the "created" state of the queue item.
+     */
     const CREATED = 'created';
+    /**
+     * Indicates the "queued" state of the queue item.
+     */
     const QUEUED = 'queued';
+    /**
+     * Indicates the "in progress" state of the queue item.
+     */
     const IN_PROGRESS = 'in_progress';
+    /**
+     * Indicates the "completed" state of the queue item.
+     */
     const COMPLETED = 'completed';
+    /**
+     * Indicates the "failed" state of the queue item.
+     */
     const FAILED = 'failed';
+    /**
+     * Indicates the "aborted" state of the queue item.
+     */
+    const ABORTED = 'aborted';
     /**
      * Array of simple field names.
      *
@@ -237,18 +256,21 @@ class QueueItem extends Entity
                 self::IN_PROGRESS,
                 self::COMPLETED,
                 self::FAILED,
+                self::ABORTED,
             ),
             false
         )) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Invalid QueueItem status: "%s". Status must be one of "%s", "%s", "%s", "%s" or "%s" values.',
+                    'Invalid QueueItem status: "%s". '
+                    . 'Status must be one of "%s", "%s", "%s", "%s", "%s" or "%s" values.',
                     $status,
                     self::CREATED,
                     self::QUEUED,
                     self::IN_PROGRESS,
                     self::COMPLETED,
-                    self::FAILED
+                    self::FAILED,
+                    self::ABORTED
                 )
             );
         }
@@ -729,7 +751,7 @@ class QueueItem extends Entity
     }
 
     /**
-     * Gets @see \DateTime object from timestamp.
+     * Gets \DateTime object from timestamp.
      *
      * @param int $timestamp Timestamp in seconds.
      *

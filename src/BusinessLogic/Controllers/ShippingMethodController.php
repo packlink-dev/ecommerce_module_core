@@ -184,6 +184,8 @@ class ShippingMethodController
         $shippingMethod->fixedPriceByWeightPolicy = $item->getFixedPriceByWeightPolicy();
         $shippingMethod->fixedPriceByValuePolicy = $item->getFixedPriceByValuePolicy();
 
+        $shippingMethod->logoUrl = $item->getLogoUrl();
+
         return $shippingMethod;
     }
 

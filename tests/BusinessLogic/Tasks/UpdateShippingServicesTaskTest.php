@@ -2,7 +2,6 @@
 
 namespace Packlink\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -12,23 +11,22 @@ use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
+/**
+ * Class UpdateShippingServicesTaskTest.
+ *
+ * @package Packlink\Tests\BusinessLogic\Tasks
+ */
 class UpdateShippingServicesTaskTest extends BaseSyncTest
 {
-    /**
-     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
-     */
-    public $httpClient;
     /**
      * @var ShippingMethodService
      */
@@ -59,21 +57,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
             ShopShippingMethodService::CLASS_NAME,
             function () use ($testShopShippingMethodService) {
                 return $testShopShippingMethodService;
-            }
-        );
-
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
             }
         );
 
@@ -314,6 +297,9 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         return $user;
     }
 
+    /**
+     * @return array
+     */
     protected function getValidMockResponses()
     {
         return array(
@@ -772,6 +758,11 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
          */
     }
 
+    /**
+     * @param string $countries
+     *
+     * @return string
+     */
     private function getDemoServiceDeliveryDetails($countries)
     {
         return file_get_contents(

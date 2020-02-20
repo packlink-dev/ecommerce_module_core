@@ -58,13 +58,12 @@ class ServiceRegister
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * Gets service for specified type.
      *
      * @param string $type Type of service. Should be fully qualified class name.
      *
      * @return object Instance of service.
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public static function getService($type)
     {

@@ -2,7 +2,6 @@
 
 namespace Logeecom\Tests\BusinessLogic\User;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -15,25 +14,56 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
+use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
+use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
+use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
 /**
- * Class UserAccountTest
+ * Class UserAccountTest.
+ *
  * @package Logeecom\Tests\BusinessLogic\User
  */
 class UserAccountLoginTest extends BaseTestWithServices
 {
     /**
-     * Http client instance.
-     *
-     * @var TestHttpClient
+     * Sets up the fixture, for example, open a network connection.
+     * This method is called before a test is executed.
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    public $httpClient;
+    protected function setUp()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        parent::setUp();
+
+        TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
+        TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
+
+        $queue = new TestQueueService();
+        $taskRunnerStarter = new TestTaskRunnerWakeupService();
+
+        TestServiceRegister::registerService(
+            QueueService::CLASS_NAME,
+            function () use ($queue) {
+                return $queue;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerWakeup::CLASS_NAME,
+            function () use ($taskRunnerStarter) {
+                return $taskRunnerStarter;
+            }
+        );
+
+        $this->userAccountService = UserAccountService::getInstance();
+    }
+
     /**
      * User account service instance.
      *
@@ -58,6 +88,8 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Tests user login and user initialization
      *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
@@ -75,7 +107,6 @@ class UserAccountLoginTest extends BaseTestWithServices
         // check whether parcel info is set
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertNotNull($parcelInfo);
-        $this->assertEquals('parcel test 1', $parcelInfo->name);
 
         // check whether warehouse info is set
         $warehouse = $this->shopConfig->getDefaultWarehouse();
@@ -88,8 +119,47 @@ class UserAccountLoginTest extends BaseTestWithServices
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
         $queueItems = $queueStorage->select();
         $this->assertCount(1, $queueItems);
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->assertEquals('UpdateShippingServicesTask', $queueItems[0]->getTaskType());
+
+        /** @var MemoryRepository $scheduleRepository */
+        $scheduleRepository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+        /** @var Schedule[] $allSchedules */
+        $allSchedules = $scheduleRepository->select();
+
+        $this->assertCount(5, $allSchedules);
+
+        $expectedSchedules = array(
+            WeeklySchedule::getClassName() => array(
+                UpdateShippingServicesTask::getClassName() => 1,
+            ),
+            HourlySchedule::getClassName() => array(
+                // 2 hourly schedules, starting every 30 minutes
+                UpdateShipmentDataTask::getClassName() => 2,
+                TaskCleanupTask::getClassName() => 1,
+            ),
+            DailySchedule::getClassName() => array(
+                UpdateShipmentDataTask::getClassName() => 1,
+            ),
+        );
+
+        foreach ($allSchedules as $schedule) {
+            $scheduleClass = get_class($schedule);
+            $taskClass = explode('\\', get_class($schedule->getTask()));
+            $taskClass = end($taskClass);
+            $this->assertArrayHasKey($scheduleClass, $expectedSchedules);
+            $this->assertArrayHasKey($taskClass, $expectedSchedules[$scheduleClass]);
+
+            $expectedSchedules[$scheduleClass][$taskClass]--;
+            if ($expectedSchedules[$scheduleClass][$taskClass] === 0) {
+                unset($expectedSchedules[$scheduleClass][$taskClass]);
+            }
+
+            if (empty($expectedSchedules[$scheduleClass])) {
+                unset($expectedSchedules[$scheduleClass]);
+            }
+        }
+
+        $this->assertEmpty($expectedSchedules);
     }
 
     /**
@@ -200,7 +270,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         $parcelInfo = $this->shopConfig->getDefaultParcel();
         $this->assertCount(1, $this->httpClient->getHistory());
         $this->assertNotNull($parcelInfo);
-        $this->assertEquals('parcel test 1', $parcelInfo->name);
+        $this->assertEquals(6, $parcelInfo->height);
     }
 
     /**
@@ -248,62 +318,6 @@ class UserAccountLoginTest extends BaseTestWithServices
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
             ),
         );
-    }
-
-    /**
-     * Sets up the fixture, for example, open a network connection.
-     * This method is called before a test is executed.
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
-     */
-    protected function setUp()
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        parent::setUp();
-
-        TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
-        TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
-
-        $this->httpClient = new TestHttpClient();
-        $queue = new TestQueueService();
-        $taskRunnerStarter = new TestTaskRunnerWakeupService();
-        $self = $this;
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(
-            QueueService::CLASS_NAME,
-            function () use ($queue) {
-                return $queue;
-            }
-        );
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(
-            TaskRunnerWakeup::CLASS_NAME,
-            function () use ($taskRunnerStarter) {
-                return $taskRunnerStarter;
-            }
-        );
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($self) {
-                return $self->httpClient;
-            }
-        );
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($self) {
-                /** @var Configuration $config */
-                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-
-                return new Proxy($config, $self->httpClient);
-            }
-        );
-
-        $this->userAccountService = UserAccountService::getInstance();
     }
 
     protected function tearDown()

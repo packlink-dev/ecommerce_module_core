@@ -2,12 +2,10 @@
 
 namespace Logeecom\Tests\BusinessLogic\Controllers;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
@@ -48,30 +46,22 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
 
-        $taskInstance = $this;
-        $taskInstance->shopConfig->setAuthorizationToken('test_token');
+        $me = $this;
+        $me->shopConfig->setAuthorizationToken('test_token');
 
-        $httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($httpClient) {
-                return $httpClient;
-            }
-        );
-
-        $taskInstance->testShopShippingMethodService = new TestShopShippingMethodService();
+        $me->testShopShippingMethodService = new TestShopShippingMethodService();
         TestServiceRegister::registerService(
             ShopShippingMethodService::CLASS_NAME,
-            function () use ($taskInstance) {
-                return $taskInstance->testShopShippingMethodService;
+            function () use ($me) {
+                return $me->testShopShippingMethodService;
             }
         );
 
-        $taskInstance->shippingMethodService = ShippingMethodService::getInstance();
+        $me->shippingMethodService = ShippingMethodService::getInstance();
         TestServiceRegister::registerService(
             ShippingMethodService::CLASS_NAME,
-            function () use ($taskInstance) {
-                return $taskInstance->shippingMethodService;
+            function () use ($me) {
+                return $me->shippingMethodService;
             }
         );
 

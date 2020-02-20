@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 
@@ -6,11 +7,14 @@ use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\Package;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
@@ -18,6 +22,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,9 +37,6 @@ class ShippingMethodEntityTest extends TestCase
      */
     public $httpClient;
 
-    /**
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -67,6 +69,17 @@ class ShippingMethodEntityTest extends TestCase
                 return PackageTransformer::getInstance();
             }
         );
+
+        TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
+        TestFrontDtoFactory::register(Warehouse::CLASS_KEY, Warehouse::CLASS_NAME);
+        TestFrontDtoFactory::register(ParcelInfo::CLASS_KEY, ParcelInfo::CLASS_NAME);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        TestFrontDtoFactory::reset();
     }
 
     public function testProperties()

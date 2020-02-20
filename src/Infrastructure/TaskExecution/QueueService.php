@@ -77,14 +77,9 @@ class QueueService
         $queueItem->setContext($context);
         $queueItem->setQueueTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
 
-        try {
-            $this->reportBeforeStatusChange($queueItem, QueueItem::CREATED);
-            $this->save($queueItem);
-            $this->reportStatusChange($queueItem, QueueItem::CREATED);
-            $this->getTaskRunnerWakeup()->wakeup();
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to enqueue task.', $exception);
-        }
+        $this->save($queueItem, array(), true, QueueItem::CREATED);
+
+        $this->getTaskRunnerWakeup()->wakeup();
 
         return $queueItem;
     }
@@ -96,6 +91,7 @@ class QueueService
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function start(QueueItem $queueItem)
     {
@@ -109,19 +105,14 @@ class QueueService
         $queueItem->setStartTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
         $queueItem->setLastUpdateTimestamp($queueItem->getStartTimestamp());
 
-        try {
-            $this->reportBeforeStatusChange($queueItem, QueueItem::QUEUED);
+        $this->save(
+            $queueItem,
+            array('status' => QueueItem::QUEUED, 'lastUpdateTimestamp' => $lastUpdateTimestamp),
+            true,
+            QueueItem::QUEUED
+        );
 
-            $this->save(
-                $queueItem,
-                array('status' => QueueItem::QUEUED, 'lastUpdateTimestamp' => $lastUpdateTimestamp)
-            );
-
-            $this->reportStatusChange($queueItem, QueueItem::QUEUED);
-            $queueItem->getTask()->execute();
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to start task.', $exception);
-        }
+        $queueItem->getTask()->execute();
     }
 
     /**
@@ -141,17 +132,12 @@ class QueueService
         $queueItem->setFinishTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
         $queueItem->setProgressBasePoints(10000);
 
-        try {
-            $this->reportBeforeStatusChange($queueItem, QueueItem::IN_PROGRESS);
-
-            $this->save(
-                $queueItem,
-                array('status' => QueueItem::IN_PROGRESS, 'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp())
-            );
-            $this->reportStatusChange($queueItem, QueueItem::IN_PROGRESS);
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to finish task.', $exception);
-        }
+        $this->save(
+            $queueItem,
+            array('status' => QueueItem::IN_PROGRESS, 'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp()),
+            true,
+            QueueItem::IN_PROGRESS
+        );
     }
 
     /**
@@ -173,21 +159,16 @@ class QueueService
         $queueItem->setStartTimestamp(null);
         $queueItem->setLastExecutionProgressBasePoints($queueItem->getProgressBasePoints());
 
-        try {
-            $this->reportBeforeStatusChange($queueItem, QueueItem::IN_PROGRESS);
-
-            $this->save(
-                $queueItem,
-                array(
-                    'status' => QueueItem::IN_PROGRESS,
-                    'lastExecutionProgress' => $lastExecutionProgress,
-                    'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp(),
-                )
-            );
-            $this->reportStatusChange($queueItem, QueueItem::IN_PROGRESS);
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to requeue task.', $exception);
-        }
+        $this->save(
+            $queueItem,
+            array(
+                'status' => QueueItem::IN_PROGRESS,
+                'lastExecutionProgress' => $lastExecutionProgress,
+                'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp(),
+            ),
+            true,
+            QueueItem::IN_PROGRESS
+        );
     }
 
     /**
@@ -206,10 +187,11 @@ class QueueService
             $this->throwIllegalTransitionException($queueItem->getStatus(), QueueItem::FAILED);
         }
 
-        $lastExecutionProgress = $queueItem->getLastExecutionProgressBasePoints();
-
         $queueItem->setRetries($queueItem->getRetries() + 1);
-        $queueItem->setFailureDescription($failureDescription);
+        $queueItem->setFailureDescription(
+            ($queueItem->getFailureDescription() ? ($queueItem->getFailureDescription() . "\n") : '')
+            . 'Attempt ' . $queueItem->getRetries() . ': ' . $failureDescription
+        );
 
         if ($queueItem->getRetries() > $this->getMaxRetries()) {
             $queueItem->setStatus(QueueItem::FAILED);
@@ -219,21 +201,50 @@ class QueueService
             $queueItem->setStartTimestamp(null);
         }
 
-        try {
-            $this->reportBeforeStatusChange($queueItem, QueueItem::IN_PROGRESS);
+        $this->save(
+            $queueItem,
+            array(
+                'status' => QueueItem::IN_PROGRESS,
+                'lastExecutionProgress' => $queueItem->getLastExecutionProgressBasePoints(),
+                'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp(),
+            ),
+            true,
+            QueueItem::IN_PROGRESS
+        );
+    }
 
-            $this->save(
-                $queueItem,
-                array(
-                    'status' => QueueItem::IN_PROGRESS,
-                    'lastExecutionProgress' => $lastExecutionProgress,
-                    'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp(),
-                )
-            );
-            $this->reportStatusChange($queueItem, QueueItem::IN_PROGRESS);
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to fail task.', $exception);
+    /**
+     * Aborts the queue item. Aborted queue item will not be started again.
+     *
+     * @param QueueItem $queueItem Queue item to abort.
+     * @param string $abortDescription Verbal description of the reason for abortion.
+     *
+     * @throws \BadMethodCallException Queue item must be in "in_progress" status for abort method.
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     */
+    public function abort(QueueItem $queueItem, $abortDescription)
+    {
+        if ($queueItem->getStatus() !== QueueItem::IN_PROGRESS) {
+            $this->throwIllegalTransitionException($queueItem->getStatus(), QueueItem::ABORTED);
         }
+
+        $queueItem->setStatus(QueueItem::ABORTED);
+        $queueItem->setFailTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
+        $queueItem->setFailureDescription(
+            ($queueItem->getFailureDescription() ? ($queueItem->getFailureDescription() . "\n") : '')
+            . 'Attempt ' . ($queueItem->getRetries() + 1) . ': ' . $abortDescription
+        );
+
+        $this->save(
+            $queueItem,
+            array(
+                'status' => QueueItem::IN_PROGRESS,
+                'lastExecutionProgress' => $queueItem->getLastExecutionProgressBasePoints(),
+                'lastUpdateTimestamp' => $queueItem->getLastUpdateTimestamp(),
+            ),
+            true,
+            QueueItem::IN_PROGRESS
+        );
     }
 
     /**
@@ -256,18 +267,14 @@ class QueueService
         $queueItem->setProgressBasePoints($progress);
         $queueItem->setLastUpdateTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
 
-        try {
-            $this->save(
-                $queueItem,
-                array(
-                    'status' => QueueItem::IN_PROGRESS,
-                    'lastExecutionProgress' => $lastExecutionProgress,
-                    'lastUpdateTimestamp' => $lastUpdateTimestamp,
-                )
-            );
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to update task progress.', $exception);
-        }
+        $this->save(
+            $queueItem,
+            array(
+                'status' => QueueItem::IN_PROGRESS,
+                'lastExecutionProgress' => $lastExecutionProgress,
+                'lastUpdateTimestamp' => $lastUpdateTimestamp,
+            )
+        );
     }
 
     /**
@@ -283,18 +290,14 @@ class QueueService
         $lastUpdateTimestamp = $queueItem->getLastUpdateTimestamp();
         $queueItem->setLastUpdateTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
 
-        try {
-            $this->save(
-                $queueItem,
-                array(
-                    'status' => QueueItem::IN_PROGRESS,
-                    'lastExecutionProgress' => $lastExecutionProgress,
-                    'lastUpdateTimestamp' => $lastUpdateTimestamp,
-                )
-            );
-        } catch (QueueItemSaveException $exception) {
-            throw new QueueStorageUnavailableException('Unable to keep task alive.', $exception);
-        }
+        $this->save(
+            $queueItem,
+            array(
+                'status' => QueueItem::IN_PROGRESS,
+                'lastExecutionProgress' => $lastExecutionProgress,
+                'lastUpdateTimestamp' => $lastUpdateTimestamp,
+            )
+        );
     }
 
     /**
@@ -372,21 +375,39 @@ class QueueService
 
     /**
      * Creates or updates given queue item using storage service. If queue item id is not set, new queue item will be
-     * created otherwise update will be performed.
+     * created; otherwise, update will be performed.
      *
      * @param QueueItem $queueItem Item to save.
      * @param array $additionalWhere List of key/value pairs to set in where clause when saving queue item.
+     * @param bool $reportStateChange Indicates whether to invoke a status change event.
+     * @param string $previousState If event should be invoked, indicates the previous state.
      *
      * @return int Id of saved queue item.
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
-    private function save(QueueItem $queueItem, array $additionalWhere = array())
-    {
-        $id = $this->getStorage()->saveWithCondition($queueItem, $additionalWhere);
-        $queueItem->setId($id);
+    private function save(
+        QueueItem $queueItem,
+        array $additionalWhere = array(),
+        $reportStateChange = false,
+        $previousState = ''
+    ) {
+        try {
+            if ($reportStateChange) {
+                $this->reportBeforeStatusChange($queueItem, $previousState);
+            }
 
-        return $id;
+            $id = $this->getStorage()->saveWithCondition($queueItem, $additionalWhere);
+            $queueItem->setId($id);
+
+            if ($reportStateChange) {
+                $this->reportStatusChange($queueItem, $previousState);
+            }
+
+            return $id;
+        } catch (QueueItemSaveException $exception) {
+            throw new QueueStorageUnavailableException('Unable to update the task.', $exception);
+        }
     }
 
     /**

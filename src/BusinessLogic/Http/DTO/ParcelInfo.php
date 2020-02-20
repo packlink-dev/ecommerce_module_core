@@ -2,25 +2,25 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\FrontDto;
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\DTO\ValidationError;
+
 /**
  * Class ParcelInfo.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class ParcelInfo extends BaseDto
+class ParcelInfo extends FrontDto
 {
     /**
-     * Id of the parcel.
-     *
-     * @var string
+     * Fully qualified name of this class.
      */
-    public $id;
+    const CLASS_NAME = __CLASS__;
     /**
-     * Name of the parcel.
-     *
-     * @var string
+     * Unique class key.
      */
-    public $name;
+    const CLASS_KEY = 'parcel';
     /**
      * Weight of the parcel.
      *
@@ -46,63 +46,37 @@ class ParcelInfo extends BaseDto
      */
     public $width;
     /**
-     * Created date of the parcel.
-     *
-     * @var \DateTime
-     */
-    public $createdAt;
-    /**
-     * Updated date of the parcel.
-     *
-     * @var \DateTime
-     */
-    public $updatedAt;
-    /**
      * Represent if it's the default parcel.
      *
      * @var bool
      */
     public $default;
-
     /**
-     * Transforms raw array data to its DTO.
+     * Fields for this DTO. Needed for validation and transformation from/to array.
      *
-     * @param array $raw Raw array data.
-     *
-     * @return static Transformed DTO object.
+     * @var array
      */
-    public static function fromArray(array $raw)
-    {
-        $instance = new static();
-        $instance->id = static::getValue($raw, 'id');
-        $instance->name = static::getValue($raw, 'name');
-        $instance->weight = static::getValue($raw, 'weight');
-        $instance->length = static::getValue($raw, 'length');
-        $instance->height = static::getValue($raw, 'height');
-        $instance->width = static::getValue($raw, 'width');
-        $instance->default = static::getValue($raw, 'default');
-
-        $instance->updatedAt = static::getValue($raw, 'updated_at');
-        $instance->updatedAt = $instance->updatedAt ? \DateTime::createFromFormat('Y-m-d H:i:s', $instance->updatedAt)
-            : null;
-
-        $instance->createdAt = static::getValue($raw, 'created_at');
-        $instance->createdAt = $instance->createdAt ? \DateTime::createFromFormat('Y-m-d H:i:s', $instance->createdAt)
-            : null;
-
-        return $instance;
-    }
+    protected static $fields = array(
+        'weight',
+        'width',
+        'length',
+        'height',
+        'default',
+    );
 
     /**
      * Gets default parcel details.
      *
      * @return static Default parcel.
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public static function defaultParcel()
     {
-        return static::fromArray(
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return FrontDtoFactory::get(
+            static::CLASS_KEY,
             array(
-                'name' => 'Default parcel',
                 'weight' => 1,
                 'width' => 10,
                 'height' => 10,
@@ -113,22 +87,46 @@ class ParcelInfo extends BaseDto
     }
 
     /**
-     * Transforms DTO to its array format suitable for http client.
+     * Generates validation errors for the payload.
      *
-     * @return array DTO in array format.
+     * @param array $payload The payload in key-value format.
+     *
+     * @return ValidationError[] An array of validation errors, if any.
      */
-    public function toArray()
+    protected static function validatePayload(array $payload)
     {
-        return array(
-            'id' => $this->id,
-            'name' => $this->name,
-            'weight' => $this->weight,
-            'length' => $this->length,
-            'height' => $this->height,
-            'width' => $this->width,
-            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
-            'created_at' => $this->createdAt ? $this->createdAt->format('Y-m-d H:i:s') : null,
-            'default' => $this->default,
-        );
+        $validationErrors = parent::validatePayload($payload);
+        foreach (array('weight', 'width', 'length', 'height') as $field) {
+            if (empty($payload[$field])) {
+                $validationErrors[] = static::getValidationError(
+                    ValidationError::ERROR_REQUIRED_FIELD,
+                    $field,
+                    'Field is required.'
+                );
+            }
+        }
+
+        $options = array('options' => array('min_range' => 0));
+        foreach (array('width', 'length', 'height') as $field) {
+            if (!empty($payload[$field]) && filter_var($payload[$field], FILTER_VALIDATE_INT, $options) === false) {
+                $validationErrors[] = static::getValidationError(
+                    ValidationError::ERROR_INVALID_FIELD,
+                    $field,
+                    ucfirst($field) . ' must be a positive integer.'
+                );
+            }
+        }
+
+        if (!empty($payload['weight'])
+            && (filter_var($payload['weight'], FILTER_VALIDATE_FLOAT) === false || $payload['weight'] <= 0)
+        ) {
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'weight',
+                'Weight must be a positive decimal number.'
+            );
+        }
+
+        return $validationErrors;
     }
 }

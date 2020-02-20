@@ -106,6 +106,12 @@ class Schedule extends Entity
     {
         parent::inflate($data);
 
+        if (!empty($data['nextTimestamp'])) {
+            /** @var TimeProvider $timeProvider */
+            $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
+            $this->nextSchedule = $timeProvider->getDateTime($data['nextTimestamp']);
+        }
+
         $this->task = Serializer::unserialize($data['task']);
     }
 
@@ -118,6 +124,9 @@ class Schedule extends Entity
     {
         $data = parent::toArray();
         $data['task'] = Serializer::serialize($this->task);
+        if ($this->nextSchedule) {
+            $data['nextTimestamp'] = $this->nextSchedule->getTimestamp();
+        }
 
         return $data;
     }

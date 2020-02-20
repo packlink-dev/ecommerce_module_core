@@ -2,14 +2,23 @@
 
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
-use Packlink\BusinessLogic\Http\DTO\BaseDto;
+use Packlink\BusinessLogic\DTO\FrontDto;
 
 /**
- * Class DashboardStatus
+ * Class DashboardStatus.
+ *
  * @package Packlink\BusinessLogic\Controllers\DTO
  */
-class DashboardStatus extends BaseDto
+class DashboardStatus extends FrontDto
 {
+    /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+    /**
+     * Unique class key.
+     */
+    const CLASS_KEY = 'dashboard_status';
     /**
      * Shipping method set flag.
      *
@@ -34,19 +43,15 @@ class DashboardStatus extends BaseDto
      * @var bool
      */
     public $isWarehouseSet;
-
     /**
-     * Transforms DTO to its array format suitable for http client.
+     * Fields for this DTO. Needed for validation and transformation from/to array.
      *
-     * @return array DTO in array format.
+     * @var array
      */
-    public function toArray()
-    {
-        return array(
-            'parcelSet' => $this->isParcelSet,
-            'orderStatusMappingsSet' => $this->isOrderStatusMappingsSet,
-            'warehouseSet' => $this->isWarehouseSet,
-            'shippingMethodSet' => $this->isShippingMethodSet,
-        );
-    }
+    protected static $fields = array(
+        'isShippingMethodSet',
+        'isParcelSet',
+        'isWarehouseSet',
+        'isOrderStatusMappingsSet',
+    );
 }

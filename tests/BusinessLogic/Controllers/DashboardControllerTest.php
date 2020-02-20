@@ -2,16 +2,16 @@
 
 namespace Logeecom\Tests\BusinessLogic\Controllers;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\DashboardController;
+use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -49,14 +49,6 @@ class DashboardControllerTest extends BaseTestWithServices
         $taskInstance = $this;
         $taskInstance->shopConfig->setAuthorizationToken('test_token');
 
-        $httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($httpClient) {
-                return $httpClient;
-            }
-        );
-
         $taskInstance->testShopShippingMethodService = new TestShopShippingMethodService();
         TestServiceRegister::registerService(
             ShopShippingMethodService::CLASS_NAME,
@@ -74,6 +66,7 @@ class DashboardControllerTest extends BaseTestWithServices
         );
 
         $this->dashboardController = new DashboardController();
+        TestFrontDtoFactory::register(DashboardStatus::CLASS_KEY, DashboardStatus::CLASS_NAME);
     }
 
     protected function tearDown()
@@ -82,38 +75,50 @@ class DashboardControllerTest extends BaseTestWithServices
         parent::tearDown();
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testGetStatusNothingSet()
     {
         $status = $this->dashboardController->getStatus();
 
-        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\DashboardStatus', $status);
+        $this->assertInstanceOf(DashboardStatus::CLASS_NAME, $status);
         $this->assertFalse($status->isParcelSet);
         $this->assertFalse($status->isWarehouseSet);
         $this->assertFalse($status->isShippingMethodSet);
 
         $asArray = $status->toArray();
 
-        $this->assertArrayHasKey('parcelSet', $asArray);
-        $this->assertFalse($asArray['parcelSet']);
-        $this->assertArrayHasKey('warehouseSet', $asArray);
-        $this->assertFalse($asArray['warehouseSet']);
-        $this->assertArrayHasKey('shippingMethodSet', $asArray);
-        $this->assertFalse($asArray['shippingMethodSet']);
+        $this->assertArrayHasKey('isParcelSet', $asArray);
+        $this->assertFalse($asArray['isParcelSet']);
+        $this->assertArrayHasKey('isWarehouseSet', $asArray);
+        $this->assertFalse($asArray['isWarehouseSet']);
+        $this->assertArrayHasKey('isShippingMethodSet', $asArray);
+        $this->assertFalse($asArray['isShippingMethodSet']);
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testGetStatusShippingNotSet()
     {
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
+        $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
 
         $status = $this->dashboardController->getStatus();
 
-        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\DashboardStatus', $status);
         $this->assertTrue($status->isParcelSet);
         $this->assertTrue($status->isWarehouseSet);
         $this->assertFalse($status->isShippingMethodSet);
     }
 
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testGetStatusAllSet()
     {
         $shippingMethod = new ShippingMethod();
@@ -127,12 +132,11 @@ class DashboardControllerTest extends BaseTestWithServices
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME)->save($shippingMethod);
 
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
+        $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
 
         $status = $this->dashboardController->getStatus();
 
-        $this->assertInstanceOf('Packlink\BusinessLogic\Controllers\DTO\DashboardStatus', $status);
         $this->assertTrue($status->isParcelSet);
         $this->assertTrue($status->isWarehouseSet);
         $this->assertTrue($status->isShippingMethodSet);

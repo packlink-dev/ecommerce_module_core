@@ -2,18 +2,20 @@
 
 namespace Logeecom\Tests\BusinessLogic\WebHook;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 
@@ -24,9 +26,9 @@ use Packlink\BusinessLogic\WebHook\WebHookEventHandler;
 class WebHookHandlerTest extends BaseTestWithServices
 {
     /**
-     * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
+     * @var \Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService
      */
-    public $httpClient;
+    public $orderShipmentDetailsService;
 
     /**
      * @inheritdoc
@@ -38,20 +40,26 @@ class WebHookHandlerTest extends BaseTestWithServices
         BootstrapComponent::init();
         $me = $this;
 
-        $this->httpClient = new TestHttpClient();
-        $orderRepository = new TestOrderRepository();
+        TestRepositoryRegistry::registerRepository(
+            OrderShipmentDetails::getClassName(),
+            MemoryRepository::getClassName()
+        );
+
+        $this->orderShipmentDetailsService = OrderShipmentDetailsService::getInstance();
+
+        TestServiceRegister::registerService(
+            OrderShipmentDetailsService::CLASS_NAME,
+            function () use ($me) {
+                return $me->orderShipmentDetailsService;
+            }
+        );
+
+        $orderRepository = new TestShopOrderService();
         $configService = new TestShopConfiguration();
         $configService->setAuthorizationToken('test');
 
         TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            OrderRepository::CLASS_NAME,
+            ShopOrderService::CLASS_NAME,
             function () use ($orderRepository) {
                 return $orderRepository;
             }
@@ -75,20 +83,22 @@ class WebHookHandlerTest extends BaseTestWithServices
 
     /**
      * Tests setting of shipping status
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testHandleShippingStatusEvent()
     {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
         $webhookHandler = WebHookEventHandler::getInstance();
         $input = $this->getShippingStatusEventBody();
         $webhookHandler->handle($input);
 
-        /** @var TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
+        /** @var TestShopOrderService $shopOrderService */
+        $shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $order = $shopOrderService->getOrder('test_order_id');
 
         $this->assertNotNull($order);
-        $this->assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getShipment()->getStatus());
+        $this->assertEquals(ShipmentStatus::STATUS_DELIVERED, $order->getStatus());
     }
 
     /**
@@ -116,8 +126,9 @@ class WebHookHandlerTest extends BaseTestWithServices
      */
     public function testHandleShippingStatusEventNoOrder()
     {
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService $orderRepository */
+        $orderRepository = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $orderRepository->shouldThrowOrderNotFoundException(true);
 
         $this->httpClient->setMockResponses($this->getMockStatusResponse());
@@ -131,9 +142,11 @@ class WebHookHandlerTest extends BaseTestWithServices
 
     /**
      * Tests setting of shipping tracking
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testHandleShippingTrackingEvent()
     {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
         $this->httpClient->setMockResponses(
             array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())
         );
@@ -141,9 +154,9 @@ class WebHookHandlerTest extends BaseTestWithServices
         $input = $this->getTrackingEventBody();
         $webhookHandler->handle($input);
 
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
+        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService $orderRepository */
+        $orderRepository = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $order = $orderRepository->getOrder('test_order_id');
 
         $this->assertNotNull($order);
         $trackingHistories = $order->getShipment()->getTrackingHistory();
@@ -178,10 +191,6 @@ class WebHookHandlerTest extends BaseTestWithServices
      */
     public function testHandleShippingTrackingEventNoOrder()
     {
-        /** @var TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowOrderNotFoundException(true);
-
         $this->httpClient->setMockResponses(
             array_merge($this->getMockTrackingResponse(), $this->getMockStatusResponse())
         );
@@ -190,16 +199,20 @@ class WebHookHandlerTest extends BaseTestWithServices
         $webhookHandler->handle($input);
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
-        $this->assertEquals('Order not found.', $this->shopLogger->loggedMessages[1]->getMessage());
+        $this->assertEquals(
+            'Order details not found for reference "test".',
+            $this->shopLogger->loggedMessages[1]->getMessage()
+        );
     }
 
     /**
      * Tests when reference has no tracking info associated with it.
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testHandleShippingTrackingEventWhen404IsThrown()
     {
-        /** @var TestOrderRepository $orderRepository */
-        $orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        /** @var TestShopOrderService $orderRepository */
+        $orderRepository = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
 
         $this->httpClient->setMockResponses(
             array_merge($this->get404ErrorResponse(), $this->get404ErrorResponse())
@@ -216,29 +229,12 @@ class WebHookHandlerTest extends BaseTestWithServices
      *
      * @return HttpResponse[] Array of Http responses.
      */
-    private function getMockLabelResponse()
-    {
-        return array(
-            new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
-            ),
-            new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentLabels.json')
-            )
-        );
-    }
-
-    /**
-     * Returns responses for testing parcel and warehouse initialization.
-     *
-     * @return HttpResponse[] Array of Http responses.
-     */
     private function getMockStatusResponse()
     {
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
-            )
+            ),
         );
     }
 
@@ -255,7 +251,7 @@ class WebHookHandlerTest extends BaseTestWithServices
             ),
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/tracking.json')
-            )
+            ),
         );
     }
 
@@ -267,7 +263,7 @@ class WebHookHandlerTest extends BaseTestWithServices
     private function getErrorMockResponse()
     {
         return array(
-            new HttpResponse(400, array(), null)
+            new HttpResponse(400, array(), null),
         );
     }
 
@@ -279,18 +275,8 @@ class WebHookHandlerTest extends BaseTestWithServices
     private function get404ErrorResponse()
     {
         return array(
-            new HttpResponse(404, array(), null)
+            new HttpResponse(404, array(), null),
         );
-    }
-
-    /**
-     * Returns body of the shipment delivered event.
-     *
-     * @return string
-     */
-    private function getShipmentLabelEventBody()
-    {
-        return file_get_contents(__DIR__ . '/../Common/WebhookEvents/shipmentLabelEventBody.json');
     }
 
     /**

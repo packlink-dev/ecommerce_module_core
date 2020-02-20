@@ -5,6 +5,38 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+**BREAKING CHANGES**
+This release contains several breaking changes. Check in detail when updating to this version.
+Contains implementation of the "*Core Enhancements 1*" set of features. 
+Check the documentation for more info.
+
+### Added
+- Added a `TaskClenupTask` for removing unnecessary queue items (tasks) from the database.
+- `OrderShipmentDetailsService` is added. This service is in charge of working with the `OrderShipmentDetails` entity.
+- `OrderShipmentDetailsRepository` is added for getting and storing the `OrderShipmentDetails` entity.
+- `SendDraftTask` and `UpdateShipmentDataTask` tasks were updated to reflect the above changes.
+Most notably, they now call either `OrderShipmentDetailsService` or `ShopOrderService` separately where needed.
+- Added task abortion functionality. If needed, a task should throw `AbortTaskExecutionException` to abort it.
+Aborted tasks will not be restarted by the queue service.
+- `FrontDTO` and associated factory `FrontDtoFactory` is added. Now, any frontend DTO should be instantiated 
+only through the factory method. If input data is not correct, a `FrontDtoValidationException` will be thrown
+containing `ValidationError` array.
+- `ShopShippingMethodService` interface has a new method `getCarrierLogoFilePath`.
+- `WarehouseService` is introduced to manipulate the data for default warehouse. 
+This service should be used to fetch and save warehouse data instead of direct call to 
+the `ConfigurationService`.
+
+### Changed
+- `OrderRepository` interface is changed. It is renamed to `ShopOrderService` and now the 
+only responsibility of this service is to work with an order in the shop/integration.
+Most of the methods are removed.
+- `OrderShipmentDetails` entity does not contain a reference to a task anymore.
+- `DraftController` is renamed to `ShipmentDraftService` and handles both immediate and delayed 
+`SendDraftTask` enqueueing. It provides a method for getting current status of the SendDraftTask for specific order.
+- `DashboardStatus` is now a frontend DTO and a signature for the generated array is changed.
+- `Warehouse` DTO changed namespace.
+- `ShippingMethodsController` now adds logo URL to the ShippingMethod, so integrations do not need to set it.
+
 ## [v1.5.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.1...v1.5.2) - 2019-12-04
 ### Changed
 - Replaced `substr` with `mb_substring` to prevent cutting the string in the middle of the special unicode character.

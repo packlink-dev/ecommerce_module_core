@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Packlink\BusinessLogic\DTO\BaseDto;
 use Packlink\BusinessLogic\Http\DTO\Draft\AdditionalData;
 use Packlink\BusinessLogic\Http\DTO\Draft\Address;
 use Packlink\BusinessLogic\Http\DTO\Draft\DraftPrice;

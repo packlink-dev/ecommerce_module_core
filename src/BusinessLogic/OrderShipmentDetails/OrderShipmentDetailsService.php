@@ -2,11 +2,11 @@
 
 namespace Packlink\BusinessLogic\OrderShipmentDetails;
 
-use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
-use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
-use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
+use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class OrderShipmentDetailsService
@@ -28,9 +28,9 @@ class OrderShipmentDetailsService extends BaseService
     /**
      * Order shipment details repository.
      *
-     * @var RepositoryInterface
+     * @var OrderShipmentDetailsRepository
      */
-    protected $orderShipmentDetailsRepository;
+    protected $repository;
 
     /**
      * OrderShipmentDetailsService constructor.
@@ -39,7 +39,7 @@ class OrderShipmentDetailsService extends BaseService
     {
         parent::__construct();
 
-        $this->orderShipmentDetailsRepository = $this->getRepository(OrderShipmentDetails::getClassName());
+        $this->repository = new OrderShipmentDetailsRepository();
     }
 
     /**
@@ -47,18 +47,217 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string | int $orderId Order id in an integration system.
      *
-     * @return OrderShipmentDetails | null Instance that retrieved by the specifed id.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @return OrderShipmentDetails|null Instance for the specified order id, if found.
      */
     public function getDetailsByOrderId($orderId)
     {
-        $query = new QueryFilter();
-        $query->where('orderId', Operators::EQUALS, $orderId);
+        return $this->repository->selectByOrderId($orderId);
+    }
 
-        /** @var OrderShipmentDetails | null $entity */
-        $entity = $this->orderShipmentDetailsRepository->selectOne($query);
+    /**
+     * Retrieves order shipment details.
+     *
+     * @param string $shipmentReference Shipment reference.
+     *
+     * @return OrderShipmentDetails|null Instance for the specified reference, if found.
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function getDetailsByReference($shipmentReference)
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $this->getDetailsByReferenceInternal($shipmentReference, false);
+    }
 
-        return $entity;
+    /**
+     * Returns shipment references of the orders that have not yet been completed.
+     *
+     * @return array Array of shipment references.
+     */
+    public function getIncompleteOrderReferences()
+    {
+        return $this->repository->getIncomplete();
+    }
+
+    /**
+     * Retrieves list of order references where order is in one of the provided statuses.
+     *
+     * @param array $statuses List of order statuses.
+     *
+     * @return string[] Array of shipment references.
+     */
+    public function getOrderReferencesWithStatus(array $statuses)
+    {
+        return $this->repository->selectByStatus($statuses);
+    }
+
+    /**
+     * Sets shipment reference number. Creates new object if it does not exist.
+     *
+     * @param string $orderId Unique order id.
+     * @param string $shipmentReference Packlink shipment reference.
+     */
+    public function setReference($orderId, $shipmentReference)
+    {
+        $orderDetails = $this->getDetailsByOrderId($orderId);
+
+        if ($orderDetails === null) {
+            $orderDetails = new OrderShipmentDetails();
+            $orderDetails->setOrderId($orderId);
+        }
+
+        $orderDetails->setReference($shipmentReference);
+        $orderDetails->setStatus(ShipmentStatus::STATUS_PENDING);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Sets shipment tracking URL and numbers.
+     *
+     * @param string $shipmentReference
+     * @param string $trackingUrl
+     * @param array $trackingNumbers
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function setTrackingInfo($shipmentReference, $trackingUrl, array $trackingNumbers)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+
+        $orderDetails->setCarrierTrackingUrl($trackingUrl);
+        $orderDetails->setCarrierTrackingNumbers($trackingNumbers);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Sets order packlink shipping status.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     * @param string $shippingStatus Packlink shipping status.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function setShippingStatus($shipmentReference, $shippingStatus)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+
+        $orderDetails->setShippingStatus($shippingStatus);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Sets shipping price.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     * @param float $price Shipment price.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function setShippingPrice($shipmentReference, $price)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+        $orderDetails->setShippingCost($price);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Sets packlink shipment labels.
+     *
+     * @param string $shipmentReference Shipment reference.
+     * @param string[] $labels Packlink shipment labels as a list of URLs.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function setLabelsByReference($shipmentReference, array $labels)
+    {
+        $labelsPrepared = array();
+        foreach ($labels as $labelLink) {
+            $labelsPrepared[] = new ShipmentLabel($labelLink);
+        }
+
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+        $orderDetails->setShipmentLabels($labelsPrepared);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Sets label identified by order ID and link to PDF to have been printed.
+     *
+     * @param string $shipmentReference Shipment reference.
+     * @param string $link Link to PDF.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function markLabelPrinted($shipmentReference, $link)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+
+        foreach ($orderDetails->getShipmentLabels() as $label) {
+            if ($label->getLink() === $link) {
+                $label->setPrinted(true);
+            }
+        }
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
+     * Marks shipment identified by provided reference as deleted on Packlink.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     */
+    public function markShipmentDeleted($shipmentReference)
+    {
+        $orderDetails = $this->getDetailsByReference($shipmentReference);
+        if ($orderDetails !== null) {
+            $orderDetails->setDeleted(true);
+            $this->repository->persist($orderDetails);
+        }
+    }
+
+    /**
+     * Returns whether shipment identified by provided reference is deleted on Packlink or not.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     *
+     * @return bool Returns TRUE if shipment has been deleted; otherwise returns FALSE.
+     */
+    public function isShipmentDeleted($shipmentReference)
+    {
+        $orderDetails = $this->getDetailsByReference($shipmentReference);
+
+        return $orderDetails === null || $orderDetails->isDeleted();
+    }
+
+    /**
+     * Retrieves order shipment details.
+     * Throws an exception if shipment details do not exist and throwing is requested.
+     *
+     * @param string $shipmentReference
+     * @param bool $throwException Specifies whether to throw an exception if details are not found.
+     *
+     * @return OrderShipmentDetails|null
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    protected function getDetailsByReferenceInternal($shipmentReference, $throwException = true)
+    {
+        $details = $this->repository->selectByReference($shipmentReference);
+
+        if ($details === null && $throwException) {
+            throw new OrderShipmentDetailsNotFound(
+                'Order details not found for reference "' . $shipmentReference . '".'
+            );
+        }
+
+        return $details;
     }
 }

@@ -14,3 +14,6 @@ echo -e "\e[32mPHP 7.2\e[39m"
 
 echo -e "\e[32mPHP 7.3\e[39m"
 /usr/bin/php7.3 ./vendor/bin/phpunit --configuration ./phpunit.xml
+
+echo -e "\e[32mPHP 7.4\e[39m"
+/usr/bin/php7.4 ./vendor/bin/phpunit --configuration ./phpunit.xml

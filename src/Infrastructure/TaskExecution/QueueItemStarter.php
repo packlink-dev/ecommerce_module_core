@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
 
 /**
@@ -107,8 +108,12 @@ class QueueItemStarter implements Runnable
 
         try {
             $this->getConfigService()->setContext($queueItem->getContext());
-            $this->getQueueService()->start($queueItem);
-            $this->getQueueService()->finish($queueItem);
+            try {
+                $this->getQueueService()->start($queueItem);
+                $this->getQueueService()->finish($queueItem);
+            } catch (AbortTaskExecutionException $exception) {
+                $this->getQueueService()->abort($queueItem, $exception->getMessage());
+            }
         } catch (\Exception $ex) {
             if (QueueItem::IN_PROGRESS === $queueItem->getStatus()) {
                 $this->getQueueService()->fail($queueItem, $ex->getMessage());

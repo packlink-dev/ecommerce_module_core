@@ -9,6 +9,7 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
@@ -21,9 +22,9 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
 use Packlink\BusinessLogic\Utility\Php\Php55;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
  * Class Proxy. In charge for communication with Packlink API.
@@ -75,13 +76,16 @@ class Proxy
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getUsersParcelInfo()
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, 'users/parcels');
-        $data = $response->decodeBodyAsJson();
+        $data = $response->decodeBodyAsJson() ?: array();
 
-        return ParcelInfo::fromArrayBatch($data ?: array());
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return FrontDtoFactory::getFromBatch(ParcelInfo::CLASS_KEY, $data);
     }
 
     /**
@@ -92,13 +96,16 @@ class Proxy
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getUsersWarehouses()
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, 'clients/warehouses');
-        $data = $response->decodeBodyAsJson();
+        $data = $response->decodeBodyAsJson() ?: array();
 
-        return Warehouse::fromArrayBatch($data ?: array());
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return FrontDtoFactory::getFromBatch(Warehouse::CLASS_KEY, $data);
     }
 
     /**
@@ -148,7 +155,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
 
-        return DropOff::fromArrayBatch($response->decodeBodyAsJson());
+        return DropOff::fromArrayBatch($response->decodeBodyAsJson() ?: array());
     }
 
     /**
@@ -262,6 +269,7 @@ class Proxy
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      */
     public function sendDraft(Draft $draft)
     {

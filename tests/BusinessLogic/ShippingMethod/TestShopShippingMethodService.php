@@ -69,6 +69,13 @@ class TestShopShippingMethodService implements ShopShippingMethodService
         return true;
     }
 
+    /**
+     * Adds backup shipping method based on provided shipping method.
+     *
+     * @param ShippingMethod $shippingMethod
+     *
+     * @return bool TRUE if backup shipping method is added; otherwise, FALSE.
+     */
     public function addBackupShippingMethod(ShippingMethod $shippingMethod)
     {
         if ($this->returnFalse) {
@@ -80,6 +87,11 @@ class TestShopShippingMethodService implements ShopShippingMethodService
         return true;
     }
 
+    /**
+     * Deletes backup shipping method.
+     *
+     * @return bool TRUE if backup shipping method is deleted; otherwise, FALSE.
+     */
     public function deleteBackupShippingMethod()
     {
         if ($this->returnFalse) {
@@ -89,5 +101,17 @@ class TestShopShippingMethodService implements ShopShippingMethodService
         $this->callHistory['deleteBackup'][] = 'called';
 
         return true;
+    }
+
+    /**
+     * Gets the carrier logo path based on carrier name.
+     *
+     * @param string $carrierName
+     *
+     * @return string
+     */
+    public function getCarrierLogoFilePath($carrierName)
+    {
+        return 'tmp://' . $carrierName;
     }
 }

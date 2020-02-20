@@ -8,8 +8,8 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 
 /**
@@ -106,15 +106,16 @@ class SendDraftTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function execute()
     {
         $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
         if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
-            Logger::logWarning("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
+            Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
             $this->reportProgress(100);
+
             return;
         }
 
@@ -139,18 +140,16 @@ class SendDraftTask extends Task
      * @param string $orderId Order id in an integrated system.
      *
      * @return boolean Returns TRUE if draft has been created; FALSE otherwise.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     private function isDraftCreated($orderId)
     {
-        $draft = $this->getOrderShipmentDetailsService()->getDetailsByOrderId($orderId);
+        $shipmentDetails = $this->getOrderShipmentDetailsService()->getDetailsByOrderId($orderId);
 
-        if ($draft === null) {
+        if ($shipmentDetails === null) {
             return false;
         }
 
-        $reference = $draft->getReference();
+        $reference = $shipmentDetails->getReference();
 
         return !empty($reference);
     }

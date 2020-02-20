@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
@@ -17,7 +18,9 @@ use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
+use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
 use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
@@ -52,16 +55,6 @@ class UserAccountService extends BaseService
     private $proxy;
 
     /**
-     * UserAccountService constructor.
-     */
-    protected function __construct()
-    {
-        parent::__construct();
-
-        $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-    }
-
-    /**
      * Validates provided API key and initializes user's data.
      *
      * @param string $apiKey API key.
@@ -78,13 +71,13 @@ class UserAccountService extends BaseService
         }
 
         // set token before calling API
-        $this->configuration->setAuthorizationToken($apiKey);
+        $this->getConfigService()->setAuthorizationToken($apiKey);
 
         try {
             $userDto = $this->getProxy()->getUserData();
             $this->initializeUser($userDto);
         } catch (HttpBaseException $e) {
-            $this->configuration->resetAuthorizationCredentials();
+            $this->getConfigService()->resetAuthorizationCredentials();
             Logger::logError($e->getMessage());
 
             return false;
@@ -104,7 +97,7 @@ class UserAccountService extends BaseService
      */
     public function setDefaultParcel($force)
     {
-        $parcelInfo = $this->configuration->getDefaultParcel();
+        $parcelInfo = $this->getConfigService()->getDefaultParcel();
         if ($parcelInfo === null || $force) {
             if ($this->setParcelInfoInternal()) {
                 return;
@@ -119,7 +112,7 @@ class UserAccountService extends BaseService
             }
 
             if ($parcelInfo !== null) {
-                $this->configuration->setDefaultParcel($parcelInfo);
+                $this->getConfigService()->setDefaultParcel($parcelInfo);
             }
         }
     }
@@ -133,7 +126,7 @@ class UserAccountService extends BaseService
      */
     public function setWarehouseInfo($force)
     {
-        $warehouse = $this->configuration->getDefaultWarehouse();
+        $warehouse = $this->getConfigService()->getDefaultWarehouse();
         if ($warehouse === null || $force) {
             if ($this->setWarehouseInfoInternal()) {
                 return;
@@ -147,13 +140,13 @@ class UserAccountService extends BaseService
                 }
             }
 
-            $userInfo = $this->configuration->getUserInfo();
+            $userInfo = $this->getConfigService()->getUserInfo();
             if ($userInfo === null) {
                 $userInfo = $this->getProxy()->getUserData();
             }
 
             if ($warehouse !== null && $userInfo !== null && $warehouse->country === $userInfo->country) {
-                $this->configuration->setDefaultWarehouse($warehouse);
+                $this->getConfigService()->setDefaultWarehouse($warehouse);
             }
         }
     }
@@ -168,8 +161,8 @@ class UserAccountService extends BaseService
      */
     protected function initializeUser(User $user)
     {
-        $this->configuration->setUserInfo($user);
-        $defaultQueueName = $this->configuration->getDefaultQueueName();
+        $this->getConfigService()->setUserInfo($user);
+        $defaultQueueName = $this->getConfigService()->getDefaultQueueName();
 
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
@@ -177,9 +170,13 @@ class UserAccountService extends BaseService
         $this->setDefaultParcel(true);
         $this->setWarehouseInfo(true);
 
-        $queueService->enqueue($defaultQueueName, new UpdateShippingServicesTask(), $this->configuration->getContext());
+        $queueService->enqueue(
+            $defaultQueueName,
+            new UpdateShippingServicesTask(),
+            $this->getConfigService()->getContext()
+        );
 
-        $webHookUrl = $this->configuration->getWebHookUrl();
+        $webHookUrl = $this->getConfigService()->getWebHookUrl();
         if (!empty($webHookUrl)) {
             $this->getProxy()->registerWebHookHandler($webHookUrl);
         }
@@ -218,54 +215,70 @@ class UserAccountService extends BaseService
     {
         $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
 
-        // Schedule weekly task for updating services
-        $shippingServicesSchedule = new WeeklySchedule(
-            new UpdateShippingServicesTask(),
-            $this->configuration->getDefaultQueueName()
-        );
-        $shippingServicesSchedule->setDay(1);
-        $shippingServicesSchedule->setHour(2);
-        $shippingServicesSchedule->setNextSchedule();
-        $repository->save($shippingServicesSchedule);
+        $this->scheduleUpdateShipmentServicesTask($repository);
 
         // Schedule hourly task for updating shipment info - start at full hour
-        $this->setHourlyTask($repository, 0);
+        $this->scheduleUpdatePendingShipmentsData($repository, 0);
 
         // Schedule hourly task for updating shipment info - start at half hour
-        $this->setHourlyTask($repository, 30);
+        $this->scheduleUpdatePendingShipmentsData($repository, 30);
 
         // Schedule daily task for updating shipment info - start at 11:00 UTC hour
-        $this->setDailyTask($repository, 11);
+        $this->scheduleUpdateInProgressShipments($repository, 11);
+
+        // schedule hourly queue cleanup
+        $this->scheduleTaskCleanup($repository);
     }
 
     /**
-     * Creates hourly task for updating shipment data.
+     * @param \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface $repository
+     *
+     */
+    protected function scheduleUpdateShipmentServicesTask(RepositoryInterface $repository)
+    {
+        // Schedule weekly task for updating services
+        $schedule = new WeeklySchedule(
+            new UpdateShippingServicesTask(),
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
+        );
+
+        $schedule->setDay(1);
+        $schedule->setHour(2);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+    }
+
+    /**
+     * Creates hourly task for updating shipment data for pending shipments.
      *
      * @param RepositoryInterface $repository Scheduler repository.
      * @param int $minute Starting minute for the task.
      */
-    protected function setHourlyTask(RepositoryInterface $repository, $minute)
+    protected function scheduleUpdatePendingShipmentsData(RepositoryInterface $repository, $minute)
     {
         $hourlyStatuses = array(
             ShipmentStatus::STATUS_PENDING,
         );
 
-        $shipmentDataHalfHourSchedule = new HourlySchedule(
+        $schedule = new HourlySchedule(
             new UpdateShipmentDataTask($hourlyStatuses),
-            $this->configuration->getDefaultQueueName()
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
         );
-        $shipmentDataHalfHourSchedule->setMinute($minute);
-        $shipmentDataHalfHourSchedule->setNextSchedule();
-        $repository->save($shipmentDataHalfHourSchedule);
+
+        $schedule->setMinute($minute);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
     }
 
     /**
-     * Schedules daily shipment data update task.
+     * Creates daily task for updating shipment data for shipments in progress.
      *
      * @param RepositoryInterface $repository Schedule repository.
      * @param int $hour Hour of the day when schedule should be executed.
      */
-    protected function setDailyTask(RepositoryInterface $repository, $hour)
+    protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour)
     {
         $dailyStatuses = array(
             ShipmentStatus::STATUS_IN_TRANSIT,
@@ -273,18 +286,34 @@ class UserAccountService extends BaseService
             ShipmentStatus::STATUS_ACCEPTED,
         );
 
-        $dailyShipmentDataSchedule = new DailySchedule(
-            new UpdateShipmentDataTask(
-                $dailyStatuses
-            ),
-            $this->configuration->getDefaultQueueName(),
-            $this->configuration->getContext()
+        $schedule = new DailySchedule(
+            new UpdateShipmentDataTask($dailyStatuses),
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
         );
 
-        $dailyShipmentDataSchedule->setHour($hour);
-        $dailyShipmentDataSchedule->setNextSchedule();
+        $schedule->setHour($hour);
+        $schedule->setNextSchedule();
 
-        $repository->save($dailyShipmentDataSchedule);
+        $repository->save($schedule);
+    }
+
+    /**
+     * Creates hourly task for cleaning up the database queue for completed items.
+     *
+     * @param RepositoryInterface $repository Scheduler repository.
+     */
+    protected function scheduleTaskCleanup(RepositoryInterface $repository)
+    {
+        $schedule = new HourlySchedule(
+            new TaskCleanupTask(ScheduleCheckTask::getClassName(), array(QueueItem::COMPLETED), 3600),
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
+        );
+
+        $schedule->setMinute(10);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
     }
 
     /**
@@ -300,4 +329,19 @@ class UserAccountService extends BaseService
 
         return $this->proxy;
     }
+
+    /**
+     * Returns an instance of configuration service.
+     *
+     * @return \Packlink\BusinessLogic\Configuration Configuration service.
+     */
+    protected function getConfigService()
+    {
+        if ($this->configuration === null) {
+            $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+        }
+
+        return $this->configuration;
+    }
 }
+

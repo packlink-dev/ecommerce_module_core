@@ -68,7 +68,7 @@ abstract class Entity
     public function inflate(array $data)
     {
         foreach ($this->fields as $fieldName) {
-            $this->$fieldName = static::getArrayValue($data, $fieldName);
+            $this->$fieldName = static::getArrayValue($data, $fieldName, $this->$fieldName);
         }
     }
 

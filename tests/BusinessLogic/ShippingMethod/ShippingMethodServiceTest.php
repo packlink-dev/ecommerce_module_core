@@ -2,22 +2,24 @@
 
 namespace Packlink\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
-use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
+/**
+ * Class ShippingMethodServiceTest.
+ *
+ * @package Packlink\Tests\BusinessLogic\Tasks
+ */
 class ShippingMethodServiceTest extends BaseTestWithServices
 {
     /**
@@ -28,10 +30,6 @@ class ShippingMethodServiceTest extends BaseTestWithServices
      * @var TestShopShippingMethodService
      */
     public $testShopShippingMethodService;
-    /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
 
     /**
      * @inheritdoc
@@ -46,14 +44,6 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         $me = $this;
         $me->shopConfig->setAuthorizationToken('test_token');
 
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
-        );
-
         $this->testShopShippingMethodService = new TestShopShippingMethodService();
         TestServiceRegister::registerService(
             ShopShippingMethodService::CLASS_NAME,
@@ -67,13 +57,6 @@ class ShippingMethodServiceTest extends BaseTestWithServices
             ShippingMethodService::CLASS_NAME,
             function () use ($me) {
                 return $me->shippingMethodService;
-            }
-        );
-
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
             }
         );
     }
@@ -375,6 +358,11 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         self::assertEquals($service->packlinkInfo, $array['packlink_info']);
     }
 
+    /**
+     * @param int $id
+     *
+     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingService
+     */
     private function getShippingService($id)
     {
         return ShippingService::fromArray(
@@ -390,6 +378,12 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         );
     }
 
+    /**
+     * @param int $id
+     * @param string $carrierName
+     *
+     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     */
     private function getShippingServiceDetails($id, $carrierName = 'test carrier')
     {
         $details = ShippingServiceDetails::fromArray(

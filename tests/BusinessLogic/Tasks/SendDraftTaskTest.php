@@ -1,41 +1,35 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
-use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
-use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
-use Packlink\BusinessLogic\Order\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
 /**
- * Class SendDraftTaskTest
+ * Class SendDraftTaskTest.
+ *
  * @package Logeecom\Tests\BusinessLogic\Tasks
  * @property SendDraftTask syncTask
  */
 class SendDraftTaskTest extends BaseSyncTest
 {
-    /**
-     * @var TestHttpClient
-     */
-    public $httpClient;
-
     /**
      * @inheritdoc
      */
@@ -43,14 +37,9 @@ class SendDraftTaskTest extends BaseSyncTest
     {
         parent::setUp();
 
-        $me = $this;
-
-        $this->httpClient = new TestHttpClient();
-        TestServiceRegister::registerService(
-            HttpClient::CLASS_NAME,
-            function () use ($me) {
-                return $me->httpClient;
-            }
+        TestRepositoryRegistry::registerRepository(
+            OrderShipmentDetails::getClassName(),
+            MemoryRepository::getClassName()
         );
 
         TestServiceRegister::registerService(
@@ -74,37 +63,24 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        TestServiceRegister::registerService(
-            Proxy::CLASS_NAME,
-            function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
-            }
-        );
-
-        $orderRepository = new TestOrderRepository();
+        $shopOrderService = new TestShopOrderService();
 
         TestServiceRegister::registerService(
-            OrderRepository::CLASS_NAME,
-            function () use ($orderRepository) {
-                return $orderRepository;
+            ShopOrderService::CLASS_NAME,
+            function () use ($shopOrderService) {
+                return $shopOrderService;
             }
         );
 
         TestServiceRegister::registerService(
             Serializer::CLASS_NAME,
-            function() {
+            function () {
                 return new NativeSerializer();
             }
         );
 
-        TestRepositoryRegistry::registerRepository(
-            OrderShipmentDetails::getClassName(),
-            MemoryRepository::getClassName()
-        );
-
-        $this->shopConfig->setDefaultParcel(new ParcelInfo());
-        $this->shopConfig->setDefaultWarehouse(new Warehouse());
+        $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
     }
 
@@ -122,28 +98,24 @@ class SendDraftTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      */
     public function testExecute()
     {
         $this->httpClient->setMockResponses($this->getMockResponses());
         $this->syncTask->execute();
 
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $order = $orderRepository->getOrder('test');
+        /** @var OrderShipmentDetailsService $shopOrderService */
+        $shopOrderService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+        $shipmentDetails = $shopOrderService->getDetailsByOrderId('test');
 
-        $this->assertEquals('DE00019732CF', $order->getShipment()->getReferenceNumber());
+        $this->assertEquals('DE00019732CF', $shipmentDetails->getReference());
+        // there should be an info message that draft is created.
+        $this->assertCount(1, $this->shopLogger->loggedMessages);
     }
 
     /**
      * @expectedException \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
-     *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testExecuteBadResponse()
     {
@@ -152,33 +124,22 @@ class SendDraftTaskTest extends BaseSyncTest
     }
 
     /**
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * Tests idempotentness of the create draft task.
      */
-    public function testAfterFailure()
+    public function testDraftAlreadyCreated()
     {
-        /** @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestOrderRepository $orderRepository */
-        $orderRepository = TestServiceRegister::getService(OrderRepository::CLASS_NAME);
-        $orderRepository->shouldThrowOrderNotFoundException(true);
-        $serialized = '';
-        try {
-            $this->syncTask->execute();
-        } catch (\Exception $e) {
-            $serialized = Serializer::serialize($this->syncTask);
-        }
-
         $this->httpClient->setMockResponses($this->getMockResponses());
-        $orderRepository->shouldThrowOrderNotFoundException(false);
-        /** @var SendDraftTask $task */
-        $task = Serializer::unserialize($serialized);
-        $task->execute();
+        $this->syncTask->execute();
+        // reset messages
+        $this->shopLogger->loggedMessages = array();
 
-        $order = $orderRepository->getOrder('test');
+        $this->syncTask->execute();
 
-        $this->assertEquals('DE00019732CF', $order->getShipment()->getReferenceNumber());
+        $this->assertCount(1, $this->shopLogger->loggedMessages);
+        $this->assertEquals(
+            'Draft for order [test] has been already created. Task is terminating.',
+            $this->shopLogger->loggedMessages[0]->getMessage()
+        );
     }
 
     /**
@@ -199,8 +160,13 @@ class SendDraftTaskTest extends BaseSyncTest
     private function getMockResponses()
     {
         return array(
+            // send draft response
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/draftResponse.json')
+            ),
+            // send analytics call response
+            new HttpResponse(
+                200, array(), '{}'
             ),
         );
     }

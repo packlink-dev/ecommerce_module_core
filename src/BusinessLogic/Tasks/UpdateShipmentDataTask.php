@@ -8,9 +8,10 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
-use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
+use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
@@ -45,15 +46,21 @@ class UpdateShipmentDataTask extends Task
      */
     protected $orderStatuses = array();
     /**
-     * @var \Packlink\BusinessLogic\Order\Interfaces\OrderRepository
+     * @var \Packlink\BusinessLogic\Order\Interfaces\ShopOrderService
      */
-    private $orderRepository;
+    private $shopOrderService;
     /**
      * Order service instance.
      *
      * @var OrderService
      */
     private $orderService;
+    /**
+     * Order shipment details service.
+     *
+     * @var OrderShipmentDetailsService
+     */
+    private $orderDetailsService;
     /**
      * Proxy instance.
      *
@@ -150,7 +157,7 @@ class UpdateShipmentDataTask extends Task
             $orderReference = array_shift($this->references);
             try {
                 $this->updateOrderShipmentData($orderReference);
-            } catch (OrderNotFound $e) {
+            } catch (OrderShipmentDetailsNotFound $e) {
                 Logger::logWarning($e->getMessage());
             }
 
@@ -169,9 +176,9 @@ class UpdateShipmentDataTask extends Task
     protected function initializeState(array $orderStatuses = array())
     {
         if (empty($orderStatuses)) {
-            $this->references = $this->getOrderRepository()->getIncompleteOrderReferences();
+            $this->references = $this->getOrderDetailsService()->getIncompleteOrderReferences();
         } else {
-            $this->references = $this->getOrderRepository()->getOrderReferencesWithStatus($orderStatuses);
+            $this->references = $this->getOrderDetailsService()->getOrderReferencesWithStatus($orderStatuses);
         }
 
         $this->progress = 5;
@@ -189,23 +196,23 @@ class UpdateShipmentDataTask extends Task
      * @param string $reference Shipment reference
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     protected function updateOrderShipmentData($reference)
     {
-        $orderRepository = $this->getOrderRepository();
-        if (!$orderRepository->isShipmentDeleted($reference)) {
+        $shipmentDetailsService = $this->getOrderDetailsService();
+        if (!$shipmentDetailsService->isShipmentDeleted($reference)) {
             $shipment = $this->getProxy()->getShipment($reference);
             if ($shipment !== null) {
+                $shipmentDetailsService->setShippingPrice($reference, (float)$shipment->price);
                 $orderService = $this->getOrderService();
+                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
+
                 if ($this->isTrackingInfoUpdatable($shipment)) {
                     $orderService->updateTrackingInfo($shipment);
                 }
-
-                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
-                $orderRepository->setShippingPriceByReference($reference, (float)$shipment->price);
             } else {
-                $orderRepository->markShipmentDeleted($reference);
+                $shipmentDetailsService->markShipmentDeleted($reference);
             }
         }
     }
@@ -213,15 +220,29 @@ class UpdateShipmentDataTask extends Task
     /**
      * Gets the order repository instance.
      *
-     * @return OrderRepository Order repository instance.
+     * @return ShopOrderService Order repository instance.
      */
-    protected function getOrderRepository()
+    protected function getShopOrderService()
     {
-        if ($this->orderRepository === null) {
-            $this->orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        if ($this->shopOrderService === null) {
+            $this->shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
         }
 
-        return $this->orderRepository;
+        return $this->shopOrderService;
+    }
+
+    /**
+     * Gets the order repository instance.
+     *
+     * @return OrderShipmentDetailsService Order repository instance.
+     */
+    protected function getOrderDetailsService()
+    {
+        if ($this->orderDetailsService === null) {
+            $this->orderDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+        }
+
+        return $this->orderDetailsService;
     }
 
     /**

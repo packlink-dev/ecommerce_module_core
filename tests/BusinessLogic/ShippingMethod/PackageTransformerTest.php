@@ -14,9 +14,21 @@ use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
  */
 class PackageTransformerTest extends BaseTestWithServices
 {
+    /**
+     * Default weight.
+     */
     const WEIGHT = 10.5;
+    /**
+     * Default width.
+     */
     const WIDTH = 20;
+    /**
+     * Default height.
+     */
     const HEIGHT = 20;
+    /**
+     * Default length.
+     */
     const LENGTH = 20;
     /**
      * @var PackageTransformer
@@ -33,11 +45,15 @@ class PackageTransformerTest extends BaseTestWithServices
 
         $this->transformer = PackageTransformer::getInstance();
 
-        $this->defaultParcel = new ParcelInfo();
-        $this->defaultParcel->weight = self::WEIGHT;
-        $this->defaultParcel->width = self::WIDTH;
-        $this->defaultParcel->height = self::HEIGHT;
-        $this->defaultParcel->length = self::LENGTH;
+        $this->defaultParcel = ParcelInfo::fromArray(
+            array(
+                'weight' => self::WEIGHT,
+                'width' => self::WIDTH,
+                'height' => self::HEIGHT,
+                'length' => self::LENGTH,
+            )
+        );
+
         $this->shopConfig->setDefaultParcel($this->defaultParcel);
     }
 
@@ -67,6 +83,9 @@ class PackageTransformerTest extends BaseTestWithServices
         $this->assertEquals($expected->length, $package->length);
     }
 
+    /**
+     * @return array
+     */
     public function packagesProvider()
     {
         return array(

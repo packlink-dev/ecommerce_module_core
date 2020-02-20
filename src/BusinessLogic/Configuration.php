@@ -2,9 +2,10 @@
 
 namespace Packlink\BusinessLogic;
 
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
-use Packlink\BusinessLogic\Http\DTO\Warehouse;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
  * Class Configuration.
@@ -138,12 +139,15 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      * Returns default Parcel object.
      *
      * @return ParcelInfo|null Default parcel object.
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getDefaultParcel()
     {
         $value = $this->getConfigValue('defaultParcel');
 
-        return $value && is_array($value) ? ParcelInfo::fromArray($value) : null;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $value && is_array($value) ? FrontDtoFactory::get(ParcelInfo::CLASS_KEY, $value) : null;
     }
 
     /**
@@ -159,19 +163,22 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     /**
      * Returns default Warehouse object.
      *
-     * @return Warehouse|null Default warehouse object.
+     * @return \Packlink\BusinessLogic\Warehouse\Warehouse|null Default warehouse object.
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getDefaultWarehouse()
     {
         $value = $this->getConfigValue('defaultWarehouse');
 
-        return $value && is_array($value) ? Warehouse::fromArray($value) : null;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $value && is_array($value) ? FrontDtoFactory::get(Warehouse::CLASS_KEY, $value) : null;
     }
 
     /**
      * Sets default Warehouse object.
      *
-     * @param Warehouse $warehouse Default warehouse object.
+     * @param \Packlink\BusinessLogic\Warehouse\Warehouse $warehouse Default warehouse object.
      */
     public function setDefaultWarehouse(Warehouse $warehouse)
     {

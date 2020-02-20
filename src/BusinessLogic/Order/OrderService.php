@@ -13,8 +13,10 @@ use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
-use Packlink\BusinessLogic\Order\Interfaces\OrderRepository;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -44,9 +46,13 @@ class OrderService extends BaseService
      */
     private $configuration;
     /**
-     * @var OrderRepository
+     * @var ShopOrderService
      */
-    private $orderRepository;
+    private $shopOrderService;
+    /**
+     * @var OrderShipmentDetailsService
+     */
+    private $orderShipmentDetailsService;
 
     /**
      * OrderService constructor.
@@ -55,7 +61,8 @@ class OrderService extends BaseService
     {
         parent::__construct();
 
-        $this->orderRepository = ServiceRegister::getService(OrderRepository::CLASS_NAME);
+        $this->shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 
@@ -70,7 +77,7 @@ class OrderService extends BaseService
      */
     public function prepareDraft($orderId)
     {
-        $order = $this->orderRepository->getOrderAndShippingData($orderId);
+        $order = $this->shopOrderService->getOrderAndShippingData($orderId);
 
         return $this->convertOrderToDraftDto($order);
     }
@@ -80,12 +87,10 @@ class OrderService extends BaseService
      *
      * @param string $orderId Unique order id.
      * @param string $shipmentReference Packlink shipment reference.
-     *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      */
     public function setReference($orderId, $shipmentReference)
     {
-        $this->orderRepository->setReference($orderId, $shipmentReference);
+        $this->orderShipmentDetailsService->setReference($orderId, $shipmentReference);
     }
 
     /**
@@ -96,10 +101,24 @@ class OrderService extends BaseService
      */
     public function updateShippingStatus(Shipment $shipment, $status)
     {
+        $e = null;
         try {
-            $this->orderRepository->setShippingStatusByReference($shipment->reference, $status);
+            $orderShipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipment->reference);
+
+            if ($orderShipmentDetails === null) {
+                throw new OrderShipmentDetailsNotFound(
+                    'Order details not found for reference "' . $shipment->reference . '".'
+                );
+            }
+
+            $this->orderShipmentDetailsService->setShippingStatus($shipment->reference, $status);
+            $this->shopOrderService->updateShipmentStatus($orderShipmentDetails->getOrderId(), $status);
         } catch (OrderNotFound $e) {
-            Logger::logInfo(
+        } catch (OrderShipmentDetailsNotFound $e) {
+        }
+
+        if ($e !== null) {
+            Logger::logWarning(
                 $e->getMessage(),
                 'Core',
                 array('referenceId' => $shipment->reference, 'status' => $status)
@@ -116,23 +135,29 @@ class OrderService extends BaseService
     {
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        $trackingHistory = array();
         try {
-            $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
-            $this->orderRepository->updateTrackingInfo($shipment, $trackingHistory);
-        } catch (HttpBaseException $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
-        } catch (OrderNotFound $e) {
-            $trackingAsArray = array();
-            foreach ($trackingHistory as $item) {
-                $trackingAsArray[] = $item->toArray();
+            $orderShipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipment->reference);
+
+            if ($orderShipmentDetails === null) {
+                throw new OrderShipmentDetailsNotFound(
+                    'Order details not found for reference "' . $shipment->reference . '".'
+                );
             }
 
-            Logger::logInfo(
-                $e->getMessage(),
-                'Core',
-                array('referenceId' => $shipment->reference, 'trackingHistory' => $trackingAsArray)
+            $this->orderShipmentDetailsService->setTrackingInfo(
+                $shipment->reference,
+                $shipment->carrierTrackingUrl,
+                $shipment->trackingCodes
             );
+
+            $trackingHistory = $proxy->getTrackingInfo($shipment->reference);
+            $this->shopOrderService->handleUpdatedTrackingInfo($orderShipmentDetails->getOrderId(), $trackingHistory);
+        } catch (HttpBaseException $e) {
+            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
+        } catch (OrderShipmentDetailsNotFound $e) {
+            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
+        } catch (OrderNotFound $e) {
+            Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         }
     }
 
@@ -231,7 +256,7 @@ class OrderService extends BaseService
         $shippingMethod = $shippingService->getShippingMethod($methodId);
         if ($shippingMethod !== null) {
             try {
-                /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+                /** @var \Packlink\BusinessLogic\Warehouse\Warehouse $warehouse */
                 $warehouse = $this->configuration->getDefaultWarehouse();
                 $address = $order->getShippingAddress();
                 $service = ShippingCostCalculator::getCheapestShippingService(
@@ -284,7 +309,7 @@ class OrderService extends BaseService
      */
     private function addDepartureAddress(Draft $draft)
     {
-        /** @var \Packlink\BusinessLogic\Http\DTO\Warehouse $warehouse */
+        /** @var \Packlink\BusinessLogic\Warehouse\Warehouse $warehouse */
         $warehouse = $this->configuration->getDefaultWarehouse();
         $draft->from = new Draft\Address();
         $draft->from->country = $warehouse->country;

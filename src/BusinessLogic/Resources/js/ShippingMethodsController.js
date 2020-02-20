@@ -27,7 +27,7 @@ var Packlink = window.Packlink || {};
         let spinnerBarrierCount = 0;
         let spinnerBarrier = getSpinnerBarrier();
 
-        /** @var {{parcelSet, warehouseSet, shippingMethodSet}} dashboardData */
+        /** @var {{isParcelSet, isWarehouseSet, isShippingMethodSet}} dashboardData */
         let dashboardData = {};
 
         /**
@@ -278,7 +278,7 @@ var Packlink = window.Packlink || {};
 
             initSteps();
 
-            if (!dashboardData.parcelSet || !dashboardData.warehouseSet || !dashboardData.shippingMethodSet) {
+            if (!dashboardData.isParcelSet || !dashboardData.isWarehouseSet || !dashboardData.isShippingMethodSet) {
                 showDashboardModal();
             } else {
                 hideDashboardModal();
@@ -1684,7 +1684,7 @@ var Packlink = window.Packlink || {};
          * Initializes default parcel step.
          */
         function initParcelStep() {
-            let status = dashboardData.parcelSet ? 'completed' : 'in-progress';
+            let status = dashboardData.isParcelSet ? 'completed' : 'in-progress';
             let step = templateService.getComponent('pl-parcel-step');
             if (status !== 'disabled') {
                 step.addEventListener('click', handleParcelStepClicked, true);
@@ -1700,7 +1700,7 @@ var Packlink = window.Packlink || {};
          * Initializes step subtitle.
          */
         function initStepSubtitle() {
-            if (!dashboardData.parcelSet || !dashboardData.warehouseSet) {
+            if (!dashboardData.isParcelSet || !dashboardData.isWarehouseSet) {
                 templateService.getComponent('pl-step-subtitle').remove();
             }
         }
@@ -1711,8 +1711,8 @@ var Packlink = window.Packlink || {};
         function initWarehouseStep() {
             let status = 'completed';
 
-            if (!dashboardData.warehouseSet) {
-                if (dashboardData.parcelSet) {
+            if (!dashboardData.isWarehouseSet) {
+                if (dashboardData.isParcelSet) {
                     status = 'in-progress';
                 } else {
                     status = 'disabled';
@@ -1736,8 +1736,8 @@ var Packlink = window.Packlink || {};
         function initMethodsStep() {
             let status = 'completed';
 
-            if (!dashboardData.shippingMethodSet) {
-                if (dashboardData.parcelSet && dashboardData.warehouseSet) {
+            if (!dashboardData.isShippingMethodSet) {
+                if (dashboardData.isParcelSet && dashboardData.isWarehouseSet) {
                     status = 'in-progress';
                 } else {
                     status = 'disabled';
@@ -1802,7 +1802,7 @@ var Packlink = window.Packlink || {};
                 isAutoconfigure = false;
             }
 
-            if (!isAutoconfigure && (!dashboardData.parcelSet || !dashboardData.warehouseSet)) {
+            if (!isAutoconfigure && (!dashboardData.isParcelSet || !dashboardData.isWarehouseSet)) {
                 return;
             }
 
