@@ -105,7 +105,7 @@ abstract class FrontDto extends BaseDto
     }
 
     /**
-     * Checks the payload for mandatory fields.
+     * Checks the payload for mandatory fields. Uses `empty()` validation!
      *
      * @param array $payload The payload in key-value format.
      * @param ValidationError[] $validationErrors The array of errors to populate.
@@ -113,7 +113,7 @@ abstract class FrontDto extends BaseDto
     protected static function validateRequiredFields(array $payload, array &$validationErrors)
     {
         foreach (static::$requiredFields as $field) {
-            if (!isset($payload[$field])) {
+            if (empty($payload[$field])) {
                 $validationErrors[] = static::getValidationError(
                     ValidationError::ERROR_REQUIRED_FIELD,
                     $field,
