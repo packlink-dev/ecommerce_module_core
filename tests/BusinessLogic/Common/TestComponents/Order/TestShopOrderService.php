@@ -2,7 +2,6 @@
 
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\Order;
 
-use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Shipment as ShipmentDTO;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
@@ -12,8 +11,6 @@ use Packlink\BusinessLogic\Order\Objects\Item;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\Objects\Shipment;
 use Packlink\BusinessLogic\Order\Objects\TrackingHistory;
-use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
-use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 
 /**
  * Class TestOrderRepository.
@@ -40,14 +37,6 @@ class TestShopOrderService implements ShopOrderService
      * @var bool
      */
     private $throwGenericException = false;
-    /**
-     * @var int
-     */
-    private $shippingMethodId;
-    /**
-     * @var OrderShipmentDetailsService
-     */
-    private $orderShipmentDetailsService;
 
     /**
      * TestOrderRepository constructor.
@@ -55,8 +44,6 @@ class TestShopOrderService implements ShopOrderService
     public function __construct()
     {
         static::$orders = array();
-
-        $this->orderShipmentDetailsService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
     }
 
     /**
@@ -80,26 +67,6 @@ class TestShopOrderService implements ShopOrderService
     }
 
     /**
-     * Shipping method entity id.
-     *
-     * @param int $id Shipping method Id
-     */
-    public function setShippingMethodId($id)
-    {
-        $this->shippingMethodId = $id;
-    }
-
-    /**
-     * Sets test order.
-     *
-     * @param \Packlink\BusinessLogic\Order\Objects\Order $order
-     */
-    public function setOrder(Order $order)
-    {
-        static::$orders[$order->getId()] = $order;
-    }
-
-    /**
      * Fetches and returns system order by its unique identifier.
      *
      * @param string $orderId $orderId Unique order id.
@@ -114,30 +81,6 @@ class TestShopOrderService implements ShopOrderService
         }
 
         return $this->getOrder($orderId);
-    }
-
-    /**
-     * Sets order packlink shipment labels to an order by shipment reference.
-     *
-     * @param string $shipmentReference Packlink shipment reference.
-     * @param string[] $labels Packlink shipment labels.
-     *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided reference is not found.
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
-     */
-    public function setLabelsByReference($shipmentReference, array $labels)
-    {
-        if ($this->throwOrderNotFoundException) {
-            throw new OrderNotFound('Order not found.');
-        }
-
-        $shippingDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipmentReference);
-        if ($shippingDetails === null) {
-            throw new OrderShipmentDetailsNotFound('Order details not found for reference: ' . $shipmentReference);
-        }
-
-        $order = $this->getOrder($shippingDetails->getOrderId());
-        $order->setPacklinkShipmentLabels($labels);
     }
 
     /**
@@ -206,7 +149,7 @@ class TestShopOrderService implements ShopOrderService
             $order = new Order();
             $order->setId($orderId);
             $order->setShipment(new Shipment());
-            $order->setShippingMethodId($shippingMethodId ?: $this->shippingMethodId);
+            $order->setShippingMethodId($shippingMethodId);
             $order->setShippingAddress(new Address());
             $order->getShippingAddress()->setCountry($destinationCountry);
             $order->setBillingAddress(new Address());

@@ -170,20 +170,15 @@ class OrderShipmentDetailsService extends BaseService
      * Sets packlink shipment labels.
      *
      * @param string $shipmentReference Shipment reference.
-     * @param string[] $labels Packlink shipment labels as a list of URLs.
+     * @param ShipmentLabel[] $labels Packlink shipment labels.
      *
      * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function setLabelsByReference($shipmentReference, array $labels)
     {
-        $labelsPrepared = array();
-        foreach ($labels as $labelLink) {
-            $labelsPrepared[] = new ShipmentLabel($labelLink);
-        }
-
         /** @var OrderShipmentDetails $orderDetails */
         $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
-        $orderDetails->setShipmentLabels($labelsPrepared);
+        $orderDetails->setShipmentLabels($labels);
 
         $this->repository->persist($orderDetails);
     }

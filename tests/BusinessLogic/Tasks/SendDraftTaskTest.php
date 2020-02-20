@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
+use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -22,7 +23,10 @@ use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
+use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
+use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
 /**
@@ -44,7 +48,11 @@ class SendDraftTaskTest extends BaseSyncTest
             OrderShipmentDetails::getClassName(),
             MemoryRepository::getClassName()
         );
-        TestRepositoryRegistry::registerRepository(OrderSendDraftTaskMap::CLASS_NAME, MemoryRepository::getClassName());
+        TestRepositoryRegistry::registerRepository(
+            OrderSendDraftTaskMap::getClassName(),
+            MemoryRepository::getClassName()
+        );
+        TestRepositoryRegistry::registerRepository(ShippingMethod::getClassName(), MemoryRepository::getClassName());
 
         TestServiceRegister::registerService(
             OrderShipmentDetailsService::CLASS_NAME,
@@ -90,6 +98,20 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
+        TestServiceRegister::registerService(
+            ShippingMethodService::CLASS_NAME,
+            function () {
+                return ShippingMethodService::getInstance();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            ShopShippingMethodService::CLASS_NAME,
+            function () {
+                return new TestShopShippingMethodService();
+            }
+        );
+
         $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
@@ -101,6 +123,8 @@ class SendDraftTaskTest extends BaseSyncTest
     protected function tearDown()
     {
         OrderService::resetInstance();
+        ShippingMethodService::resetInstance();
+
         parent::tearDown();
     }
 
