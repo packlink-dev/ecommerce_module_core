@@ -16,8 +16,6 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
  */
 class UpdateShippingServicesTaskStatusController
 {
-    const PENDING = 'pending';
-
     /**
      * Checks the status of the task responsible for getting services.
      *
@@ -25,7 +23,7 @@ class UpdateShippingServicesTaskStatusController
      *  QueueItem::FAILED - when the task failed,
      *  QueueItem::COMPLETED - when the task completed successfully,
      *  QueueItem::IN_PROGRESS - when the task is in progress,
-     *  PENDING - when the default warehouse is not set by user and the task was not enqueued.
+     *  QueueItem::QUEUED - when the default warehouse is not set by user and the task was not enqueued.
      * </p>
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
@@ -56,6 +54,6 @@ class UpdateShippingServicesTaskStatusController
             return $expired ? QueueItem::FAILED : $status;
         }
 
-        return static::PENDING;
+        return QueueItem::QUEUED;
     }
 }
