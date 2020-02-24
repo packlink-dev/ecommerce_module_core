@@ -128,7 +128,7 @@ var Packlink = window.Packlink || {};
 
             let defaultOption = document.createElement('option');
             defaultOption.value = 'UN';
-            defaultOption.innerText = Packlink.labelMsgs.empty;
+            defaultOption.innerText = '';
             countryInput.appendChild(defaultOption);
 
             for (let code in response) {

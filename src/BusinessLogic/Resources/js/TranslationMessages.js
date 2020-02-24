@@ -15,7 +15,3 @@ Packlink.errorMsgs = {
 Packlink.successMsgs = {
     shippingMethodSaved: 'Shipping service successfully saved.'
 };
-
-Packlink.labelMsgs = {
-    empty: 'Empty'
-};
