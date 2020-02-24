@@ -154,7 +154,7 @@ class Proxy
      */
     public function getLocations($serviceId, $countryCode, $postalCode)
     {
-        $response = $this->call(HttpClient::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("dropoffs/$serviceId/$countryCode/$postalCode"));
 
         return DropOff::fromArrayBatch($response->decodeBodyAsJson() ?: array());
     }
