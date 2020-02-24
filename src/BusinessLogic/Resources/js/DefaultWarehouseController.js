@@ -54,10 +54,6 @@ var Packlink = window.Packlink || {};
         function constructPage(response) {
             currentCountry = response['country'];
 
-            if (currentCountry === 'UN') {
-                currentCountry = 'ES';
-            }
-
             for (let field of warehouseFields) {
                 let input = templateService.getComponent('pl-default-warehouse-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
@@ -129,6 +125,11 @@ var Packlink = window.Packlink || {};
          */
         function constructCountryDropdown(response) {
             countryInput = templateService.getComponent('pl-default-warehouse-country', page);
+
+            let defaultOption = document.createElement('option');
+            defaultOption.value = 'UN';
+            defaultOption.innerText = Packlink.labelMsgs.empty;
+            countryInput.appendChild(defaultOption);
 
             for (let code in response) {
                 let supportedCountry = response[code],
