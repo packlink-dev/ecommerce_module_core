@@ -54,6 +54,10 @@ var Packlink = window.Packlink || {};
         function constructPage(response) {
             currentCountry = response['country'];
 
+            if (currentCountry === 'UN') {
+                currentCountry = 'ES';
+            }
+
             for (let field of warehouseFields) {
                 let input = templateService.getComponent('pl-default-warehouse-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
