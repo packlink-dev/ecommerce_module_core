@@ -113,6 +113,12 @@ class WebHookEventHandler extends BaseService
         }
 
         if ($shipment === null) {
+            Logger::logWarning(
+                'Received a webhook for an unknown shipment.',
+                'Core',
+                array('reference' => $eventData->shipment_reference)
+            );
+
             return;
         }
 
