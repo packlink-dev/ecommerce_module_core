@@ -489,6 +489,10 @@ class Proxy
                 $message = '';
                 if (isset($error['messages']) && is_array($error['messages'])) {
                     $message = implode("\n", Php55::arrayColumn($error['messages'], 'message'));
+                    // if there is only one message, 'messages' is associative array
+                    if (empty($message) && !empty($error['messages']['message'])) {
+                        $message = $error['messages']['message'];
+                    }
                 } elseif (isset($error['message'])) {
                     $message = $error['message'];
                 }
