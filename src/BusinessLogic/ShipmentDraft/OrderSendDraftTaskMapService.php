@@ -69,6 +69,10 @@ class OrderSendDraftTaskMapService extends BaseService
      */
     public function isMappedTaskFailed($orderTaskMap)
     {
+        if ($orderTaskMap->getExecutionId() === null) {
+            return false;
+        }
+
         $queueItemRepository = RepositoryRegistry::getRepository(QueueItem::CLASS_NAME);
         $filter = new QueryFilter();
         $filter->where('id', Operators::EQUALS, $orderTaskMap->getExecutionId());
