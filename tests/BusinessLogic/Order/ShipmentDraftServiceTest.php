@@ -176,6 +176,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testCreateDraft()
     {
@@ -194,6 +195,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testCreateDelayedDraft()
     {
@@ -221,6 +223,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     /**
      * Tests idempotent operation for creating send draft shipment task.
      *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
@@ -260,6 +263,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testStatusFailed()
     {

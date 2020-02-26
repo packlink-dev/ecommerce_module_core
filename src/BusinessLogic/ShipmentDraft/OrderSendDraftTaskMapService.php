@@ -2,6 +2,10 @@
 
 namespace Packlink\BusinessLogic\ShipmentDraft;
 
+use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
+use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists;
 use Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound;
@@ -51,6 +55,27 @@ class OrderSendDraftTaskMapService extends BaseService
     public function getOrderTaskMap($orderId)
     {
         return $this->repository->selectByOrderId($orderId);
+    }
+
+    /**
+     * Returns whether a task associated with the map failed with execution.
+     *
+     * @param OrderSendDraftTaskMap $orderTaskMap
+     *
+     * @return bool
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function isMappedTaskFailed($orderTaskMap)
+    {
+        $queueItemRepository = RepositoryRegistry::getRepository(QueueItem::CLASS_NAME);
+        $filter = new QueryFilter();
+        $filter->where('id', Operators::EQUALS, $orderTaskMap->getExecutionId());
+        /** @var QueueItem $item */
+        $item = $queueItemRepository->selectOne($filter);
+
+        return $item->getStatus() === QueueItem::FAILED;
     }
 
     /**

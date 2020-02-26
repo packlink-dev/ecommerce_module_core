@@ -44,16 +44,20 @@ class ShipmentDraftService extends BaseService
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapExists
      * @throws \Packlink\BusinessLogic\ShipmentDraft\Exceptions\DraftTaskMapNotFound
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function enqueueCreateShipmentDraftTask($orderId, $isDelayed = false, $delayInterval = 5)
     {
         /** @var OrderSendDraftTaskMapService $draftTaskMapService */
         $draftTaskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
-        if ($draftTaskMapService->getOrderTaskMap($orderId) !== null) {
-            return;
+        $orderTaskMap = $draftTaskMapService->getOrderTaskMap($orderId);
+        if ($orderTaskMap !== null) {
+            if (!$draftTaskMapService->isMappedTaskFailed($orderTaskMap)) {
+                return;
+            }
+        } else {
+            $draftTaskMapService->createOrderTaskMap($orderId);
         }
-
-        $draftTaskMapService->createOrderTaskMap($orderId);
 
         /** @var Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
