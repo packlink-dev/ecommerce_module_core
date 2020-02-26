@@ -94,6 +94,22 @@ class OrderService extends BaseService
     }
 
     /**
+     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipment
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function updateShipmentData(Shipment $shipment)
+    {
+        /** @var OrderShipmentDetailsService $shipmentDetailsService */
+        $this->orderShipmentDetailsService->setShippingPrice($shipment->reference, (float)$shipment->price);
+        $this->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
+
+        if ($this->isTrackingInfoUpdatable($shipment->status)) {
+            $this->updateTrackingInfo($shipment);
+        }
+    }
+
+    /**
      * Updates shipping status from API for order with given shipment reference.
      *
      * @param Shipment $shipment Shipment DTO for given reference number.
@@ -194,7 +210,7 @@ class OrderService extends BaseService
     /**
      * Checks whether shipment labels are available.
      *
-     * @param string $status
+     * @param string $status Shipment status.
      *
      * @return bool TRUE if shipment labels are available; FALSE otherwise.
      */
@@ -209,6 +225,24 @@ class OrderService extends BaseService
             ),
             true
         );
+    }
+
+    /**
+     * Checks if tracking info should be updated.
+     *
+     * @param string $status Shipment status.
+     *
+     * @return bool TRUE if tracking info should be update; FALSE otherwise.
+     */
+    public function isTrackingInfoUpdatable($status)
+    {
+        $allowedUpdateStatuses = array(
+            ShipmentStatus::STATUS_ACCEPTED,
+            ShipmentStatus::STATUS_READY,
+            ShipmentStatus::STATUS_IN_TRANSIT,
+        );
+
+        return in_array(ShipmentStatus::getStatus($status), $allowedUpdateStatuses, true);
     }
 
     /**

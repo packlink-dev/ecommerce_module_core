@@ -85,10 +85,16 @@ class WebHookHandlerTest extends BaseTestWithServices
      * Tests setting of shipping status
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
-    public function testHandleShippingStatusEvent()
+    public function testHandleShippingDeliveredEvent()
     {
         $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
-        $this->httpClient->setMockResponses($this->getMockStatusResponse());
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentDelivered.json')
+                ),
+            )
+        );
         $webhookHandler = WebHookEventHandler::getInstance();
         $input = $this->getShippingStatusEventBody();
         $webhookHandler->handle($input);

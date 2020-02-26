@@ -204,13 +204,7 @@ class UpdateShipmentDataTask extends Task
         if (!$shipmentDetailsService->isShipmentDeleted($reference)) {
             $shipment = $this->getProxy()->getShipment($reference);
             if ($shipment !== null) {
-                $shipmentDetailsService->setShippingPrice($reference, (float)$shipment->price);
-                $orderService = $this->getOrderService();
-                $orderService->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
-
-                if ($this->isTrackingInfoUpdatable($shipment)) {
-                    $orderService->updateTrackingInfo($shipment);
-                }
+                $this->getOrderService()->updateShipmentData($shipment);
             } else {
                 $shipmentDetailsService->markShipmentDeleted($reference);
             }
