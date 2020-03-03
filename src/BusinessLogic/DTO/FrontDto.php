@@ -75,7 +75,7 @@ abstract class FrontDto extends BaseDto
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      *  When fields are not registered for DTO class or payload contains unknown fields.
      */
-    final protected static function validate(array $payload)
+    protected static function validate(array $payload)
     {
         $validationErrors = array();
 
