@@ -27,13 +27,13 @@ var Packlink = window.Packlink || {};
         let state = Packlink.state;
         let page;
 
-        let country;
-
+        let currentCountry;
         let currentPostalCode = '';
         let currentCity = '';
 
         let searchTerm = '';
 
+        let countryInput = null;
         let postalCodeInput = null;
 
         /**
@@ -52,21 +52,43 @@ var Packlink = window.Packlink || {};
          * @param response
          */
         function constructPage(response) {
-            country = response['country'];
+            currentCountry = response['country'];
 
             for (let field of warehouseFields) {
                 let input = templateService.getComponent('pl-default-warehouse-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
                 input.addEventListener('focus', onPostalCodeBlur);
+
                 if (response[field]) {
                     input.value = response[field];
                 }
             }
 
+            constructPostalCodeInput(response['postal_code'], response['city']);
+
+            let submitButton = templateService.getComponent(
+                'pl-default-warehouse-submit-btn',
+                page
+            );
+
+            submitButton.addEventListener('click', handleSubmitButtonClicked, true);
+            utilityService.configureInputElements();
+            utilityService.hideSpinner();
+
+            ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
+        }
+
+        /**
+         * Constructs postal code input and attaches event handlers to it.
+         *
+         * @param {string} postalCode
+         * @param {string} city
+         */
+        function constructPostalCodeInput(postalCode, city) {
             postalCodeInput = templateService.getComponent('pl-default-warehouse-postal_code', page);
-            if (response['postal_code'] && response['city']) {
-                currentPostalCode = response['postal_code'];
-                currentCity = response['city'];
+            if (postalCode && city) {
+                currentPostalCode = postalCode;
+                currentCity = city;
                 postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
             }
 
@@ -80,6 +102,12 @@ var Packlink = window.Packlink || {};
             document.addEventListener('click', onPostalCodeBlur);
             postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
             postalCodeInput.addEventListener('keyup', autocompleteNavigate);
+            postalCodeInput.addEventListener(
+                'focusout',
+                function () {
+                    postalCodeInput.value = ' ';
+                },
+                true);
 
             templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener(
                 'click',
@@ -88,22 +116,42 @@ var Packlink = window.Packlink || {};
                     postalCodeInput.focus();
                 }
             );
+        }
 
-            let submitButton = templateService.getComponent(
-                'pl-default-warehouse-submit-btn',
-                page
-            );
+        /**
+         * Builds a warehouse country dropdown and populates it with all supported countries.
+         *
+         * @param response
+         */
+        function constructCountryDropdown(response) {
+            countryInput = templateService.getComponent('pl-default-warehouse-country', page);
 
-            submitButton.addEventListener('click', handleSubmitButtonClicked, true);
-            utilityService.configureInputElements();
-            utilityService.hideSpinner();
+            let defaultOption = document.createElement('option');
+            defaultOption.value = 'UN';
+            defaultOption.innerText = ' ';
+            countryInput.appendChild(defaultOption);
 
-            postalCodeInput.addEventListener(
-                'focusout',
-                function () {
-                    postalCodeInput.value = ' ';
-                },
-                true);
+            for (let code in response) {
+                let supportedCountry = response[code],
+                    optionElement = document.createElement('option');
+
+                optionElement.value = supportedCountry.code;
+                optionElement.innerText = supportedCountry.name;
+
+                if (supportedCountry.code === currentCountry) {
+                    optionElement.selected = true;
+                }
+
+                countryInput.appendChild(optionElement);
+            }
+
+            countryInput.addEventListener('change', onCountryChange);
+        }
+
+        function onCountryChange() {
+            currentCountry = countryInput.value;
+            currentPostalCode = '';
+            currentCity = '';
         }
 
         function onPostalCodeFocus() {
@@ -124,7 +172,10 @@ var Packlink = window.Packlink || {};
             }
 
             postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
-            templateService.removeError(postalCodeInput);
+            if (currentPostalCode !== '' && currentCity !== '') {
+                templateService.removeError(postalCodeInput);
+            }
+
             utilityService.configureInputElements();
         }
 
@@ -134,7 +185,10 @@ var Packlink = window.Packlink || {};
                 return;
             }
 
-            ajaxService.post(configuration.searchPostalCodesUrl, {query: searchTerm}, renderPostalCodesAutocomplete);
+            ajaxService.post(configuration.searchPostalCodesUrl, {
+                query: searchTerm,
+                country: countryInput.value
+            }, renderPostalCodesAutocomplete);
         }
 
         function renderPostalCodesAutocomplete(response) {
@@ -316,7 +370,7 @@ var Packlink = window.Packlink || {};
 
             if (isValid) {
                 utilityService.showSpinner();
-                model['country'] = country;
+                model['country'] = currentCountry;
                 model['postal_code'] = currentPostalCode;
                 model['city'] = currentCity;
 

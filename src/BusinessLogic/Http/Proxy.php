@@ -16,6 +16,7 @@ use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\LocationInfo;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\PostalCode;
+use Packlink\BusinessLogic\Http\DTO\PostalZone;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -153,7 +154,7 @@ class Proxy
      */
     public function getLocations($serviceId, $countryCode, $postalCode)
     {
-        $response = $this->call(HttpClient::HTTP_METHOD_GET, "dropoffs/$serviceId/$countryCode/$postalCode");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("dropoffs/$serviceId/$countryCode/$postalCode"));
 
         return DropOff::fromArrayBatch($response->decodeBodyAsJson() ?: array());
     }
@@ -200,9 +201,46 @@ class Proxy
      */
     public function getPostalCodes($countryCode, $zipCode)
     {
-        $response = $this->call(HttpClient::HTTP_METHOD_GET, "locations/postalcodes/$countryCode/$zipCode");
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("locations/postalcodes/$countryCode/$zipCode"));
 
         return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
+    }
+
+    /**
+     * Returns array of PostalZone objects by specified country.
+     *
+     * @param string $countryCode
+     * @param string $lang
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\PostalZone[]
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getPostalZones($countryCode, $lang = 'en')
+    {
+        $url = 'locations/postalzones/destinations?' . http_build_query(
+                array(
+                    'platform' => 'PRO',
+                    'platform_country' => $countryCode,
+                    'language' => $lang,
+                )
+            );
+
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
+
+        $postalZones = PostalZone::fromArrayBatch($response->decodeBodyAsJson());
+
+        $postalZones = array_filter(
+            $postalZones,
+            function ($postalZone) use ($countryCode) {
+                /** @var PostalZone $postalZone */
+                return $postalZone->isoCode === $countryCode;
+            }
+        );
+
+        return $postalZones;
     }
 
     /**
@@ -451,6 +489,10 @@ class Proxy
                 $message = '';
                 if (isset($error['messages']) && is_array($error['messages'])) {
                     $message = implode("\n", Php55::arrayColumn($error['messages'], 'message'));
+                    // if there is only one message, 'messages' is associative array
+                    if (empty($message) && !empty($error['messages']['message'])) {
+                        $message = $error['messages']['message'];
+                    }
                 } elseif (isset($error['message'])) {
                     $message = $error['message'];
                 }

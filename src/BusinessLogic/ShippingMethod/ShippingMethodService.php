@@ -120,7 +120,6 @@ class ShippingMethodService extends BaseService
         }
 
         $this->setShippingMethodDetails($method, $serviceDetails);
-        $method->setLogoUrl($this->shopShippingMethodService->getCarrierLogoFilePath($method->getCarrierName()));
 
         $this->save($method);
 
@@ -480,16 +479,11 @@ class ShippingMethodService extends BaseService
      * @param QueryFilter $filter Filter for query.
      *
      * @return ShippingMethod[] A list of found shipping methods.
+     * @noinspection PhpIncompatibleReturnTypeInspection
      */
     protected function select($filter = null)
     {
-        /** @var ShippingMethod[] $methods */
-        $methods = $this->shippingMethodRepository->select($filter);
-        foreach ($methods as $method) {
-            $method->setLogoUrl($this->shopShippingMethodService->getCarrierLogoFilePath($method->getCarrierName()));
-        }
-
-        return $methods;
+        return $this->shippingMethodRepository->select($filter);
     }
 
     /**
@@ -498,16 +492,10 @@ class ShippingMethodService extends BaseService
      * @param QueryFilter $filter Filter for query.
      *
      * @return ShippingMethod First found shipping method.
+     * @noinspection PhpIncompatibleReturnTypeInspection
      */
     protected function selectOne($filter)
     {
-        /** @var ShippingMethod $method */
-        $method = $this->shippingMethodRepository->selectOne($filter);
-
-        if ($method) {
-            $this->shopShippingMethodService->getCarrierLogoFilePath($method->getCarrierName());
-        }
-
-        return $method;
+        return $this->shippingMethodRepository->selectOne($filter);
     }
 }

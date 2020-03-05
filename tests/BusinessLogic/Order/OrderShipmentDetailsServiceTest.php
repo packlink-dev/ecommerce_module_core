@@ -6,6 +6,7 @@ use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 
@@ -73,7 +74,10 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     public function testSetLabels()
     {
         $this->orderShipmentDetailsService->setReference('test', 'test_reference');
-        $this->orderShipmentDetailsService->setLabelsByReference('test_reference', array('label1', 'label2'));
+        $this->orderShipmentDetailsService->setLabelsByReference(
+            'test_reference',
+            array(new ShipmentLabel('label1'), new ShipmentLabel('label2'))
+        );
 
         $shipmentDetailsByRef = $this->orderShipmentDetailsService->getDetailsByReference('test_reference');
 
@@ -90,7 +94,10 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     public function testSetLabelsUnknownReference()
     {
         $this->orderShipmentDetailsService->setReference('test', 'test_reference');
-        $this->orderShipmentDetailsService->setLabelsByReference('some reference', array('label1', 'label2'));
+        $this->orderShipmentDetailsService->setLabelsByReference(
+            'some reference',
+            array(new ShipmentLabel('label1'), new ShipmentLabel('label2'))
+        );
 
         $this->fail('Exception must be thrown if shipment reference is not found.');
     }
@@ -103,7 +110,10 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     public function testMarkLabelPrinted()
     {
         $this->orderShipmentDetailsService->setReference('test', 'test_reference');
-        $this->orderShipmentDetailsService->setLabelsByReference('test_reference', array('label1', 'label2'));
+        $this->orderShipmentDetailsService->setLabelsByReference(
+            'test_reference',
+            array(new ShipmentLabel('label1'), new ShipmentLabel('label2'))
+        );
         $this->orderShipmentDetailsService->markLabelPrinted('test_reference', 'label2');
 
         $shipmentDetailsByRef = $this->orderShipmentDetailsService->getDetailsByReference('test_reference');

@@ -11,13 +11,6 @@ namespace Logeecom\Infrastructure;
 abstract class Singleton
 {
     /**
-     * Singleton instance of this class.
-     *
-     * @var static
-     */
-    protected static $instance;
-
-    /**
      * Hidden constructor.
      */
     protected function __construct()
@@ -33,6 +26,10 @@ abstract class Singleton
     {
         if (static::$instance === null) {
             static::$instance = new static();
+        }
+
+        if (!(static::$instance instanceof static)) {
+            throw new \RuntimeException('Wrong static instance of a singleton class.');
         }
 
         return static::$instance;

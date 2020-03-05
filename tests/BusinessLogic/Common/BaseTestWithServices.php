@@ -4,12 +4,21 @@ namespace Logeecom\Tests\BusinessLogic\Common;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Country\Country;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -72,9 +81,35 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             }
         );
 
+        TestServiceRegister::registerService(
+            CountryService::CLASS_NAME,
+            function () {
+                return CountryService::getInstance();
+            }
+        );
+
+        $queueService = new TestQueueService();
+        TestServiceRegister::registerService(
+            QueueService::CLASS_NAME,
+            function () use ($queueService) {
+                return $queueService;
+            }
+        );
+
+        $wakeupService = new TestTaskRunnerWakeupService();
+        TestServiceRegister::registerService(
+            TaskRunnerWakeup::CLASS_NAME,
+            function () use ($wakeupService) {
+                return $wakeupService;
+            }
+        );
+
+        TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::THIS_CLASS_NAME);
+
         TestFrontDtoFactory::register(Warehouse::CLASS_KEY, TestWarehouse::CLASS_NAME);
         TestFrontDtoFactory::register(ParcelInfo::CLASS_KEY, ParcelInfo::CLASS_NAME);
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
+        TestFrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
     }
 
     protected function tearDown()

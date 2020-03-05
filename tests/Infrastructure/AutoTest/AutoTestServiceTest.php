@@ -34,10 +34,6 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
      * @var TestHttpClient
      */
     protected $httpClient;
-    /**
-     * @var TestHttpClient
-     */
-    protected $logger;
 
     /**
      * @throws \Exception
@@ -87,6 +83,9 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
 
     /**
      * Test setting auto-test mode.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testSetAutoTestMode()
     {
@@ -110,6 +109,12 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
 
     /**
      * Test successful start of the auto-test.
+     *
+     * @throws \Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testStartAutoTestSuccess()
     {
@@ -158,6 +163,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
      * Tests failure when storage is not available.
      *
      * @expectedException \Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testStartAutoTestStorageFailure()
     {

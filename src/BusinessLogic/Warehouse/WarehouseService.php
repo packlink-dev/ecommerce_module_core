@@ -3,12 +3,14 @@
 namespace Packlink\BusinessLogic\Warehouse;
 
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
  * Class WarehouseService.
@@ -51,14 +53,17 @@ class WarehouseService extends BaseService
     }
 
     /**
-     * Saves warehouse data.
+     * Updates warehouse data.
      *
      * @param array $payload
      *
+     * @return \Packlink\BusinessLogic\Warehouse\Warehouse
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
-    public function setWarehouse(array $payload)
+    public function updateWarehouseData(array $payload)
     {
         $validationErrors = array();
         try {
@@ -75,7 +80,19 @@ class WarehouseService extends BaseService
 
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        /** @var \Logeecom\Infrastructure\TaskExecution\QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+
+        $oldWarehouse = $configService->getDefaultWarehouse();
+
         $configService->setDefaultWarehouse($warehouse);
+        if ($oldWarehouse === null
+            || $oldWarehouse->country !== $warehouse->country
+        ) {
+            $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
+        }
+
+        return $warehouse;
     }
 
     /**

@@ -15,6 +15,13 @@ use Logeecom\Infrastructure\Singleton;
 class AutoTestLogger extends Singleton implements ShopLoggerAdapter
 {
     /**
+     * Singleton instance of this class.
+     *
+     * @var static
+     */
+    protected static $instance;
+
+    /**
      * Logs a message in system.
      *
      * @param LogData $data Data to log.

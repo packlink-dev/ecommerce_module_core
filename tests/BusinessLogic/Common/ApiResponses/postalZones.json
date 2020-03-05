@@ -1,0 +1,16 @@
+[
+  {
+    "id": "3",
+    "isoCode": "DE",
+    "hasPostalCodes": true,
+    "name": "Germany",
+    "phonePrefix": "+49"
+  },
+  {
+    "id": "248",
+    "isoCode": "DE",
+    "hasPostalCodes": true,
+    "name": "Germany - Helgoland",
+    "phonePrefix": "+49"
+  }
+]

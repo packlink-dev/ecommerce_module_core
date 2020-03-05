@@ -9,7 +9,7 @@ use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\OrderService;
-use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
+use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 
 /**
  * Class WebHookService.
@@ -60,7 +60,7 @@ class WebHookEventHandler extends BaseService
         }
 
         if ($this->checkAuthToken() && $this->shouldHandleEvent($payload->event)) {
-            $this->handleEvent($payload->event, $payload->data);
+            $this->handleEvent($payload->data);
         }
 
         return true;
@@ -97,13 +97,10 @@ class WebHookEventHandler extends BaseService
     /**
      * Handles concrete event based on event name.
      *
-     * @param string $eventName Name of the event.
      * @param \stdClass $eventData Event payload data.
      */
-    protected function handleEvent($eventName, $eventData)
+    protected function handleEvent($eventData)
     {
-        /** @var OrderService $orderService */
-        $orderService = ServiceRegister::getService(OrderService::CLASS_NAME);
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         try {
@@ -116,19 +113,21 @@ class WebHookEventHandler extends BaseService
         }
 
         if ($shipment === null) {
+            Logger::logWarning(
+                'Received a webhook for an unknown shipment.',
+                'Core',
+                array('reference' => $eventData->shipment_reference)
+            );
+
             return;
         }
 
-        switch ($eventName) {
-            case 'shipment.carrier.success':
-                $orderService->updateShippingStatus($shipment, ShipmentStatus::STATUS_ACCEPTED);
-                break;
-            case 'shipment.delivered':
-                $orderService->updateShippingStatus($shipment, ShipmentStatus::STATUS_DELIVERED);
-                break;
-            case 'shipment.tracking.update':
-                $orderService->updateTrackingInfo($shipment);
-                break;
+        try {
+            /** @var OrderService $orderService */
+            $orderService = ServiceRegister::getService(OrderService::CLASS_NAME);
+            $orderService->updateShipmentData($shipment);
+        } catch (OrderShipmentDetailsNotFound $e) {
+            Logger::logWarning($e->getMessage());
         }
     }
 

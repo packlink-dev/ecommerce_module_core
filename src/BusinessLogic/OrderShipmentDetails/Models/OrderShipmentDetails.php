@@ -53,7 +53,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Drop off location ID.
      *
-     * @var int
+     * @var string
      */
     private $dropOffId;
     /**
@@ -325,7 +325,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Returns drop-off identifier.
      *
-     * @return int
+     * @return string
      */
     public function getDropOffId()
     {
@@ -335,7 +335,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Sets drop-off identifier.
      *
-     * @param int $dropOffId
+     * @param string $dropOffId
      */
     public function setDropOffId($dropOffId)
     {

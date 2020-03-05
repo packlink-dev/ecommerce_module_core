@@ -11,6 +11,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
+use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 
 /**
  * Class UploadDraftTask
@@ -111,6 +112,8 @@ class SendDraftTask extends Task
      */
     public function execute()
     {
+        $this->setExecution();
+
         $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
         if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
             Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
@@ -194,5 +197,24 @@ class SendDraftTask extends Task
         }
 
         return $this->orderShipmentDetailsService;
+    }
+
+    /**
+     * Sets task execution Id to the order draft task map, if needed.
+     *
+     * @noinspection PhpUnhandledExceptionInspection
+     */
+    private function setExecution()
+    {
+        /** @var OrderSendDraftTaskMapService $taskMapService */
+        $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
+        $taskMap = $taskMapService->getOrderTaskMap($this->orderId);
+        if ($taskMap === null) {
+            $taskMapService->createOrderTaskMap($this->orderId, $this->getExecutionId());
+        } else {
+            if (!$taskMap->getExecutionId()) {
+                $taskMapService->setExecutionId($this->orderId, $this->getExecutionId());
+            }
+        }
     }
 }

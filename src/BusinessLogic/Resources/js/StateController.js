@@ -18,6 +18,7 @@ var Packlink = window.Packlink || {};
      *      defaultParcelGetUrl: string,
      *      defaultParcelSubmitUrl: string,
      *      defaultWarehouseGetUrl: string,
+     *      getSupportedCountriesUrl: string,
      *      defaultWarehouseSubmitUrl: string,
      *      defaultWarehouseSearchPostalCodesUrl: string,
      *      debugGetStatusUrl: string,
@@ -71,6 +72,7 @@ var Packlink = window.Packlink || {};
             },
             'default-warehouse': {
                 getUrl: configuration.defaultWarehouseGetUrl,
+                getSupportedCountriesUrl: configuration.getSupportedCountriesUrl,
                 submitUrl: configuration.defaultWarehouseSubmitUrl,
                 searchPostalCodesUrl: configuration.defaultWarehouseSearchPostalCodesUrl
             },

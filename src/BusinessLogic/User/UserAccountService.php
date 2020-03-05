@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -61,8 +62,8 @@ class UserAccountService extends BaseService
      *
      * @return bool TRUE if login went successfully; otherwise, FALSE.
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function login($apiKey)
     {
@@ -122,7 +123,9 @@ class UserAccountService extends BaseService
      *
      * @param bool $force Force retrieval of warehouse info from Packlink API.
      *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function setWarehouseInfo($force)
     {
@@ -140,13 +143,15 @@ class UserAccountService extends BaseService
                 }
             }
 
-            $userInfo = $this->getConfigService()->getUserInfo();
-            if ($userInfo === null) {
-                $userInfo = $this->getProxy()->getUserData();
-            }
+            if ($warehouse !== null) {
+                /** @var CountryService $countryService */
+                $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-            if ($warehouse !== null && $userInfo !== null && $warehouse->country === $userInfo->country) {
-                $this->getConfigService()->setDefaultWarehouse($warehouse);
+                if ($countryService->isCountrySupported($warehouse->country)) {
+                    $this->getConfigService()->setDefaultWarehouse($warehouse);
+                } else {
+                    Logger::logWarning('Warehouse country not supported', 'Core');
+                }
             }
         }
     }
@@ -156,7 +161,10 @@ class UserAccountService extends BaseService
      *
      * @param User $user User data.
      *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     protected function initializeUser(User $user)
@@ -170,11 +178,13 @@ class UserAccountService extends BaseService
         $this->setDefaultParcel(true);
         $this->setWarehouseInfo(true);
 
-        $queueService->enqueue(
-            $defaultQueueName,
-            new UpdateShippingServicesTask(),
-            $this->getConfigService()->getContext()
-        );
+        if ($this->getConfigService()->getDefaultWarehouse() !== null) {
+            $queueService->enqueue(
+                $defaultQueueName,
+                new UpdateShippingServicesTask(),
+                $this->getConfigService()->getContext()
+            );
+        }
 
         $webHookUrl = $this->getConfigService()->getWebHookUrl();
         if (!empty($webHookUrl)) {
@@ -344,4 +354,3 @@ class UserAccountService extends BaseService
         return $this->configuration;
     }
 }
-

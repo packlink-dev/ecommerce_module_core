@@ -5,6 +5,8 @@ namespace Packlink\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Country\Country;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -22,22 +24,9 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 class UpdateShippingServicesTask extends Task
 {
     /**
-     * Mapping between country and main zip code of country's capital city.
-     *
-     * @var array
+     * @var CountryService
      */
-    protected static $countryParams = array(
-        // Rome
-        'IT' => '00118',
-        // Madrid
-        'ES' => '28001',
-        // Berlin
-        'DE' => '10115',
-        // Paris
-        'FR' => '75001',
-        // New York
-        'US' => '10001',
-    );
+    private $countryService;
 
     /**
      * Transforms array into an serializable object,
@@ -68,6 +57,7 @@ class UpdateShippingServicesTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function execute()
     {
@@ -87,37 +77,41 @@ class UpdateShippingServicesTask extends Task
     /**
      * Gets all available services for current user.
      *
-     * @return array
-     *  Key is service Id and value is @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
+     * @return array Key is service Id and value is @see \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails object.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     protected function getRemoteServices()
     {
         /** @var Configuration $config */
         $config = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-        /** @var \Packlink\BusinessLogic\Http\DTO\User $user */
-        $user = $config->getUserInfo();
-        if (!array_key_exists($user->country, static::$countryParams)) {
-            throw new \InvalidArgumentException('User country is not supported: ' . $user->country);
+        $warehouse = $config->getDefaultWarehouse();
+        if ($warehouse !== null) {
+            $sourceCountryCode = $warehouse->country;
+        } else {
+            $sourceCountryCode = $config->getUserInfo()->country;
         }
+
+        $supportedCountries = $this->getSupportedCountriesForServices();
+        $sourceCountry = $supportedCountries[$sourceCountryCode];
 
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $package = Package::fromArray($parcel->toArray());
 
         $allServices = array();
-        foreach (static::$countryParams as $country => $zip) {
+        foreach ($supportedCountries as $country) {
             $this->setServices(
                 $allServices,
                 new ShippingServiceSearch(
                     null,
-                    $user->country,
-                    static::$countryParams[$user->country],
-                    $country,
-                    $zip,
+                    $sourceCountry->code,
+                    $sourceCountry->postalCode,
+                    $country->code,
+                    $country->postalCode,
                     array($package)
                 )
             );
@@ -200,17 +194,47 @@ class UpdateShippingServicesTask extends Task
     }
 
     /**
-     * Checks if task should execute. Gets user info from configuration and returns TRUE if user exists.
-     * Otherwise, tasks should not execute.
+     * Checks if task should be executed.
      *
      * @return bool TRUE if task should execute; otherwise, FALSE.
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     protected function shouldExecute()
     {
         /** @var Configuration $config */
         $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $userInfo = $config->getUserInfo();
 
-        return $config->getUserInfo() !== null;
+        if ($userInfo === null) {
+            return false;
+        }
+
+        $supportedCountries = $this->getSupportedCountriesForServices();
+
+        return $config->getDefaultWarehouse() !== null || array_key_exists($userInfo->country, $supportedCountries);
+    }
+
+    /**
+     * Returns supported countries for available services.
+     *
+     * @return \Packlink\BusinessLogic\Country\Country[]
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    protected function getSupportedCountriesForServices()
+    {
+        $supportedCountries = $this->getCountryService()->getSupportedCountries();
+        $supportedCountries['US'] = Country::fromArray(
+            array(
+                'name' => 'United States',
+                'code' => 'US',
+                'postal_code' => '10001',
+                'registration_link' => 'https://pro.packlink.com/register',
+            )
+        );
+
+        return $supportedCountries;
     }
 
     /**
@@ -256,5 +280,19 @@ class UpdateShippingServicesTask extends Task
             && $service->expressDelivery === $shippingMethod->isExpressDelivery()
             && $service->departureDropOff === $shippingMethod->isDepartureDropOff()
             && $service->destinationDropOff === $shippingMethod->isDestinationDropOff();
+    }
+
+    /**
+     * Returns an instance of country service.
+     *
+     * @return \Packlink\BusinessLogic\Country\CountryService
+     */
+    protected function getCountryService()
+    {
+        if ($this->countryService === null) {
+            $this->countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        }
+
+        return $this->countryService;
     }
 }

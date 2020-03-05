@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Order\Interfaces;
 
+use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Order\Objects\Order;
 
@@ -32,12 +33,12 @@ interface ShopOrderService
      * Handles updated tracking info for order with a given ID.
      *
      * @param string $orderId Shop order ID.
-     * @param Tracking[] $trackings Shipment tracking history.
+     * @param Shipment $shipment Shipment object containing tracking codes and tracking url.
+     * @param Tracking[] $trackingHistory Shipment tracking history.
      *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order for provided reference is not found.
-     *  When local order shipment details are not found.
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
-    public function handleUpdatedTrackingInfo($orderId, array $trackings);
+    public function updateTrackingInfo($orderId, Shipment $shipment, array $trackingHistory);
 
     /**
      * Sets order Packlink shipping status to an order with a given ID.
