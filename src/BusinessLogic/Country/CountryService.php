@@ -71,7 +71,7 @@ class CountryService extends BaseService
             'name' => 'Belgium',
             'code' => 'BE',
             'postal_code' => '1000',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/register?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/nl-NL/{system_name}/registrieren?platform=PRO&platform_country=UN',
         ),
         'PT' => array(
             'name' => 'Portugal',
