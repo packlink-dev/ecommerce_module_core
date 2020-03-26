@@ -1,4 +1,5 @@
 <?php
+/** @noinspection LongLine */
 
 namespace Packlink\BusinessLogic\Country;
 
@@ -40,13 +41,13 @@ class CountryService extends BaseService
             'name' => 'Germany',
             'code' => 'DE',
             'postal_code' => '10115',
-            'registration_link' => 'https://auth.packlink.com/de-DE/{system_name}/registro?platform=PRO&platform_country=DE',
+            'registration_link' => 'https://auth.packlink.com/de-DE/{system_name}/registrieren?platform=PRO&platform_country=DE',
         ),
         'FR' => array(
             'name' => 'France',
             'code' => 'FR',
             'postal_code' => '75001',
-            'registration_link' => 'https://auth.packlink.com/fr-FR/{system_name}/registro?platform=PRO&platform_country=FR',
+            'registration_link' => 'https://auth.packlink.com/fr-FR/{system_name}/inscription?platform=PRO&platform_country=FR',
         ),
         'IT' => array(
             'name' => 'Italy',
@@ -64,37 +65,37 @@ class CountryService extends BaseService
             'name' => 'Netherlands',
             'code' => 'NL',
             'postal_code' => '1011',
-            'registration_link' => 'https://auth.packlink.com/nl-NL/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/nl-NL/{system_name}/registrieren?platform=PRO&platform_country=UN',
         ),
         'BE' => array(
             'name' => 'Belgium',
             'code' => 'BE',
             'postal_code' => '1000',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/register?platform=PRO&platform_country=UN',
         ),
         'PT' => array(
             'name' => 'Portugal',
             'code' => 'PT',
             'postal_code' => '1000-017',
-            'registration_link' => 'https://auth.packlink.com/pt-PT/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/pt-PT/{system_name}/registo?platform=PRO&platform_country=UN',
         ),
         'TR' => array(
             'name' => 'Turkey',
             'code' => 'TR',
             'postal_code' => '06010',
-            'registration_link' => 'https://auth.packlink.com/tr-TR/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/tr-TR/{system_name}/kayıt-yap?platform=PRO&platform_country=UN',
         ),
         'IE' => array(
             'name' => 'Ireland',
             'code' => 'IE',
             'postal_code' => 'D1',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/register?platform=PRO&platform_country=UN',
         ),
         'GB' => array(
             'name' => 'United Kingdom',
             'code' => 'GB',
             'postal_code' => 'E1 6AN',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/en-GB/{system_name}/register?platform=PRO&platform_country=UN',
         ),
     );
 
@@ -107,7 +108,7 @@ class CountryService extends BaseService
      */
     public function isCountrySupported($isoCode)
     {
-        return array_key_exists($isoCode, self::$supportedCountries);
+        return array_key_exists($isoCode, static::$supportedCountries);
     }
 
     /**
@@ -123,7 +124,7 @@ class CountryService extends BaseService
         $countries = array();
         $configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-        foreach (self::$supportedCountries as $country) {
+        foreach (static::$supportedCountries as $country) {
             $integration = strtolower($configuration->getIntegrationName());
             $country['registration_link'] = str_replace(
                 '{system_name}',
