@@ -27,6 +27,7 @@ use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 
 /**
@@ -134,6 +135,7 @@ class SendDraftTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function testExecute()
     {
@@ -144,9 +146,11 @@ class SendDraftTaskTest extends BaseSyncTest
         $shopOrderService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $shipmentDetails = $shopOrderService->getDetailsByOrderId('test');
 
-        $this->assertEquals('DE00019732CF', $shipmentDetails->getReference());
+        $this->assertEquals('test', $shipmentDetails->getReference());
+        $this->assertEquals(15.85, $shipmentDetails->getShippingCost());
+        $this->assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus($shipmentDetails->getStatus()));
         // there should be an info message that draft is created.
-        $this->assertCount(1, $this->shopLogger->loggedMessages);
+        $this->assertCount(2, $this->shopLogger->loggedMessages);
 
         /** @var OrderSendDraftTaskMapService $taskMapService */
         $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
@@ -208,6 +212,10 @@ class SendDraftTaskTest extends BaseSyncTest
             // send analytics call response
             new HttpResponse(
                 200, array(), '{}'
+            ),
+            // send shipment response
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
             ),
         );
     }
