@@ -304,6 +304,10 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             new HttpResponse(
                 200, array(), '{}'
             ),
+            // send shipment response
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json')
+            ),
         );
     }
 }

@@ -109,6 +109,7 @@ class SendDraftTask extends Task
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function execute()
     {
@@ -134,6 +135,12 @@ class SendDraftTask extends Task
         $this->reportProgress(85);
 
         $this->getOrderService()->setReference($this->orderId, $reference);
+        $shipment = $this->getProxy()->getShipment($reference);
+
+        if ($shipment) {
+            $this->getOrderService()->updateShipmentData($shipment);
+        }
+
         $this->reportProgress(100);
     }
 
