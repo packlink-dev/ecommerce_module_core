@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+## [2.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.1...v2.0.2) - 2019-04-03
+### Changed
+- Fix registration link for Austria.
+
+## [2.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.0...v2.0.1) - 2019-03-26
+### Changed
+- Fixed location picker input label
+- Order shipment data will now be immediately updated after the draft has been created. 
+This is added to immediately set the correct status and Packlink price.
+- Changed registration links for all countries.
+
+## [2.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.2...v2.0.0) - 2019-03-05
+
 **BREAKING CHANGES**
 This release contains several breaking changes. Check in detail when updating to this version.
 Contains implementation of the "*Core Enhancements 1*" set of features. 
