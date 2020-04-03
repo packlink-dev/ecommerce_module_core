@@ -59,7 +59,7 @@ class CountryService extends BaseService
             'name' => 'Austria',
             'code' => 'AT',
             'postal_code' => '1010',
-            'registration_link' => 'https://auth.packlink.com/de-DE/{system_name}/registro?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/de-DE/{system_name}/registrieren?platform=PRO&platform_country=UN',
         ),
         'NL' => array(
             'name' => 'Netherlands',
