@@ -2,7 +2,10 @@
 
 namespace Packlink\BusinessLogic\OrderShipmentDetails;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -106,6 +109,7 @@ class OrderShipmentDetailsService extends BaseService
         }
 
         $orderDetails->setReference($shipmentReference);
+        $orderDetails->setShipmentUrl($this->getDraftShipmentUrl($shipmentReference));
         $orderDetails->setStatus(ShipmentStatus::STATUS_PENDING);
 
         $this->repository->persist($orderDetails);
@@ -254,5 +258,29 @@ class OrderShipmentDetailsService extends BaseService
         }
 
         return $details;
+    }
+
+    /**
+     * Returns link to order draft on Packlink for the provided shipment reference.
+     *
+     * @param string $reference Shipment reference.
+     *
+     * @return string Link to order draft on Packlink.
+     */
+    protected function getDraftShipmentUrl($reference)
+    {
+        /** @var \Packlink\BusinessLogic\Configuration $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $userInfo = $configService->getUserInfo();
+
+        /** @var CountryService $countryService */
+        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+
+        $userDomain = 'com';
+        if ($userInfo !== null && $countryService->isBaseCountry($userInfo->country)) {
+            $userDomain = strtolower($userInfo->country);
+        }
+
+        return "https://pro.packlink.$userDomain/private/shipments/$reference";
     }
 }

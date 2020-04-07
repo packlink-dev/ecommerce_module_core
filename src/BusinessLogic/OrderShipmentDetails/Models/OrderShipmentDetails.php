@@ -36,6 +36,7 @@ class OrderShipmentDetails extends Entity
         'carrierTrackingNumbers',
         'carrierTrackingUrl',
         'shippingCost',
+        'shipmentUrl',
         'deleted',
     );
     /**
@@ -92,6 +93,12 @@ class OrderShipmentDetails extends Entity
      * @var float
      */
     private $shippingCost;
+    /**
+     * Shipment URL.
+     *
+     * @var string
+     */
+    private $shipmentUrl;
     /**
      * If order has been deleted on the system.
      *
@@ -380,5 +387,25 @@ class OrderShipmentDetails extends Entity
     public function setDeleted($deleted)
     {
         $this->deleted = $deleted;
+    }
+
+    /**
+     * Gets Shipment Url.
+     *
+     * @return string Shipment Url.
+     */
+    public function getShipmentUrl()
+    {
+        return $this->shipmentUrl;
+    }
+
+    /**
+     * Sets ShipmentUrl.
+     *
+     * @param string $shipmentUrl ShipmentUrl.
+     */
+    public function setShipmentUrl($shipmentUrl)
+    {
+        $this->shipmentUrl = $shipmentUrl;
     }
 }
