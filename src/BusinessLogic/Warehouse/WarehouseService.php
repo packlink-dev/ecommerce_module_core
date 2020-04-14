@@ -89,7 +89,11 @@ class WarehouseService extends BaseService
         if ($oldWarehouse === null
             || $oldWarehouse->country !== $warehouse->country
         ) {
-            $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
+            $queueService->enqueue(
+                $configService->getDefaultQueueName(),
+                new UpdateShippingServicesTask(),
+                $configService->getContext()
+            );
         }
 
         return $warehouse;
