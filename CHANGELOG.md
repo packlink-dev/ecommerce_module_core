@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - `CountryService` now has a method for detecting if a given county is one of the four base countries.
 - `OrderShipmentDetails` model is extended to have the shipment URL. It is set automatically when reference is set.
 
-## [2.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.1...v2.0.2) - 2030-04-03
+## [2.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.1...v2.0.2) - 2020-04-03
 ### Changed
 - Fix registration link for Austria.
 
