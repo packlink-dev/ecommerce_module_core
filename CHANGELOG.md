@@ -4,26 +4,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
+
+## [2.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.3...v2.0.4) - 2020-04-24
 ### Changed
 - `SendDraftTask` will be aborted if order has no order items.
 
-## [2.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.2...v2.0.3) - 2019-04-07
+## [2.0.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.3...v2.0.4) - 2020-04-14
+### Added
+- Fixed setting context when enqueueing update services after the warehouse has changed.
+- Fix some unit tests. 
+
+## [2.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.2...v2.0.3) - 2020-04-07
 ### Added
 - `CountryService` now has a method for detecting if a given county is one of the four base countries.
 - `OrderShipmentDetails` model is extended to have the shipment URL. It is set automatically when reference is set.
 
-## [2.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.1...v2.0.2) - 2019-04-03
+## [2.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.2...v2.0.3) - 2020-04-07
+### Added
+- `CountryService` now has a method for detecting if a given county is one of the four base countries.
+- `OrderShipmentDetails` model is extended to have the shipment URL. It is set automatically when reference is set.
+
+## [2.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.1...v2.0.2) - 2030-04-03
 ### Changed
 - Fix registration link for Austria.
 
-## [2.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.0...v2.0.1) - 2019-03-26
+## [2.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.0...v2.0.1) - 2020-03-26
 ### Changed
 - Fixed location picker input label
 - Order shipment data will now be immediately updated after the draft has been created. 
 This is added to immediately set the correct status and Packlink price.
 - Changed registration links for all countries.
 
-## [2.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.2...v2.0.0) - 2019-03-05
+## [2.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v1.5.2...v2.0.0) - 2020-03-05
 
 **BREAKING CHANGES**
 This release contains several breaking changes. Check in detail when updating to this version.
