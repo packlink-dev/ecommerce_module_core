@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
-## [2.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.3...v2.0.4) - 2020-04-24
+## [2.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.4...v2.0.5) - 2020-04-24
 ### Changed
 - `SendDraftTask` will be aborted if order has no order items.
 
@@ -13,11 +13,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Fixed setting context when enqueueing update services after the warehouse has changed.
 - Fix some unit tests. 
-
-## [2.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.2...v2.0.3) - 2020-04-07
-### Added
-- `CountryService` now has a method for detecting if a given county is one of the four base countries.
-- `OrderShipmentDetails` model is extended to have the shipment URL. It is set automatically when reference is set.
 
 ## [2.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.2...v2.0.3) - 2020-04-07
 ### Added
