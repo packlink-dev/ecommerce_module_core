@@ -6,8 +6,10 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -110,6 +112,7 @@ class SendDraftTask extends Task
      * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function execute()
     {
@@ -123,7 +126,12 @@ class SendDraftTask extends Task
             return;
         }
 
-        $draft = $this->getOrderService()->prepareDraft($this->orderId);
+        try {
+            $draft = $this->getOrderService()->prepareDraft($this->orderId);
+        } catch (EmptyOrderException $e) {
+            throw new AbortTaskExecutionException($e->getMessage());
+        }
+
         $this->reportProgress(35);
 
         $reference = $this->getProxy()->sendDraft($draft);
