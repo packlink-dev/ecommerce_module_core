@@ -19,6 +19,8 @@ class UpdateShippingServicesTaskStatusController
     /**
      * Checks the status of the task responsible for getting services.
      *
+     * @param string $context
+     *
      * @return string <p>One of the following statuses:
      *  QueueItem::FAILED - when the task failed,
      *  QueueItem::COMPLETED - when the task completed successfully,
@@ -31,11 +33,10 @@ class UpdateShippingServicesTaskStatusController
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
-    public function getLastTaskStatus()
+    public function getLastTaskStatus($context = '')
     {
         $repo = RepositoryRegistry::getQueueItemRepository();
-        $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesTask');
+        $filter = $this->buildCondition($context);
         $filter->orderBy('queueTime', 'DESC');
 
         $item = $repo->selectOne($filter);
@@ -55,5 +56,24 @@ class UpdateShippingServicesTaskStatusController
         }
 
         return QueueItem::QUEUED;
+    }
+
+    /**
+     * Builds query condition.
+     *
+     * @param string $context
+     *
+     * @return \Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     */
+    protected function buildCondition($context = '')
+    {
+        $filter = new QueryFilter();
+        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesTask');
+        if (!empty($context)) {
+            $filter->where('context', Operators::EQUALS, $context);
+        }
+
+        return $filter;
     }
 }
