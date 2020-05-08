@@ -175,7 +175,7 @@ class Warehouse extends FrontDto
         }
 
         if (!empty($payload['phone'])) {
-            $regex = '/^(\+|\/|\.|-|\(|\)|\d)+$/m';
+            $regex = '/^(\ |\+|\/|\.\|-|\(|\)|\d)+$/m';
             $phoneError = !preg_match($regex, $payload['phone']);
 
             $digits = '/\d/m';
