@@ -12,6 +12,7 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\Objects\Order;
@@ -74,10 +75,16 @@ class OrderService extends BaseService
      * @return Draft Prepared shipment draft.
      *
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException When order has no items.
      */
     public function prepareDraft($orderId)
     {
         $order = $this->shopOrderService->getOrderAndShippingData($orderId);
+
+        $items = $order->getItems();
+        if (empty($items)) {
+            throw new EmptyOrderException("Order [$orderId] has no order items.");
+        }
 
         return $this->convertOrderToDraftDto($order);
     }
