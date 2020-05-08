@@ -194,6 +194,16 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Sets automatic task runner wakeup delay in seconds.
+     *
+     * @param int $delay
+     */
+    public function setTaskRunnerWakeupDelay($delay)
+    {
+        $this->saveConfigValue('taskRunnerWakeupDelay', $delay);
+    }
+
+    /**
      * Gets maximal time in seconds allowed for runner instance to stay in alive (running) status. After this period
      * system will automatically start new runner instance and shutdown old one. Return null to use default system
      * value (60).
@@ -203,6 +213,16 @@ abstract class Configuration extends Singleton
     public function getTaskRunnerMaxAliveTime()
     {
         return $this->getConfigValue('taskRunnerMaxAliveTime');
+    }
+
+    /**
+     * Sets the maximal time in seconds allowed for a runner instance to stay in alive (running) status.
+     *
+     * @param int $delay Task runner max alive time in seconds;
+     */
+    public function setTaskRunnerMaxAliveTime($delay)
+    {
+        $this->saveConfigValue('taskRunnerMaxAliveTime', $delay);
     }
 
     /**
@@ -217,6 +237,16 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Sets the maximum number of failed task execution retries.
+     *
+     * @param int $retries Number of max execution retries.
+     */
+    public function setMaxTaskExecutionRetries($retries)
+    {
+        $this->saveConfigValue('maxTaskExecutionRetries', $retries);
+    }
+
+    /**
      * Gets max inactivity period for a task in seconds. After inactivity period is passed, system will fail such tasks
      * as expired. Return null to use default system value (30).
      *
@@ -225,6 +255,16 @@ abstract class Configuration extends Singleton
     public function getMaxTaskInactivityPeriod()
     {
         return $this->getConfigValue('maxTaskInactivityPeriod');
+    }
+
+    /**
+     * Sets the max inactivity period for a task in seconds.
+     *
+     * @param int $period Max task inactivity period in seconds.
+     */
+    public function setMaxTaskInactivityPeriod($period)
+    {
+        $this->saveConfigValue('maxTaskInactivityPeriod', $period);
     }
 
     /**
