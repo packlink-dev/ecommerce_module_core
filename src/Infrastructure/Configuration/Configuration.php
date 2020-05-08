@@ -372,6 +372,46 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Returns synchronous process timeout in milliseconds.
+     *
+     * @return int|null
+     */
+    public function getSyncRequestTimeout()
+    {
+        return $this->getConfigValue('syncRequestTimeout');
+    }
+
+    /**
+     * Sets synchronous process timeout in milliseconds.
+     *
+     * @param int $timeout
+     */
+    public function setSyncRequestTimeout($timeout)
+    {
+        $this->saveConfigValue('syncRequestTimeout', $timeout);
+    }
+
+    /**
+     * Returns async process timeout in milliseconds.
+     *
+     * @return int|null
+     */
+    public function getAsyncRequestTimeout()
+    {
+        return $this->getConfigValue('asyncRequestTimeout');
+    }
+
+    /**
+     * Sets async process timeout in milliseconds.
+     *
+     * @param int $timeout
+     */
+    public function setAsyncRequestTimeout($timeout)
+    {
+        $this->saveConfigValue('asyncRequestTimeout', $timeout);
+    }
+
+    /**
      * Gets configuration value for given name.
      *
      * @param string $name Name of the config parameter.

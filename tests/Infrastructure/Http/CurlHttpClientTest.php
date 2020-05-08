@@ -37,6 +37,21 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
         $responses = array($this->getResponse(200));
 
         $this->successCall($responses);
+        $this->assertCallTimeout(CurlHttpClient::DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Test a sync call.
+     */
+    public function testSyncCallWithDifferentTimeout()
+    {
+        $newTimeout = 20000;
+        $this->shopConfig->setSyncRequestTimeout($newTimeout);
+
+        $responses = array($this->getResponse(200));
+
+        $this->successCall($responses);
+        $this->assertCallTimeout($newTimeout);
     }
 
     /**
@@ -57,14 +72,23 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
             $history[0]['type'],
             'Async call should pass.'
         );
-        $curlOptions = $this->httpClient->getCurlOptions();
-        $this->assertNotEmpty($curlOptions, 'Curl options should be set.');
-        $this->assertTrue(isset($curlOptions[CURLOPT_TIMEOUT_MS]), 'Curl timeout should be set for async call.');
-        $this->assertEquals(
-            CurlHttpClient::DEFAULT_ASYNC_REQUEST_TIMEOUT,
-            $curlOptions[CURLOPT_TIMEOUT_MS],
-            'Curl default timeout should be set for async call.'
-        );
+        $this->assertCallTimeout(CurlHttpClient::DEFAULT_ASYNC_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Test an async call with custom timeout.
+     */
+    public function testAsyncCallDifferentTimeout()
+    {
+        $responses = array($this->getResponse(200));
+
+        $this->httpClient->setMockResponses($responses);
+
+        $newTimeout = 200;
+        $this->shopConfig->setAsyncRequestTimeout($newTimeout);
+        $this->httpClient->requestAsync('POST', 'test.url.com');
+
+        $this->assertCallTimeout($newTimeout);
     }
 
     /**
@@ -200,6 +224,21 @@ Content-Length: 24860\r
 X-Custom-Header: Content: database\r
 \r
 {\"status\":\"success\"}",
+        );
+    }
+
+    /**
+     * @param $timeout
+     */
+    private function assertCallTimeout($timeout)
+    {
+        $curlOptions = $this->httpClient->getCurlOptions();
+        $this->assertNotEmpty($curlOptions, 'Curl options should be set.');
+        $this->assertTrue(isset($curlOptions[CURLOPT_TIMEOUT_MS]), 'Curl timeout should be set for async call.');
+        $this->assertEquals(
+            $timeout,
+            $curlOptions[CURLOPT_TIMEOUT_MS],
+            'Curl default timeout should be set for async call.'
         );
     }
 }
