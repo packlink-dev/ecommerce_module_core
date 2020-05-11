@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+## [2.0.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.6...v2.0.7) - 2020-05-08
+### Changed
+- Fix validation of phone number for warehouse
+- Add HTTP request parameters to config service
+- Add more setters to the config service
+
+## [2.0.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.5...v2.0.6) - 2020-04-27
+### Changed
+- Add optional context parameter when checking shipping service task status
+
 ## [2.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.4...v2.0.5) - 2020-04-24
 ### Changed
 - `SendDraftTask` will be aborted if order has no order items.

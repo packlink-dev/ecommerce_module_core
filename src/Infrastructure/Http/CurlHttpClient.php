@@ -30,6 +30,10 @@ class CurlHttpClient extends HttpClient
      */
     const SWITCH_PROTOCOL = 'SWITCH_PROTOCOL';
     /**
+     * Indicates whether to use SSL verification.
+     */
+    const SSL_STRICT_MODE = false;
+    /**
      * cURL options for the request.
      *
      * @var array
@@ -212,6 +216,11 @@ class CurlHttpClient extends HttpClient
      */
     protected function initializeCurlSession()
     {
+        // this constant is not defined prior to php 7.0.7
+        if (!defined('CURL_REDIR_POST_ALL')) {
+            define('CURL_REDIR_POST_ALL', 7);
+        }
+
         $this->curlSession = curl_init();
         $this->curlOptions = array();
     }
@@ -223,10 +232,9 @@ class CurlHttpClient extends HttpClient
      */
     protected function setCurlSessionOptionsBasedOnMethod($method)
     {
-        if ($method === self::HTTP_METHOD_POST) {
+        if ($method === static::HTTP_METHOD_POST) {
             // follow 30x redirects with POST
-            // this constant is not defined prior to php 7.0.7
-            $this->curlOptions[CURLOPT_POSTREDIR] = defined('CURL_REDIR_POST_ALL') ? CURL_REDIR_POST_ALL : 7;
+            $this->curlOptions[CURLOPT_POSTREDIR] = CURL_REDIR_POST_ALL;
         }
 
         $this->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
@@ -244,13 +252,14 @@ class CurlHttpClient extends HttpClient
     {
         $this->curlOptions[CURLOPT_URL] = $this->adjustUrlIfNeeded($url);
         $this->curlOptions[CURLOPT_HTTPHEADER] = $headers;
-        if ($method === self::HTTP_METHOD_POST) {
+        if ($method === static::HTTP_METHOD_POST) {
             $this->curlOptions[CURLOPT_POSTFIELDS] = $body;
         }
     }
 
     /**
      * Sets common options for cURL session.
+     * @noinspection CurlSslServerSpoofingInspection
      */
     protected function setCommonOptionsForCurlSession()
     {
@@ -264,8 +273,8 @@ class CurlHttpClient extends HttpClient
         }
 
         $this->curlOptions[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
-        $this->curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
-        $this->curlOptions[CURLOPT_SSL_VERIFYHOST] = false;
+        $this->curlOptions[CURLOPT_SSL_VERIFYPEER] = static::SSL_STRICT_MODE;
+        $this->curlOptions[CURLOPT_SSL_VERIFYHOST] = static::SSL_STRICT_MODE;
         // Set default user agent, because for some shops if user agent is missing, request will not work.
         $this->curlOptions[CURLOPT_USERAGENT] =
             'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36';
@@ -276,7 +285,8 @@ class CurlHttpClient extends HttpClient
      */
     protected function setCurlSessionOptionsForSynchronousRequest()
     {
-        $this->curlOptions[CURLOPT_TIMEOUT_MS] = self::DEFAULT_REQUEST_TIMEOUT;
+        $this->curlOptions[CURLOPT_TIMEOUT_MS] =
+            $this->getConfigService()->getSyncRequestTimeout() ?: static::DEFAULT_REQUEST_TIMEOUT;
     }
 
     /**
@@ -287,7 +297,8 @@ class CurlHttpClient extends HttpClient
         // Always ensure the connection is fresh.
         $this->curlOptions[CURLOPT_FRESH_CONNECT] = true;
         // Timeout super fast once connected, so it goes into async.
-        $this->curlOptions[CURLOPT_TIMEOUT_MS] = self::DEFAULT_ASYNC_REQUEST_TIMEOUT;
+        $this->curlOptions[CURLOPT_TIMEOUT_MS] =
+            $this->getConfigService()->getAsyncRequestTimeout() ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
     }
 
     /**
@@ -308,7 +319,7 @@ class CurlHttpClient extends HttpClient
         $domain = parse_url($this->curlOptions[CURLOPT_URL], PHP_URL_HOST);
         $options = $this->getAdditionalOptions($domain);
         foreach ($options as $key => $value) {
-            if ($key !== self::SWITCH_PROTOCOL) {
+            if ($key !== static::SWITCH_PROTOCOL) {
                 $this->curlOptions[$key] = $value;
             }
         }
@@ -382,7 +393,7 @@ class CurlHttpClient extends HttpClient
          * CURLOPT_FOLLOWLOCATION => false (default is true)
          * SWITCH_PROTOCOL => This is not a cURL option and is treated differently. Default is false.
          */
-        $switchProtocol = new OptionsDTO(self::SWITCH_PROTOCOL, true);
+        $switchProtocol = new OptionsDTO(static::SWITCH_PROTOCOL, true);
         $ipVersion = new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
         if ($this->followLocation) {
             $followLocation = new OptionsDTO(CURLOPT_FOLLOWLOCATION, false);
@@ -416,7 +427,7 @@ class CurlHttpClient extends HttpClient
     {
         $domain = parse_url($url, PHP_URL_HOST);
         $options = $this->getAdditionalOptions($domain);
-        if (!empty($options[self::SWITCH_PROTOCOL])) {
+        if (!empty($options[static::SWITCH_PROTOCOL])) {
             if (mb_strpos($url, 'http:') === 0) {
                 $url = str_replace('http:', 'https:', $url);
             } else {
