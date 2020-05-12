@@ -110,6 +110,24 @@ class Proxy
     }
 
     /**
+     * @param $data
+     *
+     * @return string
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function register($data)
+    {
+        $response = $this->call(HttpClient::HTTP_METHOD_POST, 'register', $data);
+
+        $data = $response->decodeBodyAsJson();
+
+        return !empty($data['token']) ? $data['token'] : '';
+    }
+
+    /**
      * Returns user info.
      *
      * @return User User info.

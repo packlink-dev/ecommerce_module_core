@@ -22,6 +22,7 @@ use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -63,6 +64,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             WarehouseService::CLASS_NAME,
             function () {
                 return WarehouseService::getInstance();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            RegistrationService::CLASS_NAME,
+            function () {
+                return RegistrationService::getInstance();
             }
         );
 

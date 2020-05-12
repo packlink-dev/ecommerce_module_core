@@ -1,0 +1,110 @@
+<?php
+
+namespace BusinessLogic\Registration;
+
+use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException;
+use Packlink\BusinessLogic\Registration\RegistrationRequest;
+use Packlink\BusinessLogic\Registration\RegistrationService;
+
+/**
+ * Class RegistrationServiceTest
+ *
+ * @package BusinessLogic\Registration
+ */
+class RegistrationServiceTest extends BaseTestWithServices
+{
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     */
+    public function testRegister()
+    {
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/registrationSuccessful.json');
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        /** @var RegistrationService $service */
+        $service = ServiceRegister::getService(RegistrationService::CLASS_NAME);
+
+        $token = $service->register($this->getRequest());
+
+        $this->assertNotEmpty($token, 'Token should not be an empty string');
+        $this->assertEquals('ee0870a7dc61e4eda41fbae68395c672aeafe375cd90ce4adcf615c6ae86f28d', $token);
+    }
+
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     */
+    public function testRegisterSameEmailTwice()
+    {
+        $successResponse = file_get_contents(__DIR__ . '/../Common/ApiResponses/registrationSuccessful.json');
+        $failureResponse = file_get_contents(__DIR__ . '/../Common/ApiResponses/userAlreadyRegistered.json');
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(200, array(), $successResponse),
+                new HttpResponse(400, array(), $failureResponse),
+            )
+        );
+
+        /** @var RegistrationService $service */
+        $service = ServiceRegister::getService(RegistrationService::CLASS_NAME);
+
+        $token = $service->register($this->getRequest());
+
+        $this->assertNotEmpty($token, 'Token should not be an empty string');
+        $this->assertEquals('ee0870a7dc61e4eda41fbae68395c672aeafe375cd90ce4adcf615c6ae86f28d', $token);
+
+        $this->setExpectedException(UnableToRegisterAccountException::CLASS_NAME);
+
+        $service->register($this->getRequest());
+    }
+
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     */
+    public function testBadRequest()
+    {
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/registrationBadRequest.json');
+        $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), $response)));
+
+        /** @var RegistrationService $service */
+        $service = ServiceRegister::getService(RegistrationService::CLASS_NAME);
+        $request = $this->getRequest();
+        $request->platform = 'test';
+
+        $this->setExpectedException(UnableToRegisterAccountException::CLASS_NAME);
+        $service->register($this->getRequest());
+    }
+
+    /**
+     * @return \Packlink\BusinessLogic\Registration\RegistrationRequest
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    private function getRequest()
+    {
+        return RegistrationRequest::fromArray(
+            array(
+                'email' => 'john.doe@example.com',
+                'password' => 'test1234',
+                'phone' => '(024) 418 52 52',
+                'estimated_delivery_volume' => '1 - 10',
+                'platform' => 'PRO',
+                'language' => 'de_DE',
+                'platform_country' => 'UN',
+                'policies' => array(
+                    'data_processing' => true,
+                    'terms_and_conditions' => true,
+                    'marketing_emails' => true,
+                    'marketing_calls' => true,
+                ),
+                'source' => 'http://example.com',
+                'ecommerces' => array('Shopify'),
+                'marketplaces' => array('eBay'),
+            )
+        );
+    }
+}

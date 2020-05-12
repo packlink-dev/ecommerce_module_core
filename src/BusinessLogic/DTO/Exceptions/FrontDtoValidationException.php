@@ -13,6 +13,10 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 class FrontDtoValidationException extends BaseException
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+    /**
      * Validation errors.
      *
      * @var ValidationError[]

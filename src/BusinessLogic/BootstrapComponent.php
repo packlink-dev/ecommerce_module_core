@@ -18,6 +18,9 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
+use Packlink\BusinessLogic\Registration\RegistrationLegalPolicy;
+use Packlink\BusinessLogic\Registration\RegistrationRequest;
+use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
@@ -146,6 +149,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 return CountryService::getInstance();
             }
         );
+
+        ServiceRegister::registerService(
+            RegistrationService::CLASS_NAME,
+            function () {
+                return RegistrationService::getInstance();
+            }
+        );
     }
 
     /**
@@ -180,5 +190,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         FrontDtoFactory::register(ParcelInfo::CLASS_KEY, ParcelInfo::CLASS_NAME);
         FrontDtoFactory::register(DashboardStatus::CLASS_KEY, DashboardStatus::CLASS_NAME);
         FrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
+        FrontDtoFactory::register(RegistrationRequest::CLASS_KEY, RegistrationRequest::CLASS_NAME);
+        FrontDtoFactory::register(RegistrationLegalPolicy::CLASS_KEY, RegistrationLegalPolicy::CLASS_NAME);
     }
 }
