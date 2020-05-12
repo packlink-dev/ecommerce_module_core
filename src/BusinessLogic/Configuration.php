@@ -76,6 +76,16 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     }
 
     /**
+     * Sets scheduler time threshold between checks.
+     *
+     * @param int $schedulerTimeThreshold Threshold in seconds.
+     */
+    public function setSchedulerTimeThreshold($schedulerTimeThreshold)
+    {
+        $this->saveConfigValue('schedulerTimeThreshold', $schedulerTimeThreshold);
+    }
+
+    /**
      * Returns scheduler queue name.
      *
      * @return string Queue name.

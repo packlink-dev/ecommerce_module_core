@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 
+## [2.0.8](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.7...v2.0.8) - 2020-05-12
+### Changed
+- Scheduler will not enqueue tasks that are already scheduled for execution or currently executing
+
 ## [2.0.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.6...v2.0.7) - 2020-05-08
 ### Changed
 - Fix validation of phone number for warehouse
