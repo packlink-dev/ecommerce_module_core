@@ -23,6 +23,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
@@ -84,10 +86,7 @@ class ScheduleCheckTaskTest extends TestCase
 
         $taskInstance = $this;
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $nowDateTime = new \DateTime();
-        $nowDateTime->setDate(2018, 3, 21);
-        $nowDateTime->setTime(13, 42, 5);
+        $nowDateTime = new \DateTime('2018-03-21T13:42:05');
 
         $timeProvider = new TestTimeProvider();
         $timeProvider->setCurrentLocalTime($nowDateTime);
@@ -143,6 +142,8 @@ class ScheduleCheckTaskTest extends TestCase
     public function tearDown()
     {
         date_default_timezone_set($this->oldTimeZone);
+        MemoryStorage::reset();
+
         parent::tearDown();
     }
 
@@ -151,6 +152,8 @@ class ScheduleCheckTaskTest extends TestCase
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testEmptyExecution()
     {
@@ -161,15 +164,14 @@ class ScheduleCheckTaskTest extends TestCase
     /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testSchedulingTasks()
     {
         $this->prepareScheduleTasks();
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $nowDateTime = new \DateTime();
-        $nowDateTime->setDate(2018, 3, 22);
-        $nowDateTime->setTime(13, 42, 5);
+        $nowDateTime = new \DateTime('2018-03-22T13:42:05');
         $this->timeProvider->setCurrentLocalTime($nowDateTime);
         $this->syncTask->execute();
 
@@ -187,6 +189,7 @@ class ScheduleCheckTaskTest extends TestCase
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testDelayedTask()
     {
@@ -231,6 +234,113 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testMultiSchedules()
+    {
+        $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+
+        $schedule = new HourlySchedule(new FooTask());
+        $schedule->setHour(13);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+
+        $nowDateTime = new \DateTime('2018-03-22T13:42:05');
+        $this->timeProvider->setCurrentLocalTime($nowDateTime);
+        $this->syncTask->execute();
+
+        // run scheduler once again after the previous tasks is enqueued but not executed
+        $nowDateTime = new \DateTime('2018-03-22T15:42:05');
+        $this->timeProvider->setCurrentLocalTime($nowDateTime);
+        $this->syncTask->execute();
+
+        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
+        $queueItems = $this->queueStorage->select();
+        $this->assertCount(1, $queueItems);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testMultipleSchedulesForCompletedTask()
+    {
+        $this->multipleSchedulesTest(QueueItem::COMPLETED, 1);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testMultipleSchedulesForInProgressTask()
+    {
+        $this->multipleSchedulesTest(QueueItem::IN_PROGRESS, 0);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testMultipleSchedulesForFailedTask()
+    {
+        $this->multipleSchedulesTest(QueueItem::FAILED, 1);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testMultipleSchedulesForAbortedTask()
+    {
+        $this->multipleSchedulesTest(QueueItem::ABORTED, 1);
+    }
+
+    /**
+     * @param string $newStatus
+     * @param int $expectedCount
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    private function multipleSchedulesTest($newStatus, $expectedCount)
+    {
+        $this->testMultiSchedules();
+
+        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
+        $queueItems = $this->queueStorage->select();
+        $this->assertCount(1, $queueItems);
+
+        // set task as in progress
+        $queueItems[0]->setStatus($newStatus);
+        $this->queueStorage->update($queueItems[0]);
+
+        $filter = new QueryFilter();
+        $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
+        $queueItems = $this->queueStorage->select($filter);
+        // make sure there are no queued items before execution
+        $this->assertEmpty($queueItems);
+
+        // run scheduler once again
+        $this->syncTask->execute();
+
+        $queueItems = $this->queueStorage->select($filter);
+        $this->assertCount($expectedCount, $queueItems);
+    }
+
+    /**
      * Prepares scheduled tasks
      */
     private function prepareScheduleTasks()
@@ -241,19 +351,16 @@ class ScheduleCheckTaskTest extends TestCase
         $daily->setHour(13);
         $daily->setMinute(40);
         $daily->setDaysOfWeek(array(1, 2, 3, 4, 5));
-        /** @noinspection PhpUnhandledExceptionInspection */
         $daily->setNextSchedule();
 
-        $weekly = new WeeklySchedule(new FooTask(), 'queueForWeeklyFoo');
+        $weekly = new WeeklySchedule(new BarTask(), 'queueForWeeklyFoo');
         $weekly->setDay(4);
-        /** @noinspection PhpUnhandledExceptionInspection */
         $weekly->setNextSchedule();
 
         $monthly = new MonthlySchedule(new FooTask(), 'queueForMonthlyFoo');
-        $monthly->setDay(21);
+        $monthly->setDay(23);
         $monthly->setHour(13);
         $monthly->setMinute(42);
-        /** @noinspection PhpUnhandledExceptionInspection */
         $monthly->setNextSchedule();
 
         $repository->save($daily);

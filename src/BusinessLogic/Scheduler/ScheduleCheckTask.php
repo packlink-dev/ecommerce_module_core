@@ -8,6 +8,7 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -61,7 +62,19 @@ class ScheduleCheckTask extends Task
         /** @var Schedule $schedule */
         foreach ($this->getSchedules() as $schedule) {
             $task = $schedule->getTask();
+            if (!$task) {
+                continue;
+            }
+
             try {
+                $latestTask = $queueService->findLatestByType($task->getType(), $schedule->getContext());
+                if ($latestTask
+                    && in_array($latestTask->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)
+                ) {
+                    // do not enqueue task if it is already scheduled for execution
+                    continue;
+                }
+
                 $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext());
 
                 if ($schedule->isRecurring()) {
