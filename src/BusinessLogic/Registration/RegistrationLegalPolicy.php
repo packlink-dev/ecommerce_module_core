@@ -113,18 +113,10 @@ class RegistrationLegalPolicy extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
-        if ($payload['data_processing'] === false) {
+        if ($payload['data_processing'] === false || $payload['terms_and_conditions'] === false) {
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
-                'data_processing',
-                'Field must be set to true.'
-            );
-        }
-
-        if ($payload['terms_and_conditions'] === false) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'terms_and_conditions',
+                'policies',
                 'Field must be set to true.'
             );
         }
