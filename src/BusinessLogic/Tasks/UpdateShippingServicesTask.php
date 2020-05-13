@@ -231,6 +231,7 @@ class UpdateShippingServicesTask extends Task
                 'code' => 'US',
                 'postal_code' => '10001',
                 'registration_link' => 'https://pro.packlink.com/register',
+                'platform_country' => 'UN',
             )
         );
 
