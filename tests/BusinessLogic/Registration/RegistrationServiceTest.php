@@ -5,6 +5,7 @@ namespace BusinessLogic\Registration;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
@@ -57,7 +58,10 @@ class RegistrationServiceTest extends BaseTestWithServices
         $this->assertNotEmpty($token, 'Token should not be an empty string');
         $this->assertEquals('ee0870a7dc61e4eda41fbae68395c672aeafe375cd90ce4adcf615c6ae86f28d', $token);
 
-        $this->setExpectedException(UnableToRegisterAccountException::CLASS_NAME);
+        $this->setExpectedException(
+            UnableToRegisterAccountException::CLASS_NAME,
+            'Registration failed. Error: Client already exists'
+        );
 
         $service->register($this->getRequest());
     }
@@ -76,8 +80,27 @@ class RegistrationServiceTest extends BaseTestWithServices
         $request = $this->getRequest();
         $request->platform = 'test';
 
-        $this->setExpectedException(UnableToRegisterAccountException::CLASS_NAME);
-        $service->register($this->getRequest());
+        $this->setExpectedException(
+            UnableToRegisterAccountException::CLASS_NAME,
+            'Registration failed. Error: Bad Request'
+        );
+
+        $service->register($request);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        TestServiceRegister::registerService(
+            RegistrationService::CLASS_NAME,
+            function () {
+                return RegistrationService::getInstance();
+            }
+        );
     }
 
     /**

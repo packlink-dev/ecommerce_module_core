@@ -2,9 +2,7 @@
 
 namespace Packlink\BusinessLogic\Registration;
 
-use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
-use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
-use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -44,15 +42,11 @@ class RegistrationService extends BaseService
             $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
 
             return $proxy->register($request->toArray());
-        } catch (HttpAuthenticationException $e) {
-        } catch (HttpCommunicationException $e) {
-        } catch (HttpRequestException $e) {
+        } catch (HttpBaseException $e) {
             throw new UnableToRegisterAccountException(
                 'Registration failed. Error: ' . $e->getMessage(),
                 $e->getCode()
             );
         }
-
-        return '';
     }
 }

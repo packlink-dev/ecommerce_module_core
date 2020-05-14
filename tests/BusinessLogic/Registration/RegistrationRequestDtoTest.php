@@ -38,9 +38,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['email'] = 'test';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
-
-        RegistrationRequest::fromArray($request);
+        $this->checkIfValidationExceptionIsThrown($request, 'email');
     }
 
     /**
@@ -51,9 +49,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['password'] = 'pass1';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
-
-        RegistrationRequest::fromArray($request);
+        $this->checkIfValidationExceptionIsThrown($request, 'password');
     }
 
     /**
@@ -64,9 +60,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['estimated_delivery_volume'] = 'test';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
-
-        RegistrationRequest::fromArray($request);
+        $this->checkIfValidationExceptionIsThrown($request, 'estimated_delivery_volume');
     }
 
     /**
@@ -77,9 +71,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['phone'] = '1234e756789-00';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
-
-        RegistrationRequest::fromArray($request);
+        $this->checkIfValidationExceptionIsThrown($request, 'phone');
     }
 
     /**
@@ -90,9 +82,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['language'] = 'en_US';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
-
-        RegistrationRequest::fromArray($request);
+        $this->checkIfValidationExceptionIsThrown($request, 'language');
     }
 
     /**
@@ -103,9 +93,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['platform_country'] = 'AT';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
-
-        RegistrationRequest::fromArray($request);
+        $this->checkIfValidationExceptionIsThrown($request, 'platform_country');
     }
 
     /**
@@ -116,9 +104,32 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $request = $this->getRequest();
         $request['source'] = 'test';
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
+        $this->checkIfValidationExceptionIsThrown($request, 'source');
+    }
 
-        RegistrationRequest::fromArray($request);
+    /**
+     * Checks whether a validation exception for a specified field has been thrown for the request.
+     *
+     * @param array $request
+     * @param string $field
+     */
+    private function checkIfValidationExceptionIsThrown($request, $field)
+    {
+        $exceptionThrown = false;
+
+        try {
+            RegistrationRequest::fromArray($request);
+        } catch (FrontDtoValidationException $e) {
+            $exceptionThrown = true;
+            $errors = $e->getValidationErrors();
+            self::assertCount(1, $errors);
+
+            $errorCodes = array_map(create_function('$error', 'return $error->field;'), $errors);
+
+            self::assertArraySubset(array($field), $errorCodes);
+        }
+
+        self::assertTrue($exceptionThrown);
     }
 
     /**

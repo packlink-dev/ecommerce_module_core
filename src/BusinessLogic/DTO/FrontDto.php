@@ -113,7 +113,7 @@ abstract class FrontDto extends BaseDto
     protected static function validateRequiredFields(array $payload, array &$validationErrors)
     {
         foreach (static::$requiredFields as $field) {
-            if (!array_key_exists($field, $payload)) {
+            if (empty($payload[$field])) {
                 $validationErrors[] = static::getValidationError(
                     ValidationError::ERROR_REQUIRED_FIELD,
                     $field,

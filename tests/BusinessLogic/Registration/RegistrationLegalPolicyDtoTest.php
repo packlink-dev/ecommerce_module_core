@@ -27,15 +27,12 @@ class RegistrationLegalPolicyDtoTest extends BaseDtoTest
             )
         );
 
-        self::assertEquals(true, $policy->isDataProcessingAccepted);
-        self::assertEquals(true, $policy->isTermsAccepted);
-        self::assertEquals(false, $policy->isMarketingCallsAccepted);
-        self::assertEquals(false, $policy->isMarketingCallsAccepted);
+        self::assertTrue($policy->isDataProcessingAccepted);
+        self::assertTrue($policy->isTermsAccepted);
+        self::assertFalse($policy->isMarketingCallsAccepted);
+        self::assertFalse($policy->isMarketingCallsAccepted);
     }
 
-    /**
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     */
     public function testInvalidRegistrationLegalPolicy()
     {
         $policy = array(
@@ -45,8 +42,20 @@ class RegistrationLegalPolicyDtoTest extends BaseDtoTest
             'marketing_calls' => false,
         );
 
-        $this->setExpectedException(FrontDtoValidationException::CLASS_NAME);
+        $exceptionThrown = false;
 
-        RegistrationLegalPolicy::fromArray($policy);
+        try {
+            RegistrationLegalPolicy::fromArray($policy);
+        } catch (FrontDtoValidationException $e) {
+            $exceptionThrown = true;
+            $errors = $e->getValidationErrors();
+            self::assertCount(2, $errors);
+
+            $errorCodes = array_map(create_function('$error', 'return $error->field;'), $errors);
+
+            self::assertArraySubset(array('data_processing', 'terms_and_conditions'), $errorCodes);
+        }
+
+        self::assertTrue($exceptionThrown);
     }
 }

@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Warehouse;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Utility\DtoValidator;
 
 /**
  * Class Warehouse.
@@ -166,7 +167,7 @@ class Warehouse extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
-        if (!empty($payload['email']) && filter_var($payload['email'], FILTER_VALIDATE_EMAIL) === false) {
+        if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'email',
@@ -174,21 +175,12 @@ class Warehouse extends FrontDto
             );
         }
 
-        if (!empty($payload['phone'])) {
-            $regex = '/^(\ |\+|\/|\.\|-|\(|\)|\d)+$/m';
-            $phoneError = !preg_match($regex, $payload['phone']);
-
-            $digits = '/\d/m';
-            $match = preg_match_all($digits, $payload['phone'], $matches);
-            $phoneError |= $match === false || $match < 3;
-
-            if ($phoneError) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
-                    'phone',
-                    'Field must be a valid phone number.'
-                );
-            }
+        if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'phone',
+                'Field must be a valid phone number.'
+            );
         }
     }
 }

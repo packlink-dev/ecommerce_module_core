@@ -110,9 +110,11 @@ class Proxy
     }
 
     /**
-     * @param $data
+     * Attemps to register a new user account on Packlink PRO API.
      *
-     * @return string
+     * @param array $data
+     *
+     * @return string Authorization token of the new account if it was created.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
@@ -120,6 +122,11 @@ class Proxy
      */
     public function register($data)
     {
+        $data['referral'] = array(
+            'onboarding_product' => $this->configService->getIntegrationName(),
+            'onboarding_subproduct' => 'marketplace',
+        );
+
         $response = $this->call(HttpClient::HTTP_METHOD_POST, 'register', $data);
 
         $data = $response->decodeBodyAsJson();

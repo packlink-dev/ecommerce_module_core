@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Registration;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Utility\DtoValidator;
 
 /**
  * Class RegistrationRequest
@@ -209,7 +210,7 @@ class RegistrationRequest extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
-        if (!empty($payload['email']) && filter_var($payload['email'], FILTER_VALIDATE_EMAIL) === false) {
+        if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'email',
@@ -235,21 +236,12 @@ class RegistrationRequest extends FrontDto
             );
         }
 
-        if (!empty($payload['phone'])) {
-            $regex = '/^(\ |\+|\/|\.\|-|\(|\)|\d)+$/m';
-            $phoneError = !preg_match($regex, $payload['phone']);
-
-            $digits = '/\d/m';
-            $match = preg_match_all($digits, $payload['phone'], $matches);
-            $phoneError |= $match === false || $match < 3;
-
-            if ($phoneError) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
-                    'phone',
-                    'Field must be a valid phone number.'
-                );
-            }
+        if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'phone',
+                'Field must be a valid phone number.'
+            );
         }
 
         if (!empty($payload['language']) && !in_array($payload['language'], static::$supportedLanguages, true)) {
@@ -275,6 +267,14 @@ class RegistrationRequest extends FrontDto
                 ValidationError::ERROR_INVALID_FIELD,
                 'source',
                 'Field must be a valid URL.'
+            );
+        }
+
+        if (!empty($payload['platform']) && $payload['platform'] !== 'PRO') {
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'platform',
+                'Field must be set to "PRO".'
             );
         }
     }
