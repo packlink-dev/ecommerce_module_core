@@ -123,7 +123,6 @@ class RegistrationRequest extends FrontDto
         'policies',
         'source',
         'ecommerces',
-        'marketplaces',
     );
     /**
      * Allowed values for estimated delivery volume.
