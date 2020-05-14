@@ -124,7 +124,7 @@ class Proxy
     {
         $data['referral'] = array(
             'onboarding_product' => $this->configService->getIntegrationName(),
-            'onboarding_subproduct' => 'marketplace',
+            'onboarding_sub_product' => 'marketplace',
         );
 
         $response = $this->call(HttpClient::HTTP_METHOD_POST, 'register', $data);
