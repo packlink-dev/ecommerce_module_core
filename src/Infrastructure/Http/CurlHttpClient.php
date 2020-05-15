@@ -79,7 +79,7 @@ class CurlHttpClient extends HttpClient
             return 0;
         }
 
-        // Abort as soon as upload is donne. For async request we do not need to wait for response!
+        // Abort as soon as upload is done. For async request we do not need to wait for response!
         return 1;
     }
 
