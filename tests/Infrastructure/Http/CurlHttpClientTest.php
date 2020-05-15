@@ -125,67 +125,6 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * Tests 301 and 302 following redirects.
-     */
-    public function test30xRedirectsSuccess()
-    {
-        $responses = array(
-            $this->getResponse(301),
-            $this->getResponse(302),
-            $this->getResponse(200),
-        );
-
-        $this->httpClient->setMockResponses($responses);
-        $success = $this->httpClient->request('POST', 'test.url.com');
-
-        $this->assertTrue($success->isSuccessful(), 'Sync call should pass.');
-        $history = $this->httpClient->getHistory();
-        $this->assertCount(1, $history);
-        // original URL
-        $this->assertEquals('test.url.com', $history[0]['url'], 'Base curl URL should not be changed.');
-        // updated URL
-        $options = $this->httpClient->getCurlOptions();
-        $this->assertEquals('https://test.url.com', $options[CURLOPT_URL], 'Curl URL should be changed.');
-    }
-
-    public function test30xMaxRedirectsSuccess()
-    {
-        // max redirects is 5;
-        $responses = array(
-            $this->getResponse(301),
-            $this->getResponse(302),
-            $this->getResponse(302),
-            $this->getResponse(301),
-            $this->getResponse(302),
-            $this->getResponse(200),
-        );
-
-        $this->successCall($responses);
-    }
-
-    /**
-     * Tests 301 and 302 following redirects.
-     */
-    public function test30xRedirectsFail()
-    {
-        // max redirects in test client is 5;
-        $responses = array(
-            $this->getResponse(301),
-            $this->getResponse(302),
-            $this->getResponse(302),
-            $this->getResponse(302),
-            $this->getResponse(301),
-            $this->getResponse(302),
-            $this->getResponse(200),
-        );
-
-        $this->httpClient->setMockResponses($responses);
-        $success = $this->httpClient->request('POST', 'test.url.com');
-
-        $this->assertFalse($success->isSuccessful(), 'Curl call should not pass.');
-    }
-
-    /**
      * Tests setting follow location.
      */
     public function testFollowLocation()
@@ -213,17 +152,18 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
     {
         return array(
             'status' => $code,
-            'data' => "HTTP/1.1 $code CUSTOM\r
-Cache-Control: no-cache\r
-Server: test\r
-Location: https://test.url.com\r
-Date: Wed Jul 4 15:32:03 2019\r
-Connection: Keep-Alive:\r
-Content-Type: application/json\r
-Content-Length: 24860\r
-X-Custom-Header: Content: database\r
-\r
-{\"status\":\"success\"}",
+            'headers' => array(
+                "HTTP/1.1 $code CUSTOM",
+                'Cache-Control' => 'no-cache',
+                'Server' => 'test',
+                'Location' => 'https://test.url.com',
+                'Date' => 'Wed Jul 4 15:32:03 2019',
+                'Connection' => 'Keep-Alive:',
+                'Content-Type' => 'application/json',
+                'Content-Length' => '24860',
+                'X-Custom-Header' => 'Content: database',
+            ),
+            'data' => "{\"status\":\"success\"}",
         );
     }
 

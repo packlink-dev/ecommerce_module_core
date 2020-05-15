@@ -120,7 +120,7 @@ abstract class HttpClient
      * @param string $body Request payload. String data to send as HTTP request payload. Optional.
      *
      */
-    public function requestAsync($method, $url, $headers = array(), $body = '')
+    public function requestAsync($method, $url, $headers = array(), $body = '1')
     {
         Logger::logDebug(
             "Sending async http request to $url",

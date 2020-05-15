@@ -94,7 +94,8 @@ class TestCurlHttpClient extends CurlHttpClient
 
         $response = array_shift($this->responses);
 
-        return array($response['data'], $response['status']);
+        $headers = !empty($response['headers']) ? $response['headers'] : array();
+        return array($response['data'], $response['status'], $headers);
     }
 
     /**

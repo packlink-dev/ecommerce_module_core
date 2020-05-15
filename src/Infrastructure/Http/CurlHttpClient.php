@@ -53,6 +53,34 @@ class CurlHttpClient extends HttpClient
     private $curlSession;
 
     /**
+     * Aborts async process request after first byte of the request is uploaded.
+     *
+     * @param $curlResource
+     * @param $downloadTotal
+     * @param $downloadSoFar
+     * @param $uploadTotal
+     * @param $uploadedSoFar
+     *
+     * @return int
+     * @noinspection PhpUnused
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function abortAfterAsyncRequestCallback(
+        $curlResource,
+        $downloadTotal,
+        $downloadSoFar,
+        $uploadTotal,
+        $uploadedSoFar
+    ) {
+        if ($uploadTotal === 0 || ($uploadTotal !== $uploadedSoFar)) {
+            return 0;
+        }
+
+        // Abort as soon as upload is donne. For async request we do not need to wait for response!
+        return 1;
+    }
+
+    /**
      * Create and send request.
      *
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
@@ -85,7 +113,7 @@ class CurlHttpClient extends HttpClient
      *
      * @return bool|string
      */
-    protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '')
+    protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '1')
     {
         $this->setCurlSessionAndCommonRequestParts($method, $url, $headers, $body);
         $this->setCurlSessionOptionsForAsynchronousRequest();
@@ -103,7 +131,7 @@ class CurlHttpClient extends HttpClient
      */
     protected function executeSynchronousRequest()
     {
-        list($result, $statusCode) = $this->executeRequest();
+        list($result, $statusCode, $headers) = $this->executeCurlRequest();
 
         if ($result === false) {
             $error = curl_errno($this->curlSession) . ' = ' . curl_error($this->curlSession);
@@ -115,13 +143,8 @@ class CurlHttpClient extends HttpClient
         }
 
         curl_close($this->curlSession);
-        $result = $this->strip100Header($result);
 
-        return new HttpResponse(
-            $statusCode,
-            $this->getHeadersFromCurlResponse($result),
-            $this->getBodyFromCurlResponse($result)
-        );
+        return new HttpResponse($statusCode, $headers, $result);
     }
 
     /**
@@ -131,7 +154,7 @@ class CurlHttpClient extends HttpClient
      */
     protected function executeAsynchronousRequest()
     {
-        list($result, $statusCode) = $this->executeRequest();
+        list($result, $statusCode) = $this->executeCurlRequest();
 
         // 0 status code is set when timeout is reached
         if (!in_array($statusCode, array(0, 200), true)) {
@@ -147,52 +170,6 @@ class CurlHttpClient extends HttpClient
         curl_close($this->curlSession);
 
         return $result;
-    }
-
-    /**
-     * Executes cURL request and returns response and status code.
-     *
-     * @param int $redirects Redirects counter.
-     *
-     * @return array Array with plain response as the first item and status code as the second item.
-     */
-    protected function executeRequest($redirects = 0)
-    {
-        list($result, $statusCode) = $this->executeCurlRequest();
-
-        if ($redirects < static::MAX_REDIRECTS && in_array($statusCode, array(301, 302), true)) {
-            $headers = $this->getHeadersFromCurlResponse($result);
-            if (isset($headers['Location'])) {
-                // validate URL
-                $parsedUrl = parse_url($headers['Location']);
-                if (!empty($parsedUrl)) {
-                    $this->curlOptions[CURLOPT_URL] = $headers['Location'];
-                    curl_setopt($this->curlSession, CURLOPT_URL, $headers['Location']);
-
-                    return $this->executeRequest(++$redirects);
-                }
-            }
-        }
-
-        return array($result, $statusCode);
-    }
-
-    /**
-     * Strips 100 header that is added before regular header in certain requests.
-     *
-     * @param string $response API response.
-     *
-     * @return string Returns refined response.
-     */
-    protected function strip100Header($response)
-    {
-        $delimiter = "\r\n\r\n";
-        $needle = 'HTTP/1.1 100';
-        if (mb_strpos($response, $needle) === 0) {
-            return mb_substr($response, mb_strpos($response, $delimiter) + 4);
-        }
-
-        return $response;
     }
 
     /**
@@ -252,7 +229,9 @@ class CurlHttpClient extends HttpClient
     {
         $this->curlOptions[CURLOPT_URL] = $this->adjustUrlIfNeeded($url);
         $this->curlOptions[CURLOPT_HTTPHEADER] = $headers;
-        if ($method === static::HTTP_METHOD_POST) {
+
+        $methodsWithBody = array(static::HTTP_METHOD_POST, static::HTTP_METHOD_PUT, static::HTTP_METHOD_PATCH);
+        if (in_array($method, $methodsWithBody, true)) {
             $this->curlOptions[CURLOPT_POSTFIELDS] = $body;
         }
     }
@@ -263,7 +242,6 @@ class CurlHttpClient extends HttpClient
      */
     protected function setCommonOptionsForCurlSession()
     {
-        $this->curlOptions[CURLOPT_HEADER] = true;
         $this->curlOptions[CURLOPT_RETURNTRANSFER] = true;
         if ($this->followLocation) {
             $this->curlOptions[CURLOPT_FOLLOWLOCATION] = true;
@@ -299,6 +277,8 @@ class CurlHttpClient extends HttpClient
         // Timeout super fast once connected, so it goes into async.
         $this->curlOptions[CURLOPT_TIMEOUT_MS] =
             $this->getConfigService()->getAsyncRequestTimeout() ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
+        $this->curlOptions[CURLOPT_NOPROGRESS] = false;
+        $this->curlOptions[CURLOPT_PROGRESSFUNCTION] = array($this, 'abortAfterAsyncRequestCallback');
     }
 
     /**
@@ -328,52 +308,29 @@ class CurlHttpClient extends HttpClient
     /**
      * Executes cURL request and returns response and status code.
      *
-     * @return array Array with plain response as the first item and status code as the second item.
+     * @return array Array with plain response as the first item, status code as the second item and headers as third.
+     * @noinspection PhpUnusedParameterInspection
      */
     protected function executeCurlRequest()
     {
-        return array(curl_exec($this->curlSession), curl_getinfo($this->curlSession, CURLINFO_HTTP_CODE));
-    }
-
-    /**
-     * Returns array of headers from cURL response.
-     *
-     * @param string $response Response string.
-     *
-     * @return array Array of cURL response headers.
-     */
-    protected function getHeadersFromCurlResponse($response)
-    {
         $headers = array();
-        $headersBodyDelimiter = "\r\n\r\n";
-        $headerText = mb_substr($response, 0, mb_strpos($response, $headersBodyDelimiter));
-        $headersDelimiter = "\r\n";
+        curl_setopt(
+            $this->curlSession,
+            CURLOPT_HEADERFUNCTION,
+            // Callback function is called by curl for each header line received
+            function($curl, $header) use (&$headers) {
+                // Set only valid headers
+                $headerArray = explode(':', $header, 2);
+                if (count($headerArray) >= 2) {
+                    $headers[trim($headerArray[0])] = trim($headerArray[1]);
+                }
 
-        foreach (explode($headersDelimiter, $headerText) as $i => $line) {
-            if ($i === 0) {
-                $headers[] = $line;
-            } else {
-                list($key, $value) = explode(': ', $line, 2);
-                $headers[$key] = $value;
+                // Do not use mb_strlen here because curl expects number of bytes to be returned not number of chars
+                return strlen($header);
             }
-        }
+        );
 
-        return $headers;
-    }
-
-    /**
-     * Returns body from cURL response.
-     *
-     * @param string $response Response string.
-     *
-     * @return string Response body.
-     */
-    protected function getBodyFromCurlResponse($response)
-    {
-        $headersBodyDelimiter = "\r\n\r\n";
-        $bodyStartingPositionOffset = 4; // number of special signs in delimiter;
-
-        return mb_substr($response, mb_strpos($response, $headersBodyDelimiter) + $bodyStartingPositionOffset);
+        return array(curl_exec($this->curlSession), curl_getinfo($this->curlSession, CURLINFO_HTTP_CODE), $headers);
     }
 
     /**
