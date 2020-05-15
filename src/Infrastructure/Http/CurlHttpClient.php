@@ -61,7 +61,8 @@ class CurlHttpClient extends HttpClient
      * @param $uploadTotal
      * @param $uploadedSoFar
      *
-     * @return int
+     * @return int If non-zero value is returned underlying curl transfer will bee aborted.
+     * @see https://www.php.net/manual/en/function.curl-setopt.php CURLOPT_PROGRESSFUNCTION config option
      * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
      */
@@ -73,6 +74,8 @@ class CurlHttpClient extends HttpClient
         $uploadedSoFar
     ) {
         if ($uploadTotal === 0 || ($uploadTotal !== $uploadedSoFar)) {
+            // Signal curl library to continue until upload is still in progress. According to PHP manual non zero value
+            // will abort, therefore we have to return zero here.
             return 0;
         }
 
@@ -109,7 +112,10 @@ class CurlHttpClient extends HttpClient
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
      * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
-     * @param string $body Request payload. String data to send as HTTP request payload. Optional.
+     * @param string $body Request payload. String data to send as HTTP request payload. Optional. Default value for
+     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods. This will ensure that
+     * we have upload progress and enable async request termination as soon as upload is finished without waiting for
+     * response (without downloading body or relaying on fixed request timeout)
      *
      * @return bool|string
      */

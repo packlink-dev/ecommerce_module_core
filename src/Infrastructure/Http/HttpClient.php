@@ -117,7 +117,8 @@ abstract class HttpClient
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
      * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
-     * @param string $body Request payload. String data to send as HTTP request payload. Optional.
+     * @param string $body Request payload. String data to send as HTTP request payload. Optional. Default value for
+     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods.
      *
      */
     public function requestAsync($method, $url, $headers = array(), $body = '1')
@@ -194,9 +195,10 @@ abstract class HttpClient
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
      * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
-     * @param string $body Request payload. String data to send as HTTP request payload. Optional.
+     * @param string $body Request payload. String data to send as HTTP request payload. Optional.  Default value for
+     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods.
      */
-    abstract protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '');
+    abstract protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '1');
 
     /**
      * Get additional options combinations for specified method and url.
