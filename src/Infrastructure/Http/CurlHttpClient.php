@@ -55,15 +55,14 @@ class CurlHttpClient extends HttpClient
     /**
      * Aborts async process request after first byte of the request is uploaded.
      *
-     * @param $curlResource
-     * @param $downloadTotal
-     * @param $downloadSoFar
-     * @param $uploadTotal
-     * @param $uploadedSoFar
+     * @param resource $curlResource cURL resource.
+     * @param int $downloadTotal Total number of bytes expected to be downloaded in transfer.
+     * @param int $downloadSoFar Number of bytes downloaded so far.
+     * @param int $uploadTotal Total number of bytes expected to be uploaded in this transfer.
+     * @param int $uploadedSoFar Number of bytes uploaded so far.
      *
-     * @return int If non-zero value is returned underlying curl transfer will be aborted.
+     * @return int If non-zero value is returned, underlying curl transfer will be aborted.
      * @see https://www.php.net/manual/en/function.curl-setopt.php CURLOPT_PROGRESSFUNCTION config option
-     * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
      */
     public function abortAfterAsyncRequestCallback(
@@ -74,12 +73,11 @@ class CurlHttpClient extends HttpClient
         $uploadedSoFar
     ) {
         if ($uploadTotal === 0 || ($uploadTotal !== $uploadedSoFar)) {
-            // Signal curl library to continue until upload is still in progress. According to PHP manual non zero value
-            // will abort, therefore we have to return zero here.
+            // Signal curl library to continue until upload is still in progress.
             return 0;
         }
 
-        // Abort as soon as upload is done. For async request we do not need to wait for response!
+        // Abort as soon as the upload is done. For an async request, we do not need to wait for a response.
         return 1;
     }
 
@@ -111,11 +109,11 @@ class CurlHttpClient extends HttpClient
      *
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
-     * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
-     * @param string $body Request payload. String data to send as HTTP request payload. Optional. Default value for
-     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods. This will ensure that
-     * we have upload progress and enable async request termination as soon as upload is finished without waiting for
-     * response (without downloading body or relaying on fixed request timeout)
+     * @param array|null $headers [Optional] Request headers to send. Key as header name and value as header content.
+     * @param string $body [Optional] Request payload. String data to send as HTTP request payload. Default value for
+     *     request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods. This will ensure
+     *     that we have the upload progress and enable the async request termination as soon as the upload is finished
+     *     without waiting for a response (without downloading a body or relaying on a fixed request timeout).
      *
      * @return bool|string
      */
@@ -324,7 +322,7 @@ class CurlHttpClient extends HttpClient
             $this->curlSession,
             CURLOPT_HEADERFUNCTION,
             // Callback function is called by curl for each header line received
-            function($curl, $header) use (&$headers) {
+            function ($curl, $header) use (&$headers) {
                 // Set only valid headers
                 $headerArray = explode(':', $header, 2);
                 if (count($headerArray) >= 2) {

@@ -116,10 +116,9 @@ abstract class HttpClient
      *
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
-     * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
-     * @param string $body Request payload. String data to send as HTTP request payload. Optional. Default value for
-     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods.
-     *
+     * @param array|null $headers [Optional] Request headers to send. Key as header name and value as header content.
+     * @param string $body [Optional] Request payload. String data to send as HTTP request payload. Default value for
+     *      a request body is '1' to ensure a minimal request data in a case of POST, PUT, PATCH methods.
      */
     public function requestAsync($method, $url, $headers = array(), $body = '1')
     {
@@ -194,9 +193,11 @@ abstract class HttpClient
      *
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
-     * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
-     * @param string $body Request payload. String data to send as HTTP request payload. Optional.  Default value for
-     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods.
+     * @param array|null $headers [Optional] Request headers to send. Key as header name and value as header content.
+     * @param string $body [Optional] Request payload. String data to send as HTTP request payload. Default value for
+     *     request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods. This will ensure
+     *     that we have the upload progress and enable the async request termination as soon as the upload is finished
+     *     without waiting for a response (without downloading a body or relaying on a fixed request timeout).
      */
     abstract protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '1');
 
@@ -207,7 +208,7 @@ abstract class HttpClient
      * @param string $url Request URL.
      *
      * @return array
-     *  Array of additional options combinations. Each array item should be an array of OptionsDTO instances.
+     *      Array of additional options combinations. Each array item should be an array of OptionsDTO instances.
      */
     protected function getAutoConfigurationOptionsCombinations($method, $url)
     {

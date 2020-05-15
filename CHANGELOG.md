@@ -4,13 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
+
+## [2.0.9](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.8...v2.0.9) - 2020-05-15
+### Added
+- Added registration request processing
+
 ### Changed
 - Changed `CurlHttpClient::executeCurlRequest` to return response headers as last item array
 ### Removed
- - Method `CurlHttpClient::executeRequest` is removed
- - Method `CurlHttpClient::getHeadersFromCurlResponse` is removed
- - Method `CurlHttpClient::getBodyFromCurlResponse` is removed
- - Method `CurlHttpClient::strip100Header` is removed
+- Method `CurlHttpClient::executeRequest` is removed
+- Method `CurlHttpClient::getHeadersFromCurlResponse` is removed
+- Method `CurlHttpClient::getBodyFromCurlResponse` is removed
+- Method `CurlHttpClient::strip100Header` is removed
  
 ## [2.0.8](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.7...v2.0.8) - 2020-05-12
 ### Changed
