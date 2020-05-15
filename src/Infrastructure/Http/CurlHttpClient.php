@@ -61,7 +61,7 @@ class CurlHttpClient extends HttpClient
      * @param $uploadTotal
      * @param $uploadedSoFar
      *
-     * @return int If non-zero value is returned underlying curl transfer will bee aborted.
+     * @return int If non-zero value is returned underlying curl transfer will be aborted.
      * @see https://www.php.net/manual/en/function.curl-setopt.php CURLOPT_PROGRESSFUNCTION config option
      * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
