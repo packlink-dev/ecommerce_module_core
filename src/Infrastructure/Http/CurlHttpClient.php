@@ -278,15 +278,13 @@ class CurlHttpClient extends HttpClient
     {
         // Always ensure the connection is fresh.
         $this->curlOptions[CURLOPT_FRESH_CONNECT] = true;
-        // Timeout super fast once connected, so it goes into async.
-        $asyncRequestTimeout = $this->getConfigService()->getAsyncRequestTimeout();
-        $this->curlOptions[CURLOPT_TIMEOUT_MS] = $asyncRequestTimeout ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
+        // Timeout super fast once connected, so it goes into async. Pay attention that fast timout is not desired when
+        // callback progress method is used for request aborting because request can go in timout before request
+        // upload finishes therefore making async requests less stable that it needs to be.
+        $this->curlOptions[CURLOPT_TIMEOUT_MS] =
+            $this->getConfigService()->getAsyncRequestTimeout() ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
 
         if ($this->getConfigService()->isAsyncRequestWithProgress()) {
-            // Use sync request timeout by default if progress callback mechanism is used for async request aborting.
-            // We do not need/want fast timeouts in this case because the abort mechanism relays on the amount of
-            // uploaded data.
-            $this->curlOptions[CURLOPT_TIMEOUT_MS] = $asyncRequestTimeout ?: static::DEFAULT_REQUEST_TIMEOUT;
             $this->curlOptions[CURLOPT_NOPROGRESS] = false;
             $this->curlOptions[CURLOPT_PROGRESSFUNCTION] = array($this, 'abortAfterAsyncRequestCallback');
         }

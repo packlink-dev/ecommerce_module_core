@@ -103,7 +103,7 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
         $this->httpClient->requestAsync('POST', 'test.url.com');
 
         $this->assertProgressCallback();
-        $this->assertCallTimeout(CurlHttpClient::DEFAULT_REQUEST_TIMEOUT);
+        $this->assertCallTimeout(CurlHttpClient::DEFAULT_ASYNC_REQUEST_TIMEOUT);
     }
 
     /**
