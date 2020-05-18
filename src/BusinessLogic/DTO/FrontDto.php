@@ -105,7 +105,7 @@ abstract class FrontDto extends BaseDto
     }
 
     /**
-     * Checks the payload for mandatory fields. Uses `empty()` validation!
+     * Checks the payload for mandatory fields.
      *
      * @param array $payload The payload in key-value format.
      * @param ValidationError[] $validationErrors The array of errors to populate.

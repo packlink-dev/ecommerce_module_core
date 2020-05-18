@@ -44,6 +44,12 @@ class Country extends FrontDto
      */
     public $registrationLink;
     /**
+     * 2-letter platform country code.
+     *
+     * @var string
+     */
+    public $platformCountry;
+    /**
      * Fields for this DTO.
      *
      * @var array
@@ -53,6 +59,7 @@ class Country extends FrontDto
         'code',
         'postal_code',
         'registration_link',
+        'platform_country',
     );
     /**
      * Required fields for DTO to be valid.
@@ -64,6 +71,7 @@ class Country extends FrontDto
         'code',
         'postal_code',
         'registration_link',
+        'platform_country',
     );
 
     /**
@@ -81,6 +89,7 @@ class Country extends FrontDto
 
         $instance->postalCode = static::getValue($raw, 'postal_code');
         $instance->registrationLink = static::getValue($raw, 'registration_link');
+        $instance->platformCountry = static::getValue($raw, 'platform_country');
 
         return $instance;
     }
@@ -97,6 +106,7 @@ class Country extends FrontDto
             array(
                 'postal_code' => $this->postalCode,
                 'registration_link' => $this->registrationLink,
+                'platform_country' => $this->platformCountry,
             )
         );
     }
