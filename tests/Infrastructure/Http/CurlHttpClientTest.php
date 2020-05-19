@@ -2,7 +2,6 @@
 
 namespace Logeecom\Tests\Infrastructure\Http;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\CurlHttpClient;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
@@ -104,7 +103,7 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
         $this->httpClient->requestAsync('POST', 'test.url.com');
 
         $this->assertProgressCallback();
-        $this->assertCallTimeout(Configuration::DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT);
+        $this->assertCallTimeout(CurlHttpClient::DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT);
     }
 
     /**

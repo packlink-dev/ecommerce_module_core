@@ -18,6 +18,10 @@ class CurlHttpClient extends HttpClient
      */
     const DEFAULT_ASYNC_REQUEST_TIMEOUT = 1000;
     /**
+     * Default asynchronous request timeout value in milliseconds when progress callback is used.
+     */
+    const DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT = 60000;
+    /**
      * Default synchronous request timeout value in milliseconds.
      */
     const DEFAULT_REQUEST_TIMEOUT = 60000;
@@ -278,13 +282,18 @@ class CurlHttpClient extends HttpClient
     {
         // Always ensure the connection is fresh.
         $this->curlOptions[CURLOPT_FRESH_CONNECT] = true;
-        // Timeout super fast once connected, so it goes into async. Pay attention that fast timout is not desired when
-        // callback progress method is used for request aborting because request can go in timout before request
-        // upload finishes therefore making async requests less stable that it needs to be.
-        $this->curlOptions[CURLOPT_TIMEOUT_MS] =
-            $this->getConfigService()->getAsyncRequestTimeout() ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
+        // Timeout super fast once connected, so it goes into async.
+        $asyncRequestTimeout = $this->getConfigService()->getAsyncRequestTimeout();
+        $this->curlOptions[CURLOPT_TIMEOUT_MS] = $asyncRequestTimeout ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
 
         if ($this->getConfigService()->isAsyncRequestWithProgress()) {
+            // Use higher request timeout value by default if progress callback mechanism is used for async request
+            // aborting. Pay attention that fast timout is not desired in this case because request can go in timout
+            // before request upload finishes, therefore, making async requests less stable that it needs to be.
+            if (!$asyncRequestTimeout) {
+                $this->curlOptions[CURLOPT_TIMEOUT_MS] = static::DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT;
+            }
+
             $this->curlOptions[CURLOPT_NOPROGRESS] = false;
             $this->curlOptions[CURLOPT_PROGRESSFUNCTION] = array($this, 'abortAfterAsyncRequestCallback');
         }
