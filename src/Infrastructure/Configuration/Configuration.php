@@ -39,6 +39,10 @@ abstract class Configuration extends Singleton
      */
     const ASYNC_CALL_METHOD = 'POST';
     /**
+     * Default asynchronous request timeout value in milliseconds when progress callback is used.
+     */
+    const DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT = 60000;
+    /**
      * System user context.
      *
      * @var string
@@ -438,7 +442,12 @@ abstract class Configuration extends Singleton
      */
     public function getAsyncRequestTimeout()
     {
-        return $this->getConfigValue('asyncRequestTimeout');
+        $configValue = $this->getConfigValue('asyncRequestTimeout');
+        if ($configValue || !$this->isAsyncRequestWithProgress()) {
+            return $configValue;
+        }
+
+        return static::DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT;
     }
 
     /**
