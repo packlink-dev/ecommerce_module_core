@@ -57,7 +57,7 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
     /**
      * Test an async call.
      */
-    public function testAsyncCall()
+    public function testDefaultAsyncCall()
     {
         $responses = array($this->getResponse(200));
 
@@ -78,13 +78,61 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
     /**
      * Test an async call with custom timeout.
      */
-    public function testAsyncCallDifferentTimeout()
+    public function testDefaultAsyncCallDifferentTimeout()
     {
         $responses = array($this->getResponse(200));
 
         $this->httpClient->setMockResponses($responses);
 
         $newTimeout = 200;
+        $this->shopConfig->setAsyncRequestTimeout($newTimeout);
+        $this->httpClient->requestAsync('POST', 'test.url.com');
+
+        $this->assertCallTimeout($newTimeout);
+    }
+
+    /**
+     * Test async call with progress callback
+     */
+    public function testAsyncCallWithProgressCallback()
+    {
+        $responses = array($this->getResponse(200));
+        $this->httpClient->setMockResponses($responses);
+
+        $this->shopConfig->setAsyncRequestWithProgress(true);
+        $this->httpClient->requestAsync('POST', 'test.url.com');
+
+        $this->assertProgressCallback();
+        $this->assertCallTimeout(CurlHttpClient::DEFAULT_ASYNC_REQUEST_WITH_PROGRESS_TIMEOUT);
+    }
+
+    /**
+     * Test async call without progress callback
+     */
+    public function testAsyncCallWithoutProgressCallback()
+    {
+        $responses = array($this->getResponse(200));
+
+        $this->httpClient->setMockResponses($responses);
+
+        $this->shopConfig->setAsyncRequestWithProgress(false);
+        $this->httpClient->requestAsync('POST', 'test.url.com');
+
+        $this->assertProgressCallback(false);
+        $this->assertCallTimeout(CurlHttpClient::DEFAULT_ASYNC_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Test an async call with custom timeout and progress callback.
+     */
+    public function testDAsyncCallWithProgressCallbackDifferentTimeout()
+    {
+        $responses = array($this->getResponse(200));
+
+        $this->httpClient->setMockResponses($responses);
+
+        $newTimeout = 200;
+        $this->shopConfig->setAsyncRequestWithProgress(true);
         $this->shopConfig->setAsyncRequestTimeout($newTimeout);
         $this->httpClient->requestAsync('POST', 'test.url.com');
 
@@ -179,6 +227,43 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
             $timeout,
             $curlOptions[CURLOPT_TIMEOUT_MS],
             'Curl default timeout should be set for async call.'
+        );
+    }
+
+    private function assertProgressCallback($isOn = true)
+    {
+        $curlOptions = $this->httpClient->getCurlOptions();
+        $this->assertNotEmpty($curlOptions, 'Curl options should be set.');
+        if (!$isOn) {
+            $this->assertFalse(
+                isset($curlOptions[CURLOPT_NOPROGRESS]),
+                'Curl progress callback should not be set.'
+            );
+            $this->assertFalse(
+                isset($curlOptions[CURLOPT_PROGRESSFUNCTION]),
+                'Curl progress callback should not be set.'
+            );
+
+            return;
+        }
+
+
+        $this->assertTrue(
+            isset($curlOptions[CURLOPT_NOPROGRESS]),
+            'Curl progress callback should be set for async call.'
+        );
+        $this->assertFalse(
+            $curlOptions[CURLOPT_NOPROGRESS],
+            'Curl progress callback should be set for async call.'
+        );
+        $this->assertTrue(
+            isset($curlOptions[CURLOPT_PROGRESSFUNCTION]),
+            'Curl progress callback should be set for async call.'
+        );
+        $this->assertEquals(
+            array($this->httpClient, 'abortAfterAsyncRequestCallback'),
+            $curlOptions[CURLOPT_PROGRESSFUNCTION],
+            'Curl progress callback should be set for async call.'
         );
     }
 }

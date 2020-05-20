@@ -452,6 +452,26 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Returns whether the async requests are aborted with progress callback (used in CurlHttpClient).
+     *
+     * @return bool TRUE if the async requests are aborted with progress callback; otherwise, FALSE.
+     */
+    public function isAsyncRequestWithProgress()
+    {
+        return (bool)$this->getConfigValue('asyncRequestWithProgress', false);
+    }
+
+    /**
+     * Sets flag for usage of progress callback abort mechanism inside CurlHttpClient
+     *
+     * @param bool $withProgress
+     */
+    public function setAsyncRequestWithProgress($withProgress)
+    {
+        $this->saveConfigValue('asyncRequestWithProgress', $withProgress);
+    }
+
+    /**
      * Gets configuration value for given name.
      *
      * @param string $name Name of the config parameter.

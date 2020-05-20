@@ -3,7 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
+## [2.0.10](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.9...v2.0.10)
+### Added
+- Added configuration flag for async request progress callback usage (methods
+`Configuration::isAsyncRequestWithProgress` and `Configuration::setAsyncRequestWithProgress`)
+
+### Changed
+- Changed default timeout for async requests that utilize progress callback to be the same as for standard sync request.
+In this case progress callback is controlling request abort based on uploaded data so short timeout is undesirable.
 
 ## [2.0.9](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.8...v2.0.9) - 2020-05-15
 ### Added
