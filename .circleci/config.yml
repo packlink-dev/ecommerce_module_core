@@ -45,11 +45,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore: master
       - tests-7_2:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore: master
