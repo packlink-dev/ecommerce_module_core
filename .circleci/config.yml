@@ -1,0 +1,33 @@
+---
+version: 2.1
+executors:
+  tester:
+    docker:
+      - image: circleci/php:5.6
+      - image: circleci/php:7.2
+jobs:
+  tests:
+    executor: tester
+    working_directory: ~/ecommerce_module_core
+    steps:
+      - checkout
+      - run:
+          name: Enable PHP modules
+          command: sudo -E docker-php-ext-install mysqli zip pdo pdo_mysql
+      - run:
+          name: Execute composer install
+          command: composer install
+      - run:
+          name: Run tests
+          command: php vendor/bin/phpunit --configuration phpunit.xml
+
+workflows:
+  version: 2.1
+  ecommerce_module_core:
+    jobs:
+      - tests:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: master
