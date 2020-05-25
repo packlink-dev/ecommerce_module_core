@@ -51,7 +51,12 @@ class RegistrationLegalPolicyDtoTest extends BaseDtoTest
             $errors = $e->getValidationErrors();
             self::assertCount(2, $errors);
 
-            $errorCodes = array_map(create_function('$error', 'return $error->field;'), $errors);
+            $errorCodes = array_map(
+                function ($error) {
+                    return $error->field;
+                },
+                $errors
+            );
 
             self::assertArraySubset(array('data_processing', 'terms_and_conditions'), $errorCodes);
         }
