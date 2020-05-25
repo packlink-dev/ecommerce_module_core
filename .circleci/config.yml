@@ -1,15 +1,15 @@
 ---
 version: 2.1
 executors:
-  php-5.6:
+  php-5_6:
     docker:
       - image: circleci/php:5.6
-  php-7.2:
+  php-7_2:
     docker:
       - image: circleci/php:7.2
 jobs:
   tests-5.6:
-    executor: php-5.6
+    executor: php-5_6
     working_directory: ~/ecommerce_module_core
     steps:
       - checkout
@@ -23,7 +23,7 @@ jobs:
           name: Run tests
           command: php vendor/bin/phpunit --configuration phpunit.xml
   tests-7.2:
-    executor: php-7.2
+    executor: php-7_2
     working_directory: ~/ecommerce_module_core
     steps:
       - checkout
@@ -41,13 +41,13 @@ workflows:
   version: 2.1
   ecommerce_module_core:
     jobs:
-      - tests-5.6:
+      - tests-5_6:
           filters:
             tags:
               only: /.*/
             branches:
               ignore: master
-      - tests-7.2:
+      - tests-7_2:
           filters:
             tags:
               only: /.*/
