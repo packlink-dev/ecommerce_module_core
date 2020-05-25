@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.0.12](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.11...v2.0.12) - 2020-05-25
+### Changed
+- Fixed unit tests
+
 ## [2.0.11](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.10...v2.0.11) - 2020-05-25
 ### Changed
 - Fixed unit tests
