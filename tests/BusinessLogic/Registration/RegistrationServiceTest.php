@@ -38,6 +38,9 @@ class RegistrationServiceTest extends BaseTestWithServices
     /**
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     *
+     * @expectedException \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     * @expectedExceptionMessage Registration failed. Error: Client already exists
      */
     public function testRegisterSameEmailTwice()
     {
@@ -58,17 +61,15 @@ class RegistrationServiceTest extends BaseTestWithServices
         $this->assertNotEmpty($token, 'Token should not be an empty string');
         $this->assertEquals('ee0870a7dc61e4eda41fbae68395c672aeafe375cd90ce4adcf615c6ae86f28d', $token);
 
-        $this->setExpectedException(
-            UnableToRegisterAccountException::CLASS_NAME,
-            'Registration failed. Error: Client already exists'
-        );
-
         $service->register($this->getRequest());
     }
 
     /**
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     *
+     * @expectedException \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     * @expectedExceptionMessage Registration failed. Error: Bad Request
      */
     public function testBadRequest()
     {
@@ -79,11 +80,6 @@ class RegistrationServiceTest extends BaseTestWithServices
         $service = ServiceRegister::getService(RegistrationService::CLASS_NAME);
         $request = $this->getRequest();
         $request->platform = 'test';
-
-        $this->setExpectedException(
-            UnableToRegisterAccountException::CLASS_NAME,
-            'Registration failed. Error: Bad Request'
-        );
 
         $service->register($request);
     }
