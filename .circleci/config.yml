@@ -8,7 +8,7 @@ executors:
     docker:
       - image: circleci/php:7.2
 jobs:
-  tests-5.6:
+  tests-5_6:
     executor: php-5_6
     working_directory: ~/ecommerce_module_core
     steps:
@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Run tests
           command: php vendor/bin/phpunit --configuration phpunit.xml
-  tests-7.2:
+  tests-7:2:
     executor: php-7_2
     working_directory: ~/ecommerce_module_core
     steps:
