@@ -253,7 +253,7 @@ class CurlHttpClientTest extends BaseInfrastructureTestWithServices
             'Curl progress callback should be set for async call.'
         );
         $this->assertFalse(
-            $curlOptions[CURLOPT_NOPROGRESS],
+            (bool)$curlOptions[CURLOPT_NOPROGRESS],
             'Curl progress callback should be set for async call.'
         );
         $this->assertTrue(
