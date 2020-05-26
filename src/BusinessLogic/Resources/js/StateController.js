@@ -34,13 +34,15 @@ var Packlink = window.Packlink || {};
      *      getSystemOrderStatusesUrl: string,
      *      orderStatusMappingsSaveUrl: string,
      *      orderStatusMappingsGetUrl: string,
-     *      getShippingCountriesUrl: string
+     *      getShippingCountriesUrl: string,
+     *      initialPage: string
      * }} configuration
      *
      * @constructor
      */
     function StateController(configuration) {
         let pageControllerFactory = Packlink.pageControllerFactory;
+        let initialPage = 'shipping-methods';
 
         let sidebarButtons = [
             'shipping-methods',
@@ -61,7 +63,6 @@ var Packlink = window.Packlink || {};
             submenuItems = submenuItems.concat(configuration.submenuItems);
         }
 
-        let sidebarController = new Packlink.SidebarController(navigate, sidebarButtons, submenuItems);
         let utilityService = Packlink.utilityService;
         let context = '';
 
@@ -103,19 +104,27 @@ var Packlink = window.Packlink || {};
             'footer': {
                 getDebugStatusUrl: configuration.debugGetStatusUrl,
                 setDebugStatusUrl: configuration.debugSetStatusUrl
-            }
+            },
+            'initialPage': configuration.initialPage
         };
 
         if (typeof configuration.pageConfiguration !== 'undefined') {
             pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration};
         }
 
+        if (typeof pageConfiguration.initialPage !== 'undefined') {
+            initialPage = pageConfiguration.initialPage;
+        }
+
+        let sidebarController = new Packlink.SidebarController(navigate, sidebarButtons, submenuItems);
+        sidebarController.setState(initialPage);
+
         this.display = function () {
             pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
             let dp = pageControllerFactory.getInstance(
-                'shipping-methods',
-                getControllerConfiguration('shipping-methods')
+                initialPage,
+                getControllerConfiguration(initialPage)
             );
             dp.display();
         };
