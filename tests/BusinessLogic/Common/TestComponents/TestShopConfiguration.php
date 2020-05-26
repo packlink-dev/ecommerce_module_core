@@ -90,7 +90,7 @@ class TestShopConfiguration extends Configuration
      */
     public function getWebHookUrl()
     {
-        return 'https://example.com';
+        return 'https://example.com?context=' . $this->getContext();
     }
 
     /**
