@@ -4,7 +4,7 @@ namespace Packlink\DemoUI\Services\BusinessLogic;
 
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
-use Packlink\DemoUI\Repository\AssetsRepository;
+use Packlink\DemoUI\Services\Integration\UrlService;
 
 /**
  * Class CarrierService
@@ -22,9 +22,9 @@ class CarrierService implements ShopShippingMethodService
      */
     public function getCarrierLogoFilePath($carrierName)
     {
-        $assetsRepo = new AssetsRepository();
+        $assetsRepo = new UrlService();
 
-        return $assetsRepo->getUrl('images/carriers/carrier.jpg');
+        return $assetsRepo->getAssetsUrl('images/carriers/carrier.jpg');
     }
 
     /**

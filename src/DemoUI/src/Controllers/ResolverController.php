@@ -23,7 +23,7 @@ class ResolverController
         $payload = $payload != null ? $payload : array();
         $headers = getallheaders();
 
-        $controllerClass =  __NAMESPACE__ . '\\' . $controllerName;
+        $controllerClass =  __NAMESPACE__ . '\\' . $controllerName . 'Controller';
         $controller = new $controllerClass;
 
         header('Content-Type: application/json');

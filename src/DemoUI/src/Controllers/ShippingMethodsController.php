@@ -15,7 +15,7 @@ class ShippingMethodsController
      */
     public function getAll(Request $request)
     {
-
+        echo json_encode(array());
     }
 
     /**
@@ -23,7 +23,7 @@ class ShippingMethodsController
      */
     public function getTaskStatus(Request $request)
     {
-
+        echo json_encode(array('status' => 'completed'));
     }
 
     /**

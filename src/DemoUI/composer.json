@@ -10,8 +10,13 @@
     "psr-4": {
       "Logeecom\\Infrastructure\\": "../Infrastructure",
       "Packlink\\BusinessLogic\\": "../BusinessLogic",
+      "Packlink\\DemoUI\\Lib\\": "Lib",
       "Packlink\\DemoUI\\": "src"
     }
+  },
+  "scripts": {
+    "post-update-cmd": "Packlink\\DemoUI\\Lib\\Composer::postUpdate",
+    "post-install-cmd": "Packlink\\DemoUI\\Lib\\Composer::postUpdate"
   },
   "config": {
     "platform": {
