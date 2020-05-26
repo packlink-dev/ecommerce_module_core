@@ -26,7 +26,6 @@ class UrlService
      */
     public function getEndpointUrl($controllerName, $action)
     {
-
         return "{$this->schema}://{$_SERVER['HTTP_HOST']}/Controllers/Index.php?controller={$controllerName}&action={$action}";
     }
 
