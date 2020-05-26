@@ -3,7 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [2.0.10](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.9...v2.0.10)
+## Unreleased
+
+## [2.0.12](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.11...v2.0.12) - 2020-05-25
+### Changed
+- Fixed unit tests
+
+## [2.0.11](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.10...v2.0.11) - 2020-05-25
+### Changed
+- Fixed unit tests
+ 
+## [2.0.10](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.9...v2.0.10) - 2020-05-20
 ### Added
 - Added configuration flag for async request progress callback usage (methods
 `Configuration::isAsyncRequestWithProgress` and `Configuration::setAsyncRequestWithProgress`)

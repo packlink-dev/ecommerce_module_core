@@ -124,7 +124,12 @@ class RegistrationRequestDtoTest extends BaseDtoTest
             $errors = $e->getValidationErrors();
             self::assertCount(1, $errors);
 
-            $errorCodes = array_map(create_function('$error', 'return $error->field;'), $errors);
+            $errorCodes = array_map(
+                function ($error) {
+                    return $error->field;
+                },
+                $errors
+            );
 
             self::assertArraySubset(array($field), $errorCodes);
         }
