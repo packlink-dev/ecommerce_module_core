@@ -24,7 +24,7 @@ class CarrierService implements ShopShippingMethodService
     {
         $assetsRepo = new UrlService();
 
-        return $assetsRepo->getAssetsUrl('images/carriers/carrier.jpg');
+        return $assetsRepo->getResourceUrl("images/carriers/{$carrierName}.jpg");
     }
 
     /**

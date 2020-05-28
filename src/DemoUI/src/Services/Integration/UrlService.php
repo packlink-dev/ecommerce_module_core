@@ -26,10 +26,10 @@ class UrlService
      *
      * @return string
      */
-    public static function getAssetsUrl($filePath)
+    public static function getResourceUrl($filePath)
     {
         $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
 
-        return "{$schema}}://{$_SERVER['HTTP_HOST']}/Controllers/assets/{$filePath}";
+        return "{$schema}}://{$_SERVER['HTTP_HOST']}/Views/resources/{$filePath}";
     }
 }
