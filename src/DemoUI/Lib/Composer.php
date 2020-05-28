@@ -16,7 +16,6 @@ class Composer
             $fromBase . 'LocationPicker/js' => $toBase . 'js/location',
             $fromBase . 'LocationPicker/css' => $toBase . 'css/location',
             $fromBase . 'img' => $toBase . 'images',
-            $fromBase . 'img/carriers' => $toBase . 'images/carriers',
         );
 
         foreach ($map as $from => $to) {

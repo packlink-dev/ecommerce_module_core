@@ -9,24 +9,16 @@ namespace Packlink\DemoUI\Services\Integration;
 class UrlService
 {
     /**
-     * @var string (http/https)
-     */
-    private $schema;
-
-    public function __construct()
-    {
-        $this->schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
-    }
-
-    /**
      * @param $controllerName
      * @param $action
      *
      * @return string
      */
-    public function getEndpointUrl($controllerName, $action)
+    public static function getEndpointUrl($controllerName, $action)
     {
-        return "{$this->schema}://{$_SERVER['HTTP_HOST']}/Controllers/Index.php?controller={$controllerName}&action={$action}";
+        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+
+        return "{$schema}://{$_SERVER['HTTP_HOST']}/Controllers/Index.php?controller={$controllerName}&action={$action}";
     }
 
     /**
@@ -34,8 +26,10 @@ class UrlService
      *
      * @return string
      */
-    public function getAssetsUrl($filePath)
+    public static function getAssetsUrl($filePath)
     {
-        return "{$this->schema}}://{$_SERVER['HTTP_HOST']}/Controllers/assets/{$filePath}";
+        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+
+        return "{$schema}}://{$_SERVER['HTTP_HOST']}/Controllers/assets/{$filePath}";
     }
 }
