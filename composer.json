@@ -4,7 +4,8 @@
     "type": "library",
     "license": "proprietary",
     "require": {
-      "php": ">=5.3.29"
+      "php": ">=5.3.29",
+      "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
