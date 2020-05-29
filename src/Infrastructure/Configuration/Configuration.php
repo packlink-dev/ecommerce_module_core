@@ -59,6 +59,8 @@ abstract class Configuration extends Singleton
     protected $repository;
 
     /**
+     * Retrieves current language.
+     *
      * @return string
      */
     public static function getCurrentLanguage()
@@ -67,6 +69,8 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Sets current language.
+     *
      * @param string $currentLanguage
      */
     public static function setCurrentLanguage($currentLanguage)

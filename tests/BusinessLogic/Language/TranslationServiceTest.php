@@ -45,6 +45,35 @@ class TranslationServiceTest extends TestCase
     }
 
     /**
+     * Tests translation function when current language is not set in config service.
+     */
+    public function testTranslateCurrentLanguageNotSet()
+    {
+        $configuration = new TestShopConfiguration();
+        Configuration::setCurrentLanguage(null);
+        $logger = new TestShopLogger();
+        $timeProvider = new TestTimeProvider();
+
+        new TestServiceRegister(
+            array(
+                Configuration::CLASS_NAME => function () use ($configuration) {
+                    return $configuration;
+                },
+                TimeProvider::CLASS_NAME => function () use ($timeProvider) {
+                    return $timeProvider;
+                },
+                ShopLoggerAdapter::CLASS_NAME => function () use ($logger) {
+                    return $logger;
+                }
+            )
+        );
+
+        $translation = $this->translationService->translate('testKey');
+
+        $this->assertStringStartsWith('testValueEn', $translation);
+    }
+
+    /**
      * Tests translation function when non existing key is tried to be translated for not supported language.
      */
     public function testTranslateNotSupportedLanguage()

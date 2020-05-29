@@ -14,17 +14,25 @@ use Packlink\BusinessLogic\Language\Interfaces\TranslationService as BaseService
 class TranslationService implements BaseService
 {
     /**
+     * Default language.
+     */
+    const DEFAULT_LANG = 'en';
+
+    /**
      * Associative array in format:
      * ['currentLang' => ['translationKey' => 'translation']]
      * @var array
      */
-    protected $translations = array();
+    protected static $translations = array();
 
     /**
      * @var string $translationsFileBasePath
      */
     protected $translationsFileBasePath;
 
+    /**
+     * @var string
+     */
     private $currentLanguage;
 
     /**
@@ -58,14 +66,14 @@ class TranslationService implements BaseService
     {
         $this->currentLanguage = Configuration::getCurrentLanguage();
 
-        if (empty($this->translations[$this->currentLanguage][$key])) {
+        if (empty(self::$translations[$this->currentLanguage])) {
             $this->initializeTranslations();
         }
 
         $result = $this->getTranslation($key, $this->currentLanguage);
 
         if ($result === null) {
-            $result = $this->getTranslation($key, 'en');
+            $result = $this->getTranslation($key, self::DEFAULT_LANG);
         }
 
         if ($result === null) {
@@ -81,15 +89,19 @@ class TranslationService implements BaseService
     protected function initializeTranslations()
     {
         $languageLowerCase = strtolower($this->currentLanguage);
-        $languageUpperCase = strtoupper($this->currentLanguage);
-
         $this->translationsFileBasePath = rtrim($this->translationsFileBasePath, '/') . '/';
-        $translationFilePath = "{$this->translationsFileBasePath}{$languageLowerCase}_{$languageUpperCase}.json";
+        $translationFilePath = "{$this->translationsFileBasePath}{$languageLowerCase}.json";
         $this->initializeLanguage($translationFilePath, $this->currentLanguage);
         $this->initializeFallbackLanguage();
     }
 
-    private function initializeLanguage($translationFilePath, $language)
+    /**
+     * Initializes the language to translations dictionary.
+     *
+     * @param $translationFilePath
+     * @param $language
+     */
+    protected function initializeLanguage($translationFilePath, $language)
     {
         try {
             $serializedJson = file_get_contents($translationFilePath);
@@ -99,47 +111,49 @@ class TranslationService implements BaseService
         }
 
         if ($serializedJson !== false) {
-            $this->translations[$language] = json_decode($serializedJson, true);
+            self::$translations[$language] = json_decode($serializedJson, true);
         }
     }
 
-    private function initializeFallbackLanguage()
+    /**
+     * Initializes the fallback language.
+     */
+    protected function initializeFallbackLanguage()
     {
-        if (strtolower($this->currentLanguage) != 'en') {
-            $translationFilePath = "{$this->translationsFileBasePath}en_EN.json";
-            $this->initializeLanguage($translationFilePath, 'en');
+        if (strtolower($this->currentLanguage) !== self::DEFAULT_LANG) {
+            $defaultLang = self::DEFAULT_LANG;
+            $translationFilePath = "{$this->translationsFileBasePath}{$defaultLang}.json";
+            $this->initializeLanguage($translationFilePath, self::DEFAULT_LANG);
         }
     }
 
-    private function getTranslation($key, $currentLanguage)
+    /**
+     * Gets the translation for given key and language.
+     * @param string $key
+     * @param string $currentLanguage
+     *
+     * @return string|null
+     */
+    protected function getTranslation($key, $currentLanguage)
     {
         $keys = explode('_', $key);
+        $keysCount = count($keys);
 
-        if (count($keys) > 0 && isset($this->translations[$currentLanguage])) {
-            $result = $this->translations[$currentLanguage];
+        if ($keysCount > 0 && isset(self::$translations[$currentLanguage])) {
+            $result = self::$translations[$currentLanguage];
         } else {
             $result = null;
         }
 
-        for ($i = 0; $i < count($keys); $i++) {
-            if (!isset($result[$keys[$i]])) {
+        foreach ($keys as $i => $value) {
+            if (!isset($result[$value]) || (!is_array($result[$value]) && $i < $keysCount - 1)) {
                 $result = null;
                 break;
             }
 
-            if ($this->isNonIterableElement($result, $keys, $i)) {
-                $result = null;
-                break;
-            }
-
-            $result = $result[$keys[$i]];
+            $result = $result[$value];
         }
 
-        return $result;
-    }
-
-    private function isNonIterableElement($currentNamespace, $keys, $i)
-    {
-        return !is_array($currentNamespace[$keys[$i]]) && $i < count($keys) - 1;
+        return is_string($result) ? $result : null;
     }
 }
