@@ -13,6 +13,7 @@ var Packlink = window.Packlink || {};
      *      hasCountryConfiguration: boolean,
      *      canDisplayCarrierLogos: boolean,
      *      shippingServiceMaxTitleLength: number,
+     *      stateUrl: string,
      *      autoConfigureStartUrl: string,
      *      dashboardGetStatusUrl: string,
      *      defaultParcelGetUrl: string,
@@ -41,6 +42,7 @@ var Packlink = window.Packlink || {};
      */
     function StateController(configuration) {
         let pageControllerFactory = Packlink.pageControllerFactory;
+        let ajaxService = Packlink.ajaxService;
 
         let sidebarButtons = [
             'shipping-methods',
@@ -113,11 +115,7 @@ var Packlink = window.Packlink || {};
         this.display = function () {
             pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
-            let dp = pageControllerFactory.getInstance(
-                'shipping-methods',
-                getControllerConfiguration('shipping-methods')
-            );
-            dp.display();
+            ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
         };
 
         /**
@@ -146,6 +144,27 @@ var Packlink = window.Packlink || {};
         this.getContext = function () {
             return context;
         };
+
+        function displayPageBasedOnState(response) {
+            let dp = pageControllerFactory.getInstance(
+                'shipping-methods',
+                getControllerConfiguration('shipping-methods')
+            );
+
+            if (response.state === 'login') {
+                dp = pageControllerFactory.getInstance(
+                    'login',
+                    getControllerConfiguration('onboarding')
+                );
+            } else if (response.state === 'onBoarding') {
+                dp = pageControllerFactory.getInstance(
+                    'onboarding',
+                    getControllerConfiguration('onboarding')
+                );
+            }
+
+            dp.display();
+        }
 
         /**
          * Navigation callback.

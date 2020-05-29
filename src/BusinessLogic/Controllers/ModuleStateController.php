@@ -39,7 +39,7 @@ class ModuleStateController
         if (empty($apiToken)) {
             $result->state = ModuleState::LOGIN_STATE;
 
-        } else if (empty($defaultParcel) || empty($defaultWarehouse)) {
+        } else if ($defaultParcel === null || $defaultWarehouse === null) {
             $result->state = ModuleState::ONBOARDING_STATE;
 
         } else {

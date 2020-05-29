@@ -14,7 +14,7 @@ class ModuleState extends FrontDto
     /**
      * Login state key.
      */
-    const LOGIN_STATE = 'login/register';
+    const LOGIN_STATE = 'login';
 
     /**
      * On-boarding state key.
