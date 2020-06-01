@@ -2,10 +2,10 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
+use Exception;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -31,12 +31,6 @@ class TaskRunner
      * @var string
      */
     protected $guid;
-    /**
-     * Service.
-     *
-     * @var AsyncProcessStarterService
-     */
-    private $asyncProcessStarter;
     /**
      * Service.
      *
@@ -94,7 +88,7 @@ class TaskRunner
             $this->wakeup();
 
             $this->logDebug(array('Message' => 'Task runner: lifecycle ended.'));
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             $this->logDebug(
                 array(
                     'Message' => 'Fail to run task runner. Unexpected error occurred.',
@@ -151,7 +145,6 @@ class TaskRunner
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\ProcessStarterSaveException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     private function startOldestQueuedItems()
     {
@@ -173,14 +166,31 @@ class TaskRunner
             return;
         }
 
+        $asyncStarterBatchSize = $this->getConfigurationService()->getAsyncStarterBatchSize();
+        $batchStarter = new AsyncBatchStarter($asyncStarterBatchSize);
         foreach ($items as $item) {
-            if (!$this->isCurrentRunnerAlive()) {
-                return;
-            }
-
-            $this->logMessageFor($item, 'Task runner: Starting async task execution.');
-            $this->getAsyncProcessStarter()->start(new QueueItemStarter($item->getId()));
+            $this->logMessageFor($item, 'Task runner: Adding task to a batch starter for async execution.');
+            $batchStarter->addRunner(new QueueItemStarter($item->getId()));
         }
+
+        if (!$this->isCurrentRunnerAlive()) {
+            return;
+        }
+
+        $this->logDebug(array('Message' => 'Task runner: Starting batch starter execution.'));
+        $startTime = $this->getTimeProvider()->getMicroTimestamp();
+        $batchStarter->run();
+        $endTime = $this->getTimeProvider()->getMicroTimestamp();
+
+        $averageRequestTime = ($endTime - $startTime) / $asyncStarterBatchSize;
+        $this->logDebug(
+            array(
+                'Message' => 'Task runner: Batch starter execution finished.',
+                'ExecutionTime' => ($endTime - $startTime) . 's',
+                'AverageRequestTime' => $averageRequestTime . 's',
+                'StartedItems' => count($items),
+            )
+        );
     }
 
     /**
@@ -256,23 +266,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see AsyncProcessStarterService service instance.
+     * Gets @return QueueService Queue service instance.
+     * @see QueueService service instance.
      *
-     * @return AsyncProcessStarterService Class instance.
-     */
-    private function getAsyncProcessStarter()
-    {
-        if ($this->asyncProcessStarter === null) {
-            $this->asyncProcessStarter = ServiceRegister::getService(AsyncProcessService::CLASS_NAME);
-        }
-
-        return $this->asyncProcessStarter;
-    }
-
-    /**
-     * Gets @see QueueService service instance.
-     *
-     * @return QueueService Queue service instance.
      */
     private function getQueue()
     {
@@ -284,9 +280,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see TaskRunnerStatusStorageInterface service instance.
+     * Gets @return TaskRunnerStatusStorage Service instance.
+     * @see TaskRunnerStatusStorageInterface service instance.
      *
-     * @return TaskRunnerStatusStorage Service instance.
      */
     private function getRunnerStorage()
     {
@@ -298,9 +294,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see Configuration service instance.
+     * Gets @return Configuration Service instance.
+     * @see Configuration service instance.
      *
-     * @return Configuration Service instance.
      */
     private function getConfigurationService()
     {
@@ -312,9 +308,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see TimeProvider instance.
+     * Gets @return TimeProvider Service instance.
+     * @see TimeProvider instance.
      *
-     * @return TimeProvider Service instance.
      */
     private function getTimeProvider()
     {
@@ -326,9 +322,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see TaskRunnerWakeupInterface service instance.
+     * Gets @return TaskRunnerWakeup Service instance.
+     * @see TaskRunnerWakeupInterface service instance.
      *
-     * @return TaskRunnerWakeup Service instance.
      */
     private function getTaskWakeup()
     {

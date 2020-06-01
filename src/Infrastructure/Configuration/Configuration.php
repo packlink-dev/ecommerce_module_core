@@ -39,6 +39,10 @@ abstract class Configuration extends Singleton
      */
     const ASYNC_CALL_METHOD = 'POST';
     /**
+     * Default batch size for the asynchronous execution.
+     */
+    const DEFAULT_ASYNC_STARTER_BATCH_SIZE = 8;
+    /**
      * System user context.
      *
      * @var string
@@ -148,6 +152,26 @@ abstract class Configuration extends Singleton
     public function setDebugModeEnabled($status)
     {
         $this->saveConfigValue('debugModeEnabled', (bool)$status);
+    }
+
+    /**
+     * Retrieves async starter batch size.
+     *
+     * @return int Async starter batch size.
+     */
+    public function getAsyncStarterBatchSize()
+    {
+        return $this->getConfigValue('asyncStarterBatchSize', static::DEFAULT_ASYNC_STARTER_BATCH_SIZE);
+    }
+
+    /**
+     * Sets async process batch size.
+     *
+     * @param int $size
+     */
+    public function setAsyncStarterBatchSize($size)
+    {
+        $this->saveConfigValue('asyncStarterBatchSize', $size);
     }
 
     /**

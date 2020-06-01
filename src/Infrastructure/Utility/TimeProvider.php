@@ -2,6 +2,8 @@
 
 namespace Logeecom\Infrastructure\Utility;
 
+use DateTime;
+
 /**
  * Class TimeProvider.
  *
@@ -50,23 +52,21 @@ class TimeProvider
      */
     public function getCurrentLocalTime()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return new \DateTime();
+        return new DateTime();
     }
 
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * Returns @see \DateTime object from timestamp.
-     *
-     * @param int $timestamp Timestamp in seconds.
+     * Returns @param int $timestamp Timestamp in seconds.
      *
      * @return \DateTime Object from timestamp.
+     * @see \DateTime object from timestamp.
+     *
      */
     public function getDateTime($timestamp)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return new \DateTime("@{$timestamp}");
+        return new DateTime("@{$timestamp}");
     }
 
     /**
@@ -76,7 +76,17 @@ class TimeProvider
      */
     public function getMillisecondsTimestamp()
     {
-        return (int)round(microtime(true) * 1000);
+        return (int)round($this->getMicroTimestamp() * 1000);
+    }
+
+    /**
+     * Returns current timestamp with microseconds (float value with microsecond precision)
+     *
+     * @return float Current timestamp as float value with microseconds.
+     */
+    public function getMicroTimestamp()
+    {
+        return microtime(true);
     }
 
     /**
@@ -103,7 +113,7 @@ class TimeProvider
             return null;
         }
 
-        return \DateTime::createFromFormat($format ?: DATE_ATOM, $dateTime);
+        return DateTime::createFromFormat($format ?: DATE_ATOM, $dateTime);
     }
 
     /**
@@ -114,7 +124,7 @@ class TimeProvider
      *
      * @return string|null String serialized date.
      */
-    public function serializeDate(\DateTime $dateTime = null, $format = null)
+    public function serializeDate(DateTime $dateTime = null, $format = null)
     {
         if ($dateTime === null) {
             return null;
