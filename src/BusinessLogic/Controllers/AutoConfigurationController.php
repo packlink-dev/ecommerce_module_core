@@ -78,6 +78,12 @@ class AutoConfigurationController
         // enqueue the task for updating shipping services
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-        $queueService->enqueue($configService->getDefaultQueueName(), new UpdateShippingServicesTask());
+        $task = new UpdateShippingServicesTask();
+        $queueService->enqueue(
+            $configService->getDefaultQueueName(),
+            $task,
+            $configService->getContext(),
+            $task->getPriority()
+        );
     }
 }

@@ -66,7 +66,12 @@ class ShipmentDraftService extends BaseService
         if (!$isDelayed) {
             /** @var QueueService $queue */
             $queue = ServiceRegister::getService(QueueService::CLASS_NAME);
-            $queue->enqueue($configService->getDefaultQueueName(), $sendDraftTask, $configService->getContext());
+            $queue->enqueue(
+                $configService->getDefaultQueueName(),
+                $sendDraftTask,
+                $configService->getContext(),
+                $sendDraftTask->getPriority()
+            );
 
             if ($sendDraftTask->getExecutionId() !== null) {
                 $draftTaskMapService->setExecutionId($orderId, $sendDraftTask->getExecutionId());
