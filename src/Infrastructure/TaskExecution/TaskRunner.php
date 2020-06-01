@@ -26,6 +26,10 @@ class TaskRunner
      */
     const WAKEUP_DELAY = 5;
     /**
+     * Defines minimal time in seconds between two consecutive alive since updates.
+     */
+    const TASK_RUNNER_KEEP_ALIVE_PERIOD = 2;
+    /**
      * Runner guid.
      *
      * @var string
@@ -61,6 +65,12 @@ class TaskRunner
      * @var TaskRunnerWakeup
      */
     private $taskWakeup;
+    /**
+     * Defines when was the task runner alive since time step last updated at.
+     *
+     * @var int
+     */
+    private $aliveSinceUpdatedAt = 0;
 
     /**
      * Sets task runner guid.
@@ -78,12 +88,16 @@ class TaskRunner
     public function run()
     {
         try {
+            $this->keepAlive();
+
             $this->logDebug(array('Message' => 'Task runner: lifecycle started.'));
 
             if ($this->isCurrentRunnerAlive()) {
                 $this->failOrRequeueExpiredTasks();
                 $this->startOldestQueuedItems();
             }
+
+            $this->keepAlive();
 
             $this->wakeup();
 
@@ -115,6 +129,8 @@ class TaskRunner
             return;
         }
 
+        $this->keepAlive();
+
         foreach ($runningItems as $runningItem) {
             if ($this->isItemExpired($runningItem) && $this->isCurrentRunnerAlive()) {
                 $this->logMessageFor($runningItem, 'Task runner: Expired task detected.');
@@ -133,6 +149,8 @@ class TaskRunner
                     );
                 }
             }
+
+            $this->keepAlive();
         }
     }
 
@@ -148,6 +166,8 @@ class TaskRunner
      */
     private function startOldestQueuedItems()
     {
+        $this->keepAlive();
+
         $this->logDebug(array('Message' => 'Task runner: available task detection started.'));
 
         // Calculate how many queue items can be started
@@ -160,7 +180,11 @@ class TaskRunner
             return;
         }
 
+        $this->keepAlive();
+
         $items = $this->getQueue()->findOldestQueuedItems($numberOfAvailableSlots);
+
+        $this->keepAlive();
 
         if (!$this->isCurrentRunnerAlive()) {
             return;
@@ -173,6 +197,8 @@ class TaskRunner
             $batchStarter->addRunner(new QueueItemStarter($item->getId()));
         }
 
+        $this->keepAlive();
+
         if (!$this->isCurrentRunnerAlive()) {
             return;
         }
@@ -181,6 +207,8 @@ class TaskRunner
         $startTime = $this->getTimeProvider()->getMicroTimestamp();
         $batchStarter->run();
         $endTime = $this->getTimeProvider()->getMicroTimestamp();
+
+        $this->keepAlive();
 
         $averageRequestTime = ($endTime - $startTime) / $asyncStarterBatchSize;
         $this->logDebug(
@@ -202,12 +230,33 @@ class TaskRunner
     private function wakeup()
     {
         $this->logDebug(array('Message' => 'Task runner: starting self deactivation.'));
-        $this->getTimeProvider()->sleep($this->getWakeupDelay());
+
+        for ($i = 0; $i < $this->getWakeupDelay(); $i++) {
+            $this->getTimeProvider()->sleep(1);
+            $this->keepAlive();
+        }
 
         $this->getRunnerStorage()->setStatus(TaskRunnerStatus::createNullStatus());
 
         $this->logDebug(array('Message' => 'Task runner: sending task runner wakeup signal.'));
         $this->getTaskWakeup()->wakeup();
+    }
+
+    /**
+     * Updates alive since time stamp of the task runner.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
+     */
+    private function keepAlive()
+    {
+        $currentTime = $this->getTimeProvider()->getCurrentLocalTime()->getTimestamp();
+        if (($currentTime - $this->aliveSinceUpdatedAt) < self::TASK_RUNNER_KEEP_ALIVE_PERIOD) {
+
+            return;
+        }
+
+        $this->getConfigurationService()->setTaskRunnerStatus($this->guid, $currentTime);
+        $this->aliveSinceUpdatedAt = $currentTime;
     }
 
     /**
