@@ -30,6 +30,36 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     protected static $instance;
 
     /**
+     * Checks if any shipment has been created on Packlink.
+     *
+     * @return bool True if a shipment has been created; FALSE otherwise.
+     */
+    public function isFirstShipmentDraftCreated()
+    {
+        $value = $this->getConfigValue('isFirstShipmentDraftCreated');
+
+        // If the value is null, that implies that the user has been registered
+        // Before tracking of this flag has been implemented.
+        // For such users we will return true,
+        // Since this flag is used to enqueue schedules if its value is false, and already registered
+        // Users have schedules since the schedules are created when they've registered in the app.
+        if ($value || $value === null) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets the flag that indicates that the first shipment has been created to true.
+     */
+    public function setFirstShipmentDraftCreated()
+    {
+        $this->saveConfigValue('isFirstShipmentDraftCreated', true);
+    }
+
+    /**
      * Returns web-hook callback URL for current system.
      *
      * @return string Web-hook callback URL.

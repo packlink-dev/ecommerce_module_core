@@ -130,19 +130,14 @@ class UserAccountLoginTest extends BaseTestWithServices
         /** @var Schedule[] $allSchedules */
         $allSchedules = $scheduleRepository->select();
 
-        $this->assertCount(5, $allSchedules);
+        $this->assertCount(2, $allSchedules);
 
         $expectedSchedules = array(
             WeeklySchedule::getClassName() => array(
                 UpdateShippingServicesTask::getClassName() => 1,
             ),
             HourlySchedule::getClassName() => array(
-                // 2 hourly schedules, starting every 30 minutes
-                UpdateShipmentDataTask::getClassName() => 2,
                 TaskCleanupTask::getClassName() => 1,
-            ),
-            DailySchedule::getClassName() => array(
-                UpdateShipmentDataTask::getClassName() => 1,
             ),
         );
 

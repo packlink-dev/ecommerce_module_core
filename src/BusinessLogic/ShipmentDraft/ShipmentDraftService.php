@@ -3,16 +3,20 @@
 namespace Packlink\BusinessLogic\ShipmentDraft;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\ShipmentDraft\Objects\ShipmentDraftStatus;
+use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
+use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 
 /**
  * Class ShipmentDraftService.
@@ -59,8 +63,8 @@ class ShipmentDraftService extends BaseService
             $draftTaskMapService->createOrderTaskMap($orderId);
         }
 
-        /** @var Configuration $configService */
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        /** @var \Packlink\BusinessLogic\Configuration $configService */
+        $configService = $this->getConfigService();
 
         $sendDraftTask = new SendDraftTask($orderId);
         if (!$isDelayed) {
@@ -78,6 +82,11 @@ class ShipmentDraftService extends BaseService
             }
         } else {
             $this->enqueueDelayedTask($sendDraftTask, $delayInterval);
+        }
+
+        if (!$configService->isFirstShipmentDraftCreated()) {
+            $this->enqueueShipmentSchedules();
+            $configService->setFirstShipmentDraftCreated();
         }
     }
 
@@ -143,5 +152,86 @@ class ShipmentDraftService extends BaseService
         $schedule->setNextSchedule();
 
         RepositoryRegistry::getRepository(Schedule::CLASS_NAME)->save($schedule);
+    }
+
+    /**
+     * Enqueues shipment related schedules.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    private function enqueueShipmentSchedules()
+    {
+        $repository = RepositoryRegistry::getRepository(Schedule::getClassName());
+        $firstStart = rand(0, 59);
+        $secondStart = ($firstStart + 30) % 60;
+
+
+        // Schedule hourly task for updating shipment info - start at full hour
+        $this->scheduleUpdatePendingShipmentsData($repository, $firstStart);
+
+        // Schedule hourly task for updating shipment info - start at half hour
+        $this->scheduleUpdatePendingShipmentsData($repository, $secondStart);
+
+        // Schedule daily task for updating shipment info - start at 11:00 UTC hour
+        $this->scheduleUpdateInProgressShipments($repository, 11);
+    }
+
+    /**
+     * Creates hourly task for updating shipment data for pending shipments.
+     *
+     * @param RepositoryInterface $repository Scheduler repository.
+     * @param int $minute Starting minute for the task.
+     */
+    protected function scheduleUpdatePendingShipmentsData(RepositoryInterface $repository, $minute)
+    {
+        $hourlyStatuses = array(
+            ShipmentStatus::STATUS_PENDING,
+        );
+
+        $schedule = new HourlySchedule(
+            new UpdateShipmentDataTask($hourlyStatuses),
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
+        );
+
+        $schedule->setMinute($minute);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+    }
+
+    /**
+     * Creates daily task for updating shipment data for shipments in progress.
+     *
+     * @param RepositoryInterface $repository Schedule repository.
+     * @param int $hour Hour of the day when schedule should be executed.
+     */
+    protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour)
+    {
+        $dailyStatuses = array(
+            ShipmentStatus::STATUS_IN_TRANSIT,
+            ShipmentStatus::STATUS_READY,
+            ShipmentStatus::STATUS_ACCEPTED,
+        );
+
+        $schedule = new DailySchedule(
+            new UpdateShipmentDataTask($dailyStatuses),
+            $this->getConfigService()->getDefaultQueueName(),
+            $this->getConfigService()->getContext()
+        );
+
+        $schedule->setHour($hour);
+        $schedule->setNextSchedule();
+
+        $repository->save($schedule);
+    }
+
+    /**
+     * Retrieves config service.
+     *
+     * @return Configuration | object
+     */
+    private function getConfigService()
+    {
+        return ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 }
