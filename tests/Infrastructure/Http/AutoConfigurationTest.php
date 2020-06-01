@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Http\AutoConfiguration;
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
@@ -26,12 +26,11 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
 
         $this->httpClient = new TestHttpClient();
         $me = $this;
-        new TestServiceRegister(
-            array(
-                HttpClient::CLASS_NAME => function () use ($me) {
-                    return $me->httpClient;
-                },
-            )
+        TestServiceRegister::registerService(
+            HttpClient::CLASS_NAME,
+            function () use ($me) {
+                return $me->httpClient;
+            }
         );
 
         $this->shopConfig->setAutoConfigurationUrl('http://example.com');
@@ -80,7 +79,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
             new HttpResponse(200, array(), '{}'),
         );
         $this->httpClient->setMockResponses($responses);
-        $additionalOptionsCombination = array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4));
+        $additionalOptionsCombination = array(new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4));
 
         $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
         $success = $controller->start();

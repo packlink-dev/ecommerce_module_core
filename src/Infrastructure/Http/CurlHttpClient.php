@@ -2,7 +2,7 @@
 
 namespace Logeecom\Infrastructure\Http;
 
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Logger\Logger;
 
@@ -51,35 +51,6 @@ class CurlHttpClient extends HttpClient
      * @var resource
      */
     private $curlSession;
-
-    /**
-     * Aborts async process request after first byte of the request is uploaded.
-     *
-     * @param resource $curlResource cURL resource.
-     * @param int $downloadTotal Total number of bytes expected to be downloaded in transfer.
-     * @param int $downloadSoFar Number of bytes downloaded so far.
-     * @param int $uploadTotal Total number of bytes expected to be uploaded in this transfer.
-     * @param int $uploadedSoFar Number of bytes uploaded so far.
-     *
-     * @return int If non-zero value is returned, underlying curl transfer will be aborted.
-     * @see https://www.php.net/manual/en/function.curl-setopt.php CURLOPT_PROGRESSFUNCTION config option
-     * @noinspection PhpUnusedParameterInspection
-     */
-    public function abortAfterAsyncRequestCallback(
-        $curlResource,
-        $downloadTotal,
-        $downloadSoFar,
-        $uploadTotal,
-        $uploadedSoFar
-    ) {
-        if ($uploadTotal === 0 || ($uploadTotal !== $uploadedSoFar)) {
-            // Signal curl library to continue until upload is still in progress.
-            return 0;
-        }
-
-        // Abort as soon as the upload is done. For an async request, we do not need to wait for a response.
-        return 1;
-    }
 
     /**
      * Create and send request.
@@ -279,10 +250,8 @@ class CurlHttpClient extends HttpClient
         // Always ensure the connection is fresh.
         $this->curlOptions[CURLOPT_FRESH_CONNECT] = true;
         // Timeout super fast once connected, so it goes into async.
-        $this->curlOptions[CURLOPT_TIMEOUT_MS] =
-            $this->getConfigService()->getAsyncRequestTimeout() ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
-        $this->curlOptions[CURLOPT_NOPROGRESS] = false;
-        $this->curlOptions[CURLOPT_PROGRESSFUNCTION] = array($this, 'abortAfterAsyncRequestCallback');
+        $asyncRequestTimeout = $this->getConfigService()->getAsyncRequestTimeout();
+        $this->curlOptions[CURLOPT_TIMEOUT_MS] = $asyncRequestTimeout ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
     }
 
     /**
@@ -344,7 +313,7 @@ class CurlHttpClient extends HttpClient
      * @param string $url Request URL. Full URL where request should be sent.
      *
      * @return array
-     *  Array of additional options combinations. Each array item should be an array of OptionsDTO instances.
+     *  Array of additional options combinations. Each array item should be an array of Options instances.
      */
     protected function getAutoConfigurationOptionsCombinations($method, $url)
     {
@@ -354,10 +323,10 @@ class CurlHttpClient extends HttpClient
          * CURLOPT_FOLLOWLOCATION => false (default is true)
          * SWITCH_PROTOCOL => This is not a cURL option and is treated differently. Default is false.
          */
-        $switchProtocol = new OptionsDTO(static::SWITCH_PROTOCOL, true);
-        $ipVersion = new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+        $switchProtocol = new Options(static::SWITCH_PROTOCOL, true);
+        $ipVersion = new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
         if ($this->followLocation) {
-            $followLocation = new OptionsDTO(CURLOPT_FOLLOWLOCATION, false);
+            $followLocation = new Options(CURLOPT_FOLLOWLOCATION, false);
 
             return array(
                 array($switchProtocol),

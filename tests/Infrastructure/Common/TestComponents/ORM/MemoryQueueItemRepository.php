@@ -22,17 +22,21 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
     public $disabled = false;
 
     /**
-     * Finds list of earliest queued queue items per queue. Following list of criteria for searching must be satisfied:
+     * Finds list of earliest queued queue items per queue for given priority.
+     * Following list of criteria for searching must be satisfied:
      *      - Queue must be without already running queue items
      *      - For one queue only one (oldest queued) item should be returned
+     *      - Only queue items with given priority can be retrieved.
      *
+     * @param int $priority Queue item priority priority.
      * @param int $limit Result set limit. By default max 10 earliest queue items will be returned
      *
      * @return QueueItem[] Found queue item list
+     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
-    public function findOldestQueuedItems($limit = 10)
+    public function findOldestQueuedItems($priority, $limit = 10)
     {
         $filter = new QueryFilter();
         $filter->where('status', '=', QueueItem::IN_PROGRESS);
@@ -45,6 +49,8 @@ class MemoryQueueItemRepository extends MemoryRepository implements QueueItemRep
         }
 
         $filter = new QueryFilter();
+
+        $filter->where('priority', Operators::EQUALS, $priority);
         $filter->where('status', '=', QueueItem::QUEUED);
         $filter->where('queueName', 'NOT IN', array_unique($runningQueuesQuery));
         $filter->orderBy('queueTime', 'ASC');

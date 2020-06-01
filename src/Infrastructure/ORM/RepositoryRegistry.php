@@ -35,19 +35,19 @@ class RepositoryRegistry
      */
     public static function getRepository($entityClass)
     {
-        if (!self::isRegistered($entityClass)) {
+        if (!static::isRegistered($entityClass)) {
             throw new RepositoryNotRegisteredException("Repository for entity $entityClass not found or registered.");
         }
 
-        if (!array_key_exists($entityClass, self::$instantiated)) {
-            $repositoryClass = self::$repositories[$entityClass];
+        if (!array_key_exists($entityClass, static::$instantiated)) {
+            $repositoryClass = static::$repositories[$entityClass];
             /** @var RepositoryInterface $repository */
             $repository = new $repositoryClass();
             $repository->setEntityClass($entityClass);
-            self::$instantiated[$entityClass] = $repository;
+            static::$instantiated[$entityClass] = $repository;
         }
 
-        return self::$instantiated[$entityClass];
+        return static::$instantiated[$entityClass];
     }
 
     /**
@@ -64,8 +64,8 @@ class RepositoryRegistry
             throw new RepositoryClassException("Class $repositoryClass is not implementation of RepositoryInterface.");
         }
 
-        unset(self::$instantiated[$entityClass]);
-        self::$repositories[$entityClass] = $repositoryClass;
+        unset(static::$instantiated[$entityClass]);
+        static::$repositories[$entityClass] = $repositoryClass;
     }
 
     /**
@@ -77,7 +77,7 @@ class RepositoryRegistry
      */
     public static function isRegistered($entityClass)
     {
-        return isset(self::$repositories[$entityClass]);
+        return isset(static::$repositories[$entityClass]);
     }
 
     /**
@@ -91,7 +91,7 @@ class RepositoryRegistry
     public static function getQueueItemRepository()
     {
         /** @var QueueItemRepository $repository */
-        $repository = self::getRepository(QueueItem::getClassName());
+        $repository = static::getRepository(QueueItem::getClassName());
         if (!($repository instanceof QueueItemRepository)) {
             throw new RepositoryClassException('Instance class is not implementation of QueueItemRepository');
         }

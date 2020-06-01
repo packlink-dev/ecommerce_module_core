@@ -2,6 +2,7 @@
 
 namespace Logeecom\Infrastructure\ORM\Utility;
 
+use DateTime;
 use Logeecom\Infrastructure\ORM\Entity;
 
 /**
@@ -64,7 +65,7 @@ class IndexHelper
             return $value;
         }
 
-        if ($type === 'dateTime' && $value instanceof \DateTime) {
+        if ($type === 'dateTime' && $value instanceof DateTime) {
             return (string)$value->getTimestamp();
         }
 

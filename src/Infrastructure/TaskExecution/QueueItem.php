@@ -2,6 +2,8 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
+use DateTime;
+use InvalidArgumentException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
@@ -9,6 +11,7 @@ use Logeecom\Infrastructure\ORM\Entity;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -70,6 +73,7 @@ class QueueItem extends Entity
         'earliestStartTime',
         'queueTime',
         'lastUpdateTime',
+        'priority',
     );
     /**
      * Queue item status.
@@ -168,6 +172,12 @@ class QueueItem extends Entity
      */
     protected $lastUpdateTime;
     /**
+     * Specifies the execution priority of the queue item.
+     *
+     * @var int QueueItem execution priority.
+     */
+    protected $priority;
+    /**
      * Instance of time provider.
      *
      * @var TimeProvider
@@ -260,7 +270,7 @@ class QueueItem extends Entity
             ),
             false
         )) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Invalid QueueItem status: "%s". '
                     . 'Status must be one of "%s", "%s", "%s", "%s", "%s" or "%s" values.',
@@ -324,7 +334,7 @@ class QueueItem extends Entity
         if (!is_int($lastExecutionProgressBasePoints) ||
             $lastExecutionProgressBasePoints < 0 ||
             10000 < $lastExecutionProgressBasePoints) {
-            throw new \InvalidArgumentException('Last execution progress percentage must be value between 0 and 100.');
+            throw new InvalidArgumentException('Last execution progress percentage must be value between 0 and 100.');
         }
 
         $this->lastExecutionProgressBasePoints = $lastExecutionProgressBasePoints;
@@ -364,7 +374,7 @@ class QueueItem extends Entity
     public function setProgressBasePoints($progressBasePoints)
     {
         if (!is_int($progressBasePoints) || $progressBasePoints < 0 || 10000 < $progressBasePoints) {
-            throw new \InvalidArgumentException('Progress percentage must be value between 0 and 100.');
+            throw new InvalidArgumentException('Progress percentage must be value between 0 and 100.');
         }
 
         $this->progressBasePoints = $progressBasePoints;
@@ -664,6 +674,30 @@ class QueueItem extends Entity
     }
 
     /**
+     * Retrieves queue item execution priority.
+     *
+     * @return int QueueItem execution priority.
+     */
+    public function getPriority()
+    {
+        return $this->priority ?: Priority::NORMAL;
+    }
+
+    /**
+     * Sets queue item execution priority,.
+     *
+     * @param int $priority QueueItem execution priority.
+     */
+    public function setPriority($priority)
+    {
+        if (!in_array($priority, array(Priority::LOW, Priority::NORMAL, Priority::HIGH), true)) {
+            throw new InvalidArgumentException("Priority {$priority} is not supported.");
+        }
+
+        $this->priority = $priority;
+    }
+
+    /**
      * Reconfigures underlying task.
      *
      * @throws Exceptions\QueueItemDeserializationException
@@ -693,7 +727,8 @@ class QueueItem extends Entity
             ->addStringIndex('context')
             ->addDateTimeIndex('queueTime')
             ->addIntegerIndex('lastExecutionProgress')
-            ->addIntegerIndex('lastUpdateTimestamp');
+            ->addIntegerIndex('lastUpdateTimestamp')
+            ->addIntegerIndex('priority');
 
         return new EntityConfiguration($indexMap, 'QueueItem');
     }
@@ -715,6 +750,7 @@ class QueueItem extends Entity
         $result['finishTime'] = $this->timeProvider->serializeDate($this->finishTime);
         $result['failTime'] = $this->timeProvider->serializeDate($this->failTime);
         $result['earliestStartTime'] = $this->timeProvider->serializeDate($this->earliestStartTime);
+        $result['priority'] = $this->getPriority();
 
         return $result;
     }
@@ -745,7 +781,7 @@ class QueueItem extends Entity
      * @return int|null
      *   Timestamp of provided datetime or null if time is not defined.
      */
-    protected function getTimestamp(\DateTime $time = null)
+    protected function getTimestamp(DateTime $time = null)
     {
         return $time !== null ? $time->getTimestamp() : null;
     }

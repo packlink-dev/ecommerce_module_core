@@ -16,15 +16,18 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 interface QueueItemRepository extends RepositoryInterface
 {
     /**
-     * Finds list of earliest queued queue items per queue. Following list of criteria for searching must be satisfied:
+     * Finds list of earliest queued queue items per queue for given priority.
+     * Following list of criteria for searching must be satisfied:
      *      - Queue must be without already running queue items
      *      - For one queue only one (oldest queued) item should be returned
+     *      - Only queue items with given priority can be retrieved.
      *
+     * @param int $priority Queue item priority priority.
      * @param int $limit Result set limit. By default max 10 earliest queue items will be returned
      *
      * @return QueueItem[] Found queue item list
      */
-    public function findOldestQueuedItems($limit = 10);
+    public function findOldestQueuedItems($priority, $limit = 10);
 
     /**
      * Creates or updates given queue item. If queue item id is not set, new queue item will be created otherwise
