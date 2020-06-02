@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
+** BREAKING CHANGES **
+
+### Added
+- Added a socket http client for async requests
+- Added task execution priority
+- Added async batch starter
+- Added task runner keep alive mechanism
+- Added batch task cleanup task
+
+### Changed
+- Changed when the schedules are created 
 
 ## [2.0.9](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.8...v2.0.9) - 2020-05-15
 ### Added
