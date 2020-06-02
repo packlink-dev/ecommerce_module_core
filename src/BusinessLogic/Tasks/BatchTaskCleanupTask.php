@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Tasks;
 
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
@@ -96,6 +97,8 @@ class BatchTaskCleanupTask extends Task
      */
     public function execute()
     {
+        Logger::logDebug('Task types to be deleted:', 'Core', $this->taskTypes);
+
         $repository = $this->getQueueItemRepository();
         if (!$repository instanceof ConditionallyDeletes) {
             throw new AbortTaskExecutionException(
