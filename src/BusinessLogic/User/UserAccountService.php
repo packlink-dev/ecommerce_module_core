@@ -7,7 +7,6 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
@@ -15,11 +14,8 @@ use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
-use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
-use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
@@ -224,9 +220,6 @@ class UserAccountService extends BaseService
         $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
 
         $this->scheduleUpdateShipmentServicesTask($repository);
-
-        // schedule hourly queue cleanup
-        $this->scheduleTaskCleanup($repository);
     }
 
     /**
@@ -244,24 +237,6 @@ class UserAccountService extends BaseService
 
         $schedule->setDay(rand(1, 7));
         $schedule->setHour(rand(0, 5));
-        $schedule->setNextSchedule();
-        $repository->save($schedule);
-    }
-
-    /**
-     * Creates hourly task for cleaning up the database queue for completed items.
-     *
-     * @param RepositoryInterface $repository Scheduler repository.
-     */
-    protected function scheduleTaskCleanup(RepositoryInterface $repository)
-    {
-        $schedule = new HourlySchedule(
-            new TaskCleanupTask(ScheduleCheckTask::getClassName(), array(QueueItem::COMPLETED), 3600),
-            $this->getConfigService()->getDefaultQueueName(),
-            $this->getConfigService()->getContext()
-        );
-
-        $schedule->setMinute(10);
         $schedule->setNextSchedule();
         $repository->save($schedule);
     }

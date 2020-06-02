@@ -22,12 +22,33 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      * Default scheduler queue name.
      */
     const DEFAULT_SCHEDULER_QUEUE_NAME = 'SchedulerCheckTaskQueue';
+    const DEFAULT_MAX_TASK_AGE = 7;
     /**
      * Singleton instance of this class.
      *
      * @var static
      */
     protected static $instance;
+
+    /**
+     * Retrieves max task age in days. This config value must be utilized when deleting tasks.
+     *
+     * @return int Max task age in days.
+     */
+    public function getMaxTaskAge()
+    {
+        return $this->getConfigValue('maxTaskAge', self::DEFAULT_MAX_TASK_AGE);
+    }
+
+    /**
+     * Sets max task age.
+     *
+     * @param int $maxAge Positive integer. Denotes max task age in days.
+     */
+    public function setMaxTaskAge($maxAge)
+    {
+        $this->saveConfigValue('maxTaskAge', $maxAge);
+    }
 
     /**
      * Checks if any shipment has been created on Packlink.
@@ -274,5 +295,21 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     public function isSetupFinished()
     {
         return $this->getConfigValue('setupFinished') ?: false;
+    }
+
+    /**
+     * Determines whether the configuration entry is system specific.
+     *
+     * @param string $name Configuration entry name.
+     *
+     * @return bool
+     */
+    protected function isSystemSpecific($name)
+    {
+        if (in_array($name, array('maxTaskAge'))) {
+            return false;
+        }
+
+        return parent::isSystemSpecific($name);
     }
 }
