@@ -82,6 +82,7 @@ class UserAccountService extends BaseService
         }
 
         $this->createSchedules();
+        $this->getConfigService()->setFirstShipmentDraftCreated(false);
 
         return true;
     }

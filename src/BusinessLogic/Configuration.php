@@ -53,10 +53,12 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
 
     /**
      * Sets the flag that indicates that the first shipment has been created to true.
+     *
+     * @param bool $status
      */
-    public function setFirstShipmentDraftCreated()
+    public function setFirstShipmentDraftCreated($status = true)
     {
-        $this->saveConfigValue('isFirstShipmentDraftCreated', true);
+        $this->saveConfigValue('isFirstShipmentDraftCreated', $status);
     }
 
     /**
