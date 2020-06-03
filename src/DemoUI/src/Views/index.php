@@ -1218,8 +1218,7 @@ $urlService = new \Packlink\DemoUI\Services\Integration\UrlService();
 
                 templates: {
                     'required': {
-                        'pl-login-page': '<?php echo json_encode(file_get_contents('/home/igor/Documents/Projects/packlink/pl_module_core/src/DemoUI/src/Views/resources/templates/login.html', true)) ?>',
-                        'pl-register-page': "<?php echo json_encode(file_get_contents(__DIR__ . 'templates/register.html', true)) ?>"
+                        'pl-login-page': '<?php echo json_encode(file_get_contents( __DIR__ . '/../../../BusinessLogic/Resources/templates/login.html', true)) ?>',
                     }
                 },
             }
