@@ -11,14 +11,19 @@ use Packlink\DemoUI\Controllers\Models\Request;
 class LoginController
 {
     /**
+     * Handles login POST request.
+     *
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
      *
-     * @return bool
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function login(Request $request)
     {
-        $apiKey = $request->getQuery('api_key');
+        $payload = $request->getPayload();
+        $apiKey = !empty($payload['apiKey']) ? $payload['apiKey'] : null;
+        $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
 
-        return !empty($apiKey);
+        echo json_encode(array('success' => $controller->login($apiKey)));
     }
 }

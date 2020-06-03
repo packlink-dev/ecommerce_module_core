@@ -92,6 +92,47 @@ var Packlink = window.Packlink || {};
         };
 
         /**
+         * Populates the template with the provided inner HTML.
+         *
+         * @param templateId
+         * @param innerHTML
+         *
+         * @returns {string}
+         */
+        this.populateTemplate = function (templateId, innerHTML) {
+            let temp = document.getElementById(templateId);
+
+            if (!temp) {
+                return '';
+            }
+
+            temp.innerHTML = innerHTML;
+        };
+
+        /**
+         * Sets current template visible.
+         *
+         * @param templateId
+         *
+         * @returns {string}
+         */
+        this.setCurrentTemplate = function (templateId) {
+            let temp = document.getElementById(templateId);
+
+            if (!temp) {
+                return '';
+            }
+
+            let visiblePages = document.querySelectorAll('.pl-page-visible');
+
+            visiblePages.forEach(function (page) {
+                page.classList.remove('pl-page-visible');
+            });
+
+            temp.classList.add('pl-page-visible');
+        };
+
+        /**
          * Removes component's children.
          *
          * @param {Element} component

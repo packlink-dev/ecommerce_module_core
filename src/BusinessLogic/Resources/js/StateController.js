@@ -14,6 +14,7 @@ var Packlink = window.Packlink || {};
      *      canDisplayCarrierLogos: boolean,
      *      shippingServiceMaxTitleLength: number,
      *      stateUrl: string,
+     *      loginUrl: string,
      *      autoConfigureStartUrl: string,
      *      dashboardGetStatusUrl: string,
      *      defaultParcelGetUrl: string,
@@ -35,7 +36,16 @@ var Packlink = window.Packlink || {};
      *      getSystemOrderStatusesUrl: string,
      *      orderStatusMappingsSaveUrl: string,
      *      orderStatusMappingsGetUrl: string,
-     *      getShippingCountriesUrl: string
+     *      getShippingCountriesUrl: string,
+     *      templates: {
+     *          'required': {
+     *              'pl-login-page': InnerHTML,
+     *              'pl-register-page': InnerHTML
+     *          },
+     *          'extensionPoints': {
+     *              'extensionPointId': InnerHTML
+     *          }
+     *      }
      * }} configuration
      *
      * @constructor
@@ -65,6 +75,7 @@ var Packlink = window.Packlink || {};
 
         let sidebarController = new Packlink.SidebarController(navigate, sidebarButtons, submenuItems);
         let utilityService = Packlink.utilityService;
+        let templateService = Packlink.templateService;
         let context = '';
 
         let pageConfiguration = {
@@ -105,6 +116,9 @@ var Packlink = window.Packlink || {};
             'footer': {
                 getDebugStatusUrl: configuration.debugGetStatusUrl,
                 setDebugStatusUrl: configuration.debugSetStatusUrl
+            },
+            'login': {
+                submit: configuration.loginUrl
             }
         };
 
@@ -113,6 +127,12 @@ var Packlink = window.Packlink || {};
         }
 
         this.display = function () {
+            Object.values(configuration.templates).forEach((value) => {
+                for (let [templateId, innerHtml] of Object.entries(value)) {
+                    templateService.populateTemplate(templateId, innerHtml);
+                }
+            });
+
             pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
             ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
@@ -145,25 +165,29 @@ var Packlink = window.Packlink || {};
             return context;
         };
 
+        this.goToState = goToState;
+
         function displayPageBasedOnState(response) {
+            if (response.state === 'login') {
+               goToState('login');
+
+            } else if (response.state === 'onBoarding') {
+                goToState('onboarding');
+
+            } else {
+                goToState('shipping-methods');
+            }
+        }
+
+        function goToState(controller) {
             let dp = pageControllerFactory.getInstance(
-                'shipping-methods',
-                getControllerConfiguration('shipping-methods')
+                controller,
+                getControllerConfiguration(controller)
             );
 
-            if (response.state === 'login') {
-                dp = pageControllerFactory.getInstance(
-                    'login',
-                    getControllerConfiguration('onboarding')
-                );
-            } else if (response.state === 'onBoarding') {
-                dp = pageControllerFactory.getInstance(
-                    'onboarding',
-                    getControllerConfiguration('onboarding')
-                );
+            if (dp) {
+                dp.display();
             }
-
-            dp.display();
         }
 
         /**

@@ -16,14 +16,17 @@
     "loading": "Cargando..."
   },
   "login": {
+    "apiKey": "Api key",
+    "apiKeyIncorrect": "Clave de API incorrecta",
     "dontHaveAccount?": "¿No tienes una cuenta?",
-    "register": "Registro",
-    "selectCountry": "Selecciona el país para comenzar",
-    "yourAPIKey": "Puedes encontrar tu clave de API en ",
-    "connectYourAccount": "Conecta tu cuenta",
-    "apiKey": "Clave de API",
-    "logIn": "Iniciar sesión",
-    "apiKeyIncorrect": "Clave de API incorrecta"
+    "welcome": "Te damos la bienvenida a Packlink PRO",
+    "connectYourService": "Conecta tu servicio mediante tu clave. La encontrarás en la sección",
+    "settings": "\"Configuración\"",
+    "section": "apartado",
+    "proApiKey": "\"Packlink Pro API Key\"",
+    "validateApiKey": "Validar API key",
+    "chooseYourCountry": "Elige tu país para comenzar el registro",
+    "registerMe": "Registrarme"
   },
   "dashboard": {
     "almostThere": "¡Ya casi está!",

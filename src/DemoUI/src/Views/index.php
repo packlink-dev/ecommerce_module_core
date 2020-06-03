@@ -22,6 +22,9 @@ $urlService = new \Packlink\DemoUI\Services\Integration\UrlService();
             <div class="pl-logo-wrapper">
                 <img src="" class="pl-dashboard-logo" alt="Packlink PRO Shipping">
             </div>
+
+            <div id="pl-login-page"></div>
+
             <div id="pl-sidebar-shipping-methods-btn" class="pl-sidebar-link-wrapper pl-sidebar-link"
                  data-pl-sidebar-btn="shipping-methods">
                 <div class="pl-sidebar-link-wrapper-line"></div>
@@ -1162,6 +1165,7 @@ $urlService = new \Packlink\DemoUI\Services\Integration\UrlService();
 <script src="./resources/js/TemplateService.js"></script>
 <script src="./resources/js/UtilityService.js"></script>
 <script src="./resources/js/CountrySelectorController.js"></script>
+<script src="./resources/js/LoginController.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         Packlink.errorMsgs = {
@@ -1190,6 +1194,8 @@ $urlService = new \Packlink\DemoUI\Services\Integration\UrlService();
                 hasTaxConfiguration: false,
                 hasCountryConfiguration: true,
 
+                stateUrl: "<?php echo $urlService->getEndpointUrl('ModuleState', 'getCurrentState') ?>",
+                loginUrl: "<?php echo $urlService->getEndpointUrl('Login', 'login') ?>",
                 dashboardGetStatusUrl: "<?php echo $urlService->getEndpointUrl('Dashboard', 'getStatus') ?>",
                 defaultParcelGetUrl: "<?php echo $urlService->getEndpointUrl('DefaultParcel', 'getDefaultParcel') ?>",
                 defaultParcelSubmitUrl: "<?php echo $urlService->getEndpointUrl('DefaultParcel', 'setDefaultParcel') ?>",
@@ -1209,6 +1215,13 @@ $urlService = new \Packlink\DemoUI\Services\Integration\UrlService();
                 debugSetStatusUrl: "<?php echo $urlService->getEndpointUrl('Debug', 'setStatus') ?>",
                 autoConfigureStartUrl: "<?php echo $urlService->getEndpointUrl('AutoConfigure', 'start') ?>",
                 getShippingCountriesUrl: "<?php echo $urlService->getEndpointUrl('ShippingCountries', 'getAll') ?>",
+
+                templates: {
+                    'required': {
+                        'pl-login-page': '<?php echo json_encode(file_get_contents('/home/igor/Documents/Projects/packlink/pl_module_core/src/DemoUI/src/Views/resources/templates/login.html', true)) ?>',
+                        'pl-register-page': "<?php echo json_encode(file_get_contents(__DIR__ . 'templates/register.html', true)) ?>"
+                    }
+                },
             }
         );
 

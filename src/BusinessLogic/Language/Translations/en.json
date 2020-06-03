@@ -16,14 +16,17 @@
     "loading": "Loading..."
   },
   "login": {
-    "dontHaveAccount?": "Don't have an account?",
-    "register": "Register",
-    "selectCountry": "Select country to start",
-    "yourAPIKey": "Your API key can be found under",
-    "connectYourAccount": "Connect your account",
     "apiKey": "Api key",
-    "logIn": "Log in",
-    "apiKeyIncorrect": "API key was incorrect."
+    "apiKeyIncorrect": "API key was incorrect.",
+    "dontHaveAccount?": "Don't have an account?",
+    "welcome": "Welcome to Packlink PRO",
+    "connectYourService": "Connect your service using your key. You'll find it in the",
+    "settings": "\"Settings\"",
+    "section": "section of",
+    "proApiKey": "\"Packlink Pro API Key\"",
+    "validateApiKey": "Validate API key",
+    "chooseYourCountry": "Choose your country to start the registration process",
+    "registerMe": "Register me"
   },
   "dashboard": {
     "almostThere": "You're almost there!",

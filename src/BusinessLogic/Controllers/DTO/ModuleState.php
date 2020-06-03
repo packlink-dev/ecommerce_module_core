@@ -12,6 +12,11 @@ use Packlink\BusinessLogic\DTO\FrontDto;
 class ModuleState extends FrontDto
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Login state key.
      */
     const LOGIN_STATE = 'login';
@@ -30,4 +35,13 @@ class ModuleState extends FrontDto
      * @var string Current state.
      */
     public $state;
+
+    /**
+     * Fields for this DTO. Needed for validation and transformation from/to array.
+     *
+     * @var array
+     */
+    protected static $fields = array(
+        'state',
+    );
 }

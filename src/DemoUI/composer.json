@@ -9,6 +9,7 @@
   "autoload": {
     "psr-4": {
       "Logeecom\\Infrastructure\\": "../Infrastructure",
+      "Logeecom\\Tests\\": "../../tests",
       "Packlink\\BusinessLogic\\": "../BusinessLogic",
       "Packlink\\DemoUI\\Lib\\": "Lib",
       "Packlink\\DemoUI\\": "src"
