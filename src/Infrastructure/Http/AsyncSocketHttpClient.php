@@ -26,6 +26,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 class AsyncSocketHttpClient extends CurlHttpClient
 {
     const DEFAULT_ASYNC_REQUEST_TIMEOUT = 5;
+    const FWRITE_SLEEP_USECONDS = 300000;
 
     /**
      * Create and send request asynchronously.
@@ -66,7 +67,7 @@ class AsyncSocketHttpClient extends CurlHttpClient
     protected function getTransferProtocol(array $urlDetails)
     {
         if ($urlDetails['scheme'] === 'https') {
-            return 'ssl://';
+            return 'tls://';
         }
 
         return 'tcp://';
@@ -140,7 +141,7 @@ class AsyncSocketHttpClient extends CurlHttpClient
             $payload .= $header . (!empty($value) ? ": $value" : '') . "\r\n";
         }
 
-        $payload .= "Content-length: " . strlen($body) . "\r\n";
+        $payload .= "Content-Length: " . strlen($body) . "\r\n";
         $payload .= "Connection: close\r\n\r\n";
 
         $payload .= $body . "\r\n\r\n";
@@ -171,6 +172,11 @@ class AsyncSocketHttpClient extends CurlHttpClient
         if ($writeResult === false) {
             throw new HttpRequestException('Unable to write to php socket.');
         }
+
+        // Even though php reports that the write has been completed
+        // The data is not necessarily been written
+        // We must wait to make sure that the write is acutally complete
+        usleep(self::FWRITE_SLEEP_USECONDS);
 
         fclose($socket);
     }

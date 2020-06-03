@@ -27,7 +27,7 @@ class AsyncSocketHttpClientTest extends BaseInfrastructureTestWithServices
         $this->client->requestAsync('GET', $url);
 
         // assert
-        $this->assertEquals('ssl://', $this->client->requestHistory[0]['transferProtocol']);
+        $this->assertEquals('tls://', $this->client->requestHistory[0]['transferProtocol']);
     }
 
     public function testTransferProtocolHttp()
