@@ -690,7 +690,7 @@ class QueueItem extends Entity
      */
     public function setPriority($priority)
     {
-        if (!in_array($priority, array(Priority::LOW, Priority::NORMAL, Priority::HIGH), true)) {
+        if (!in_array($priority, static::getAvailablePriorities(), true)) {
             throw new InvalidArgumentException("Priority {$priority} is not supported.");
         }
 
@@ -771,6 +771,16 @@ class QueueItem extends Entity
         $this->finishTime = $this->timeProvider->deserializeDateString($data['finishTime']);
         $this->failTime = $this->timeProvider->deserializeDateString($data['failTime']);
         $this->earliestStartTime = $this->timeProvider->deserializeDateString($data['earliestStartTime']);
+    }
+
+    /**
+     * Defines available priorities.
+     *
+     * @return array
+     */
+    public static function getAvailablePriorities()
+    {
+        return array(Priority::LOW, Priority::NORMAL, Priority::HIGH);
     }
 
     /**

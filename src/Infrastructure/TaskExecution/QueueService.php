@@ -378,9 +378,8 @@ class QueueService
     {
         $result = array();
         $currentLimit = $limit;
-        $availablePriorities = array(Priority::HIGH, Priority::NORMAL, Priority::LOW);
 
-        foreach ($availablePriorities as $priority) {
+        foreach (QueueItem::getAvailablePriorities() as $priority) {
             $batch = $this->getStorage()->findOldestQueuedItems($priority, $currentLimit);
             $result[] = $batch;
 
