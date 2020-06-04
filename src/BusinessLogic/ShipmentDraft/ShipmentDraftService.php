@@ -203,7 +203,7 @@ class ShipmentDraftService extends BaseService
      *
      * @param RepositoryInterface $repository Schedule repository.
      * @param int $hour Hour of the day when schedule should be executed.
-     * @param int $minute
+     * @param int $minute Minute of the schedule.
      */
     protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour, $minute)
     {
