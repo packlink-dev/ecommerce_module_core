@@ -66,21 +66,21 @@ class QueueService
      *     integration) context based on account id should be provided. Failing to do this will result in global task
      *     context and unpredictable task execution.
      *
-     * @param int $priority
+     * @param int | null $priority Null priority falls back to Priority::NORMAL
      *
      * @return \Logeecom\Infrastructure\TaskExecution\QueueItem Created queue item.
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException When queue storage
      *      fails to save the item.
      */
-    public function enqueue($queueName, Task $task, $context = '', $priority = Priority::NORMAL)
+    public function enqueue($queueName, Task $task, $context = '', $priority = null)
     {
         $queueItem = new QueueItem($task);
         $queueItem->setStatus(QueueItem::QUEUED);
         $queueItem->setQueueName($queueName);
         $queueItem->setContext($context);
         $queueItem->setQueueTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
-        $queueItem->setPriority($priority);
+        $queueItem->setPriority($priority ?: Priority::NORMAL);
 
         $this->save($queueItem, array(), true, QueueItem::CREATED);
 
