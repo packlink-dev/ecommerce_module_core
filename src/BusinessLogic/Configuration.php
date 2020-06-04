@@ -60,12 +60,11 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
         $value = $this->getConfigValue('isFirstShipmentDraftCreated');
 
         // If the value is null, that implies that the user has been registered
-        // Before tracking of this flag has been implemented.
+        // before tracking of this flag has been implemented.
         // For such users we will return true,
-        // Since this flag is used to enqueue schedules if its value is false, and already registered
-        // Users have schedules since the schedules are created when they've registered in the app.
+        // since this flag is used to enqueue schedules if its value is false, and already registered
+        // users have schedules since the schedules are created when they've registered in the app.
         if ($value || $value === null) {
-
             return true;
         }
 
