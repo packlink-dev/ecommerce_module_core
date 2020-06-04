@@ -64,11 +64,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
         // For such users we will return true,
         // since this flag is used to enqueue schedules if its value is false, and already registered
         // users have schedules since the schedules are created when they've registered in the app.
-        if ($value || $value === null) {
-            return true;
-        }
-
-        return false;
+        return ($value || $value === null);
     }
 
     /**
