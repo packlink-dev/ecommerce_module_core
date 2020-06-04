@@ -2,13 +2,13 @@
 
 namespace Packlink\BusinessLogic\Http\DTO\Draft;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class DraftItem
  * @package Packlink\BusinessLogic\Http\DTO\Draft
  */
-class DraftItem extends BaseDto
+class DraftItem extends DataTransferObject
 {
     /**
      * Item price.

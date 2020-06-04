@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class PostalCode.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class PostalCode extends BaseDto
+class PostalCode extends DataTransferObject
 {
     /**
      * Zipcode.

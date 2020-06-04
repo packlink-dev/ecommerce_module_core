@@ -43,17 +43,17 @@ class CountryDtoTest extends BaseDtoTest
         $countries = TestFrontDtoFactory::getFromBatch(Country::CLASS_KEY, $data);
         $this->assertCount(2, $countries);
 
-        $this->assertEquals('Germany', $countries[0]->name);
-        $this->assertEquals('DE', $countries[0]->code);
-        $this->assertEquals('10115', $countries[0]->postalCode);
-        $this->assertEquals('https://pro.packlink.de/registrieren', $countries[0]->registrationLink);
-        $this->assertEquals('DE', $countries[0]->platformCountry);
+        $this->assertEquals('Germany', $countries['de']->name);
+        $this->assertEquals('DE', $countries['de']->code);
+        $this->assertEquals('10115', $countries['de']->postalCode);
+        $this->assertEquals('https://pro.packlink.de/registrieren', $countries['de']->registrationLink);
+        $this->assertEquals('DE', $countries['de']->platformCountry);
 
-        $this->assertEquals('Netherlands', $countries[1]->name);
-        $this->assertEquals('NL', $countries[1]->code);
-        $this->assertEquals('1011', $countries[1]->postalCode);
-        $this->assertEquals('https://pro.packlink.com/register', $countries[1]->registrationLink);
-        $this->assertEquals('UN', $countries[1]->platformCountry);
+        $this->assertEquals('Netherlands', $countries['nl']->name);
+        $this->assertEquals('NL', $countries['nl']->code);
+        $this->assertEquals('1011', $countries['nl']->postalCode);
+        $this->assertEquals('https://pro.packlink.com/register', $countries['nl']->registrationLink);
+        $this->assertEquals('UN', $countries['nl']->platformCountry);
     }
 
     public function testToArray()

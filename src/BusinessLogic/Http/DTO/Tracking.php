@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class Tracking.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class Tracking extends BaseDto
+class Tracking extends DataTransferObject
 {
     /**
      * Timestamp of tracking entry.
@@ -54,9 +54,9 @@ class Tracking extends BaseDto
     public static function fromArray(array $raw)
     {
         $tracking = new static();
-        $tracking->timestamp = static::getValue($raw, 'timestamp');
-        $tracking->description = static::getValue($raw, 'description');
-        $tracking->city = static::getValue($raw, 'city');
+        $tracking->timestamp = static::getDataValue($raw, 'timestamp');
+        $tracking->description = static::getDataValue($raw, 'description');
+        $tracking->city = static::getDataValue($raw, 'city');
 
         return $tracking;
     }
@@ -68,11 +68,10 @@ class Tracking extends BaseDto
      *
      * @return static[] Array of transformed DTO objects.
      */
-    public static function fromArrayBatch(array $batchRaw)
+    public static function fromBatch(array $batchRaw)
     {
         $batchRaw = (isset($batchRaw['history']) && is_array($batchRaw['history']) ? $batchRaw['history'] : array());
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return parent::fromArrayBatch($batchRaw);
+        return parent::fromBatch($batchRaw);
     }
 }

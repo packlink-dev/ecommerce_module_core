@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class PostalZone
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class PostalZone extends BaseDto
+class PostalZone extends DataTransferObject
 {
     /**
      * ID of the postal zone.
@@ -53,11 +53,11 @@ class PostalZone extends BaseDto
     {
         $instance = new static();
 
-        $instance->id = static::getValue($raw, 'id');
-        $instance->name = static::getValue($raw, 'name');
-        $instance->hasPostalCodes = static::getValue($raw, 'hasPostalCodes', false);
-        $instance->isoCode = static::getValue($raw, 'isoCode');
-        $instance->phonePrefix = static::getValue($raw, 'phonePrefix');
+        $instance->id = static::getDataValue($raw, 'id');
+        $instance->name = static::getDataValue($raw, 'name');
+        $instance->hasPostalCodes = static::getDataValue($raw, 'hasPostalCodes', false);
+        $instance->isoCode = static::getDataValue($raw, 'isoCode');
+        $instance->phonePrefix = static::getDataValue($raw, 'phonePrefix');
 
         return $instance;
     }

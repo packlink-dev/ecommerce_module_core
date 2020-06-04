@@ -2,13 +2,13 @@
 
 namespace Packlink\BusinessLogic\Http\DTO\Draft;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class ItemPrice
  * @package Packlink\BusinessLogic\Http\DTO\Draft
  */
-class ItemPrice extends BaseDto
+class ItemPrice extends DataTransferObject
 {
     /**
      * Value of item in EUR without taxes.

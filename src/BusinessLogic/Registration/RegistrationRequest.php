@@ -175,8 +175,8 @@ class RegistrationRequest extends FrontDto
         /** @var static $instance */
         $instance = parent::fromArray($raw);
 
-        $instance->estimatedDeliveryVolume = static::getValue($raw, 'estimated_delivery_volume');
-        $instance->platformCountry = static::getValue($raw, 'platform_country');
+        $instance->estimatedDeliveryVolume = static::getDataValue($raw, 'estimated_delivery_volume');
+        $instance->platformCountry = static::getDataValue($raw, 'platform_country');
         $instance->policies = RegistrationLegalPolicy::fromArray($raw['policies']);
 
         return $instance;

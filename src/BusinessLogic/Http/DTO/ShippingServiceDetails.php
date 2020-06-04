@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class ShippingServiceDetails holds information about delivery details for specific shipping service
@@ -10,7 +10,7 @@ use Packlink\BusinessLogic\DTO\BaseDto;
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class ShippingServiceDetails extends BaseDto
+class ShippingServiceDetails extends DataTransferObject
 {
     /**
      * Service Id.
@@ -177,33 +177,33 @@ class ShippingServiceDetails extends BaseDto
     {
         $instance = new static();
 
-        $instance->id = self::getValue($raw, 'id');
-        $instance->carrierName = self::getValue($raw, 'carrier_name');
-        $instance->serviceName = self::getValue($raw, 'service_name');
-        $instance->currency = self::getValue($raw, 'currency');
-        $instance->country = self::getValue($raw, 'country');
-        $instance->departureDropOff = self::getValue($raw, 'dropoff', false);
-        $instance->destinationDropOff = self::getValue($raw, 'delivery_to_parcelshop', false);
-        $instance->labelsRequired = self::getValue($raw, 'labels_required', false);
-        $instance->category = self::getValue($raw, 'category');
+        $instance->id = self::getDataValue($raw, 'id');
+        $instance->carrierName = self::getDataValue($raw, 'carrier_name');
+        $instance->serviceName = self::getDataValue($raw, 'service_name');
+        $instance->currency = self::getDataValue($raw, 'currency');
+        $instance->country = self::getDataValue($raw, 'country');
+        $instance->departureDropOff = self::getDataValue($raw, 'dropoff', false);
+        $instance->destinationDropOff = self::getDataValue($raw, 'delivery_to_parcelshop', false);
+        $instance->labelsRequired = self::getDataValue($raw, 'labels_required', false);
+        $instance->category = self::getDataValue($raw, 'category');
         $instance->expressDelivery = $instance->category === 'express';
-        $instance->transitTime = self::getValue($raw, 'transit_time');
-        $instance->transitHours = (int)self::getValue($raw, 'transit_hours', 0);
+        $instance->transitTime = self::getDataValue($raw, 'transit_time');
+        $instance->transitHours = (int)self::getDataValue($raw, 'transit_hours', 0);
         $instance->firstEstimatedDeliveryDate = \DateTime::createFromFormat(
             'YYYY/MM/DD',
-            self::getValue($raw, 'first_estimated_delivery_date', '1970/01/01')
+            self::getDataValue($raw, 'first_estimated_delivery_date', '1970/01/01')
         );
         /** @var array $prices */
-        $prices = self::getValue($raw, 'price', array());
+        $prices = self::getDataValue($raw, 'price', array());
         if (!empty($prices)) {
-            $instance->totalPrice = self::getValue($prices, 'total_price', 0);
-            $instance->taxPrice = self::getValue($prices, 'tax_price', 0);
-            $instance->basePrice = self::getValue($prices, 'base_price', 0);
+            $instance->totalPrice = self::getDataValue($prices, 'total_price', 0);
+            $instance->taxPrice = self::getDataValue($prices, 'tax_price', 0);
+            $instance->basePrice = self::getDataValue($prices, 'base_price', 0);
         }
 
-        $instance->serviceInfo = self::getValue($raw, 'service_info', array());
-        $instance->availableDates = self::getValue($raw, 'available_dates', array());
-        $instance->national = self::getValue($raw, 'national', null);
+        $instance->serviceInfo = self::getDataValue($raw, 'service_info', array());
+        $instance->availableDates = self::getDataValue($raw, 'available_dates', array());
+        $instance->national = self::getDataValue($raw, 'national', null);
 
         return $instance;
     }

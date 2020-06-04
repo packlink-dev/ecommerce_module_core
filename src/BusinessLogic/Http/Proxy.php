@@ -181,7 +181,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("dropoffs/$serviceId/$countryCode/$postalCode"));
 
-        return DropOff::fromArrayBatch($response->decodeBodyToArray() ?: array());
+        return DropOff::fromBatch($response->decodeBodyToArray() ?: array());
     }
 
     /**
@@ -210,7 +210,7 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
 
-        return LocationInfo::fromArrayBatch($response->decodeBodyToArray());
+        return LocationInfo::fromBatch($response->decodeBodyToArray());
     }
 
     /**
@@ -228,7 +228,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("locations/postalcodes/$countryCode/$zipCode"));
 
-        return PostalCode::fromArrayBatch($response->decodeBodyToArray());
+        return PostalCode::fromBatch($response->decodeBodyToArray());
     }
 
     /**
@@ -255,7 +255,7 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
 
-        $postalZones = PostalZone::fromArrayBatch($response->decodeBodyToArray());
+        $postalZones = PostalZone::fromBatch($response->decodeBodyToArray());
 
         $postalZones = array_filter(
             $postalZones,
@@ -293,7 +293,7 @@ class Proxy
             return array();
         }
 
-        $shippingDetails = ShippingServiceDetails::fromArrayBatch($body);
+        $shippingDetails = ShippingServiceDetails::fromBatch($body);
 
         foreach ($shippingDetails as $shippingDetail) {
             $shippingDetail->departureCountry = $params->fromCountry;
@@ -410,7 +410,7 @@ class Proxy
     {
         $response = $this->getShipmentData($referenceId, 'track');
 
-        return $response !== null ? Tracking::fromArrayBatch($response->decodeBodyToArray()) : array();
+        return $response !== null ? Tracking::fromBatch($response->decodeBodyToArray()) : array();
     }
 
     /**

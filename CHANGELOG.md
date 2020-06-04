@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Changed when the schedules are created 
+- BaseDto is deprecated
 
 ## [2.0.9](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.8...v2.0.9) - 2020-05-15
 ### Added

@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -12,7 +12,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
  *
  * @package Packlink\BusinessLogic\Controllers\DTO
  */
-class ShippingMethodConfiguration extends BaseDto
+class ShippingMethodConfiguration extends DataTransferObject
 {
     /**
      * Shipping method identifier.

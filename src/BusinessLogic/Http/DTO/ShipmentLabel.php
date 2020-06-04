@@ -2,15 +2,15 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
+use Logeecom\Infrastructure\Data\DataTransferObject;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Packlink\BusinessLogic\DTO\BaseDto;
 
 /**
  * Class ShipmentLabel
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class ShipmentLabel extends BaseDto
+class ShipmentLabel extends DataTransferObject
 {
     /**
      * Link to PDF.
@@ -59,9 +59,9 @@ class ShipmentLabel extends BaseDto
     public static function fromArray(array $batchRaw)
     {
         return new static(
-            static::getValue($batchRaw, 'link'),
-            static::getValue($batchRaw, 'printed', false),
-            static::getValue($batchRaw, 'createTime', 0)
+            static::getDataValue($batchRaw, 'link'),
+            static::getDataValue($batchRaw, 'printed', false),
+            static::getDataValue($batchRaw, 'createTime', 0)
         );
     }
 

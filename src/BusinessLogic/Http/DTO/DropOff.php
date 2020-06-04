@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class DropOff.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class DropOff extends BaseDto
+class DropOff extends DataTransferObject
 {
     /**
      * Unique identifier of drop-off point.
@@ -105,7 +105,7 @@ class DropOff extends BaseDto
             'lat' => $this->lat,
             'long' => $this->long,
             'phone' => $this->phone,
-            'workingHours' => $this->workingHours
+            'workingHours' => $this->workingHours,
         );
     }
 
@@ -120,17 +120,17 @@ class DropOff extends BaseDto
     {
         $entity = new self();
 
-        $entity->id = static::getValue($raw, 'id');
-        $entity->name = static::getValue($raw, 'commerce_name');
-        $entity->type = static::getValue($raw, 'type');
-        $entity->countryCode = static::getValue($raw, 'country');
-        $entity->state = static::getValue($raw, 'state');
-        $entity->zip = static::getValue($raw, 'zip');
-        $entity->city = static::getValue($raw, 'city');
-        $entity->address = static::getValue($raw, 'address');
-        $entity->lat = static::getValue($raw, 'lat', 0);
-        $entity->long = static::getValue($raw, 'long', 0);
-        $entity->phone = static::getValue($raw, 'phone');
+        $entity->id = static::getDataValue($raw, 'id');
+        $entity->name = static::getDataValue($raw, 'commerce_name');
+        $entity->type = static::getDataValue($raw, 'type');
+        $entity->countryCode = static::getDataValue($raw, 'country');
+        $entity->state = static::getDataValue($raw, 'state');
+        $entity->zip = static::getDataValue($raw, 'zip');
+        $entity->city = static::getDataValue($raw, 'city');
+        $entity->address = static::getDataValue($raw, 'address');
+        $entity->lat = static::getDataValue($raw, 'lat', 0);
+        $entity->long = static::getDataValue($raw, 'long', 0);
+        $entity->phone = static::getDataValue($raw, 'phone');
         $entity->workingHours =
             !empty($raw['opening_times']['opening_times']) ? $raw['opening_times']['opening_times'] : array();
 

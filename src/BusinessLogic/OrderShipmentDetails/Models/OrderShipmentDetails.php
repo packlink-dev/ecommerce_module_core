@@ -136,7 +136,7 @@ class OrderShipmentDetails extends Entity
 
         foreach ($this->fields as $fieldName) {
             if ($fieldName === 'shipmentLabels' && !empty($data['shipmentLabels'])) {
-                $this->shipmentLabels = ShipmentLabel::fromArrayBatch($data['shipmentLabels']);
+                $this->shipmentLabels = ShipmentLabel::fromBatch($data['shipmentLabels']);
             } elseif ($fieldName === 'lastStatusUpdateTime' && !empty($data['lastStatusUpdateTime'])) {
                 $this->lastStatusUpdateTime = $timeProvider->getDateTime($data['lastStatusUpdateTime']);
             } else {
