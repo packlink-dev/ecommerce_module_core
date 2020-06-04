@@ -218,9 +218,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
     public function testSchedulesNotCreatedForCurrentUsers()
     {
-        // arrange
-        $this->shopConfig->setFirstShipmentDraftCreated(true);
-
         // act
         $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
 
