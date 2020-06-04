@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
 
 /**
@@ -11,7 +11,7 @@ use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
  *
  * @package Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM
  */
-class MemoryRepositoryWithConditionalDelete extends MemoryRepository implements ConditionallyDeletes
+class MemoryQueueItemReposiotoryWithConditionalDelete extends MemoryQueueItemRepository implements ConditionallyDeletes
 {
     /**
      * Fully qualified name of this class.

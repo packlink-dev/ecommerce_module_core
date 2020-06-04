@@ -9,7 +9,6 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
@@ -94,19 +93,20 @@ class BatchTaskCleanupTask extends Task
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
     public function execute()
     {
         Logger::logDebug('Task types to be deleted:', 'Core', $this->taskTypes);
 
-        $repository = $this->getQueueItemRepository();
+        $repository = RepositoryRegistry::getQueueItemRepository();
         if (!$repository instanceof ConditionallyDeletes) {
             throw new AbortTaskExecutionException(
                 'QueueItemRepository must implement ConditionallyDeletes '
-                        . 'interface before it can utilize BatchTaskCleanupTask.'
+                . 'interface before it can utilize BatchTaskCleanupTask.'
             );
         }
-        
+
         $query = $this->getDeleteQuery();
 
         $this->reportProgress(10);
@@ -114,18 +114,6 @@ class BatchTaskCleanupTask extends Task
         $repository->deleteWhere($query);
 
         $this->reportProgress(100);
-    }
-
-    /**
-     * Retrieves queue item repository.
-     *
-     * @return \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface |
-     *     \Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     */
-    private function getQueueItemRepository()
-    {
-        return RepositoryRegistry::getRepository(QueueItem::getClassName());
     }
 
     /**

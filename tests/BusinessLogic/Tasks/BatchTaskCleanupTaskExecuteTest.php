@@ -8,8 +8,8 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM\MemoryRepositoryWithConditionalDelete;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM\MemoryQueueItemReposiotoryWithConditionalDelete;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Packlink\BusinessLogic\Tasks\BatchTaskCleanupTask;
@@ -20,7 +20,10 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     {
         parent::setUp();
 
-        RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryRepositoryWithConditionalDelete::getClassName());
+        RepositoryRegistry::registerRepository(
+            QueueItem::getClassName(),
+            MemoryQueueItemReposiotoryWithConditionalDelete::getClassName()
+        );
 
         $this->repoSetup();
     }
@@ -28,12 +31,18 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     public function testTaskAgeCutOff()
     {
         // arrange
-        $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS), array('FooTask', 'BarTask'));
+        $task = new BatchTaskCleanupTask(
+            array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS),
+            array('FooTask', 'BarTask')
+        );
 
         // act
         $task->execute();
         // arrange
-        $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS), array('FooTask', 'BarTask'));
+        $task = new BatchTaskCleanupTask(
+            array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS),
+            array('FooTask', 'BarTask')
+        );
 
         // act
         $task->execute();
@@ -42,18 +51,27 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
         $tasks = $this->getQueueItemRepo()->select();
         $this->assertCount(1, $tasks);
         $item = $tasks[0];
-        $this->assertInstanceOf('\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask', $item->getTask());
+        $this->assertInstanceOf(
+            '\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask',
+            $item->getTask()
+        );
         // assert
         $tasks = $this->getQueueItemRepo()->select();
         $this->assertCount(1, $tasks);
         $item = $tasks[0];
-        $this->assertInstanceOf('\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask', $item->getTask());
+        $this->assertInstanceOf(
+            '\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask',
+            $item->getTask()
+        );
     }
 
     public function testTasksOlderThanAgeCutOff()
     {
         // arrange
-        $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS), array('FooTask', 'BarTask'));
+        $task = new BatchTaskCleanupTask(
+            array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS),
+            array('FooTask', 'BarTask')
+        );
         $this->getConfigService()->setMaxTaskAge(1);
 
         // act
@@ -67,7 +85,10 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     public function testTasksYungerThenAgeCutOff()
     {
         // arrange
-        $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS), array('FooTask', 'BarTask'));
+        $task = new BatchTaskCleanupTask(
+            array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS),
+            array('FooTask', 'BarTask')
+        );
         $this->getConfigService()->setMaxTaskAge(20);
 
         // act
@@ -91,7 +112,10 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
         $tasks = $this->getQueueItemRepo()->select();
         $this->assertCount(1, $tasks);
         $item = $tasks[0];
-        $this->assertInstanceOf('\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask', $item->getTask());
+        $this->assertInstanceOf(
+            '\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask',
+            $item->getTask()
+        );
     }
 
     public function testTaskWithSpecificStatus()
@@ -107,7 +131,10 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
         $tasks = $this->getQueueItemRepo()->select();
         $this->assertCount(1, $tasks);
         $item = $tasks[0];
-        $this->assertInstanceOf('\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask', $item->getTask());
+        $this->assertInstanceOf(
+            '\Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask',
+            $item->getTask()
+        );
     }
 
     public function testNoTaskTypesProvided()
@@ -130,7 +157,7 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     public function testRepositoryDoesNotImplementConditionallyDeletes()
     {
         // arrange
-        RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryRepository::getClassName());
+        RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryQueueItemRepository::getClassName());
         $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS));
 
         // act
