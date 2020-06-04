@@ -165,7 +165,6 @@ class ShipmentDraftService extends BaseService
         $firstStart = rand(0, 59);
         $secondStart = ($firstStart + 30) % 60;
 
-
         // Schedule hourly task for updating shipment info - start at full hour
         $this->scheduleUpdatePendingShipmentsData($repository, $firstStart);
 
@@ -173,7 +172,7 @@ class ShipmentDraftService extends BaseService
         $this->scheduleUpdatePendingShipmentsData($repository, $secondStart);
 
         // Schedule daily task for updating shipment info - start at 11:00 UTC hour
-        $this->scheduleUpdateInProgressShipments($repository, 11);
+        $this->scheduleUpdateInProgressShipments($repository, 11, rand(0, 59));
     }
 
     /**
@@ -204,8 +203,9 @@ class ShipmentDraftService extends BaseService
      *
      * @param RepositoryInterface $repository Schedule repository.
      * @param int $hour Hour of the day when schedule should be executed.
+     * @param int $minute
      */
-    protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour)
+    protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour, $minute)
     {
         $dailyStatuses = array(
             ShipmentStatus::STATUS_IN_TRANSIT,
@@ -220,6 +220,7 @@ class ShipmentDraftService extends BaseService
         );
 
         $schedule->setHour($hour);
+        $schedule->setMinute($minute);
         $schedule->setNextSchedule();
 
         $repository->save($schedule);
