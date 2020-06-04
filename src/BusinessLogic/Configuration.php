@@ -22,6 +22,9 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      * Default scheduler queue name.
      */
     const DEFAULT_SCHEDULER_QUEUE_NAME = 'SchedulerCheckTaskQueue';
+    /**
+     * Default task retention time expressed in days. After this time tasks are not necesseary any more in the system.
+     */
     const DEFAULT_MAX_TASK_AGE = 7;
     /**
      * Singleton instance of this class.
@@ -31,7 +34,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     protected static $instance;
 
     /**
-     * Retrieves max task age in days. This config value must be utilized when deleting tasks.
+     * Retrieves max task age in days. Tasks older than the given number of days are no longer needed in the system.
      *
      * @return int Max task age in days.
      */
@@ -301,7 +304,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     protected function isSystemSpecific($name)
     {
-        if (in_array($name, array('maxTaskAge'))) {
+        if ($name === 'maxTaskAge') {
             return false;
         }
 
