@@ -80,7 +80,7 @@ class QueueService
         $queueItem->setQueueName($queueName);
         $queueItem->setContext($context);
         $queueItem->setQueueTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
-        $queueItem->setPriority($priority ?: Priority::NORMAL);
+        $queueItem->setPriority($priority ?: ($task->getPriority() ?: Priority::NORMAL));
 
         $this->save($queueItem, array(), true, QueueItem::CREATED);
 
