@@ -237,6 +237,7 @@ class UserAccountService extends BaseService
 
         $schedule->setDay(rand(1, 7));
         $schedule->setHour(rand(0, 5));
+        $schedule->setMinute(rand(0, 59));
         $schedule->setNextSchedule();
         $repository->save($schedule);
     }
