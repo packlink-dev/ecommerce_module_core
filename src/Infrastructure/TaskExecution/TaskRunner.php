@@ -71,7 +71,12 @@ class TaskRunner
      * @var int
      */
     private $aliveSinceUpdatedAt = 0;
-
+    /**
+     * Sleep time in seconds with microsecond precision.
+     *
+     * @var float
+     */
+    private $batchSleepTime = 0.0;
     /**
      * Sets task runner guid.
      *
@@ -211,9 +216,7 @@ class TaskRunner
         $this->keepAlive();
 
         $averageRequestTime = ($endTime - $startTime) / $asyncStarterBatchSize;
-
-        $waitTime = $batchStarter->getWaitTime($averageRequestTime);
-        usleep((int)$waitTime);
+        $this->batchSleepTime = $batchStarter->getWaitTime($averageRequestTime);
 
         $this->logDebug(
             array(
@@ -397,7 +400,9 @@ class TaskRunner
     {
         $configurationValue = $this->getConfigurationService()->getTaskRunnerWakeupDelay();
 
-        return $configurationValue !== null ? $configurationValue : self::WAKEUP_DELAY;
+        $minimalSleepTime  = $configurationValue !== null ? $configurationValue : self::WAKEUP_DELAY;
+
+        return $minimalSleepTime + ceil($this->batchSleepTime);
     }
 
     /**
