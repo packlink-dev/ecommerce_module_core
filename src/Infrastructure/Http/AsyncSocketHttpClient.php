@@ -11,7 +11,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
  * web sockets as supported by php.
  *
  * Main purpose of the AsyncSocketHttpClient is to improve the performance
- * of the async requests especially in a multitenant environment where
+ * of the async requests especially in a multi tenant environment where
  * the major task execution bottleneck is the task starting process, since on
  * average it takes about 1 second for the curl library to actually perform the
  * request, therefore, minimal time necessary to send async request is around
@@ -25,7 +25,13 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
  */
 class AsyncSocketHttpClient extends CurlHttpClient
 {
+    /**
+     * Default request timeout.
+     */
     const DEFAULT_ASYNC_REQUEST_TIMEOUT = 5;
+    /**
+     * Sleep time after fwrite().
+     */
     const FWRITE_SLEEP_USECONDS = 300000;
 
     /**
@@ -175,7 +181,7 @@ class AsyncSocketHttpClient extends CurlHttpClient
 
         // Even though php reports that the write has been completed
         // The data is not necessarily been written
-        // We must wait to make sure that the write is acutally complete
+        // We must wait to make sure that the write is actually complete
         usleep(self::FWRITE_SLEEP_USECONDS);
 
         fclose($socket);

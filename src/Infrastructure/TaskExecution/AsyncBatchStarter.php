@@ -188,9 +188,9 @@ class AsyncBatchStarter implements Runnable
      * Calculates time required for whole batch with its sub-batches to run. Wait time calculation si based on HTTP
      * request duration provided as method argument
      *
-     * @param float $requestDuration Expected HTTP request duration in milliseconds
+     * @param float $requestDuration Expected HTTP request duration in microseconds.
      *
-     * @return float Wait period in milliseconds that is required for whole batch (with sub-batches) to run
+     * @return float Wait period in micro seconds that is required for whole batch (with sub-batches) to run
      */
     public function getWaitTime($requestDuration)
     {

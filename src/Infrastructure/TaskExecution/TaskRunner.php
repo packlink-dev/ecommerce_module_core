@@ -211,6 +211,10 @@ class TaskRunner
         $this->keepAlive();
 
         $averageRequestTime = ($endTime - $startTime) / $asyncStarterBatchSize;
+
+        $waitTime = $batchStarter->getWaitTime($averageRequestTime);
+        usleep((int)$waitTime);
+
         $this->logDebug(
             array(
                 'Message' => 'Task runner: Batch starter execution finished.',
