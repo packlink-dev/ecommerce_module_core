@@ -32,7 +32,7 @@ class BaseDtoTest extends TestCase
     }
 
     /**
-     * @expectedException \BadMethodCallException
+     * @expectedException \RuntimeException
      */
     public function testFromArrayNotImplemented()
     {

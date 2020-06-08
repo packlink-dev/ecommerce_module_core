@@ -2,13 +2,13 @@
 
 namespace Packlink\BusinessLogic\Http\DTO\Draft;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class DraftPrice
  * @package Packlink\BusinessLogic\Http\DTO\Draft
  */
-class DraftPrice extends BaseDto
+class DraftPrice extends DataTransferObject
 {
     /**
      * Value of item in EUR without taxes.
@@ -34,6 +34,7 @@ class DraftPrice extends BaseDto
      * @var ItemPrice[]
      */
     public $items = array();
+
     /**
      * Transforms DTO to its array format suitable for http client.
      *

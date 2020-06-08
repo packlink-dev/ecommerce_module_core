@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 use Packlink\BusinessLogic\Http\DTO\Draft\AdditionalData;
 use Packlink\BusinessLogic\Http\DTO\Draft\Address;
 use Packlink\BusinessLogic\Http\DTO\Draft\DraftPrice;
@@ -12,7 +12,7 @@ use Packlink\BusinessLogic\Http\DTO\Draft\DraftPrice;
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class Draft extends BaseDto
+class Draft extends DataTransferObject
 {
     /**
      * Unique user identifier.

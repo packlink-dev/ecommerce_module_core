@@ -138,8 +138,8 @@ class Warehouse extends FrontDto
     {
         /** @var static $instance */
         $instance = parent::fromArray($raw);
-        $instance->default = static::getValue($raw, 'default_selection', false);
-        $instance->postalCode = static::getValue($raw, 'postal_code');
+        $instance->default = static::getDataValue($raw, 'default_selection', false);
+        $instance->postalCode = static::getDataValue($raw, 'postal_code');
 
         return $instance;
     }

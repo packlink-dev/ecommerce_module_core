@@ -82,7 +82,7 @@ class Proxy
     public function getUsersParcelInfo()
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, 'users/parcels');
-        $data = $response->decodeBodyAsJson() ?: array();
+        $data = $response->decodeBodyToArray() ?: array();
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -102,7 +102,7 @@ class Proxy
     public function getUsersWarehouses()
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, 'clients/warehouses');
-        $data = $response->decodeBodyAsJson() ?: array();
+        $data = $response->decodeBodyToArray() ?: array();
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -129,7 +129,7 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_POST, 'register', $data);
 
-        $data = $response->decodeBodyAsJson();
+        $data = $response->decodeBodyToArray();
 
         return !empty($data['token']) ? $data['token'] : '';
     }
@@ -147,7 +147,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, 'clients');
 
-        return User::fromArray($response->decodeBodyAsJson());
+        return User::fromArray($response->decodeBodyToArray());
     }
 
     /**
@@ -181,7 +181,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("dropoffs/$serviceId/$countryCode/$postalCode"));
 
-        return DropOff::fromArrayBatch($response->decodeBodyAsJson() ?: array());
+        return DropOff::fromBatch($response->decodeBodyToArray() ?: array());
     }
 
     /**
@@ -210,7 +210,7 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
 
-        return LocationInfo::fromArrayBatch($response->decodeBodyAsJson());
+        return LocationInfo::fromBatch($response->decodeBodyToArray());
     }
 
     /**
@@ -228,7 +228,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, urlencode("locations/postalcodes/$countryCode/$zipCode"));
 
-        return PostalCode::fromArrayBatch($response->decodeBodyAsJson());
+        return PostalCode::fromBatch($response->decodeBodyToArray());
     }
 
     /**
@@ -255,7 +255,7 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
 
-        $postalZones = PostalZone::fromArrayBatch($response->decodeBodyAsJson());
+        $postalZones = PostalZone::fromBatch($response->decodeBodyToArray());
 
         $postalZones = array_filter(
             $postalZones,
@@ -288,12 +288,12 @@ class Proxy
 
         $response = $this->call(HttpClient::HTTP_METHOD_GET, 'services?' . http_build_query($params->toArray()));
 
-        $body = $response->decodeBodyAsJson();
+        $body = $response->decodeBodyToArray();
         if (empty($body)) {
             return array();
         }
 
-        $shippingDetails = ShippingServiceDetails::fromArrayBatch($body);
+        $shippingDetails = ShippingServiceDetails::fromBatch($body);
 
         foreach ($shippingDetails as $shippingDetail) {
             $shippingDetail->departureCountry = $params->fromCountry;
@@ -319,7 +319,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_GET, "services/available/$id/details");
 
-        return ShippingService::fromArray($response->decodeBodyAsJson());
+        return ShippingService::fromArray($response->decodeBodyToArray());
     }
 
     /**
@@ -338,7 +338,7 @@ class Proxy
     {
         $response = $this->call(HttpClient::HTTP_METHOD_POST, 'shipments', $draft->toArray());
 
-        $result = $response->decodeBodyAsJson();
+        $result = $response->decodeBodyToArray();
         $reference = array_key_exists('reference', $result) ? $result['reference'] : '';
 
         if (!$reference) {
@@ -374,7 +374,7 @@ class Proxy
     {
         $response = $this->getShipmentData($referenceId);
 
-        return $response !== null ? Shipment::fromArray($response->decodeBodyAsJson()) : null;
+        return $response !== null ? Shipment::fromArray($response->decodeBodyToArray()) : null;
     }
 
     /**
@@ -392,7 +392,7 @@ class Proxy
     {
         $response = $this->getShipmentData($referenceId, 'labels');
 
-        return $response !== null ? $response->decodeBodyAsJson() : array();
+        return $response !== null ? $response->decodeBodyToArray() : array();
     }
 
     /**
@@ -410,7 +410,7 @@ class Proxy
     {
         $response = $this->getShipmentData($referenceId, 'track');
 
-        return $response !== null ? Tracking::fromArrayBatch($response->decodeBodyAsJson()) : array();
+        return $response !== null ? Tracking::fromBatch($response->decodeBodyToArray()) : array();
     }
 
     /**
@@ -509,7 +509,7 @@ class Proxy
     {
         if (!$response->isSuccessful()) {
             $httpCode = $response->getStatus();
-            $error = $message = $response->decodeBodyAsJson();
+            $error = $message = $response->decodeBodyToArray();
             if (is_array($error)) {
                 $message = '';
                 if (isset($error['messages']) && is_array($error['messages'])) {

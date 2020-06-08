@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class ShippingService hold primary details about shipping service.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class ShippingService extends BaseDto
+class ShippingService extends DataTransferObject
 {
     /**
      * Service Id.
@@ -91,15 +91,15 @@ class ShippingService extends BaseDto
     {
         $instance = new static();
 
-        $instance->id = (int)self::getValue($raw, 'service_id');
-        $instance->enabled = (bool)self::getValue($raw, 'enabled');
-        $instance->carrierName = self::getValue($raw, 'carrier_name');
-        $instance->serviceName = self::getValue($raw, 'service_name');
-        $instance->logoUrl = self::getValue($raw, 'service_logo');
-        $instance->departureDropOff = self::getValue($raw, 'departure_type') === 'drop-off';
-        $instance->destinationDropOff = self::getValue($raw, 'destination_type') === 'drop-off';
-        $instance->serviceDetails = self::getValue($raw, 'service_details', array());
-        $instance->packlinkInfo = self::getValue($raw, 'packlink_info', array());
+        $instance->id = (int)self::getDataValue($raw, 'service_id');
+        $instance->enabled = (bool)self::getDataValue($raw, 'enabled');
+        $instance->carrierName = self::getDataValue($raw, 'carrier_name');
+        $instance->serviceName = self::getDataValue($raw, 'service_name');
+        $instance->logoUrl = self::getDataValue($raw, 'service_logo');
+        $instance->departureDropOff = self::getDataValue($raw, 'departure_type') === 'drop-off';
+        $instance->destinationDropOff = self::getDataValue($raw, 'destination_type') === 'drop-off';
+        $instance->serviceDetails = self::getDataValue($raw, 'service_details', array());
+        $instance->packlinkInfo = self::getDataValue($raw, 'packlink_info', array());
 
         return $instance;
     }

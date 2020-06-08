@@ -6,6 +6,9 @@ namespace Packlink\BusinessLogic\DTO;
  * Base class for all data transfer objects.
  *
  * @package Packlink\BusinessLogic\Http\DTO
+ *
+ * @deprecated This class is replaced with DataTransferObject from infrastructure core. It is left behind for backwards
+ *      compatibility.
  */
 abstract class BaseDto
 {

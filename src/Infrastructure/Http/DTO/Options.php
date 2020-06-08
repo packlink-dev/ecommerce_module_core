@@ -2,12 +2,14 @@
 
 namespace Logeecom\Infrastructure\Http\DTO;
 
+use Logeecom\Infrastructure\Data\DataTransferObject;
+
 /**
- * Class OptionsDTO. Represents HTTP options set for Request by HttpClient.
+ * Class Options. Represents HTTP options set for Request by HttpClient.
  *
  * @package Logeecom\Infrastructure\Http\DTO
  */
-class OptionsDTO
+class Options extends DataTransferObject
 {
     /**
      * Name of the option.
@@ -23,7 +25,7 @@ class OptionsDTO
     private $value;
 
     /**
-     * OptionsDTO constructor.
+     * Options constructor.
      *
      * @param string $name Name of the option.
      * @param string $value Value of the option.
@@ -68,31 +70,14 @@ class OptionsDTO
     }
 
     /**
-     * Transforms raw array data to OptionsDTO.
+     * Transforms raw array data to Options.
      *
      * @param array $raw Raw array data.
      *
-     * @return OptionsDTO Transformed object.
+     * @return Options Transformed object.
      */
     public static function fromArray(array $raw)
     {
         return new static($raw['name'], $raw['value']);
-    }
-
-    /**
-     * Transforms batch of raw array data to an array of DTOs.
-     *
-     * @param array $batchRaw Raw array data.
-     *
-     * @return static[] Array of transformed DTOs.
-     */
-    public static function fromArrayBatch(array $batchRaw)
-    {
-        $results = array();
-        foreach ($batchRaw as $item) {
-            $results[] = static::fromArray($item);
-        }
-
-        return $results;
     }
 }

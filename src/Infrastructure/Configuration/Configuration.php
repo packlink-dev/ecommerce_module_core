@@ -5,7 +5,7 @@
 
 namespace Logeecom\Infrastructure\Configuration;
 
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Singleton;
@@ -38,6 +38,10 @@ abstract class Configuration extends Singleton
      * Default HTTP method to use for async call.
      */
     const ASYNC_CALL_METHOD = 'POST';
+    /**
+     * Default batch size for the asynchronous execution.
+     */
+    const DEFAULT_ASYNC_STARTER_BATCH_SIZE = 8;
     /**
      * System user context.
      *
@@ -148,6 +152,26 @@ abstract class Configuration extends Singleton
     public function setDebugModeEnabled($status)
     {
         $this->saveConfigValue('debugModeEnabled', (bool)$status);
+    }
+
+    /**
+     * Retrieves async starter batch size.
+     *
+     * @return int Async starter batch size.
+     */
+    public function getAsyncStarterBatchSize()
+    {
+        return $this->getConfigValue('asyncStarterBatchSize', static::DEFAULT_ASYNC_STARTER_BATCH_SIZE);
+    }
+
+    /**
+     * Sets async process batch size.
+     *
+     * @param int $size
+     */
+    public function setAsyncStarterBatchSize($size)
+    {
+        $this->saveConfigValue('asyncStarterBatchSize', $size);
     }
 
     /**
@@ -340,13 +364,13 @@ abstract class Configuration extends Singleton
      *
      * @param string $domain A domain for which to return configuration options.
      *
-     * @return \Logeecom\Infrastructure\Http\DTO\OptionsDTO[]
+     * @return \Logeecom\Infrastructure\Http\DTO\Options[]
      */
     public function getHttpConfigurationOptions($domain)
     {
         $data = json_decode($this->getConfigValue('httpConfigurationOptions', '[]'), true);
         if (isset($data[$domain])) {
-            return OptionsDTO::fromArrayBatch($data[$domain]);
+            return Options::fromBatch($data[$domain]);
         }
 
         return array();
@@ -357,7 +381,7 @@ abstract class Configuration extends Singleton
      *
      * @param string $domain A domain for which to save configuration options.
      *
-     * @param OptionsDTO[] $options HTTP configuration options
+     * @param Options[] $options HTTP configuration options
      */
     public function setHttpConfigurationOptions($domain, array $options)
     {

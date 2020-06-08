@@ -3,7 +3,7 @@
 namespace Logeecom\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
@@ -116,9 +116,10 @@ abstract class HttpClient
      *
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
-     * @param array|null $headers [Optional] Request headers to send. Key as header name and value as header content.
-     * @param string $body [Optional] Request payload. String data to send as HTTP request payload. Default value for
-     *      a request body is '1' to ensure a minimal request data in a case of POST, PUT, PATCH methods.
+     * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
+     * @param string $body Request payload. String data to send as HTTP request payload. Optional. Default value for
+     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods.
+     *
      */
     public function requestAsync($method, $url, $headers = array(), $body = '1')
     {
@@ -193,11 +194,9 @@ abstract class HttpClient
      *
      * @param string $method HTTP method (GET, POST, PUT, DELETE etc.)
      * @param string $url Request URL. Full URL where request should be sent.
-     * @param array|null $headers [Optional] Request headers to send. Key as header name and value as header content.
-     * @param string $body [Optional] Request payload. String data to send as HTTP request payload. Default value for
-     *     request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods. This will ensure
-     *     that we have the upload progress and enable the async request termination as soon as the upload is finished
-     *     without waiting for a response (without downloading a body or relaying on a fixed request timeout).
+     * @param array|null $headers Request headers to send. Key as header name and value as header content. Optional.
+     * @param string $body Request payload. String data to send as HTTP request payload. Optional.  Default value for
+     * request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods.
      */
     abstract protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '1');
 
@@ -208,7 +207,9 @@ abstract class HttpClient
      * @param string $url Request URL.
      *
      * @return array
-     *      Array of additional options combinations. Each array item should be an array of OptionsDTO instances.
+     *  Array of additional options combinations. Each array item should be an array of Options instances.
+     *
+     * @noinspection PhpUnusedParameterInspection
      */
     protected function getAutoConfigurationOptionsCombinations($method, $url)
     {
@@ -221,7 +222,7 @@ abstract class HttpClient
      * Save additional options for request.
      *
      * @param string $domain A domain for which to set configuration options.
-     * @param OptionsDTO[] $options Additional options to add to HTTP request.
+     * @param Options[] $options Additional options to add to HTTP request.
      */
     protected function setAdditionalOptions($domain, $options)
     {
@@ -273,7 +274,6 @@ abstract class HttpClient
     private function isRequestSuccessful($method, $url, $headers = array(), $body = '')
     {
         try {
-            /** @var HttpResponse $response */
             $response = $this->request($method, $url, $headers, $body);
         } catch (HttpCommunicationException $ex) {
             $response = null;

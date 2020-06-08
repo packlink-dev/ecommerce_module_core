@@ -233,7 +233,7 @@ class LocationServiceTest extends BaseTestWithServices
      * @param float $basePrice
      * @param bool $isDropOff
      *
-     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     * @return \Logeecom\Infrastructure\Data\DataTransferObject|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
      */
     private function getShippingServiceDetails($id, $basePrice = 10.73, $isDropOff = true)
     {

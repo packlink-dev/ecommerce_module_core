@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class LocationInfo.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class LocationInfo extends BaseDto
+class LocationInfo extends DataTransferObject
 {
     /**
      * Id.
@@ -53,11 +53,11 @@ class LocationInfo extends BaseDto
     {
         $result = new self();
 
-        $result->id = static::getValue($raw, 'id');
-        $result->state = static::getValue($raw, 'state');
-        $result->city = static::getValue($raw, 'city');
-        $result->zipcode = static::getValue($raw, 'zipcode');
-        $result->text = static::getValue($raw, 'text');
+        $result->id = static::getDataValue($raw, 'id');
+        $result->state = static::getDataValue($raw, 'state');
+        $result->city = static::getDataValue($raw, 'city');
+        $result->zipcode = static::getDataValue($raw, 'zipcode');
+        $result->text = static::getDataValue($raw, 'text');
 
         return $result;
     }

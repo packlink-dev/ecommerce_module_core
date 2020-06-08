@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class Analytics.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class Analytics extends BaseDto
+class Analytics extends DataTransferObject
 {
     const EVENT_SETUP = 'setup';
     const EVENT_CONFIGURATION = 'api_configuration';

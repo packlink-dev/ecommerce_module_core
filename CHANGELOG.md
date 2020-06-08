@@ -3,7 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [2.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.12...v2.1.0)
+** BREAKING CHANGES **
+
+### Added
+- Added a socket http client for async requests
+- Added task execution priority
+- Added async batch starter
+- Added task runner keep alive mechanism
+- Added batch task cleanup task
+
+### Changed
+- Changed when the schedules are created 
+- BaseDto is deprecated
 
 ## [2.0.12](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.11...v2.0.12) - 2020-05-25
 ### Changed

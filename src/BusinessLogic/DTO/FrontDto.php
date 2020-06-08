@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\DTO;
 
+use Logeecom\Infrastructure\Data\DataTransferObject;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 
 /**
@@ -9,7 +10,7 @@ use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
  *
  * @package Packlink\BusinessLogic\DTO
  */
-abstract class FrontDto extends BaseDto
+abstract class FrontDto extends DataTransferObject
 {
     /**
      * Fully qualified name of this class.

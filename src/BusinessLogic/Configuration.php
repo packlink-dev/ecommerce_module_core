@@ -23,11 +23,62 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     const DEFAULT_SCHEDULER_QUEUE_NAME = 'SchedulerCheckTaskQueue';
     /**
+     * Default task retention time expressed in days. After this time tasks are not necesseary any more in the system.
+     */
+    const DEFAULT_MAX_TASK_AGE = 7;
+    /**
      * Singleton instance of this class.
      *
      * @var static
      */
     protected static $instance;
+
+    /**
+     * Retrieves max task age in days. Tasks older than the given number of days are no longer needed in the system.
+     *
+     * @return int Max task age in days.
+     */
+    public function getMaxTaskAge()
+    {
+        return $this->getConfigValue('maxTaskAge', self::DEFAULT_MAX_TASK_AGE);
+    }
+
+    /**
+     * Sets max task age.
+     *
+     * @param int $maxAge Positive integer. Denotes max task age in days.
+     */
+    public function setMaxTaskAge($maxAge)
+    {
+        $this->saveConfigValue('maxTaskAge', $maxAge);
+    }
+
+    /**
+     * Checks if any shipment has been created on Packlink.
+     *
+     * @return bool True if a shipment has been created; FALSE otherwise.
+     */
+    public function isFirstShipmentDraftCreated()
+    {
+        $value = $this->getConfigValue('isFirstShipmentDraftCreated');
+
+        // If the value is null, that implies that the user has been registered
+        // before tracking of this flag has been implemented.
+        // For such users we will return true,
+        // since this flag is used to enqueue schedules if its value is false, and already registered
+        // users have schedules since the schedules are created when they've registered in the app.
+        return ($value || $value === null);
+    }
+
+    /**
+     * Sets the flag that indicates that the first shipment has been created to true.
+     *
+     * @param bool $status
+     */
+    public function setFirstShipmentDraftCreated($status = true)
+    {
+        $this->saveConfigValue('isFirstShipmentDraftCreated', $status);
+    }
 
     /**
      * Returns web-hook callback URL for current system.
@@ -242,5 +293,21 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     public function isSetupFinished()
     {
         return $this->getConfigValue('setupFinished') ?: false;
+    }
+
+    /**
+     * Determines whether the configuration entry is system specific.
+     *
+     * @param string $name Configuration entry name.
+     *
+     * @return bool
+     */
+    protected function isSystemSpecific($name)
+    {
+        if ($name === 'maxTaskAge') {
+            return false;
+        }
+
+        return parent::isSystemSpecific($name);
     }
 }

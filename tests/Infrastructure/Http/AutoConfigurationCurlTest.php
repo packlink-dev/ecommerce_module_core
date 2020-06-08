@@ -6,7 +6,7 @@ namespace Logeecom\Tests\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Http\AutoConfiguration;
 use Logeecom\Infrastructure\Http\CurlHttpClient;
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestCurlHttpClient;
@@ -81,7 +81,7 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
             $this->getResponse(200),
         );
         $this->httpClient->setMockResponses($responses);
-        $additionalOptionsCombination = array(new OptionsDTO(CurlHttpClient::SWITCH_PROTOCOL, true));
+        $additionalOptionsCombination = array(new Options(CurlHttpClient::SWITCH_PROTOCOL, true));
 
         $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
         $success = $controller->start();
@@ -118,9 +118,9 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
         );
         $this->httpClient->setMockResponses($responses);
         $additionalOptionsCombination = array(
-            new OptionsDTO(CurlHttpClient::SWITCH_PROTOCOL, true),
-            new OptionsDTO(CURLOPT_FOLLOWLOCATION, false),
-            new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6),
+            new Options(CurlHttpClient::SWITCH_PROTOCOL, true),
+            new Options(CURLOPT_FOLLOWLOCATION, false),
+            new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6),
         );
 
         $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);

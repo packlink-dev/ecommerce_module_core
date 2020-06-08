@@ -5,7 +5,7 @@
 
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents;
 
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\HttpClient;
 
@@ -89,8 +89,8 @@ class TestHttpClient extends HttpClient
         if (empty($this->autoConfigurationCombinations)) {
             $this->setAdditionalOptionsCombinations(
                 array(
-                    array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4)),
-                    array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6)),
+                    array(new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4)),
+                    array(new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6)),
                 )
             );
         }
@@ -112,7 +112,7 @@ class TestHttpClient extends HttpClient
      * Save additional options for request.
      *
      * @param string $domain A domain for which to reset configuration options.
-     * @param OptionsDTO[] $options Additional option to add to HTTP request.
+     * @param Options[] $options Additional option to add to HTTP request.
      */
     protected function setAdditionalOptions($domain, $options)
     {

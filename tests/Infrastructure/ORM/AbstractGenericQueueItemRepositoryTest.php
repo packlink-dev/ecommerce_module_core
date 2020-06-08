@@ -2,9 +2,11 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
+use DateTime;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
@@ -44,28 +46,25 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testRegisteredRepositories
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueueItemMassInsert()
     {
-        $repository = RepositoryRegistry::getQueueItemRepository();
-
-        foreach ($this->readQueueItemsFromFile() as $entity) {
-            $id = $repository->save($entity);
+        $insertedIds = $this->insertQueueItems();
+        foreach ($insertedIds as $id) {
             $this->assertGreaterThan(0, $id);
         }
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testUpdate()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
         $queryFilter->where('taskType', '=', 'FooTask');
@@ -86,25 +85,25 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryAllQueueItems()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
 
         $this->assertCount($this->queueItemCount, $repository->select());
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryWithFiltersString()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
         $queryFilter->where('taskType', '=', 'FooTask');
@@ -117,13 +116,13 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryWithFiltersInt()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
         $queryFilter->where('lastExecutionProgress', '>', 0);
@@ -140,16 +139,16 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testQueryWithFiltersAndSort()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('queueTime', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
+        $queryFilter->where('queueTime', '<', DateTime::createFromFormat('Y-m-d', '2017-07-01'));
         $queryFilter->orderBy('queueTime', 'DESC');
 
         $results = $repository->select($queryFilter);
@@ -157,16 +156,16 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testQueryWithFiltersAndLimit()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
-        $queryFilter->where('queueTime', '<', \DateTime::createFromFormat('Y-m-d', '2017-07-01'));
+        $queryFilter->where('queueTime', '<', DateTime::createFromFormat('Y-m-d', '2017-07-01'));
         $queryFilter->setLimit(5);
 
         $results = $repository->select($queryFilter);
@@ -174,21 +173,19 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testQueueItemMassInsert
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testFindOldestQueuedItems()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
 
-        $this->assertCount(2, $repository->findOldestQueuedItems());
-        $this->assertTrue(true);
+        $this->assertCount(1, $repository->findOldestQueuedItems(Priority::LOW));
+        $this->assertCount(1, $repository->findOldestQueuedItems(Priority::NORMAL));
     }
 
     /**
-     * @depends testQueueItemMassInsert
-     *
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
@@ -198,6 +195,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
      */
     public function testSaveWithCondition()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
         $queryFilter->where('lastUpdateTimestamp', '=', 1493851325);
@@ -223,8 +221,6 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @depends testQueueItemMassInsert
-     *
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
@@ -234,6 +230,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
      */
     public function testSaveWithConditionWithNull()
     {
+        $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
         $queryFilter = new QueryFilter();
         $queryFilter->where('lastUpdateTimestamp', '=', 1518325751);
@@ -285,6 +282,22 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
+     * @return array
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    protected function insertQueueItems()
+    {
+        $repository = RepositoryRegistry::getQueueItemRepository();
+        $ids = array();
+        foreach ($this->readQueueItemsFromFile() as $entity) {
+            $ids[] = $repository->save($entity);
+        }
+
+        return $ids;
+    }
+
+    /**
      * Reads test data fixtures about queue items from file
      *
      * @return QueueItem[]
@@ -315,6 +328,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
             $queueItem->setLastUpdateTimestamp($item['lastUpdateTimestamp']);
             $queueItem->setFinishTimestamp($item['finishTimestamp']);
             $queueItem->setFailTimestamp($item['failTimestamp']);
+            $queueItem->setPriority($item['priority']);
 
             $queueItems[] = $queueItem;
         }
