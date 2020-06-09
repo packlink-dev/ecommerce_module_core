@@ -13,8 +13,7 @@ class Composer
 
         $map = array(
             $fromBase . 'js' => $toBase . 'js',
-            $fromBase . 'LocationPicker/js' => $toBase . 'js/location',
-            $fromBase . 'LocationPicker/css' => $toBase . 'css/location',
+            $fromBase . 'css' => $toBase . 'css',
             $fromBase . 'img' => $toBase . 'images',
         );
 

@@ -1,0 +1,126 @@
+@font-face {
+    font-weight: 700;
+    font-family: pl-proxima-nova;
+    font-style: normal;
+    src: url(https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-BoldWeb.woff) format("woff")
+}
+
+@font-face {
+    font-weight: 600;
+    font-family: pl-proxima-nova;
+    font-style: normal;
+    src: url(https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-SemiboldWeb.woff) format("woff")
+}
+
+@font-face {
+    font-weight: 400;
+    font-family: pl-proxima-nova;
+    font-style: normal;
+    src: url(https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-RegularWeb.woff) format("woff")
+}
+
+/* color and style guide
+ *************************
+ COLORS:
+   primary-blue: #2195f2;
+   login-footer: #2e4265;
+   borders:
+     gray-border: #e9eae8
+     gray-border-light: #d7d7d7
+     gray-border-control: #f5f5f5
+   font:
+     regular-text: #3a3d46
+     page-title: #5d5d5d
+     section-title: #5e6972
+     control-label: #9b9b9b
+     input-text: #191919
+     primary-button: #ffffff
+     disabled-button: control-label
+     white-button: login-footer
+     link: #57b3f8
+
+   button:
+     primary-back: primary-blue
+     disabled-back: #e1e1e1
+ */
+
+/* CSS reset */
+/* We do not reset the html and body, since we need to reset only for the app's root element #pl-page */
+#pl-page {
+    display: flex;
+    flex-direction: column;
+}
+
+#pl-page template {
+    display: none;
+}
+
+#pl-page * {
+    margin: 0;
+    padding: 0;
+    font-family: pl-proxima-nova sans-serif;
+    font-size: 100%;
+    vertical-align: baseline;
+    color: #3a3d46;
+}
+
+#pl-page *, #pl-page *::before, #pl-page *::after {
+    box-sizing: border-box;
+}
+
+#pl-page h1, #pl-page h2, #pl-page h3, #pl-page h4, #pl-page h5, #pl-page h6 {
+    font-size: 100%;
+    font-weight: normal
+}
+
+#pl-page ul, #pl-page ol {
+    list-style: none
+}
+
+#pl-page img {
+    height: auto;
+    max-width: 100%
+}
+
+#pl-page table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+#pl-page td:not([align]), #pl-page th:not([align]) {
+    text-align: left
+}
+
+#pl-page a, #pl-page :link, #pl-page :visited {
+    text-decoration: none;
+}
+
+/* Styles start here */
+#pl-page .pl-main-logo {
+    width: 200px;
+}
+
+#pl-page > header {
+    border-bottom: 2px solid #e9eae8;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+#pl-page > main {
+    flex-grow: 1;
+}
+
+#pl-page .pl-sub-header {
+
+}
+
+/* mobile rules */
+@media screen and (max-width: 768px) {
+
+}
+
+/* tablet rules */
+@media screen and (min-width: 769px) and (max-width: 1280px) {
+
+}

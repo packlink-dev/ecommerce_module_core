@@ -5,8 +5,7 @@ var Packlink = window.Packlink || {};
      * Main controller of the application.
      *
      * @param {{
-     *      sidebarButtons: array,
-     *      submenuItems: array,
+     *      pagePlaceholder: string,
      *      pageConfiguration: array,
      *      scrollConfiguration: {scrollOffset: number, rowHeight: number},
      *      hasTaxConfiguration: boolean,
@@ -37,15 +36,7 @@ var Packlink = window.Packlink || {};
      *      orderStatusMappingsSaveUrl: string,
      *      orderStatusMappingsGetUrl: string,
      *      getShippingCountriesUrl: string,
-     *      templates: {
-     *          'required': {
-     *              'pl-login-page': InnerHTML,
-     *              'pl-register-page': InnerHTML
-     *          },
-     *          'extensionPoints': {
-     *              'extensionPointId': InnerHTML
-     *          }
-     *      }
+     *      templates: {}
      * }} configuration
      *
      * @constructor
@@ -53,27 +44,6 @@ var Packlink = window.Packlink || {};
     function StateController(configuration) {
         let pageControllerFactory = Packlink.pageControllerFactory;
         let ajaxService = Packlink.ajaxService;
-
-        let sidebarButtons = [
-            'shipping-methods',
-            'basic-settings'
-        ];
-
-        if (typeof configuration.sidebarButtons !== 'undefined') {
-            sidebarButtons = sidebarButtons.concat(configuration.sidebarButtons);
-        }
-
-        let submenuItems = [
-            'order-state-mapping',
-            'default-parcel',
-            'default-warehouse'
-        ];
-
-        if (typeof configuration.submenuItems !== 'undefined') {
-            submenuItems = submenuItems.concat(configuration.submenuItems);
-        }
-
-        let sidebarController = new Packlink.SidebarController(navigate, sidebarButtons, submenuItems);
         let utilityService = Packlink.utilityService;
         let templateService = Packlink.templateService;
         let context = '';
@@ -127,13 +97,13 @@ var Packlink = window.Packlink || {};
         }
 
         this.display = function () {
-            Object.values(configuration.templates).forEach((value) => {
-                for (let [templateId, innerHtml] of Object.entries(value)) {
-                    templateService.populateTemplate(templateId, innerHtml);
-                }
-            });
+            if (configuration.pagePlaceholder) {
+                templateService.setMainPlaceholder(configuration.pagePlaceholder);
+            }
 
-            pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
+            templateService.setTemplates(configuration.templates);
+
+            //pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
             ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
         };
@@ -197,14 +167,14 @@ var Packlink = window.Packlink || {};
          * @param event
          */
         function navigate(event) {
-            let state = event.target.getAttribute('data-pl-sidebar-btn');
-            sidebarController.setState(state);
-            if (state !== 'basic-settings') {
-                utilityService.disableInputMask();
-
-                let controller = pageControllerFactory.getInstance(state, getControllerConfiguration(state));
-                controller.display();
-            }
+            // let state = event.target.getAttribute('data-pl-sidebar-btn');
+            // sidebarController.setState(state);
+            // if (state !== 'basic-settings') {
+            //     utilityService.disableInputMask();
+            //
+            //     let controller = pageControllerFactory.getInstance(state, getControllerConfiguration(state));
+            //     controller.display();
+            // }
         }
 
         function getControllerConfiguration(controller, fromStep) {

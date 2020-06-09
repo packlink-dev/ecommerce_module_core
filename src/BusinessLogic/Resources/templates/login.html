@@ -1,46 +1,41 @@
 <div class="pl-login-page">
-    <div class="pl-login-page-side-img-wrapper pl-collapse">
-        <img src="" class="pl-login-icon" alt="Packlink PRO Shipping">
-    </div>
     <div class="pl-login-page-content-wrapper">
         <div class="pl-login-form-header">
             <div class="pl-login-form-title-wrapper">
-                login.welcome
+                {$login.welcome}
             </div>
             <div class="pl-login-form-text-wrapper">
-                login.connectYourService <strong>login.settings</strong> login.section
-                <strong>login.proApiKey</strong>
+                {$login.connectYourService}
             </div>
         </div>
         <p class="pl-login-error-msg" id="pl-login-error-msg">
-            login.apiKeyIncorrect
+            {$login.apiKeyIncorrect}
         </p>
         <form method="POST" name="plLoginForm" id="pl-login-form">
             <div class="pl-login-form-wrapper">
-                <fieldset class="form-group pl-form-section-input pl-text-input">
-                    <input aria-label="" type="text" class="form-control" id="pl-login-api-key" name="apiKey" required/>
-                    <span class="pl-text-input-label" id="pl-login-api-key-label">
-                            login.apiKey <br>
-                            ASD-0000 0000 0000 0000
-                        </span>
-                </fieldset>
+                <div class="form-group pl-form-section-input pl-text-input">
+                    <label for="pl-login-api-key" class="pl-text-input-label" id="pl-login-api-key-label">
+                        {$login.apiKey}
+                    </label>
+                    <input type="text" class="form-control" id="pl-login-api-key" name="apiKey" required/>
+                </div>
             </div>
             <div>
                 <button type="submit" name="login" class="button button-primary button-login">
-                    login.validateApiKey
+                    {$login.validateApiKey}
                 </button>
             </div>
         </form>
         <div class="pl-register-button-wrapper">
             <div class="">
-                login.dontHaveAccount
+                {$login.dontHaveAccount}
             </div>
             <div class="">
-                login.chooseYourCountry
+                {$login.chooseYourCountry}
             </div>
             <div>
                 <button type="submit" name="register" class="button button-primary button-register">
-                    login.registerMe
+                    {$login.registerMe}
                 </button>
             </div>
         </div>

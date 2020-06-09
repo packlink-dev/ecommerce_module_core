@@ -20,12 +20,9 @@ var Packlink = window.Packlink || {};
         this.display = function () {
             templateService.setCurrentTemplate(templateId);
 
-            let loginPage = templateService.getComponent('pl-login-page');
+            let loginPage = templateService.getMainPage();
 
-            templateService.getComponent('pl-login-form', loginPage).addEventListener(
-                'submit',
-                login
-            );
+            templateService.getComponent('pl-login-form', loginPage).addEventListener('submit', login);
         };
 
         /**

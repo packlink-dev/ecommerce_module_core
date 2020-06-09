@@ -3,25 +3,27 @@ var Packlink = window.Packlink || {};
 (function () {
     function TemplateService() {
         /**
-         * Retrieves template children by template id.
-         *
-         * @param {string} template
-         * @return {HTMLCollection | null}
+         * The configuration object for all templates
+         * @type {{}}
          */
-        this.getTemplate = function (template) {
-            let temp = document.getElementById(template);
+        let templates = {};
+        let mainPlaceholder = '#pl-main-page-holder';
 
-            if (!temp) {
-                return null;
-            }
-
-            let clone = temp.cloneNode(true);
-
-            return clone.children;
+        this.setMainPlaceholder = function (placeholder) {
+            mainPlaceholder = placeholder;
         };
 
         /**
-         * Retrieves component by it's id or attribute.
+         * Gets the main page DOM element.
+         *
+         * @returns {Element}
+         */
+        this.getMainPage = function () {
+            return document.querySelector(mainPlaceholder);
+        };
+
+        /**
+         * Retrieves component by its id or attribute.
          *
          * @param {string} component
          * @param {Element} [element]
@@ -30,11 +32,11 @@ var Packlink = window.Packlink || {};
          * @return {Element}
          */
         this.getComponent = function (component, element, attribute) {
-            if (typeof element === 'undefined') {
+            if (!element) {
                 return document.getElementById(component);
             }
 
-            if (typeof attribute === 'undefined') {
+            if (!attribute) {
                 return element.querySelector('#' + component);
             }
 
@@ -52,7 +54,7 @@ var Packlink = window.Packlink || {};
         this.getComponentsByAttribute = function (attribute, element) {
             let selector = '[' + attribute + ']';
 
-            if (typeof element === 'undefined') {
+            if (!element) {
                 return document.querySelectorAll(selector);
             }
 
@@ -67,9 +69,10 @@ var Packlink = window.Packlink || {};
          * @param {boolean} [clearExtensionPoint=true]
          *
          * @return {Element}
+         * @deprecated Do not use since it is not updated to the latest template format.
          */
         this.setTemplate = function (template, extensionPointIdentifier, clearExtensionPoint) {
-            if (typeof extensionPointIdentifier === 'undefined') {
+            if (!extensionPointIdentifier) {
                 extensionPointIdentifier = 'pl-content-extension-point';
             }
 
@@ -92,44 +95,27 @@ var Packlink = window.Packlink || {};
         };
 
         /**
-         * Populates the template with the provided inner HTML.
+         * Populates the template with the provided HTML for page elements.
          *
-         * @param templateId
-         * @param innerHTML
-         *
-         * @returns {string}
+         * @param {{}} configuration
          */
-        this.populateTemplate = function (templateId, innerHTML) {
-            let temp = document.getElementById(templateId);
-
-            if (!temp) {
-                return '';
-            }
-
-            temp.innerHTML = innerHTML;
+        this.setTemplates = function (configuration) {
+            templates = configuration;
         };
 
         /**
-         * Sets current template visible.
+         * Sets current template in the page.
          *
-         * @param templateId
-         *
-         * @returns {string}
+         * @param {string} templateId
          */
         this.setCurrentTemplate = function (templateId) {
-            let temp = document.getElementById(templateId);
+            for (let [extensionPointId, html] of Object.entries(templates[templateId])) {
+                const component = this.getComponent(extensionPointId);
 
-            if (!temp) {
-                return '';
+                if (component) {
+                    component.innerHTML = html ? replaceTranslations(html) : '';
+                }
             }
-
-            let visiblePages = document.querySelectorAll('.pl-page-visible');
-
-            visiblePages.forEach(function (page) {
-                page.classList.remove('pl-page-visible');
-            });
-
-            temp.classList.add('pl-page-visible');
         };
 
         /**
@@ -152,7 +138,7 @@ var Packlink = window.Packlink || {};
         this.setError = function (input, message) {
             this.removeError(input);
 
-            let errorTemplate = this.getTemplate('pl-error-template')[0];
+            let errorTemplate = this.getComponent('pl-error-template');
             let msgField = this.getComponent('pl-error-text', errorTemplate);
             msgField.innerHTML = message;
             input.after(errorTemplate);
@@ -172,6 +158,25 @@ var Packlink = window.Packlink || {};
 
             input.classList.remove('pl-error');
         };
+
+        /**
+         * Replaces the translations in every node of the given element. The replacements are done inline.
+         *
+         * @param {string} template
+         */
+        function replaceTranslations(template) {
+            // Replace the placeholders for translations. They are in the format {$key|param1|param2}.
+            let format = /{\$[.A-Za-z|]+}/g;
+
+            return template.replace(format, function (key) {
+                // remove the placeholder characters to get "key|param1|param2"
+                key = key.substr(2, key.length - 3);
+                // split parameters
+                let params = key.split('|');
+
+                return Packlink.translationService.translate(params[0], params.slice(1)) || key;
+            });
+        }
     }
 
     Packlink.templateService = new TemplateService();

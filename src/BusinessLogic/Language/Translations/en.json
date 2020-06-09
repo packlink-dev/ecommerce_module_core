@@ -18,12 +18,9 @@
   "login": {
     "apiKey": "Api key",
     "apiKeyIncorrect": "API key was incorrect.",
-    "dontHaveAccount?": "Don't have an account?",
+    "dontHaveAccount": "Don't have an account?",
     "welcome": "Welcome to Packlink PRO",
-    "connectYourService": "Connect your service using your key. You'll find it in the",
-    "settings": "\"Settings\"",
-    "section": "section of",
-    "proApiKey": "\"Packlink Pro API Key\"",
+    "connectYourService": "Connect your service using your key. You'll find it in the <strong>\"Packlink Pro API Key\"</strong> section of the <strong>\"Settings\"</strong>.",
     "validateApiKey": "Validate API key",
     "chooseYourCountry": "Choose your country to start the registration process",
     "registerMe": "Register me"

@@ -15,6 +15,10 @@ var Packlink = window.Packlink || {};
         this.display = function () {
             footer = templateService.getComponent('pl-footer-extension-point');
             let templateComponents = templateService.getTemplate('pl-footer-template');
+            if (!templateComponents) {
+                return;
+            }
+
             for (let component of templateComponents) {
                 footer.appendChild(component);
             }
