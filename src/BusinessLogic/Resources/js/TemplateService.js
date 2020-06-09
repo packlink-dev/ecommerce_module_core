@@ -113,7 +113,7 @@ var Packlink = window.Packlink || {};
                 const component = this.getComponent(extensionPointId);
 
                 if (component) {
-                    component.innerHTML = html ? replaceTranslations(html) : '';
+                    component.innerHTML = html ? Packlink.translationService.translateHtml(html) : '';
                 }
             }
         };
@@ -158,25 +158,6 @@ var Packlink = window.Packlink || {};
 
             input.classList.remove('pl-error');
         };
-
-        /**
-         * Replaces the translations in every node of the given element. The replacements are done inline.
-         *
-         * @param {string} template
-         */
-        function replaceTranslations(template) {
-            // Replace the placeholders for translations. They are in the format {$key|param1|param2}.
-            let format = /{\$[.A-Za-z|]+}/g;
-
-            return template.replace(format, function (key) {
-                // remove the placeholder characters to get "key|param1|param2"
-                key = key.substr(2, key.length - 3);
-                // split parameters
-                let params = key.split('|');
-
-                return Packlink.translationService.translate(params[0], params.slice(1)) || key;
-            });
-        }
     }
 
     Packlink.templateService = new TemplateService();

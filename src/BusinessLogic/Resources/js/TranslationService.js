@@ -43,6 +43,27 @@ var Packlink = window.Packlink || {};
         };
 
         /**
+         * Replaces the translations in the given HTML code.
+         *
+         * @param {string} html
+         * @return {string} The updated HTML.
+         */
+        this.translateHtml = function (html) {
+            // Replace the placeholders for translations. They are in the format {$key|param1|param2}.
+            let format = /{\$[.A-Za-z|]+}/g;
+            const me = this;
+
+            return html.replace(format, function (key) {
+                // remove the placeholder characters to get "key|param1|param2"
+                key = key.substr(2, key.length - 3);
+                // split parameters
+                let params = key.split('|');
+
+                return me.translate(params[0], params.slice(1)) || key;
+            });
+        }
+
+        /**
          * Gets the translation from the dictionary if exists.
          *
          * @param {string} type 'default' or 'current'
@@ -58,6 +79,13 @@ var Packlink = window.Packlink || {};
             return null;
         }
 
+        /**
+         * Replaces the parameters in the given text, if any.
+         *
+         * @param {string} text
+         * @param {[]} params
+         * @return {string}
+         */
         function replaceParams(text, params) {
             if (!params) {
                 return text;
