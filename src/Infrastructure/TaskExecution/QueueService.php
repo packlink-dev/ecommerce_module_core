@@ -2,6 +2,7 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
+use BadMethodCallException;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -11,6 +12,7 @@ use Logeecom\Infrastructure\TaskExecution\Events\BeforeQueueStatusChangeEvent;
 use Logeecom\Infrastructure\TaskExecution\Events\QueueStatusChangedEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -64,18 +66,21 @@ class QueueService
      *     integration) context based on account id should be provided. Failing to do this will result in global task
      *     context and unpredictable task execution.
      *
+     * @param int | null $priority Null priority falls back to Priority::NORMAL
+     *
      * @return \Logeecom\Infrastructure\TaskExecution\QueueItem Created queue item.
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     *  When queue storage fails to save the item.
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException When queue storage
+     *      fails to save the item.
      */
-    public function enqueue($queueName, Task $task, $context = '')
+    public function enqueue($queueName, Task $task, $context = '', $priority = null)
     {
         $queueItem = new QueueItem($task);
         $queueItem->setStatus(QueueItem::QUEUED);
         $queueItem->setQueueName($queueName);
         $queueItem->setContext($context);
         $queueItem->setQueueTimestamp($this->getTimeProvider()->getCurrentLocalTime()->getTimestamp());
+        $queueItem->setPriority($priority ?: ($task->getPriority() ?: Priority::NORMAL));
 
         $this->save($queueItem, array(), true, QueueItem::CREATED);
 
@@ -258,7 +263,7 @@ class QueueService
     public function updateProgress(QueueItem $queueItem, $progress)
     {
         if ($queueItem->getStatus() !== QueueItem::IN_PROGRESS) {
-            throw new \BadMethodCallException('Progress reported for not started queue item.');
+            throw new BadMethodCallException('Progress reported for not started queue item.');
         }
 
         $lastExecutionProgress = $queueItem->getLastExecutionProgressBasePoints();
@@ -363,6 +368,7 @@ class QueueService
     /**
      * Finds list of earliest queued queue items per queue.
      * Only queues that doesn't have running tasks are taken in consideration.
+     * Returned queue items are ordered in the descending priority.
      *
      * @param int $limit Result set limit. By default max 10 earliest queue items will be returned.
      *
@@ -370,7 +376,21 @@ class QueueService
      */
     public function findOldestQueuedItems($limit = 10)
     {
-        return $this->getStorage()->findOldestQueuedItems($limit);
+        $result = array();
+        $currentLimit = $limit;
+
+        foreach (QueueItem::getAvailablePriorities() as $priority) {
+            $batch = $this->getStorage()->findOldestQueuedItems($priority, $currentLimit);
+            $result[] = $batch;
+
+            if (($currentLimit -= count($batch)) <= 0) {
+                break;
+            }
+        }
+
+        $result = !empty($result) ? call_user_func_array('array_merge', $result) : $result;
+
+        return array_slice($result, 0, $limit);
     }
 
     /**
@@ -505,7 +525,7 @@ class QueueService
      */
     private function throwIllegalTransitionException($fromStatus, $toStatus)
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             sprintf(
                 'Illegal queue item state transition from "%s" to "%s"',
                 $fromStatus,

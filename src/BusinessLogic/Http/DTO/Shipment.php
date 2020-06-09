@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class Shipment.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class Shipment extends BaseDto
+class Shipment extends DataTransferObject
 {
     /**
      * Shipment reference unique identifier.
@@ -112,27 +112,27 @@ class Shipment extends BaseDto
     public static function fromArray(array $raw)
     {
         $shipment = new static();
-        $date = static::getValue($raw, 'order_date');
+        $date = static::getDataValue($raw, 'order_date');
         if ($date) {
             $shipment->orderDate = \DateTime::createFromFormat('Y-m-d', $date);
         }
 
-        $shipment->reference = static::getValue($raw, 'packlink_reference');
-        $shipment->shipmentCustomReference = static::getValue($raw, 'shipment_custom_reference');
-        $shipment->service = static::getValue($raw, 'service');
-        $shipment->serviceId = static::getValue($raw, 'service_id');
-        $shipment->content = static::getValue($raw, 'content');
-        $shipment->carrier = static::getValue($raw, 'carrier');
-        $shipment->status = static::getValue($raw, 'state');
-        $shipment->trackingCodes = static::getValue($raw, 'trackings', array());
-        $shipment->price = static::getValue($raw, 'price', null);
+        $shipment->reference = static::getDataValue($raw, 'packlink_reference');
+        $shipment->shipmentCustomReference = static::getDataValue($raw, 'shipment_custom_reference');
+        $shipment->service = static::getDataValue($raw, 'service');
+        $shipment->serviceId = static::getDataValue($raw, 'service_id');
+        $shipment->content = static::getDataValue($raw, 'content');
+        $shipment->carrier = static::getDataValue($raw, 'carrier');
+        $shipment->status = static::getDataValue($raw, 'state');
+        $shipment->trackingCodes = static::getDataValue($raw, 'trackings', array());
+        $shipment->price = static::getDataValue($raw, 'price', null);
         if (is_array($shipment->price)) {
-            $shipment->price = static::getValue($shipment->price, 'base_price');
+            $shipment->price = static::getDataValue($shipment->price, 'base_price');
         } else {
             $shipment->price = 0.0;
         }
 
-        $shipment->carrierTrackingUrl = static::getValue($raw, 'tracking_url');
+        $shipment->carrierTrackingUrl = static::getDataValue($raw, 'tracking_url');
 
         return $shipment;
     }

@@ -2,10 +2,10 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
+use Exception;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -26,17 +26,15 @@ class TaskRunner
      */
     const WAKEUP_DELAY = 5;
     /**
+     * Defines minimal time in seconds between two consecutive alive since updates.
+     */
+    const TASK_RUNNER_KEEP_ALIVE_PERIOD = 2;
+    /**
      * Runner guid.
      *
      * @var string
      */
     protected $guid;
-    /**
-     * Service.
-     *
-     * @var AsyncProcessStarterService
-     */
-    private $asyncProcessStarter;
     /**
      * Service.
      *
@@ -67,7 +65,18 @@ class TaskRunner
      * @var TaskRunnerWakeup
      */
     private $taskWakeup;
-
+    /**
+     * Defines when was the task runner alive since time step last updated at.
+     *
+     * @var int
+     */
+    private $aliveSinceUpdatedAt = 0;
+    /**
+     * Sleep time in seconds with microsecond precision.
+     *
+     * @var float
+     */
+    private $batchSleepTime = 0.0;
     /**
      * Sets task runner guid.
      *
@@ -84,6 +93,8 @@ class TaskRunner
     public function run()
     {
         try {
+            $this->keepAlive();
+
             $this->logDebug(array('Message' => 'Task runner: lifecycle started.'));
 
             if ($this->isCurrentRunnerAlive()) {
@@ -91,10 +102,12 @@ class TaskRunner
                 $this->startOldestQueuedItems();
             }
 
+            $this->keepAlive();
+
             $this->wakeup();
 
             $this->logDebug(array('Message' => 'Task runner: lifecycle ended.'));
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             $this->logDebug(
                 array(
                     'Message' => 'Fail to run task runner. Unexpected error occurred.',
@@ -121,6 +134,8 @@ class TaskRunner
             return;
         }
 
+        $this->keepAlive();
+
         foreach ($runningItems as $runningItem) {
             if ($this->isItemExpired($runningItem) && $this->isCurrentRunnerAlive()) {
                 $this->logMessageFor($runningItem, 'Task runner: Expired task detected.');
@@ -139,6 +154,8 @@ class TaskRunner
                     );
                 }
             }
+
+            $this->keepAlive();
         }
     }
 
@@ -151,10 +168,11 @@ class TaskRunner
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\ProcessStarterSaveException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     private function startOldestQueuedItems()
     {
+        $this->keepAlive();
+
         $this->logDebug(array('Message' => 'Task runner: available task detection started.'));
 
         // Calculate how many queue items can be started
@@ -167,20 +185,47 @@ class TaskRunner
             return;
         }
 
+        $this->keepAlive();
+
         $items = $this->getQueue()->findOldestQueuedItems($numberOfAvailableSlots);
+
+        $this->keepAlive();
 
         if (!$this->isCurrentRunnerAlive()) {
             return;
         }
 
+        $asyncStarterBatchSize = $this->getConfigurationService()->getAsyncStarterBatchSize();
+        $batchStarter = new AsyncBatchStarter($asyncStarterBatchSize);
         foreach ($items as $item) {
-            if (!$this->isCurrentRunnerAlive()) {
-                return;
-            }
-
-            $this->logMessageFor($item, 'Task runner: Starting async task execution.');
-            $this->getAsyncProcessStarter()->start(new QueueItemStarter($item->getId()));
+            $this->logMessageFor($item, 'Task runner: Adding task to a batch starter for async execution.');
+            $batchStarter->addRunner(new QueueItemStarter($item->getId()));
         }
+
+        $this->keepAlive();
+
+        if (!$this->isCurrentRunnerAlive()) {
+            return;
+        }
+
+        $this->logDebug(array('Message' => 'Task runner: Starting batch starter execution.'));
+        $startTime = $this->getTimeProvider()->getMicroTimestamp();
+        $batchStarter->run();
+        $endTime = $this->getTimeProvider()->getMicroTimestamp();
+
+        $this->keepAlive();
+
+        $averageRequestTime = ($endTime - $startTime) / $asyncStarterBatchSize;
+        $this->batchSleepTime = $batchStarter->getWaitTime($averageRequestTime);
+
+        $this->logDebug(
+            array(
+                'Message' => 'Task runner: Batch starter execution finished.',
+                'ExecutionTime' => ($endTime - $startTime) . 's',
+                'AverageRequestTime' => $averageRequestTime . 's',
+                'StartedItems' => count($items),
+            )
+        );
     }
 
     /**
@@ -192,12 +237,33 @@ class TaskRunner
     private function wakeup()
     {
         $this->logDebug(array('Message' => 'Task runner: starting self deactivation.'));
-        $this->getTimeProvider()->sleep($this->getWakeupDelay());
+
+        for ($i = 0; $i < $this->getWakeupDelay(); $i++) {
+            $this->getTimeProvider()->sleep(1);
+            $this->keepAlive();
+        }
 
         $this->getRunnerStorage()->setStatus(TaskRunnerStatus::createNullStatus());
 
         $this->logDebug(array('Message' => 'Task runner: sending task runner wakeup signal.'));
         $this->getTaskWakeup()->wakeup();
+    }
+
+    /**
+     * Updates alive since time stamp of the task runner.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
+     */
+    private function keepAlive()
+    {
+        $currentTime = $this->getTimeProvider()->getCurrentLocalTime()->getTimestamp();
+        if (($currentTime - $this->aliveSinceUpdatedAt) < self::TASK_RUNNER_KEEP_ALIVE_PERIOD) {
+
+            return;
+        }
+
+        $this->getConfigurationService()->setTaskRunnerStatus($this->guid, $currentTime);
+        $this->aliveSinceUpdatedAt = $currentTime;
     }
 
     /**
@@ -256,23 +322,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see AsyncProcessStarterService service instance.
+     * Gets @return QueueService Queue service instance.
+     * @see QueueService service instance.
      *
-     * @return AsyncProcessStarterService Class instance.
-     */
-    private function getAsyncProcessStarter()
-    {
-        if ($this->asyncProcessStarter === null) {
-            $this->asyncProcessStarter = ServiceRegister::getService(AsyncProcessService::CLASS_NAME);
-        }
-
-        return $this->asyncProcessStarter;
-    }
-
-    /**
-     * Gets @see QueueService service instance.
-     *
-     * @return QueueService Queue service instance.
      */
     private function getQueue()
     {
@@ -284,9 +336,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see TaskRunnerStatusStorageInterface service instance.
+     * Gets @return TaskRunnerStatusStorage Service instance.
+     * @see TaskRunnerStatusStorageInterface service instance.
      *
-     * @return TaskRunnerStatusStorage Service instance.
      */
     private function getRunnerStorage()
     {
@@ -298,9 +350,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see Configuration service instance.
+     * Gets @return Configuration Service instance.
+     * @see Configuration service instance.
      *
-     * @return Configuration Service instance.
      */
     private function getConfigurationService()
     {
@@ -312,9 +364,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see TimeProvider instance.
+     * Gets @return TimeProvider Service instance.
+     * @see TimeProvider instance.
      *
-     * @return TimeProvider Service instance.
      */
     private function getTimeProvider()
     {
@@ -326,9 +378,9 @@ class TaskRunner
     }
 
     /**
-     * Gets @see TaskRunnerWakeupInterface service instance.
+     * Gets @return TaskRunnerWakeup Service instance.
+     * @see TaskRunnerWakeupInterface service instance.
      *
-     * @return TaskRunnerWakeup Service instance.
      */
     private function getTaskWakeup()
     {
@@ -348,7 +400,9 @@ class TaskRunner
     {
         $configurationValue = $this->getConfigurationService()->getTaskRunnerWakeupDelay();
 
-        return $configurationValue !== null ? $configurationValue : self::WAKEUP_DELAY;
+        $minimalSleepTime  = $configurationValue !== null ? $configurationValue : self::WAKEUP_DELAY;
+
+        return $minimalSleepTime + ceil($this->batchSleepTime);
     }
 
     /**

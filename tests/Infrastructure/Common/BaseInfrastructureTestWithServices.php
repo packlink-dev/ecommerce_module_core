@@ -3,6 +3,7 @@
 
 namespace Logeecom\Tests\Infrastructure\Common;
 
+use DateTime;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
@@ -65,7 +66,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
         $me = $this;
 
         $this->timeProvider = new TestTimeProvider();
-        $this->timeProvider->setCurrentLocalTime(new \DateTime());
+        $this->timeProvider->setCurrentLocalTime(new DateTime());
         $this->shopConfig = new TestShopConfiguration();
         $this->shopLogger = new TestShopLogger();
         $this->defaultLogger = new TestDefaultLogger();
@@ -90,7 +91,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
                 },
                 Serializer::CLASS_NAME => function () use ($me) {
                     return $me->serializer;
-                }
+                },
             )
         );
     }

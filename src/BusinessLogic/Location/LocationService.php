@@ -6,7 +6,6 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\DTO\BaseDto;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -144,7 +143,7 @@ class LocationService extends BaseService
     /**
      * Transforms collection of DTOs to an array response.
      *
-     * @param BaseDto[] $collection
+     * @param \Logeecom\Infrastructure\Data\DataTransferObject[] $collection
      *
      * @return array
      */

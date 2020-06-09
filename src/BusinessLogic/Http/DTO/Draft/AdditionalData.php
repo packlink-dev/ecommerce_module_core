@@ -2,13 +2,13 @@
 
 namespace Packlink\BusinessLogic\Http\DTO\Draft;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class AdditionalData
  * @package Packlink\BusinessLogic\Http\DTO\Draft
  */
-class AdditionalData extends BaseDto
+class AdditionalData extends DataTransferObject
 {
     /**
      * Value of the postal zone id corresponding to the origin postal code.

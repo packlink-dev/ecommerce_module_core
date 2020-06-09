@@ -15,7 +15,7 @@ class TaskRunnerStatus
     /**
      * Maximal time allowed for runner instance to stay in alive (running) status in seconds
      */
-    const MAX_ALIVE_TIME = 60;
+    const MAX_ALIVE_TIME = 15;
     /**
      * Identifier of task runner.
      *

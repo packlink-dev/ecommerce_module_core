@@ -80,10 +80,10 @@ class RegistrationLegalPolicy extends FrontDto
         /** @var static $instance */
         $instance = parent::fromArray($raw);
 
-        $instance->isDataProcessingAccepted = static::getValue($raw, 'data_processing');
-        $instance->isTermsAccepted = static::getValue($raw, 'terms_and_conditions');
-        $instance->isMarketingEmailsAccepted = static::getValue($raw, 'marketing_emails');
-        $instance->isMarketingCallsAccepted = static::getValue($raw, 'marketing_calls');
+        $instance->isDataProcessingAccepted = static::getDataValue($raw, 'data_processing');
+        $instance->isTermsAccepted = static::getDataValue($raw, 'terms_and_conditions');
+        $instance->isMarketingEmailsAccepted = static::getDataValue($raw, 'marketing_emails');
+        $instance->isMarketingCallsAccepted = static::getDataValue($raw, 'marketing_calls');
 
         return $instance;
     }

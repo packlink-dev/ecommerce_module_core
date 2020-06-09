@@ -7,7 +7,6 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
@@ -15,14 +14,8 @@ use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
-use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
-use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
-use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
-use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
-use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
@@ -85,6 +78,7 @@ class UserAccountService extends BaseService
         }
 
         $this->createSchedules();
+        $this->getConfigService()->setFirstShipmentDraftCreated(false);
 
         return true;
     }
@@ -226,18 +220,6 @@ class UserAccountService extends BaseService
         $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
 
         $this->scheduleUpdateShipmentServicesTask($repository);
-
-        // Schedule hourly task for updating shipment info - start at full hour
-        $this->scheduleUpdatePendingShipmentsData($repository, 0);
-
-        // Schedule hourly task for updating shipment info - start at half hour
-        $this->scheduleUpdatePendingShipmentsData($repository, 30);
-
-        // Schedule daily task for updating shipment info - start at 11:00 UTC hour
-        $this->scheduleUpdateInProgressShipments($repository, 11);
-
-        // schedule hourly queue cleanup
-        $this->scheduleTaskCleanup($repository);
     }
 
     /**
@@ -253,75 +235,9 @@ class UserAccountService extends BaseService
             $this->getConfigService()->getContext()
         );
 
-        $schedule->setDay(1);
-        $schedule->setHour(2);
-        $schedule->setNextSchedule();
-        $repository->save($schedule);
-    }
-
-    /**
-     * Creates hourly task for updating shipment data for pending shipments.
-     *
-     * @param RepositoryInterface $repository Scheduler repository.
-     * @param int $minute Starting minute for the task.
-     */
-    protected function scheduleUpdatePendingShipmentsData(RepositoryInterface $repository, $minute)
-    {
-        $hourlyStatuses = array(
-            ShipmentStatus::STATUS_PENDING,
-        );
-
-        $schedule = new HourlySchedule(
-            new UpdateShipmentDataTask($hourlyStatuses),
-            $this->getConfigService()->getDefaultQueueName(),
-            $this->getConfigService()->getContext()
-        );
-
-        $schedule->setMinute($minute);
-        $schedule->setNextSchedule();
-        $repository->save($schedule);
-    }
-
-    /**
-     * Creates daily task for updating shipment data for shipments in progress.
-     *
-     * @param RepositoryInterface $repository Schedule repository.
-     * @param int $hour Hour of the day when schedule should be executed.
-     */
-    protected function scheduleUpdateInProgressShipments(RepositoryInterface $repository, $hour)
-    {
-        $dailyStatuses = array(
-            ShipmentStatus::STATUS_IN_TRANSIT,
-            ShipmentStatus::STATUS_READY,
-            ShipmentStatus::STATUS_ACCEPTED,
-        );
-
-        $schedule = new DailySchedule(
-            new UpdateShipmentDataTask($dailyStatuses),
-            $this->getConfigService()->getDefaultQueueName(),
-            $this->getConfigService()->getContext()
-        );
-
-        $schedule->setHour($hour);
-        $schedule->setNextSchedule();
-
-        $repository->save($schedule);
-    }
-
-    /**
-     * Creates hourly task for cleaning up the database queue for completed items.
-     *
-     * @param RepositoryInterface $repository Scheduler repository.
-     */
-    protected function scheduleTaskCleanup(RepositoryInterface $repository)
-    {
-        $schedule = new HourlySchedule(
-            new TaskCleanupTask(ScheduleCheckTask::getClassName(), array(QueueItem::COMPLETED), 3600),
-            $this->getConfigService()->getDefaultQueueName(),
-            $this->getConfigService()->getContext()
-        );
-
-        $schedule->setMinute(10);
+        $schedule->setDay(rand(1, 7));
+        $schedule->setHour(rand(0, 5));
+        $schedule->setMinute(rand(0, 59));
         $schedule->setNextSchedule();
         $repository->save($schedule);
     }

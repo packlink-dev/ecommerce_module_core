@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO\Draft;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class Address.
  *
  * @package Packlink\BusinessLogic\Http\DTO\Draft
  */
-class Address extends BaseDto
+class Address extends DataTransferObject
 {
     /**
      * Name of sender/receiver.

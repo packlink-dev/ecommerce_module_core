@@ -75,7 +75,7 @@ class ScheduleCheckTask extends Task
                     continue;
                 }
 
-                $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext());
+                $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext(), $task->getPriority());
 
                 if ($schedule->isRecurring()) {
                     $schedule->setNextSchedule();

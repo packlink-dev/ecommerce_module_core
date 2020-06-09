@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * This class holds search parameters that are used when searching for services
@@ -10,7 +10,7 @@ use Packlink\BusinessLogic\DTO\BaseDto;
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class ShippingServiceSearch extends BaseDto
+class ShippingServiceSearch extends DataTransferObject
 {
     /**
      * Service ID. Optional.
@@ -115,21 +115,21 @@ class ShippingServiceSearch extends BaseDto
     {
         $instance = new static();
 
-        $instance->serviceId = self::getValue($raw, 'service_id', null);
-        $instance->fromCountry = self::getValue($raw, 'from[country]');
-        $instance->fromZip = self::getValue($raw, 'from[zip]');
-        $instance->toCountry = self::getValue($raw, 'to[country]');
-        $instance->toZip = self::getValue($raw, 'to[zip]');
+        $instance->serviceId = self::getDataValue($raw, 'service_id', null);
+        $instance->fromCountry = self::getDataValue($raw, 'from[country]');
+        $instance->fromZip = self::getDataValue($raw, 'from[zip]');
+        $instance->toCountry = self::getDataValue($raw, 'to[country]');
+        $instance->toZip = self::getDataValue($raw, 'to[zip]');
         $instance->packages = array();
 
         $index = 0;
         while (array_key_exists("packages[$index][height]", $raw)) {
             $package = new Package();
 
-            $package->height = self::getValue($raw, "packages[$index][height]");
-            $package->width = self::getValue($raw, "packages[$index][width]");
-            $package->length = self::getValue($raw, "packages[$index][length]");
-            $package->weight = self::getValue($raw, "packages[$index][weight]");
+            $package->height = self::getDataValue($raw, "packages[$index][height]");
+            $package->width = self::getDataValue($raw, "packages[$index][width]");
+            $package->length = self::getDataValue($raw, "packages[$index][length]");
+            $package->weight = self::getDataValue($raw, "packages[$index][weight]");
 
             $instance->packages[] = $package;
             $index++;

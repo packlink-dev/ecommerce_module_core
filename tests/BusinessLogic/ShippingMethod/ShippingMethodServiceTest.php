@@ -361,7 +361,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
     /**
      * @param int $id
      *
-     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingService
+     * @return \Logeecom\Infrastructure\Data\DataTransferObject |\Packlink\BusinessLogic\Http\DTO\ShippingService
      */
     private function getShippingService($id)
     {
@@ -382,7 +382,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
      * @param int $id
      * @param string $carrierName
      *
-     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     * @return \Logeecom\Infrastructure\Data\DataTransferObject|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
      */
     private function getShippingServiceDetails($id, $carrierName = 'test carrier')
     {

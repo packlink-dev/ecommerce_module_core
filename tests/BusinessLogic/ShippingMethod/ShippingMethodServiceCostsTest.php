@@ -867,7 +867,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
      * @param bool $destinationDropOff
      * @param float $basePrice
      *
-     * @return \Packlink\BusinessLogic\DTO\BaseDto|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     * @return \Logeecom\Infrastructure\Data\DataTransferObject |\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
      */
     private function getShippingServiceDetails(
         $id,

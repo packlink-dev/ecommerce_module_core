@@ -2,6 +2,8 @@
 
 namespace Logeecom\Infrastructure\ORM\QueryFilter;
 
+use DateTime;
+
 /**
  * Class Condition
  * @package Logeecom\Infrastructure\ORM\QueryFilter
@@ -45,7 +47,7 @@ class QueryCondition
         $this->value = $value;
 
         $this->valueType = gettype($value);
-        if ($this->valueType === 'object' && $value instanceof \DateTime) {
+        if ($this->valueType === 'object' && $value instanceof DateTime) {
             $this->valueType = 'dateTime';
         }
     }

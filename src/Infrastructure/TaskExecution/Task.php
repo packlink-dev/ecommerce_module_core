@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Serializer\Interfaces\Serializable;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
 use Logeecom\Infrastructure\Utility\Events\EventEmitter;
@@ -66,6 +67,16 @@ abstract class Task extends EventEmitter implements Serializable
     {
         // This method was intentionally left blank because
         // this task doesn't have any properties which needs to encapsulate.
+    }
+
+    /**
+     * Retrieves task priority.
+     *
+     * @return int Task priority.
+     */
+    public function getPriority()
+    {
+        return Priority::NORMAL;
     }
 
     /**
