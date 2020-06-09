@@ -153,6 +153,8 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
+        RepositoryRegistry::registerRepository(Schedule::getClassName(), MemoryRepository::getClassName());
+
         $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
@@ -186,6 +188,42 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
         $this->assertEquals(QueueItem::QUEUED, $draftStatus->status);
         $this->assertEmpty($draftStatus->message);
+    }
+
+    public function testSchedulesCreated()
+    {
+        // arrange
+        $this->shopConfig->setFirstShipmentDraftCreated(false);
+
+        // act
+        $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
+
+        // assert
+        $schedules = $this->getScheduleRepository()->select();
+        $this->assertCount(3, $schedules);
+    }
+
+    public function testSchedulesNotCreated()
+    {
+        // arrange
+        $this->shopConfig->setFirstShipmentDraftCreated(true);
+
+        // act
+        $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
+
+        // assert
+        $schedules = $this->getScheduleRepository()->select();
+        $this->assertCount(0, $schedules);
+    }
+
+    public function testSchedulesNotCreatedForCurrentUsers()
+    {
+        // act
+        $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
+
+        // assert
+        $schedules = $this->getScheduleRepository()->select();
+        $this->assertCount(0, $schedules);
     }
 
     /**
@@ -286,6 +324,11 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
         $this->assertEquals(QueueItem::FAILED, $draftStatus->status);
         $this->assertEquals('Attempt 7: Error in task.', $draftStatus->message);
+    }
+
+    private function getScheduleRepository()
+    {
+        return RepositoryRegistry::getRepository(Schedule::getClassName());
     }
 
     /**

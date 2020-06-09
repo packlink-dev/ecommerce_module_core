@@ -87,9 +87,9 @@ class Country extends FrontDto
         /** @var static $instance */
         $instance = parent::fromArray($raw);
 
-        $instance->postalCode = static::getValue($raw, 'postal_code');
-        $instance->registrationLink = static::getValue($raw, 'registration_link');
-        $instance->platformCountry = static::getValue($raw, 'platform_country');
+        $instance->postalCode = static::getDataValue($raw, 'postal_code');
+        $instance->registrationLink = static::getDataValue($raw, 'registration_link');
+        $instance->platformCountry = static::getDataValue($raw, 'platform_country');
 
         return $instance;
     }

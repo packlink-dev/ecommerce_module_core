@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\ShipmentDraft\Objects;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class ShipmentDraftStatus.
  *
  * @package Packlink\BusinessLogic\ShipmentDraft\Objects
  */
-class ShipmentDraftStatus extends BaseDto
+class ShipmentDraftStatus extends DataTransferObject
 {
     /**
      * Represents the status where create shipment draft task is not created.
@@ -42,8 +42,8 @@ class ShipmentDraftStatus extends BaseDto
     public static function fromArray(array $raw)
     {
         $me = new static();
-        $me->status = static::getValue($raw, 'status');
-        $me->message = static::getValue($raw, 'message');
+        $me->status = static::getDataValue($raw, 'status');
+        $me->message = static::getDataValue($raw, 'message');
 
         return $me;
     }

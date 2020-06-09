@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class Package.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class Package extends BaseDto
+class Package extends DataTransferObject
 {
     /**
      * Weight of package in kg.
@@ -72,10 +72,10 @@ class Package extends BaseDto
     public static function fromArray(array $raw)
     {
         $instance = new static();
-        $instance->weight = static::getValue($raw, 'weight', 0.0);
-        $instance->length = static::getValue($raw, 'length', 0.0);
-        $instance->height = static::getValue($raw, 'height', 0.0);
-        $instance->width = static::getValue($raw, 'width', 0.0);
+        $instance->weight = static::getDataValue($raw, 'weight', 0.0);
+        $instance->length = static::getDataValue($raw, 'length', 0.0);
+        $instance->height = static::getDataValue($raw, 'height', 0.0);
+        $instance->width = static::getDataValue($raw, 'width', 0.0);
 
         return $instance;
     }

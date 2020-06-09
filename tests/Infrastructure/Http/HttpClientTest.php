@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\Http;
 
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
@@ -58,7 +58,7 @@ class HttpClientTest extends TestCase
             new HttpResponse(200, array(), '{}'),
         );
         $this->httpClient->setMockResponses($responses);
-        $additionalOptionsCombination = array(new OptionsDTO(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4));
+        $additionalOptionsCombination = array(new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4));
 
         $success = $this->httpClient->autoConfigure('POST', 'test.url.com');
 

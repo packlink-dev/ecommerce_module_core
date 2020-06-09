@@ -31,7 +31,12 @@ class ScheduleTickHandler
         if ($task === null || $task->getQueueTimestamp() + $threshold < time()) {
             $task = new ScheduleCheckTask();
             try {
-                $queueService->enqueue($configService->getSchedulerQueueName(), $task);
+                $queueService->enqueue(
+                    $configService->getSchedulerQueueName(),
+                    $task,
+                    $configService->getContext(),
+                    $task->getPriority()
+                );
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
                     'Failed to enqueue task ' . $task->getType(),

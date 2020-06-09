@@ -3,6 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 
 /**
  * Class MemoryGenericQueueItemRepositoryTest.
@@ -24,5 +25,6 @@ class MemoryGenericQueueItemRepositoryTest extends AbstractGenericQueueItemRepos
      */
     public function cleanUpStorage()
     {
+        MemoryStorage::reset();
     }
 }

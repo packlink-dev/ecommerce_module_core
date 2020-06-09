@@ -2,14 +2,14 @@
 
 namespace Packlink\BusinessLogic\Http\DTO;
 
-use Packlink\BusinessLogic\DTO\BaseDto;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
  * Class User. Represents Packlink User.
  *
  * @package Packlink\BusinessLogic\Http\DTO
  */
-class User extends BaseDto
+class User extends DataTransferObject
 {
     /**
      * First name.
@@ -62,10 +62,10 @@ class User extends BaseDto
     {
         $user = new static();
 
-        $user->firstName = static::getValue($raw, 'name');
-        $user->lastName = static::getValue($raw, 'surname');
-        $user->email = static::getValue($raw, 'email');
-        $user->country = static::getValue($raw, 'platform_country');
+        $user->firstName = static::getDataValue($raw, 'name');
+        $user->lastName = static::getDataValue($raw, 'surname');
+        $user->email = static::getDataValue($raw, 'email');
+        $user->country = static::getDataValue($raw, 'platform_country');
 
         return $user;
     }

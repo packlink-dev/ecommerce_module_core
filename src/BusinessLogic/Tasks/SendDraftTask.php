@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
@@ -101,6 +102,16 @@ class SendDraftTask extends Task
     public function unserialize($serialized)
     {
         list($this->orderId) = Serializer::unserialize($serialized);
+    }
+
+    /**
+     * Retrieves task priority.
+     *
+     * @return int Task priority.
+     */
+    public function getPriority()
+    {
+        return Priority::HIGH;
     }
 
     /**

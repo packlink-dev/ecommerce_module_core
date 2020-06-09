@@ -85,6 +85,7 @@ class TestCurlHttpClient extends CurlHttpClient
      * Mocks cURL request and returns response and status code.
      *
      * @return array Array with plain response as the first item and status code as the second item.
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      */
     protected function executeCurlRequest()
     {
@@ -93,8 +94,8 @@ class TestCurlHttpClient extends CurlHttpClient
         }
 
         $response = array_shift($this->responses);
-        $headers = !empty($response['headers']) ? $response['headers'] : array();
 
+        $headers = !empty($response['headers']) ? $response['headers'] : array();
         return array($response['data'], $response['status'], $headers);
     }
 

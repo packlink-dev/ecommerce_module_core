@@ -4,7 +4,7 @@ namespace Logeecom\Tests\Infrastructure\AutoTest;
 
 use Logeecom\Infrastructure\AutoTest\AutoTestLogger;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
-use Logeecom\Infrastructure\Http\DTO\OptionsDTO;
+use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\LogData;
@@ -120,7 +120,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     {
         RepositoryRegistry::registerRepository(LogData::getClassName(), MemoryRepository::getClassName());
         $domain = parse_url($this->shopConfig->getAsyncProcessUrl(''), PHP_URL_HOST);
-        $this->shopConfig->setHttpConfigurationOptions($domain, array(new OptionsDTO('test', 'value')));
+        $this->shopConfig->setHttpConfigurationOptions($domain, array(new Options('test', 'value')));
 
         $service = new AutoTestService();
         $queueItemId = $service->startAutoTest();

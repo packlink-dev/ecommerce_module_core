@@ -86,7 +86,7 @@ class FrontDtoFactory
         /** @var FrontDto $className Actually, it is a string, but this is for code completion purpose. */
         $className = self::$registry[$key];
 
-        return $className::fromArrayBatch($payload);
+        return $className::fromBatch($payload);
     }
 
     /**

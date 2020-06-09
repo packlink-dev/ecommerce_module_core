@@ -69,11 +69,13 @@ class HttpResponse
     /**
      * Returns json decoded response body.
      *
-     * @return mixed Response body decoded as json decode.
+     * @return array Response body decoded as json decode.
      */
-    public function decodeBodyAsJson()
+    public function decodeBodyToArray()
     {
-        return json_decode($this->body, true);
+        $result = json_decode($this->body, true);
+
+        return !empty($result) ? $result : array();
     }
 
     /**

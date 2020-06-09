@@ -15,12 +15,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegist
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
-use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
-use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
-use Packlink\BusinessLogic\Tasks\UpdateShipmentDataTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
@@ -76,8 +72,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testEmptyApiKey()
     {
@@ -96,8 +90,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLogin()
     {
@@ -130,19 +122,11 @@ class UserAccountLoginTest extends BaseTestWithServices
         /** @var Schedule[] $allSchedules */
         $allSchedules = $scheduleRepository->select();
 
-        $this->assertCount(5, $allSchedules);
+        $this->assertCount(1, $allSchedules);
 
         $expectedSchedules = array(
             WeeklySchedule::getClassName() => array(
                 UpdateShippingServicesTask::getClassName() => 1,
-            ),
-            HourlySchedule::getClassName() => array(
-                // 2 hourly schedules, starting every 30 minutes
-                UpdateShipmentDataTask::getClassName() => 2,
-                TaskCleanupTask::getClassName() => 1,
-            ),
-            DailySchedule::getClassName() => array(
-                UpdateShipmentDataTask::getClassName() => 1,
             ),
         );
 
@@ -171,8 +155,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLoginNoParcel()
     {
@@ -196,8 +178,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLoginNoWarehouse()
     {
@@ -247,8 +227,6 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testLoginBadHttp()
     {
@@ -303,8 +281,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testSettingWarehouseInfo()
     {
@@ -325,8 +301,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testSettingUnsupportedWarehouse()
     {
@@ -350,7 +324,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json')
-            )
+            ),
         );
     }
 
@@ -364,7 +338,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         return array(
             new HttpResponse(
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/unsupportedWarehouse.json')
-            )
+            ),
         );
     }
 

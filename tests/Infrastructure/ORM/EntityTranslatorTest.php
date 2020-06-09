@@ -5,6 +5,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 use Logeecom\Infrastructure\ORM\IntermediateObject;
 use Logeecom\Infrastructure\ORM\Utility\EntityTranslator;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
@@ -29,6 +30,7 @@ class EntityTranslatorTest extends BaseInfrastructureTestWithServices
         $entity->setLastUpdateTimestamp(time());
         $entity->setFailTimestamp(time());
         $entity->setFinishTimestamp(time());
+        $entity->setPriority(Priority::LOW);
 
         $intermediate = new IntermediateObject();
         $data = $entity->toArray();

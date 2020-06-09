@@ -2,6 +2,8 @@
 
 namespace Logeecom\Infrastructure\ORM;
 
+use InvalidArgumentException;
+use Logeecom\Infrastructure\Data\DataTransferObject;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 
 /**
@@ -9,7 +11,7 @@ use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
  *
  * @package Logeecom\Infrastructure\ORM\Entities
  */
-abstract class Entity
+abstract class Entity extends DataTransferObject
 {
     /**
      * Fully qualified name of this class.
@@ -130,7 +132,7 @@ abstract class Entity
             return $this->$indexKey;
         }
 
-        throw new \InvalidArgumentException('Neither field not getter found for index "' . $indexKey . '".');
+        throw new InvalidArgumentException('Neither field not getter found for index "' . $indexKey . '".');
     }
 
     /**

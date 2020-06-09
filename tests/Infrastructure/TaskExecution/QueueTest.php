@@ -3,6 +3,7 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use DateTime;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -176,6 +177,7 @@ class QueueTest extends TestCase
     /**
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBePossibleToFindRunningQueueItems()
     {
@@ -229,7 +231,7 @@ class QueueTest extends TestCase
     public function testFindOldestQueuedItems()
     {
         // Arrange
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -3 days'));
         $earliestQueue1Item = $this->queue->enqueue(
             'queue1',
             new FooTask()
@@ -244,7 +246,7 @@ class QueueTest extends TestCase
             new FooTask()
         );
 
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -2 days'));
         $this->queue->enqueue(
             'queue1',
             new FooTask()
@@ -284,7 +286,7 @@ class QueueTest extends TestCase
     public function testFindLatestByType()
     {
         // Arrange
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -3 days'));
         $this->queue->enqueue(
             'queue1',
             new FooTask(),
@@ -292,14 +294,14 @@ class QueueTest extends TestCase
         );
         $this->queue->enqueue('queue2', new FooTask(), 'context');
 
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -2 days'));
         $latestQueueItem = $this->queue->enqueue(
             'queue1',
             new FooTask(),
             'context'
         );
 
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -1 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -1 days'));
         $this->queue->enqueue('queue1', new BarTask(), 'context');
         $globallyLatestQueueItem = $this->queue->enqueue(
             'queue1',
@@ -339,24 +341,24 @@ class QueueTest extends TestCase
     public function testLimitOfFinOldestQueuedItems()
     {
         // Arrange
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -2 days'));
         $this->queue->enqueue(
             'queue5',
             new FooTask()
         );
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -3 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -3 days'));
         $this->queue->enqueue(
             'queue4',
             new FooTask()
         );
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -4 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -4 days'));
         $earliestQueue3Item = $this->queue->enqueue(
             'queue3',
             new FooTask()
         );
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -5 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -5 days'));
         $earliestQueue2Item = $this->queue->enqueue('queue2', new FooTask());
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -6 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -6 days'));
         $earliestQueue1Item = $this->queue->enqueue(
             'queue1',
             new FooTask()
@@ -389,7 +391,7 @@ class QueueTest extends TestCase
     public function testItShouldBePossibleEnqueueTaskToQueue()
     {
         // Arrange
-        $currentTime = new \DateTime();
+        $currentTime = new DateTime();
         $this->timeProvider->setCurrentLocalTime($currentTime);
 
         // Act
@@ -495,11 +497,11 @@ class QueueTest extends TestCase
         // Arrange
         $task = new FooTask();
 
-        $queuedTime = new \DateTime('now -2 days');
+        $queuedTime = new DateTime('now -2 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
         $queueItem = $this->queue->enqueue('testQueue', $task);
 
-        $startTime = new \DateTime('now -1 day');
+        $startTime = new DateTime('now -1 day');
         $this->timeProvider->setCurrentLocalTime($startTime);
 
         // Act
@@ -551,6 +553,7 @@ class QueueTest extends TestCase
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenInProgressReportedProgressShouldBeStoredUsingQueue()
     {
@@ -576,6 +579,7 @@ class QueueTest extends TestCase
      * @expectedExceptionMessage Progress reported for not started queue item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenNotInProgressReportedProgressShouldFailJob()
     {
@@ -604,7 +608,7 @@ class QueueTest extends TestCase
         $queueItem = $this->queue->enqueue('testQueue', $task);
         $this->queue->start($queueItem);
 
-        $lastSaveTime = new \DateTime();
+        $lastSaveTime = new DateTime();
         $this->timeProvider->setCurrentLocalTime($lastSaveTime);
 
         // Act
@@ -629,15 +633,15 @@ class QueueTest extends TestCase
         // Arrange
         $task = new FooTask();
 
-        $queuedTime = new \DateTime('now -3 days');
+        $queuedTime = new DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
         $queueItem = $this->queue->enqueue('testQueue', $task);
 
-        $startTime = new \DateTime('now -2 days');
+        $startTime = new DateTime('now -2 days');
         $this->timeProvider->setCurrentLocalTime($startTime);
         $this->queue->start($queueItem);
 
-        $finishTime = new \DateTime('now -1 day');
+        $finishTime = new DateTime('now -1 day');
         $this->timeProvider->setCurrentLocalTime($finishTime);
 
         // Act
@@ -693,11 +697,11 @@ class QueueTest extends TestCase
         // Arrange
         $task = new FooTask();
 
-        $queuedTime = new \DateTime('now -3 days');
+        $queuedTime = new DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
         $queueItem = $this->queue->enqueue('testQueue', $task);
 
-        $startTime = new \DateTime('now -2 days');
+        $startTime = new DateTime('now -2 days');
         $this->timeProvider->setCurrentLocalTime($startTime);
         $this->queue->start($queueItem);
 
@@ -739,16 +743,16 @@ class QueueTest extends TestCase
         // Arrange
         $task = new FooTask();
 
-        $queuedTime = new \DateTime('now -3 days');
+        $queuedTime = new DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
         $queueItem = $this->queue->enqueue('testQueue', $task);
 
-        $startTime = new \DateTime('now -2 days');
+        $startTime = new DateTime('now -2 days');
         $this->timeProvider->setCurrentLocalTime($startTime);
         $queueItem->setLastExecutionProgressBasePoints(3123);
         $this->queue->start($queueItem);
 
-        $failTime = new \DateTime('now -1 day');
+        $failTime = new DateTime('now -1 day');
         $this->timeProvider->setCurrentLocalTime($failTime);
 
         // Act
@@ -804,14 +808,14 @@ class QueueTest extends TestCase
         // Arrange
         $task = new FooTask();
 
-        $queuedTime = new \DateTime('now -3 days');
+        $queuedTime = new DateTime('now -3 days');
         $this->timeProvider->setCurrentLocalTime($queuedTime);
         $queueItem = $this->queue->enqueue('testQueue', $task);
 
-        $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
+        $this->timeProvider->setCurrentLocalTime(new DateTime('now -2 days'));
         $this->queue->start($queueItem);
 
-        $failTime = new \DateTime('now -1 day');
+        $failTime = new DateTime('now -1 day');
         $this->timeProvider->setCurrentLocalTime($failTime);
 
         // Act
@@ -880,6 +884,10 @@ class QueueTest extends TestCase
 
     /**
      * Test regular task abort.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testAbortQueueItemMethod()
     {
@@ -899,6 +907,7 @@ class QueueTest extends TestCase
 
     /**
      * Test regular task abort.
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testAbortingQueueItemFromTask()
     {
@@ -920,6 +929,9 @@ class QueueTest extends TestCase
 
     /**
      * Test regular task abort.
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testAbortingQueueItemAfterFailure()
     {
@@ -944,6 +956,10 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testStartingQueueItemAfterAbortion()
     {
@@ -958,6 +974,8 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "created" to "in_progress"
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
@@ -1035,6 +1053,8 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "in_progress" to "in_progress"
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
@@ -1054,8 +1074,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "failed" to "in_progress"
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedToInProgressStatus()
     {
@@ -1081,8 +1103,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "failed" to "failed"
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedFailedStatus()
     {
@@ -1108,8 +1132,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "failed" to "completed"
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedCompletedStatus()
     {
@@ -1135,8 +1161,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "completed" to "in_progress"
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromCompletedToInProgressStatus()
     {
@@ -1157,8 +1185,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "completed" to "failed"
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromCompletedToFailedStatus()
     {
@@ -1179,8 +1209,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "completed" to "completed"
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromCompletedToCompletedStatus()
     {
@@ -1201,6 +1233,8 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "queued" to "aborted"
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromQueuedToAbortedStatus()
     {
@@ -1214,6 +1248,10 @@ class QueueTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Illegal queue item state transition from "failed" to "aborted"
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedToAbortedStatus()
     {
@@ -1253,8 +1291,10 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     *
      * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenStoringQueueItemFailsStartMethodMustFail()
     {
@@ -1275,8 +1315,10 @@ class QueueTest extends TestCase
 
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     *
      * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenStoringQueueItemFailsFailMethodMustFail()
     {
@@ -1299,7 +1341,9 @@ class QueueTest extends TestCase
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenStoringQueueItemProgressFailsProgressMethodMustFail()
     {
@@ -1322,7 +1366,9 @@ class QueueTest extends TestCase
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenStoringQueueItemAliveFailsAliveMethodMustFail()
     {
@@ -1342,7 +1388,9 @@ class QueueTest extends TestCase
     /**
      * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testWhenStoringQueueItemFailsFinishMethodMustFail()
     {
@@ -1422,8 +1470,10 @@ class QueueTest extends TestCase
      * @param \Logeecom\Infrastructure\TaskExecution\Task $task
      *
      * @return \Logeecom\Infrastructure\TaskExecution\QueueItem
+     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     private function generateRunningQueueItem($queueName, Task $task)
     {
