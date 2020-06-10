@@ -13,11 +13,19 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <head>
     <title>Demo UI</title>
     <link rel="icon" href="data:;base64,iVBORwOKGO="/>
-    <link rel="stylesheet" type="text/css" href="./resources/css/index.css"/>
     <link rel="stylesheet" type="text/css" href="./resources/css/app.css"/>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            background-color: #e6e6e6;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
-<body style="padding: 10px 10px 10px 150px; height:100%;">
-<div class="container-fluid" id="pl-page" style="border: 1px solid red;">
+<body style="padding: 10px 10px 10px 250px; ">
+<div id="pl-page">
     <div class="pl-input-mask" id="pl-input-mask"></div>
     <div class="pl-spinner" id="pl-spinner">
         <div></div>
@@ -31,10 +39,8 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
     <main id="pl-main-page-holder">
     </main>
 
-    <div style="display: none" id="pl-footer-extension-point"></div>
+    <div id="pl-footer-extension-point"></div>
 </div>
-
-</body>
 <script src="./resources/js/AjaxService.js"></script>
 <script src="./resources/js/TranslationService.js"></script>
 <script src="./resources/js/DefaultParcelController.js"></script>
@@ -157,4 +163,5 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
         }, false
     );
 </script>
+</body>
 </html>
