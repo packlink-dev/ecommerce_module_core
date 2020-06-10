@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.1.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.0...v2.1.1)
+
+### Changed
+- Added initial page property to JS state controller.
+
 ## [2.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.0.12...v2.1.0)
 ** BREAKING CHANGES **
 
