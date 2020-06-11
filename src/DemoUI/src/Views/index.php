@@ -22,9 +22,19 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
             background-color: #e6e6e6;
             box-sizing: border-box;
         }
+
+        body {
+            padding: 10px 10px 10px 250px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+        }
     </style>
 </head>
-<body style="padding: 10px 10px 10px 250px; ">
+<body>
 <div id="pl-page">
     <div class="pl-input-mask" id="pl-input-mask"></div>
     <div class="pl-spinner" id="pl-spinner">

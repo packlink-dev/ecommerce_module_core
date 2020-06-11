@@ -87,7 +87,7 @@
 }
 
 /* Styles start here */
-#pl-page .pl-main-logo {
+#pl-page .pl-main-logo img {
     width: 200px;
 }
 
@@ -134,6 +134,14 @@
 
 #pl-page .pl-bottom-separate {
     margin-bottom: 36px;
+}
+
+#pl-page .pl-hidden {
+    display: none !important;
+}
+
+#pl-page .pl-page-padding {
+    padding: 20px;
 }
 
 /* control classes */
@@ -216,7 +224,6 @@
     font-size: 12px;
 }
 
-
 #pl-page .pl-form-group select {
     height: 50px;
     line-height: 50px;
@@ -259,11 +266,17 @@
 }
 
 /* mobile rules */
-@media screen and (max-width: 768px) {
+@media (max-width: 768px) {
+    #pl-page .pl-desktop-only {
+        display: none !important;
+    }
 
+    #pl-page .pl-main-logo, #pl-page button, #pl-page .pl-button {
+        width: 100%;
+    }
 }
 
 /* tablet rules */
-@media screen and (min-width: 769px) and (max-width: 1280px) {
+@media (min-width: 769px) and (max-width: 1280px) {
 
 }

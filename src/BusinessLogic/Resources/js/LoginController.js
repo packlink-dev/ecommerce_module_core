@@ -4,15 +4,16 @@ var Packlink = window.Packlink || {};
     /**
      * Handles login page logic.
      *
-     * @param configuration
+     * @param {{submit: string}} configuration
      * @constructor
      */
     function LoginController(configuration) {
 
-        let templateService = Packlink.templateService,
+        const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
             state = Packlink.state,
             templateId = 'pl-login-page';
+        let errorMsg, loginBtn;
 
         /**
          * Displays page content.
@@ -20,9 +21,14 @@ var Packlink = window.Packlink || {};
         this.display = function () {
             templateService.setCurrentTemplate(templateId);
 
-            let loginPage = templateService.getMainPage();
+            const loginPage = templateService.getMainPage();
+
+            loginBtn = templateService.getComponent('pl-login-button');
+            errorMsg = templateService.getComponent('pl-login-error-msg');
 
             templateService.getComponent('pl-login-form', loginPage).addEventListener('submit', login);
+            const input = templateService.getComponent('pl-login-api-key', loginPage);
+            input.addEventListener('input', enableButton);
         };
 
         /**
@@ -33,24 +39,27 @@ var Packlink = window.Packlink || {};
         function login(event) {
             event.preventDefault();
 
+            errorMsg.classList.add('pl-hidden');
             ajaxService.post(configuration.submit, {apiKey: event.target['apiKey'].value}, successfulLogin, failedLogin);
 
             return false;
         }
 
-        function successfulLogin(response) {
-            let errorMsg = templateService.getComponent('pl-login-error-msg');
+        function enableButton(event) {
+            loginBtn.disabled = event.target.value.length === 0;
+        }
 
+        function successfulLogin(response) {
             if (response.success) {
-                errorMsg.classList.remove('visible');
+                errorMsg.classList.add('pl-hidden');
                 state.goToState('onboarding');
             } else {
-                errorMsg.classList.add('visible');
+                errorMsg.classList.remove('pl-hidden');
             }
         }
 
         function failedLogin() {
-            console.log('Unhandled error!');
+            errorMsg.classList.remove('pl-hidden');
         }
     }
 
