@@ -4,6 +4,9 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+
+session_start();
+
 Configuration::setCurrentLanguage('es');
 $lang = Configuration::getCurrentLanguage() ?: 'en';
 
