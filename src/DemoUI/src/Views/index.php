@@ -14,6 +14,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <!DOCTYPE html>
 <html lang="<?php echo $lang ?>">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo UI</title>
     <link rel="icon" href="data:;base64,iVBORwOKGO="/>
     <link rel="stylesheet" type="text/css" href="./resources/css/app.css"/>
