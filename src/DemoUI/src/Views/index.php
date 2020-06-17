@@ -18,6 +18,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
     <link rel="icon" href="data:;base64,iVBORwOKGO="/>
     <link rel="stylesheet" type="text/css" href="./resources/css/app.css"/>
     <style>
+        /*This is just for the demo page and should not be used in any integration*/
         html, body {
             width: 100%;
             height: 100%;
@@ -38,22 +39,42 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
     </style>
 </head>
 <body>
+
+<!-- This is a main placeholder that should be used in all integrations -->
 <div id="pl-page">
-    <div class="pl-input-mask" id="pl-input-mask"></div>
-    <div class="pl-spinner" id="pl-spinner">
-        <div></div>
-    </div>
     <header>
         <div class="pl-main-logo">
             <img src="https://cdn.packlink.com/apps/giger/logos/packlink-pro.svg" alt="logo">
         </div>
         <div class="header-holder" id="pl-header-section"></div>
     </header>
-    <main id="pl-main-page-holder">
-    </main>
 
-    <div id="pl-footer-extension-point"></div>
+    <main id="pl-main-page-holder"></main>
+
+    <footer id="pl-footer-extension-point"></footer>
+
+    <div class="pl-input-mask" id="pl-input-mask"></div>
+    <div class="pl-spinner" id="pl-spinner">
+        <div></div>
+    </div>
+
+    <div id="pl-modal-mask" class="pl-modal-mask enabled">
+        <div class="pl-modal">
+            <div class="pl-modal-close-button">×</div>
+            <div class="pl-modal-title">
+                This is a modal title
+            </div>
+            <div class="pl-modal-body">
+                Put modal body here
+            </div>
+            <div class="pl-modal-footer">
+                <button class="pl-button pl-button-primary">Primary</button>
+                <button class="pl-button">Secondary</button>
+            </div>
+        </div>
+    </div>
 </div>
+
 <script src="./resources/js/AjaxService.js"></script>
 <script src="./resources/js/TranslationService.js"></script>
 <script src="./resources/js/DefaultParcelController.js"></script>
