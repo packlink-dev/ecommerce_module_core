@@ -26,7 +26,7 @@ class Translator
      */
     public static function translate($key, array $arguments = array())
     {
-        return self::getTranslationService()->translate($key, $arguments);
+        return static::getTranslationService()->translate($key, $arguments);
     }
 
     /**
@@ -36,18 +36,10 @@ class Translator
      */
     protected static function getTranslationService()
     {
-        if (self::$translationService === null) {
-            self::$translationService = ServiceRegister::getService(TranslationServiceInterface::CLASS_NAME);
+        if (static::$translationService === null) {
+            static::$translationService = ServiceRegister::getService(TranslationServiceInterface::CLASS_NAME);
         }
 
-        return self::$translationService;
-    }
-
-    /**
-     * Resets translation service instance.
-     */
-    public static function resetInstance()
-    {
-        static::$translationService = null;
+        return static::$translationService;
     }
 }

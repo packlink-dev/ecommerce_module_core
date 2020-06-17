@@ -66,14 +66,14 @@ class TranslationService implements BaseService
     {
         $this->currentLanguage = Configuration::getCurrentLanguage();
 
-        if (empty(self::$translations[$this->currentLanguage])) {
+        if (empty(static::$translations[$this->currentLanguage])) {
             $this->initializeTranslations();
         }
 
         $result = $this->getTranslation($key, $this->currentLanguage);
 
         if ($result === null) {
-            $result = $this->getTranslation($key, self::DEFAULT_LANG);
+            $result = $this->getTranslation($key, static::DEFAULT_LANG);
         }
 
         if ($result === null) {
@@ -111,7 +111,7 @@ class TranslationService implements BaseService
         }
 
         if ($serializedJson !== false) {
-            self::$translations[$language] = json_decode($serializedJson, true);
+            static::$translations[$language] = json_decode($serializedJson, true);
         }
     }
 
@@ -120,10 +120,10 @@ class TranslationService implements BaseService
      */
     protected function initializeFallbackLanguage()
     {
-        if (strtolower($this->currentLanguage) !== self::DEFAULT_LANG) {
-            $defaultLang = self::DEFAULT_LANG;
+        if (strtolower($this->currentLanguage) !== static::DEFAULT_LANG) {
+            $defaultLang = static::DEFAULT_LANG;
             $translationFilePath = "{$this->translationsFileBasePath}{$defaultLang}.json";
-            $this->initializeLanguage($translationFilePath, self::DEFAULT_LANG);
+            $this->initializeLanguage($translationFilePath, static::DEFAULT_LANG);
         }
     }
 
@@ -139,8 +139,8 @@ class TranslationService implements BaseService
         $keys = explode('_', $key);
         $keysCount = count($keys);
 
-        if ($keysCount > 0 && isset(self::$translations[$currentLanguage])) {
-            $result = self::$translations[$currentLanguage];
+        if ($keysCount > 0 && isset(static::$translations[$currentLanguage])) {
+            $result = static::$translations[$currentLanguage];
         } else {
             $result = null;
         }
