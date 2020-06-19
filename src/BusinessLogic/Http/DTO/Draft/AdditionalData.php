@@ -68,6 +68,18 @@ class AdditionalData extends DataTransferObject
      * @var string[]
      */
     public $parcelIds = array();
+    /**
+     * Order ID.
+     *
+     * @var string
+     */
+    public $orderId;
+    /**
+     * Seller user ID.
+     *
+     * @var string
+     */
+    public $sellerUserId;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -85,6 +97,8 @@ class AdditionalData extends DataTransferObject
             'selectedWarehouseId' => $this->selectedWarehouseId,
             'parcel_Ids' => $this->parcelIds,
             'postal_zone_name_to' => $this->postalZoneNameTo,
+            'order_id' => $this->orderId,
+            'seller_user_id' => $this->sellerUserId,
         );
 
         if (!empty($this->items)) {

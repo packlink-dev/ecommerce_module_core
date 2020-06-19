@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
 ### Changed
 - Added Hungary to the list of supported countries.
+- Added additional data (seller user ID and order ID) when creating order shipment draft.
 
 ## [2.1.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.0...v2.1.1)
 
