@@ -4,7 +4,7 @@ var Packlink = window.Packlink || {};
     /**
      * Handles login page logic.
      *
-     * @param {{submit: string}} configuration
+     * @param {{submit: string, listOfCountriesUrl: string, logoPath: string}} configuration
      * @constructor
      */
     function LoginController(configuration) {
@@ -27,6 +27,7 @@ var Packlink = window.Packlink || {};
             errorMsg = templateService.getComponent('pl-login-error-msg');
 
             templateService.getComponent('pl-login-form', loginPage).addEventListener('submit', login);
+            templateService.getComponent('pl-go-to-register', loginPage).addEventListener('click', goToRegister);
             const input = templateService.getComponent('pl-login-api-key', loginPage);
             input.addEventListener('input', enableButton);
         };
@@ -41,6 +42,26 @@ var Packlink = window.Packlink || {};
 
             errorMsg.classList.add('pl-hidden');
             ajaxService.post(configuration.submit, {apiKey: event.target['apiKey'].value}, successfulLogin, failedLogin);
+
+            return false;
+        }
+
+        /**
+         * Redirects to register.
+         *
+         * @param event
+         *
+         * @returns {boolean}
+         */
+        function goToRegister(event) {
+            event.preventDefault();
+
+            let registerModalController = new Packlink.RegisterModalController(
+                'pl-modal-mask',
+                configuration.listOfCountriesUrl,
+                configuration.logoPath
+            );
+            registerModalController.display();
 
             return false;
         }

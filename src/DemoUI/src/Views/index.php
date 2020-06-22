@@ -59,18 +59,25 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
         <div></div>
     </div>
 
-    <div id="pl-modal-mask" class="pl-modal-mask enabled">
+    <div id="pl-error-template">
+        <div class="pl-error-msg" data-pl-element="error">
+            <div id="pl-error-text">
+            </div>
+        </div>
+    </div>
+
+    <div id="pl-modal-mask" class="pl-modal-mask">
         <div class="pl-modal">
             <div class="pl-modal-close-button">×</div>
             <div class="pl-modal-title">
-                This is a modal title
+
             </div>
             <div class="pl-modal-body">
-                Put modal body here
+
             </div>
             <div class="pl-modal-footer">
-                <button class="pl-button pl-button-primary">Primary</button>
-                <button class="pl-button">Secondary</button>
+<!--                <button class="pl-button pl-button-primary">Primary</button>-->
+<!--                <button class="pl-button">Secondary</button>-->
             </div>
         </div>
     </div>
@@ -89,6 +96,8 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/UtilityService.js"></script>
 <script src="./resources/js/CountrySelectorController.js"></script>
 <script src="./resources/js/LoginController.js"></script>
+<script src="./resources/js/RegisterModalController.js"></script>
+<script src="./resources/js/RegisterController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
@@ -100,6 +109,9 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                 echo file_exists($langFile) ? file_get_contents($langFile) : ''
                 ?>,
             };
+
+            Packlink.models = {};
+
             Packlink.errorMsgs = {
                 required: 'This field is required.',
                 numeric: 'Value must be valid number.',
@@ -128,6 +140,9 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 
                     stateUrl: "<?php echo UrlService::getEndpointUrl('ModuleState', 'getCurrentState') ?>",
                     loginUrl: "<?php echo UrlService::getEndpointUrl('Login', 'login') ?>",
+                    listOfCountriesUrl: "<?php echo UrlService::getEndpointUrl('Country', 'get') ?>",
+                    registrationDataUrl: "<?php echo UrlService::getEndpointUrl('Registration', 'get') ?>",
+                    registrationSubmitUrl: "<?php echo UrlService::getEndpointUrl('Registration', 'post') ?>",
                     dashboardGetStatusUrl: "<?php echo UrlService::getEndpointUrl('Dashboard', 'getStatus') ?>",
                     defaultParcelGetUrl: "<?php echo UrlService::getEndpointUrl(
                         'DefaultParcel',
@@ -183,11 +198,17 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                     debugSetStatusUrl: "<?php echo UrlService::getEndpointUrl('Debug', 'setStatus') ?>",
                     autoConfigureStartUrl: "<?php echo UrlService::getEndpointUrl('AutoConfigure', 'start') ?>",
                     getShippingCountriesUrl: "<?php echo UrlService::getEndpointUrl('ShippingCountries', 'getAll') ?>",
+                    logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>",
 
                     templates: {
                         'pl-login-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/login.html')
+                            ) ?>
+                        },
+                        'pl-register-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/register.html')
                             ) ?>
                         }
                     },

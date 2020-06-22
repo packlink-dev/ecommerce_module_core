@@ -2,6 +2,7 @@
 
 namespace Packlink\DemoUI;
 
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Http\CurlHttpClient;
 use Logeecom\Infrastructure\Http\HttpClient;
@@ -19,6 +20,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepos
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
@@ -80,6 +82,11 @@ class Bootstrap extends BootstrapComponent
     private $userAccountService;
 
     /**
+     * @var RegistrationInfoService
+     */
+    private $registrationInfoService;
+
+    /**
      * Bootstrap constructor.
      */
     public function __construct() {
@@ -90,6 +97,7 @@ class Bootstrap extends BootstrapComponent
         $this->shopOrderService = new ShopOrderService();
         $this->carrierService = new CarrierService();
         $this->userAccountService = UserAccountService::getInstance();
+        $this->registrationInfoService = new TestRegistrationInfoService();
 
         static::$instance = $this;
     }
@@ -177,6 +185,13 @@ class Bootstrap extends BootstrapComponent
             UserAccountService::CLASS_NAME,
             function () use ($instance) {
                 return $instance->userAccountService;
+            }
+        );
+
+        ServiceRegister::registerService(
+            RegistrationInfoService::CLASS_NAME,
+            function () use ($instance) {
+                return $instance->registrationInfoService;
             }
         );
     }

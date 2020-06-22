@@ -14,6 +14,9 @@ var Packlink = window.Packlink || {};
      *      shippingServiceMaxTitleLength: number,
      *      stateUrl: string,
      *      loginUrl: string,
+     *      listOfCountriesUrl: string,
+     *      registrationDataUrl: string,
+     *      registrationSubmitUrl: string,
      *      autoConfigureStartUrl: string,
      *      dashboardGetStatusUrl: string,
      *      defaultParcelGetUrl: string,
@@ -36,6 +39,7 @@ var Packlink = window.Packlink || {};
      *      orderStatusMappingsSaveUrl: string,
      *      orderStatusMappingsGetUrl: string,
      *      getShippingCountriesUrl: string,
+     *      logoPath: string,
      *      templates: {}
      * }} configuration
      *
@@ -88,7 +92,13 @@ var Packlink = window.Packlink || {};
                 setDebugStatusUrl: configuration.debugSetStatusUrl
             },
             'login': {
-                submit: configuration.loginUrl
+                submit: configuration.loginUrl,
+                listOfCountriesUrl: configuration.listOfCountriesUrl,
+                logoPath: configuration.logoPath
+            },
+            'register': {
+                getRegistrationData: configuration.registrationDataUrl,
+                submit: configuration.registrationSubmitUrl
             }
         };
 

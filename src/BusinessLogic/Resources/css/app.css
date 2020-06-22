@@ -109,6 +109,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-top: 15px;
 }
 
 /* utility classes */
@@ -118,6 +119,11 @@
 
 #pl-page .pl-text-center {
     text-align: center;
+}
+
+#pl-page .pl-text-center.pl-text-with-margins {
+    margin-top: 36px;
+    margin-bottom: 36px;
 }
 
 #pl-page .pl-flex-expand {
@@ -198,6 +204,10 @@
     position: relative;
     border: none;
     width: 100%;
+}
+
+#pl-page .pl-form-group:not(:first-child) {
+    margin-top: 15px;
 }
 
 #pl-page .pl-form-group input {
@@ -313,6 +323,38 @@
 
 #pl-page .pl-modal-mask.enabled {
     display: flex;
+}
+
+#pl-page .pl-modal-mask .pl-register-country-list-wrapper {
+    margin-top: 15px;
+    height: 97%;
+}
+
+#pl-page .pl-modal-mask .pl-register-country-list-wrapper a {
+    text-decoration: none !important;
+}
+
+#pl-page .pl-modal-mask .pl-country {
+    display: flex;
+    height: 35px;
+    width: 30px;
+    line-height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    color: #2095f2;
+    font-size: 15px;
+    text-transform: uppercase;
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+#pl-page .pl-modal-mask .pl-country-logo {
+    width: 60px;
+}
+
+#pl-page .pl-modal-mask .pl-country-name {
+    white-space: nowrap;
+    margin-left: 15px;
 }
 
 #pl-page .pl-modal {

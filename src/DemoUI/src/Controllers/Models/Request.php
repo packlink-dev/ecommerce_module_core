@@ -40,15 +40,15 @@ class Request
     /**
      * @param string|null $key
      *
-     * @return array
+     * @return string|null
      */
     public function getQuery($key = null)
     {
-        if ($key != null && isset($this->query[$key])) {
+        if ($key !== null && isset($this->query[$key])) {
             return $this->query[$key];
         }
 
-        return $this->query;
+        return null;
     }
 
     /**
@@ -66,7 +66,7 @@ class Request
      */
     public function getHeaders($key = null)
     {
-        if ($key != null && isset($this->headers[$key])) {
+        if ($key !== null && isset($this->headers[$key])) {
             return $this->headers[$key];
         }
 

@@ -30,6 +30,6 @@ class UrlService
     {
         $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
 
-        return "{$schema}}://{$_SERVER['HTTP_HOST']}/Views/resources/{$filePath}";
+        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/resources/{$filePath}";
     }
 }

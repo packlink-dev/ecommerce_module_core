@@ -151,9 +151,11 @@ var Packlink = window.Packlink || {};
          * @param {Element} input
          */
         this.removeError = function (input) {
-            let firstSibling = input.nextSibling;
-            if (firstSibling && firstSibling.getAttribute && firstSibling.getAttribute('data-pl-element') === 'error') {
-                firstSibling.remove();
+            let firstSibling = input.parentNode.querySelector('.pl-error-msg');
+            if (firstSibling &&
+                firstSibling.getAttribute &&
+                firstSibling.getAttribute('data-pl-element') === 'error') {
+                firstSibling.querySelector('div').innerText = '';
             }
 
             input.classList.remove('pl-error');

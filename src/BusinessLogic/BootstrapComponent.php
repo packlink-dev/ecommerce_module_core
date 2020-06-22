@@ -15,6 +15,8 @@ use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Language\Interfaces\TranslationService as TranslationServiceInterface;
+use Packlink\BusinessLogic\Language\TranslationService;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -154,6 +156,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             RegistrationService::CLASS_NAME,
             function () {
                 return RegistrationService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            TranslationServiceInterface::CLASS_NAME,
+            function () {
+                return new TranslationService();
             }
         );
     }
