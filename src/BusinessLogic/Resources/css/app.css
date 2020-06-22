@@ -403,6 +403,32 @@
     padding: 20px 0;
 }
 
+.pl-register-country-list-wrapper {
+    width: 100%;
+}
+.pl-register-country-list-wrapper a {
+    display: block;
+    width: 100%;
+}
+
+#pl-page .pl-modal-mask .pl-register-country-list-wrapper a .pl-country {
+    display: flex;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#pl-page .pl-modal-mask .pl-register-country-list-wrapper a .pl-country img {
+    width: 35px;
+    height: 35px;
+}
+
+#pl-page .pl-modal-mask .pl-register-country-list-wrapper a .pl-country .pl-country-name {
+    margin-top: 0;
+}
+
 #pl-page .pl-modal .pl-modal-footer .pl-button + .pl-button {
     margin-left: 10px;
 }
