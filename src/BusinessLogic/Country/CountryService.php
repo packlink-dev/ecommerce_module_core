@@ -117,7 +117,7 @@ class CountryService extends BaseService
             'name' => 'Hungary',
             'code' => 'HU',
             'postal_code' => '1014',
-            'registration_link' => 'https://auth.packlink.com/hu-HU/{integration}/regisztracio?platform=PRO&platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/hu-HU/{integration}/regisztracio?platform_country=UN',
             'platform_country' => 'UN',
         ),
     );
