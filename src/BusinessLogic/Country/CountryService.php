@@ -161,7 +161,7 @@ class CountryService extends BaseService
                     $country['registration_link']
                 ) . '?platform=PRO&platform_country=' . $country['platform_country'];
 
-            $country['name'] = Translator::translate($country['code']);
+            $country['name'] = Translator::translate('register_' . $country['code']);
             $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
         }
 
