@@ -4,18 +4,18 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Controllers\DTO\OnBoardingState;
+use Packlink\BusinessLogic\Controllers\DTO\OnboardingState;
 
-class OnBoardingController
+class OnboardingController
 {
     /**
      * Gets current state of the on-boarding page.
      *
-     * @return OnBoardingState
+     * @return OnboardingState
      */
     public function getCurrentState()
     {
-        $result = new OnBoardingState();
+        $result = new OnboardingState();
 
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
@@ -24,10 +24,10 @@ class OnBoardingController
         $warehouse = $configService->getDefaultWarehouse();
 
         if ($parcel === null && $warehouse === null) {
-            $result->state = OnBoardingState::WELCOME_STATE;
+            $result->state = OnboardingState::WELCOME_STATE;
 
         } else {
-            $result->state = OnBoardingState::OVERVIEW_STATE;
+            $result->state = OnboardingState::OVERVIEW_STATE;
         }
 
         return $result;

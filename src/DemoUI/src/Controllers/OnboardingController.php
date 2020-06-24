@@ -4,17 +4,18 @@
 namespace Packlink\DemoUI\Controllers;
 
 /**
- * Class OnBoardingController
+ * Class OnboardingController
+ *
  * @package Packlink\DemoUI\Controllers
  */
-class OnBoardingController
+class OnboardingController
 {
     /**
      * Gets current app state.
      */
     public function getCurrentState()
     {
-        $controller = new \Packlink\BusinessLogic\Controllers\OnBoardingController();
+        $controller = new \Packlink\BusinessLogic\Controllers\OnboardingController();
 
         echo json_encode($controller->getCurrentState()->toArray());
     }
