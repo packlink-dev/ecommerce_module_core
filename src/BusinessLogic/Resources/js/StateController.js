@@ -17,6 +17,7 @@ var Packlink = window.Packlink || {};
      *      listOfCountriesUrl: string,
      *      registrationDataUrl: string,
      *      registrationSubmitUrl: string,
+     *      getOnboardingStateUrl: string,
      *      autoConfigureStartUrl: string,
      *      dashboardGetStatusUrl: string,
      *      defaultParcelGetUrl: string,
@@ -99,6 +100,9 @@ var Packlink = window.Packlink || {};
             'register': {
                 getRegistrationData: configuration.registrationDataUrl,
                 submit: configuration.registrationSubmitUrl
+            },
+            'onboarding-state': {
+                getState: configuration.getOnboardingStateUrl
             }
         };
 
@@ -152,7 +156,7 @@ var Packlink = window.Packlink || {};
                goToState('login');
 
             } else if (response.state === 'onBoarding') {
-                goToState('onboarding');
+                goToState('onboarding-state');
 
             } else {
                 goToState('shipping-methods');

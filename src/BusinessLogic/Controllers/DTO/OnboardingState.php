@@ -4,13 +4,12 @@ namespace Packlink\BusinessLogic\Controllers\DTO;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 
-class OnBoardingState extends FrontDto
+class OnboardingState extends FrontDto
 {
     /**
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
-
     /**
      * Welcome state key.
      */

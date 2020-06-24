@@ -97,6 +97,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/LoginController.js"></script>
 <script src="./resources/js/RegisterModalController.js"></script>
 <script src="./resources/js/RegisterController.js"></script>
+<script src="./resources/js/OnboardingStateController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
@@ -142,6 +143,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                     listOfCountriesUrl: "<?php echo UrlService::getEndpointUrl('Country', 'get') ?>",
                     registrationDataUrl: "<?php echo UrlService::getEndpointUrl('Registration', 'get') ?>",
                     registrationSubmitUrl: "<?php echo UrlService::getEndpointUrl('Registration', 'post') ?>",
+                    getOnboardingStateUrl: "<?php echo UrlService::getEndpointUrl('Onboarding', 'getCurrentState') ?>",
                     dashboardGetStatusUrl: "<?php echo UrlService::getEndpointUrl('Dashboard', 'getStatus') ?>",
                     defaultParcelGetUrl: "<?php echo UrlService::getEndpointUrl(
                         'DefaultParcel',
@@ -208,6 +210,11 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                         'pl-register-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/register.html')
+                            ) ?>
+                        },
+                        'pl-onboarding-welcome-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-welcome.html')
                             ) ?>
                         }
                     },
