@@ -82,6 +82,23 @@
   list-style: none;
 }
 
+#pl-page ol.pl-onboarding-welcome-steps {
+    width: 100%;
+}
+
+#pl-page ol.pl-onboarding-welcome-steps li {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#pl-page ol.pl-onboarding-welcome-steps hr {
+    border: 1px solid #f0f2f3;
+}
+
+#pl-page .pl-w-85 {
+    width: 85%;
+}
+
 #pl-page img {
   height: auto;
   max-width: 100%;
