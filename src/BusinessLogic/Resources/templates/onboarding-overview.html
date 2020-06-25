@@ -1,0 +1,62 @@
+<div class="pl-onboarding-overview-page pl-flex-expand">
+    <div class="pl-onboarding-overview-mobile-header">
+        <strong>
+            {$onboardingOverview.myShipmentServices}:
+        </strong>
+    </div>
+    <div class="pl-flex-expand pl-text-center pl-page-padding">
+        <div class="pl-bottom-separate">
+            <h1 class="pl-text-center">
+                {$onboardingOverview.header}
+            </h1>
+        </div>
+        <div class="pl-w-85 pl-onboarding-overview-list">
+            <div class="pl-list-item pl-parcel-wrapper">
+                <i class="pl-info-icon-ok pl-display-none">J</i>
+                <i class="pl-info-icon-x pl-display-none">X</i>
+                <p class="pl-onboarding-list-title">{$onboardingOverview.parcelDetails}</p>
+                <p id="pl-parcel-details" class="pl-display-none pl-w-100">
+                    <span class="pl-min-width-81">
+                        <span>{$onboardingOverview.weight} <span id="pl-parcel-weight"></span> kg </span> |
+                        <span>{$onboardingOverview.height} <span id="pl-parcel-height"></span> cm </span> |
+                        <span>{$onboardingOverview.width} <span id="pl-parcel-width"></span> cm </span> |
+                        <span>{$onboardingOverview.length} <span id="pl-parcel-length"></span> cm </span>
+                    </span>
+                    <button class="pl-button pl-button-secondary pl-small">{$onboardingOverview.edit}</button>
+                </p>
+                <p class="pl-onboarding-missing-info pl-display-none pl-w-100">
+                    <span class="pl-min-width-81">
+                        {$onboardingOverview.missingInfo}
+                    </span>
+                    <button class="pl-button pl-button-primary pl-small">{$onboardingOverview.complete}</button>
+                </p>
+            </div>
+            <hr>
+            <div class="pl-list-item pl-wh-wrapper">
+                <i class="pl-info-icon-ok pl-display-none">J</i>
+                <i class="pl-info-icon-x pl-display-none">X</i>
+                <p class="pl-onboarding-list-title">{$onboardingOverview.senderAddress}</p>
+                <p id="pl-wh-details" class="pl-display-none pl-w-100">
+                    <span class="pl-min-width-81">
+                        <span id="pl-wh-alias"></span> |
+                        <span id="pl-wh-user"></span> |
+                        <span id="pl-wh-company"></span>
+                    </span>
+                    <button class="pl-button pl-button-secondary pl-small">{$onboardingOverview.edit}</button>
+                </p>
+                <p class="pl-onboarding-missing-info pl-display-none pl-w-100">
+                     <span class="pl-min-width-81">
+                        {$onboardingOverview.missingInfo}
+                    </span>
+                    <button class="pl-button pl-button-primary pl-small">{$onboardingOverview.complete}</button>
+                </p>
+            </div>
+        </div>
+        <div class="pl-w-85 pl-responsive-docked-btn-wrapper">
+            <button id="pl-onboarding-overview-button" type="submit" name="onboardingOverview"
+                    class="pl-button pl-button-primary">
+                {$onboardingOverview.continue}
+            </button>
+        </div>
+    </div>
+</div>

@@ -2,26 +2,25 @@
     <div class="pl-flex-expand pl-text-center pl-page-padding">
         <div class="pl-bottom-separate">
             <h1 class="pl-text-center">
-                {$onBoardingWelcome.header}
+                {$onboardingWelcome.header}
             </h1>
             <p class="pl-text-center">
-                {$onBoardingWelcome.steps}
+                {$onboardingWelcome.steps}
             </p>
         </div>
-        <div class="pl-w-85">
-            <ol class="pl-onboarding-welcome-steps" type="1">
-                <li>
-                    1. {$onBoardingWelcome.stepOne}
-                </li>
-                <hr>
-                <li>
-                    2. {$onBoardingWelcome.stepTwo}
-                </li>
-            </ol>
+        <div class="pl-w-85 pl-onboarding-welcome-steps">
+            <div class="pl-list-item">
+                1. {$onboardingWelcome.stepOne}
+            </div>
+            <hr>
+            <div class="pl-list-item">
+                2. {$onboardingWelcome.stepTwo}
+            </div>
         </div>
         <div class="pl-w-85 pl-responsive-docked-btn-wrapper">
-            <button id="pl-login-button" type="submit" name="login" class="pl-button pl-button-primary">
-                {$onBoardingWelcome.startSetUp}
+            <button id="pl-onboarding-welcome-button" type="submit" name="onboardingWelcome"
+                    class="pl-button pl-button-primary">
+                {$onboardingWelcome.startSetUp}
             </button>
         </div>
     </div>
