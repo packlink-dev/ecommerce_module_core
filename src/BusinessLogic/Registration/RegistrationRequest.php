@@ -210,17 +210,13 @@ class RegistrationRequest extends FrontDto
         parent::doValidate($payload, $validationErrors);
 
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'email',
-                'Field must be a valid email.'
-            );
+            static::setInvalidFieldError('email', $validationErrors, 'Field must be a valid email.');
         }
 
         if (!empty($payload['password']) && strlen($payload['password']) < 6) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'password',
+                $validationErrors,
                 'The password must be at least 6 characters long.'
             );
         }
@@ -228,53 +224,37 @@ class RegistrationRequest extends FrontDto
         if (!empty($payload['estimated_delivery_volume'])
             && !in_array($payload['estimated_delivery_volume'], static::$supportedDeliveryOptions, true)
         ) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'estimated_delivery_volume',
+                $validationErrors,
                 'Field is not a valid delivery volume.'
             );
         }
 
         if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'phone',
-                'Field must be a valid phone number.'
-            );
+            static::setInvalidFieldError('phone', $validationErrors, 'Field must be a valid phone number.');
         }
 
         if (!empty($payload['language']) && !in_array($payload['language'], static::$supportedLanguages, true)) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'language',
-                'Field is not a valid language.'
-            );
+            static::setInvalidFieldError('language', $validationErrors, 'Field is not a valid language.');
         }
 
         if (!empty($payload['platform_country'])
             && !in_array($payload['platform_country'], static::$supportedPlatformCountries, true)
         ) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'platform_country',
+                $validationErrors,
                 'Field is not a valid platform country.'
             );
         }
 
         if (!empty($payload['source']) && filter_var($payload['source'], FILTER_VALIDATE_URL) === false) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'source',
-                'Field must be a valid URL.'
-            );
+            static::setInvalidFieldError('source', $validationErrors, 'Field must be a valid URL.');
         }
 
         if (!empty($payload['platform']) && $payload['platform'] !== 'PRO') {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'platform',
-                'Field must be set to "PRO".'
-            );
+            static::setInvalidFieldError('platform', $validationErrors, 'Field must be set to "PRO".');
         }
     }
 }

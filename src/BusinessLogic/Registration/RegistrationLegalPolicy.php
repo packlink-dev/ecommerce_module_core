@@ -104,22 +104,16 @@ class RegistrationLegalPolicy extends FrontDto
     }
 
     /**
-     * Checks the payload for mandatory fields. Uses `empty()` validation!
+     * Checks whether the array element with the given key is set.
      *
      * @param array $payload The payload in key-value format.
-     * @param ValidationError[] $validationErrors The array of errors to populate.
+     * @param string $key The field key.
+     *
+     * @return bool
      */
-    protected static function validateRequiredFields(array $payload, array &$validationErrors)
+    protected static function requiredFieldSet(array $payload, $key)
     {
-        foreach (static::$requiredFields as $field) {
-            if (!array_key_exists($field, $payload)) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
-        }
+        return array_key_exists($key, $payload);
     }
 
     /**
@@ -134,11 +128,7 @@ class RegistrationLegalPolicy extends FrontDto
 
         foreach (array('data_processing', 'terms_and_conditions') as $key) {
             if ($payload[$key] === false) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
-                    $key,
-                    'Field must be set to true.'
-                );
+                static::setInvalidFieldError($key, $validationErrors, 'Field must be set to true.');
             }
         }
     }

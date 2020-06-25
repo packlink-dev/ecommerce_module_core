@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\Tests\BusinessLogic\Tasks;
+namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;

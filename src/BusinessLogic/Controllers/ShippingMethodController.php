@@ -49,17 +49,6 @@ class ShippingMethodController
      */
     const ECONOMIC = 'economic';
     /**
-     * Allowed policies.
-     *
-     * @var array
-     */
-    private static $policies = array(
-        ShippingMethod::PRICING_POLICY_PACKLINK,
-        ShippingMethod::PRICING_POLICY_PERCENT,
-        ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT,
-        ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE,
-    );
-    /**
      * Shipping method service.
      *
      * @var ShippingMethodService
@@ -99,10 +88,6 @@ class ShippingMethodController
      */
     public function save(ShippingMethodConfiguration $shippingMethod)
     {
-        if (!$this->isValid($shippingMethod)) {
-            return null;
-        }
-
         $model = $this->shippingMethodService->getShippingMethod($shippingMethod->id);
         if (!$model) {
             Logger::logError("Shipping method with id {$shippingMethod->id} not found!");
@@ -117,10 +102,9 @@ class ShippingMethodController
             return $this->transformShippingMethodModelToDto($model);
         } catch (\Exception $e) {
             Logger::logError($e->getMessage(), 'Core', $shippingMethod->toArray());
-            $result = null;
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -178,33 +162,10 @@ class ShippingMethodController
         $shippingMethod->taxClass = $item->getTaxClass();
         $shippingMethod->shippingCountries = $item->getShippingCountries();
         $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
-
-        $shippingMethod->pricePolicy = $item->getPricingPolicy();
-        $shippingMethod->percentPricePolicy = $item->getPercentPricePolicy();
-        $shippingMethod->fixedPriceByWeightPolicy = $item->getFixedPriceByWeightPolicy();
-        $shippingMethod->fixedPriceByValuePolicy = $item->getFixedPriceByValuePolicy();
-
+        $shippingMethod->pricingPolicies = $item->getPricingPolicies();
         $shippingMethod->logoUrl = $item->getLogoUrl();
 
         return $shippingMethod;
-    }
-
-    /**
-     * Validates shipping method data.
-     *
-     * @param ShippingMethodConfiguration $data Shipping method data object.
-     *
-     * @return bool Returns true if shipping method data is valid, false otherwise.
-     */
-    private function isValid(ShippingMethodConfiguration $data)
-    {
-        return !(!isset($data->id, $data->name, $data->showLogo, $data->pricePolicy)
-            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && !isset($data->percentPricePolicy))
-            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT
-                && empty($data->fixedPriceByWeightPolicy))
-            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE
-                && empty($data->fixedPriceByValuePolicy))
-            || (!is_bool($data->showLogo) || !in_array($data->pricePolicy, static::$policies, false)));
     }
 
     /**
@@ -220,19 +181,9 @@ class ShippingMethodController
         $model->setTaxClass($configuration->taxClass);
         $model->setShipToAllCountries($configuration->isShipToAllCountries);
         $model->setShippingCountries($configuration->shippingCountries);
-        switch ($configuration->pricePolicy) {
-            case ShippingMethod::PRICING_POLICY_PACKLINK:
-                $model->setPacklinkPricePolicy();
-                break;
-            case ShippingMethod::PRICING_POLICY_PERCENT:
-                $model->setPercentPricePolicy($configuration->percentPricePolicy);
-                break;
-            case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT:
-                $model->setFixedPriceByWeightPolicy($configuration->fixedPriceByWeightPolicy);
-                break;
-            case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE:
-                $model->setFixedPriceByValuePolicy($configuration->fixedPriceByValuePolicy);
-                break;
+
+        foreach ($configuration->pricingPolicies as $policy) {
+            $model->addPricingPolicy($policy);
         }
     }
 }

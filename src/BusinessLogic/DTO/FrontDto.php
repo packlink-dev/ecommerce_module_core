@@ -114,13 +114,7 @@ abstract class FrontDto extends DataTransferObject
     protected static function validateRequiredFields(array $payload, array &$validationErrors)
     {
         foreach (static::$requiredFields as $field) {
-            if (empty($payload[$field])) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
+            static::validateRequiredField($payload, $field, $validationErrors);
         }
     }
 
@@ -132,6 +126,62 @@ abstract class FrontDto extends DataTransferObject
      */
     protected static function doValidate(array $payload, array &$validationErrors)
     {
+    }
+
+    /**
+     * Validates a single required field.
+     *
+     * @param array $payload The payload in key-value format.
+     * @param string $key
+     * @param ValidationError[] $validationErrors The array of errors to populate.
+     *
+     * @return bool
+     */
+    protected static function validateRequiredField(array $payload, $key, &$validationErrors)
+    {
+        if (!static::requiredFieldSet($payload, $key)) {
+            static::setRequiredFieldError($key, $validationErrors);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether the array element with the given key is set.
+     *
+     * @param array $payload The payload in key-value format.
+     * @param string $key
+     *
+     * @return bool
+     */
+    protected static function requiredFieldSet(array $payload, $key)
+    {
+        return !empty($payload[$key]);
+    }
+
+    /**
+     * Sets the required field validation error.
+     *
+     * @param string $code The field code.
+     * @param \Packlink\BusinessLogic\DTO\ValidationError[] $errors The list of errors to alter.
+     */
+    protected static function setRequiredFieldError($code, &$errors)
+    {
+        $errors[] = static::getValidationError(ValidationError::ERROR_REQUIRED_FIELD, $code, 'Field is required.');
+    }
+
+    /**
+     * Sets the invalid field validation error.
+     *
+     * @param string $code The field code.
+     * @param \Packlink\BusinessLogic\DTO\ValidationError[] $errors The list of errors to alter.
+     * @param string $message Optional field message
+     */
+    protected static function setInvalidFieldError($code, &$errors, $message = 'Field is invalid.')
+    {
+        $errors[] = static::getValidationError(ValidationError::ERROR_INVALID_FIELD, $code, $message);
     }
 
     /**

@@ -168,19 +168,11 @@ class Warehouse extends FrontDto
         parent::doValidate($payload, $validationErrors);
 
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'email',
-                'Field must be a valid email.'
-            );
+            static::setInvalidFieldError('email', $validationErrors, 'Field must be a valid email.');
         }
 
         if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'phone',
-                'Field must be a valid phone number.'
-            );
+            static::setInvalidFieldError('phone', $validationErrors, 'Field must be a valid phone number.');
         }
     }
 }

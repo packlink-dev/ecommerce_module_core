@@ -3,7 +3,6 @@
 namespace Packlink\BusinessLogic\Tax;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
-use Packlink\BusinessLogic\DTO\ValidationError;
 
 /**
  * Class TaxClass.
@@ -46,21 +45,15 @@ class TaxClass extends FrontDto
     protected static $requiredFields = array('label', 'value');
 
     /**
-     * Checks the payload for mandatory fields.
+     * Checks whether the array element with the given key is set.
      *
      * @param array $payload The payload in key-value format.
-     * @param ValidationError[] $validationErrors The array of errors to populate.
+     * @param string $key The field key.
+     *
+     * @return bool
      */
-    protected static function validateRequiredFields(array $payload, array &$validationErrors)
+    protected static function requiredFieldSet(array $payload, $key)
     {
-        foreach (static::$requiredFields as $field) {
-            if (!isset($payload[$field])) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
-        }
+        return isset($payload[$key]);
     }
 }

@@ -8,8 +8,8 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 
 /**
@@ -28,7 +28,7 @@ class ShippingCostCalculator
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
-     * @param float $totalAmount Total cart value if calculation is done by value
+     * @param float $totalPrice Total cart value if calculation is done by value
      *
      * @return float Calculated shipping cost for service if found. Otherwise, 0.0;
      */
@@ -39,7 +39,7 @@ class ShippingCostCalculator
         $toCountry,
         $toZip,
         array $packages,
-        $totalAmount
+        $totalPrice
     ) {
         $data = self::getShippingCosts(
             array($shippingMethod),
@@ -48,7 +48,7 @@ class ShippingCostCalculator
             $toCountry,
             $toZip,
             $packages,
-            $totalAmount
+            $totalPrice
         );
         $data = !empty($data) ? current($data) : 0;
 
@@ -56,7 +56,7 @@ class ShippingCostCalculator
     }
 
     /**
-     * Returns shipping costs for all given shipping methods that support delivery with specified parameters.
+     * Returns shipping costs for all given shipping methods that support delivery for specified parameters.
      *
      * @param ShippingMethod[] $shippingMethods Shipping methods to do a calculation for.
      * @param string $fromCountry Departure country code.
@@ -64,7 +64,7 @@ class ShippingCostCalculator
      * @param string $toCountry Destination country code.
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
-     * @param float $totalAmount Total cart value if calculation is done by value
+     * @param float $totalPrice Total cart value if calculation is done by value
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
@@ -75,7 +75,7 @@ class ShippingCostCalculator
         $toCountry,
         $toZip,
         array $packages,
-        $totalAmount
+        $totalPrice
     ) {
         if (empty($shippingMethods)) {
             return array();
@@ -91,7 +91,7 @@ class ShippingCostCalculator
                 $shippingMethods,
                 $response,
                 $package->weight,
-                $totalAmount
+                $totalPrice
             );
         } catch (HttpBaseException $e) {
             // Fallback when API is not available.
@@ -101,7 +101,7 @@ class ShippingCostCalculator
                     $fromCountry,
                     $toCountry,
                     $package->weight,
-                    $totalAmount
+                    $totalPrice
                 );
             }
         }
@@ -110,7 +110,7 @@ class ShippingCostCalculator
     }
 
     /**
-     * Returns cheapest service in shipping method.
+     * Returns cheapest service in shipping method. It does not take into consideration pricing policies.
      *
      * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $method
      * @param string $fromCountry From country code.
@@ -119,7 +119,7 @@ class ShippingCostCalculator
      * @param string $toZip To zip code.
      * @param Package[] $packages Packages for which to find service.
      *
-     * @return ShippingService Cheapest service.
+     * @return ShippingService|null The cheapest service if found; otherwise, null.
      */
     public static function getCheapestShippingService(
         ShippingMethod $method,
@@ -140,27 +140,14 @@ class ShippingCostCalculator
             $services = array();
         }
 
-        /** @var ShippingService $result */
         $result = null;
         if (!empty($services)) {
             foreach ($services as $service) {
-                foreach ($method->getShippingServices() as $methodService) {
-                    if ($service->id === $methodService->serviceId
-                        && ($result === null || $result->basePrice > $methodService->basePrice)
-                    ) {
-                        $result = $methodService;
-                    }
-                }
+                $result = self::getCheapestService($method->getShippingServices(), $result, $service->id);
             }
         } else {
             // Fallback.
-            foreach ($method->getShippingServices() as $service) {
-                if ($service->destinationCountry === $toCountry) {
-                    if ($result === null || $result->basePrice > $service->basePrice) {
-                        $result = $service;
-                    }
-                }
-            }
+            $result = self::getCheapestService($method->getShippingServices(), $result, '', $toCountry);
         }
 
         if ($result !== null) {
@@ -175,141 +162,13 @@ class ShippingCostCalculator
     }
 
     /**
-     * Calculates shipping method cost based on given criteria.
-     *
-     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $shippingMethod
-     * @param float $totalAmount
-     *
-     * @param int $serviceId
-     * @param float $basePrice
-     *
-     * @param string $fromCountry
-     * @param string $toCountry
-     *
-     * @return float|bool Calculated cost or FALSE if cost cannot be calculated for the given criteria.
-     */
-    protected static function calculateShippingMethodCost(
-        ShippingMethod $shippingMethod,
-        $totalAmount,
-        $serviceId = 0,
-        $basePrice = 0.0,
-        $fromCountry = '',
-        $toCountry = ''
-    ) {
-        $cost = PHP_INT_MAX;
-        foreach ($shippingMethod->getShippingServices() as $methodService) {
-            if (($serviceId !== 0 && $methodService->serviceId === $serviceId)
-                || ($methodService->departureCountry === $fromCountry
-                    && $methodService->destinationCountry === $toCountry)
-            ) {
-                try {
-                    $baseCost = self::calculateCostForShippingMethod(
-                        $shippingMethod,
-                        $basePrice ?: $methodService->basePrice,
-                        $totalAmount
-                    );
-                } catch (FixedPriceValueOutOfBoundsException $e) {
-                    return false;
-                }
-
-                $cost = min($cost, $baseCost);
-            }
-        }
-
-        return $cost !== PHP_INT_MAX ? $cost : false;
-    }
-
-    /**
-     * Calculates shipping cost for given shipping method based on its pricing policy.
-     *
-     * @param ShippingMethod $shippingMethod Method to calculate cost for.
-     * @param float $baseCost Base cost from Packlink API or from default cost.
-     * @param float $totalAmount Total amount (weight or value).
-     *
-     * @return float Calculated shipping cost.
-     *
-     * @throws \Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException
-     */
-    protected static function calculateCostForShippingMethod(
-        ShippingMethod $shippingMethod,
-        $baseCost,
-        $totalAmount = 0.0
-    ) {
-        $pricingPolicy = $shippingMethod->getPricingPolicy();
-        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT
-            || $pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE
-        ) {
-            return round(self::calculateFixedPriceCost($shippingMethod, $totalAmount), 2);
-        }
-
-        return round(self::calculateVariableCost($shippingMethod, $baseCost), 2);
-    }
-
-    /**
-     * Calculates shipping cost for fixed price policy.
-     *
-     * @param ShippingMethod $shippingMethod Method to calculate cost for.
-     * @param float $total Total weight or value.
-     *
-     * @return float Calculated fixed price cost.
-     *
-     * @throws \Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException
-     */
-    protected static function calculateFixedPriceCost(ShippingMethod $shippingMethod, $total)
-    {
-        $fixedPricePolicies = $shippingMethod->getFixedPriceByWeightPolicy();
-        if ($shippingMethod->getPricingPolicy() === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE) {
-            $fixedPricePolicies = $shippingMethod->getFixedPriceByValuePolicy();
-        }
-
-        self::sortFixedPricePolicy($fixedPricePolicies);
-
-        if ($total < $fixedPricePolicies[0]->from) {
-            throw new FixedPriceValueOutOfBoundsException('Fixed price value out of bounds.');
-        }
-
-        foreach ($fixedPricePolicies as $fixedPricePolicy) {
-            if ($fixedPricePolicy->from <= $total && $fixedPricePolicy->to > $total) {
-                return $fixedPricePolicy->amount;
-            }
-        }
-
-        return $fixedPricePolicies[count($fixedPricePolicies) - 1]->amount;
-    }
-
-    /**
-     * Calculates cost based on default value and percent or Packlink pricing policy.
-     *
-     * @param ShippingMethod $shippingMethod Method to calculate cost for.
-     * @param float $defaultCost Base cost on which to apply pricing policy.
-     *
-     * @return float Final cost.
-     */
-    protected static function calculateVariableCost(ShippingMethod $shippingMethod, $defaultCost)
-    {
-        $pricingPolicy = $shippingMethod->getPricingPolicy();
-        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_PACKLINK) {
-            return $defaultCost;
-        }
-
-        $policy = $shippingMethod->getPercentPricePolicy();
-        $amount = $defaultCost * ($policy->amount / 100);
-        if ($policy->increase) {
-            return $defaultCost + $amount;
-        }
-
-        return $defaultCost - $amount;
-    }
-
-    /**
      * Returns default shipping costs for all given shipping methods in the system.
      *
      * @param ShippingMethod[] $shippingMethods Array of shipping methods fmr the shop.
-     *
      * @param string $fromCountry Departure country code.
      * @param string $toCountry Destination country code.
      * @param float $totalWeight Package total weight.
-     * @param float $totalAmount Total cart value if calculation is done by value
+     * @param float $totalPrice Total cart value if calculation is done by value
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
@@ -318,15 +177,15 @@ class ShippingCostCalculator
         $fromCountry,
         $toCountry,
         $totalWeight,
-        $totalAmount
+        $totalPrice
     ) {
         $shippingCosts = array();
 
-        /** @var ShippingMethod $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
             $cost = self::calculateShippingMethodCost(
                 $shippingMethod,
-                self::getAmountBasedOnPricingPolicy($shippingMethod, $totalAmount, $totalWeight),
+                $totalWeight,
+                $totalPrice,
                 0,
                 0.0,
                 $fromCountry,
@@ -347,25 +206,29 @@ class ShippingCostCalculator
      * @param ShippingMethod[] $shippingMethods Array of active shipping methods in the system.
      * @param ShippingServiceDetails[] $shippingServices Array of shipping services delivery details.
      * @param float $totalWeight Package total weight.
-     * @param float $totalAmount Total value if calculation is done by value
+     * @param float $totalPrice Total value if calculation is done by value
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
-    private static function calculateShippingCostsPerShippingMethod(
+    protected static function calculateShippingCostsPerShippingMethod(
         array $shippingMethods,
         array $shippingServices,
         $totalWeight,
-        $totalAmount
+        $totalPrice
     ) {
         $shippingCosts = array();
 
-        /** @var ShippingMethod $method */
         foreach ($shippingMethods as $method) {
-            $amount = self::getAmountBasedOnPricingPolicy($method, $totalAmount, $totalWeight);
-
             $cost = PHP_INT_MAX;
             foreach ($shippingServices as $service) {
-                $baseCost = self::calculateShippingMethodCost($method, $amount, $service->id, $service->basePrice);
+                $baseCost = self::calculateShippingMethodCost(
+                    $method,
+                    $totalWeight,
+                    $totalPrice,
+                    $service->id,
+                    $service->basePrice
+                );
+
                 if ($baseCost !== false) {
                     $cost = min($cost, $baseCost);
                 }
@@ -380,37 +243,109 @@ class ShippingCostCalculator
     }
 
     /**
-     * Gets instance of proxy.
+     * Calculates shipping method cost based on given criteria.
      *
-     * @return \Packlink\BusinessLogic\Http\Proxy Packlink Proxy.
+     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $shippingMethod
+     * @param float $totalWeight
+     * @param float $totalPrice
+     * @param int $serviceId
+     * @param float $basePrice
+     * @param string $fromCountry
+     * @param string $toCountry
+     *
+     * @return float|bool Calculated cost or FALSE if cost cannot be calculated for the given criteria.
      */
-    private static function getProxy()
-    {
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+    protected static function calculateShippingMethodCost(
+        ShippingMethod $shippingMethod,
+        $totalWeight,
+        $totalPrice,
+        $serviceId = 0,
+        $basePrice = 0.0,
+        $fromCountry = '',
+        $toCountry = ''
+    ) {
+        $cost = PHP_INT_MAX;
+        // porting to array_reduce would increase complexity of the code because inner function will need a lot of
+        // parameters
+        foreach ($shippingMethod->getShippingServices() as $methodService) {
+            if (($serviceId !== 0 && $methodService->serviceId === $serviceId)
+                || ($methodService->departureCountry === $fromCountry
+                    && $methodService->destinationCountry === $toCountry)
+            ) {
+                $baseCost = self::getCostForShippingService(
+                    $shippingMethod,
+                    $basePrice ?: $methodService->basePrice,
+                    $totalWeight,
+                    $totalPrice
+                );
 
-        return $proxy;
+                $cost = min($cost, $baseCost);
+            }
+        }
+
+        return $cost !== PHP_INT_MAX ? $cost : false;
     }
 
     /**
-     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $method
-     * @param $totalAmount
-     * @param $totalWeight
+     * Calculates shipping cost for given shipping method based on its pricing policy.
      *
-     * @return int
+     * @param ShippingMethod $method
+     * @param float $baseCost Base cost from Packlink API or from default cost.
+     * @param float $totalWeight
+     * @param float $totalPrice Total amount (weight or value).
      *
+     * @return float Calculated shipping cost.
      */
-    private static function getAmountBasedOnPricingPolicy(ShippingMethod $method, $totalAmount, $totalWeight)
-    {
-        $pricingPolicy = $method->getPricingPolicy();
-        $amount = 0;
-        if ($pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT) {
-            $amount = $totalWeight;
-        } elseif ($pricingPolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE) {
-            $amount = $totalAmount;
+    protected static function getCostForShippingService(
+        ShippingMethod $method,
+        $baseCost,
+        $totalWeight = 0.0,
+        $totalPrice = 0.0
+    ) {
+        $pricingPolicies = $method->getPricingPolicies();
+        if (empty($pricingPolicies)) {
+            return $baseCost;
         }
 
-        return $amount;
+        $cost = PHP_INT_MAX;
+        foreach ($pricingPolicies as $policy) {
+            if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice)) {
+                $cost = min($cost, self::calculateCost($policy, $baseCost));
+            }
+        }
+
+        // if no policy can be applied because of range, use base cost if it is set that way
+        if ($cost === PHP_INT_MAX && $method->isUseWhenOutOfRange()) {
+            $cost = $baseCost;
+        }
+
+        return $cost !== PHP_INT_MAX ? $cost : false;
+    }
+
+    /**
+     * Calculates cost based on default value and percent or Packlink pricing policy.
+     *
+     * @param ShippingPricePolicy $policy Pricing policy
+     * @param float $defaultCost Base cost on which to apply pricing policy.
+     *
+     * @return float Final cost.
+     */
+    protected static function calculateCost(ShippingPricePolicy $policy, $defaultCost)
+    {
+        if ($policy->pricingPolicy === ShippingPricePolicy::POLICY_PACKLINK) {
+            return $defaultCost;
+        }
+
+        if ($policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE) {
+            return $policy->fixedPrice;
+        }
+
+        $amount = $defaultCost * ($policy->changePercent / 100);
+        if ($policy->increase) {
+            return round($defaultCost + $amount, 2);
+        }
+
+        return round($defaultCost - $amount, 2);
     }
 
     /**
@@ -429,22 +364,64 @@ class ShippingCostCalculator
     }
 
     /**
-     * Sorts fixed price policies.
+     * Indicates whether the given policy can be applied by range for the given parameters.
      *
-     * @param \Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy[] $fixedPricePolicies
-     *      Reference to an fixed price policy array.
+     * @param ShippingPricePolicy $policy
+     * @param float $totalWeight
+     * @param float $totalPrice
+     *
+     * @return bool
      */
-    private static function sortFixedPricePolicy(&$fixedPricePolicies)
+    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice)
     {
-        usort(
-            $fixedPricePolicies,
-            function ($a, $b) {
-                if ($a->from === $b->from) {
-                    return 0;
-                }
+        $byPrice = $policy->fromPrice <= $totalPrice && (empty($policy->toPrice) || $totalPrice < $policy->toPrice);
+        $byWeight = $policy->fromWeight <= $totalWeight
+            && (empty($policy->toWeight) || $totalWeight < $policy->toWeight);
 
-                return $a->from < $b->from ? -1 : 1;
+        switch ($policy->rangeType) {
+            case ShippingPricePolicy::RANGE_PRICE:
+                return $byPrice;
+            case ShippingPricePolicy::RANGE_WEIGHT:
+                return $byWeight;
+            default:
+                return $byPrice && $byWeight;
+        }
+    }
+
+    /**
+     * Gets the cheapest shipping services.
+     *
+     * @param ShippingService[] $services Shipping services to check.
+     * @param ShippingService|null $result The service to compare to.
+     * @param int|string $serviceId The ID of service to take into consideration.
+     * @param string $toCountry The destination country for the service.
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService
+     */
+    private static function getCheapestService(array $services, $result, $serviceId = '', $toCountry = '')
+    {
+        foreach ($services as $service) {
+            if ((!$toCountry || $service->destinationCountry === $toCountry)
+                && (!$serviceId || $serviceId === $service->serviceId)
+                && ($result === null || $result->basePrice > $service->basePrice)
+            ) {
+                $result = $service;
             }
-        );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets instance of proxy.
+     *
+     * @return \Packlink\BusinessLogic\Http\Proxy Packlink Proxy.
+     */
+    private static function getProxy()
+    {
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+
+        return $proxy;
     }
 }

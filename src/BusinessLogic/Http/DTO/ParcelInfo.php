@@ -110,9 +110,9 @@ class ParcelInfo extends FrontDto
         $options = array('options' => array('min_range' => 0));
         foreach (array('width', 'length', 'height') as $field) {
             if (!empty($payload[$field]) && filter_var($payload[$field], FILTER_VALIDATE_INT, $options) === false) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
+                static::setInvalidFieldError(
                     $field,
+                    $validationErrors,
                     ucfirst($field) . ' must be a positive integer.'
                 );
             }
@@ -121,11 +121,7 @@ class ParcelInfo extends FrontDto
         if (!empty($payload['weight'])
             && (filter_var($payload['weight'], FILTER_VALIDATE_FLOAT) === false || $payload['weight'] <= 0)
         ) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'weight',
-                'Weight must be a positive decimal number.'
-            );
+            static::setInvalidFieldError('weight', $validationErrors, 'Weight must be a positive decimal number.');
         }
     }
 }

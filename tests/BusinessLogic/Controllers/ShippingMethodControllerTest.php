@@ -5,17 +5,16 @@ namespace Logeecom\Tests\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
+use Logeecom\Tests\BusinessLogic\Tasks\UpdateShippingServicesTaskTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
-use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
-use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
-use Packlink\Tests\BusinessLogic\Tasks\UpdateShippingServicesTaskTest;
 
 /**
  * Class ShippingMethodControllerTest
@@ -98,7 +97,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->id = $first->id;
         $shipment->name = 'First name test';
         $shipment->showLogo = !$first->showLogo;
-        $shipment->pricePolicy = $first->pricePolicy;
+        $shipment->pricingPolicies = $first->pricingPolicies;
         $shipment->isShipToAllCountries = true;
         $shipment->shippingCountries = array();
 
@@ -109,17 +108,26 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $this->assertEquals($shipment->id, $model->id);
         $this->assertEquals($shipment->name, $model->name);
         $this->assertEquals($shipment->showLogo, $model->showLogo);
-        $this->assertEquals($shipment->pricePolicy, $model->pricePolicy);
+        $this->assertEquals($shipment->pricingPolicies, $model->pricingPolicies);
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testShippingMethodConfigurationToArray()
     {
         $instance = new ShippingMethodConfiguration();
         $instance->id = 12;
         $instance->name = 'First name test';
         $instance->showLogo = true;
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
-        $instance->fixedPriceByWeightPolicy[] = new FixedPricePolicy(0, 10, 12);
+        $instance->pricingPolicies[] = ShippingPricePolicy::fromArray(
+            array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
+            )
+        );
 
         $data = $instance->toArray();
 
@@ -127,29 +135,12 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertEquals($instance->id, $data['id']);
         self::assertEquals($instance->name, $data['name']);
         self::assertEquals($instance->showLogo, $data['showLogo']);
-        self::assertEquals($instance->pricePolicy, $data['pricePolicy']);
-        self::assertCount(1, $data['fixedPriceByWeightPolicy']);
-        self::assertEquals(0, $data['fixedPriceByWeightPolicy'][0]['from']);
-        self::assertEquals(10, $data['fixedPriceByWeightPolicy'][0]['to']);
-        self::assertEquals(12, $data['fixedPriceByWeightPolicy'][0]['amount']);
-
-        $instance->fixedPriceByValuePolicy[] = new FixedPricePolicy(0, 100, 120);
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
-        $data = $instance->toArray();
-
-        self::assertCount(1, $data['fixedPriceByValuePolicy']);
-        self::assertEquals(0, $data['fixedPriceByValuePolicy'][0]['from']);
-        self::assertEquals(100, $data['fixedPriceByValuePolicy'][0]['to']);
-        self::assertEquals(120, $data['fixedPriceByValuePolicy'][0]['amount']);
-
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
-        $instance->percentPricePolicy = new PercentPricePolicy(false, 10);
-        $data = $instance->toArray();
-
-        self::assertEquals(false, $data['percentPricePolicy']['increase']);
-        self::assertEquals(10, $data['percentPricePolicy']['amount']);
+        self::assertCount(1, $instance->pricingPolicies);
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
     public function testShippingMethodResponseToArray()
     {
         $instance = new ShippingMethodResponse();
@@ -163,8 +154,14 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $instance->logoUrl = 'url';
         $instance->showLogo = false;
         $instance->selected = false;
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
-        $instance->fixedPriceByWeightPolicy[] = new FixedPricePolicy(0, 10, 12);
+        $instance->pricingPolicies[] = ShippingPricePolicy::fromArray(
+            array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
+            )
+        );
 
         $data = $instance->toArray();
 
@@ -179,26 +176,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertEquals($instance->logoUrl, $data['logoUrl']);
         self::assertEquals($instance->showLogo, $data['showLogo']);
         self::assertEquals($instance->selected, $data['selected']);
-        self::assertEquals($instance->pricePolicy, $data['pricePolicy']);
-        self::assertCount(1, $data['fixedPriceByWeightPolicy']);
-        self::assertEquals(0, $data['fixedPriceByWeightPolicy'][0]['from']);
-        self::assertEquals(10, $data['fixedPriceByWeightPolicy'][0]['to']);
-        self::assertEquals(12, $data['fixedPriceByWeightPolicy'][0]['amount']);
-
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
-        $instance->fixedPriceByValuePolicy[] = new FixedPricePolicy(0, 100, 120);
-        $data = $instance->toArray();
-        self::assertCount(1, $data['fixedPriceByValuePolicy']);
-        self::assertEquals(0, $data['fixedPriceByValuePolicy'][0]['from']);
-        self::assertEquals(100, $data['fixedPriceByValuePolicy'][0]['to']);
-        self::assertEquals(120, $data['fixedPriceByValuePolicy'][0]['amount']);
-
-        $instance->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
-        $instance->percentPricePolicy = new PercentPricePolicy(false, 10);
-        $data = $instance->toArray();
-
-        self::assertEquals(false, $data['percentPricePolicy']['increase']);
-        self::assertEquals(10, $data['percentPricePolicy']['amount']);
+        self::assertCount(1, $instance->pricingPolicies);
     }
 
     public function testSaveNoShippingMethod()
@@ -207,7 +185,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $shipment->id = 1235412;
         $shipment->name = 'First name test';
         $shipment->showLogo = true;
-        $shipment->pricePolicy = 1;
 
         $this->assertNull($this->controller->save($shipment));
     }
@@ -215,15 +192,14 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     public function testSaveInvalidMissingProperty()
     {
         $shipment = new ShippingMethodConfiguration();
-        $properties = array('id', 'name', 'showLogo', 'pricePolicy');
+        $properties = array('id', 'name', 'showLogo', 'pricingPolicies');
         $shipment->id = 1235412;
         $shipment->name = 'First name test';
         $shipment->showLogo = true;
-        $shipment->pricePolicy = 1;
 
         foreach ($properties as $property) {
             $value = $shipment->$property;
-            unset($shipment->$property);
+            $shipment->$property = null;
 
             $this->assertNull($this->controller->save($shipment));
 
@@ -234,11 +210,10 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     public function testSaveInvalidPropertyWrongType()
     {
         $shipment = new ShippingMethodConfiguration();
-        $properties = array('id' => 'abc', 'name' => true, 'showLogo' => 12.5, 'pricePolicy' => 'abc');
+        $properties = array('id' => 'abc', 'name' => true, 'showLogo' => 12.5, 'pricingPolicies' => 'asdf');
         $shipment->id = 1235412;
         $shipment->name = 'First name test';
         $shipment->showLogo = true;
-        $shipment->pricePolicy = 1;
 
         foreach ($properties as $property => $value) {
             $oldValue = $shipment->$property;
@@ -248,55 +223,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
 
             $shipment->$property = $oldValue;
         }
-    }
-
-    public function testSaveInvalidMissingPricePolicy()
-    {
-        $this->importShippingMethods();
-        $all = $this->controller->getAll();
-        $first = $all[0];
-        $shipment = new ShippingMethodConfiguration();
-        $shipment->id = $first->id;
-        $shipment->name = 'First name test';
-        $shipment->showLogo = !$first->showLogo;
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
-        $this->assertNull($this->controller->save($shipment));
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
-        $this->assertNull($this->controller->save($shipment));
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
-        $this->assertNull($this->controller->save($shipment));
-    }
-
-    public function testSaveCorrectPricePolicy()
-    {
-        $this->importShippingMethods();
-        $all = $this->controller->getAll();
-        $first = $all[0];
-        $shipment = new ShippingMethodConfiguration();
-        $shipment->id = $first->id;
-        $shipment->name = 'First name test';
-        $shipment->showLogo = !$first->showLogo;
-        $shipment->isShipToAllCountries = true;
-        $shipment->shippingCountries = array();
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_PERCENT;
-        $shipment->percentPricePolicy = new PercentPricePolicy(true, 0.1);
-        $this->assertNotNull($this->controller->save($shipment));
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
-        $shipment->fixedPriceByWeightPolicy = array();
-        $shipment->fixedPriceByWeightPolicy[] = new FixedPricePolicy(0, 1, 1);
-        $shipment->fixedPriceByWeightPolicy[] = new FixedPricePolicy(1, 2.5, 1.5);
-        $this->assertNotNull($this->controller->save($shipment));
-
-        $shipment->pricePolicy = ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
-        $shipment->fixedPriceByValuePolicy = array();
-        $shipment->fixedPriceByValuePolicy[] = new FixedPricePolicy(0, 1, 1);
-        $shipment->fixedPriceByValuePolicy[] = new FixedPricePolicy(1, 2.5, 1.5);
-        $this->assertNotNull($this->controller->save($shipment));
     }
 
     public function testActivate()
