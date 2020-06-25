@@ -122,6 +122,12 @@ class Order
      * @var bool
      */
     private $deleted = false;
+    /**
+     * Seller user ID.
+     *
+     * @var string
+     */
+    private $sellerUserId;
 
     /**
      * Returns order unique identifier.
@@ -501,5 +507,25 @@ class Order
     public function setDeleted($deleted)
     {
         $this->deleted = $deleted;
+    }
+
+    /**
+     * Returns seller user ID.
+     *
+     * @return string
+     */
+    public function getSellerUserId()
+    {
+        return $this->sellerUserId;
+    }
+
+    /**
+     * Sets seller user ID.
+     *
+     * @param string $sellerUserId
+     */
+    public function setSellerUserId($sellerUserId)
+    {
+        $this->sellerUserId = $sellerUserId;
     }
 }
