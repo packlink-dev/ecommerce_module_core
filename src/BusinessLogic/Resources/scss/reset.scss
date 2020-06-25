@@ -1,0 +1,96 @@
+@font-face {
+  font-weight: 700;
+  font-family: pl-proxima-nova;
+  font-style: normal;
+  src: url("https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-BoldWeb.woff") format("woff")
+}
+
+@font-face {
+  font-weight: 600;
+  font-family: pl-proxima-nova;
+  font-style: normal;
+  src: url("https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-SemiboldWeb.woff") format("woff")
+}
+
+@font-face {
+  font-weight: 400;
+  font-family: pl-proxima-nova;
+  font-style: normal;
+  src: url("https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-RegularWeb.woff") format("woff")
+}
+
+// CSS reset
+// We do not reset the html and body, since we need to reset only for the app's root element
+#pl-page {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  height: 100%;
+  position: relative;
+
+
+  template {
+    display: none;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: pl-proxima-nova, sans-serif;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 400;
+    font-style: normal;
+    vertical-align: baseline;
+    color: #3a3d46;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #5E6972;
+    font-weight: bold;
+  }
+
+  h1 {
+    line-height: 22px;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  ul, ol {
+    list-style: none
+  }
+
+  img {
+    height: auto;
+    max-width: 100%
+  }
+
+  strong {
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+
+    td:not([align]), th:not([align]) {
+      text-align: left
+    }
+  }
+
+  a, :link, :visited {
+    text-decoration: none;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}

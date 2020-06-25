@@ -1,0 +1,58 @@
+#pl-page {
+  .pl-inline {
+    display: inline;
+  }
+
+  .pl-text-center {
+    text-align: center;
+
+    &.pl-text-with-margins {
+      margin-top: 36px;
+      margin-bottom: 36px;
+    }
+  }
+
+  .pl-flex-expand {
+    flex-grow: 1;
+  }
+
+  .pl-flex-left {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .pl-full-width {
+    width: 100%;
+  }
+
+  .pl-bottom-separate {
+    margin-bottom: 36px;
+  }
+
+  .pl-hidden {
+    display: none !important;
+  }
+
+  .pl-page-padding {
+    padding: 20px;
+  }
+
+  .pl-w-85 {
+    width: 85%;
+  }
+}
+
+// mobile rules
+@media (max-width: 768px) {
+  #pl-page {
+    .pl-desktop-only {
+      display: none !important;
+    }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
+  }
+}

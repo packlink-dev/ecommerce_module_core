@@ -25,14 +25,14 @@ function buildCss($src, $dst)
 
     createDir($dst);
 
-    $scssFiles = glob("{$src}/*.scss");
-    $dstFileName = $dst . '/output.css';
+    $scssFiles = array('reset', 'animations', 'ui-controls', 'utility', 'app');
+    $dstFileName = $dst . '/app.css';
     file_put_contents($dstFileName, '');
 
     foreach ($scssFiles as $filename) {
-        $compiledCss = $scss->compile(file_get_contents($filename));
+        $compiledCss = $scss->compile(file_get_contents("{$src}/{$filename}.scss"));
         $existingContent = file_get_contents($dstFileName);
-        file_put_contents($dstFileName,  $existingContent . $compiledCss);
+        file_put_contents($dstFileName, $existingContent . $compiledCss);
     }
 }
 
