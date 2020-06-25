@@ -2,38 +2,24 @@
 
 require_once __DIR__ . '/vendor/leafo/scssphp/scss.inc.php';
 
-$fromBase = __DIR__ . '/src/BusinessLogic/Resources/';
-$toBase = __DIR__ . '/src/BusinessLogic/Resources/';
+buildCss();
 
-$map = array(
-    $fromBase . 'scss' => $toBase . 'css',
-);
-
-foreach ($map as $from => $to) {
-    buildCss($from, $to);
-}
-
-/**
- * Copies directory.
- *
- * @param string $src
- * @param string $dst
- */
-function buildCss($src, $dst)
+function buildCss()
 {
+    $src = __DIR__ . '/src/BusinessLogic/Resources/scss';
+    $dst = __DIR__ . '/src/BusinessLogic/Resources/css';
+
     $scss = new scssc();
+    $scss->setImportPaths('src/BusinessLogic/Resources/scss/');
 
     createDir($dst);
 
-    $scssFiles = array('reset', 'animations', 'ui-controls', 'utility', 'app');
     $dstFileName = $dst . '/app.css';
     file_put_contents($dstFileName, '');
 
-    foreach ($scssFiles as $filename) {
-        $compiledCss = $scss->compile(file_get_contents("{$src}/{$filename}.scss"));
-        $existingContent = file_get_contents($dstFileName);
-        file_put_contents($dstFileName, $existingContent . $compiledCss);
-    }
+    $compiledCss = $scss->compile(file_get_contents("{$src}/app.scss"));
+    $existingContent = file_get_contents($dstFileName);
+    file_put_contents($dstFileName, $existingContent . $compiledCss);
 }
 
 /**
