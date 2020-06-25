@@ -3,8 +3,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/master...dev)
-### Changed
+## [2.1.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.1...v2.1.2) - 2020-06-25
+### Added
 - Added Hungary to the list of supported countries.
 - Added additional data (seller user ID and order ID) when creating order shipment draft.
 
