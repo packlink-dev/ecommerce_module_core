@@ -103,6 +103,10 @@ var Packlink = window.Packlink || {};
             },
             'onboarding-state': {
                 getState: configuration.getOnboardingStateUrl
+            },
+            'onboarding-overview': {
+                defaultParcelGet: configuration.defaultParcelGetUrl,
+                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
             }
         };
 

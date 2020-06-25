@@ -98,6 +98,8 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/RegisterModalController.js"></script>
 <script src="./resources/js/RegisterController.js"></script>
 <script src="./resources/js/OnboardingStateController.js"></script>
+<script src="./resources/js/OnboardingWelcomeController.js"></script>
+<script src="./resources/js/OnboardingOverviewController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
@@ -215,6 +217,11 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                         'pl-onboarding-welcome-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-welcome.html')
+                            ) ?>
+                        },
+                        'pl-onboarding-overview-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-overview.html')
                             ) ?>
                         }
                     },

@@ -3,10 +3,10 @@ var Packlink = window.Packlink || {};
 (function () {
     function OnboardingStateController(configuration) {
 
-        const templateService = Packlink.templateService,
+        const state = Packlink.state,
             ajaxService = Packlink.ajaxService,
-            welcomeTemplateId = 'pl-onboarding-welcome-page',
-            overviewTemplateId = 'pl-onboarding-overview-page';
+            welcomeController = 'onboarding-overview',
+            overviewController = 'onboarding-overview';
 
         /**
          * Displays page content.
@@ -17,9 +17,9 @@ var Packlink = window.Packlink || {};
 
         function showPageBasedOnState(response) {
             if (response.state === 'welcome') {
-                templateService.setCurrentTemplate(welcomeTemplateId);
+                state.goToState(welcomeController);
             } else {
-                templateService.setCurrentTemplate(overviewTemplateId);
+                state.goToState(overviewController);
             }
         }
     }

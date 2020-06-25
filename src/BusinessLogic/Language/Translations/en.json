@@ -57,12 +57,26 @@
     "IE": "Ireland",
     "GB": "Great Britain"
   },
-  "onBoardingWelcome": {
+  "onboardingWelcome": {
     "header": "Let's set up basic information so that you can make shipments",
     "steps": "It's just two steps that we need to go through to offer you the carrier that best suits your needs",
     "stepOne": "Set parcel details",
     "stepTwo": "Set sender's address",
     "startSetUp": "Start set up"
+  },
+  "onboardingOverview": {
+    "header": "Almost there! Please check that the information entered is correct, or complete it in order to continue.",
+    "parcelDetails": "Parcel details",
+    "senderAddress": "Sender's Address",
+    "missingInfo": "Missing information",
+    "weight": "Weight",
+    "height": "Height",
+    "width": "Width",
+    "length": "Length",
+    "complete": "Complete",
+    "edit": "Edit",
+    "continue": "Continue",
+    "myShipmentServices": "My shipment services"
   },
   "dashboard": {
     "almostThere": "You're almost there!",
