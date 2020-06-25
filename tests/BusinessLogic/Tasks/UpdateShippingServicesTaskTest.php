@@ -251,6 +251,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
                 new HttpResponse(200, array(), '[]'),
                 new HttpResponse(200, array(), '[]'),
                 new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
             )
         );
 
@@ -308,6 +309,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-IE')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-GB')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-US')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-HU')),
         );
     }
 
