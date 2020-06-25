@@ -1,3 +1,4 @@
+@import "variables";
 @import "reset";
 @import "animations";
 @import "utility";
@@ -13,7 +14,7 @@
     }
 
     hr {
-      border: 1px solid #f0f2f3;
+      border: 1px solid $border-color;
       width: 100%;
     }
 
@@ -31,7 +32,7 @@
       display: none;
 
       strong {
-        color: white;
+        color: $color-white;
       }
     }
   }
@@ -110,12 +111,12 @@
 
   .pl-login-footer {
     padding: 20px;
-    background-color: #2E4265;
-    color: #ffffff;
+    background-color: $color-navy-dark;
+    color: $color-white;
   }
 
   .pl-login-footer * {
-    color: #ffffff;
+    color: $color-white;
   }
 }
 
@@ -130,7 +131,7 @@
       display: block;
       background-color: #2195F2;
       width: 100%;
-      color: white;
+      color: $color-white;
       padding: 15px;
     }
   }

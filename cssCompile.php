@@ -11,6 +11,7 @@ function buildCss()
 
     $scss = new scssc();
     $scss->setImportPaths('src/BusinessLogic/Resources/scss/');
+    $scss->setFormatter('scss_formatter');
 
     createDir($dst);
 

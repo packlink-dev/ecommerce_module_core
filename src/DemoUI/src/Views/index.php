@@ -59,12 +59,10 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
         <div></div>
     </div>
 
-    <div id="pl-error-template">
-        <div class="pl-error-msg" data-pl-element="error">
-            <div id="pl-error-text">
-            </div>
+    <template id="pl-error-template">
+        <div class="pl-error-message" data-pl-element="error">
         </div>
-    </div>
+    </template>
 
     <div id="pl-modal-mask" class="pl-modal-mask">
         <div class="pl-modal">

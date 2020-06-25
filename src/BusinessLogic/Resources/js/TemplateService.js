@@ -138,27 +138,25 @@ var Packlink = window.Packlink || {};
         this.setError = function (input, message) {
             this.removeError(input);
 
-            let errorTemplate = this.getComponent('pl-error-template');
-            let msgField = this.getComponent('pl-error-text', errorTemplate);
-            msgField.innerHTML = message;
-            input.after(errorTemplate);
-            input.classList.add('pl-error');
+            let errorTemplate = document.createElement('div');
+            errorTemplate.innerHTML = this.getComponent('pl-error-template').innerHTML;
+            errorTemplate.firstElementChild.innerHTML = message;
+            input.after(errorTemplate.firstElementChild);
+            input.parentElement.classList.add('pl-error');
         };
 
         /**
-         * Removes error from input element.
+         * Removes error from input form group element.
          *
          * @param {Element} input
          */
         this.removeError = function (input) {
-            let firstSibling = input.parentNode.querySelector('.pl-error-msg');
-            if (firstSibling &&
-                firstSibling.getAttribute &&
-                firstSibling.getAttribute('data-pl-element') === 'error') {
-                firstSibling.querySelector('div').innerText = '';
+            let errorElement = input.parentNode.querySelector('.pl-error-message');
+            if (errorElement) {
+                input.parentNode.removeChild(errorElement);
             }
 
-            input.classList.remove('pl-error');
+            input.parentElement.classList.remove('pl-error');
         };
     }
 

@@ -24,7 +24,7 @@
 #pl-page {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: $color-white;
   height: 100%;
   position: relative;
 
@@ -42,7 +42,7 @@
     font-weight: 400;
     font-style: normal;
     vertical-align: baseline;
-    color: #3a3d46;
+    color: $text-color;
   }
 
   *, *::before, *::after {
@@ -50,7 +50,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: #5E6972;
+    color: $text-heading-color;
     font-weight: bold;
   }
 
