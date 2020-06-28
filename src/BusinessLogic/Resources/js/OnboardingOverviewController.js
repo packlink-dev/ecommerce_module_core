@@ -5,6 +5,7 @@ var Packlink = window.Packlink || {};
 
         const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
+            state = Packlink.state,
             templateId = 'pl-onboarding-overview-page';
 
         let defaultParcel,
@@ -25,7 +26,12 @@ var Packlink = window.Packlink || {};
         function initializePage(response) {
             defaultWarehouse = response;
             templateService.setCurrentTemplate(templateId);
-            let submitBtn = templateService.getComponent('pl-onboarding-overview-button');
+            let submitBtn = templateService.getComponent('pl-onboarding-overview-button'),
+                defaultParcelBtns = document.querySelectorAll('.pl-onboarding-overview-list .pl-go-to-default-parcel');
+
+            defaultParcelBtns.forEach(function (btn) {
+                btn.addEventListener('click', goToDefaultParcelForm);
+            });
 
             if (defaultParcel && defaultParcel.hasOwnProperty('weight') && defaultParcel.weight !== null) {
                 setRequiredInfoPopulatedState('pl-parcel-details', 'pl-parcel-wrapper');
@@ -74,6 +80,10 @@ var Packlink = window.Packlink || {};
 
             let indicator = document.querySelector('.' + indicatorWrapperClass + ' .pl-info-icon-ok');
             indicator.classList.remove('pl-display-none');
+        }
+
+        function goToDefaultParcelForm() {
+            state.goToState('default-parcel');
         }
     }
 
