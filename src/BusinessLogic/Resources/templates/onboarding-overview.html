@@ -15,20 +15,24 @@
                 <i class="pl-info-icon-ok pl-display-none">J</i>
                 <i class="pl-info-icon-x pl-display-none">X</i>
                 <p class="pl-onboarding-list-title">{$onboardingOverview.parcelDetails}</p>
-                <p id="pl-parcel-details" class="pl-display-none pl-w-100">
+                <p id="pl-parcel-details" class="pl-display-none pl-text-align-left">
                     <span class="pl-min-width-81">
-                        <span>{$onboardingOverview.weight} <span id="pl-parcel-weight"></span> kg </span> |
-                        <span>{$onboardingOverview.height} <span id="pl-parcel-height"></span> cm </span> |
-                        <span>{$onboardingOverview.width} <span id="pl-parcel-width"></span> cm </span> |
-                        <span>{$onboardingOverview.length} <span id="pl-parcel-length"></span> cm </span>
+                        <span>{$defaultParcel.weight} <span id="pl-parcel-weight"></span> kg </span> |
+                        <span>{$defaultParcel.height} <span id="pl-parcel-height"></span> cm </span> |
+                        <span>{$defaultParcel.width} <span id="pl-parcel-width"></span> cm </span> |
+                        <span>{$defaultParcel.length} <span id="pl-parcel-length"></span> cm </span>
                     </span>
-                    <button class="pl-button pl-button-secondary pl-small">{$onboardingOverview.edit}</button>
+                    <button class="pl-button pl-button-secondary pl-small pl-go-to-default-parcel">
+                        {$onboardingOverview.edit}
+                    </button>
                 </p>
-                <p class="pl-onboarding-missing-info pl-display-none pl-w-100">
+                <p class="pl-onboarding-missing-info pl-display-none pl-text-align-left">
                     <span class="pl-min-width-81">
                         {$onboardingOverview.missingInfo}
                     </span>
-                    <button class="pl-button pl-button-primary pl-small">{$onboardingOverview.complete}</button>
+                    <button class="pl-button pl-button-primary pl-small pl-go-to-default-parcel">
+                        {$onboardingOverview.complete}
+                    </button>
                 </p>
             </div>
             <hr>
@@ -36,7 +40,7 @@
                 <i class="pl-info-icon-ok pl-display-none">J</i>
                 <i class="pl-info-icon-x pl-display-none">X</i>
                 <p class="pl-onboarding-list-title">{$onboardingOverview.senderAddress}</p>
-                <p id="pl-wh-details" class="pl-display-none pl-w-100">
+                <p id="pl-wh-details" class="pl-display-none pl-text-align-left">
                     <span class="pl-min-width-81">
                         <span id="pl-wh-alias"></span> |
                         <span id="pl-wh-user"></span> |
@@ -44,7 +48,7 @@
                     </span>
                     <button class="pl-button pl-button-secondary pl-small">{$onboardingOverview.edit}</button>
                 </p>
-                <p class="pl-onboarding-missing-info pl-display-none pl-w-100">
+                <p class="pl-onboarding-missing-info pl-display-none pl-text-align-left">
                      <span class="pl-min-width-81">
                         {$onboardingOverview.missingInfo}
                     </span>

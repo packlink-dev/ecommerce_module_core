@@ -2,10 +2,8 @@
 
 namespace Packlink\DemoUI\Controllers;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Controllers\DefaultParcelController as DefaultParcelControllerBase;
 use Packlink\DemoUI\Controllers\Models\Request;
-use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
 /**
  * Class DefaultParcelController
@@ -15,39 +13,37 @@ use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 class DefaultParcelController
 {
     /**
-     * @var ConfigurationService
+     * @var DefaultParcelControllerBase
      */
-    private $configService;
+    private $controller;
+
+    public function __construct()
+    {
+        $this->controller = new DefaultParcelControllerBase();
+    }
 
     /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     * Gets default parcel
      */
     public function getDefaultParcel()
     {
-        $parcel = $this->getConfigService()->getDefaultParcel();
+        $parcel = $this->controller->getDefaultParcel();
 
         echo json_encode($parcel ? $parcel->toArray() : array());
     }
 
     /**
+     * Sets default parcel.
+     *
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     *
+     * @throws \Exception
      */
     public function setDefaultParcel(Request $request)
     {
+        $data = $request->getPayload();
 
+        $this->controller->setDefaultParcel($data);
     }
 
-    /**
-     * Returns an instance of configuration service.
-     *
-     * @return ConfigurationService
-     */
-    protected function getConfigService()
-    {
-        if ($this->configService === null) {
-            $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        }
-
-        return $this->configService;
-    }
 }

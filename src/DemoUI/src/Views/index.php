@@ -223,6 +223,11 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-overview.html')
                             ) ?>
+                        },
+                        'pl-default-parcel-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/default-parcel.html')
+                            ) ?>
                         }
                     },
                 }

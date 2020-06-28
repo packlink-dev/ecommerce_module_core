@@ -52,6 +52,8 @@ var Packlink = window.Packlink || {};
         let utilityService = Packlink.utilityService;
         let templateService = Packlink.templateService;
         let context = '';
+        let currentState = '';
+        let previousState = '';
 
         let pageConfiguration = {
             'default-parcel': {
@@ -155,9 +157,11 @@ var Packlink = window.Packlink || {};
 
         this.goToState = goToState;
 
+        this.getPreviousState = getPreviousState;
+
         function displayPageBasedOnState(response) {
             if (response.state === 'login') {
-               goToState('login');
+                goToState('login');
 
             } else if (response.state === 'onBoarding') {
                 goToState('onboarding-state');
@@ -176,6 +180,13 @@ var Packlink = window.Packlink || {};
             if (dp) {
                 dp.display(additionalConfig);
             }
+
+            previousState = currentState;
+            currentState = controller;
+        }
+
+        function getPreviousState() {
+            return previousState;
         }
 
         /**

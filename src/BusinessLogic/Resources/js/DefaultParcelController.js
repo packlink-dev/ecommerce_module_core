@@ -22,10 +22,17 @@ var Packlink = window.Packlink || {};
             'height'
         ];
 
+        const ONBOARDING_OVERVIEW_STATE = 'onboarding-overview';
+        const ONBOARDING_WELCOME_STATE = 'onboarding-welcome';
+        const ONBOARDING_WH_STATE = 'onboarding-warehouse';
+        // TODO: Add when configuration is done.
+        const CONFIGURATION_STATE = '';
+
         let templateService = Packlink.templateService;
         let utilityService = Packlink.utilityService;
         let ajaxService = Packlink.ajaxService;
         let state = Packlink.state;
+        let translationService = Packlink.translationService;
 
         let parcelData;
         let page;
@@ -46,11 +53,13 @@ var Packlink = window.Packlink || {};
          */
         function constructPage(response) {
             parcelData = response;
-            page = templateService.setTemplate('pl-default-parcel-template');
+            page = templateService.setCurrentTemplate('pl-default-parcel-page');
 
             for (let field of defaultParcelFields) {
                 let input = templateService.getComponent('pl-default-parcel-' + field, page);
                 input.addEventListener('blur', onBlurHandler, true);
+                input.addEventListener('input', onInputHandler, true);
+
                 if (parcelData[field]) {
                     input.value = parcelData[field];
                 }
@@ -61,10 +70,42 @@ var Packlink = window.Packlink || {};
                 page
             );
 
+            if (isFormValid()) {
+                submitButton.disabled = false;
+            }
+
+            setTemplateBasedOnState();
+
             submitButton.addEventListener('click', handleDefaultParcelSubmitButtonClickedEvent, true);
 
             utilityService.configureInputElements();
             utilityService.hideSpinner();
+        }
+
+        function setTemplateBasedOnState() {
+            let backButton = templateService.getComponent('pl-parcel-back'),
+                submitButton = templateService.getComponent('pl-default-parcel-submit-btn'),
+                headerEl = document.querySelector('.pl-default-parcel-page .pl-text-center span'),
+                headerInfoEl = document.querySelector('.pl-default-parcel-page .pl-header-info');
+
+            if (state.getPreviousState() === ONBOARDING_WELCOME_STATE) {
+                setOnboardingCommon('defaultParcel.continue');
+            } else if (state.getPreviousState() === ONBOARDING_OVERVIEW_STATE) {
+                setOnboardingCommon('defaultParcel.save');
+            } else {
+                page.classList.add('pl-form-left-align');
+            }
+
+            function setOnboardingCommon(btnLabel) {
+                submitButton.innerText = translationService.translate(btnLabel);
+                backButton.addEventListener('click', goToOverviewPage);
+                headerEl.innerHTML += '1. ' + translationService.translate('onboardingParcel.header');
+                headerInfoEl.innerHTML += translationService.translate('onboardingParcel.info');
+            }
+        }
+
+        function goToOverviewPage() {
+            state.goToState(ONBOARDING_OVERVIEW_STATE);
         }
 
         /**
@@ -74,6 +115,22 @@ var Packlink = window.Packlink || {};
          */
         function onBlurHandler(event) {
             validateField(event.target.id.substr('pl-default-parcel-'.length), event.target.value, event.target);
+
+            let submitButton = templateService.getComponent(
+                'pl-default-parcel-submit-btn',
+                page
+            )
+
+            submitButton.disabled = !isFormValid();
+        }
+
+        /**
+         * Handles on blur action.
+         *
+         * @param event
+         */
+        function onInputHandler(event) {
+            templateService.removeError(event.target);
         }
 
         /**
@@ -82,7 +139,7 @@ var Packlink = window.Packlink || {};
          * @param event
          */
         function handleDefaultParcelSubmitButtonClickedEvent(event) {
-            let model = getFormattedParcelFormInput();
+            let model = getFormattedParcelFormInput(true);
 
             let isValid = true;
             for (let field of defaultParcelFields) {
@@ -100,12 +157,17 @@ var Packlink = window.Packlink || {};
                 ajaxService.post(
                     configuration.submitUrl,
                     model,
-                    function () {
+                    function (event) {
+                        event.preventDefault();
                         utilityService.hideSpinner();
 
-                        if (configuration.fromStep) {
-                            state.stepFinished();
+                        if (state.getPreviousState() === ONBOARDING_WELCOME_STATE) {
+                            state.goToState(ONBOARDING_WH_STATE);
+                        } else if (state.getPreviousState() === ONBOARDING_OVERVIEW_STATE) {
+                            state.goToState(ONBOARDING_OVERVIEW_STATE);
                         }
+
+                        return false;
                     },
                     function (response) {
                         for (let field in response) {
@@ -125,15 +187,17 @@ var Packlink = window.Packlink || {};
         /**
          * Retrieves formatted input from default parcel form.
          *
-         * @return {object}
+         * @param validateWithDisplay boolean
+         *
+         * @returns {object}
          */
-        function getFormattedParcelFormInput() {
+        function getFormattedParcelFormInput(validateWithDisplay) {
             let model = {};
 
             for (let field of defaultParcelFields) {
                 let value = getInputValue('pl-default-parcel-' + field),
                     element = templateService.getComponent('pl-default-parcel-' + field, page),
-                    error = validateField(field, value, element);
+                    error = validateWithDisplay ? validateField(field, value, element) : validateFieldValue(field, value);
 
                 model[field] = error ? null : value;
             }
@@ -160,6 +224,18 @@ var Packlink = window.Packlink || {};
          * @returns {string}
          */
         function validateField(field, value, element) {
+            let error = validateFieldValue(field, value)
+
+            if (error) {
+                templateService.setError(element, error);
+            } else {
+                templateService.removeError(element);
+            }
+
+            return error;
+        }
+
+        function validateFieldValue(field, value) {
             let error = '';
 
             if (value === '') {
@@ -181,13 +257,21 @@ var Packlink = window.Packlink || {};
                 }
             }
 
-            if (error) {
-                templateService.setError(element, error);
-            } else {
-                templateService.removeError(element);
+            return error;
+        }
+
+        function isFormValid() {
+            let model = getFormattedParcelFormInput(false);
+
+            let isValid = true;
+            for (let field of defaultParcelFields) {
+                if (!model[field]) {
+                    isValid = false;
+                    break;
+                }
             }
 
-            return error;
+            return isValid;
         }
     }
 
