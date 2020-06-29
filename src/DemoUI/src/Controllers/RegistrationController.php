@@ -30,6 +30,8 @@ class RegistrationController
     {
         $payload = $request->getPayload();
 
+        $payload['ecommerces'] = array('Test');
+
         echo json_encode(array('success' => $this->controller->register($payload)));
     }
 }
