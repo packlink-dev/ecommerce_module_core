@@ -55,7 +55,8 @@
     "PT": "Portugal",
     "TR": "Turkey",
     "IE": "Ireland",
-    "GB": "Great Britain"
+    "GB": "Great Britain",
+    "HU": "Hungary"
   },
   "onboardingWelcome": {
     "header": "Let's set up basic information so that you can make shipments",
