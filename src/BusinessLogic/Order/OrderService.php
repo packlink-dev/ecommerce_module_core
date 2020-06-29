@@ -378,6 +378,9 @@ class OrderService extends BaseService
     {
         $additional = new Draft\AdditionalData();
         $additional->selectedWarehouseId = $this->configuration->getDefaultWarehouse()->id;
+        $additional->orderId = $order->getId();
+        $additional->sellerUserId = $order->getSellerUserId();
+
         $additional->items = array();
         foreach ($order->getItems() as $item) {
             $draftItem = new Draft\DraftItem();

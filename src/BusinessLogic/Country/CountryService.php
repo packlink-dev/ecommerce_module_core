@@ -114,6 +114,13 @@ class CountryService extends BaseService
             'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register',
             'platform_country' => 'UN',
         ),
+        'HU' => array(
+            'name' => 'Hungary',
+            'code' => 'HU',
+            'postal_code' => '1014',
+            'registration_link' => 'https://auth.packlink.com/hu-HU/{integration}/regisztracio?platform_country=UN',
+            'platform_country' => 'UN',
+        ),
     );
 
     /**
