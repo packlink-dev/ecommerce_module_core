@@ -118,6 +118,17 @@
   .pl-login-footer * {
     color: $color-white;
   }
+
+  .pl-back-arrow {
+    color: #2f66d3;
+  }
+
+  .pl-icon-wrapper {
+    i {
+      font-size: 20px;
+      width: auto;
+    }
+  }
 }
 
 // mobile rules

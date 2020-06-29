@@ -40,6 +40,60 @@
   .pl-w-85 {
     width: 85%;
   }
+
+  .pl-m-30 {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: 30px;
+  }
+
+  .pl-float-left {
+    float: left;
+  }
+
+  .pl-justify-f-start {
+    justify-content: flex-start;
+  }
+
+  .pl-w-100 {
+    width: 100%;
+  }
+
+  .pl-text-align-left {
+    text-align: left;
+  }
+
+  .pl-text-center {
+    .pl-header-text-wrapper {
+      line-height: 22px;
+      font-size: 22px;
+    }
+  }
+
+  .pl-button {
+    &.pl-mt-20{
+      margin-top: 20px;
+    }
+  }
+
+  button {
+    &.pl-icon-wrapper {
+      border: none;
+      background: transparent;
+    }
+  }
+
+  button {
+    &.pl-icon-wrapper:focus {
+      outline: none;
+    }
+  }
+
+  button {
+    &.pl-icon-wrapper:hover {
+      cursor: pointer;
+    }
+  }
 }
 
 // mobile rules
