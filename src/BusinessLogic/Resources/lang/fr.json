@@ -45,6 +45,12 @@
     "logIn": "Se connecter",
     "apiKeyIncorrect": "Clé API incorrecte"
   },
+  "validation": {
+    "requiredField": "Ce champs est obligatoire.",
+    "invalidEmail": "Le champs doit être une adresse email valide",
+    "shortPassword": "Le mot de passe doit comporter au moins %s lettres.",
+    "invalidPhone": "Ce champs doit contenir un numéro de téléphone valide."
+  },
   "register": {
     "logIn": "Se connecter",
     "email": "Email",

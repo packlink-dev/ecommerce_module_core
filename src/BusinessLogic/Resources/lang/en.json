@@ -53,6 +53,12 @@
     "chooseYourCountry": "Choose your country to start the registration process",
     "registerMe": "Register me"
   },
+  "validation": {
+    "requiredField": "This field is required.",
+    "invalidEmail": "This field must be valid email.",
+    "shortPassword": "The password must be at least %s characters long.",
+    "invalidPhone": "This field must be valid phone number."
+  },
   "register": {
     "logIn": "Log in",
     "email": "Email",

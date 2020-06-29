@@ -51,6 +51,12 @@
     "chooseYourCountry": "Elige tu país para comenzar el registro",
     "registerMe": "Registrarme"
   },
+  "validation": {
+    "requiredField": "Esta campo es obligatorio.",
+    "invalidEmail": "El campo debe ser un correo electrónico válido.",
+    "shortPassword": "La contraseña debe contener %s caracteres como mínimo.",
+    "invalidPhone": "Este campo deber ser un número de teléfono válido."
+  },
   "register": {
     "logIn": "Iniciar sesión",
     "email": "Correo electrónico",

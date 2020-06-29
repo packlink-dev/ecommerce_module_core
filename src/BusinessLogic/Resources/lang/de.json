@@ -45,6 +45,12 @@
     "logIn": "Login",
     "apiKeyIncorrect": "Falscher API-Schlüssel"
   },
+  "validation": {
+    "requiredField": "Dies ist ein Pflichtfeld.",
+    "invalidEmail": "Das Feld muss eine gültige E-Mail-Adresse sein.",
+    "shortPassword": "Das Passwort muss mindestens %s Zeichen haben.",
+    "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein."
+  },
   "register": {
     "logIn": "Log in",
     "email": "Email",
