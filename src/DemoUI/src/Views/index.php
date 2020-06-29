@@ -73,7 +73,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
             <div class="pl-modal-body">
 
             </div>
-            <div class="pl-modal-footer">
+            <div class="pl-modal-footer pl-hidden">
 <!--                <button class="pl-button pl-button-primary">Primary</button>-->
 <!--                <button class="pl-button">Secondary</button>-->
             </div>

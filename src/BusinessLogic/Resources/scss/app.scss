@@ -69,7 +69,6 @@
     color: #2095f2;
     font-size: 15px;
     text-transform: uppercase;
-    margin-left: 20px;
     margin-bottom: 15px;
   }
 
@@ -98,6 +97,10 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.8;
+    }
   }
 
   .pl-modal-mask .pl-register-country-list-wrapper a .pl-country img {
