@@ -154,6 +154,7 @@ class TestShopOrderService implements ShopOrderService
             $order->getShippingAddress()->setCountry($destinationCountry);
             $order->setBillingAddress(new Address());
             $order->setItems(array(new Item()));
+            $order->setSellerUserId('test');
 
             static::$orders[$orderId] = $order;
         }
