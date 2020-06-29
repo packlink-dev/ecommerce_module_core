@@ -159,14 +159,14 @@ var Packlink = window.Packlink || {};
             }
         }
 
-        function goToState(controller) {
+        function goToState(controller, additionalConfig = null) {
             let dp = pageControllerFactory.getInstance(
                 controller,
                 getControllerConfiguration(controller)
             );
 
             if (dp) {
-                dp.display();
+                dp.display(additionalConfig);
             }
         }
 

@@ -104,22 +104,72 @@
 #pl-page .pl-bottom-separate {
   margin-bottom: 36px;
 }
+
 #pl-page .pl-hidden {
   display: none !important;
 }
+
 #pl-page .pl-page-padding {
   padding: 20px;
 }
+
 #pl-page .pl-w-85 {
   width: 85%;
 }
+
+#pl-page .pl-m-30 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-left: 30px;
+}
+
+#pl-page .pl-float-left {
+  float: left;
+}
+
+#pl-page .pl-justify-f-start {
+  justify-content: flex-start;
+}
+
+#pl-page .pl-w-100 {
+  width: 100%;
+}
+
+#pl-page .pl-text-align-left {
+  text-align: left;
+}
+
+#pl-page .pl-text-center .pl-header-text-wrapper {
+  line-height: 22px;
+  font-size: 22px;
+}
+
+#pl-page .pl-button.pl-mt-20 {
+  margin-top: 20px;
+}
+
+#pl-page button.pl-icon-wrapper {
+  border: none;
+  background: transparent;
+}
+
+#pl-page button.pl-icon-wrapper:focus {
+  outline: none;
+}
+
+#pl-page button.pl-icon-wrapper:hover {
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   #pl-page .pl-desktop-only {
     display: none !important;
   }
 }
+
 @media (min-width: 769px) and (max-width: 1280px) {
 }
+
 #pl-page > header {
   border-bottom: 1px solid #d7d7d7;
   padding: 20px;
@@ -239,14 +289,17 @@
   background-color: #f8d7da;
   border-color: #f5c6cb;
 }
+
 #pl-page .pl-alert.pl-alert-success {
   color: #155724;
   background-color: #d4edda;
   border-color: #c3e6cb;
 }
-#pl-page .md-checkbox {
+
+#pl-page .pl-checkbox {
   margin-top: 15px;
 }
+
 #pl-page .pl-input-mask {
   display: none;
   background-color: rgba(255, 255, 255, 0.5);
@@ -337,40 +390,32 @@
   width: 100%;
   overflow: hidden auto;
 }
-
 #pl-page .pl-modal-mask .pl-modal .pl-modal-footer {
   display: flex;
   flex-direction: row;
   border-top: 1px solid #d7d7d7;
   padding: 20px 0;
 }
-
 #pl-page .pl-modal-mask .pl-modal .pl-modal-footer .pl-button + .pl-button {
   margin-left: 10px;
 }
-
 #pl-page .pl-error input, #pl-page .pl-error select {
   border: 2px solid #df341c !important;
 }
-
 #pl-page .pl-error label {
   color: #df341c;
 }
-
 #pl-page .pl-error .pl-error-message {
   margin: 8px 16px 0;
   color: #df341c;
 }
-
 @media (max-width: 768px) {
   #pl-page button, #pl-page .pl-button {
     width: 100%;
   }
 }
-
 @media (min-width: 769px) and (max-width: 1280px) {
 }
-
 #pl-page .pl-onboarding-overview-list {
   width: 100%;
 }
@@ -455,18 +500,31 @@
 #pl-page .pl-modal-mask .pl-register-country-list-wrapper a .pl-country .pl-country-name {
   margin-top: 0;
 }
+
 #pl-page .pl-login-footer {
   padding: 20px;
   background-color: #2e4265;
   color: #fff;
 }
+
 #pl-page .pl-login-footer * {
   color: #fff;
 }
+
+#pl-page .pl-back-arrow {
+  color: #2f66d3;
+}
+
+#pl-page .pl-icon-wrapper i {
+  font-size: 20px;
+  width: auto;
+}
+
 @media (max-width: 768px) {
   #pl-page .pl-main-logo {
     width: 100%;
   }
+
   #pl-page .pl-onboarding-overview-mobile-header {
     display: block;
     background-color: #2195f2;

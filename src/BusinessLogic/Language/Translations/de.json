@@ -25,6 +25,66 @@
     "logIn": "Login",
     "apiKeyIncorrect": "Falscher API-Schlüssel"
   },
+  "validation": {
+    "requiredField": "Dies ist ein Pflichtfeld.",
+    "invalidEmail": "Das Feld muss eine gültige E-Mail-Adresse sein.",
+    "shortPassword": "Das Passwort muss mindestens %s Zeichen haben.",
+    "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein."
+  },
+  "register": {
+    "logIn": "Log in",
+    "email": "Email",
+    "password": "Passwort",
+    "haveAccount": "Already have an account?",
+    "startEnjoying": "Genießen Sie ab jetzt Packlink PRO!",
+    "registerAccount": "Jetzt registrieren",
+    "getToKnowYou": "Wir möchten Sie besser kennenlernen, um uns an Sie anzupassen und Ihnen ein individuelles Angebot zukommen zu lassen",
+    "monthlyShipmentVolume": "Wie hoch ist Ihr monatliches Sendungsaufkommen?",
+    "phone": "Telefonnummer",
+    "termsAndConditions": "Ich akzeptiere die <a href=\"%s\" target=\"_blank\">Nutzungsbedingungen</a> und die <a href=\"%s\" target=\"_blank\">Datenschutzerklärung</a> von Packlink",
+    "marketingEmails": "Ich ermächtige Packlink Shipping S.L., mir kommerzielle Mitteilungen per E-Mail zuzusenden",
+    "submit": "Registrieren",
+    "chooseYourCountry": "Choose your country",
+    "ES": "Spain",
+    "DE": "Germany",
+    "FR": "France",
+    "IT": "Italy",
+    "AT": "Austria",
+    "NL": "Netherlands",
+    "BE": "Belgium",
+    "PT": "Portugal",
+    "TR": "Turkey",
+    "IE": "Ireland",
+    "GB": "Great Britain"
+  },
+  "onboardingWelcome": {
+    "header": "Let's set up basic information so that you can make shipments",
+    "steps": "It's just two steps that we need to go through to offer you the carrier that best suits your needs",
+    "stepOne": "Set parcel details",
+    "stepTwo": "Set sender's address",
+    "startSetUp": "Start set up"
+  },
+  "onboardingOverview": {
+    "header": "Almost there! Please check that the information entered is <br> correct, or complete it in order to continue.",
+    "parcelDetails": "Parcel details",
+    "senderAddress": "Sender's Address",
+    "missingInfo": "Missing information",
+    "complete": "Complete",
+    "edit": "Edit",
+    "continue": "Continue",
+    "myShipmentServices": "My shipment services"
+  },
+  "defaultParcel": {
+    "weight": "Weight",
+    "height": "Height",
+    "width": "Width",
+    "length": "Length",
+    "save": "Save"
+  },
+  "onboardingParcel": {
+    "header": "Set parcel details",
+    "info": "We will use this default data for <strong>items that do not have defined <br> dimensions and weight.</strong> You can edit them whenever you like <br> via the settings tab."
+  },
   "dashboard": {
     "almostThere": "Fast geschafft!",
     "detailsSynced": "Daten, die mit Ihrem Packlink PRO-Konto verknüpft sind",

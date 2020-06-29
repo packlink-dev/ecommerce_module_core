@@ -92,6 +92,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/StateController.js"></script>
 <script src="./resources/js/TemplateService.js"></script>
 <script src="./resources/js/UtilityService.js"></script>
+<script src="./resources/js/ValidationService.js"></script>
 <script src="./resources/js/CountrySelectorController.js"></script>
 <script src="./resources/js/LoginController.js"></script>
 <script src="./resources/js/RegisterModalController.js"></script>

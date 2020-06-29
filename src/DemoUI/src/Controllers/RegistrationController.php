@@ -2,7 +2,6 @@
 
 namespace Packlink\DemoUI\Controllers;
 
-use Packlink\BusinessLogic\Controllers\DTO\RegistrationRequest;
 use Packlink\BusinessLogic\Controllers\RegistrationController as RegistrationControllerBase;
 use Packlink\DemoUI\Controllers\Models\Request;
 
@@ -24,29 +23,13 @@ class RegistrationController
 
     public function get()
     {
-        $data = $this->controller->getRegisterData();
-
-        echo json_encode($data->toArray());
+        echo json_encode($this->controller->getRegisterData());
     }
 
     public function post(Request $request)
     {
         $payload = $request->getPayload();
 
-        $registrationRequest = new RegistrationRequest(
-            $payload['email'],
-            $payload['password'],
-            $payload['estimated_delivery_volume'],
-            $payload['phone'],
-            $payload['platform_country'],
-            $payload['source'],
-            array('Test'),
-            array(),
-            $payload['terms_and_conditions'],
-            $payload['marketing_emails']
-        );
-
-        echo json_encode(array('success' => $this->controller->register($registrationRequest)));
+        echo json_encode(array('success' => $this->controller->register($payload)));
     }
-
 }

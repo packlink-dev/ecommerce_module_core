@@ -8,17 +8,22 @@ class RegistrationInfo
      * @var string
      */
     private $email;
-
     /**
      * @var string
      */
     private $phone;
-
     /**
      * @var string
      */
     private $source;
 
+    /**
+     * RegistrationInfo constructor.
+     *
+     * @param string $email
+     * @param string $phone
+     * @param string $source
+     */
     public function __construct($email, $phone, $source)
     {
         $this->email = $email !== null ? $email : '';
@@ -26,6 +31,9 @@ class RegistrationInfo
         $this->source = $source !== null ? $source : '';
     }
 
+    /**
+     * @return string
+     */
     public function getEmail()
     {
         return $this->email;

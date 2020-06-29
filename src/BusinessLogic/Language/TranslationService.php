@@ -64,7 +64,7 @@ class TranslationService implements BaseService
      */
     public function translate($key, array $arguments = array())
     {
-        $this->currentLanguage = Configuration::getCurrentLanguage();
+        $this->currentLanguage = Configuration::getCurrentLanguage() ?: static::DEFAULT_LANG;
 
         if (empty(static::$translations[$this->currentLanguage])) {
             $this->initializeTranslations();

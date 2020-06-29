@@ -65,9 +65,8 @@ var Packlink = window.Packlink || {};
 
         function handleCountrySelected(supportedCountry) {
             return function() {
-                Packlink.models.country = supportedCountry.platform_country;
                 close();
-                Packlink.state.goToState('register');
+                Packlink.state.goToState('register', {country: supportedCountry});
             }
         }
 

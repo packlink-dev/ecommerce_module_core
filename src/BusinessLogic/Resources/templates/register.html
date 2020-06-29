@@ -25,13 +25,14 @@
                            class="form-control"
                            name="password"
                            minlength="6"
+                           data-min-length="6"
                            required/>
                 </div>
                 <p class="pl-text-center">
                     {$register.getToKnowYou}
                 </p>
                 <div class="pl-form-group" id="pl-register-delivery-volume">
-                    <label for="pl-register-shipment-volume">
+                    <label for="pl-register-shipment-volume" class="pl-text-input-label">
                         {$register.monthlyShipmentVolume}
                     </label>
                     <select class=form-control"
@@ -59,14 +60,15 @@
                 </button>
             </div>
             <div class="pl-legal-policies">
-                <div class="md-checkbox">
+                <div class="pl-checkbox">
                     <label id="pl-register-terms-and-conditions-label">
-                        <input type="checkbox" name="terms_and_conditions" id="pl-register-terms-and-conditions" tabindex="-1" required>
+                        <input type="checkbox" name="terms_and_conditions" id="pl-register-terms-and-conditions"
+                               tabindex="-1" required>
                     </label>
                 </div>
             </div>
             <div class="pl-legal-policies pl-marketing-emails-wrapper">
-                <div class="md-checkbox">
+                <div class="pl-checkbox">
                     <label>
                         <input type="checkbox" name="marketing_emails" id="pl-register-marketing-emails" tabindex="-1">
                         {$register.marketingEmails}

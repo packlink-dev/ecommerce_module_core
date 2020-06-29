@@ -14,36 +14,20 @@ var Packlink = window.Packlink || {};
             state = Packlink.state,
             utilityService = Packlink.utilityService,
             translationService = Packlink.translationService,
+            validationService = Packlink.validationService,
             templateId = 'pl-register-page';
 
-        let form;
+        let form,
+            country;
 
         /**
          * Displays page content.
          */
-        this.display = function () {
+        this.display = function (additionalConfig) {
             templateService.setCurrentTemplate(templateId);
+            country = additionalConfig.hasOwnProperty('country') ? additionalConfig.country : 'ES';
 
             ajaxService.get(configuration.getRegistrationData, populateInitialValues);
-
-            utilityService.configureInputElements();
-
-            const registerPage = templateService.getMainPage();
-
-            form = templateService.getComponent('pl-register-form', registerPage);
-            form.addEventListener('submit', register);
-            templateService.getComponent('pl-go-to-login', registerPage).addEventListener('click', goToLogin);
-
-            templateService.getComponent('pl-register-platform-country', registerPage).value =
-                Packlink.models.hasOwnProperty('country') ? Packlink.models.country : 'ES';
-
-            initEmailField();
-            initPasswordField();
-            initPhoneField();
-            initSelectBox();
-            initTermsAndConditionCheckbox();
-
-            validateForm();
         };
 
         function populateInitialValues(response) {
@@ -57,11 +41,29 @@ var Packlink = window.Packlink || {};
 
             let termsAndConditionsLabel = templateService.getComponent('pl-register-terms-and-conditions-label'),
                 termsTranslation = translationService.translate(
-                'register.termsAndConditions',
-                [response.termsAndConditionsUrl, response.privacyPolicyUrl]
-            );
+                    'register.termsAndConditions',
+                    [response.termsAndConditionsUrl, response.privacyPolicyUrl]
+                );
 
             termsAndConditionsLabel.innerHTML += termsTranslation;
+
+            utilityService.configureInputElements();
+
+            const registerPage = templateService.getMainPage();
+
+            form = templateService.getComponent('pl-register-form', registerPage);
+            form.addEventListener('submit', register);
+            templateService.getComponent('pl-go-to-login', registerPage).addEventListener('click', goToLogin);
+
+            templateService.getComponent('pl-register-platform-country', registerPage).value = country;
+
+            validateRequiredInputField('pl-register-email', validationService.validateEmail);
+            validateRequiredInputField('pl-register-password', validationService.validatePasswordLength);
+            validateRequiredInputField('pl-register-phone', validationService.validatePhone);
+            initSelectBox();
+            initTermsAndConditionCheckbox();
+
+            validateForm();
         }
 
         /**
@@ -79,39 +81,11 @@ var Packlink = window.Packlink || {};
             return false;
         }
 
-        function initEmailField() {
-            let input = templateService.getComponent('pl-register-email');
+        function validateRequiredInputField(componentSelector, specificValidationCallback) {
+            let input = templateService.getComponent(componentSelector);
 
             input.addEventListener('blur', function () {
-                if (!validateRequiredField(input) || !validateEmail(input)) {
-                    input.setAttribute('data-pl-contains-errors', '1');
-                }
-
-                validateForm();
-            }, true);
-
-            clearErrors(input);
-        }
-
-        function initPasswordField() {
-            let input = templateService.getComponent('pl-register-password');
-
-            input.addEventListener('blur', function () {
-                if (!validateRequiredField(input) || !validatePasswordLength(input)) {
-                    input.setAttribute('data-pl-contains-errors', '1');
-                }
-
-                validateForm();
-            }, true);
-
-            clearErrors(input);
-        }
-
-        function initPhoneField() {
-            let input = templateService.getComponent('pl-register-phone');
-
-            input.addEventListener('blur', function () {
-                if (!validateRequiredField(input) || !validatePhone(input)) {
+                if (!validationService.validateRequiredField(input) || !specificValidationCallback(input)) {
                     input.setAttribute('data-pl-contains-errors', '1');
                 }
 
@@ -127,7 +101,7 @@ var Packlink = window.Packlink || {};
                 label = container.querySelector('.pl-text-input-label');
 
             input.addEventListener('blur', function () {
-                if (!validateRequiredField(input)) {
+                if (!validationService.validateRequiredField(input)) {
                     label.classList.remove('selected');
                     input.setAttribute('data-pl-contains-errors', '1');
                 }
@@ -152,55 +126,11 @@ var Packlink = window.Packlink || {};
         }
 
         function initTermsAndConditionCheckbox() {
-            let checkbox = templateService.getComponent('pl-register-terms-and-conditions');
+            let checkbox = document.getElementById('pl-register-terms-and-conditions');
 
             checkbox.addEventListener('change', function () {
                 validateForm();
             });
-        }
-
-       function validateRequiredField(input) {
-            if (input.value === '') {
-                templateService.setError(input, translationService.translate('register.requiredField'));
-
-                return false;
-            }
-
-            return true;
-        }
-
-        function validateEmail(input) {
-            let regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-            if (!regex.test(String(input.value).toLowerCase())) {
-                templateService.setError(input, translationService.translate('register.invalidEmail'));
-
-                return false;
-            }
-
-            return true;
-        }
-
-        function validatePasswordLength(input) {
-            if (input.value.length < 6) {
-                templateService.setError(input, translationService.translate('register.shortPassword'));
-
-                return false;
-            }
-
-            return true;
-        }
-
-        function validatePhone(input) {
-            let regex = /^(\ |\+|\/|\.\|-|\(|\)|\d)+$/m;
-
-            if (!regex.test(String(input.value).toLowerCase())) {
-                templateService.setError(input, translationService.translate('register.invalidPhone'));
-
-                return false;
-            }
-
-            return true;
         }
 
         function validateForm() {
@@ -217,7 +147,7 @@ var Packlink = window.Packlink || {};
             }
 
             for (let input of inputs) {
-                if (input.hasAttribute('data-pl-contains-errors') || input.value === '') {
+                if (input.hasAttribute('data-pl-contains-errors')) {
                     registerButton.disabled = true;
 
                     break;

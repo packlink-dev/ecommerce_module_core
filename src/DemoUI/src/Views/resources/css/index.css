@@ -1609,7 +1609,7 @@
     margin-top: 10px;
 }
 
-.md-checkbox input[type=checkbox]:checked + i.md-checkbox-control:before {
+.pl-checkbox input[type=checkbox]:checked + i.pl-checkbox-control:before {
     background-color: #2095F2 !important;
 }
 
@@ -1762,7 +1762,7 @@ body {
     color: #5d5d5d;
 }
 
-.pl-system-info-panel .md-checkbox {
+.pl-system-info-panel .pl-checkbox {
     margin: 10px 0;
 }
 

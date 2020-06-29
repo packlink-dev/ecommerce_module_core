@@ -25,6 +25,66 @@
     "chooseYourCountry": "Elige tu país para comenzar el registro",
     "registerMe": "Registrarme"
   },
+  "validation": {
+    "requiredField": "Esta campo es obligatorio.",
+    "invalidEmail": "El campo debe ser un correo electrónico válido.",
+    "shortPassword": "La contraseña debe contener %s caracteres como mínimo.",
+    "invalidPhone": "Este campo deber ser un número de teléfono válido."
+  },
+  "register": {
+    "logIn": "Iniciar sesión",
+    "email": "Email",
+    "password": "Contraseña",
+    "haveAccount": "Already have an account?",
+    "startEnjoying": "¡Empieza a disfrutar de Packlink PRO!",
+    "registerAccount": "Registro",
+    "getToKnowYou": "Queremos conocerte mejor para adaptarnos a ti y hacerte una propuesta personalizada.",
+    "monthlyShipmentVolume": "¿Cuántos envíos sueles hacer al mes?",
+    "phone": "Phone number",
+    "termsAndConditions": "Acepto los <a href=\"%s\" target=\"_blank\">Términos y condiciones</a> y la <a href=\"%s\" target=\"_blank\">Política de privacidad</a> de Packlink",
+    "marketingEmails": "Autorizo a Packlink Shipping S.L. a enviarme información comercial por correo electrónico",
+    "submit": "Regístrate",
+    "chooseYourCountry": "Choose your country",
+    "ES": "Spain",
+    "DE": "Germany",
+    "FR": "France",
+    "IT": "Italy",
+    "AT": "Austria",
+    "NL": "Netherlands",
+    "BE": "Belgium",
+    "PT": "Portugal",
+    "TR": "Turkey",
+    "IE": "Ireland",
+    "GB": "Great Britain"
+  },
+  "onboardingWelcome": {
+    "header": "Vamos a configurar tu información básica <br> para poder hacer envíos",
+    "steps": "Son solo dos pasos, los necesitamos para ofrecerte los servicios <br> de transporte que más se adaptan a tus necesidades.",
+    "stepOne": "Configurar los detalles del paquete",
+    "stepTwo": "Configurar la dirección del remitente ",
+    "startSetUp": "Comenzar con la configuración"
+  },
+  "onboardingOverview": {
+    "header": "Ya casi estamos. Por favor, comprueba que la información es <br> correcta o complétala para continuar.",
+    "parcelDetails": "Detalle del paquete",
+    "senderAddress": "Dirección del remitente",
+    "missingInfo": "Faltan datos",
+    "complete": "Completar",
+    "edit": "Editar",
+    "continue": "Continuar",
+    "myShipmentServices": "My shipment services"
+  },
+  "defaultParcel": {
+    "weight": "Peso",
+    "height": "Alto",
+    "width": "Ancho",
+    "length": "Largo",
+    "save": "Guardar"
+  },
+  "onboardingParcel": {
+    "header": "Configurar los detalles del paquete",
+    "info": "Utilizaremos estos datos predeterminados para <strong>los artículos <br> que no tengan dimensiones y peso definidos.</strong> Podrás editarlos <br> cuando quieras desde la pestaña de configuración."
+  },
   "dashboard": {
     "almostThere": "¡Ya casi está!",
     "detailsSynced": "Datos sincronizados con tu cuenta Packlink PRO",
