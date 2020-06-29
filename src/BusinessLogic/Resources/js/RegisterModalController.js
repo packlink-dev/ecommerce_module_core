@@ -23,14 +23,27 @@ var Packlink = window.Packlink || {};
         };
 
         function populateCountryList(response) {
-            let countryList = document.querySelector('.pl-register-country-list-wrapper');
+            let countryList = document.querySelector('.pl-register-country-list-wrapper'),
+                countryFilter = document.getElementById('pl-country-filter');
 
             if (!countryList) {
                 modalTemplate.querySelector('.pl-modal-body').innerHTML +=
+                    '<div class="pl-form-group">' +
+                    '<label for="pl-country-filter">' +
+                    translationService.translate('register.searchCountry') +
+                    '</label>' +
+                    '<input id="pl-country-filter" type="text" class="form-control" name="countryFilter">' +
+                    '</div>' +
                     '<div class="pl-register-country-list-wrapper"></div>';
 
                 countryList = document.querySelector('.pl-register-country-list-wrapper');
+                countryFilter = document.getElementById('pl-country-filter');
+            } else {
+                countryFilter.value = '';
             }
+
+            countryFilter.addEventListener('input', filterCountriesCallback);
+            filterCountries('');
 
             if (countryList.childElementCount > 0) {
                 return;
@@ -44,6 +57,7 @@ var Packlink = window.Packlink || {};
                     imageElement = document.createElement('img'),
                     nameElement = document.createElement('div');
 
+                linkElement.dataset.code = supportedCountry.code;
                 linkElement.addEventListener('click', handleCountrySelected(supportedCountry));
 
                 countryElement.classList.add('pl-country');
@@ -67,6 +81,28 @@ var Packlink = window.Packlink || {};
             return function() {
                 close();
                 Packlink.state.goToState('register', {country: supportedCountry});
+            }
+        }
+
+        function filterCountriesCallback(event) {
+            return filterCountries(event.target.value);
+
+        }
+
+        function filterCountries(filter) {
+            filter = filter.toLowerCase();
+
+            let countries = document.querySelectorAll('.pl-register-country-list-wrapper a');
+
+            for (let i = 0; i < countries.length; i++) {
+                if (countries[i].dataset.code.toLowerCase().startsWith(filter) ||
+                    countries[i].querySelector('.pl-country-name').innerText.toLowerCase().startsWith(filter) ||
+                    filter === ''
+                ) {
+                    countries[i].classList.remove('pl-hidden');
+                } else {
+                    countries[i].classList.add('pl-hidden');
+                }
             }
         }
 

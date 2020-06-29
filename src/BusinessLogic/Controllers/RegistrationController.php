@@ -94,9 +94,6 @@ class RegistrationController
             'marketing_calls' => $acceptedMarketingEmails,
         );
 
-        //TODO: Check!
-        $payload['ecommerces'] = array('Test');
-
         /** @var RegistrationRequest $request */
         $registrationRequest = FrontDtoFactory::get(RegistrationRequest::CLASS_KEY, $payload);
 
