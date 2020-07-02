@@ -231,8 +231,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                         },
                         'pl-register-modal': <?php echo json_encode(
                             file_get_contents($baseResourcesPath . 'Resources/templates/registerModal.html')
-                        ) ?>
-                        },
+                        ) ?>,
                         'pl-onboarding-welcome-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-welcome.html')
