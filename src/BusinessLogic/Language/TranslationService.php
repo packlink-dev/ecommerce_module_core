@@ -8,7 +8,8 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Language\Interfaces\TranslationService as BaseService;
 
 /**
- * Class TranslationService
+ * Class TranslationService.
+ *
  * @package Packlink\BusinessLogic\Language
  */
 class TranslationService implements BaseService
