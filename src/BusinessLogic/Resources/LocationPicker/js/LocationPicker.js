@@ -267,7 +267,7 @@ var Packlink = window.Packlink || {};
 
             if (workingHoursNode.classList.contains('enabled')) {
                 event.target.innerHTML = getTranslation(lang, ['workingHoursLabel']);
-                workingHoursNode.classList.remove('enabled');
+                workingHoursNode.classList.remove('pl-enabled');
             } else {
                 event.target.innerHTML = getTranslation(lang, ['hideWorkingHoursLabel']);
                 workingHoursNode.classList.add('enabled');

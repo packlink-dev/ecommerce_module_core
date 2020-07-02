@@ -72,7 +72,6 @@ var Packlink = window.Packlink || {};
             );
 
             submitButton.addEventListener('click', handleSubmitButtonClicked, true);
-            utilityService.configureInputElements();
             utilityService.hideSpinner();
 
             ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
@@ -132,6 +131,10 @@ var Packlink = window.Packlink || {};
             countryInput.appendChild(defaultOption);
 
             for (let code in response) {
+                if (!response.hasOwnProperty(code)) {
+                    continue;
+                }
+
                 let supportedCountry = response[code],
                     optionElement = document.createElement('option');
 
@@ -175,8 +178,6 @@ var Packlink = window.Packlink || {};
             if (currentPostalCode !== '' && currentCity !== '') {
                 templateService.removeError(postalCodeInput);
             }
-
-            utilityService.configureInputElements();
         }
 
         function onPostalCodeSearch(event) {

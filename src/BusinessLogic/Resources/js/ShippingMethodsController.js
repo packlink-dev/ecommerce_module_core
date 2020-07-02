@@ -672,7 +672,6 @@ var Packlink = window.Packlink || {};
             scrollConfigForm(methodId);
 
             utilityService.enableInputMask();
-            utilityService.configureInputElements();
         }
 
         /**
@@ -1064,8 +1063,6 @@ var Packlink = window.Packlink || {};
             }
 
             isFixedPriceValid(validateLastAmount, validateLastTo, byWeight);
-
-            utilityService.configureInputElements();
         }
 
         /**
@@ -1553,7 +1550,6 @@ var Packlink = window.Packlink || {};
             }
 
             setPercentButtonsClass();
-            utilityService.configureInputElements();
         }
 
         /**

@@ -85,6 +85,15 @@
       margin-top: 15px;
     }
 
+    label {
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      color: $color-gray;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
     input {
       background-color: $color-white;
       border-radius: 0;
@@ -98,36 +107,89 @@
 
       &:focus {
         border: 1px solid $color-blue;
+        outline: none;
       }
-    }
 
-    label {
-      position: absolute;
-      top: 8px;
-      left: 16px;
-      color: $color-gray;
-      text-transform: uppercase;
-      font-size: 12px;
+      &.compact {
+        padding: 13px 16px;
+      }
     }
 
     select {
       height: 50px;
       border: 1px solid $border-color;
       line-height: 50px;
-      padding: 0 0 0 15px;
+      padding: 7px 0 0 15px;
       background-color: $color-white;
       color: $input-control-color;
       font-size: 12px;
       width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      &:focus {
+        border: 1px solid $color-blue;
+        outline: none;
+      }
     }
+
+    i {
+      position: absolute;
+      right: 10px;
+      top: 13px;
+      color: $border-color;
+    }
+  }
+
+  input[type=checkbox] {
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid $border-color;
+    position: relative;
+
+    ~ label {
+      margin-left: 10px;
+    }
+
+    &:hover {
+      border-color: $color-blue;
+    }
+
+    &:checked {
+      background-color: $color-blue;
+      border-color: $color-blue;
+
+      &:before {
+        color: $color-white;
+        content: '\2713';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .pl-alert-wrapper {
+    position: absolute;
+    width: 100%;
+    padding: 10px;
   }
 
   .pl-alert {
     position: relative;
+    cursor: pointer;
     padding: .75rem 1.25rem;
-    margin-bottom: 1rem;
+    margin: auto;
     border: 1px solid transparent;
     border-radius: .25rem;
+    flex-direction: row;
 
     &.pl-alert-danger {
       color: $color-red;
@@ -140,14 +202,36 @@
       background-color: #d4edda;
       border-color: #c3e6cb;
     }
+
+    .pl-alert-text {
+      color: inherit;
+    }
+
+    i {
+      color: inherit;
+      margin-left: 20px;
+    }
   }
 
   .pl-checkbox {
     margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+
+    label {
+      cursor: pointer;
+      text-align: left;
+    }
+
+    &.pl-error {
+      .pl-error-message {
+        display: none;
+      }
+    }
   }
 
   .pl-input-mask {
-    display: none;
+    display: block;
     background-color: $color-semi-transparent;
     z-index: 100;
     top: 0;
@@ -155,27 +239,19 @@
     right: 0;
     bottom: 0;
     position: absolute;
-
-    &.enabled {
-      display: block;
-    }
   }
 
   .pl-spinner {
     position: fixed;
     z-index: 500;
     background-color: $color-semi-transparent;
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-
-    &.enabled {
-      display: flex;
-    }
 
     div {
       width: 100px;
@@ -197,14 +273,9 @@
     padding: 20px;
     background-color: $color-little-transparent;
     z-index: 100;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-
-    &.enabled {
-      display: flex;
-    }
-
 
     .pl-modal {
       background: $color-white;
@@ -227,6 +298,11 @@
         font-weight: 600;
         color: $color-blue;
         cursor: pointer;
+
+        i {
+          color: $color-blue;
+          font-weight: bold;
+        }
       }
 
       .pl-modal-title {
@@ -264,7 +340,7 @@
       border: 2px solid $color-red !important;
     }
 
-    label {
+    label, i {
       color: $color-red;
     }
 

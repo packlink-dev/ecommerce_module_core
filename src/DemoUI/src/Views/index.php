@@ -12,12 +12,15 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $lang ?>">
+<html lang="<?php
+echo $lang ?>">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo UI</title>
     <link rel="icon" href="data:;base64,iVBORwOKGO="/>
     <link rel="stylesheet" type="text/css" href="./resources/css/app.css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
     <style>
         /*This is just for the demo page and should not be used in any integration*/
         html, body {
@@ -54,49 +57,61 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 
     <footer id="pl-footer-extension-point"></footer>
 
-    <div class="pl-input-mask" id="pl-input-mask"></div>
-    <div class="pl-spinner" id="pl-spinner">
+    <div class="pl-input-mask pl-hidden" id="pl-input-mask"></div>
+    <div class="pl-spinner pl-hidden" id="pl-spinner">
         <div></div>
     </div>
 
-    <template id="pl-error-template">
-        <div class="pl-error-message" data-pl-element="error">
+    <template id="pl-alert">
+        <div class="pl-alert-wrapper">
+            <div class="pl-alert">
+                <span class="pl-alert-text"></span>
+                <i class="material-icons">close</i>
+            </div>
         </div>
     </template>
 
-    <div id="pl-modal-mask" class="pl-modal-mask">
+    <div id="pl-modal-mask" class="pl-modal-mask pl-hidden">
         <div class="pl-modal">
-            <div class="pl-modal-close-button">×</div>
+            <div class="pl-modal-close-button">
+                <i class="material-icons">close</i>
+            </div>
             <div class="pl-modal-title">
 
             </div>
             <div class="pl-modal-body">
 
             </div>
-            <div class="pl-modal-footer pl-hidden">
-<!--                <button class="pl-button pl-button-primary">Primary</button>-->
-<!--                <button class="pl-button">Secondary</button>-->
+            <div class="pl-modal-footer">
             </div>
         </div>
     </div>
+
+    <template id="pl-error-template">
+        <div class="pl-error-message" data-pl-element="error">
+        </div>
+    </template>
 </div>
 
 <script src="./resources/js/AjaxService.js"></script>
 <script src="./resources/js/TranslationService.js"></script>
-<script src="./resources/js/DefaultParcelController.js"></script>
-<script src="./resources/js/DefaultWarehouseController.js"></script>
-<script src="./resources/js/FooterController.js"></script>
-<script src="./resources/js/OrderStateMappingController.js"></script>
-<script src="./resources/js/PageControllerFactory.js"></script>
-<script src="./resources/js/ShippingMethodsController.js"></script>
-<script src="./resources/js/StateController.js"></script>
+<script src="./resources/js/ModalService.js"></script>
 <script src="./resources/js/TemplateService.js"></script>
 <script src="./resources/js/UtilityService.js"></script>
 <script src="./resources/js/ValidationService.js"></script>
-<script src="./resources/js/CountrySelectorController.js"></script>
+<script src="./resources/js/FooterController.js"></script>
+<script src="./resources/js/StateController.js"></script>
+
 <script src="./resources/js/LoginController.js"></script>
 <script src="./resources/js/RegisterModalController.js"></script>
 <script src="./resources/js/RegisterController.js"></script>
+
+<script src="./resources/js/DefaultParcelController.js"></script>
+<script src="./resources/js/DefaultWarehouseController.js"></script>
+<script src="./resources/js/OrderStateMappingController.js"></script>
+<script src="./resources/js/PageControllerFactory.js"></script>
+<script src="./resources/js/ShippingMethodsController.js"></script>
+<script src="./resources/js/CountrySelectorController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
@@ -209,7 +224,10 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/register.html')
                             ) ?>
-                        }
+                        },
+                        'pl-register-modal': <?php echo json_encode(
+                            file_get_contents($baseResourcesPath . 'Resources/templates/registerModal.html')
+                        ) ?>
                     },
                 }
             );

@@ -9,22 +9,15 @@
             </p>
         </div>
         <form method="POST" name="plLoginForm" id="pl-login-form" class="pl-full-width">
-            <p class="pl-alert pl-alert-danger pl-hidden" id="pl-login-error-msg">
-                {$login.apiKeyIncorrect}
-            </p>
-            <div>
-                <div class="pl-form-group">
-                    <label for="pl-login-api-key">
-                        {$login.apiKey}
-                    </label>
-                    <input type="text" id="pl-login-api-key" name="apiKey" placeholder="abcdefgh12345676789"/>
-                </div>
+            <div class="pl-form-group">
+                <input type="text" id="pl-login-api-key" name="apiKey" placeholder="abcdefgh12345676789"/>
+                <label for="pl-login-api-key">
+                    {$login.apiKey}
+                </label>
             </div>
-            <div>
-                <button id="pl-login-button" type="submit" name="login" class="pl-button pl-button-primary" disabled>
-                    {$login.validateApiKey}
-                </button>
-            </div>
+            <button id="pl-login-button" type="submit" name="login" class="pl-button pl-button-primary" disabled>
+                {$login.validateApiKey}
+            </button>
         </form>
     </div>
     <div class="pl-full-width pl-login-footer pl-page-padding">

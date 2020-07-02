@@ -3,6 +3,7 @@
 @import "animations";
 @import "utility";
 @import "ui-controls";
+@import "icons";
 
 #pl-page {
   .pl-onboarding-overview-list {
@@ -46,70 +47,47 @@
     width: 200px;
   }
 
-  #pl-error-template {
-    margin-top: 15px;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper {
-    margin-top: 15px;
-    height: 97%;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper a {
-    text-decoration: none !important;
-  }
-
-  .pl-modal-mask .pl-country {
-    display: flex;
-    height: 35px;
-    width: 30px;
-    line-height: 35px;
-    border-radius: 50%;
-    text-align: center;
-    color: #2095f2;
-    font-size: 15px;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-  }
-
-  .pl-modal-mask .pl-country-logo {
-    width: 60px;
-  }
-
-  .pl-modal-mask .pl-country-name {
-    white-space: nowrap;
-    margin-left: 15px;
-  }
-
   .pl-register-country-list-wrapper {
+    margin-top: 15px;
+    min-width: 300px;
     width: 100%;
-  }
-
-  .pl-register-country-list-wrapper a {
-    display: block;
-    width: 100%;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper a .pl-country {
     display: flex;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    cursor: pointer;
-    &:hover {
-      opacity: 0.8;
+    flex-direction: column;
+
+    .pl-country {
+      display: flex;
+      width: 100%;
+      padding: 5px 0;
+      color: #2095f2;
+      font-size: 15px;
+      text-transform: uppercase;
+      flex-direction: row;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $color-little-transparent;
+
+        .pl-country-name {
+          color: $color-blue;
+        }
+      }
+
+      .pl-country-logo {
+        width: 60px;
+      }
+
+      .pl-country-name {
+        white-space: nowrap;
+        margin-left: 15px;
+        align-items: flex-start;
+        flex-grow: 1;
+      }
+
+      img {
+        width: 35px;
+        height: 35px;
+      }
     }
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper a .pl-country img {
-    width: 35px;
-    height: 35px;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper a .pl-country .pl-country-name {
-    margin-top: 0;
   }
 
   .pl-login-footer {
@@ -120,17 +98,6 @@
 
   .pl-login-footer * {
     color: $color-white;
-  }
-
-  .pl-back-arrow {
-    color: #2f66d3;
-  }
-
-  .pl-icon-wrapper {
-    i {
-      font-size: 20px;
-      width: auto;
-    }
   }
 }
 
@@ -147,6 +114,10 @@
       width: 100%;
       color: $color-white;
       padding: 15px;
+    }
+
+    .pl-register-country-list-wrapper {
+      min-width: 100%;
     }
   }
 }

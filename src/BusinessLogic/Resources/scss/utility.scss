@@ -75,8 +75,19 @@
   }
 
   .pl-button {
-    &.pl-mt-20{
+    &.pl-mt-20 {
       margin-top: 20px;
+    }
+  }
+
+  .pl-back-arrow {
+    color: $color-blue;
+  }
+
+  .pl-icon-wrapper {
+    i {
+      font-size: 20px;
+      width: auto;
     }
   }
 
