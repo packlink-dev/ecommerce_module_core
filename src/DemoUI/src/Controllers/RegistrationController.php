@@ -6,7 +6,8 @@ use Packlink\BusinessLogic\Controllers\RegistrationController as RegistrationCon
 use Packlink\DemoUI\Controllers\Models\Request;
 
 /**
- * Class RegistrationController
+ * Class RegistrationController.
+ *
  * @package Packlink\DemoUI\Controllers
  */
 class RegistrationController
@@ -16,16 +17,31 @@ class RegistrationController
      */
     private $controller;
 
+    /**
+     * RegistrationController constructor.
+     */
     public function __construct()
     {
         $this->controller = new RegistrationControllerBase();
     }
 
+    /**
+     * Handles GET request.
+     */
     public function get()
     {
         echo json_encode($this->controller->getRegisterData());
     }
 
+    /**
+     * Handles POST request.
+     *
+     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     */
     public function post(Request $request)
     {
         $payload = $request->getPayload();

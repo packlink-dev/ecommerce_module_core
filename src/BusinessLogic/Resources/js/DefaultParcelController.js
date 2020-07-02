@@ -78,7 +78,6 @@ var Packlink = window.Packlink || {};
 
             submitButton.addEventListener('click', handleDefaultParcelSubmitButtonClickedEvent, true);
 
-            utilityService.configureInputElements();
             utilityService.hideSpinner();
         }
 

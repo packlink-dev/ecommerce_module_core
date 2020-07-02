@@ -5,7 +5,8 @@ use Packlink\DemoUI\Bootstrap;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-$bootstrap = new Bootstrap();
+session_start();
+
 Bootstrap::init();
 $routingController = new ResolverController();
 $routingController->handleAction();

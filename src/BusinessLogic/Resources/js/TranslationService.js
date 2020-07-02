@@ -25,16 +25,53 @@ var Packlink = window.Packlink || {};
      */
     function TranslationService() {
         /**
+         * Gets the translation from the dictionary if exists.
+         *
+         * @param {'default' | 'current'} type
+         * @param {string} group
+         * @param {string} key
+         * @returns {null|string}
+         */
+        const getTranslation = (type, group, key) => {
+            if (Packlink.translations[type][group] && Packlink.translations[type][group][key]) {
+                return Packlink.translations[type][group][key];
+            }
+
+            return null;
+        };
+
+        /**
+         * Replaces the parameters in the given text, if any.
+         *
+         * @param {string} text
+         * @param {[]} params
+         * @return {string}
+         */
+        const replaceParams = (text, params) => {
+            if (!params) {
+                return text;
+            }
+
+            let i = 0;
+            return text.replace(/%s/g, function () {
+                return params[i++] || '%s';
+            });
+        };
+
+        /**
          * Returns a translated string based on the input key and given parameters. If the string to translate
          * has parameters, the placeholder is "%s". For example: Input key %s is not valid. This method will
          * replace parameters in the order given in the params array, if any.
          *
-         * @param {string} key The translation key.
-         * @param {[]} params [optional] An array of parameters to be replaced in the output string.
+         * @param {string} key The translation key in format "group.key".
+         * @param {[]} [params] An array of parameters to be replaced in the output string.
+         *
+         * @return {string}
          */
-        this.translate = function (key, params) {
-            let keyParts = key.split('.');
-            let result = getTranslation('current', keyParts[0], keyParts[1]) || getTranslation('default', keyParts[0], keyParts[1]);
+        this.translate = (key, params) => {
+            const keys = key.split('.');
+
+            let result = getTranslation('current', keys[0], keys[1]) || getTranslation('default', keys[0], keys[1]);
             if (result) {
                 return replaceParams(result, params);
             }
@@ -48,7 +85,7 @@ var Packlink = window.Packlink || {};
          * @param {string} html
          * @return {string} The updated HTML.
          */
-        this.translateHtml = function (html) {
+        this.translateHtml = html => {
             // Replace the placeholders for translations. They are in the format {$key|param1|param2}.
             let format = /{\$[.A-Za-z|]+}/g;
             const me = this;
@@ -60,40 +97,6 @@ var Packlink = window.Packlink || {};
                 let params = key.split('|');
 
                 return me.translate(params[0], params.slice(1)) || key;
-            });
-        }
-
-        /**
-         * Gets the translation from the dictionary if exists.
-         *
-         * @param {string} type 'default' or 'current'
-         * @param {string} key1
-         * @param {string} key2
-         * @returns {null|string}
-         */
-        function getTranslation(type, key1, key2) {
-            if (Packlink.translations[type][key1] && Packlink.translations[type][key1][key2]) {
-                return Packlink.translations[type][key1][key2];
-            }
-
-            return null;
-        }
-
-        /**
-         * Replaces the parameters in the given text, if any.
-         *
-         * @param {string} text
-         * @param {[]} params
-         * @return {string}
-         */
-        function replaceParams(text, params) {
-            if (!params) {
-                return text;
-            }
-
-            let i = 0;
-            return text.replace(/%s/g, function () {
-                return params[i++] || '%s';
             });
         }
     }
