@@ -208,7 +208,7 @@ if (!window.Packlink) {
          */
         const successfulRegister = response => {
             if (response.success) {
-                state.goToState('onboarding');
+                state.goToState('onboarding-state');
             }
         };
 

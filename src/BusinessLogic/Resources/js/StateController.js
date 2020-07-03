@@ -194,7 +194,7 @@ var Packlink = window.Packlink || {};
                     break;
 
                 case 'onBoarding':
-                    this.goToState('onboarding');
+                    this.goToState('onboarding-state');
                     break;
                 default:
                     this.goToState('shipping-methods');

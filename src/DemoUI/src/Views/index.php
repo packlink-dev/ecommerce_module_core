@@ -30,18 +30,21 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
             box-sizing: border-box;
         }
 
-        body {
-            padding: 10px 10px 10px 250px;
+        #pl-page {
+            margin: 10px 10px 10px 250px;
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 0;
+            #pl-page {
+                margin: 0;
             }
         }
     </style>
 </head>
 <body>
+<a style="position: absolute; left: 10px; top:10px; z-index: 1" id="logout"
+   href="<?php
+   echo UrlService::getEndpointUrl('Login', 'logout') ?>">Logout</a>
 
 <!-- This is a main placeholder that should be used in all integrations -->
 <div id="pl-page">

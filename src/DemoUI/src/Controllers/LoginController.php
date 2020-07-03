@@ -3,6 +3,7 @@
 namespace Packlink\DemoUI\Controllers;
 
 use Packlink\DemoUI\Controllers\Models\Request;
+use Packlink\DemoUI\Services\Integration\UrlService;
 
 /**
  * Class LoginController
@@ -25,5 +26,16 @@ class LoginController
         $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
 
         echo json_encode(array('success' => $controller->login($apiKey)));
+    }
+
+    /**
+     * Terminates the session.
+     */
+    public function logout()
+    {
+        session_destroy();
+
+        http_response_code(302);
+        header('Location: ' . UrlService::getHomepage());
     }
 }

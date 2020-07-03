@@ -75,7 +75,7 @@ var Packlink = window.Packlink || {};
 
         const successfulLogin = response => {
             if (response.success) {
-                state.goToState('onboarding');
+                state.goToState('onboarding-state');
             } else {
                 failedLogin();
             }
