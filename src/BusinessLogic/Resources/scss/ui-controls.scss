@@ -11,7 +11,7 @@
     flex-grow: 1;
   }
 
-  .pl-button {
+  button, .pl-button {
     overflow: visible;
     display: inline-flex;
     padding: 16px;
@@ -34,7 +34,7 @@
     justify-content: center;
     margin: 10px 0 0;
     height: auto;
-    width: 170px;
+    min-width: 170px;
 
     &.pl-button-primary {
       background-color: $color-blue;
@@ -242,7 +242,7 @@
   }
 
   .pl-spinner {
-    position: fixed;
+    position: absolute;
     z-index: 500;
     background-color: $color-semi-transparent;
     display: flex;

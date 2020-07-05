@@ -43,6 +43,8 @@ var Packlink = window.Packlink || {};
         const login = event => {
             event.preventDefault();
 
+            Packlink.utilityService.showSpinner();
+
             ajaxService.post(configuration.submit, {apiKey: event.target['apiKey'].value}, successfulLogin, failedLogin);
 
             return false;
@@ -83,6 +85,7 @@ var Packlink = window.Packlink || {};
 
         const failedLogin = () => {
             Packlink.validationService.setError(inputElem, errorMessage);
+            Packlink.utilityService.hideSpinner();
         };
     }
 

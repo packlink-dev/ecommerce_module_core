@@ -6,6 +6,12 @@
 @import "icons";
 
 #pl-page {
+  .pl-onboarding-list {
+    width: 100%;
+    justify-content: flex-start;
+    flex-grow: 1;
+  }
+
   .pl-onboarding-overview-list {
     width: 100%;
 
@@ -99,12 +105,37 @@
   .pl-login-footer * {
     color: $color-white;
   }
+
+  .pl-back-arrow {
+    color: $color-blue;
+  }
+
+  .pl-onboarding-welcome-steps {
+    align-items: flex-start;
+    width: 100%;
+
+    .pl-list-item {
+      padding: 20px 0;
+      width: 100%;
+      border-bottom: 1px solid $color-light;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
 }
 
 // mobile rules
 @media (max-width: 768px) {
   #pl-page {
     .pl-main-logo {
+      width: 100%;
+    }
+
+    .pl-page-buttons {
+      position: fixed;
+      bottom: 0;
       width: 100%;
     }
 

@@ -56,6 +56,23 @@ var Packlink = window.Packlink || {};
         let previousState = '';
 
         let pageConfiguration = {
+            'login': {
+                submit: configuration.loginUrl,
+                listOfCountriesUrl: configuration.listOfCountriesUrl,
+                logoPath: configuration.logoPath
+            },
+            'register': {
+                getRegistrationData: configuration.registrationDataUrl,
+                submit: configuration.registrationSubmitUrl
+            },
+            'onboarding-state': {
+                getState: configuration.getOnboardingStateUrl
+            },
+            'onboarding-welcome': {},
+            'onboarding-overview': {
+                defaultParcelGet: configuration.defaultParcelGetUrl,
+                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
+            },
             'default-parcel': {
                 getUrl: configuration.defaultParcelGetUrl,
                 submitUrl: configuration.defaultParcelSubmitUrl
@@ -93,22 +110,6 @@ var Packlink = window.Packlink || {};
             'footer': {
                 getDebugStatusUrl: configuration.debugGetStatusUrl,
                 setDebugStatusUrl: configuration.debugSetStatusUrl
-            },
-            'login': {
-                submit: configuration.loginUrl,
-                listOfCountriesUrl: configuration.listOfCountriesUrl,
-                logoPath: configuration.logoPath
-            },
-            'register': {
-                getRegistrationData: configuration.registrationDataUrl,
-                submit: configuration.registrationSubmitUrl
-            },
-            'onboarding-state': {
-                getState: configuration.getOnboardingStateUrl
-            },
-            'onboarding-overview': {
-                defaultParcelGet: configuration.defaultParcelGetUrl,
-                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
             }
         };
 
@@ -161,6 +162,7 @@ var Packlink = window.Packlink || {};
             );
 
             if (dp) {
+                utilityService.hideSpinner();
                 dp.display(additionalConfig);
             }
 
