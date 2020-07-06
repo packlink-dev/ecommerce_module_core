@@ -60,8 +60,8 @@
     "HU": "Hungary"
   },
   "onboardingWelcome": {
-    "header": "Let's set up basic information so that you can make shipments",
-    "steps": "It's just two steps that we need to go through to offer you the carrier that best suits your needs",
+    "header": "Let's set up basic information so that<br>you can make shipments",
+    "steps": "It's just two steps that we need to go through to offer you the<br>carrier that best suits your needs",
     "stepOne": "Set parcel details",
     "stepTwo": "Set sender's address",
     "startSetUp": "Start set up"
