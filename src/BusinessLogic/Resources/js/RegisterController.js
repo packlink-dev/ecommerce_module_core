@@ -181,6 +181,7 @@ if (!window.Packlink) {
             validateForm();
 
             if (form.querySelectorAll('[data-pl-contains-errors]').length === 0) {
+                utilityService.showSpinner();
                 ajaxService.post(
                     configuration.submit,
                     {
@@ -218,6 +219,7 @@ if (!window.Packlink) {
          * @param {{success: boolean, error?: string, messages?: ValidationMessage[]}} response
          */
         const errorHandler = response => {
+            utilityService.hideSpinner();
             if (response.error) {
                 utilityService.showFlashMessage(response.error, 'danger', 7000);
             } else if (response.messages) {

@@ -88,7 +88,7 @@ class RegistrationRequest extends FrontDto
      *
      * @var array
      */
-    public $marketplaces;
+    public $marketplaces = array();
     /**
      * Fields for this DTO.
      *
