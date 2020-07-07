@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -153,7 +155,7 @@ var Packlink = window.Packlink || {};
          * Navigates to a state.
          *
          * @param {string} controller
-         * @param {array|null} additionalConfig
+         * @param {object|null} additionalConfig
          */
         this.goToState = (controller, additionalConfig = null) => {
             let dp = pageControllerFactory.getInstance(

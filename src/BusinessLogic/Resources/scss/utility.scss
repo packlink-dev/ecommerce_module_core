@@ -3,14 +3,49 @@
     display: inline;
   }
 
+  .pl-full-width {
+    width: 100%;
+  }
+
+  .pl-medium-page {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pl-small-page {
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pl-hidden {
+    display: none !important;
+  }
+
+  .pl-pull-left {
+    float: left;
+  }
+
   .pl-text-center {
     text-align: center;
+  }
 
+  .pl-text-left {
+    text-align: left;
   }
 
   .pl-separate-vertically {
     margin-top: 26px;
     margin-bottom: 26px;
+  }
+
+  .pl-bottom-separate {
+    margin-bottom: 36px;
+  }
+
+  .pl-page-padding {
+    padding: 20px;
   }
 
   .pl-flex-expand {
@@ -22,75 +57,49 @@
     justify-content: flex-start;
   }
 
-  .pl-full-width {
-    width: 100%;
-  }
-
-  .pl-bottom-separate {
-    margin-bottom: 36px;
-  }
-
-  .pl-hidden {
-    display: none !important;
-  }
-
-  .pl-page-padding {
-    padding: 20px;
-  }
-
-  .pl-m-30 {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    margin-left: 30px;
-  }
-
-  .pl-pull-left {
-    float: left;
-  }
-
   .pl-justify-f-start {
     justify-content: flex-start;
+  }
+
+  .pl-center {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
 
   .pl-flex-start {
     align-items: flex-start;
   }
 
-  .pl-text-align-left {
-    text-align: left;
+  .pl-header-text-wrapper {
+    line-height: 22px;
+    font-size: 22px;
   }
 
-  .pl-text-center {
-    .pl-header-text-wrapper {
-      line-height: 22px;
-      font-size: 22px;
-    }
-  }
+  .pl-icon-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: $icon-button-size;
+    height: $icon-button-size;
+    min-width: $icon-button-size;
+    margin: 0;
 
-  .pl-button {
-    &.pl-mt-20 {
-      margin-top: 20px;
-    }
-  }
-
-  .pl-icon-wrapper {
     i {
       font-size: 20px;
       width: auto;
+      color: $color-blue;
     }
-  }
 
-  button {
-    &.pl-icon-wrapper {
-      border: none;
-      background: transparent;
+    &:focus {
+      outline: none;
+    }
 
-      &:focus {
-        outline: none;
-      }
+    &:hover {
+      cursor: pointer;
 
-      &:hover {
-        cursor: pointer;
+      i {
+        color: $color-white;
       }
     }
   }
@@ -99,6 +108,11 @@
     white-space: nowrap;
     width: auto;
   }
+
+  .pl-page-buttons {
+    display: block;
+    text-align: center;
+  }
 }
 
 // mobile rules
@@ -106,6 +120,17 @@
   #pl-page {
     .pl-desktop-only {
       display: none !important;
+    }
+
+    .pl-page-buttons {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .pl-medium-page, .pl-small-page {
+      width: 100%;
     }
   }
 }

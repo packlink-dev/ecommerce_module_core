@@ -16,7 +16,11 @@ if (!window.Packlink) {
 
             const btn = templateService.getComponent('pl-onboarding-welcome-button');
             btn.addEventListener('click', () => {
-                Packlink.state.goToState('default-parcel');
+                Packlink.state.goToState('default-parcel', {
+                    'code': 'onboarding',
+                    'prevState': 'onboarding-overview',
+                    'nextState': 'default-warehouse',
+                });
             });
         };
     }

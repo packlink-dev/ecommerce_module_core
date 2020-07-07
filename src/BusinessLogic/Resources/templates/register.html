@@ -1,5 +1,5 @@
 <div class="pl-register-page pl-flex-expand">
-    <div class="pl-flex-expand pl-text-center pl-page-padding">
+    <div class="pl-flex-expand pl-page-padding pl-medium-page">
         <div class="pl-bottom-separate">
             <h1 class="pl-text-center">
                 {$register.startEnjoying}
@@ -11,7 +11,8 @@
         <form method="POST" name="plRegisterForm" id="pl-register-form" class="pl-full-width">
             <div>
                 <div class="pl-form-group">
-                    <input id="pl-register-email" type="email" class="form-control" name="email"/>
+                    <input id="pl-register-email" type="email" class="form-control" name="email"
+                           data-type="email" data-required="true"/>
                     <label for="pl-register-email">
                         {$register.email}
                     </label>
@@ -21,9 +22,8 @@
                            type="password"
                            class="form-control"
                            name="password"
-                           minlength="6"
                            data-min-length="6"
-                    />
+                           data-type="password" data-required="true"/>
                     <label for="pl-register-password">
                         {$register.password}
                     </label>
@@ -34,7 +34,8 @@
                 <div class="pl-form-group" id="pl-register-delivery-volume">
                     <select class=form-control"
                             name="estimated_delivery_volume"
-                            id="pl-register-shipment-volume">
+                            id="pl-register-shipment-volume"
+                            data-required="true">
                         <option disabled selected value></option>
                         <option value="1 - 10">1 - 10</option>
                         <option value="11 - 50">11 - 50</option>
@@ -48,21 +49,26 @@
                     </label>
                 </div>
                 <div class="pl-form-group">
-                    <input id="pl-register-phone" type="text" class="form-control" name="phone"/>
+                    <input id="pl-register-phone" type="text" class="form-control" name="phone"
+                           data-type="phone" data-required="true"/>
                     <label for="pl-register-phone">
                         {$register.phone}
                     </label>
                 </div>
             </div>
             <div>
-                <button id="pl-register-button" type="submit" name="register" class="pl-button pl-button-primary" disabled>
+                <button id="pl-register-button" type="submit" name="register"
+                        class="pl-button pl-button-primary"
+                        disabled>
                     {$register.submit}
                 </button>
             </div>
             <div class="pl-legal-policies pl-flex-start">
                 <div class="pl-checkbox" id="pl-register-terms-and-conditions-label">
                     <input type="checkbox" name="terms_and_conditions" id="pl-register-terms-and-conditions"
-                           tabindex="-1">
+                           data-required="true"
+                           tabindex="-1"
+                    >
                     <label for="pl-register-terms-and-conditions"></label>
                 </div>
             </div>
@@ -79,10 +85,8 @@
         </form>
     </div>
     <div class="pl-full-width pl-login-footer pl-page-padding">
-        <div>
+        <div class="pl-medium-page pl-text-center">
             <strong>{$register.haveAccount}</strong>
-        </div>
-        <div>
             <button type="submit" name="login" class="pl-button pl-button-inverted" id="pl-go-to-login">
                 {$register.logIn}
             </button>

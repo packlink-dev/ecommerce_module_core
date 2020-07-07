@@ -44,6 +44,7 @@ class DefaultParcelController
         $data = $request->getPayload();
 
         $this->controller->setDefaultParcel($data);
-    }
 
+        $this->getDefaultParcel();
+    }
 }

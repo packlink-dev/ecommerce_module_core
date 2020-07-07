@@ -5,8 +5,6 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-session_start();
-
 Configuration::setCurrentLanguage('es');
 $lang = Configuration::getCurrentLanguage() ?: 'en';
 
@@ -101,6 +99,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/TemplateService.js"></script>
 <script src="./resources/js/UtilityService.js"></script>
 <script src="./resources/js/ValidationService.js"></script>
+<script src="./resources/js/ResponseService.js"></script>
 <script src="./resources/js/FooterController.js"></script>
 <script src="./resources/js/StateController.js"></script>
 
@@ -131,18 +130,6 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
             };
 
             Packlink.models = {};
-
-            Packlink.errorMsgs = {
-                required: 'This field is required.',
-                numeric: 'Value must be valid number.',
-                invalid: 'This field is not valid.',
-                phone: 'This field must be valid phone number.',
-                titleLength: 'Title can have at most 64 characters.',
-                greaterThanZero: 'Value must be greater than 0.',
-                numberOfDecimalPlaces: 'Field must have 2 decimal places.',
-                integer: 'Field must be an integer.',
-                invalidCountryList: 'You must select destination countries.'
-            };
 
             Packlink.successMsgs = {
                 shippingMethodSaved: 'Shipping service successfully saved.'

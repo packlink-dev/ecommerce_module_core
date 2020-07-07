@@ -140,6 +140,27 @@ if (!window.Packlink) {
 
             return (prefix + input).slice(length * -1);
         };
+
+        /**
+         * Converts a collection to array.
+         *
+         * @param collection
+         * @return {[]}
+         */
+        this.toArray = (collection) => {
+            if (Array.prototype.from) {
+                return Array.from(collection);
+            }
+
+            const result = [],
+                length = collection.length;
+
+            for (let i = 0; i < length; i++) {
+                result.push(collection[i]);
+            }
+
+            return result;
+        };
     }
 
     Packlink.utilityService = new UtilityService();

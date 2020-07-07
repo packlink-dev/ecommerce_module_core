@@ -9,7 +9,6 @@
   .pl-onboarding-list {
     width: 100%;
     justify-content: flex-start;
-    flex-grow: 1;
   }
 
   .pl-onboarding-overview-list {
@@ -18,11 +17,6 @@
     div {
       padding-top: 15px;
       padding-bottom: 15px;
-    }
-
-    hr {
-      border: 1px solid $border-color;
-      width: 100%;
     }
 
     .pl-min-width-81 {
@@ -62,12 +56,13 @@
 
     .pl-country {
       display: flex;
+      flex-direction: row;
+      align-items: center;
       width: 100%;
       padding: 5px 0;
       color: #2095f2;
       font-size: 15px;
       text-transform: uppercase;
-      flex-direction: row;
       cursor: pointer;
 
       &:hover {
@@ -97,17 +92,13 @@
   }
 
   .pl-login-footer {
-    padding: 20px;
+    padding: 24px 30px 32px;
     background-color: $color-navy-dark;
     color: $color-white;
   }
 
   .pl-login-footer * {
     color: $color-white;
-  }
-
-  .pl-back-arrow {
-    color: $color-blue;
   }
 
   .pl-onboarding-welcome-steps {
@@ -133,29 +124,12 @@
       width: 100%;
     }
 
-    .pl-page-buttons {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      padding: 20px;
-    }
-
-    .pl-onboarding-overview-mobile-header {
-      display: block;
-      background-color: #2195F2;
-      width: 100%;
-      color: $color-white;
-      padding: 15px;
-    }
-
     .pl-register-country-list-wrapper {
       min-width: 100%;
     }
-  }
-}
 
-// tablet rules
-@media (min-width: 769px) and (max-width: 1280px) {
-  #pl-page {
+    .pl-login-footer {
+      padding: 16px 20px;
+    }
   }
 }

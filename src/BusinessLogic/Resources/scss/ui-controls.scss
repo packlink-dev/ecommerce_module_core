@@ -1,9 +1,22 @@
 #pl-page {
-  > header {
+  header {
     border-bottom: 1px solid $border-color;
     padding: 20px;
     display: flex;
     align-items: center;
+
+    &.pl-sub-header {
+      border-color: $color-light;
+      flex-direction: row;
+
+      button {
+        z-index: 1;
+      }
+
+      h1 {
+        margin: 0 0 0 -$icon-button-size;
+      }
+    }
   }
 
   > main {
@@ -112,6 +125,10 @@
 
       &.compact {
         padding: 13px 16px;
+      }
+
+      ::placeholder, ::-webkit-input-placeholder {
+        color: $color-light;
       }
     }
 
