@@ -14,26 +14,27 @@
   .pl-onboarding-overview-list {
     width: 100%;
 
-    div {
-      padding-top: 15px;
-      padding-bottom: 15px;
-    }
+    .pl-list-item {
+      flex-direction: row;
+      align-items: center;
+      padding-bottom: 20px;
 
-    .pl-min-width-81 {
-      display: inline-block;
-      min-width: 81.5%;
-      margin-bottom: 10px;
-    }
+      i {
+        margin-right: 10px;
+      }
 
-    .pl-onboarding-list-title {
-      color: #2a77c2;
-    }
+      & + .pl-list-item {
+        border-top: 1px solid $color-light;
+        padding-top: 20px;
+      }
 
-    .pl-onboarding-overview-mobile-header {
-      display: none;
+      .pl-item-details {
+        text-align: left;
+      }
 
-      strong {
-        color: $color-white;
+      .pl-onboarding-list-title {
+        color: $color-gray;
+        text-align: left;
       }
     }
   }
@@ -130,6 +131,10 @@
 
     .pl-login-footer {
       padding: 16px 20px;
+    }
+
+    .pl-list-item .pl-row-orientation {
+      flex-direction: column;
     }
   }
 }

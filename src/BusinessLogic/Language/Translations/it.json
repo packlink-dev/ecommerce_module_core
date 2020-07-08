@@ -77,14 +77,12 @@
     "startSetUp": "Start set up"
   },
   "onboardingOverview": {
-    "header": "Almost there! Please check that the information entered is <br> correct, or complete it in order to continue.",
+    "header": "Almost there! Please check that the information entered is correct, or complete it in order to continue.",
     "parcelDetails": "Parcel details",
     "senderAddress": "Sender's Address",
     "missingInfo": "Missing information",
-    "complete": "Complete",
-    "edit": "Edit",
-    "continue": "Continue",
-    "myShipmentServices": "My shipment services"
+    "parcelData": "Weight %s kg | Height %s cm | Width %s cm | Length %s cm",
+    "warehouseData": "%s | %s | %s"
   },
   "defaultParcel": {
     "weight": "Weight",

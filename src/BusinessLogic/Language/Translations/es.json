@@ -83,11 +83,12 @@
     "startSetUp": "Comenzar con la configuración"
   },
   "onboardingOverview": {
-    "header": "Ya casi estamos. Por favor, comprueba que la información es <br> correcta o complétala para continuar.",
+    "header": "Ya casi estamos. Por favor, comprueba que la información es correcta o complétala para continuar.",
     "parcelDetails": "Detalle del paquete",
     "senderAddress": "Dirección del remitente",
     "missingInfo": "Faltan datos",
-    "myShipmentServices": "My shipment services"
+    "parcelData": "Peso %s kg | Alto %s cm | Ancho %s cm | Largo %s cm",
+    "warehouseData": "%s | %s | %s"
   },
   "defaultParcel": {
     "title-onboarding": "1. Configurar los detalles del paquete",

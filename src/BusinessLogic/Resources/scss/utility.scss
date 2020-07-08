@@ -8,13 +8,13 @@
   }
 
   .pl-medium-page {
-    max-width: 500px;
+    max-width: 540px;
     margin-left: auto;
     margin-right: auto;
   }
 
   .pl-small-page {
-    max-width: 400px;
+    max-width: 410px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -50,6 +50,10 @@
 
   .pl-flex-expand {
     flex-grow: 1;
+  }
+
+  .pl-row-orientation {
+    flex-direction: row;
   }
 
   .pl-flex-left {
@@ -112,6 +116,14 @@
   .pl-page-buttons {
     display: block;
     text-align: center;
+  }
+
+  .pl-error-text {
+    color: $color-red;
+  }
+
+  .pl-icon-text {
+    color: $color-blue;
   }
 }
 
