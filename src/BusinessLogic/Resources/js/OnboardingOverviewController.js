@@ -12,21 +12,11 @@ if (!window.Packlink) {
             templateId = 'pl-onboarding-overview-page';
 
         /**
-         * @var {{weight: number, length: number, width: number, height: number}}
+         * @var {Parcel}
          */
         let defaultParcel;
         /**
-         * @var {{
-         *  id: string,
-         *  alias: string,
-         *  name: string,
-         *  surname: string,
-         *  city: string,
-         *  phone: string,
-         *  country: string,
-         *  company: string,
-         *  postal_code: string,
-         *  address: string}}
+         * @var {Warehouse}
          */
         let defaultWarehouse;
 
@@ -56,15 +46,17 @@ if (!window.Packlink) {
                 return translationService.translate('onboardingOverview.warehouseData', [
                     defaultWarehouse.alias,
                     defaultWarehouse.name + ' ' + defaultWarehouse.surname,
-                    defaultWarehouse.company
+                    defaultWarehouse.company || '-'
                 ]);
             });
 
             const submitBtn = templateService.getComponent('pl-onboarding-overview-button');
-            submitBtn.disabled = !!defaultParcel.weight || !!defaultWarehouse.postal_code;
+            submitBtn.disabled = !defaultParcel.weight || !defaultWarehouse.postal_code;
             submitBtn.addEventListener('click', () => {
                 state.goToState('shipping-services');
             });
+
+            Packlink.utilityService.hideSpinner();
         }
 
         const populateSegment = (segment, data, editState, infoProvider) => {

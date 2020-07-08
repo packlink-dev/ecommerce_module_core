@@ -2,11 +2,11 @@
 
 namespace Packlink\DemoUI\Controllers;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Country\CountryService;
+use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 use Packlink\DemoUI\Controllers\Models\Request;
-use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
 /**
  * Class DefaultWarehouseController
@@ -16,12 +16,7 @@ use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 class DefaultWarehouseController
 {
     /**
-     * @var ConfigurationService
-     */
-    private $configService;
-
-    /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     * Gets the default warehouse.
      */
     public function getDefaultWarehouse()
     {
@@ -33,40 +28,73 @@ class DefaultWarehouseController
     }
 
     /**
+     * Sets the default warehouse.
+     *
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function setDefaultWarehouse(Request $request)
     {
+        /** @var WarehouseService $warehouseService */
+        $warehouseService = ServiceRegister::getService(WarehouseService::CLASS_NAME);
+        $warehouseService->updateWarehouseData($request->getPayload());
 
+        $this->getDefaultWarehouse();
     }
 
     /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     * Gets the list of supported countries.
      */
-    public function getSupportedCountries(Request $request)
+    public function getSupportedCountries()
     {
+        /** @var CountryService $countryService */
+        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        $supportedCountries = $countryService->getSupportedCountries();
 
+        $this->returnDtoEntitiesResponse($supportedCountries);
     }
 
     /**
+     * Searches for postal codes.
+     *
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
      */
     public function searchPostalCodes(Request $request)
     {
+        $data = $request->getPayload();
 
+        if (empty($data['query']) || empty($data['country'])) {
+            die('{}');
+        }
+
+        /** @var LocationService $locationService */
+        $locationService = ServiceRegister::getService(LocationService::CLASS_NAME);
+
+        try {
+            $locations = $locationService->searchLocations($data['country'], $data['query']);
+            $this->returnDtoEntitiesResponse($locations);
+        } catch (\Exception $e) {
+            die('{}');
+        }
     }
 
     /**
-     * Returns an instance of configuration service.
+     * Echos the FrontDto array to the output.
      *
-     * @return ConfigurationService
+     * @param array $data
      */
-    protected function getConfigService()
+    private function returnDtoEntitiesResponse(array $data)
     {
-        if ($this->configService === null) {
-            $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        }
+        $result = array_map(
+            function ($entity) {
+                return $entity->toArray();
+            },
+            $data
+        );
 
-        return $this->configService;
+        echo json_encode($result);
     }
 }

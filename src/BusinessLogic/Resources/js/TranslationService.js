@@ -87,7 +87,7 @@ var Packlink = window.Packlink || {};
          */
         this.translateHtml = html => {
             // Replace the placeholders for translations. They are in the format {$key|param1|param2}.
-            let format = /{\$[.A-Za-z|]+}/g;
+            let format = /{\$[.\-_A-Za-z|]+}/g;
             const me = this;
 
             return html.replace(format, function (key) {

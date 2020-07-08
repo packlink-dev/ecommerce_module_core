@@ -164,7 +164,6 @@ if (!window.Packlink) {
             );
 
             if (dp) {
-                utilityService.hideSpinner();
                 dp.display(additionalConfig);
             }
 

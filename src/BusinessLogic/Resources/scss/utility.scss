@@ -134,11 +134,18 @@
       display: none !important;
     }
 
+    .pl-page-content {
+      height: 100%;
+      overflow: auto;
+      margin-bottom: 80px;
+    }
+
     .pl-page-buttons {
-      position: absolute;
+      position: fixed;
       bottom: 0;
       width: 100%;
       padding: 20px;
+      background-color: $color-white;
     }
 
     .pl-medium-page, .pl-small-page {

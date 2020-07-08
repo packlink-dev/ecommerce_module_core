@@ -102,20 +102,18 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/ResponseService.js"></script>
 <script src="./resources/js/FooterController.js"></script>
 <script src="./resources/js/StateController.js"></script>
+<script src="./resources/js/PageControllerFactory.js"></script>
 
 <script src="./resources/js/LoginController.js"></script>
 <script src="./resources/js/RegisterModalController.js"></script>
 <script src="./resources/js/RegisterController.js"></script>
+
 <script src="./resources/js/OnboardingStateController.js"></script>
 <script src="./resources/js/OnboardingWelcomeController.js"></script>
 <script src="./resources/js/OnboardingOverviewController.js"></script>
-
-<script src="./resources/js/CountrySelectorController.js"></script>
 <script src="./resources/js/DefaultParcelController.js"></script>
 <script src="./resources/js/DefaultWarehouseController.js"></script>
-<script src="./resources/js/OrderStateMappingController.js"></script>
 
-<script src="./resources/js/PageControllerFactory.js"></script>
 <script src="./resources/js/ShippingMethodsController.js"></script>
 <script>
     <?php
@@ -235,6 +233,11 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                         'pl-default-parcel-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/default-parcel.html')
+                            ) ?>
+                        },
+                        'pl-default-warehouse-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/default-warehouse.html')
                             ) ?>
                         }
                     },

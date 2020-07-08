@@ -63,6 +63,8 @@ if (!window.Packlink) {
          * @return {boolean}
          */
         this.validateInputField = (input) => {
+            this.removeError(input);
+
             const data = input.dataset;
 
             if (data.required !== undefined && !this.validateRequiredField(input)) {
