@@ -103,8 +103,8 @@
   "defaultWarehouse": {
     "title-onboarding": "2. Configurar la dirección del remitente ",
     "description-onboarding": "Utilizaremos esta dirección para crear un <strong>remitente por defecto que valga para todos los envíos.</strong> Podrás editarla cuando quieras desde la pestaña de configuración.",
-    "title-config": "Default sender address",
-    "description-config": "We will use this address to create <strong>a default sender for all shipments.</strong> You can edit it at any time",
+    "title-config": "Dirección del remitente por defecto",
+    "description-config": "Utilizaremos esta <strong>dirección para crear un remitente por defecto<strong> que valga para todos los envíos.",
     "alias": "Nombre del almacén",
     "alias-placeholder": "Almacen principal",
     "name": "Nombre de la persona de contacto",
