@@ -1,0 +1,52 @@
+<div class="pl-configuration-page pl-flex-expand pl-full-width">
+    <div class="pl-flex-expand">
+        <header class="pl-sub-header">
+            <button id="pl-back-button" class="pl-icon-button">
+                <i class="material-icons">keyboard_backspace</i>
+            </button>
+            <h1>{$configuration.menu}</h1>
+        </header>
+        <div class="pl-flex-left pl-config-list">
+            <div class="pl-config-list-item" id="pl-navigate-order-status">
+                <i class="material-icons pl-icon-text">sync_alt</i>
+                <div class="pl-flex-expand pl-left-separate">
+                    {$configuration.orderStatus}
+                </div>
+                <i class="material-icons pl-no-margin pl-icon-text">chevron_right</i>
+            </div>
+            <div class="pl-config-list-item" id="pl-navigate-warehouse">
+                <i class="material-icons pl-icon-text">corporate_fare</i>
+                <div class="pl-flex-expand pl-left-separate">
+                    {$configuration.warehouse}
+                </div>
+                <i class="material-icons pl-no-margin pl-icon-text">chevron_right</i>
+            </div>
+            <div class="pl-config-list-item" id="pl-navigate-parcel">
+                <i class="material-icons pl-icon-text">pages</i>
+                <div class="pl-flex-expand pl-left-separate">
+                    {$configuration.parcel}
+                </div>
+                <i class="material-icons pl-no-margin pl-icon-text">chevron_right</i>
+            </div>
+            <div class="pl-config-list-item">
+                <a target="_blank" id="pl-navigate-help">
+                    <i class="material-icons pl-icon-text">help_outline</i>
+                    <div class="pl-flex-expand pl-left-separate">
+                        {$configuration.help}
+                    </div>
+                    <i class="material-icons pl-no-margin pl-icon-text">chevron_right</i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="pl-footer">
+        <div class="pl-row-orientation">
+            <span>{$configuration.contactUs}</span>
+            &nbsp;<a href="mailto::business@packlink.com" rel="nofollow" target="_blank">business@packlink.com</a>
+        </div>
+        <div class="pl-row-orientation">
+            <span id="pl-version-number"></span>
+            &nbsp;<div class="pl-icon-text pl-clickable">{$configuration.systemInfo}</div>
+        </div>
+    </div>
+</div>

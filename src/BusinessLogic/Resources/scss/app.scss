@@ -96,10 +96,10 @@
     padding: 24px 30px 32px;
     background-color: $color-navy-dark;
     color: $color-white;
-  }
 
-  .pl-login-footer * {
-    color: $color-white;
+    * {
+      color: $color-white;
+    }
   }
 
   .pl-onboarding-welcome-steps {
@@ -114,6 +114,78 @@
       &:last-child {
         border-bottom: none;
       }
+    }
+  }
+
+  .pl-configuration-menu {
+    padding: 5px 20px;
+    margin-right: -20px;
+    font-weight: bold;
+
+    i {
+      margin-left: 10px;
+    }
+  }
+
+  .pl-configuration-page {
+    justify-content: space-between;
+
+    .pl-sub-header {
+      h1 {
+        margin-left: 10px;
+      }
+    }
+
+    .pl-config-list {
+      flex-direction: column;
+      width: 300px;
+
+      .pl-config-list-item {
+        border-bottom: 1px solid $border-light;
+        padding: 17px 0 17px 26px;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+
+        &:hover {
+          background-color: $border-light;
+          cursor: pointer;
+        }
+
+        a {
+          display: flex;
+          flex-direction: row;
+          flex-grow: 1;
+          align-items: center;
+        }
+      }
+    }
+
+    .pl-footer {
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 20px;
+
+      span {
+        color: $color-light-gray;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .pl-page-config {
+    header.pl-sub-header h1 {
+      text-align: left;
+      margin-left: 10px;
+    }
+
+    .pl-small-page, .pl-medium-page {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .pl-text-center, .pl-page-buttons {
+      text-align: left;
     }
   }
 }
@@ -135,6 +207,25 @@
 
     .pl-list-item .pl-row-orientation {
       flex-direction: column;
+    }
+
+    .pl-configuration-page {
+      .pl-config-list {
+        width: 100%;
+
+        .pl-config-list-item {
+          padding-right: 15px;
+          padding-left: 20px;
+        }
+      }
+
+      .pl-footer {
+        flex-direction: column;
+
+        > :first-child {
+          padding-bottom: 20px;
+        }
+      }
     }
   }
 }

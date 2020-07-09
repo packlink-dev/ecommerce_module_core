@@ -16,7 +16,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
     <title>Demo UI</title>
     <link rel="icon" href="data:;base64,iVBORwOKGO="/>
     <link rel="stylesheet" type="text/css" href="./resources/css/app.css"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
           rel="stylesheet">
     <style>
         /*This is just for the demo page and should not be used in any integration*/
@@ -28,29 +28,30 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
             box-sizing: border-box;
         }
 
-        #pl-page {
-            margin: 10px 10px 10px 250px;
+        body {
+            display: flex;
         }
 
         @media (max-width: 768px) {
-            #pl-page {
-                margin: 0;
+            aside {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-<a style="position: absolute; left: 10px; top:10px; z-index: 1" id="logout"
-   href="<?php
-   echo UrlService::getEndpointUrl('Login', 'logout') ?>">Logout</a>
+<aside style="width: 250px">
+    <a id="logout" href="<?php
+    echo UrlService::getEndpointUrl('Login', 'logout') ?>">Logout</a>
+</aside>
 
 <!-- This is a main placeholder that should be used in all integrations -->
 <div id="pl-page">
-    <header>
+    <header id="pl-main-header">
         <div class="pl-main-logo">
             <img src="https://cdn.packlink.com/apps/giger/logos/packlink-pro.svg" alt="logo">
         </div>
-        <div class="header-holder" id="pl-header-section"></div>
+        <div class="pl-header-holder" id="pl-header-section"></div>
     </header>
 
     <main id="pl-main-page-holder"></main>
@@ -115,6 +116,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/DefaultWarehouseController.js"></script>
 
 <script src="./resources/js/ShippingMethodsController.js"></script>
+<script src="./resources/js/ConfigurationController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
@@ -205,6 +207,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                     autoConfigureStartUrl: "<?php echo UrlService::getEndpointUrl('AutoConfigure', 'start') ?>",
                     getShippingCountriesUrl: "<?php echo UrlService::getEndpointUrl('ShippingCountries', 'getAll') ?>",
                     logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>",
+                    configurationGetDataUrl: "<?php echo UrlService::getEndpointUrl('Configuration', 'getData')?>",
 
                     templates: {
                         'pl-login-page': {
@@ -238,6 +241,20 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                         'pl-default-warehouse-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'Resources/templates/default-warehouse.html')
+                            ) ?>
+                        },
+                        'pl-configuration-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/configuration.html')
+                            ) ?>,
+                            'pl-header-section': ''
+                        },
+                        'pl-shipping-methods-page': {
+                            'pl-main-page-holder': '',
+                            'pl-header-section': <?php echo json_encode(
+                                file_get_contents(
+                                    $baseResourcesPath . 'Resources/templates/shipping-methods-header.html'
+                                )
                             ) ?>
                         }
                     },

@@ -20,6 +20,12 @@ if (!window.Packlink) {
          * @returns {Element}
          */
         this.getMainPage = () => document.querySelector(mainPlaceholder);
+        /**
+         * Gets the header of the page.
+         *
+         * @return {HTMLElement}
+         */
+        this.getHeader = () => document.getElementById('pl-main-header');
 
         /**
          * Retrieves component by its id or attribute.

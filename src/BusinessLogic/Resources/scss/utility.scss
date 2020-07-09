@@ -44,6 +44,10 @@
     margin-bottom: 36px;
   }
 
+  .pl-left-separate {
+    margin-left: 20px;
+  }
+
   .pl-page-padding {
     padding: 20px;
   }
@@ -63,6 +67,10 @@
 
   .pl-justify-f-start {
     justify-content: flex-start;
+  }
+
+  .pl-no-margin {
+    margin: 0;
   }
 
   .pl-center {
@@ -116,6 +124,7 @@
   .pl-page-buttons {
     display: block;
     text-align: center;
+    padding: 0 20px 20px;
   }
 
   .pl-error-text {
@@ -124,6 +133,10 @@
 
   .pl-icon-text {
     color: $color-blue;
+  }
+
+  .pl-clickable {
+    cursor: pointer;
   }
 }
 
@@ -137,7 +150,7 @@
     .pl-page-content {
       height: 100%;
       overflow: auto;
-      margin-bottom: 80px;
+      margin-bottom: 100px;
     }
 
     .pl-page-buttons {
@@ -150,6 +163,7 @@
 
     .pl-medium-page, .pl-small-page {
       width: 100%;
+      max-width: 100%;
     }
   }
 }

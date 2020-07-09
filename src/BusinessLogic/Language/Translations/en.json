@@ -124,13 +124,15 @@
     "email": "Email",
     "email-placeholder": "youremail@example.com"
   },
-  "dashboard": {
-    "almostThere": "You're almost there!",
-    "detailsSynced": "Details synced with your existing account",
-    "setDefaultParcel": "Set default parcel details",
-    "setDefaultWarehouse": "Set default warehouse details",
-    "justFewMoreSteps": "Just a few more steps to complete the setup",
-    "selectShippingServices": "Select shipping services"
+  "configuration": {
+    "menu": "Settings",
+    "title": "Settings",
+    "orderStatus": "Order status",
+    "warehouse": "Default sender address",
+    "parcel": "Default parcel",
+    "help": "Help",
+    "contactUs": "Contact us at",
+    "systemInfo": "System information"
   },
   "mapOrderStatuses": {
     "mapStatuses": "Map order statuses",

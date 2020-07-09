@@ -42,6 +42,7 @@ if (!window.Packlink) {
      *      orderStatusMappingsSaveUrl: string,
      *      orderStatusMappingsGetUrl: string,
      *      getShippingCountriesUrl: string,
+     *      configurationGetDataUrl: string,
      *      logoPath: string,
      *      templates: {}
      * }} configuration
@@ -84,6 +85,9 @@ if (!window.Packlink) {
                 getSupportedCountriesUrl: configuration.getSupportedCountriesUrl,
                 submitUrl: configuration.defaultWarehouseSubmitUrl,
                 searchPostalCodesUrl: configuration.defaultWarehouseSearchPostalCodesUrl
+            },
+            'configuration': {
+                getDataUrl: configuration.configurationGetDataUrl
             },
             'shipping-methods': {
                 getDashboardStatusUrl: configuration.dashboardGetStatusUrl,

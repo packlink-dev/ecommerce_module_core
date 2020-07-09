@@ -5,8 +5,21 @@
     display: flex;
     align-items: center;
 
+    .pl-header-holder {
+      justify-content: space-between;
+      flex-direction: row;
+      flex-grow: 1;
+      align-items: center;
+      margin-left: 20px;
+
+      .pl-button {
+        padding: 10px 13px;
+        text-transform: none;
+      }
+    }
+
     &.pl-sub-header {
-      border-color: $color-light;
+      border-color: $border-light;
       flex-direction: row;
 
       button {
@@ -22,6 +35,7 @@
   > main {
     display: flex;
     flex-grow: 1;
+    overflow: auto;
   }
 
   button, .pl-button {
@@ -396,6 +410,13 @@
   #pl-page {
     button, .pl-button {
       width: 100%;
+    }
+
+    .pl-header-holder {
+
+      .pl-button {
+        display: none;
+      }
     }
   }
 }
