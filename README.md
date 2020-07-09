@@ -1,4 +1,8 @@
 # ecommerce_module_core
+[![CircleCI](https://circleci.com/gh/packlink-dev/ecommerce_module_core.svg?style=svg&circle-token=5a8c6ee766cec62056be80c0c910a05475649ac0)](https://circleci.com/gh/packlink-dev/ecommerce_module_core)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/6666d16039094921ac58a5dba588ac60)](https://www.codacy.com/gh/packlink-dev/ecommerce_module_core?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=packlink-dev/ecommerce_module_core&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/6666d16039094921ac58a5dba588ac60)](https://www.codacy.com/gh/packlink-dev/ecommerce_module_core?utm_source=github.com&utm_medium=referral&utm_content=packlink-dev/ecommerce_module_core&utm_campaign=Badge_Coverage)
+
 Core library for e-commerces (PS, Woo, Magento, etc) modules
 
 ## Commit Procedure
