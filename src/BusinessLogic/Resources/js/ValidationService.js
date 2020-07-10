@@ -103,7 +103,7 @@ if (!window.Packlink) {
          * @param {HTMLInputElement} input
          * @return {boolean} Indication of the validity.
          */
-        this.validateNumber = input => {
+        this.validateNumber = (input) => {
             const ruleset = input.dataset.validationRule ? input.dataset.validationRule.split(',') : [],
                 length = ruleset.length;
 

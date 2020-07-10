@@ -71,7 +71,7 @@ var Packlink = window.Packlink || {};
         this.translate = (key, params) => {
             const keys = key.split('.');
 
-            let result = getTranslation('current', keys[0], keys[1]) || getTranslation('default', keys[0], keys[1]);
+            const result = getTranslation('current', keys[0], keys[1]) || getTranslation('default', keys[0], keys[1]);
             if (result) {
                 return replaceParams(result, params);
             }

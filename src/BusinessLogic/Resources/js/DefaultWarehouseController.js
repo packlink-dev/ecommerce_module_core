@@ -59,7 +59,7 @@ if (!window.Packlink) {
 
         const parentConstruct = parent.constructPage;
 
-        parent.constructPage = response => {
+        parent.constructPage = (response) => {
             page = templateService.getMainPage();
             parentConstruct(response);
             setSpecificFields(response);
@@ -103,7 +103,7 @@ if (!window.Packlink) {
          *
          * @param {{}} response
          */
-        const constructCountryDropdown = response => {
+        const constructCountryDropdown = (response) => {
             countryInput = templateService.getComponent('pl-default-warehouse-country', page);
 
             let defaultOption = document.createElement('option');
@@ -158,7 +158,7 @@ if (!window.Packlink) {
             }
 
             postalCodeInput.addEventListener('focus', onPostalCodeFocus);
-            postalCodeInput.addEventListener('click', event => {
+            postalCodeInput.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
 
@@ -172,7 +172,7 @@ if (!window.Packlink) {
                 }
             }, true);
 
-            postalCodeInput.parentElement.querySelector('i').addEventListener('click', event => {
+            postalCodeInput.parentElement.querySelector('i').addEventListener('click', (event) => {
                 event.stopPropagation();
                 postalCodeInput.focus();
             });
@@ -183,7 +183,7 @@ if (!window.Packlink) {
             searchTerm = '';
         };
 
-        const onPostalCodeBlur = event => {
+        const onPostalCodeBlur = (event) => {
             if (event) {
                 event.stopPropagation();
             }
@@ -196,7 +196,7 @@ if (!window.Packlink) {
             }
         };
 
-        const onPostalCodeSearch = event => {
+        const onPostalCodeSearch = (event) => {
             searchTerm = event.target.value;
             if (searchTerm.length < 3 || [13, 27, 38, 40].indexOf(event.keyCode) !== -1) {
                 return;
@@ -208,7 +208,7 @@ if (!window.Packlink) {
             }, renderPostalCodesAutocomplete);
         };
 
-        const renderPostalCodesAutocomplete = response => {
+        const renderPostalCodesAutocomplete = (response) => {
             let oldAutocomplete = templateService.getComponent('pl-postal-codes-autocomplete', page);
             if (oldAutocomplete) {
                 oldAutocomplete.remove();
@@ -268,14 +268,14 @@ if (!window.Packlink) {
             event.target.classList.add('pl-focus');
         };
 
-        const onPostalCodeSelected = event => {
+        const onPostalCodeSelected = (event) => {
             currentCity = event.target.getAttribute('data-pl-city');
             currentPostalCode = event.target.getAttribute('data-pl-postal_code');
 
             postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
         };
 
-        const autocompleteNavigate = event => {
+        const autocompleteNavigate = (event) => {
             // noinspection JSDeprecatedSymbols
             const keyCode = event.keyCode;
             //esc
