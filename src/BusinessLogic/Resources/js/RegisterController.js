@@ -26,7 +26,7 @@ if (!window.Packlink) {
         /**
          * The main entry point for controller.
          */
-        this.display = additionalConfig => {
+        this.display = (additionalConfig) => {
             templateService.setCurrentTemplate(templateId);
             country = additionalConfig.hasOwnProperty('country') ? additionalConfig.country : 'ES';
 
@@ -59,7 +59,7 @@ if (!window.Packlink) {
          *  privacyPolicyUrl: string
          *  }} response
          */
-        const populateInitialValues = response => {
+        const populateInitialValues = (response) => {
             const emailInput = templateService.getComponent('pl-register-email'),
                 phoneInput = templateService.getComponent('pl-register-phone'),
                 sourceInput = templateService.getComponent('pl-register-source');
@@ -122,7 +122,7 @@ if (!window.Packlink) {
                 registerButton = templateService.getComponent('pl-register-button');
 
             registerButton.disabled = false;
-            inputs.forEach(input => {
+            inputs.forEach((input) => {
                 if (input.hasAttribute('data-pl-contains-errors')) {
                     registerButton.disabled = true;
                 }
@@ -141,7 +141,7 @@ if (!window.Packlink) {
          * @param {Event} event
          * @returns {boolean}
          */
-        const register = event => {
+        const register = (event) => {
             event.preventDefault();
             validateForm();
 
@@ -172,7 +172,7 @@ if (!window.Packlink) {
          *
          * @param {{success: boolean}} response
          */
-        const successfulRegister = response => {
+        const successfulRegister = (response) => {
             if (response.success) {
                 state.goToState('onboarding-state');
             }

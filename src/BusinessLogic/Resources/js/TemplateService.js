@@ -10,7 +10,7 @@ if (!window.Packlink) {
         let templates = {};
         let mainPlaceholder = '#pl-main-page-holder';
 
-        this.setMainPlaceholder = placeholder => {
+        this.setMainPlaceholder = (placeholder) => {
             mainPlaceholder = placeholder;
         };
 
@@ -65,7 +65,7 @@ if (!window.Packlink) {
          *
          * @param {{}} configuration
          */
-        this.setTemplates = configuration => {
+        this.setTemplates = (configuration) => {
             templates = configuration;
         };
 
@@ -76,14 +76,14 @@ if (!window.Packlink) {
          *
          * @return {string} HTML as string.
          */
-        this.getTemplate = templateId => Packlink.translationService.translateHtml(templates[templateId]);
+        this.getTemplate = (templateId) => Packlink.translationService.translateHtml(templates[templateId]);
 
         /**
          * Sets current template in the page.
          *
          * @param {string} templateId
          */
-        this.setCurrentTemplate = templateId => {
+        this.setCurrentTemplate = (templateId) => {
             for (let [extensionPointId, html] of Object.entries(templates[templateId])) {
                 const component = this.getComponent(extensionPointId);
 
@@ -98,7 +98,7 @@ if (!window.Packlink) {
          *
          * @param {Element} component
          */
-        this.clearComponent = component => {
+        this.clearComponent = (component) => {
             while (component.firstChild) {
                 component.removeChild(component.firstChild);
             }

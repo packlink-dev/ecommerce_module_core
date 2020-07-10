@@ -43,7 +43,7 @@ if (!window.Packlink) {
          *
          * @return {HTMLButtonElement}
          */
-        const createButton = button => {
+        const createButton = (button) => {
             const buttonElem = document.createElement('button');
             const cssClasses = button.cssClass ? ['pl-button', ...button.cssClass] : ['pl-button'];
 
@@ -92,7 +92,7 @@ if (!window.Packlink) {
             if (config.footer === false || !config.buttons) {
                 utilityService.hideElement(footer);
             } else {
-                config.buttons.forEach(button => {
+                config.buttons.forEach((button) => {
                     const buttonElem = createButton(button);
                     footer.appendChild(buttonElem);
                 });
