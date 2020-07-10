@@ -140,7 +140,7 @@ if (!window.Packlink) {
          *
          * @param {string} step
          */
-        this.startStep = step => {
+        this.startStep = (step) => {
             utilityService.disableInputMask();
             let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
             controller.display();
@@ -194,7 +194,7 @@ if (!window.Packlink) {
          *
          * @param {{state: string}} response
          */
-        const displayPageBasedOnState = response => {
+        const displayPageBasedOnState = (response) => {
             switch (response.state) {
                 case 'login':
                     this.goToState('login');

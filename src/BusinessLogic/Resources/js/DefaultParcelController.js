@@ -64,7 +64,7 @@ if (!window.Packlink) {
          *
          * @param {Parcel} response
          */
-        this.constructPage = response => {
+        this.constructPage = (response) => {
             const page = templateService.getMainPage();
             templateService.setCurrentTemplate(this.pageId);
 

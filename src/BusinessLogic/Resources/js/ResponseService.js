@@ -17,7 +17,7 @@ if (!window.Packlink) {
          *
          * @param {{success: boolean, error?: string, messages?: ValidationMessage[]}} response
          */
-        this.errorHandler = response => {
+        this.errorHandler = (response) => {
             utilityService.hideSpinner();
             if (response.error) {
                 utilityService.showFlashMessage(response.error, 'danger', 7000);
