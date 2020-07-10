@@ -131,7 +131,7 @@
     "warehouse": "Default sender address",
     "parcel": "Default parcel",
     "help": "Help",
-    "contactUs": "Contact us at",
+    "contactUs": "Contact us at:",
     "systemInfo": "System information"
   },
   "mapOrderStatuses": {

@@ -123,6 +123,16 @@
     "email": "Correo electrónico",
     "email-placeholder": "tucorreo@example.com"
   },
+  "configuration": {
+    "menu": "Configuración",
+    "title": "Configuración",
+    "orderStatus": "Estado de la orden",
+    "warehouse": "Almacén por defecto",
+    "parcel": "Paquete predeterminado",
+    "help": "Ayuda",
+    "contactUs": "Contáctanos:",
+    "systemInfo": "Información del sistema"
+  },
   "mapOrderStatuses": {
     "mapStatuses": "Sincronización de estados",
     "packlinkProShippingStatus": "Estado del envío de Packlink PRO",
