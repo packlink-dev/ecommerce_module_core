@@ -133,6 +133,11 @@
     "contactUs": "Contáctanos:",
     "systemInfo": "Información del sistema"
   },
+  "systemInfo": {
+    "title": "System information file and debug mode",
+    "debugMode": "Debug mode",
+    "download": "Download system information"
+  },
   "mapOrderStatuses": {
     "mapStatuses": "Sincronización de estados",
     "packlinkProShippingStatus": "Estado del envío de Packlink PRO",

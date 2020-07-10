@@ -134,6 +134,11 @@
     "contactUs": "Contact us at:",
     "systemInfo": "System information"
   },
+  "systemInfo": {
+    "title": "System information file and debug mode",
+    "debugMode": "Debug mode",
+    "download": "Download system information"
+  },
   "mapOrderStatuses": {
     "mapStatuses": "Map order statuses",
     "packlinkProShippingStatus": "Packlink PRO Shipping Status",

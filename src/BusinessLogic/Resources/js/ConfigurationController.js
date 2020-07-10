@@ -29,6 +29,10 @@ if (!window.Packlink) {
             version.innerHTML = 'v' + response.version;
             helpLink.href = response.helpUrl;
 
+            templateService.getComponent('pl-open-system-info').addEventListener('click', () => {
+                state.goToState('system-info');
+            });
+
             utilityService.hideSpinner();
         };
 

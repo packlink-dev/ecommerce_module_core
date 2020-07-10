@@ -89,6 +89,10 @@ if (!window.Packlink) {
             'configuration': {
                 getDataUrl: configuration.configurationGetDataUrl
             },
+            'system-info': {
+                getStatusUrl: configuration.debugGetStatusUrl,
+                setStatusUrl: configuration.debugSetStatusUrl
+            },
             'shipping-methods': {
                 getDashboardStatusUrl: configuration.dashboardGetStatusUrl,
                 getAllMethodsUrl: configuration.shippingMethodsGetAllUrl,
@@ -173,7 +177,7 @@ if (!window.Packlink) {
 
             previousState = currentState;
             currentState = controller;
-        }
+        };
 
         this.getPreviousState = () => previousState;
 

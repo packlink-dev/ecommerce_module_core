@@ -72,21 +72,23 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
         </div>
     </template>
 
-    <div id="pl-modal-mask" class="pl-modal-mask pl-hidden">
-        <div class="pl-modal">
-            <div class="pl-modal-close-button">
-                <i class="material-icons">close</i>
-            </div>
-            <div class="pl-modal-title">
+    <template id="pl-modal">
+        <div id="pl-modal-mask" class="pl-modal-mask pl-hidden">
+            <div class="pl-modal">
+                <div class="pl-modal-close-button">
+                    <i class="material-icons">close</i>
+                </div>
+                <div class="pl-modal-title">
 
-            </div>
-            <div class="pl-modal-body">
+                </div>
+                <div class="pl-modal-body">
 
-            </div>
-            <div class="pl-modal-footer">
+                </div>
+                <div class="pl-modal-footer">
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
     <template id="pl-error-template">
         <div class="pl-error-message" data-pl-element="error">
@@ -117,6 +119,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 
 <script src="./resources/js/ShippingMethodsController.js"></script>
 <script src="./resources/js/ConfigurationController.js"></script>
+<script src="./resources/js/SystemInfoController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/Resources/';
@@ -249,12 +252,13 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                             ) ?>,
                             'pl-header-section': ''
                         },
+                        'pl-system-info-modal': <?php echo json_encode(
+                            file_get_contents($baseResourcesPath . 'templates/system-info-modal.html')
+                        ) ?>,
                         'pl-shipping-methods-page': {
                             'pl-main-page-holder': '',
                             'pl-header-section': <?php echo json_encode(
-                                file_get_contents(
-                                    $baseResourcesPath . 'templates/shipping-methods-header.html'
-                                )
+                                file_get_contents($baseResourcesPath . 'templates/shipping-methods-header.html')
                             ) ?>
                         }
                     },
