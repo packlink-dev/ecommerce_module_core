@@ -119,21 +119,21 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
 <script src="./resources/js/ConfigurationController.js"></script>
 <script>
     <?php
-    $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
+    $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/Resources/';
     ?>
     document.addEventListener('DOMContentLoaded', function () {
-            Packlink.translations = {
-                default: <?php echo file_get_contents($baseResourcesPath . 'Language/Translations/en.json') ?>,
-                current: <?php $langFile = $baseResourcesPath . 'Language/Translations/' . $lang . '.json';
-                echo file_exists($langFile) ? file_get_contents($langFile) : ''
-                ?>,
-            };
+        Packlink.translations = {
+            default: <?php echo file_get_contents($baseResourcesPath . 'lang/en.json') ?>,
+            current: <?php $langFile = $baseResourcesPath . 'lang/' . $lang . '.json';
+            echo file_exists($langFile) ? file_get_contents($langFile) : ''
+            ?>,
+        };
 
-            Packlink.models = {};
+        Packlink.models = {};
 
-            Packlink.successMsgs = {
-                shippingMethodSaved: 'Shipping service successfully saved.'
-            };
+        Packlink.successMsgs = {
+            shippingMethodSaved: 'Shipping service successfully saved.'
+        };
 
             Packlink.state = new Packlink.StateController(
                 {
@@ -212,40 +212,40 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                     templates: {
                         'pl-login-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/login.html')
+                                file_get_contents($baseResourcesPath . 'templates/login.html')
                             ) ?>
                         },
                         'pl-register-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/register.html')
+                                file_get_contents($baseResourcesPath . 'templates/register.html')
                             ) ?>
                         },
                         'pl-register-modal': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'Resources/templates/registerModal.html')
+                            file_get_contents($baseResourcesPath . 'templates/register-modal.html')
                         ) ?>,
                         'pl-onboarding-welcome-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-welcome.html')
+                                file_get_contents($baseResourcesPath . 'templates/onboarding-welcome.html')
                             ) ?>
                         },
                         'pl-onboarding-overview-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-overview.html')
+                                file_get_contents($baseResourcesPath . 'templates/onboarding-overview.html')
                             ) ?>
                         },
                         'pl-default-parcel-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/default-parcel.html')
+                                file_get_contents($baseResourcesPath . 'templates/default-parcel.html')
                             ) ?>
                         },
                         'pl-default-warehouse-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/default-warehouse.html')
+                                file_get_contents($baseResourcesPath . 'templates/default-warehouse.html')
                             ) ?>
                         },
                         'pl-configuration-page': {
                             'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'Resources/templates/configuration.html')
+                                file_get_contents($baseResourcesPath . 'templates/configuration.html')
                             ) ?>,
                             'pl-header-section': ''
                         },
@@ -253,7 +253,7 @@ $lang = Configuration::getCurrentLanguage() ?: 'en';
                             'pl-main-page-holder': '',
                             'pl-header-section': <?php echo json_encode(
                                 file_get_contents(
-                                    $baseResourcesPath . 'Resources/templates/shipping-methods-header.html'
+                                    $baseResourcesPath . 'templates/shipping-methods-header.html'
                                 )
                             ) ?>
                         }

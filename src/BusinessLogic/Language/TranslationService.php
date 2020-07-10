@@ -46,8 +46,7 @@ class TranslationService implements BaseService
         $this->translationsFileBasePath = $translationsFileBasePath;
 
         if (empty($this->translationsFileBasePath)) {
-            $currentDir = __DIR__;
-            $this->translationsFileBasePath = "{$currentDir}/Translations";
+            $this->translationsFileBasePath = __DIR__ . '/../Resources/lang';
         }
     }
 
