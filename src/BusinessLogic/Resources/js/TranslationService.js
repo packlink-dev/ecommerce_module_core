@@ -85,7 +85,7 @@ var Packlink = window.Packlink || {};
          * @param {string} html
          * @return {string} The updated HTML.
          */
-        this.translateHtml = html => {
+        this.translateHtml = (html) => {
             // Replace the placeholders for translations. They are in the format {$key|param1|param2}.
             let format = /{\$[.A-Za-z|]+}/g;
             const me = this;

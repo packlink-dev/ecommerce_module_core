@@ -32,8 +32,8 @@ if (!window.Packlink) {
             modal = new Packlink.modalService({
                 title: translationService.translate('register.chooseYourCountry'),
                 content: Packlink.templateService.getTemplate('pl-register-modal'),
-                onOpen: modal => {
-                    ajaxService.get(listOfCountriesUrl, response => {
+                onOpen: (modal) => {
+                    ajaxService.get(listOfCountriesUrl, (response) => {
                         populateCountryList(modal, response);
                     });
                 }
@@ -52,7 +52,7 @@ if (!window.Packlink) {
 
             countryFilter.addEventListener('input', filterCountries);
 
-            response.forEach(country => {
+            response.forEach((country) => {
                 let countryElement = document.createElement('div');
 
                 countryElement.innerHTML = template.innerHTML.replace('$code', country.code)
@@ -69,7 +69,7 @@ if (!window.Packlink) {
          *
          * @param {Country} country
          */
-        const handleCountrySelected = country => {
+        const handleCountrySelected = (country) => {
             modal.close();
             Packlink.state.goToState('register', {country: country.platform_country});
         };
@@ -79,12 +79,12 @@ if (!window.Packlink) {
          *
          * @param event
          */
-        const filterCountries = event => {
+        const filterCountries = (event) => {
             let filter = event.target.value.toLowerCase();
 
             let countries = document.querySelectorAll('.pl-register-country-list-wrapper .pl-country');
 
-            countries.forEach(country => {
+            countries.forEach((country) => {
                 if (filter === ''
                     || country.dataset.code.toLowerCase().startsWith(filter)
                     || country.querySelector('.pl-country-name').innerText.toLowerCase().search(filter) !== -1

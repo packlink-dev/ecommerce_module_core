@@ -27,7 +27,7 @@ var Packlink = window.Packlink || {};
 
             loginBtn = templateService.getComponent('pl-login-button');
             inputElem = templateService.getComponent('pl-login-api-key');
-            inputElem.addEventListener('input', event => {
+            inputElem.addEventListener('input', (event) => {
                 enableButton(event);
             });
 
@@ -40,7 +40,7 @@ var Packlink = window.Packlink || {};
          * @param event
          * @returns {boolean}
          */
-        const login = event => {
+        const login = (event) => {
             event.preventDefault();
 
             ajaxService.post(configuration.submit, {apiKey: event.target['apiKey'].value}, successfulLogin, failedLogin);
@@ -55,7 +55,7 @@ var Packlink = window.Packlink || {};
          *
          * @returns {boolean}
          */
-        const goToRegister = event => {
+        const goToRegister = (event) => {
             event.preventDefault();
 
             let registerModalController = new Packlink.RegisterModalController(
@@ -68,12 +68,12 @@ var Packlink = window.Packlink || {};
             return false;
         };
 
-        const enableButton = event => {
+        const enableButton = (event) => {
             Packlink.validationService.removeError(inputElem);
             loginBtn.disabled = event.target.value.length === 0;
         };
 
-        const successfulLogin = response => {
+        const successfulLogin = (response) => {
             if (response.success) {
                 state.goToState('onboarding');
             } else {

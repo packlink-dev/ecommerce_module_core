@@ -25,7 +25,7 @@ if (!window.Packlink) {
          * @param {HTMLInputElement|HTMLSelectElement} input
          * @return {boolean}
          */
-        this.validateRequiredField = input => validateField(
+        this.validateRequiredField = (input) => validateField(
             input,
             input.value === '' || (input.type === 'checkbox' && !input.checked),
             'validation.requiredField'
@@ -37,7 +37,7 @@ if (!window.Packlink) {
          * @param {HTMLInputElement} input
          * @return {boolean}
          */
-        this.validateEmail = input => {
+        this.validateEmail = (input) => {
             let regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
             return validateField(
@@ -53,7 +53,7 @@ if (!window.Packlink) {
          * @param {HTMLInputElement} input
          * @return {boolean}
          */
-        this.validatePhone = input => {
+        this.validatePhone = (input) => {
             let regex = /^( |\+|\/|\.\|-|\(|\)|\d)+$/m;
 
             return validateField(
@@ -69,7 +69,7 @@ if (!window.Packlink) {
          * @param {HTMLInputElement} input
          * @return {boolean}
          */
-        this.validatePasswordLength = input => validateField(
+        this.validatePasswordLength = (input) => validateField(
             input,
             input.value.length < input.dataset.minLength,
             'validation.shortPassword',
@@ -80,7 +80,7 @@ if (!window.Packlink) {
          * Handles validation errors. These errors come from the back end.
          * @param {ValidationMessage[]} errors
          */
-        this.handleValidationErrors = errors => {
+        this.handleValidationErrors = (errors) => {
             for (const error of errors) {
                 this.markFieldGroupInvalid('[name=' + error.field + ']', error.message);
             }
@@ -122,7 +122,7 @@ if (!window.Packlink) {
          *
          * @param {Element} input
          */
-        this.removeError = input => {
+        this.removeError = (input) => {
             let errorElement = input.parentNode.querySelector('.pl-error-message');
             if (errorElement) {
                 input.parentNode.removeChild(errorElement);
