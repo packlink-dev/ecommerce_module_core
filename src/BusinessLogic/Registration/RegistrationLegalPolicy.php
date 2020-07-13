@@ -105,19 +105,6 @@ class RegistrationLegalPolicy extends FrontDto
     }
 
     /**
-     * Checks whether the array element with the given key is set.
-     *
-     * @param array $payload The payload in key-value format.
-     * @param string $key The field key.
-     *
-     * @return bool
-     */
-    protected static function isFieldSet(array $payload, $key)
-    {
-        return array_key_exists($key, $payload);
-    }
-
-    /**
      * Generates validation errors for the payload.
      *
      * @param array $payload The payload in key-value format.
@@ -129,9 +116,9 @@ class RegistrationLegalPolicy extends FrontDto
 
         foreach (array('data_processing', 'terms_and_conditions') as $key) {
             if ($payload[$key] === false) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
+                static::setInvalidFieldError(
                     $key,
+                    $validationErrors,
                     Translator::translate('validation.invalidFieldValue', array('true'))
                 );
             }

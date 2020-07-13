@@ -36,7 +36,6 @@ class RegistrationRequest extends FrontDto
     public $password;
     /**
      * Estimated delivery volume.
-     *
      * Can be one of the following: "1 - 10", "11 - 50", "51 - 100", "101 - 200", "> 200"
      *
      * @var string
@@ -211,17 +210,13 @@ class RegistrationRequest extends FrontDto
         parent::doValidate($payload, $validationErrors);
 
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'email',
-                Translator::translate('validation.invalidEmail')
-            );
+            static::setInvalidFieldError('email', $validationErrors, Translator::translate('validation.invalidEmail'));
         }
 
         if (!empty($payload['password']) && strlen($payload['password']) < 6) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'password',
+                $validationErrors,
                 Translator::translate('validation.shortPassword', array(6))
             );
         }
@@ -229,25 +224,21 @@ class RegistrationRequest extends FrontDto
         if (!empty($payload['estimated_delivery_volume'])
             && !in_array($payload['estimated_delivery_volume'], static::$supportedDeliveryOptions, true)
         ) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'estimated_delivery_volume',
+                $validationErrors,
                 Translator::translate('register.invalidDeliveryVolume')
             );
         }
 
         if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'phone',
-                Translator::translate('validation.invalidPhone')
-            );
+            static::setInvalidFieldError('phone', $validationErrors, Translator::translate('validation.invalidPhone'));
         }
 
         if (!empty($payload['language']) && !in_array($payload['language'], static::$supportedLanguages, true)) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'language',
+                $validationErrors,
                 Translator::translate('validation.invalidLanguage')
             );
         }
@@ -255,25 +246,21 @@ class RegistrationRequest extends FrontDto
         if (!empty($payload['platform_country'])
             && !in_array($payload['platform_country'], static::$supportedPlatformCountries, true)
         ) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'platform_country',
+                $validationErrors,
                 Translator::translate('validation.invalidPlatformCountry')
             );
         }
 
         if (!empty($payload['source']) && filter_var($payload['source'], FILTER_VALIDATE_URL) === false) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'source',
-                Translator::translate('validation.invalidUrl')
-            );
+            static::setInvalidFieldError('source', $validationErrors, Translator::translate('validation.invalidUrl'));
         }
 
         if (!empty($payload['platform']) && $payload['platform'] !== 'PRO') {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 'platform',
+                $validationErrors,
                 Translator::translate('validation.invalidFieldValue', array('PRO'))
             );
         }

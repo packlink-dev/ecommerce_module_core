@@ -23,6 +23,7 @@
   },
   "validation": {
     "requiredField": "This field is required.",
+    "invalidField": "This field is invalid.",
     "invalidEmail": "This field must be valid email.",
     "shortPassword": "The password must be at least %s characters long.",
     "invalidPhone": "This field must be valid phone number.",

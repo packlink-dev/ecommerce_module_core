@@ -73,7 +73,6 @@ abstract class FrontDto extends DataTransferObject
      *
      * @param array $payload The payload in key-value format.
      *
-     * @return void
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      *  When fields are not registered for DTO class or payload contains unknown fields.
      */
@@ -93,7 +92,7 @@ abstract class FrontDto extends DataTransferObject
     /**
      * Validates whether a DTO has a definition of its fields.
      *
-     * @param array $validationErrors
+     * @param ValidationError[] $validationErrors The array of errors to populate.
      */
     protected static function validateDefinition(array &$validationErrors)
     {
@@ -115,14 +114,28 @@ abstract class FrontDto extends DataTransferObject
     protected static function validateRequiredFields(array $payload, array &$validationErrors)
     {
         foreach (static::$requiredFields as $field) {
-            if (!static::isFieldSet($payload, $field)) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    Translator::translate('validation.requiredField')
-                );
-            }
+            self::validateRequiredField($payload, $field, $validationErrors);
         }
+    }
+
+    /**
+     * Validates a required field.
+     *
+     * @param array $payload The payload.
+     * @param string $field The field code.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
+     *
+     * @return bool Returns the result of validation.
+     */
+    protected static function validateRequiredField(array $payload, $field, array &$validationErrors)
+    {
+        if (!static::isFieldSet($payload, $field)) {
+            static::setRequiredFieldError($field, $validationErrors);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -146,6 +159,37 @@ abstract class FrontDto extends DataTransferObject
      */
     protected static function doValidate(array $payload, array &$validationErrors)
     {
+    }
+
+    /**
+     * Sets the required field validation error.
+     *
+     * @param string $code The field code.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
+     */
+    protected static function setRequiredFieldError($code, array &$validationErrors)
+    {
+        $validationErrors[] = static::getValidationError(
+            ValidationError::ERROR_REQUIRED_FIELD,
+            $code,
+            Translator::translate('validation.requiredField')
+        );
+    }
+
+    /**
+     * Sets the invalid field validation error.
+     *
+     * @param string $code The field code.
+     * @param ValidationError[] $validationErrors The array of errors to populate.
+     * @param string $message Optional field message
+     */
+    protected static function setInvalidFieldError($code, array &$validationErrors, $message = '')
+    {
+        $validationErrors[] = static::getValidationError(
+            ValidationError::ERROR_INVALID_FIELD,
+            $code,
+            $message ?: Translator::translate('validation.invalidField')
+        );
     }
 
     /**

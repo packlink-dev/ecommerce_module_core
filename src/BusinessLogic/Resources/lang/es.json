@@ -23,6 +23,7 @@
   },
   "validation": {
     "requiredField": "Esta campo es obligatorio.",
+    "invalidField": "This field is invalid.",
     "invalidEmail": "El campo debe ser un correo electrónico válido.",
     "shortPassword": "La contraseña debe contener %s caracteres como mínimo.",
     "invalidPhone": "Este campo deber ser un número de teléfono válido.",

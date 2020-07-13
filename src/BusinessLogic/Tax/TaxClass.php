@@ -43,17 +43,4 @@ class TaxClass extends FrontDto
      * @var array
      */
     protected static $requiredFields = array('label', 'value');
-
-    /**
-     * Checks whether the array element with the given key is set.
-     *
-     * @param array $payload The payload in key-value format.
-     * @param string $key The field key.
-     *
-     * @return bool
-     */
-    protected static function isFieldSet(array $payload, $key)
-    {
-        return isset($payload[$key]);
-    }
 }

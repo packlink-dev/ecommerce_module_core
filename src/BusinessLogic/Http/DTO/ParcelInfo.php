@@ -123,24 +123,20 @@ class ParcelInfo extends FrontDto
      * @param ValidationError[] $validationErrors The list of validation errors to alter.
      * @param int $filter Validation filter
      */
-    private static function validateNumber(array $payload, $field, &$validationErrors, $filter)
+    private static function validateNumber(array $payload, $field, array &$validationErrors, $filter)
     {
-        if (!isset($payload[$field])) {
+        if (!static::isFieldSet($payload, $field)) {
             // required field validation already happened
             return;
         }
 
         $value = filter_var($payload[$field], $filter);
         if ($value === false) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                $field,
-                Translator::translate('validation.integer')
-            );
+            static::setInvalidFieldError($field, $validationErrors, Translator::translate('validation.integer'));
         } elseif ($value <= 0) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
+            static::setInvalidFieldError(
                 $field,
+                $validationErrors,
                 Translator::translate('validation.greaterThanZero')
             );
         }
