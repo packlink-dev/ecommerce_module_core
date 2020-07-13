@@ -1,0 +1,129 @@
+@import "variables";
+@import "reset";
+@import "animations";
+@import "utility";
+@import "ui-controls";
+@import "icons";
+
+#pl-page {
+  .pl-onboarding-overview-list {
+    width: 100%;
+
+    div {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+
+    hr {
+      border: 1px solid $border-color;
+      width: 100%;
+    }
+
+    .pl-min-width-81 {
+      display: inline-block;
+      min-width: 81.5%;
+      margin-bottom: 10px;
+    }
+
+    .pl-onboarding-list-title {
+      color: #2a77c2;
+    }
+
+    .pl-onboarding-overview-mobile-header {
+      display: none;
+
+      strong {
+        color: $color-white;
+      }
+    }
+  }
+
+  .pl-parcel-wrapper, .pl-wh-wrapper {
+    align-items: flex-start;
+    min-width: 100%;
+  }
+
+  .pl-main-logo img {
+    width: 200px;
+  }
+
+  .pl-register-country-list-wrapper {
+    margin-top: 15px;
+    min-width: 300px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .pl-country {
+      display: flex;
+      width: 100%;
+      padding: 5px 0;
+      color: #2095f2;
+      font-size: 15px;
+      text-transform: uppercase;
+      flex-direction: row;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $color-little-transparent;
+
+        .pl-country-name {
+          color: $color-blue;
+        }
+      }
+
+      .pl-country-logo {
+        width: 60px;
+      }
+
+      .pl-country-name {
+        white-space: nowrap;
+        margin-left: 15px;
+        align-items: flex-start;
+        flex-grow: 1;
+      }
+
+      img {
+        width: 35px;
+        height: 35px;
+      }
+    }
+  }
+
+  .pl-login-footer {
+    padding: 20px;
+    background-color: $color-navy-dark;
+    color: $color-white;
+  }
+
+  .pl-login-footer * {
+    color: $color-white;
+  }
+}
+
+// mobile rules
+@media (max-width: 768px) {
+  #pl-page {
+    .pl-main-logo {
+      width: 100%;
+    }
+
+    .pl-onboarding-overview-mobile-header {
+      display: block;
+      background-color: #2195F2;
+      width: 100%;
+      color: $color-white;
+      padding: 15px;
+    }
+
+    .pl-register-country-list-wrapper {
+      min-width: 100%;
+    }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
+  }
+}

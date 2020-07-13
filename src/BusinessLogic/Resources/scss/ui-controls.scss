@@ -1,0 +1,367 @@
+#pl-page {
+  > header {
+    border-bottom: 1px solid $border-color;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  > main {
+    display: flex;
+    flex-grow: 1;
+  }
+
+  .pl-button {
+    overflow: visible;
+    display: inline-flex;
+    padding: 16px;
+    vertical-align: middle;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    color: $color-blue;
+    font-style: normal;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    box-shadow: none;
+    transition: background .4s, border-color .4s, color .4s;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0 0;
+    height: auto;
+    width: 170px;
+
+    &.pl-button-primary {
+      background-color: $color-blue;
+      color: $color-white;
+    }
+
+    &.pl-button-secondary {
+      border: 1px solid $color-blue;
+      background-color: $color-white;
+
+      &:hover {
+        color: $color-blue-darker;
+        border: 1px solid $color-blue-darker;
+      }
+    }
+
+    &.pl-small {
+      padding: 5px;
+      width: 100px;
+      margin: 0;
+    }
+
+    &.pl-button-inverted {
+      background-color: $color-white;
+      color: $color-navy-dark;
+    }
+
+    &:hover {
+      color: $color-white;
+      background: $color-blue-darker;
+      box-shadow: none;
+    }
+
+    &:disabled {
+      color: $color-gray;
+      background-color: $color-light;
+      pointer-events: none;
+    }
+  }
+
+  .pl-form-group {
+    position: relative;
+    border: none;
+    width: 100%;
+    align-items: start;
+
+    &:not(:first-child) {
+      margin-top: 15px;
+    }
+
+    label {
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      color: $color-gray;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    input {
+      background-color: $color-white;
+      border-radius: 0;
+      border: 1px solid $border-color;
+      padding: 21px 16px 13px;
+      color: $input-control-color;
+      width: 100%;
+      margin: 0;
+      box-shadow: unset;
+      line-height: 22px;
+
+      &:focus {
+        border: 1px solid $color-blue;
+        outline: none;
+      }
+
+      &.compact {
+        padding: 13px 16px;
+      }
+    }
+
+    select {
+      height: 50px;
+      border: 1px solid $border-color;
+      line-height: 50px;
+      padding: 7px 0 0 15px;
+      background-color: $color-white;
+      color: $input-control-color;
+      font-size: 12px;
+      width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      &:focus {
+        border: 1px solid $color-blue;
+        outline: none;
+      }
+    }
+
+    i {
+      position: absolute;
+      right: 10px;
+      top: 13px;
+      color: $border-color;
+    }
+  }
+
+  input[type=checkbox] {
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid $border-color;
+    position: relative;
+
+    ~ label {
+      margin-left: 10px;
+    }
+
+    &:hover {
+      border-color: $color-blue;
+    }
+
+    &:checked {
+      background-color: $color-blue;
+      border-color: $color-blue;
+
+      &:before {
+        color: $color-white;
+        content: '\2713';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .pl-alert-wrapper {
+    position: absolute;
+    width: 100%;
+    padding: 10px;
+  }
+
+  .pl-alert {
+    position: relative;
+    cursor: pointer;
+    padding: .75rem 1.25rem;
+    margin: auto;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    flex-direction: row;
+
+    &.pl-alert-danger {
+      color: $color-red;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    &.pl-alert-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .pl-alert-text {
+      color: inherit;
+    }
+
+    i {
+      color: inherit;
+      margin-left: 20px;
+    }
+  }
+
+  .pl-checkbox {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+
+    label {
+      cursor: pointer;
+      text-align: left;
+    }
+
+    &.pl-error {
+      .pl-error-message {
+        display: none;
+      }
+    }
+  }
+
+  .pl-input-mask {
+    display: block;
+    background-color: $color-semi-transparent;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+  }
+
+  .pl-spinner {
+    position: fixed;
+    z-index: 500;
+    background-color: $color-semi-transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    div {
+      width: 100px;
+      height: 100px;
+      border: 3px solid transparent;
+      border-right-color: $color-blue;
+      border-left-color: $color-blue;
+      border-radius: 50%;
+      animation: pl-rotate 1s linear 0s infinite;
+    }
+  }
+
+  .pl-modal-mask {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background-color: $color-little-transparent;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .pl-modal {
+      background: $color-white;
+      display: flex;
+      max-height: 100%;
+      flex-flow: column;
+      align-items: center;
+      padding: 20px 40px;
+      position: relative;
+      margin: 0 auto;
+      box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2);
+
+      .pl-modal-close-button {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 23px;
+        right: 19px;
+        font-size: 3rem;
+        font-weight: 600;
+        color: $color-blue;
+        cursor: pointer;
+
+        i {
+          color: $color-blue;
+          font-weight: bold;
+        }
+      }
+
+      .pl-modal-title {
+        color: $text-heading-color;
+        font-size: 21px;
+        font-weight: bold;
+        line-height: 22px;
+        text-align: center;
+        margin-right: 20px;
+      }
+
+      .pl-modal-body {
+        margin: 20px 0;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+        overflow: hidden auto;
+      }
+
+      .pl-modal-footer {
+        display: flex;
+        flex-direction: row;
+        border-top: 1px solid $border-color;
+        padding: 20px 0;
+
+        .pl-button + .pl-button {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+
+  .pl-error {
+    input, select {
+      border: 2px solid $color-red !important;
+    }
+
+    label, i {
+      color: $color-red;
+    }
+
+    .pl-error-message {
+      margin: 8px 16px 0;
+      color: $color-red;
+    }
+  }
+}
+
+// mobile rules
+@media (max-width: 768px) {
+  #pl-page {
+    button, .pl-button {
+      width: 100%;
+    }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
+  }
+}

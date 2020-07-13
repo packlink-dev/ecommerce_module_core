@@ -1,0 +1,27 @@
+{
+  "name": "packlink/demo-ui",
+  "description": "Packlink Demo UI core library",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": ">=5.3.29"
+  },
+  "autoload": {
+    "psr-4": {
+      "Logeecom\\Infrastructure\\": "../Infrastructure",
+      "Logeecom\\Tests\\": "../../tests",
+      "Packlink\\BusinessLogic\\": "../BusinessLogic",
+      "Packlink\\DemoUI\\Lib\\": "Lib",
+      "Packlink\\DemoUI\\": "src"
+    }
+  },
+  "scripts": {
+    "post-update-cmd": "Packlink\\DemoUI\\Lib\\Composer::postUpdate",
+    "post-install-cmd": "Packlink\\DemoUI\\Lib\\Composer::postUpdate"
+  },
+  "config": {
+    "platform": {
+      "php": "5.3.29"
+    }
+  }
+}

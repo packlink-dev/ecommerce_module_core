@@ -5,14 +5,18 @@ var Packlink = window.Packlink || {};
      * Main controller of the application.
      *
      * @param {{
-     *      sidebarButtons: array,
-     *      submenuItems: array,
+     *      pagePlaceholder: string,
      *      pageConfiguration: array,
      *      scrollConfiguration: {scrollOffset: number, rowHeight: number},
      *      hasTaxConfiguration: boolean,
      *      hasCountryConfiguration: boolean,
      *      canDisplayCarrierLogos: boolean,
      *      shippingServiceMaxTitleLength: number,
+     *      stateUrl: string,
+     *      loginUrl: string,
+     *      listOfCountriesUrl: string,
+     *      registrationDataUrl: string,
+     *      registrationSubmitUrl: string,
      *      autoConfigureStartUrl: string,
      *      dashboardGetStatusUrl: string,
      *      defaultParcelGetUrl: string,
@@ -35,35 +39,17 @@ var Packlink = window.Packlink || {};
      *      orderStatusMappingsSaveUrl: string,
      *      orderStatusMappingsGetUrl: string,
      *      getShippingCountriesUrl: string,
-     *      initialPage: string
+     *      logoPath: string,
+     *      templates: {}
      * }} configuration
      *
      * @constructor
      */
     function StateController(configuration) {
         let pageControllerFactory = Packlink.pageControllerFactory;
-        let initialPage = 'shipping-methods';
-
-        let sidebarButtons = [
-            'shipping-methods',
-            'basic-settings'
-        ];
-
-        if (typeof configuration.sidebarButtons !== 'undefined') {
-            sidebarButtons = sidebarButtons.concat(configuration.sidebarButtons);
-        }
-
-        let submenuItems = [
-            'order-state-mapping',
-            'default-parcel',
-            'default-warehouse'
-        ];
-
-        if (typeof configuration.submenuItems !== 'undefined') {
-            submenuItems = submenuItems.concat(configuration.submenuItems);
-        }
-
+        let ajaxService = Packlink.ajaxService;
         let utilityService = Packlink.utilityService;
+        let templateService = Packlink.templateService;
         let context = '';
 
         let pageConfiguration = {
@@ -105,28 +91,31 @@ var Packlink = window.Packlink || {};
                 getDebugStatusUrl: configuration.debugGetStatusUrl,
                 setDebugStatusUrl: configuration.debugSetStatusUrl
             },
-            'initialPage': configuration.initialPage
+            'login': {
+                submit: configuration.loginUrl,
+                listOfCountriesUrl: configuration.listOfCountriesUrl,
+                logoPath: configuration.logoPath
+            },
+            'register': {
+                getRegistrationData: configuration.registrationDataUrl,
+                submit: configuration.registrationSubmitUrl
+            }
         };
 
         if (typeof configuration.pageConfiguration !== 'undefined') {
             pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration};
         }
 
-        if (typeof pageConfiguration.initialPage !== 'undefined') {
-            initialPage = pageConfiguration.initialPage;
-        }
+        this.display = () => {
+            if (configuration.pagePlaceholder) {
+                templateService.setMainPlaceholder(configuration.pagePlaceholder);
+            }
 
-        let sidebarController = new Packlink.SidebarController(navigate, sidebarButtons, submenuItems);
-        sidebarController.setState(initialPage);
+            templateService.setTemplates(configuration.templates);
 
-        this.display = function () {
-            pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
+            //pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
-            let dp = pageControllerFactory.getInstance(
-                initialPage,
-                getControllerConfiguration(initialPage)
-            );
-            dp.display();
+            ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
         };
 
         /**
@@ -134,7 +123,7 @@ var Packlink = window.Packlink || {};
          *
          * @param {string} step
          */
-        this.startStep = function (step) {
+        this.startStep = (step) => {
             utilityService.disableInputMask();
             let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
             controller.display();
@@ -143,37 +132,69 @@ var Packlink = window.Packlink || {};
         /**
          * Called when configuration step is finished.
          */
-        this.stepFinished = function () {
+        this.stepFinished = () => {
             pageControllerFactory.getInstance(
                 'shipping-methods',
                 getControllerConfiguration('shipping-methods')).display();
         };
 
         /**
-         * Returns context.
+         * Navigates to a state.
+         *
+         * @param {string} controller
+         * @param {array|null} additionalConfig
          */
-        this.getContext = function () {
-            return context;
+        this.goToState = (controller, additionalConfig = null) => {
+            let dp = pageControllerFactory.getInstance(
+                controller,
+                getControllerConfiguration(controller)
+            );
+
+            if (dp) {
+                dp.display(additionalConfig);
+            }
         };
 
         /**
-         * Navigation callback.
-         * Handles navigation menu button clicked event.
-         *
-         * @param event
+         * Returns context.
          */
-        function navigate(event) {
-            let state = event.target.getAttribute('data-pl-sidebar-btn');
-            sidebarController.setState(state);
-            if (state !== 'basic-settings') {
-                utilityService.disableInputMask();
+        this.getContext = () => context;
 
-                let controller = pageControllerFactory.getInstance(state, getControllerConfiguration(state));
-                controller.display();
+        /**
+         * Sets context.
+         */
+        const setContext = () => {
+            context = Math.random().toString(36);
+        };
+
+        /**
+         * Opens a specific page based on the current state.
+         *
+         * @param {{state: string}} response
+         */
+        const displayPageBasedOnState = (response) => {
+            switch (response.state) {
+                case 'login':
+                    this.goToState('login');
+                    break;
+
+                case 'onBoarding':
+                    this.goToState('onboarding');
+                    break;
+                default:
+                    this.goToState('shipping-methods');
+                    break;
             }
-        }
+        };
 
-        function getControllerConfiguration(controller, fromStep) {
+        /**
+         * Gets controller configuration.
+         *
+         * @param {string} controller
+         * @param {boolean} [fromStep]
+         * @return {{}}
+         */
+        const getControllerConfiguration = (controller, fromStep = false) => {
             let config = utilityService.cloneObject(pageConfiguration[controller]);
 
             setContext();
@@ -184,14 +205,7 @@ var Packlink = window.Packlink || {};
             }
 
             return config;
-        }
-
-        /**
-         * Sets context.
-         */
-        function setContext() {
-            context = Math.random().toString(36);
-        }
+        };
     }
 
     Packlink.StateController = StateController;

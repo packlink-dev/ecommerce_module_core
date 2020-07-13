@@ -27,7 +27,7 @@ class CountryServiceTest extends BaseTestWithServices
         $this->assertEquals('ES', $countries['ES']->code);
         $this->assertEquals('28001', $countries['ES']->postalCode);
         $this->assertEquals(
-            'https://auth.packlink.com/es-ES/test-system/registro?platform_country=ES&platform=PRO',
+            'https://auth.packlink.com/es-ES/test-system/registro?platform=PRO&platform_country=ES',
             $countries['ES']->registrationLink
         );
     }
