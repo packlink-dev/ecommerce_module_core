@@ -130,12 +130,6 @@
   .pl-configuration-page {
     justify-content: space-between;
 
-    .pl-sub-header {
-      h1 {
-        margin-left: 10px;
-      }
-    }
-
     .pl-config-list {
       flex-direction: column;
       width: 300px;
@@ -174,6 +168,9 @@
   }
 
   .pl-page-config {
+    width: 100%;
+    flex-grow: 1;
+
     header.pl-sub-header h1 {
       text-align: left;
       margin-left: 10px;
@@ -186,6 +183,31 @@
 
     .pl-text-center, .pl-page-buttons {
       text-align: left;
+    }
+  }
+
+  .pl-status-mapping {
+    width: 100%;
+    flex-direction: row;
+    border-top: 1px solid $border-light;
+    border-bottom: 1px solid $border-light;
+
+    &.pl-order-status-mappings-header {
+      border: none;
+    }
+
+    .pl-half-width {
+      flex-direction: row;
+      max-width: 50%;
+      min-width: 50%;
+      align-items: center;
+      margin: 0;
+      padding: 5px 0;
+
+      .pl-separation-indicator {
+        font-size: 32px;
+        margin-right: 36px;
+      }
     }
   }
 }

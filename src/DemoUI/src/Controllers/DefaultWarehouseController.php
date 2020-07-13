@@ -13,7 +13,7 @@ use Packlink\DemoUI\Controllers\Models\Request;
  *
  * @package Packlink\DemoUI\Controllers
  */
-class DefaultWarehouseController
+class DefaultWarehouseController extends BaseHttpController
 {
     /**
      * Gets the default warehouse.
@@ -24,7 +24,7 @@ class DefaultWarehouseController
         $warehouseService = ServiceRegister::getService(WarehouseService::CLASS_NAME);
         $warehouse = $warehouseService->getWarehouse();
 
-        echo json_encode($warehouse ? $warehouse->toArray() : array());
+        $this->output($warehouse ? $warehouse->toArray() : array());
     }
 
     /**
@@ -54,7 +54,7 @@ class DefaultWarehouseController
         $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
         $supportedCountries = $countryService->getSupportedCountries();
 
-        $this->returnDtoEntitiesResponse($supportedCountries);
+        $this->outputDtoEntities($supportedCountries);
     }
 
     /**
@@ -67,7 +67,7 @@ class DefaultWarehouseController
         $data = $request->getPayload();
 
         if (empty($data['query']) || empty($data['country'])) {
-            die('{}');
+            return;
         }
 
         /** @var LocationService $locationService */
@@ -75,26 +75,8 @@ class DefaultWarehouseController
 
         try {
             $locations = $locationService->searchLocations($data['country'], $data['query']);
-            $this->returnDtoEntitiesResponse($locations);
+            $this->outputDtoEntities($locations);
         } catch (\Exception $e) {
-            die('{}');
         }
-    }
-
-    /**
-     * Echos the FrontDto array to the output.
-     *
-     * @param array $data
-     */
-    private function returnDtoEntitiesResponse(array $data)
-    {
-        $result = array_map(
-            function ($entity) {
-                return $entity->toArray();
-            },
-            $data
-        );
-
-        echo json_encode($result);
     }
 }

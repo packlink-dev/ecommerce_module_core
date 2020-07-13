@@ -134,20 +134,22 @@
     "systemInfo": "Información del sistema"
   },
   "systemInfo": {
-    "title": "System information file and debug mode",
+    "title": "System information file <br>and debug mode",
     "debugMode": "Debug mode",
     "download": "Download system information"
   },
-  "mapOrderStatuses": {
-    "mapStatuses": "Sincronización de estados",
-    "packlinkProShippingStatus": "Estado del envío de Packlink PRO",
-    "status": "Estado",
+  "orderStatusMapping": {
+    "title": "Estado de la orden",
+    "description": "Con Packlink puedes actualizar el estado de tu pedido de %s con la información de envío. <br>Puedes editarla en cualquier momento.",
+    "packlinkProShipmentStatus": "ESTADO DEL <strong>ENVÍO</strong> de Packlink PRO",
+    "systemOrderStatus": "ESTADO DEL <strong>PEDIDO</strong> de %s",
     "none": "Ninguno",
     "pending": "Pendiente",
     "processing": "Procesando",
-    "ready": "Listo para enviar",
+    "readyForShipping": "Listo para enviar",
     "inTransit": "En tránsito",
     "delivered": "Entregado",
+    "cancelled": "Cancelado",
     "statusSetByPacklink": "Estado establecido por Packlink PRO."
   },
   "shippingServicesSettings": {

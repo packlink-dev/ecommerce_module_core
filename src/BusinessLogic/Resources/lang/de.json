@@ -139,16 +139,17 @@
     "fieldMustBePositive": "Das Feld muss eine positive ganze Zahl sein."
   },
   "mapOrderStatuses": {
-    "mapStatuses": "Bestellstatus synchronisieren",
-    "packlinkProShippingStatus": "Versandstatus von Packlink PRO",
-    "status": "Status",
+    "title": "Order status",
+    "description": "With Packlink you can update your %s order status with shipping information. <br>You can edit it at any time.",
+    "packlinkProShipmentStatus": "Packlink PRO <strong>SHIPMENT</strong> STATUS",
+    "systemOrderStatus": "%s <strong>ORDER STATUS</strong>",
     "none": "Leer",
     "pending": "Ausstehend",
     "processing": "In Bearbeitung",
-    "ready": "Versandfertig",
+    "readyForShipping": "Versandfertig",
     "inTransit": "Unterwegs",
     "delivered": "Zugestellt",
-    "statusSetByPacklink": "Status wurde von Packlink PRO festgelegt."
+    "cancelled": "Storniert"
   },
   "shippingServicesSettings": {
     "filterServices": "Versanddienste filtern",

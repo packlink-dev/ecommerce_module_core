@@ -54,7 +54,6 @@ if (!window.Packlink) {
          * @param {{code:string, prevState: string, nextState: string}} displayConfig
          */
         this.display = (displayConfig) => {
-            utilityService.showSpinner();
             this.config = displayConfig;
             ajaxService.get(configuration.getUrl, this.constructPage);
         };

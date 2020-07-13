@@ -10,13 +10,16 @@ use Packlink\DemoUI\Controllers\Models\Request;
  *
  * @package Packlink\DemoUI\Controllers
  */
-class DefaultParcelController
+class DefaultParcelController extends BaseHttpController
 {
     /**
      * @var DefaultParcelControllerBase
      */
     private $controller;
 
+    /**
+     * DefaultParcelController constructor.
+     */
     public function __construct()
     {
         $this->controller = new DefaultParcelControllerBase();
@@ -29,7 +32,7 @@ class DefaultParcelController
     {
         $parcel = $this->controller->getDefaultParcel();
 
-        echo json_encode($parcel ? $parcel->toArray() : array());
+        $this->output($parcel ? $parcel->toArray() : array());
     }
 
     /**

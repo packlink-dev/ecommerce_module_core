@@ -150,7 +150,6 @@
     select {
       border: 1px solid $border-color;
       line-height: 50px;
-      padding: 7px 0 0 11px;
       background-color: $color-white;
       color: $input-control-color;
       font-size: 12px;
@@ -163,6 +162,10 @@
         border: 1px solid $color-blue;
         outline: none;
       }
+
+      &.pl-with-label {
+        padding: 7px 0 0 11px;
+      }
     }
 
     i {
@@ -170,6 +173,12 @@
       right: 10px;
       top: 18px;
       color: $border-color;
+      width: $icon-button-size;
+      height: $icon-button-size;
+    }
+
+    select + i {
+      cursor: pointer;
     }
 
     .pl-autocomplete-list {

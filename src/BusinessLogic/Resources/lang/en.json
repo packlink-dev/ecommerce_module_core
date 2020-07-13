@@ -135,21 +135,22 @@
     "systemInfo": "System information"
   },
   "systemInfo": {
-    "title": "System information file and debug mode",
+    "title": "System information file <br>and debug mode",
     "debugMode": "Debug mode",
     "download": "Download system information"
   },
-  "mapOrderStatuses": {
-    "mapStatuses": "Map order statuses",
-    "packlinkProShippingStatus": "Packlink PRO Shipping Status",
-    "status": "Status",
+  "orderStatusMapping": {
+    "title": "Order status",
+    "description": "With Packlink you can update your %s order status with shipping information. <br>You can edit it at any time.",
+    "packlinkProShipmentStatus": "Packlink PRO <strong>SHIPMENT</strong> STATUS",
+    "systemOrderStatus": "%s <strong>ORDER STATUS</strong>",
     "none": "None",
     "pending": "Pending",
     "processing": "Processing",
-    "ready": "Ready for shipping",
+    "readyForShipping": "Ready for shipping",
     "inTransit": "In transit",
     "delivered": "Delivered",
-    "statusSetByPacklink": "Status set by Packlink PRO."
+    "cancelled": "Canceled"
   },
   "shippingServicesSettings": {
     "filterServices": "Filter services",

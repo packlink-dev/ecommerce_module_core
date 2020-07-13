@@ -9,7 +9,7 @@ use Packlink\DemoUI\Services\Integration\UrlService;
  * Class LoginController
  * @package Packlink\DemoUI\Controllers
  */
-class LoginController
+class LoginController extends BaseHttpController
 {
     /**
      * Handles login POST request.
@@ -25,7 +25,7 @@ class LoginController
         $apiKey = !empty($payload['apiKey']) ? $payload['apiKey'] : null;
         $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
 
-        echo json_encode(array('success' => $controller->login($apiKey)));
+        $this->output(array('success' => $controller->login($apiKey)));
     }
 
     /**

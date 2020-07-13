@@ -11,7 +11,7 @@ use Packlink\DemoUI\Services\Integration\UrlService;
  *
  * @package Packlink\DemoUI\Controllers
  */
-class DebugController
+class DebugController extends BaseHttpController
 {
     /**
      * @var CoreDebugController
@@ -31,7 +31,7 @@ class DebugController
      */
     public function getStatus()
     {
-        echo json_encode(
+        $this->output(
             array(
                 'status' => $this->controller->getStatus(),
                 'downloadUrl' => UrlService::getEndpointUrl('Debug', 'getSystemInfo'),
