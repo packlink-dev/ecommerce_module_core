@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -36,10 +38,10 @@ var Packlink = window.Packlink || {};
      *      shippingMethodsDeactivateUrl: string,
      *      shopShippingMethodCountGetUrl: string,
      *      shopShippingMethodsDisableUrl: string,
-     *      getSystemOrderStatusesUrl: string,
+     *      orderStatusMappingsGetMappingsAndStatusesUrl: string,
      *      orderStatusMappingsSaveUrl: string,
-     *      orderStatusMappingsGetUrl: string,
      *      getShippingCountriesUrl: string,
+     *      configurationGetDataUrl: string,
      *      logoPath: string,
      *      templates: {}
      * }} configuration
@@ -56,6 +58,23 @@ var Packlink = window.Packlink || {};
         let previousState = '';
 
         let pageConfiguration = {
+            'login': {
+                submit: configuration.loginUrl,
+                listOfCountriesUrl: configuration.listOfCountriesUrl,
+                logoPath: configuration.logoPath
+            },
+            'register': {
+                getRegistrationData: configuration.registrationDataUrl,
+                submit: configuration.registrationSubmitUrl
+            },
+            'onboarding-state': {
+                getState: configuration.getOnboardingStateUrl
+            },
+            'onboarding-welcome': {},
+            'onboarding-overview': {
+                defaultParcelGet: configuration.defaultParcelGetUrl,
+                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
+            },
             'default-parcel': {
                 getUrl: configuration.defaultParcelGetUrl,
                 submitUrl: configuration.defaultParcelSubmitUrl
@@ -65,6 +84,17 @@ var Packlink = window.Packlink || {};
                 getSupportedCountriesUrl: configuration.getSupportedCountriesUrl,
                 submitUrl: configuration.defaultWarehouseSubmitUrl,
                 searchPostalCodesUrl: configuration.defaultWarehouseSearchPostalCodesUrl
+            },
+            'configuration': {
+                getDataUrl: configuration.configurationGetDataUrl
+            },
+            'system-info': {
+                getStatusUrl: configuration.debugGetStatusUrl,
+                setStatusUrl: configuration.debugSetStatusUrl
+            },
+            'order-status-mapping': {
+                getMappingAndStatusesUrl: configuration.orderStatusMappingsGetMappingsAndStatusesUrl,
+                setUrl: configuration.orderStatusMappingsSaveUrl
             },
             'shipping-methods': {
                 getDashboardStatusUrl: configuration.dashboardGetStatusUrl,
@@ -84,31 +114,6 @@ var Packlink = window.Packlink || {};
                 canDisplayCarrierLogos: configuration.canDisplayCarrierLogos,
                 getShippingCountries: configuration.getShippingCountriesUrl,
                 hasCountryConfiguration: configuration.hasCountryConfiguration
-            },
-            'order-state-mapping': {
-                getSystemOrderStatusesUrl: configuration.getSystemOrderStatusesUrl,
-                getUrl: configuration.orderStatusMappingsGetUrl,
-                saveUrl: configuration.orderStatusMappingsSaveUrl
-            },
-            'footer': {
-                getDebugStatusUrl: configuration.debugGetStatusUrl,
-                setDebugStatusUrl: configuration.debugSetStatusUrl
-            },
-            'login': {
-                submit: configuration.loginUrl,
-                listOfCountriesUrl: configuration.listOfCountriesUrl,
-                logoPath: configuration.logoPath
-            },
-            'register': {
-                getRegistrationData: configuration.registrationDataUrl,
-                submit: configuration.registrationSubmitUrl
-            },
-            'onboarding-state': {
-                getState: configuration.getOnboardingStateUrl
-            },
-            'onboarding-overview': {
-                defaultParcelGet: configuration.defaultParcelGetUrl,
-                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
             }
         };
 
@@ -116,14 +121,12 @@ var Packlink = window.Packlink || {};
             pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration};
         }
 
-        this.display = function () {
+        this.display = () => {
             if (configuration.pagePlaceholder) {
                 templateService.setMainPlaceholder(configuration.pagePlaceholder);
             }
 
             templateService.setTemplates(configuration.templates);
-
-            //pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
 
             ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
         };
@@ -133,45 +136,19 @@ var Packlink = window.Packlink || {};
          *
          * @param {string} step
          */
-        this.startStep = function (step) {
+        this.startStep = (step) => {
             utilityService.disableInputMask();
             let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
             controller.display();
         };
 
         /**
-         * Called when configuration step is finished.
+         * Navigates to a state.
+         *
+         * @param {string} controller
+         * @param {object|null} additionalConfig
          */
-        this.stepFinished = function () {
-            pageControllerFactory.getInstance(
-                'shipping-methods',
-                getControllerConfiguration('shipping-methods')).display();
-        };
-
-        /**
-         * Returns context.
-         */
-        this.getContext = function () {
-            return context;
-        };
-
-        this.goToState = goToState;
-
-        this.getPreviousState = getPreviousState;
-
-        function displayPageBasedOnState(response) {
-            if (response.state === 'login') {
-                goToState('login');
-
-            } else if (response.state === 'onBoarding') {
-                goToState('onboarding-state');
-
-            } else {
-                goToState('shipping-methods');
-            }
-        }
-
-        function goToState(controller, additionalConfig = null) {
+        this.goToState = (controller, additionalConfig = null) => {
             let dp = pageControllerFactory.getInstance(
                 controller,
                 getControllerConfiguration(controller)
@@ -183,30 +160,50 @@ var Packlink = window.Packlink || {};
 
             previousState = currentState;
             currentState = controller;
-        }
+        };
 
-        function getPreviousState() {
-            return previousState;
-        }
+        this.getPreviousState = () => previousState;
 
         /**
-         * Navigation callback.
-         * Handles navigation menu button clicked event.
-         *
-         * @param event
+         * Returns context.
          */
-        function navigate(event) {
-            // let state = event.target.getAttribute('data-pl-sidebar-btn');
-            // sidebarController.setState(state);
-            // if (state !== 'basic-settings') {
-            //     utilityService.disableInputMask();
-            //
-            //     let controller = pageControllerFactory.getInstance(state, getControllerConfiguration(state));
-            //     controller.display();
-            // }
-        }
+        this.getContext = () => context;
 
-        function getControllerConfiguration(controller, fromStep) {
+        /**
+         * Sets context.
+         */
+        const setContext = () => {
+            context = Math.random().toString(36);
+        };
+
+        /**
+         * Opens a specific page based on the current state.
+         *
+         * @param {{state: string}} response
+         */
+        const displayPageBasedOnState = (response) => {
+            switch (response.state) {
+                case 'login':
+                    this.goToState('login');
+                    break;
+
+                case 'onBoarding':
+                    this.goToState('onboarding-state');
+                    break;
+                default:
+                    this.goToState('shipping-methods');
+                    break;
+            }
+        };
+
+        /**
+         * Gets controller configuration.
+         *
+         * @param {string} controller
+         * @param {boolean} [fromStep]
+         * @return {{}}
+         */
+        const getControllerConfiguration = (controller, fromStep = false) => {
             let config = utilityService.cloneObject(pageConfiguration[controller]);
 
             setContext();
@@ -217,14 +214,7 @@ var Packlink = window.Packlink || {};
             }
 
             return config;
-        }
-
-        /**
-         * Sets context.
-         */
-        function setContext() {
-            context = Math.random().toString(36);
-        }
+        };
     }
 
     Packlink.StateController = StateController;

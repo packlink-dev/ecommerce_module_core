@@ -52,7 +52,7 @@ class TaxClass extends FrontDto
      *
      * @return bool
      */
-    protected static function requiredFieldSet(array $payload, $key)
+    protected static function isFieldSet(array $payload, $key)
     {
         return isset($payload[$key]);
     }

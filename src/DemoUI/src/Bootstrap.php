@@ -2,7 +2,6 @@
 
 namespace Packlink\DemoUI;
 
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Http\CurlHttpClient;
 use Logeecom\Infrastructure\Http\HttpClient;
@@ -17,8 +16,10 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
@@ -30,11 +31,11 @@ use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\ShopOrderService;
-use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\DemoUI\Services\Infrastructure\LoggerService;
 
 /**
  * Class Bootstrap
+ *
  * @package Packlink\DemoUI
  */
 class Bootstrap extends BootstrapComponent
@@ -45,42 +46,34 @@ class Bootstrap extends BootstrapComponent
      * @var Bootstrap
      */
     protected static $instance;
-
     /**
      * @var JsonSerializer
      */
     private $jsonSerializer;
-
     /**
      * @var CurlHttpClient
      */
     private $httpClientService;
-
     /**
      * @var LoggerService
      */
     private $loggerService;
-
     /**
      * @var ConfigurationService
      */
     private $configService;
-
     /**
      * @var ShopOrderService
      */
     private $shopOrderService;
-
     /**
      * @var CarrierService
      */
     private $carrierService;
-
     /**
      * @var UserAccountService
      */
     private $userAccountService;
-
     /**
      * @var RegistrationInfoService
      */
@@ -89,7 +82,8 @@ class Bootstrap extends BootstrapComponent
     /**
      * Bootstrap constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->jsonSerializer = new JsonSerializer();
         $this->httpClientService = new CurlHttpClient();
         $this->loggerService = new LoggerService();
@@ -98,8 +92,16 @@ class Bootstrap extends BootstrapComponent
         $this->carrierService = new CarrierService();
         $this->userAccountService = UserAccountService::getInstance();
         $this->registrationInfoService = new TestRegistrationInfoService();
+    }
 
-        static::$instance = $this;
+    /**
+     * Initializes infrastructure components.
+     */
+    public static function init()
+    {
+        static::$instance = new static();
+
+        parent::init();
     }
 
     /**

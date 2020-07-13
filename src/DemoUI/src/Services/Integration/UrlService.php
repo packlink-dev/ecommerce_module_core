@@ -4,6 +4,7 @@ namespace Packlink\DemoUI\Services\Integration;
 
 /**
  * Class UrlService
+ *
  * @package Packlink\DemoUI\Repository
  */
 class UrlService
@@ -31,5 +32,17 @@ class UrlService
         $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
 
         return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/resources/{$filePath}";
+    }
+
+    /**
+     * Returns the URL to the homepage.
+     *
+     * @return string
+     */
+    public static function getHomepage()
+    {
+        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+
+        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/index.php";
     }
 }

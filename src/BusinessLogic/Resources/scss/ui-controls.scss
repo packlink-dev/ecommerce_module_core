@@ -1,17 +1,44 @@
 #pl-page {
-  > header {
+  header {
     border-bottom: 1px solid $border-color;
     padding: 20px;
     display: flex;
     align-items: center;
+
+    .pl-header-holder {
+      justify-content: space-between;
+      flex-direction: row;
+      flex-grow: 1;
+      align-items: center;
+      margin-left: 20px;
+
+      .pl-button {
+        padding: 10px 13px;
+        text-transform: none;
+      }
+    }
+
+    &.pl-sub-header {
+      border-color: $border-light;
+      flex-direction: row;
+
+      button {
+        z-index: 1;
+      }
+
+      h1 {
+        margin: 0 0 0 -$icon-button-size;
+      }
+    }
   }
 
   > main {
     display: flex;
     flex-grow: 1;
+    overflow: auto;
   }
 
-  .pl-button {
+  button, .pl-button {
     overflow: visible;
     display: inline-flex;
     padding: 16px;
@@ -34,7 +61,7 @@
     justify-content: center;
     margin: 10px 0 0;
     height: auto;
-    width: 170px;
+    min-width: 170px;
 
     &.pl-button-primary {
       background-color: $color-blue;
@@ -54,6 +81,7 @@
     &.pl-small {
       padding: 5px;
       width: 100px;
+      min-width: 100px;
       margin: 0;
     }
 
@@ -85,6 +113,15 @@
       margin-top: 15px;
     }
 
+    label {
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      color: $color-gray;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
     input {
       background-color: $color-white;
       border-radius: 0;
@@ -98,36 +135,128 @@
 
       &:focus {
         border: 1px solid $color-blue;
+        outline: none;
+      }
+
+      &.compact {
+        padding: 13px 16px;
+      }
+
+      ::placeholder, ::-webkit-input-placeholder {
+        color: $color-light;
       }
     }
 
-    label {
-      position: absolute;
-      top: 8px;
-      left: 16px;
-      color: $color-gray;
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-
     select {
-      height: 50px;
       border: 1px solid $border-color;
       line-height: 50px;
-      padding: 0 0 0 15px;
       background-color: $color-white;
       color: $input-control-color;
       font-size: 12px;
       width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      &:focus {
+        border: 1px solid $color-blue;
+        outline: none;
+      }
+
+      &.pl-with-label {
+        padding: 7px 0 0 11px;
+
+        & ~ i {
+          top: 18px;
+        }
+      }
     }
+
+    i {
+      position: absolute;
+      right: 10px;
+      top: 14px;
+      color: $border-color;
+      width: $icon-button-size;
+      height: $icon-button-size;
+    }
+
+    select + i {
+      cursor: default;
+    }
+
+    .pl-autocomplete-list {
+      background-color: $color-white;
+      border: 1px solid $border-color;
+      width: 100%;
+      margin-top: 57px;
+      position: absolute;
+      z-index: 1;
+      max-height: 200px;
+      overflow: auto;
+
+      .pl-autocomplete-list-item {
+        width: 100%;
+        padding: 5px;
+        font-size: 15px;
+        cursor: pointer;
+
+        &:hover, &.pl-focus {
+          background-color: $color-little-transparent;
+          color: $color-blue;
+        }
+      }
+    }
+  }
+
+  input[type=checkbox] {
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid $border-color;
+    position: relative;
+
+    ~ label {
+      margin-left: 10px;
+    }
+
+    &:hover {
+      border-color: $color-blue;
+    }
+
+    &:checked {
+      background-color: $color-blue;
+      border-color: $color-blue;
+
+      &:before {
+        color: $color-white;
+        content: '\2713';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .pl-alert-wrapper {
+    position: absolute;
+    width: 100%;
+    padding: 10px;
   }
 
   .pl-alert {
     position: relative;
+    cursor: pointer;
     padding: .75rem 1.25rem;
-    margin-bottom: 1rem;
+    margin: auto;
     border: 1px solid transparent;
     border-radius: .25rem;
+    flex-direction: row;
 
     &.pl-alert-danger {
       color: $color-red;
@@ -140,14 +269,36 @@
       background-color: #d4edda;
       border-color: #c3e6cb;
     }
+
+    .pl-alert-text {
+      color: inherit;
+    }
+
+    i {
+      color: inherit;
+      margin-left: 20px;
+    }
   }
 
   .pl-checkbox {
     margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+
+    label {
+      cursor: pointer;
+      text-align: left;
+    }
+
+    &.pl-error {
+      .pl-error-message {
+        display: none;
+      }
+    }
   }
 
   .pl-input-mask {
-    display: none;
+    display: block;
     background-color: $color-semi-transparent;
     z-index: 100;
     top: 0;
@@ -155,27 +306,19 @@
     right: 0;
     bottom: 0;
     position: absolute;
-
-    &.enabled {
-      display: block;
-    }
   }
 
   .pl-spinner {
-    position: fixed;
+    position: absolute;
     z-index: 500;
     background-color: $color-semi-transparent;
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-
-    &.enabled {
-      display: flex;
-    }
 
     div {
       width: 100px;
@@ -197,14 +340,9 @@
     padding: 20px;
     background-color: $color-little-transparent;
     z-index: 100;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-
-    &.enabled {
-      display: flex;
-    }
-
 
     .pl-modal {
       background: $color-white;
@@ -219,14 +357,19 @@
 
       .pl-modal-close-button {
         position: absolute;
-        width: 16px;
-        height: 16px;
-        top: 23px;
-        right: 19px;
+        width: 24px;
+        height: 24px;
+        top: 15px;
+        right: 12px;
         font-size: 3rem;
         font-weight: 600;
         color: $color-blue;
         cursor: pointer;
+
+        i {
+          color: $color-blue;
+          font-weight: bold;
+        }
       }
 
       .pl-modal-title {
@@ -264,7 +407,7 @@
       border: 2px solid $color-red !important;
     }
 
-    label {
+    label, i {
       color: $color-red;
     }
 
@@ -280,6 +423,13 @@
   #pl-page {
     button, .pl-button {
       width: 100%;
+    }
+
+    .pl-header-holder {
+
+      .pl-button {
+        display: none;
+      }
     }
   }
 }

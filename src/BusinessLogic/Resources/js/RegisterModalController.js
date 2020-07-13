@@ -1,78 +1,107 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
 
     /**
-     * Controller that displays shipping country selector pop up.
+     * Country object received from the back end.
+     *
+     * @typedef {{
+     *  name: string,
+     *  code: string,
+     *  postal_code: string,
+     *  registration_link: string,
+     *  platform_country: string
+     * }} Country
+     */
+
+    /**
+     * Controller that displays shipping country selector modal.
      *
      * @constructor
+     * @param {string} modalTemplateId
+     * @param {string} listOfCountriesUrl
+     * @param {string} logoPath
      */
     function RegisterModalController(modalTemplateId, listOfCountriesUrl, logoPath) {
 
+        // noinspection JSCheckFunctionSignatures
         const ajaxService = Packlink.ajaxService,
             translationService = Packlink.translationService,
-            modalTemplate = document.getElementById(modalTemplateId);
+            modal = new Packlink.modalService({
+                title: translationService.translate('register.chooseYourCountry'),
+                content: Packlink.templateService.getTemplate('pl-register-modal'),
+                onOpen: (modal) => {
+                    ajaxService.get(listOfCountriesUrl, (response) => {
+                        populateCountryList(modal, response);
+                    });
+                }
+            });
 
-        this.display = function() {
-            modalTemplate.classList.remove('enabled');
-            modalTemplate.classList.add('enabled');
-            modalTemplate.querySelector('.pl-modal-close-button').addEventListener('click', close);
-            modalTemplate.querySelector('.pl-modal-title').innerHTML = translationService.translate('register.chooseYourCountry');
+        /**
+         * Displays countries in the modal body.
+         *
+         * @param {HTMLElement} modal
+         * @param {Country[]} response
+         */
+        const populateCountryList = (modal, response) => {
+            let countryList = modal.querySelector('.pl-register-country-list-wrapper'),
+                template = countryList.querySelector('#country-template'),
+                countryFilter = modal.querySelector('#pl-country-filter');
 
-            ajaxService.get(listOfCountriesUrl, populateCountryList);
+            countryFilter.addEventListener('input', filterCountries);
+
+            response.forEach((country) => {
+                let countryElement = document.createElement('div');
+
+                countryElement.innerHTML = template.innerHTML.replace('$code', country.code)
+                    .replace('logo_url', logoPath + '/' + country.code + '.svg')
+                    .replace(/country_name/g, country.name);
+
+                countryElement.firstElementChild.addEventListener('click', () => handleCountrySelected(country));
+                countryList.appendChild(countryElement.firstElementChild);
+            });
         };
 
-        function populateCountryList(response) {
-            let countryList = document.querySelector('.pl-register-country-list-wrapper');
+        /**
+         * Handles click on a country.
+         *
+         * @param {Country} country
+         */
+        const handleCountrySelected = (country) => {
+            modal.close();
+            Packlink.state.goToState('register', {country: country.platform_country});
+        };
 
-            if (!countryList) {
-                modalTemplate.querySelector('.pl-modal-body').innerHTML +=
-                    '<div class="pl-register-country-list-wrapper"></div>';
+        /**
+         * Filters country list on user input.
+         *
+         * @param event
+         */
+        const filterCountries = (event) => {
+            let filter = event.target.value.toLowerCase();
 
-                countryList = document.querySelector('.pl-register-country-list-wrapper');
-            }
+            let countries = document.querySelectorAll('.pl-register-country-list-wrapper .pl-country');
 
-            if (countryList.childElementCount > 0) {
-                return;
-            }
+            countries.forEach((country) => {
+                if (filter === ''
+                    || country.dataset.code.toLowerCase().startsWith(filter)
+                    || country.querySelector('.pl-country-name').innerText.toLowerCase().search(filter) !== -1
+                ) {
+                    country.classList.remove('pl-hidden');
+                } else {
+                    country.classList.add('pl-hidden');
+                }
+            });
+        };
 
-            for (let code in response) {
-                // noinspection JSUnfilteredForInLoop
-                let supportedCountry = response[code],
-                    linkElement = document.createElement('a'),
-                    countryElement = document.createElement('div'),
-                    imageElement = document.createElement('img'),
-                    nameElement = document.createElement('div');
-
-                linkElement.addEventListener('click', handleCountrySelected(supportedCountry));
-
-                countryElement.classList.add('pl-country');
-
-                imageElement.src = logoPath + '/' + supportedCountry.code + '.svg';
-                imageElement.classList.add('pl-country-logo');
-                imageElement.alt = supportedCountry.name;
-
-                countryElement.appendChild(imageElement);
-
-                nameElement.classList.add('pl-country-name');
-                nameElement.innerText = supportedCountry.name;
-
-                countryElement.appendChild(nameElement);
-                linkElement.appendChild(countryElement);
-                countryList.appendChild(linkElement);
-            }
-        }
-
-        function handleCountrySelected(supportedCountry) {
-            return function() {
-                close();
-                Packlink.state.goToState('register', {country: supportedCountry});
-            }
-        }
-
-        function close() {
-            modalTemplate.classList.remove('enabled');
-        }
+        /**
+         * The main entry point for controller.
+         */
+        this.display = () => {
+            modal.open();
+        };
     }
 
     Packlink.RegisterModalController = RegisterModalController;

@@ -1,25 +1,24 @@
-<div class="pl-onboarding-welcome-page pl-flex-expand">
+<div class="pl-onboarding-welcome-page pl-flex-expand pl-medium-page">
     <div class="pl-flex-expand pl-text-center pl-page-padding">
-        <div class="pl-bottom-separate">
-            <h1 class="pl-text-center">
-                {$onboardingWelcome.header}
-            </h1>
-            <p class="pl-text-center">
-                {$onboardingWelcome.steps}
-            </p>
-        </div>
-        <div class="pl-w-85 pl-onboarding-welcome-steps">
-            <div class="pl-list-item">
-                1. {$onboardingWelcome.stepOne}
+        <h1>
+            {$onboardingWelcome.header}
+        </h1>
+        <p>
+            {$onboardingWelcome.steps}
+        </p>
+        <div class="pl-onboarding-list">
+            <div class="pl-onboarding-welcome-steps pl-separate-vertically">
+                <div class="pl-list-item">
+                    1. {$onboardingWelcome.stepOne}
+                </div>
+                <div class="pl-list-item">
+                    2. {$onboardingWelcome.stepTwo}
+                </div>
             </div>
-            <hr>
-            <div class="pl-list-item">
-                2. {$onboardingWelcome.stepTwo}
-            </div>
         </div>
-        <div class="pl-w-85 pl-responsive-docked-btn-wrapper">
+        <div class="pl-page-buttons">
             <button id="pl-onboarding-welcome-button" type="submit" name="onboardingWelcome"
-                    class="pl-button pl-button-primary">
+                    class="pl-button pl-button-primary pl-no-wrap">
                 {$onboardingWelcome.startSetUp}
             </button>
         </div>

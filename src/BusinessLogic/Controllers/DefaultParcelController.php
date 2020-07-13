@@ -5,7 +5,6 @@ namespace Packlink\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
@@ -32,22 +31,18 @@ class DefaultParcelController
      *
      * @param array $rawData
      *
-     * @throws \Exception
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function setDefaultParcel(array $rawData)
     {
         $rawData['default'] = true;
         $oldParcel = $this->getConfigService()->getDefaultParcel();
 
-        try {
-            $parcelInfo = ParcelInfo::fromArray($rawData);
-            $this->getConfigService()->setDefaultParcel($parcelInfo);
-        } catch (FrontDtoValidationException $e) {
-            // TODO: Change when error handling mechanism is done.
-            throw new \Exception('Validation failed');
-        }
+        $parcelInfo = ParcelInfo::fromArray($rawData);
+        $this->getConfigService()->setDefaultParcel($parcelInfo);
 
-        if ($oldParcel === null || ($oldParcel !== null && array_diff($oldParcel->toArray(), $parcelInfo->toArray()))) {
+        if ($oldParcel === null || array_diff($oldParcel->toArray(), $parcelInfo->toArray())) {
             /** @var QueueService $queueService */
             $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
             $defaultQueueName = $this->getConfigService()->getDefaultQueueName();

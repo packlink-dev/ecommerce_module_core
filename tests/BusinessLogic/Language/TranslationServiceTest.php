@@ -1,6 +1,6 @@
 <?php
 
-namespace BusinessLogic\Language;
+namespace Logeecom\Tests\BusinessLogic\Language;
 
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -9,7 +9,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Language\TranslationService;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,7 +29,7 @@ class TranslationServiceTest extends TestCase
         parent::setUp();
 
         $baseFilePath = __DIR__ . '/Translations/';
-        $this->translationService = new TranslationService($baseFilePath);
+        $this->translationService = new TestTranslationService($baseFilePath);
 
         $configuration = new TestShopConfiguration();
         Configuration::setCurrentLanguage('de');
@@ -141,7 +140,7 @@ class TranslationServiceTest extends TestCase
      */
     public function testTranslateToGermanNestedKeyWithPlaceholders()
     {
-        $key = 'namespace_nestedKeyWithPlaceholder';
+        $key = 'namespace.nestedKeyWithPlaceholder';
         $translation = $this->translationService->translate($key, array(1, 2));
 
         $this->assertEquals('Test1 1, test2 2.', $translation);

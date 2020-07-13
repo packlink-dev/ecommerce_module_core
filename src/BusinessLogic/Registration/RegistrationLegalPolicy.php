@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Registration;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class RegistrationLegalPolicy
@@ -111,7 +112,7 @@ class RegistrationLegalPolicy extends FrontDto
      *
      * @return bool
      */
-    protected static function requiredFieldSet(array $payload, $key)
+    protected static function isFieldSet(array $payload, $key)
     {
         return array_key_exists($key, $payload);
     }
@@ -128,7 +129,11 @@ class RegistrationLegalPolicy extends FrontDto
 
         foreach (array('data_processing', 'terms_and_conditions') as $key) {
             if ($payload[$key] === false) {
-                static::setInvalidFieldError($key, $validationErrors, 'Field must be set to true.');
+                $validationErrors[] = static::getValidationError(
+                    ValidationError::ERROR_INVALID_FIELD,
+                    $key,
+                    Translator::translate('validation.invalidFieldValue', array('true'))
+                );
             }
         }
     }

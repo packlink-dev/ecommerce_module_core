@@ -8,7 +8,8 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Language\Interfaces\TranslationService as BaseService;
 
 /**
- * Class TranslationService
+ * Class TranslationService.
+ *
  * @package Packlink\BusinessLogic\Language
  */
 class TranslationService implements BaseService
@@ -45,22 +46,23 @@ class TranslationService implements BaseService
         $this->translationsFileBasePath = $translationsFileBasePath;
 
         if (empty($this->translationsFileBasePath)) {
-            $currentDir = __DIR__;
-            $this->translationsFileBasePath = "{$currentDir}/Translations";
+            $this->translationsFileBasePath = __DIR__ . '/../Resources/lang';
         }
     }
 
     /**
-     * Translates a key to a value defined for that key for a current language. If the key can not be found for current
-     * language translation fallback value will be returned (translation in English). If the key is not found in fallback
-     * passed key will be returned.
+     * Translates a key to a value defined for that key for a current language.
+     * If the key can not be found for the current language, translation fallback
+     * value will be returned (translation in English).
+     * If the key is not found in fallback passed key will be returned.
      *
-     * @param string $key String to be translated. If the key is nested it should be sent separated by '_'. For example:
-     * Translation file has next definition: {"parent": {"child": "childTranslation"}}. Key for parent is: "parent", key
-     * for child is: "parent_child"
-     * @param array $arguments
+     * @param string $key <p>String to be translated. If the key is nested it should be sent separated by '.'.
+     * For example:
+     * Translation file has next definition: {"parent": {"child": "childTranslation"}}.
+     * The key for a parent is: "parent", the key for a child is: "parent.child"</p>
+     * @param array $arguments A list of arguments for translation if needed.
      *
-     * @return string
+     * @return string A translated string if translation is found; otherwise, the input key.
      */
     public function translate($key, array $arguments = array())
     {
@@ -111,7 +113,16 @@ class TranslationService implements BaseService
         }
 
         if ($serializedJson !== false) {
-            static::$translations[$language] = json_decode($serializedJson, true);
+            $translations = json_decode($serializedJson, true);
+            foreach ($translations as $groupKey => $group) {
+                if (is_array($group)) {
+                    foreach ($group as $key => $value) {
+                        static::$translations[$language][$groupKey . '.' . $key] = $value;
+                    }
+                } else {
+                    static::$translations[$language][$groupKey] = $group;
+                }
+            }
         }
     }
 
@@ -129,31 +140,14 @@ class TranslationService implements BaseService
 
     /**
      * Gets the translation for given key and language.
-     * @param string $key
-     * @param string $currentLanguage
      *
-     * @return string|null
+     * @param string $key The translation key.
+     * @param string $language The translation language.
+     *
+     * @return string|null The translation.
      */
-    protected function getTranslation($key, $currentLanguage)
+    protected function getTranslation($key, $language)
     {
-        $keys = explode('_', $key);
-        $keysCount = count($keys);
-
-        if ($keysCount > 0 && isset(static::$translations[$currentLanguage])) {
-            $result = static::$translations[$currentLanguage];
-        } else {
-            $result = null;
-        }
-
-        foreach ($keys as $i => $value) {
-            if (!isset($result[$value]) || (!is_array($result[$value]) && $i < $keysCount - 1)) {
-                $result = null;
-                break;
-            }
-
-            $result = $result[$value];
-        }
-
-        return is_string($result) ? $result : null;
+        return isset(static::$translations[$language][$key]) ? static::$translations[$language][$key] : null;
     }
 }

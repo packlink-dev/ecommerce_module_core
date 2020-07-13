@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Registration;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\Utility\DtoValidator;
 
 /**
@@ -88,7 +89,7 @@ class RegistrationRequest extends FrontDto
      *
      * @var array
      */
-    public $marketplaces;
+    public $marketplaces = array();
     /**
      * Fields for this DTO.
      *
@@ -210,51 +211,71 @@ class RegistrationRequest extends FrontDto
         parent::doValidate($payload, $validationErrors);
 
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
-            static::setInvalidFieldError('email', $validationErrors, 'Field must be a valid email.');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'email',
+                Translator::translate('validation.invalidEmail')
+            );
         }
 
         if (!empty($payload['password']) && strlen($payload['password']) < 6) {
-            static::setInvalidFieldError(
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
                 'password',
-                $validationErrors,
-                'The password must be at least 6 characters long.'
+                Translator::translate('validation.shortPassword', array(6))
             );
         }
 
         if (!empty($payload['estimated_delivery_volume'])
             && !in_array($payload['estimated_delivery_volume'], static::$supportedDeliveryOptions, true)
         ) {
-            static::setInvalidFieldError(
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
                 'estimated_delivery_volume',
-                $validationErrors,
-                'Field is not a valid delivery volume.'
+                Translator::translate('register.invalidDeliveryVolume')
             );
         }
 
         if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
-            static::setInvalidFieldError('phone', $validationErrors, 'Field must be a valid phone number.');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'phone',
+                Translator::translate('validation.invalidPhone')
+            );
         }
 
         if (!empty($payload['language']) && !in_array($payload['language'], static::$supportedLanguages, true)) {
-            static::setInvalidFieldError('language', $validationErrors, 'Field is not a valid language.');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'language',
+                Translator::translate('validation.invalidLanguage')
+            );
         }
 
         if (!empty($payload['platform_country'])
             && !in_array($payload['platform_country'], static::$supportedPlatformCountries, true)
         ) {
-            static::setInvalidFieldError(
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
                 'platform_country',
-                $validationErrors,
-                'Field is not a valid platform country.'
+                Translator::translate('validation.invalidPlatformCountry')
             );
         }
 
         if (!empty($payload['source']) && filter_var($payload['source'], FILTER_VALIDATE_URL) === false) {
-            static::setInvalidFieldError('source', $validationErrors, 'Field must be a valid URL.');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'source',
+                Translator::translate('validation.invalidUrl')
+            );
         }
 
         if (!empty($payload['platform']) && $payload['platform'] !== 'PRO') {
-            static::setInvalidFieldError('platform', $validationErrors, 'Field must be set to "PRO".');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'platform',
+                Translator::translate('validation.invalidFieldValue', array('PRO'))
+            );
         }
     }
 }

@@ -3,36 +3,38 @@
 @import "animations";
 @import "utility";
 @import "ui-controls";
+@import "icons";
 
 #pl-page {
+  .pl-onboarding-list {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .pl-onboarding-overview-list {
     width: 100%;
 
-    div {
-      padding-top: 15px;
-      padding-bottom: 15px;
-    }
+    .pl-list-item {
+      flex-direction: row;
+      align-items: center;
+      padding-bottom: 20px;
 
-    hr {
-      border: 1px solid $border-color;
-      width: 100%;
-    }
+      i {
+        margin-right: 10px;
+      }
 
-    .pl-min-width-81 {
-      display: inline-block;
-      min-width: 81.5%;
-      margin-bottom: 10px;
-    }
+      & + .pl-list-item {
+        border-top: 1px solid $color-light;
+        padding-top: 20px;
+      }
 
-    .pl-onboarding-list-title {
-      color: #2a77c2;
-    }
+      .pl-item-details {
+        text-align: left;
+      }
 
-    .pl-onboarding-overview-mobile-header {
-      display: none;
-
-      strong {
-        color: $color-white;
+      .pl-onboarding-list-title {
+        color: $color-gray;
+        text-align: left;
       }
     }
   }
@@ -46,87 +48,166 @@
     width: 200px;
   }
 
-  #pl-error-template {
-    margin-top: 15px;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper {
-    margin-top: 15px;
-    height: 97%;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper a {
-    text-decoration: none !important;
-  }
-
-  .pl-modal-mask .pl-country {
-    display: flex;
-    height: 35px;
-    width: 30px;
-    line-height: 35px;
-    border-radius: 50%;
-    text-align: center;
-    color: #2095f2;
-    font-size: 15px;
-    text-transform: uppercase;
-    margin-left: 20px;
-    margin-bottom: 15px;
-  }
-
-  .pl-modal-mask .pl-country-logo {
-    width: 60px;
-  }
-
-  .pl-modal-mask .pl-country-name {
-    white-space: nowrap;
-    margin-left: 15px;
-  }
-
   .pl-register-country-list-wrapper {
+    margin-top: 15px;
+    min-width: 300px;
     width: 100%;
-  }
-
-  .pl-register-country-list-wrapper a {
-    display: block;
-    width: 100%;
-  }
-
-  .pl-modal-mask .pl-register-country-list-wrapper a .pl-country {
     display: flex;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-  }
+    flex-direction: column;
 
-  .pl-modal-mask .pl-register-country-list-wrapper a .pl-country img {
-    width: 35px;
-    height: 35px;
-  }
+    .pl-country {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      padding: 5px 0;
+      color: $color-blue;
+      font-size: 15px;
+      text-transform: uppercase;
+      cursor: pointer;
 
-  .pl-modal-mask .pl-register-country-list-wrapper a .pl-country .pl-country-name {
-    margin-top: 0;
+      &:hover {
+        background-color: $color-little-transparent;
+
+        .pl-country-name {
+          color: $color-blue;
+        }
+      }
+
+      .pl-country-logo {
+        width: 60px;
+      }
+
+      .pl-country-name {
+        white-space: nowrap;
+        margin-left: 15px;
+        align-items: flex-start;
+        flex-grow: 1;
+      }
+
+      img {
+        width: 35px;
+        height: 35px;
+      }
+    }
   }
 
   .pl-login-footer {
-    padding: 20px;
+    padding: 24px 30px 32px;
     background-color: $color-navy-dark;
     color: $color-white;
+
+    * {
+      color: $color-white;
+    }
   }
 
-  .pl-login-footer * {
-    color: $color-white;
+  .pl-onboarding-welcome-steps {
+    align-items: flex-start;
+    width: 100%;
+
+    .pl-list-item {
+      padding: 20px 0;
+      width: 100%;
+      border-bottom: 1px solid $color-light;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 
-  .pl-back-arrow {
-    color: #2f66d3;
-  }
+  .pl-configuration-menu {
+    padding: 5px 20px;
+    margin-right: -20px;
+    font-weight: bold;
 
-  .pl-icon-wrapper {
     i {
-      font-size: 20px;
-      width: auto;
+      margin-left: 10px;
+    }
+  }
+
+  .pl-configuration-page {
+    justify-content: space-between;
+
+    .pl-config-list {
+      flex-direction: column;
+      width: 300px;
+
+      .pl-config-list-item {
+        border-bottom: 1px solid $border-light;
+        padding: 17px 0 17px 26px;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+
+        &:hover {
+          background-color: $border-light;
+          cursor: pointer;
+        }
+
+        a {
+          display: flex;
+          flex-direction: row;
+          flex-grow: 1;
+          align-items: center;
+        }
+      }
+    }
+
+    .pl-footer {
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 20px;
+
+      span {
+        color: $color-light-gray;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .pl-page-config {
+    width: 100%;
+    flex-grow: 1;
+
+    header.pl-sub-header h1 {
+      text-align: left;
+      margin-left: 10px;
+    }
+
+    .pl-small-page, .pl-medium-page {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .pl-text-center, .pl-page-buttons {
+      text-align: left;
+    }
+  }
+
+  .pl-status-mapping {
+    width: 100%;
+    flex-direction: row;
+    border-top: 1px solid $border-light;
+    border-bottom: 1px solid $border-light;
+
+    &.pl-order-status-mappings-header {
+      border: none;
+    }
+
+    .pl-half-width {
+      flex-direction: row;
+      max-width: 50%;
+      min-width: 50%;
+      align-items: center;
+      margin: 0;
+      padding: 5px 0;
+
+      .pl-separation-indicator {
+        font-size: 32px;
+        margin-right: 36px;
+      }
     }
   }
 }
@@ -138,18 +219,35 @@
       width: 100%;
     }
 
-    .pl-onboarding-overview-mobile-header {
-      display: block;
-      background-color: #2195F2;
-      width: 100%;
-      color: $color-white;
-      padding: 15px;
+    .pl-register-country-list-wrapper {
+      min-width: 100%;
     }
-  }
-}
 
-// tablet rules
-@media (min-width: 769px) and (max-width: 1280px) {
-  #pl-page {
+    .pl-login-footer {
+      padding: 16px 20px;
+    }
+
+    .pl-list-item .pl-row-orientation {
+      flex-direction: column;
+    }
+
+    .pl-configuration-page {
+      .pl-config-list {
+        width: 100%;
+
+        .pl-config-list-item {
+          padding-right: 15px;
+          padding-left: 20px;
+        }
+      }
+
+      .pl-footer {
+        flex-direction: column;
+
+        > :first-child {
+          padding-bottom: 20px;
+        }
+      }
+    }
   }
 }

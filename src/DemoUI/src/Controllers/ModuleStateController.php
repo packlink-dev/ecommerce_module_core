@@ -1,13 +1,13 @@
 <?php
 
-
 namespace Packlink\DemoUI\Controllers;
 
 /**
- * Class ModuleStateController
+ * Class ModuleStateController.
+ *
  * @package Packlink\DemoUI\Controllers
  */
-class ModuleStateController
+class ModuleStateController extends BaseHttpController
 {
     /**
      * Gets current app state.
@@ -16,6 +16,6 @@ class ModuleStateController
     {
         $controller = new \Packlink\BusinessLogic\Controllers\ModuleStateController();
 
-        echo json_encode($controller->getCurrentState()->toArray());
+        $this->output($controller->getCurrentState()->toArray());
     }
 }

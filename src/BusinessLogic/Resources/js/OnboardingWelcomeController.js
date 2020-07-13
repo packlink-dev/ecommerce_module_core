@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     function OnboardingWelcomeController() {
@@ -9,8 +11,17 @@ var Packlink = window.Packlink || {};
         /**
          * Displays page content.
          */
-        this.display = function () {
+        this.display = () => {
             templateService.setCurrentTemplate(templateId);
+
+            const btn = templateService.getComponent('pl-onboarding-welcome-button');
+            btn.addEventListener('click', () => {
+                Packlink.state.goToState('default-parcel', {
+                    'code': 'onboarding',
+                    'prevState': 'onboarding-overview',
+                    'nextState': 'default-warehouse',
+                });
+            });
         };
     }
 

@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -12,24 +14,27 @@ var Packlink = window.Packlink || {};
         const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
             state = Packlink.state,
-            templateId = 'pl-login-page';
-        let errorMsg, loginBtn;
+            templateId = 'pl-login-page',
+            errorMessage = Packlink.translationService.translate('login.apiKeyIncorrect');
+
+        let inputElem, loginBtn;
 
         /**
          * Displays page content.
          */
-        this.display = function () {
+        this.display = () => {
             templateService.setCurrentTemplate(templateId);
 
             const loginPage = templateService.getMainPage();
 
             loginBtn = templateService.getComponent('pl-login-button');
-            errorMsg = templateService.getComponent('pl-login-error-msg');
+            inputElem = templateService.getComponent('pl-login-api-key');
+            inputElem.addEventListener('input', (event) => {
+                enableButton(event);
+            });
 
             templateService.getComponent('pl-login-form', loginPage).addEventListener('submit', login);
             templateService.getComponent('pl-go-to-register', loginPage).addEventListener('click', goToRegister);
-            const input = templateService.getComponent('pl-login-api-key', loginPage);
-            input.addEventListener('input', enableButton);
         };
 
         /**
@@ -37,14 +42,15 @@ var Packlink = window.Packlink || {};
          * @param event
          * @returns {boolean}
          */
-        function login(event) {
+        const login = (event) => {
             event.preventDefault();
 
-            errorMsg.classList.add('pl-hidden');
+            Packlink.utilityService.showSpinner();
+
             ajaxService.post(configuration.submit, {apiKey: event.target['apiKey'].value}, successfulLogin, failedLogin);
 
             return false;
-        }
+        };
 
         /**
          * Redirects to register.
@@ -53,7 +59,7 @@ var Packlink = window.Packlink || {};
          *
          * @returns {boolean}
          */
-        function goToRegister(event) {
+        const goToRegister = (event) => {
             event.preventDefault();
 
             let registerModalController = new Packlink.RegisterModalController(
@@ -64,24 +70,25 @@ var Packlink = window.Packlink || {};
             registerModalController.display();
 
             return false;
-        }
+        };
 
-        function enableButton(event) {
+        const enableButton = (event) => {
+            Packlink.validationService.removeError(inputElem);
             loginBtn.disabled = event.target.value.length === 0;
-        }
+        };
 
-        function successfulLogin(response) {
+        const successfulLogin = (response) => {
             if (response.success) {
-                errorMsg.classList.add('pl-hidden');
-                state.goToState('onboarding');
+                state.goToState('onboarding-state');
             } else {
-                errorMsg.classList.remove('pl-hidden');
+                failedLogin();
             }
-        }
+        };
 
-        function failedLogin() {
-            errorMsg.classList.remove('pl-hidden');
-        }
+        const failedLogin = () => {
+            Packlink.validationService.setError(inputElem, errorMessage);
+            Packlink.utilityService.hideSpinner();
+        };
     }
 
     Packlink.LoginController = LoginController;

@@ -5,7 +5,7 @@ var Packlink = window.Packlink || {};
 
         const state = Packlink.state,
             ajaxService = Packlink.ajaxService,
-            welcomeController = 'onboarding-overview',
+            welcomeController = 'onboarding-welcome',
             overviewController = 'onboarding-overview';
 
         /**

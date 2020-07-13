@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     function PageControllerFactory() {

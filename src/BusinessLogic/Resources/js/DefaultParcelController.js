@@ -1,278 +1,153 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
+    /**
+     * @typedef {{weight: number, length: number, width: number, height: number}} Parcel
+     */
+
+    /**
+     * @param {{getUrl: string, submitUrl: string}} configuration
+     * @constructor
+     */
     function DefaultParcelController(configuration) {
-        const defaultParcelFields = [
+        const templateService = Packlink.templateService,
+            utilityService = Packlink.utilityService,
+            validationService = Packlink.validationService,
+            ajaxService = Packlink.ajaxService,
+            state = Packlink.state,
+            translationService = Packlink.translationService;
+
+        this.modelFields = [
             'weight',
             'width',
             'length',
             'height'
         ];
 
-        const numericInputs = [
-            'weight',
-            'width',
-            'length',
-            'height'
-        ];
-
-        const integers = [
-            'width',
-            'length',
-            'height'
-        ];
-
-        const ONBOARDING_OVERVIEW_STATE = 'onboarding-overview';
-        const ONBOARDING_WELCOME_STATE = 'onboarding-welcome';
-        const ONBOARDING_WH_STATE = 'onboarding-warehouse';
-        // TODO: Add when configuration is done.
-        const CONFIGURATION_STATE = '';
-
-        let templateService = Packlink.templateService;
-        let utilityService = Packlink.utilityService;
-        let ajaxService = Packlink.ajaxService;
-        let state = Packlink.state;
-        let translationService = Packlink.translationService;
-
-        let parcelData;
-        let page;
+        this.config = {};
+        this.pageId = 'pl-default-parcel-page';
+        this.pageKey = 'defaultParcel';
 
         /**
-         * Displays page content.
+         * Handles Back button navigation.
          */
-        this.display = function () {
-            utilityService.showSpinner();
-            ajaxService.get(configuration.getUrl, constructPage);
+        const goToPreviousPage = () => {
+            state.goToState(this.config.prevState);
         };
 
         /**
-         * Constructs default parcel page by filling form fields
-         * with existing data and also adds event handler to submit button.
-         *
-         * @param {object} response
+         * Handles Save button navigation.
          */
-        function constructPage(response) {
-            parcelData = response;
-            page = templateService.setCurrentTemplate('pl-default-parcel-page');
+        const goToNextPage = () => {
+            state.goToState(this.config.nextState, {
+                'code': this.config.code,
+                'prevState': this.config.prevState,
+                'nextState': 'onboarding-overview',
+            });
+        };
 
-            for (let field of defaultParcelFields) {
-                let input = templateService.getComponent('pl-default-parcel-' + field, page);
-                input.addEventListener('blur', onBlurHandler, true);
-                input.addEventListener('input', onInputHandler, true);
+        /**
+         * Displays page content.
+         *
+         * @param {{code:string, prevState: string, nextState: string}} displayConfig
+         */
+        this.display = (displayConfig) => {
+            this.config = displayConfig;
+            ajaxService.get(configuration.getUrl, this.constructPage);
+        };
 
-                if (parcelData[field]) {
-                    input.value = parcelData[field];
+        /**
+         * Constructs default parcel page.
+         *
+         * @param {Parcel} response
+         */
+        this.constructPage = (response) => {
+            const page = templateService.getMainPage();
+            templateService.setCurrentTemplate(this.pageId);
+
+            for (let field of this.modelFields) {
+                let input = page.querySelector('[name=' + field + ']');
+                input.addEventListener('blur', (event) => {
+                    // noinspection JSCheckFunctionSignatures
+                    validationService.validateInputField(event.target);
+                }, true);
+                input.addEventListener('input', (event) => {
+                    // noinspection JSCheckFunctionSignatures
+                    validationService.removeError(event.target);
+                }, true);
+
+                if (response[field]) {
+                    input.value = response[field];
                 }
             }
 
-            let submitButton = templateService.getComponent(
-                'pl-default-parcel-submit-btn',
-                page
-            );
-
-            if (isFormValid()) {
-                submitButton.disabled = false;
-            }
+            const submitButton = templateService.getComponent('pl-page-submit-btn');
+            submitButton.addEventListener('click', submitPage, true);
 
             setTemplateBasedOnState();
 
-            submitButton.addEventListener('click', handleDefaultParcelSubmitButtonClickedEvent, true);
-
-            utilityService.configureInputElements();
             utilityService.hideSpinner();
-        }
+        };
 
-        function setTemplateBasedOnState() {
-            let backButton = templateService.getComponent('pl-parcel-back'),
-                submitButton = templateService.getComponent('pl-default-parcel-submit-btn'),
-                headerEl = document.querySelector('.pl-default-parcel-page .pl-text-center span'),
-                headerInfoEl = document.querySelector('.pl-default-parcel-page .pl-header-info');
+        const setTemplateBasedOnState = () => {
+            let mainPage = templateService.getMainPage(),
+                page = mainPage.querySelector('.' + this.pageId),
+                backButton = mainPage.querySelector('.pl-sub-header button'),
+                headerEl = mainPage.querySelector('.pl-sub-header h1'),
+                pageDescription = mainPage.querySelector('p.pl-page-info'),
+                submitButton = mainPage.querySelector('.pl-page-buttons button');
 
-            if (state.getPreviousState() === ONBOARDING_WELCOME_STATE) {
-                setOnboardingCommon('defaultParcel.continue');
-            } else if (state.getPreviousState() === ONBOARDING_OVERVIEW_STATE) {
-                setOnboardingCommon('defaultParcel.save');
+            page.classList.add('pl-page-' + this.config.code);
+            backButton.addEventListener('click', goToPreviousPage);
+            headerEl.innerHTML = translationService.translate(this.pageKey + '.title-' + this.config.code);
+            pageDescription.innerHTML = translationService.translate(this.pageKey + '.description-' + this.config.code);
+
+            if (state.getPreviousState() === 'onboarding-welcome') {
+                submitButton.innerText = translationService.translate('general.continue');
+            } else if (state.getPreviousState() === 'onboarding-overview') {
+                submitButton.innerText = translationService.translate('general.save');
             } else {
-                page.classList.add('pl-form-left-align');
+                submitButton.innerText = translationService.translate('general.saveChanges');
             }
-
-            function setOnboardingCommon(btnLabel) {
-                submitButton.innerText = translationService.translate(btnLabel);
-                backButton.addEventListener('click', goToOverviewPage);
-                headerEl.innerHTML += '1. ' + translationService.translate('onboardingParcel.header');
-                headerInfoEl.innerHTML += translationService.translate('onboardingParcel.info');
-            }
-        }
-
-        function goToOverviewPage() {
-            state.goToState(ONBOARDING_OVERVIEW_STATE);
-        }
+        };
 
         /**
-         * Handles on blur action.
-         *
-         * @param event
+         * Submits the form.
          */
-        function onBlurHandler(event) {
-            validateField(event.target.id.substr('pl-default-parcel-'.length), event.target.value, event.target);
+        const submitPage = () => {
+            const form = templateService.getMainPage().querySelector('form');
 
-            let submitButton = templateService.getComponent(
-                'pl-default-parcel-submit-btn',
-                page
-            )
-
-            submitButton.disabled = !isFormValid();
-        }
-
-        /**
-         * Handles on blur action.
-         *
-         * @param event
-         */
-        function onInputHandler(event) {
-            templateService.removeError(event.target);
-        }
-
-        /**
-         * Submits default parcel form.
-         *
-         * @param event
-         */
-        function handleDefaultParcelSubmitButtonClickedEvent(event) {
-            let model = getFormattedParcelFormInput(true);
-
-            let isValid = true;
-            for (let field of defaultParcelFields) {
-                if (!model[field]) {
-                    isValid = false;
-                } else {
-                    templateService.removeError(
-                        templateService.getComponent('pl-default-parcel-' + field, page)
-                    );
-                }
+            if (!validationService.validateForm(form)) {
+                return false;
             }
 
-            if (isValid) {
-                utilityService.showSpinner();
-                ajaxService.post(
-                    configuration.submitUrl,
-                    model,
-                    function (event) {
-                        event.preventDefault();
-                        utilityService.hideSpinner();
-
-                        if (state.getPreviousState() === ONBOARDING_WELCOME_STATE) {
-                            state.goToState(ONBOARDING_WH_STATE);
-                        } else if (state.getPreviousState() === ONBOARDING_OVERVIEW_STATE) {
-                            state.goToState(ONBOARDING_OVERVIEW_STATE);
-                        }
-
-                        return false;
-                    },
-                    function (response) {
-                        for (let field in response) {
-                            if (response.hasOwnProperty(field)) {
-                                let input = templateService.getComponent('pl-default-parcel-' + field, page);
-                                if (input) {
-                                    templateService.setError(input, response[field]);
-                                }
-                            }
-                        }
-
-                        utilityService.hideSpinner();
-                    });
-            }
-        }
+            utilityService.showSpinner();
+            ajaxService.post(
+                configuration.submitUrl,
+                this.getFormFields(form),
+                goToNextPage,
+                Packlink.responseService.errorHandler
+            );
+        };
 
         /**
-         * Retrieves formatted input from default parcel form.
+         * Gets the form field values model.
          *
-         * @param validateWithDisplay boolean
-         *
-         * @returns {object}
+         * @param {HTMLElement} form
+         * @return {{}}
          */
-        function getFormattedParcelFormInput(validateWithDisplay) {
+        this.getFormFields = (form) => {
             let model = {};
 
-            for (let field of defaultParcelFields) {
-                let value = getInputValue('pl-default-parcel-' + field),
-                    element = templateService.getComponent('pl-default-parcel-' + field, page),
-                    error = validateWithDisplay ? validateField(field, value, element) : validateFieldValue(field, value);
-
-                model[field] = error ? null : value;
+            for (let field of this.modelFields) {
+                // + is to convert a string to a number
+                model[field] = form[field].value !== '' ? +form[field].value : null;
             }
 
             return model;
-        }
-
-        /**
-         * Retrieves input field's value.
-         *
-         * @param input
-         * @return {string}
-         */
-        function getInputValue(input) {
-            return templateService.getComponent(input, page).value;
-        }
-
-        /**
-         * Validates if the field value is correct and displays the error on element.
-         *
-         * @param {string} field The name of the field to validate.
-         * @param {string} value The value to validate.
-         * @param {Element} element The element to display error on.
-         * @returns {string}
-         */
-        function validateField(field, value, element) {
-            let error = validateFieldValue(field, value)
-
-            if (error) {
-                templateService.setError(element, error);
-            } else {
-                templateService.removeError(element);
-            }
-
-            return error;
-        }
-
-        function validateFieldValue(field, value) {
-            let error = '';
-
-            if (value === '') {
-                error = Packlink.errorMsgs.required;
-            } else if (numericInputs.indexOf(field) !== -1) {
-                let numericValue = parseFloat(value);
-                // noinspection EqualityComparisonWithCoercionJS Because it checks parsing.
-                if (value == numericValue) {
-                    if (numericValue <= 0) {
-                        error = Packlink.errorMsgs.greaterThanZero;
-                    } else {
-                        // noinspection EqualityComparisonWithCoercionJS Cannot compare float and int with !==.
-                        if (integers.indexOf(field) !== -1 && numericValue != parseInt(value)) {
-                            error = Packlink.errorMsgs.integer;
-                        }
-                    }
-                } else {
-                    error = Packlink.errorMsgs.numeric;
-                }
-            }
-
-            return error;
-        }
-
-        function isFormValid() {
-            let model = getFormattedParcelFormInput(false);
-
-            let isValid = true;
-            for (let field of defaultParcelFields) {
-                if (!model[field]) {
-                    isValid = false;
-                    break;
-                }
-            }
-
-            return isValid;
-        }
+        };
     }
 
     Packlink.DefaultParcelController = DefaultParcelController;

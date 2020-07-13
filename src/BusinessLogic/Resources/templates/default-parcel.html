@@ -1,49 +1,47 @@
-<div class="pl-default-parcel-page pl-flex-expand">
-    <div class="pl-flex-expand pl-text-center pl-justify-f-start">
-        <div class="pl-bottom-separate pl-w-100">
-            <h1 class="pl-text-center pl-w-100 pl-m-30">
-                <button id="pl-parcel-back" class="pl-icon-wrapper pl-float-left">
-                    <i class="material-icons pl-back-arrow">keyboard_backspace</i>
-                </button>
-                <span class="pl-header-text-wrapper"></span>
-            </h1>
-            <p class="pl-text-center pl-header-info">
-            </p>
+<div class="pl-default-parcel-page">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1 id="pl-page-title" class="pl-text-center pl-full-width">
+        </h1>
+    </header>
+    <form method="POST" id="pl-parcel-form" class="pl-small-page pl-page-padding pl-page-content">
+        <p class="pl-text-center pl-page-info pl-bottom-separate">
+        </p>
+        <div>
+            <div class="pl-form-group">
+                <input type="text" id="pl-default-parcel-weight" name="weight" placeholder="1"
+                       data-type="number" data-validation-rule="greaterThanZero" data-required="true"/>
+                <label for="pl-default-parcel-weight">
+                    {$defaultParcel.weight} (kg)
+                </label>
+            </div>
+            <div class="pl-form-group">
+                <input type="text" id="pl-default-parcel-height" name="height" placeholder="20"
+                       data-type="number" data-validation-rule="integer,greaterThanZero" data-required="true"/>
+                <label for="pl-default-parcel-height">
+                    {$defaultParcel.height} (cm)
+                </label>
+            </div>
+            <div class="pl-form-group">
+                <input type="text" id="pl-default-parcel-width" name="width" placeholder="20"
+                       data-type="number" data-validation-rule="integer,greaterThanZero" data-required="true"/>
+                <label for="pl-default-parcel-width">
+                    {$defaultParcel.width} (cm)
+                </label>
+            </div>
+            <div class="pl-form-group">
+                <input type="text" id="pl-default-parcel-length" name="length" placeholder="20"
+                       data-type="number" data-validation-rule="integer,greaterThanZero" data-required="true"/>
+                <label for="pl-default-parcel-length">
+                    {$defaultParcel.length} (cm)
+                </label>
+            </div>
         </div>
-        <form method="POST" name="plParcelForm" id="pl-parcel-form" class="pl-full-width">
-            <div>
-                <div class="pl-form-group">
-                    <label for="pl-default-parcel-weight">
-                        {$defaultParcel.weight} (kg)
-                    </label>
-                    <input type="text" id="pl-default-parcel-weight" name="weight"/>
-                </div>
-                <div class="pl-form-group">
-                    <label for="pl-default-parcel-height">
-                        {$defaultParcel.height} (cm)
-                    </label>
-                    <input type="text" id="pl-default-parcel-height" name="height"/>
-                </div>
-                <div class="pl-form-group">
-                    <label for="pl-default-parcel-width">
-                        {$defaultParcel.width} (cm)
-                    </label>
-                    <input type="text" id="pl-default-parcel-width" name="width"/>
-                </div>
-                <div class="pl-form-group">
-                    <label for="pl-default-parcel-length">
-                        {$defaultParcel.length} (cm)
-                    </label>
-                    <input type="text" id="pl-default-parcel-length" name="length"/>
-                </div>
-            </div>
-            <div>
-                <button id="pl-default-parcel-submit-btn"
-                        type="submit"
-                        name="defaultParcelSubmit"
-                        class="pl-button pl-button-primary pl-mt-20" disabled>
-                </button>
-            </div>
-        </form>
+    </form>
+    <div class="pl-page-buttons">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+        </button>
     </div>
 </div>

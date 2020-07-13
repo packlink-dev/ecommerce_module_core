@@ -1,15 +1,24 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     function OnboardingOverviewController(configuration) {
 
         const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
+            translationService = Packlink.translationService,
             state = Packlink.state,
             templateId = 'pl-onboarding-overview-page';
 
-        let defaultParcel,
-            defaultWarehouse;
+        /**
+         * @var {Parcel}
+         */
+        let defaultParcel;
+        /**
+         * @var {Warehouse}
+         */
+        let defaultWarehouse;
 
         /**
          * Displays page content.
@@ -26,65 +35,59 @@ var Packlink = window.Packlink || {};
         function initializePage(response) {
             defaultWarehouse = response;
             templateService.setCurrentTemplate(templateId);
-            let submitBtn = templateService.getComponent('pl-onboarding-overview-button'),
-                defaultParcelBtns = document.querySelectorAll('.pl-onboarding-overview-list .pl-go-to-default-parcel');
 
-            defaultParcelBtns.forEach(function (btn) {
-                btn.addEventListener('click', goToDefaultParcelForm);
+            const segments = templateService.getMainPage().querySelectorAll('.pl-onboarding-overview-list .pl-list-item');
+            populateSegment(segments[0], !!defaultParcel.weight, 'default-parcel', () => {
+                return translationService.translate('onboardingOverview.parcelData', [
+                    defaultParcel.weight, defaultParcel.height, defaultParcel.width, defaultParcel.length
+                ]);
+            });
+            populateSegment(segments[1], !!defaultWarehouse.postal_code, 'default-warehouse', () => {
+                return translationService.translate('onboardingOverview.warehouseData', [
+                    defaultWarehouse.alias,
+                    defaultWarehouse.name + ' ' + defaultWarehouse.surname,
+                    defaultWarehouse.company || '-'
+                ]);
             });
 
-            if (defaultParcel && defaultParcel.hasOwnProperty('weight') && defaultParcel.weight !== null) {
-                setRequiredInfoPopulatedState('pl-parcel-details', 'pl-parcel-wrapper');
+            const submitBtn = templateService.getComponent('pl-onboarding-overview-button');
+            submitBtn.disabled = !defaultParcel.weight || !defaultWarehouse.postal_code;
+            submitBtn.addEventListener('click', () => {
+                state.goToState('shipping-methods');
+            });
 
-                let weightPlaceholder = templateService.getComponent('pl-parcel-weight'),
-                    heightPlaceholder = templateService.getComponent('pl-parcel-height'),
-                    widthPlaceholder = templateService.getComponent('pl-parcel-width'),
-                    lengthPlaceholder = templateService.getComponent('pl-parcel-length');
+            Packlink.utilityService.hideSpinner();
+        }
 
-                weightPlaceholder.innerHTML = defaultParcel.weight;
-                heightPlaceholder.innerHTML = defaultParcel.height;
-                widthPlaceholder.innerHTML = defaultParcel.width;
-                lengthPlaceholder.innerHTML = defaultParcel.length;
+        const populateSegment = (segment, data, editState, infoProvider) => {
+            const icon = segment.querySelector('i');
+            const button = segment.querySelector('button');
+            const details = segment.querySelector('.pl-item-details');
+
+            button.addEventListener('click', () => {
+                state.goToState(editState, {
+                    'code': 'onboarding',
+                    'prevState': 'onboarding-overview',
+                    'nextState': 'onboarding-overview',
+                });
+            });
+
+            if (!data) {
+                icon.innerText = 'close';
+                icon.classList.add('pl-error-text');
+                button.classList.add('pl-button-primary');
+                button.classList.remove('pl-button-secondary');
+                button.innerText = translationService.translate('general.complete');
+                details.innerHTML = translationService.translate('onboardingOverview.missingInfo');
             } else {
-                setMissingInfoState('pl-parcel-wrapper');
+                icon.innerText = 'check';
+                icon.classList.add('pl-icon-text');
+                button.classList.remove('pl-button-primary');
+                button.classList.add('pl-button-secondary');
+                button.innerText = translationService.translate('general.edit');
+                details.innerHTML = infoProvider();
             }
-
-            if (defaultWarehouse && defaultWarehouse.hasOwnProperty('name') && defaultWarehouse.name !== null) {
-                setRequiredInfoPopulatedState('pl-wh-details', 'pl-wh-wrapper');
-
-                let aliasPlaceholder = templateService.getComponent('pl-wh-alias'),
-                    userPlaceholder = templateService.getComponent('pl-wh-user'),
-                    companyPlaceholder = templateService.getComponent('pl-wh-company');
-
-                aliasPlaceholder.innerHTML = defaultWarehouse.alias;
-                userPlaceholder.innerHTML = defaultWarehouse.name + ' ' + defaultWarehouse.surname;
-                companyPlaceholder.innerHTML = defaultWarehouse.company;
-            } else {
-                setMissingInfoState('pl-wh-wrapper');
-            }
-
-            function setMissingInfoState(parentClass) {
-                let missingInfo = document.querySelector('.' + parentClass + ' .pl-onboarding-missing-info');
-                missingInfo.classList.remove('pl-display-none');
-
-                let indicator = document.querySelector('.' + parentClass + ' .pl-info-icon-x');
-                indicator.classList.remove('pl-display-none');
-
-                submitBtn.disabled = true;
-            }
-        }
-
-        function setRequiredInfoPopulatedState(detailsWrapperId, indicatorWrapperClass) {
-            let parcelInfo = templateService.getComponent(detailsWrapperId);
-            parcelInfo.classList.remove('pl-display-none');
-
-            let indicator = document.querySelector('.' + indicatorWrapperClass + ' .pl-info-icon-ok');
-            indicator.classList.remove('pl-display-none');
-        }
-
-        function goToDefaultParcelForm() {
-            state.goToState('default-parcel');
-        }
+        };
     }
 
     Packlink.OnboardingOverviewController = OnboardingOverviewController;

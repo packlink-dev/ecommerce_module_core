@@ -15,6 +15,22 @@
     "curlIsNotInstalled": "cURL non installato o abilitato nella tua installazione PHP. È necessario per il corretto funzionamento dell’attività in background. Installalo e aggiorna la pagina.",
     "loading": "Caricamento in corso..."
   },
+  "validation": {
+    "requiredField": "Questo campo è obbligatorio.",
+    "invalidEmail": "Il campo deve essere un email valido.",
+    "shortPassword": "La password deve contenere almeno %s caratteri.",
+    "invalidPhone": "Questo campo deve contenere un numero di telefono valido.",
+    "numeric": "Questo valore deve essere numerico.",
+    "greaterThanZero": "Value must be greater than 0.",
+    "nonNegative": "Field cannot have a negative value.",
+    "numberOfDecimalPlaces": "Il campo deve contenere due decimali.",
+    "integer": "Il campo deve essere un numero intero.",
+    "invalidCountryList": "Devi selezionare i paesi di destinazione.",
+    "invalidLanguage": "Field is not a valid language.",
+    "invalidPlatformCountry": "Field is not a valid platform country.",
+    "invalidUrl": "Field must be a valid URL.",
+    "invalidFieldValue": "Field must be set to \"%s\"."
+  },
   "login": {
     "dontHaveAccount?": "Non hai un account?",
     "register": "Registrati",
@@ -24,12 +40,6 @@
     "apiKey": "API Key",
     "logIn": "Accedi",
     "apiKeyIncorrect": "API Key non corretta"
-  },
-  "validation": {
-    "requiredField": "Questo campo è obbligatorio.",
-    "invalidEmail": "Il campo deve essere un email valido.",
-    "shortPassword": "La password deve contenere almeno %s caratteri.",
-    "invalidPhone": "Questo campo deve contenere un numero di telefono valido."
   },
   "register": {
     "logIn": "Log in",
@@ -45,6 +55,7 @@
     "marketingEmails": "Autorizzo Packlink Shipping S.L. a inviarmi comunicazioni commerciali via email",
     "submit": "Registrati",
     "chooseYourCountry": "Choose your country",
+    "searchCountry": "Busca el pais",
     "ES": "Spain",
     "DE": "Germany",
     "FR": "France",
@@ -55,7 +66,8 @@
     "PT": "Portugal",
     "TR": "Turkey",
     "IE": "Ireland",
-    "GB": "Great Britain"
+    "GB": "Great Britain",
+    "HU": "Hungary"
   },
   "onboardingWelcome": {
     "header": "Let's set up basic information so that you can make shipments",
@@ -65,14 +77,12 @@
     "startSetUp": "Start set up"
   },
   "onboardingOverview": {
-    "header": "Almost there! Please check that the information entered is <br> correct, or complete it in order to continue.",
+    "header": "Almost there! Please check that the information entered is correct, or complete it in order to continue.",
     "parcelDetails": "Parcel details",
     "senderAddress": "Sender's Address",
     "missingInfo": "Missing information",
-    "complete": "Complete",
-    "edit": "Edit",
-    "continue": "Continue",
-    "myShipmentServices": "My shipment services"
+    "parcelData": "Weight %s kg | Height %s cm | Width %s cm | Length %s cm",
+    "warehouseData": "%s | %s | %s"
   },
   "defaultParcel": {
     "weight": "Weight",
@@ -129,16 +139,17 @@
     "fieldMustBePositive": "Il campo deve essere un numero intero positivo."
   },
   "mapOrderStatuses": {
-    "mapStatuses": "Sincronizzazione stato ordini",
-    "packlinkProShippingStatus": "Stato della spedizione di Packlink PRO",
-    "status": "Stato",
+    "title": "Order status",
+    "description": "With Packlink you can update your % order status with shipping information. <br>You can edit it at any time.",
+    "packlinkProShipmentStatus": "Packlink PRO <strong>SHIPMENT</strong> STATUS",
+    "systemOrderStatus": "% <strong>ORDER STATUS</strong>",
     "none": "Nessuno",
     "pending": "In attesa",
     "processing": "Processando",
-    "ready": "Pronto per la spedizione",
+    "readyForShipping": "Pronto per la spedizione",
     "inTransit": "In transito",
     "delivered": "Consegnato",
-    "statusSetByPacklink": "Stato impostato da Packlink PRO."
+    "cancelled": "Annullato"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtra i servizi",

@@ -12,17 +12,28 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 class SessionRepository extends MemoryRepository
 {
     /**
+     * @var int
+     */
+    private $lastId;
+    /**
      * Fully qualified name of this class.
      */
     const THIS_CLASS_NAME = __CLASS__;
+
+    /**
+     * SessionRepository constructor.
+     */
+    public function __construct()
+    {
+        $this->ensureStorage();
+        $this->lastId = count($_SESSION['storage']);
+    }
 
     /**
      * @inheritDoc
      */
     protected function getStorage()
     {
-        $this->ensureStorage();
-
         return $_SESSION['storage'];
     }
 
@@ -31,8 +42,6 @@ class SessionRepository extends MemoryRepository
      */
     protected function saveToStorage($key, $item)
     {
-        $this->ensureStorage();
-
         $_SESSION['storage'][$key] = $item;
     }
 
@@ -42,6 +51,16 @@ class SessionRepository extends MemoryRepository
     protected function deleteFromStorage($key)
     {
         unset($_SESSION['storage'][$key]);
+    }
+
+    /**
+     * Generates a new ID.
+     *
+     * @return int
+     */
+    protected function generateId()
+    {
+        return ++$this->lastId;
     }
 
     /**

@@ -71,10 +71,13 @@ var Packlink = window.Packlink || {};
          * Displays page content.
          */
         this.display = function () {
-            utilityService.showSpinner();
-
-            extensionPoint = templateService.setTemplate('pl-shipping-methods-page-template');
-
+            templateService.setCurrentTemplate('pl-shipping-methods-page');
+            const settingsMenu = templateService.getHeader().querySelector('.pl-configuration-menu');
+            settingsMenu.addEventListener('click', () => {
+                state.goToState('configuration');
+            });
+            return;
+            extensionPoint = templateService.setTemplate('pl-shipping-methods-page');
             filtersExtensionPoint = addStaticComponent(
                 'pl-shipping-methods-filters-template',
                 'pl-shipping-methods-filters-extension-point',
@@ -672,7 +675,6 @@ var Packlink = window.Packlink || {};
             scrollConfigForm(methodId);
 
             utilityService.enableInputMask();
-            utilityService.configureInputElements();
         }
 
         /**
@@ -1064,8 +1066,6 @@ var Packlink = window.Packlink || {};
             }
 
             isFixedPriceValid(validateLastAmount, validateLastTo, byWeight);
-
-            utilityService.configureInputElements();
         }
 
         /**
@@ -1553,7 +1553,6 @@ var Packlink = window.Packlink || {};
             }
 
             setPercentButtonsClass();
-            utilityService.configureInputElements();
         }
 
         /**

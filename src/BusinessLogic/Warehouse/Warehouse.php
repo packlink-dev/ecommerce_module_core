@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Warehouse;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\Utility\DtoValidator;
 
 /**
@@ -168,11 +169,19 @@ class Warehouse extends FrontDto
         parent::doValidate($payload, $validationErrors);
 
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
-            static::setInvalidFieldError('email', $validationErrors, 'Field must be a valid email.');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'email',
+                Translator::translate('validation.invalidEmail')
+            );
         }
 
         if (!empty($payload['phone']) && !DtoValidator::isPhoneValid($payload['phone'])) {
-            static::setInvalidFieldError('phone', $validationErrors, 'Field must be a valid phone number.');
+            $validationErrors[] = static::getValidationError(
+                ValidationError::ERROR_INVALID_FIELD,
+                'phone',
+                Translator::translate('validation.invalidPhone')
+            );
         }
     }
 }
