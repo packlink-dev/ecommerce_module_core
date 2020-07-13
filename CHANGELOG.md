@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+### Changed
+- `UpdateShipmentData` task has been declared as depricated.
+- `UpdateShipmentData` task will not be scheduled anymore in core.
+- BREAKING: Methods `isFirstShipmentDraftCreated` and `setFirstShipmentDraftCreated` have been removed from `Configuration`
+Integration should check if said methods have been utilized and remove them.
+
 ## [2.1.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.2...v2.1.3) - 2020-06-25
 ### Added
 - Added additional data (seller user ID and order ID) when creating order shipment draft.
