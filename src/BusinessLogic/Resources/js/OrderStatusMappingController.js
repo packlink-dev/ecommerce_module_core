@@ -36,8 +36,9 @@ if (!window.Packlink) {
                 configuration.setUrl,
                 mappings,
                 () => {
-                    utilityService.hideSpinner();
-                }
+                    state.goToState('configuration');
+                },
+                Packlink.responseService.errorHandler
             );
         };
 
