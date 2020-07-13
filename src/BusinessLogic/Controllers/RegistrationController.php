@@ -9,7 +9,7 @@ use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\DemoUI\Services\Integration\UrlService;
+use Packlink\BusinessLogic\Utility\UrlService;
 
 class RegistrationController
 {

@@ -150,12 +150,13 @@ class CountryService extends BaseService
     /**
      * Returns a list of supported country DTOs.
      *
-     * @return \Packlink\BusinessLogic\Country\Country[]
+     * @param bool $associative Indicates whether the result should be an associative array.
      *
+     * @return \Packlink\BusinessLogic\Country\Country[]
      * @noinspection PhpUnhandledExceptionInspection
      * @noinspection PhpDocMissingThrowsInspection
      */
-    public function getSupportedCountries()
+    public function getSupportedCountries($associative = true)
     {
         $countries = array();
         $configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
@@ -172,6 +173,6 @@ class CountryService extends BaseService
             $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
         }
 
-        return $countries;
+        return $associative ? $countries : array_values($countries);
     }
 }

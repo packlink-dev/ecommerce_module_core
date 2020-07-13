@@ -165,20 +165,24 @@
 
       &.pl-with-label {
         padding: 7px 0 0 11px;
+
+        & ~ i {
+          top: 18px;
+        }
       }
     }
 
     i {
       position: absolute;
       right: 10px;
-      top: 18px;
+      top: 14px;
       color: $border-color;
       width: $icon-button-size;
       height: $icon-button-size;
     }
 
     select + i {
-      cursor: pointer;
+      cursor: default;
     }
 
     .pl-autocomplete-list {

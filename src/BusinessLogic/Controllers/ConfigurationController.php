@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
-use Packlink\DemoUI\Services\Integration\UrlService;
+use Packlink\BusinessLogic\Utility\UrlService;
 
 /**
  * Class ConfigurationController.

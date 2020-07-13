@@ -14,7 +14,7 @@ class CountryController extends BaseHttpController
     {
         /** @var CountryService $countryService */
         $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
-        $supportedCountries = $countryService->getSupportedCountries();
+        $supportedCountries = $countryService->getSupportedCountries(false);
 
         $this->outputDtoEntities($supportedCountries);
     }
