@@ -38,10 +38,10 @@ if (!window.Packlink) {
      *      shippingMethodsDeactivateUrl: string,
      *      shopShippingMethodCountGetUrl: string,
      *      shopShippingMethodsDisableUrl: string,
-     *      getSystemOrderStatusesUrl: string,
+     *      orderStatusMappingsGetMappingsAndStatusesUrl: string,
      *      orderStatusMappingsSaveUrl: string,
-     *      orderStatusMappingsGetUrl: string,
      *      getShippingCountriesUrl: string,
+     *      configurationGetDataUrl: string,
      *      logoPath: string,
      *      templates: {}
      * }} configuration
@@ -85,6 +85,17 @@ if (!window.Packlink) {
                 submitUrl: configuration.defaultWarehouseSubmitUrl,
                 searchPostalCodesUrl: configuration.defaultWarehouseSearchPostalCodesUrl
             },
+            'configuration': {
+                getDataUrl: configuration.configurationGetDataUrl
+            },
+            'system-info': {
+                getStatusUrl: configuration.debugGetStatusUrl,
+                setStatusUrl: configuration.debugSetStatusUrl
+            },
+            'order-status-mapping': {
+                getMappingAndStatusesUrl: configuration.orderStatusMappingsGetMappingsAndStatusesUrl,
+                setUrl: configuration.orderStatusMappingsSaveUrl
+            },
             'shipping-methods': {
                 getDashboardStatusUrl: configuration.dashboardGetStatusUrl,
                 getAllMethodsUrl: configuration.shippingMethodsGetAllUrl,
@@ -103,15 +114,6 @@ if (!window.Packlink) {
                 canDisplayCarrierLogos: configuration.canDisplayCarrierLogos,
                 getShippingCountries: configuration.getShippingCountriesUrl,
                 hasCountryConfiguration: configuration.hasCountryConfiguration
-            },
-            'order-state-mapping': {
-                getSystemOrderStatusesUrl: configuration.getSystemOrderStatusesUrl,
-                getUrl: configuration.orderStatusMappingsGetUrl,
-                saveUrl: configuration.orderStatusMappingsSaveUrl
-            },
-            'footer': {
-                getDebugStatusUrl: configuration.debugGetStatusUrl,
-                setDebugStatusUrl: configuration.debugSetStatusUrl
             }
         };
 
@@ -126,8 +128,6 @@ if (!window.Packlink) {
 
             templateService.setTemplates(configuration.templates);
 
-            //pageControllerFactory.getInstance('footer', getControllerConfiguration('footer')).display();
-
             ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
         };
 
@@ -140,15 +140,6 @@ if (!window.Packlink) {
             utilityService.disableInputMask();
             let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
             controller.display();
-        };
-
-        /**
-         * Called when configuration step is finished.
-         */
-        this.stepFinished = () => {
-            pageControllerFactory.getInstance(
-                'shipping-methods',
-                getControllerConfiguration('shipping-methods')).display();
         };
 
         /**
@@ -169,7 +160,7 @@ if (!window.Packlink) {
 
             previousState = currentState;
             currentState = controller;
-        }
+        };
 
         this.getPreviousState = () => previousState;
 

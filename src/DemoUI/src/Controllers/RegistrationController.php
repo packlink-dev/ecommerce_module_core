@@ -10,7 +10,7 @@ use Packlink\DemoUI\Controllers\Models\Request;
  *
  * @package Packlink\DemoUI\Controllers
  */
-class RegistrationController
+class RegistrationController extends BaseHttpController
 {
     /**
      * @var RegistrationControllerBase
@@ -30,7 +30,7 @@ class RegistrationController
      */
     public function get()
     {
-        echo json_encode($this->controller->getRegisterData());
+        $this->output($this->controller->getRegisterData());
     }
 
     /**
@@ -38,6 +38,8 @@ class RegistrationController
      *
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
      *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
@@ -48,6 +50,6 @@ class RegistrationController
 
         $payload['ecommerces'] = array('Test');
 
-        echo json_encode(array('success' => $this->controller->register($payload)));
+        $this->output(array('success' => $this->controller->register($payload)));
     }
 }

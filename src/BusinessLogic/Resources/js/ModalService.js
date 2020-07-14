@@ -19,7 +19,8 @@ if (!window.Packlink) {
      * @property {function():boolean} [onClose] Will fire before the modal is closed.
      *      If the return value is false, the modal will not be closed.
      * @property {boolean} [footer=false] Indicates whether to use footer. Defaults to false.
-     * @property {boolean} [useX=true] Indicates whether to use the X close button. Defaults to true.
+     * @property {boolean} [canClose=true] Indicates whether to use an (X) button or click outside the modal
+     * to close it. Defaults to true.
      */
 
     /**
@@ -27,7 +28,7 @@ if (!window.Packlink) {
      * @constructor
      */
     function ModalService(configuration) {
-        const modalId = 'pl-modal-mask',
+        const modalId = 'pl-modal',
             templateService = Packlink.templateService,
             utilityService = Packlink.utilityService,
             config = configuration;
@@ -67,18 +68,28 @@ if (!window.Packlink) {
          * Opens the modal.
          */
         this.open = () => {
+            const div = document.createElement('div');
+            div.innerHTML = templateService.getComponent(modalId).innerHTML;
             // noinspection JSValidateTypes
-            modal = templateService.getComponent(modalId).cloneNode(true);
+            modal = div.firstElementChild;
             const closeBtn = modal.querySelector('.pl-modal-close-button'),
                 title = modal.querySelector('.pl-modal-title'),
                 body = modal.querySelector('.pl-modal-body'),
                 footer = modal.querySelector('.pl-modal-footer');
 
             utilityService.showElement(modal);
-            if (config.useX === false) {
+            if (config.canClose === false) {
                 utilityService.hideElement(closeBtn);
             } else {
                 closeBtn.addEventListener('click', this.close);
+                modal.addEventListener('click', (event) => {
+                    if (event.target.id === 'pl-modal-mask') {
+                        event.preventDefault();
+                        this.close();
+
+                        return false;
+                    }
+                });
             }
 
             if (config.title) {

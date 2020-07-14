@@ -124,25 +124,33 @@
     "email": "Email",
     "email-placeholder": "youremail@example.com"
   },
-  "dashboard": {
-    "almostThere": "You're almost there!",
-    "detailsSynced": "Details synced with your existing account",
-    "setDefaultParcel": "Set default parcel details",
-    "setDefaultWarehouse": "Set default warehouse details",
-    "justFewMoreSteps": "Just a few more steps to complete the setup",
-    "selectShippingServices": "Select shipping services"
+  "configuration": {
+    "menu": "Settings",
+    "title": "Settings",
+    "orderStatus": "Order status",
+    "warehouse": "Default sender address",
+    "parcel": "Default parcel",
+    "help": "Help",
+    "contactUs": "Contact us at:",
+    "systemInfo": "System information"
   },
-  "mapOrderStatuses": {
-    "mapStatuses": "Map order statuses",
-    "packlinkProShippingStatus": "Packlink PRO Shipping Status",
-    "status": "Status",
+  "systemInfo": {
+    "title": "System information file <br>and debug mode",
+    "debugMode": "Debug mode",
+    "download": "Download system information"
+  },
+  "orderStatusMapping": {
+    "title": "Order status",
+    "description": "With Packlink you can update your %s order status with shipping information. <br>You can edit it at any time.",
+    "packlinkProShipmentStatus": "Packlink PRO <strong>SHIPMENT</strong> STATUS",
+    "systemOrderStatus": "%s <strong>ORDER STATUS</strong>",
     "none": "None",
     "pending": "Pending",
     "processing": "Processing",
-    "ready": "Ready for shipping",
+    "readyForShipping": "Ready for shipping",
     "inTransit": "In transit",
     "delivered": "Delivered",
-    "statusSetByPacklink": "Status set by Packlink PRO."
+    "cancelled": "Canceled"
   },
   "shippingServicesSettings": {
     "filterServices": "Filter services",

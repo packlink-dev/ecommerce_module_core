@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Packlink\DemoUI\Controllers;
 
 /**
@@ -8,7 +7,7 @@ namespace Packlink\DemoUI\Controllers;
  *
  * @package Packlink\DemoUI\Controllers
  */
-class OnboardingController
+class OnboardingController extends BaseHttpController
 {
     /**
      * Gets current app state.
@@ -17,6 +16,6 @@ class OnboardingController
     {
         $controller = new \Packlink\BusinessLogic\Controllers\OnboardingController();
 
-        echo json_encode($controller->getCurrentState()->toArray());
+        $this->output($controller->getCurrentState()->toArray());
     }
 }

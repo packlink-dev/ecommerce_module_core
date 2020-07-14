@@ -5,8 +5,21 @@
     display: flex;
     align-items: center;
 
+    .pl-header-holder {
+      justify-content: space-between;
+      flex-direction: row;
+      flex-grow: 1;
+      align-items: center;
+      margin-left: 20px;
+
+      .pl-button {
+        padding: 10px 13px;
+        text-transform: none;
+      }
+    }
+
     &.pl-sub-header {
-      border-color: $color-light;
+      border-color: $border-light;
       flex-direction: row;
 
       button {
@@ -22,6 +35,7 @@
   > main {
     display: flex;
     flex-grow: 1;
+    overflow: auto;
   }
 
   button, .pl-button {
@@ -136,7 +150,6 @@
     select {
       border: 1px solid $border-color;
       line-height: 50px;
-      padding: 7px 0 0 11px;
       background-color: $color-white;
       color: $input-control-color;
       font-size: 12px;
@@ -149,13 +162,27 @@
         border: 1px solid $color-blue;
         outline: none;
       }
+
+      &.pl-with-label {
+        padding: 7px 0 0 11px;
+
+        & ~ i {
+          top: 18px;
+        }
+      }
     }
 
     i {
       position: absolute;
       right: 10px;
-      top: 18px;
+      top: 14px;
       color: $border-color;
+      width: $icon-button-size;
+      height: $icon-button-size;
+    }
+
+    select + i {
+      cursor: default;
     }
 
     .pl-autocomplete-list {
@@ -330,10 +357,10 @@
 
       .pl-modal-close-button {
         position: absolute;
-        width: 16px;
-        height: 16px;
-        top: 23px;
-        right: 19px;
+        width: 24px;
+        height: 24px;
+        top: 15px;
+        right: 12px;
         font-size: 3rem;
         font-weight: 600;
         color: $color-blue;
@@ -396,6 +423,13 @@
   #pl-page {
     button, .pl-button {
       width: 100%;
+    }
+
+    .pl-header-holder {
+
+      .pl-button {
+        display: none;
+      }
     }
   }
 }

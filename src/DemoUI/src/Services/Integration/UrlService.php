@@ -4,6 +4,7 @@ namespace Packlink\DemoUI\Services\Integration;
 
 /**
  * Class UrlService
+ *
  * @package Packlink\DemoUI\Repository
  */
 class UrlService

@@ -90,7 +90,7 @@ var Packlink = window.Packlink || {};
             let format = /{\$[.\-_A-Za-z|]+}/g;
             const me = this;
 
-            return html.replace(format, function (key) {
+            return html.replace(format, (key) => {
                 // remove the placeholder characters to get "key|param1|param2"
                 key = key.substr(2, key.length - 3);
                 // split parameters

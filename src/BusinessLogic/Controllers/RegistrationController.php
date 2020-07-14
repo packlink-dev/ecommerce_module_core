@@ -5,11 +5,11 @@ namespace Packlink\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
-use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\User\UserAccountService;
+use Packlink\BusinessLogic\Utility\UrlService;
 
 class RegistrationController
 {
@@ -17,7 +17,6 @@ class RegistrationController
      * @var Configuration
      */
     protected $configService;
-
     /**
      * List of terms and conditions URLs for different country codes.
      *
@@ -30,7 +29,6 @@ class RegistrationController
         'FR' => 'https://pro.packlink.fr/conditions-generales/',
         'IT' => 'https://pro.packlink.it/termini-condizioni/',
     );
-
     /**
      * List of terms and conditions URLs for different country codes.
      *
@@ -70,10 +68,12 @@ class RegistrationController
      *
      * @param array $payload
      *
-     * @return bool, flag indicating whether the registration was successful.
-     * @throws UnableToRegisterAccountException
+     * @return bool A flag indicating whether the registration was successful.
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
      */
     public function register(array $payload)
     {
@@ -135,7 +135,7 @@ class RegistrationController
      */
     private function getTermsAndConditionsUrl()
     {
-        $locale = $this->getUrlLocaleKey();
+        $locale = UrlService::getUrlLocaleKey();
 
         return self::$termsAndConditionsUrls[$locale];
     }
@@ -147,30 +147,9 @@ class RegistrationController
      */
     private function getPrivacyPolicyUrl()
     {
-        $locale = $this->getUrlLocaleKey();
+        $locale = UrlService::getUrlLocaleKey();
 
         return self::$privacyPolicyUrls[$locale];
-    }
-
-    /**
-     * Returns locale for support URLs.
-     *
-     * @return string
-     */
-    private function getUrlLocaleKey()
-    {
-        $locale = 'EN';
-
-        $userInfo = $this->getConfigService()->getUserInfo();
-        $currentLang = $this->getConfigService()->getCurrentLanguage();
-
-        if ($userInfo !== null && in_array($userInfo->country, array('ES', 'DE', 'FR', 'IT'), true)) {
-            $locale = $userInfo->country;
-        } elseif (in_array(strtoupper($currentLang), array('ES', 'DE', 'FR', 'IT'), true)) {
-            $locale = strtoupper($currentLang);
-        }
-
-        return $locale;
     }
 
     /**
