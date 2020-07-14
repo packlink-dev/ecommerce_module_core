@@ -10,14 +10,80 @@ if (!window.Packlink) {
      * @property {string} message The error message.
      */
 
+    const inputType = {
+        number: 'number',
+        email: 'email',
+        phone: 'phone',
+        password: 'password'
+    };
+
+    const validationRule = {
+        numeric: 'numeric',
+        integer: 'integer',
+        greaterThanZero: 'greaterThanZero',
+        nonNegative: 'nonNegative'
+    };
+
     /**
      * The ValidationService constructor.
      *
      * @constructor
      */
     function ValidationService() {
-        let translationService = Packlink.translationService,
-            templateService = Packlink.templateService;
+        const translationService = Packlink.translationService,
+            templateService = Packlink.templateService,
+            utilityService = Packlink.utilityService;
+
+        /**
+         * Validates form. Validates all input and select elements by using data attributes as rules.
+         *
+         * @param {Element} form
+         * @return {boolean}
+         */
+        this.validateForm = (form) => {
+            const inputs = utilityService.toArray(form.getElementsByTagName('input')).concat(
+                utilityService.toArray(form.getElementsByTagName('select'))
+                ),
+                length = inputs.length;
+
+            let result = true;
+
+            for (let i = 0; i < length; i++) {
+                result &= this.validateInputField(inputs[i]);
+            }
+
+            return result;
+        };
+
+        /**
+         * Validates a single input element based on the element type and validation rules.
+         * Adds a validation error if needed.
+         *
+         * @param {Element|HTMLInputElement} input
+         * @return {boolean}
+         */
+        this.validateInputField = (input) => {
+            this.removeError(input);
+
+            const data = input.dataset;
+
+            if (data.required !== undefined && !this.validateRequiredField(input)) {
+                return false;
+            }
+
+            switch (data.type) {
+                case inputType.number:
+                    return this.validateNumber(input);
+                case inputType.email:
+                    return this.validateEmail(input);
+                case inputType.phone:
+                    return this.validatePhone(input);
+                case inputType.password:
+                    return this.validatePasswordLength(input);
+            }
+
+            return true;
+        };
 
         /**
          * Validates if the input has a value. If the value is not set, adds the error mark on field.
@@ -32,6 +98,47 @@ if (!window.Packlink) {
         );
 
         /**
+         * Validates a numeric input.
+         *
+         * @param {HTMLInputElement} input
+         * @return {boolean} Indication of the validity.
+         */
+        this.validateNumber = (input) => {
+            const ruleset = input.dataset.validationRule ? input.dataset.validationRule.split(',') : [],
+                length = ruleset.length;
+
+            if (!validateField(input, isNaN(input.value), 'validation.' + validationRule.numeric)) {
+                return false;
+            }
+
+            const value = +input.value;
+            for (let i = 0; i < length; i++) {
+                const rule = ruleset[i];
+                let condition = false;
+                switch (rule) {
+                    case validationRule.integer:
+                        condition = Number.isInteger(value);
+                        break;
+                    case validationRule.greaterThanZero:
+                        condition = value > 0;
+                        break;
+                    case validationRule.nonNegative:
+                        condition = value >= 0;
+                        break;
+                    default:
+                        continue;
+                }
+
+                if (!validateField(input, !condition, 'validation.' + rule)) {
+                    // break on first rule
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        /**
          * Validates if the input is a valid email. If not, adds the error mark on field.
          *
          * @param {HTMLInputElement} input
@@ -43,7 +150,7 @@ if (!window.Packlink) {
             return validateField(
                 input,
                 !regex.test(String(input.value).toLowerCase()),
-                'validation.requiredField'
+                'validation.invalidEmail'
             );
         };
 
@@ -111,6 +218,7 @@ if (!window.Packlink) {
             this.removeError(input);
 
             let errorTemplate = document.createElement('div');
+            input.setAttribute('data-pl-contains-errors', '1');
             errorTemplate.innerHTML = templateService.getComponent('pl-error-template').innerHTML;
             errorTemplate.firstElementChild.innerHTML = message;
             input.after(errorTemplate.firstElementChild);
@@ -128,6 +236,7 @@ if (!window.Packlink) {
                 input.parentNode.removeChild(errorElement);
             }
 
+            input.removeAttribute('data-pl-contains-errors');
             input.parentElement.classList.remove('pl-error');
         };
 

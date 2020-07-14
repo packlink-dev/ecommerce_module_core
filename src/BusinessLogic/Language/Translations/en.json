@@ -13,7 +13,29 @@
     "help": "Help",
     "downloadSystemInfoFile": "Download system info file",
     "curlIsNotInstalled": "cURL is not installed or enabled in your PHP installation. This is required for background task to work. Please install it and then refresh this page.",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "complete": "Complete",
+    "edit": "Edit"
+  },
+  "validation": {
+    "requiredField": "This field is required.",
+    "invalidEmail": "This field must be valid email.",
+    "shortPassword": "The password must be at least %s characters long.",
+    "invalidPhone": "This field must be valid phone number.",
+    "numeric": "Value must be valid number.",
+    "greaterThanZero": "Value must be greater than 0.",
+    "nonNegative": "Field cannot have a negative value.",
+    "numberOfDecimalPlaces": "Field must have 2 decimal places.",
+    "integer": "Field must be an integer.",
+    "invalidCountryList": "You must select destination countries.",
+    "invalidLanguage": "Field is not a valid language.",
+    "invalidPlatformCountry": "Field is not a valid platform country.",
+    "invalidUrl": "Field must be a valid URL.",
+    "invalidFieldValue": "Field must be set to \"%s\"."
   },
   "login": {
     "apiKey": "Api key",
@@ -24,12 +46,6 @@
     "validateApiKey": "Validate API key",
     "chooseYourCountry": "Choose your country to start the registration process",
     "registerMe": "Register me"
-  },
-  "validation": {
-    "requiredField": "This field is required.",
-    "invalidEmail": "This field must be valid email.",
-    "shortPassword": "The password must be at least %s characters long.",
-    "invalidPhone": "This field must be valid phone number."
   },
   "register": {
     "logIn": "Log in",
@@ -46,6 +62,7 @@
     "submit": "Register",
     "chooseYourCountry": "Choose your country",
     "searchCountry": "Search country",
+    "invalidDeliveryVolume": "Field is not a valid delivery volume.",
     "ES": "Spain",
     "DE": "Germany",
     "FR": "France",
@@ -59,6 +76,54 @@
     "GB": "Great Britain",
     "HU": "Hungary"
   },
+  "onboardingWelcome": {
+    "header": "Let's set up basic information so that<br>you can make shipments",
+    "steps": "It's just two steps that we need to go through to offer you the<br>carrier that best suits your needs",
+    "stepOne": "Set parcel details",
+    "stepTwo": "Set sender's address",
+    "startSetUp": "Start set up"
+  },
+  "onboardingOverview": {
+    "header": "Almost there! Please check that the entered information is correct or complete it in order to continue.",
+    "parcelDetails": "Parcel details",
+    "senderAddress": "Sender's Address",
+    "missingInfo": "Missing information",
+    "parcelData": "Weight %s kg | Height %s cm | Width %s cm | Length %s cm",
+    "warehouseData": "%s | %s | %s"
+  },
+  "defaultParcel": {
+    "title-onboarding": "1. Set parcel details",
+    "description-onboarding": "We will use this default data for <strong>items that do not have defined dimensions and weight.</strong> You can edit them whenever you like via the settings tab.",
+    "title-config": "Default parcel",
+    "description-config": "We will use this data for <strong>items that do not have defined dimensions and weight.</strong>",
+    "weight": "Weight",
+    "height": "Height",
+    "width": "Width",
+    "length": "Length"
+  },
+  "defaultWarehouse": {
+    "title-onboarding": "2. Set sender’s address",
+    "description-onboarding": "We will use this address to create <strong>a default sender for all shipments.</strong> You will be able to edit it whenever you wish via the settings tab.",
+    "title-config": "Default sender address",
+    "description-config": "We will use this address to create <strong>a default sender for all shipments.</strong> You can edit it at any time.",
+    "alias": "Sender name",
+    "alias-placeholder": "Main warehouse",
+    "name": "Name of contact person",
+    "name-placeholder": "Name",
+    "surname": "Surname of contact person",
+    "surname-placeholder": "surname",
+    "company": "Company name",
+    "company-placeholder": "Company",
+    "country": "Country",
+    "postal_code": "City or postcode",
+    "postal_code-placeholder": "-",
+    "address": "Address",
+    "address-placeholder": "Address",
+    "phone": "Phone number",
+    "phone-placeholder": "123 456 7777",
+    "email": "Email",
+    "email-placeholder": "youremail@example.com"
+  },
   "dashboard": {
     "almostThere": "You're almost there!",
     "detailsSynced": "Details synced with your existing account",
@@ -66,41 +131,6 @@
     "setDefaultWarehouse": "Set default warehouse details",
     "justFewMoreSteps": "Just a few more steps to complete the setup",
     "selectShippingServices": "Select shipping services"
-  },
-  "warehouseSettings": {
-    "defaultWarehouse": "Default warehouse",
-    "setDefaultWarehouse": "Set default warehouse",
-    "defaultWarehouseAddress": "We will use the default Warehouse address as your sender address. You can edit anytime.",
-    "warehouseName": "Warehouse name",
-    "contactPersonName": "Contact person name",
-    "contactPersonSurname": "Contact person surname",
-    "companyName": "Company name",
-    "cityOrPostal": "City or postal code",
-    "address": "Address",
-    "phone": "Phone number",
-    "email": "Email",
-    "saveChanges": "Save changes",
-    "fieldRequired": "This field is required.",
-    "fieldValidNumber": "Value must be valid number.",
-    "fieldInvalid": "This field is not valid.",
-    "fieldTwoDecimals": "Field must have 2 decimal places.",
-    "fieldInteger": "Field must be an integer.",
-    "fieldValidEmail": "Field must be valid email.",
-    "postalCodeNotCorrect.": "Postal code is not correct.",
-    "fieldValidPhone": "This field must be valid phone number."
-  },
-  "parcelSettings": {
-    "defaultParcel": "Default parcel",
-    "setDefaultParcel": "Set default parcel",
-    "defaultParcelInfo": "We will use the default parcel in case any item has not defined dimensions and weight. You can edit anytime.",
-    "weight": "Weight",
-    "width": "Width",
-    "length": "Length",
-    "height": "Height",
-    "valuePositive": "Value must be greater than 0.",
-    "saveChanges": "Save changes",
-    "weightMustBePositive": "Weight must be a positive decimal number.",
-    "fieldMustBePositive": "Field must be a positive integer."
   },
   "mapOrderStatuses": {
     "mapStatuses": "Map order statuses",
@@ -138,8 +168,6 @@
     "packlinkPrices": "Packlink prices",
     "percentagePacklinkPrices": "% of Packlink prices",
     "fixedPrices": "Fixed prices",
-    "save": "Save",
-    "cancel": "Cancel",
     "packlinkPercent": "Packlink percent",
     "configure": "Configure",
     "allShippingServices": "All shipping services",

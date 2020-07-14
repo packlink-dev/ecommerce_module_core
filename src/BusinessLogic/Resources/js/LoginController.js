@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -43,6 +45,8 @@ var Packlink = window.Packlink || {};
         const login = (event) => {
             event.preventDefault();
 
+            Packlink.utilityService.showSpinner();
+
             ajaxService.post(configuration.submit, {apiKey: event.target['apiKey'].value}, successfulLogin, failedLogin);
 
             return false;
@@ -75,7 +79,7 @@ var Packlink = window.Packlink || {};
 
         const successfulLogin = (response) => {
             if (response.success) {
-                state.goToState('onboarding');
+                state.goToState('onboarding-state');
             } else {
                 failedLogin();
             }
@@ -83,6 +87,7 @@ var Packlink = window.Packlink || {};
 
         const failedLogin = () => {
             Packlink.validationService.setError(inputElem, errorMessage);
+            Packlink.utilityService.hideSpinner();
         };
     }
 

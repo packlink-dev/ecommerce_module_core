@@ -32,4 +32,16 @@ class UrlService
 
         return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/resources/{$filePath}";
     }
+
+    /**
+     * Returns the URL to the homepage.
+     *
+     * @return string
+     */
+    public static function getHomepage()
+    {
+        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+
+        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/index.php";
+    }
 }

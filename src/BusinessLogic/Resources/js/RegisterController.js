@@ -17,6 +17,7 @@ if (!window.Packlink) {
             utilityService = Packlink.utilityService,
             translationService = Packlink.translationService,
             validationService = Packlink.validationService,
+            responseService = Packlink.responseService,
             templateId = 'pl-register-page';
 
         let form,
@@ -40,9 +41,9 @@ if (!window.Packlink) {
 
             templateService.getComponent('pl-register-platform-country', registerPage).value = country;
 
-            initInputField('pl-register-email', validationService.validateEmail);
-            initInputField('pl-register-password', validationService.validatePasswordLength);
-            initInputField('pl-register-phone', validationService.validatePhone);
+            initInputField('pl-register-email');
+            initInputField('pl-register-password');
+            initInputField('pl-register-phone');
             initInputField('pl-register-shipment-volume');
             initInputField('pl-register-terms-and-conditions');
         };
@@ -59,7 +60,7 @@ if (!window.Packlink) {
          *  }} response
          */
         const populateInitialValues = (response) => {
-            let emailInput = templateService.getComponent('pl-register-email'),
+            const emailInput = templateService.getComponent('pl-register-email'),
                 phoneInput = templateService.getComponent('pl-register-phone'),
                 sourceInput = templateService.getComponent('pl-register-source');
 
@@ -80,18 +81,17 @@ if (!window.Packlink) {
          * Initializes the input field. Attaches proper event listeners.
          *
          * @param {string} componentSelector
-         * @param {*} [specificValidationCallback]
          */
-        const initInputField = (componentSelector, specificValidationCallback) => {
+        const initInputField = (componentSelector) => {
             let input = templateService.getComponent(componentSelector);
 
             input.addEventListener('blur', () => {
-                validateInput(input, specificValidationCallback);
+                validationService.validateInputField(input);
                 enableSubmit();
             }, true);
 
             input.addEventListener('input', () => {
-                clearErrors(input);
+                validationService.removeError(input);
             });
 
             input.addEventListener('change', () => {
@@ -115,37 +115,6 @@ if (!window.Packlink) {
         };
 
         /**
-         * Validates the input. It checks if the value is set and additionally uses the provided validation function.
-         *
-         * @param {Element|string} selector
-         * @param {function(Element)} [additionalValidation]
-         */
-        const validateInput = (selector, additionalValidation) => {
-            let input = typeof selector === 'string' ? templateService.getComponent(selector) : selector;
-
-            if (!validationService.validateRequiredField(input)
-                || (additionalValidation && !additionalValidation(input))
-            ) {
-                input.setAttribute('data-pl-contains-errors', '1');
-            } else {
-                clearErrors(input);
-            }
-        };
-
-        /**
-         * Removes errors from the input field.
-         *
-         * @param {Element} input
-         */
-        const clearErrors = (input) => {
-            if (input.hasAttribute('data-pl-contains-errors')) {
-                input.removeAttribute('data-pl-contains-errors');
-            }
-
-            validationService.removeError(input);
-        };
-
-        /**
          * Enables or disables the submit button.
          */
         const enableSubmit = () => {
@@ -161,11 +130,7 @@ if (!window.Packlink) {
         };
 
         const validateForm = () => {
-            validateInput('pl-register-email', validationService.validateEmail);
-            validateInput('pl-register-password', validationService.validatePasswordLength);
-            validateInput('pl-register-phone', validationService.validatePhone);
-            validateInput('pl-register-shipment-volume');
-            validateInput('pl-register-terms-and-conditions');
+            validationService.validateForm(form);
 
             enableSubmit();
         };
@@ -181,6 +146,7 @@ if (!window.Packlink) {
             validateForm();
 
             if (form.querySelectorAll('[data-pl-contains-errors]').length === 0) {
+                utilityService.showSpinner();
                 ajaxService.post(
                     configuration.submit,
                     {
@@ -194,7 +160,7 @@ if (!window.Packlink) {
                         'marketing_emails': !!event.target['marketing_emails'].checked,
                     },
                     successfulRegister,
-                    errorHandler
+                    responseService.errorHandler
                 );
             }
 
@@ -208,22 +174,7 @@ if (!window.Packlink) {
          */
         const successfulRegister = (response) => {
             if (response.success) {
-                state.goToState('onboarding');
-            }
-        };
-
-        /**
-         * Handles an error response from the register action.
-         *
-         * @param {{success: boolean, error?: string, messages?: ValidationMessage[]}} response
-         */
-        const errorHandler = (response) => {
-            if (response.error) {
-                utilityService.showFlashMessage(response.error, 'danger', 7000);
-            } else if (response.messages) {
-                validationService.handleValidationErrors(response.messages);
-            } else {
-                utilityService.showFlashMessage('Unknown error occurred.', 'danger', 7000);
+                state.goToState('onboarding-state');
             }
         };
     }

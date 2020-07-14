@@ -15,6 +15,22 @@
     "curlIsNotInstalled": "cURL non installato o abilitato nella tua installazione PHP. È necessario per il corretto funzionamento dell’attività in background. Installalo e aggiorna la pagina.",
     "loading": "Caricamento in corso..."
   },
+  "validation": {
+    "requiredField": "Questo campo è obbligatorio.",
+    "invalidEmail": "Il campo deve essere un email valido.",
+    "shortPassword": "La password deve contenere almeno %s caratteri.",
+    "invalidPhone": "Questo campo deve contenere un numero di telefono valido.",
+    "numeric": "Questo valore deve essere numerico.",
+    "greaterThanZero": "Value must be greater than 0.",
+    "nonNegative": "Field cannot have a negative value.",
+    "numberOfDecimalPlaces": "Il campo deve contenere due decimali.",
+    "integer": "Il campo deve essere un numero intero.",
+    "invalidCountryList": "Devi selezionare i paesi di destinazione.",
+    "invalidLanguage": "Field is not a valid language.",
+    "invalidPlatformCountry": "Field is not a valid platform country.",
+    "invalidUrl": "Field must be a valid URL.",
+    "invalidFieldValue": "Field must be set to \"%s\"."
+  },
   "login": {
     "dontHaveAccount?": "Non hai un account?",
     "register": "Registrati",
@@ -24,12 +40,6 @@
     "apiKey": "API Key",
     "logIn": "Accedi",
     "apiKeyIncorrect": "API Key non corretta"
-  },
-  "validation": {
-    "requiredField": "Questo campo è obbligatorio.",
-    "invalidEmail": "Il campo deve essere un email valido.",
-    "shortPassword": "La password deve contenere almeno %s caratteri.",
-    "invalidPhone": "Questo campo deve contenere un numero di telefono valido."
   },
   "register": {
     "logIn": "Log in",
@@ -67,14 +77,12 @@
     "startSetUp": "Start set up"
   },
   "onboardingOverview": {
-    "header": "Almost there! Please check that the information entered is <br> correct, or complete it in order to continue.",
+    "header": "Almost there! Please check that the information entered is correct, or complete it in order to continue.",
     "parcelDetails": "Parcel details",
     "senderAddress": "Sender's Address",
     "missingInfo": "Missing information",
-    "complete": "Complete",
-    "edit": "Edit",
-    "continue": "Continue",
-    "myShipmentServices": "My shipment services"
+    "parcelData": "Weight %s kg | Height %s cm | Width %s cm | Length %s cm",
+    "warehouseData": "%s | %s | %s"
   },
   "defaultParcel": {
     "weight": "Weight",

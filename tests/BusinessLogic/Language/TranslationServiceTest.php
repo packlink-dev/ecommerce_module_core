@@ -140,7 +140,7 @@ class TranslationServiceTest extends TestCase
      */
     public function testTranslateToGermanNestedKeyWithPlaceholders()
     {
-        $key = 'namespace_nestedKeyWithPlaceholder';
+        $key = 'namespace.nestedKeyWithPlaceholder';
         $translation = $this->translationService->translate($key, array(1, 2));
 
         $this->assertEquals('Test1 1, test2 2.', $translation);

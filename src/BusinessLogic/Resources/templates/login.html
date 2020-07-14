@@ -1,5 +1,5 @@
 <div class="pl-login-page pl-flex-expand">
-    <div class="pl-flex-expand pl-text-center pl-page-padding">
+    <div class="pl-flex-expand pl-page-padding pl-medium-page pl-center">
         <div class="pl-bottom-separate">
             <h1 class="pl-text-center">
                 {$login.welcome}
@@ -20,14 +20,14 @@
             </button>
         </form>
     </div>
-    <div class="pl-full-width pl-login-footer pl-page-padding">
-        <div>
-            <strong>{$login.dontHaveAccount}</strong>
-        </div>
-        <div class="pl-desktop-only">
-            {$login.chooseYourCountry}
-        </div>
-        <div>
+    <div class="pl-full-width pl-login-footer pl-page-padding pl-text-center">
+        <div class="pl-medium-page">
+            <div>
+                <strong>{$login.dontHaveAccount}</strong>
+            </div>
+            <div class="pl-desktop-only">
+                {$login.chooseYourCountry}
+            </div>
             <button type="submit" name="register" class="pl-button pl-button-inverted" id="pl-go-to-register">
                 {$login.registerMe}
             </button>

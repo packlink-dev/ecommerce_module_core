@@ -48,6 +48,6 @@ class RegistrationControllerTest extends BaseTestWithServices
 
         $this->assertEquals('test@test.com', $data['email']);
         $this->assertEquals('1111111111111', $data['phone']);
-        $this->assertEquals('00000000000', $data['source']);
+        $this->assertEquals('localhost:7000', $data['source']);
     }
 }

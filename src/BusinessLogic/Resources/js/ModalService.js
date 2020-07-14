@@ -59,7 +59,7 @@ if (!window.Packlink) {
          */
         this.close = () => {
             if (!config.onClose || config.onClose()) {
-                templateService.getMainPage().removeChild(modal);
+                modal.remove();
             }
         };
 
@@ -98,7 +98,7 @@ if (!window.Packlink) {
                 });
             }
 
-            templateService.getMainPage().appendChild(modal);
+            templateService.getMainPage().parentNode.appendChild(modal);
             if (config.onOpen) {
                 config.onOpen(modal);
             }

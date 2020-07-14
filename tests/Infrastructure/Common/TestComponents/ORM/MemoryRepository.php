@@ -102,7 +102,7 @@ class MemoryRepository implements RepositoryInterface
      */
     public function save(Entity $entity)
     {
-        $id = MemoryStorage::generateId();
+        $id = $this->generateId();
         $entity->setId($id);
         $this->saveEntityToStorage($entity);
 
@@ -194,6 +194,16 @@ class MemoryRepository implements RepositoryInterface
     protected function deleteFromStorage($key)
     {
         unset(MemoryStorage::$storage[$key]);
+    }
+
+    /**
+     * Generates a new ID.
+     *
+     * @return int
+     */
+    protected function generateId()
+    {
+        return MemoryStorage::generateId();
     }
 
     /**

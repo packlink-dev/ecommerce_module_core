@@ -15,6 +15,22 @@
     "curlIsNotInstalled": "cURL non installé ou non activé dans votre installation PHP. Cette démarche est nécessaire pour que la tâche de fond fonctionne. Veuillez l’installer et rafraîchir cette page.",
     "loading": "Chargement en cours..."
   },
+  "validation": {
+    "requiredField": "Ce champs est obligatoire.",
+    "invalidEmail": "Le champs doit être une adresse email valide",
+    "shortPassword": "Le mot de passe doit comporter au moins %s lettres.",
+    "invalidPhone": "Ce champs doit contenir un numéro de téléphone valide.",
+    "numeric": "Cette valeur doit être numérique.",
+    "greaterThanZero": "La valeur doit être spérieure à 0.",
+    "nonNegative": "Field cannot have a negative value.",
+    "numberOfDecimalPlaces": "Le champs doit contenir deux décimales.",
+    "integer": "Le champs doit être un nombre entier.",
+    "invalidCountryList": "Veuillez sélectionner les pays de destination.",
+    "invalidLanguage": "Field is not a valid language.",
+    "invalidPlatformCountry": "Field is not a valid platform country.",
+    "invalidUrl": "Field must be a valid URL.",
+    "invalidFieldValue": "Field must be set to \"%s\"."
+  },
   "login": {
     "dontHaveAccount?": "Vous n'avez pas de compte?",
     "register": "S'inscrire",
@@ -24,12 +40,6 @@
     "apiKey": "Clé API",
     "logIn": "Se connecter",
     "apiKeyIncorrect": "Clé API incorrecte"
-  },
-  "validation": {
-    "requiredField": "Ce champs est obligatoire.",
-    "invalidEmail": "Le champs doit être une adresse email valide",
-    "shortPassword": "Le mot de passe doit comporter au moins %s lettres.",
-    "invalidPhone": "Ce champs doit contenir un numéro de téléphone valide."
   },
   "register": {
     "logIn": "Se connecter",
@@ -67,14 +77,12 @@
     "startSetUp": "Start set up"
   },
   "onboardingOverview": {
-    "header": "Almost there! Please check that the information entered is <br> correct, or complete it in order to continue.",
+    "header": "Almost there! Please check that the information entered is correct, or complete it in order to continue.",
     "parcelDetails": "Parcel details",
     "senderAddress": "Sender's Address",
     "missingInfo": "Missing information",
-    "complete": "Complete",
-    "edit": "Edit",
-    "continue": "Continue",
-    "myShipmentServices": "My shipment services"
+    "parcelData": "Weight %s kg | Height %s cm | Width %s cm | Length %s cm",
+    "warehouseData": "%s | %s | %s"
   },
   "defaultParcel": {
     "weight": "Weight",

@@ -5,15 +5,12 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-session_start();
-
 Configuration::setCurrentLanguage('es');
 $lang = Configuration::getCurrentLanguage() ?: 'en';
 
 ?>
 <!DOCTYPE html>
-<html lang="<?php
-echo $lang ?>">
+<html lang="<?php echo $lang ?>">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo UI</title>
@@ -31,18 +28,21 @@ echo $lang ?>">
             box-sizing: border-box;
         }
 
-        body {
-            padding: 10px 10px 10px 250px;
+        #pl-page {
+            margin: 10px 10px 10px 250px;
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 0;
+            #pl-page {
+                margin: 0;
             }
         }
     </style>
 </head>
 <body>
+<a style="position: absolute; left: 10px; top:10px; z-index: 1" id="logout"
+   href="<?php
+   echo UrlService::getEndpointUrl('Login', 'logout') ?>">Logout</a>
 
 <!-- This is a main placeholder that should be used in all integrations -->
 <div id="pl-page">
@@ -99,19 +99,22 @@ echo $lang ?>">
 <script src="./resources/js/TemplateService.js"></script>
 <script src="./resources/js/UtilityService.js"></script>
 <script src="./resources/js/ValidationService.js"></script>
+<script src="./resources/js/ResponseService.js"></script>
 <script src="./resources/js/FooterController.js"></script>
 <script src="./resources/js/StateController.js"></script>
+<script src="./resources/js/PageControllerFactory.js"></script>
 
 <script src="./resources/js/LoginController.js"></script>
 <script src="./resources/js/RegisterModalController.js"></script>
 <script src="./resources/js/RegisterController.js"></script>
 
+<script src="./resources/js/OnboardingStateController.js"></script>
+<script src="./resources/js/OnboardingWelcomeController.js"></script>
+<script src="./resources/js/OnboardingOverviewController.js"></script>
 <script src="./resources/js/DefaultParcelController.js"></script>
 <script src="./resources/js/DefaultWarehouseController.js"></script>
-<script src="./resources/js/OrderStateMappingController.js"></script>
-<script src="./resources/js/PageControllerFactory.js"></script>
+
 <script src="./resources/js/ShippingMethodsController.js"></script>
-<script src="./resources/js/CountrySelectorController.js"></script>
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/';
@@ -125,18 +128,6 @@ echo $lang ?>">
             };
 
             Packlink.models = {};
-
-            Packlink.errorMsgs = {
-                required: 'This field is required.',
-                numeric: 'Value must be valid number.',
-                invalid: 'This field is not valid.',
-                phone: 'This field must be valid phone number.',
-                titleLength: 'Title can have at most 64 characters.',
-                greaterThanZero: 'Value must be greater than 0.',
-                numberOfDecimalPlaces: 'Field must have 2 decimal places.',
-                integer: 'Field must be an integer.',
-                invalidCountryList: 'You must select destination countries.'
-            };
 
             Packlink.successMsgs = {
                 shippingMethodSaved: 'Shipping service successfully saved.'
@@ -157,6 +148,7 @@ echo $lang ?>">
                     listOfCountriesUrl: "<?php echo UrlService::getEndpointUrl('Country', 'get') ?>",
                     registrationDataUrl: "<?php echo UrlService::getEndpointUrl('Registration', 'get') ?>",
                     registrationSubmitUrl: "<?php echo UrlService::getEndpointUrl('Registration', 'post') ?>",
+                    getOnboardingStateUrl: "<?php echo UrlService::getEndpointUrl('Onboarding', 'getCurrentState') ?>",
                     dashboardGetStatusUrl: "<?php echo UrlService::getEndpointUrl('Dashboard', 'getStatus') ?>",
                     defaultParcelGetUrl: "<?php echo UrlService::getEndpointUrl(
                         'DefaultParcel',
@@ -227,7 +219,27 @@ echo $lang ?>">
                         },
                         'pl-register-modal': <?php echo json_encode(
                             file_get_contents($baseResourcesPath . 'Resources/templates/registerModal.html')
-                        ) ?>
+                        ) ?>,
+                        'pl-onboarding-welcome-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-welcome.html')
+                            ) ?>
+                        },
+                        'pl-onboarding-overview-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/onboarding-overview.html')
+                            ) ?>
+                        },
+                        'pl-default-parcel-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/default-parcel.html')
+                            ) ?>
+                        },
+                        'pl-default-warehouse-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'Resources/templates/default-warehouse.html')
+                            ) ?>
+                        }
                     },
                 }
             );

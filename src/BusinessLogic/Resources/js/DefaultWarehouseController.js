@@ -1,30 +1,45 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
+    /**
+     * @typedef {{
+     *  id: string,
+     *  alias: string,
+     *  name: string,
+     *  surname: string,
+     *  city: string,
+     *  phone: string,
+     *  country: string,
+     *  company: string,
+     *  postal_code: string,
+     *  address: string}} Warehouse
+     */
+
+    /**
+     * @param {{getUrl: string, submitUrl: string, getSupportedCountriesUrl: string, searchPostalCodesUrl: string}} configuration
+     *
+     * @constructor
+     */
     function DefaultWarehouseController(configuration) {
-        const warehouseFields = [
+        const templateService = Packlink.templateService,
+            utilityService = Packlink.utilityService,
+            ajaxService = Packlink.ajaxService,
+            pageId = 'pl-default-warehouse-page';
+
+        const modelFields = [
             'alias',
             'name',
             'surname',
             'company',
+            'country',
+            'postal_code',
             'address',
             'phone',
             'email'
         ];
 
-        const requiredFields = [
-            'alias',
-            'name',
-            'surname',
-            'address',
-            'phone',
-            'email'
-        ];
-
-        let templateService = Packlink.templateService;
-        let utilityService = Packlink.utilityService;
-        let ajaxService = Packlink.ajaxService;
-        let state = Packlink.state;
         let page;
 
         let currentCountry;
@@ -36,93 +51,59 @@ var Packlink = window.Packlink || {};
         let countryInput = null;
         let postalCodeInput = null;
 
-        /**
-         * Displays page content.
-         */
-        this.display = function () {
-            page = templateService.setTemplate('pl-default-warehouse-template');
-            utilityService.showSpinner();
-            ajaxService.get(configuration.getUrl, constructPage);
+        // change parent's properties and methods
+        const parent = new Packlink.DefaultParcelController(configuration);
+        parent.modelFields = modelFields;
+        parent.pageId = pageId;
+        parent.pageKey = 'defaultWarehouse';
+
+        const parentConstruct = parent.constructPage;
+
+        parent.constructPage = (response) => {
+            page = templateService.getMainPage();
+            parentConstruct(response);
+            setSpecificFields(response);
         };
 
         /**
-         * Attaches event handler to submit button.
-         * Fills form with existing warehouse data retrieved from server.
+         * Gets the form field values model.
          *
-         * @param response
+         * @param {HTMLElement} form
+         * @return {{}}
          */
-        function constructPage(response) {
-            currentCountry = response['country'];
+        parent.getFormFields = (form) => {
+            let model = {};
 
-            for (let field of warehouseFields) {
-                let input = templateService.getComponent('pl-default-warehouse-' + field, page);
-                input.addEventListener('blur', onBlurHandler, true);
-                input.addEventListener('focus', onPostalCodeBlur);
-
-                if (response[field]) {
-                    input.value = response[field];
-                }
+            for (let field of modelFields) {
+                model[field] = form[field].value;
             }
 
-            constructPostalCodeInput(response['postal_code'], response['city']);
+            return model;
+        };
 
-            let submitButton = templateService.getComponent(
-                'pl-default-warehouse-submit-btn',
-                page
-            );
+        this.display = parent.display;
 
-            submitButton.addEventListener('click', handleSubmitButtonClicked, true);
+        /**
+         * Sets up specific fields.
+         *
+         * @param {Warehouse} warehouse
+         */
+        const setSpecificFields = (warehouse) => {
+            currentCountry = warehouse.country;
+
+            constructPostalCodeInput(warehouse.postal_code, warehouse.city);
+
             utilityService.hideSpinner();
 
             ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
-        }
-
-        /**
-         * Constructs postal code input and attaches event handlers to it.
-         *
-         * @param {string} postalCode
-         * @param {string} city
-         */
-        function constructPostalCodeInput(postalCode, city) {
-            postalCodeInput = templateService.getComponent('pl-default-warehouse-postal_code', page);
-            if (postalCode && city) {
-                currentPostalCode = postalCode;
-                currentCity = city;
-                postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
-            }
-
-            postalCodeInput.addEventListener('focus', onPostalCodeFocus);
-            postalCodeInput.addEventListener(
-                'click',
-                function (event) {
-                    event.stopPropagation();
-                }
-            );
-            document.addEventListener('click', onPostalCodeBlur);
-            postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
-            postalCodeInput.addEventListener('keyup', autocompleteNavigate);
-            postalCodeInput.addEventListener(
-                'focusout',
-                function () {
-                    postalCodeInput.value = ' ';
-                },
-                true);
-
-            templateService.getComponent('data-pl-id', page, 'search-icon').addEventListener(
-                'click',
-                function (event) {
-                    event.stopPropagation();
-                    postalCodeInput.focus();
-                }
-            );
-        }
+        };
 
         /**
          * Builds a warehouse country dropdown and populates it with all supported countries.
          *
-         * @param response
+         * @param {{}} response
          */
-        function constructCountryDropdown(response) {
+        const constructCountryDropdown = (response) => {
             countryInput = templateService.getComponent('pl-default-warehouse-country', page);
 
             let defaultOption = document.createElement('option');
@@ -135,8 +116,9 @@ var Packlink = window.Packlink || {};
                     continue;
                 }
 
-                let supportedCountry = response[code],
-                    optionElement = document.createElement('option');
+                /** @var {{name: string, code: string, postal_code: string, platform_country: string}} */
+                const supportedCountry = response[code];
+                const optionElement = document.createElement('option');
 
                 optionElement.value = supportedCountry.code;
                 optionElement.innerText = supportedCountry.name;
@@ -149,20 +131,59 @@ var Packlink = window.Packlink || {};
             }
 
             countryInput.addEventListener('change', onCountryChange);
-        }
+        };
 
-        function onCountryChange() {
+        /**
+         * Resets the postal code input.
+         */
+        const onCountryChange = () => {
             currentCountry = countryInput.value;
             currentPostalCode = '';
             currentCity = '';
-        }
+        };
 
-        function onPostalCodeFocus() {
-            postalCodeInput.value = '';
+
+        /**
+         * Constructs postal code input and attaches event handlers to it.
+         *
+         * @param {string} postalCode
+         * @param {string} city
+         */
+        const constructPostalCodeInput = (postalCode, city) => {
+            postalCodeInput = templateService.getComponent('pl-default-warehouse-postal_code', page);
+            if (postalCode && city) {
+                currentPostalCode = postalCode;
+                currentCity = city;
+                postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+            }
+
+            postalCodeInput.addEventListener('focus', onPostalCodeFocus);
+            postalCodeInput.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            page.addEventListener('click', onPostalCodeBlur);
+            postalCodeInput.addEventListener('keyup', utilityService.debounce(250, onPostalCodeSearch));
+            postalCodeInput.addEventListener('keyup', autocompleteNavigate);
+            postalCodeInput.addEventListener('focusout', () => {
+                if (postalCodeInput.value) {
+                    // reset the value
+                    postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
+                }
+            }, true);
+
+            postalCodeInput.parentElement.querySelector('i').addEventListener('click', (event) => {
+                event.stopPropagation();
+                postalCodeInput.focus();
+            });
+        };
+
+        const onPostalCodeFocus = () => {
+            postalCodeInput.value = currentPostalCode;
             searchTerm = '';
-        }
+        };
 
-        function onPostalCodeBlur(event) {
+        const onPostalCodeBlur = (event) => {
             if (event) {
                 event.stopPropagation();
             }
@@ -173,14 +194,9 @@ var Packlink = window.Packlink || {};
             if (autocompleteList) {
                 autocompleteList.remove();
             }
+        };
 
-            postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
-            if (currentPostalCode !== '' && currentCity !== '') {
-                templateService.removeError(postalCodeInput);
-            }
-        }
-
-        function onPostalCodeSearch(event) {
+        const onPostalCodeSearch = (event) => {
             searchTerm = event.target.value;
             if (searchTerm.length < 3 || [13, 27, 38, 40].indexOf(event.keyCode) !== -1) {
                 return;
@@ -190,11 +206,10 @@ var Packlink = window.Packlink || {};
                 query: searchTerm,
                 country: countryInput.value
             }, renderPostalCodesAutocomplete);
-        }
+        };
 
-        function renderPostalCodesAutocomplete(response) {
+        const renderPostalCodesAutocomplete = (response) => {
             let oldAutocomplete = templateService.getComponent('pl-postal-codes-autocomplete', page);
-
             if (oldAutocomplete) {
                 oldAutocomplete.remove();
             }
@@ -208,21 +223,21 @@ var Packlink = window.Packlink || {};
             createAutoCompleteListElements(newAutoComplete, response);
 
             postalCodeInput.after(newAutoComplete);
-        }
+        };
 
-        function createAutoCompleteNode() {
+        const createAutoCompleteNode = () => {
             let node = document.createElement('ul');
             node.classList.add('pl-autocomplete-list');
             node.setAttribute('id', 'pl-postal-codes-autocomplete');
 
             return node;
-        }
+        };
 
-        function createAutoCompleteListElements(autoCompleteList, data) {
+        const createAutoCompleteListElements = (autoCompleteList, data) => {
             for (let elem of data) {
                 let listElement = document.createElement('li');
 
-                listElement.classList.add('pl-autocomplete-element');
+                listElement.classList.add('pl-autocomplete-list-item');
                 listElement.setAttribute('data-pl-postal_code', elem['zipcode']);
                 listElement.setAttribute('data-pl-city', elem['city']);
 
@@ -239,30 +254,32 @@ var Packlink = window.Packlink || {};
 
             let firstElem = autoCompleteList.firstChild;
             if (firstElem) {
-                firstElem.classList.add('focus');
+                firstElem.classList.add('pl-focus');
             }
-        }
+        };
 
-        function onAutoCompleteFocusChange(event, autoCompleteList) {
+        const onAutoCompleteFocusChange = (event, autoCompleteList) => {
             for (let listElement of autoCompleteList.childNodes) {
-                if (listElement.classList && listElement.classList.contains('focus')) {
-                    listElement.classList.remove('focus');
+                if (listElement.classList && listElement.classList.contains('pl-focus')) {
+                    listElement.classList.remove('pl-focus');
                 }
             }
 
-            event.target.classList.add('focus');
-        }
+            event.target.classList.add('pl-focus');
+        };
 
-        function onPostalCodeSelected(event) {
+        const onPostalCodeSelected = (event) => {
             currentCity = event.target.getAttribute('data-pl-city');
             currentPostalCode = event.target.getAttribute('data-pl-postal_code');
 
             postalCodeInput.value = currentPostalCode + ' - ' + currentCity;
-        }
+        };
 
-        function autocompleteNavigate(event) {
+        const autocompleteNavigate = (event) => {
+            // noinspection JSDeprecatedSymbols
+            const keyCode = event.keyCode;
             //esc
-            if (event.keyCode === 27) {
+            if (keyCode === 27) {
                 postalCodeInput.blur();
                 page.click();
 
@@ -274,185 +291,40 @@ var Packlink = window.Packlink || {};
                 return true;
             }
 
-            let focused = autocomplete.querySelector('.focus');
-
+            let focused = autocomplete.querySelector('.pl-focus');
             if (!focused) {
                 return true;
             }
 
-            //enter
-            if (event.keyCode === 13) {
-                postalCodeInput.blur();
-                focused.click();
-
-                return true;
+            switch (keyCode) {
+                case 13:
+                    //enter
+                    postalCodeInput.blur();
+                    focused.click();
+                    break;
+                case 38:
+                    // up arrow
+                    focusAutocompleteItem(focused.previousSibling, focused);
+                    break;
+                case 40:
+                    // down arrow
+                    focusAutocompleteItem(focused.nextSibling, focused);
+                    break;
             }
+        };
 
-            // up arrow
-            if (event.keyCode === 38) {
-                let prevSibling = focused.previousSibling;
-                if (prevSibling) {
-                    prevSibling.scrollIntoView({
-                        behavior: 'auto',
-                        block: 'center',
-                        inline: 'center'
-                    });
-                    prevSibling.classList.add('focus');
-                    focused.classList.remove('focus');
-                }
-
-                return true;
+        const focusAutocompleteItem = (nextItem, prevItem) => {
+            if (nextItem) {
+                nextItem.scrollIntoView({
+                    behavior: 'auto',
+                    block: 'center',
+                    inline: 'center'
+                });
+                nextItem.classList.add('pl-focus');
+                prevItem.classList.remove('pl-focus');
             }
-
-            // down arrow
-            if (event.keyCode === 40) {
-                let nextSibling = focused.nextSibling;
-                if (nextSibling) {
-                    nextSibling.scrollIntoView({
-                        behavior: 'auto',
-                        block: 'center',
-                        inline: 'center'
-                    });
-                    nextSibling.classList.add('focus');
-                    focused.classList.remove('focus');
-                }
-            }
-        }
-
-        /**
-         * Handles on blur action.
-         *
-         * @param event
-         */
-        function onBlurHandler(event) {
-            let value = event.target.value;
-            let field = event.target.getAttribute('id').split('-')[3];
-
-            if (!value && requiredFields.indexOf(field) !== -1) {
-                templateService.setError(event.target, Packlink.errorMsgs.required);
-            } else {
-                if (field === 'phone') {
-                    if (!isPhoneValid(value)) {
-                        templateService.setError(event.target, Packlink.errorMsgs.phone);
-                    } else {
-                        templateService.removeError(event.target);
-                    }
-                } else {
-                    templateService.removeError(event.target);
-                }
-            }
-        }
-
-        /**
-         * Handles event when submit button is clicked.
-         */
-        function handleSubmitButtonClicked() {
-            let model = getFormattedWarehouseInput();
-            let isValid = true;
-
-            for (let field of warehouseFields) {
-                if (model[field] === null) {
-                    templateService.setError(
-                        templateService.getComponent('pl-default-warehouse-' + field, page),
-                        Packlink.errorMsgs.required
-                    );
-                    isValid = false;
-                } else {
-                    templateService.removeError(templateService.getComponent('pl-default-warehouse-' + field, page));
-                }
-            }
-
-            if (!currentCity || !currentPostalCode) {
-                isValid = false;
-                templateService.setError(postalCodeInput, Packlink.errorMsgs.required);
-            } else {
-                templateService.removeError(postalCodeInput);
-            }
-
-            if (isValid) {
-                utilityService.showSpinner();
-                model['country'] = currentCountry;
-                model['postal_code'] = currentPostalCode;
-                model['city'] = currentCity;
-
-                ajaxService.post(
-                    configuration.submitUrl,
-                    model,
-                    function () {
-                        utilityService.hideSpinner();
-
-                        if (configuration.fromStep) {
-                            state.stepFinished();
-                        }
-                    },
-                    function (response) {
-                        for (let field in response) {
-                            if (response.hasOwnProperty(field)) {
-                                let input = templateService.getComponent('pl-default-warehouse-' + field, page);
-                                if (input) {
-                                    templateService.setError(input, response[field]);
-                                }
-                            }
-                        }
-
-                        utilityService.hideSpinner();
-                    });
-            }
-        }
-
-        /**
-         * Retrieves formatted input from default warehouse form.
-         *
-         * @return {object}
-         */
-        function getFormattedWarehouseInput() {
-            let model = {};
-
-            for (let field of warehouseFields) {
-                let value = getInputValue('pl-default-warehouse-' + field);
-                if (value === '' && requiredFields.indexOf(field) !== -1) {
-                    value = null;
-                }
-
-                if (value && field === 'phone' && !isPhoneValid(value)) {
-                    value = null;
-                }
-
-                model[field] = value;
-            }
-
-            return model;
-        }
-
-        /**
-         * Retrieves input field's value.
-         *
-         * @param {string} input
-         * @return {string}
-         */
-        function getInputValue(input) {
-            return templateService.getComponent(input, page).value;
-        }
-
-        /**
-         * Validates phone number.
-         *
-         * @param {string} value
-         * @return {boolean}
-         */
-        function isPhoneValid(value) {
-            let regex = /^(\+|\/|\.|-|\(|\)|\d)+$/gm;
-
-            if (!regex.test(value)) {
-                return false;
-            }
-
-            let number = /\d/gm;
-
-            return (value.match(number) || []).length > 2;
-        }
+        };
     }
-
 
     Packlink.DefaultWarehouseController = DefaultWarehouseController;
 })();

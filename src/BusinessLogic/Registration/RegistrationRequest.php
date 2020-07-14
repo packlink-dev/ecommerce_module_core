@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Registration;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\Utility\DtoValidator;
 
 /**
@@ -88,7 +89,7 @@ class RegistrationRequest extends FrontDto
      *
      * @var array
      */
-    public $marketplaces;
+    public $marketplaces = array();
     /**
      * Fields for this DTO.
      *
@@ -213,7 +214,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'email',
-                'Field must be a valid email.'
+                Translator::translate('validation.invalidEmail')
             );
         }
 
@@ -221,7 +222,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'password',
-                'The password must be at least 6 characters long.'
+                Translator::translate('validation.shortPassword', array(6))
             );
         }
 
@@ -231,7 +232,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'estimated_delivery_volume',
-                'Field is not a valid delivery volume.'
+                Translator::translate('register.invalidDeliveryVolume')
             );
         }
 
@@ -239,7 +240,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'phone',
-                'Field must be a valid phone number.'
+                Translator::translate('validation.invalidPhone')
             );
         }
 
@@ -247,7 +248,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'language',
-                'Field is not a valid language.'
+                Translator::translate('validation.invalidLanguage')
             );
         }
 
@@ -257,7 +258,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'platform_country',
-                'Field is not a valid platform country.'
+                Translator::translate('validation.invalidPlatformCountry')
             );
         }
 
@@ -265,7 +266,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'source',
-                'Field must be a valid URL.'
+                Translator::translate('validation.invalidUrl')
             );
         }
 
@@ -273,7 +274,7 @@ class RegistrationRequest extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'platform',
-                'Field must be set to "PRO".'
+                Translator::translate('validation.invalidFieldValue', array('PRO'))
             );
         }
     }

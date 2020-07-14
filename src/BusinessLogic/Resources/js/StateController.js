@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -17,6 +19,7 @@ var Packlink = window.Packlink || {};
      *      listOfCountriesUrl: string,
      *      registrationDataUrl: string,
      *      registrationSubmitUrl: string,
+     *      getOnboardingStateUrl: string,
      *      autoConfigureStartUrl: string,
      *      dashboardGetStatusUrl: string,
      *      defaultParcelGetUrl: string,
@@ -51,8 +54,27 @@ var Packlink = window.Packlink || {};
         let utilityService = Packlink.utilityService;
         let templateService = Packlink.templateService;
         let context = '';
+        let currentState = '';
+        let previousState = '';
 
         let pageConfiguration = {
+            'login': {
+                submit: configuration.loginUrl,
+                listOfCountriesUrl: configuration.listOfCountriesUrl,
+                logoPath: configuration.logoPath
+            },
+            'register': {
+                getRegistrationData: configuration.registrationDataUrl,
+                submit: configuration.registrationSubmitUrl
+            },
+            'onboarding-state': {
+                getState: configuration.getOnboardingStateUrl
+            },
+            'onboarding-welcome': {},
+            'onboarding-overview': {
+                defaultParcelGet: configuration.defaultParcelGetUrl,
+                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
+            },
             'default-parcel': {
                 getUrl: configuration.defaultParcelGetUrl,
                 submitUrl: configuration.defaultParcelSubmitUrl
@@ -90,15 +112,6 @@ var Packlink = window.Packlink || {};
             'footer': {
                 getDebugStatusUrl: configuration.debugGetStatusUrl,
                 setDebugStatusUrl: configuration.debugSetStatusUrl
-            },
-            'login': {
-                submit: configuration.loginUrl,
-                listOfCountriesUrl: configuration.listOfCountriesUrl,
-                logoPath: configuration.logoPath
-            },
-            'register': {
-                getRegistrationData: configuration.registrationDataUrl,
-                submit: configuration.registrationSubmitUrl
             }
         };
 
@@ -142,7 +155,7 @@ var Packlink = window.Packlink || {};
          * Navigates to a state.
          *
          * @param {string} controller
-         * @param {array|null} additionalConfig
+         * @param {object|null} additionalConfig
          */
         this.goToState = (controller, additionalConfig = null) => {
             let dp = pageControllerFactory.getInstance(
@@ -153,7 +166,12 @@ var Packlink = window.Packlink || {};
             if (dp) {
                 dp.display(additionalConfig);
             }
-        };
+
+            previousState = currentState;
+            currentState = controller;
+        }
+
+        this.getPreviousState = () => previousState;
 
         /**
          * Returns context.
@@ -179,7 +197,7 @@ var Packlink = window.Packlink || {};
                     break;
 
                 case 'onBoarding':
-                    this.goToState('onboarding');
+                    this.goToState('onboarding-state');
                     break;
                 default:
                     this.goToState('shipping-methods');

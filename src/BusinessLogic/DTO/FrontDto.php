@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class FrontDto.
@@ -114,14 +115,27 @@ abstract class FrontDto extends DataTransferObject
     protected static function validateRequiredFields(array $payload, array &$validationErrors)
     {
         foreach (static::$requiredFields as $field) {
-            if (empty($payload[$field])) {
+            if (!static::isFieldSet($payload, $field)) {
                 $validationErrors[] = static::getValidationError(
                     ValidationError::ERROR_REQUIRED_FIELD,
                     $field,
-                    'Field is required.'
+                    Translator::translate('validation.requiredField')
                 );
             }
         }
+    }
+
+    /**
+     * Checks if a required field is set in payload.
+     *
+     * @param array $payload The input payload.
+     * @param string $field Field code.
+     *
+     * @return bool TRUE if field is set; otherwise, false;
+     */
+    protected static function isFieldSet(array $payload, $field)
+    {
+        return isset($payload[$field]);
     }
 
     /**

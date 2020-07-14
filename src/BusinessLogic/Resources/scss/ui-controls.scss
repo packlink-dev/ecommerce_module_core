@@ -1,9 +1,22 @@
 #pl-page {
-  > header {
+  header {
     border-bottom: 1px solid $border-color;
     padding: 20px;
     display: flex;
     align-items: center;
+
+    &.pl-sub-header {
+      border-color: $color-light;
+      flex-direction: row;
+
+      button {
+        z-index: 1;
+      }
+
+      h1 {
+        margin: 0 0 0 -$icon-button-size;
+      }
+    }
   }
 
   > main {
@@ -11,7 +24,7 @@
     flex-grow: 1;
   }
 
-  .pl-button {
+  button, .pl-button {
     overflow: visible;
     display: inline-flex;
     padding: 16px;
@@ -34,7 +47,7 @@
     justify-content: center;
     margin: 10px 0 0;
     height: auto;
-    width: 170px;
+    min-width: 170px;
 
     &.pl-button-primary {
       background-color: $color-blue;
@@ -54,6 +67,7 @@
     &.pl-small {
       padding: 5px;
       width: 100px;
+      min-width: 100px;
       margin: 0;
     }
 
@@ -113,13 +127,16 @@
       &.compact {
         padding: 13px 16px;
       }
+
+      ::placeholder, ::-webkit-input-placeholder {
+        color: $color-light;
+      }
     }
 
     select {
-      height: 50px;
       border: 1px solid $border-color;
       line-height: 50px;
-      padding: 7px 0 0 15px;
+      padding: 7px 0 0 11px;
       background-color: $color-white;
       color: $input-control-color;
       font-size: 12px;
@@ -137,8 +154,31 @@
     i {
       position: absolute;
       right: 10px;
-      top: 13px;
+      top: 18px;
       color: $border-color;
+    }
+
+    .pl-autocomplete-list {
+      background-color: $color-white;
+      border: 1px solid $border-color;
+      width: 100%;
+      margin-top: 57px;
+      position: absolute;
+      z-index: 1;
+      max-height: 200px;
+      overflow: auto;
+
+      .pl-autocomplete-list-item {
+        width: 100%;
+        padding: 5px;
+        font-size: 15px;
+        cursor: pointer;
+
+        &:hover, &.pl-focus {
+          background-color: $color-little-transparent;
+          color: $color-blue;
+        }
+      }
     }
   }
 
@@ -242,7 +282,7 @@
   }
 
   .pl-spinner {
-    position: fixed;
+    position: absolute;
     z-index: 500;
     background-color: $color-semi-transparent;
     display: flex;

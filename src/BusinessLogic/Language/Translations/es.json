@@ -13,7 +13,29 @@
     "help": "Ayuda",
     "downloadSystemInfoFile": "Descargar el archivo de información del sistema",
     "curlIsNotInstalled": "cURL no está instalado ni habilitado en tu instalación de PHP. Es necesario para que funcione la tarea en segundo plano. Por favor, instálalo y luego actualiza esta página.",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "saveChanges": "Guardar cambios",
+    "cancel": "Cancel",
+    "continue": "Continuar",
+    "complete": "Completar",
+    "edit": "Editar"
+  },
+  "validation": {
+    "requiredField": "Esta campo es obligatorio.",
+    "invalidEmail": "El campo debe ser un correo electrónico válido.",
+    "shortPassword": "La contraseña debe contener %s caracteres como mínimo.",
+    "invalidPhone": "Este campo deber ser un número de teléfono válido.",
+    "numeric": "Debe ser un valor numérico.",
+    "greaterThanZero": "El valor debe ser mayor que 0.",
+    "nonNegative": "Field cannot have a negative value.",
+    "numberOfDecimalPlaces": "El campo debe tener 2 decimales.",
+    "integer": "El campo debe ser un número entero.",
+    "invalidCountryList": "Debes seleccionar los países de destino.",
+    "invalidLanguage": "Field is not a valid language.",
+    "invalidPlatformCountry": "Field is not a valid platform country.",
+    "invalidUrl": "Field must be a valid URL.",
+    "invalidFieldValue": "Field must be set to \"%s\"."
   },
   "login": {
     "apiKey": "Api key",
@@ -24,12 +46,6 @@
     "validateApiKey": "Validar API key",
     "chooseYourCountry": "Elige tu país para comenzar el registro",
     "registerMe": "Registrarme"
-  },
-  "validation": {
-    "requiredField": "Esta campo es obligatorio.",
-    "invalidEmail": "El campo debe ser un correo electrónico válido.",
-    "shortPassword": "La contraseña debe contener %s caracteres como mínimo.",
-    "invalidPhone": "Este campo deber ser un número de teléfono válido."
   },
   "register": {
     "logIn": "Iniciar sesión",
@@ -67,68 +83,45 @@
     "startSetUp": "Comenzar con la configuración"
   },
   "onboardingOverview": {
-    "header": "Ya casi estamos. Por favor, comprueba que la información es <br> correcta o complétala para continuar.",
+    "header": "Ya casi estamos. Por favor, comprueba que la información es correcta o complétala para continuar.",
     "parcelDetails": "Detalle del paquete",
     "senderAddress": "Dirección del remitente",
     "missingInfo": "Faltan datos",
-    "complete": "Completar",
-    "edit": "Editar",
-    "continue": "Continuar",
-    "myShipmentServices": "My shipment services"
+    "parcelData": "Peso %s kg | Alto %s cm | Ancho %s cm | Largo %s cm",
+    "warehouseData": "%s | %s | %s"
   },
   "defaultParcel": {
+    "title-onboarding": "1. Configurar los detalles del paquete",
+    "description-onboarding": "Utilizaremos estos datos predeterminados <strong>para los artículos que no tengan dimensiones y peso definidos.</strong> Podrás editarlos cuando quieras desde la pestaña de configuración.",
+    "title-config": "Paquete predeterminado",
+    "description-config": "Utilizaremos estos datos <strong>para los artículos que no tengan dimensiones y peso definidos.</strong>",
     "weight": "Peso",
     "height": "Alto",
     "width": "Ancho",
-    "length": "Largo",
-    "save": "Guardar"
+    "length": "Largo"
   },
-  "onboardingParcel": {
-    "header": "Configurar los detalles del paquete",
-    "info": "Utilizaremos estos datos predeterminados para <strong>los artículos <br> que no tengan dimensiones y peso definidos.</strong> Podrás editarlos <br> cuando quieras desde la pestaña de configuración."
-  },
-  "dashboard": {
-    "almostThere": "¡Ya casi está!",
-    "detailsSynced": "Datos sincronizados con tu cuenta Packlink PRO",
-    "setDefaultParcel": "Establece el paquete que más usas",
-    "setDefaultWarehouse": "Establece la dirección predefinida",
-    "justFewMoreSteps": "Te queda muy poco para completar la configuración",
-    "selectShippingServices": "Selecciona los servicios de envío"
-  },
-  "warehouseSettings": {
-    "defaultWarehouse": "Dirección predefinida",
-    "setDefaultWarehouse": "Establece la dirección predefinida",
-    "defaultWarehouseAddress": "Usaremos la dirección predefinida como la dirección del remitente. Puedes editarla en cualquier momento.",
-    "warehouseName": "Dirección predefinida",
-    "contactPersonName": "Nombre de la persona de contacto",
-    "contactPersonSurname": "Apellido de la persona de contacto",
-    "companyName": "Nombre de la empresa",
-    "cityOrPostal": "Ciudad o código postal",
+  "defaultWarehouse": {
+    "title-onboarding": "2. Configurar la dirección del remitente ",
+    "description-onboarding": "Utilizaremos esta dirección para crear un <strong>remitente por defecto que valga para todos los envíos.</strong> Podrás editarla cuando quieras desde la pestaña de configuración.",
+    "title-config": "Dirección del remitente por defecto",
+    "description-config": "Utilizaremos esta <strong>dirección para crear un remitente por defecto<strong> que valga para todos los envíos.",
+    "alias": "Nombre del almacén",
+    "alias-placeholder": "Almacen principal",
+    "name": "Nombre de la persona de contacto",
+    "name-placeholder": "Nombe de la persona",
+    "surname": "Apellido de la persona de contacto",
+    "surname-placeholder": "Apellido de la persona",
+    "company": "Nombre de la empresa",
+    "company-placeholder": "Empresa S.A.",
+    "country": "País",
+    "postal_code": "Ciudad o código postal",
+    "postal_code-placeholder": "-",
     "address": "Dirección",
-    "phone": "Teléfono",
-    "email": "Email",
-    "saveChanges": "Guardar cambios",
-    "fieldRequired": "Esta campo es obligatorio.",
-    "fieldValidNumber": "Debe ser un valor numérico.",
-    "fieldInvalid": "Este campo no es válido.",
-    "fieldTwoDecimals": "El campo debe tener 2 decimales.",
-    "fieldInteger": "El campo debe ser un número entero.",
-    "fieldValidEmail": "El campo debe ser un correo electrónico válido.",
-    "postalCodeNotCorrect.": "El código postal no es correcto.",
-    "fieldValidPhone": "Este campo deber ser un número de teléfono válido."
-  },
-  "parcelSettings": {
-    "defaultParcel": "Paquete predefinido",
-    "setDefaultParcel": "Establece el paquete que más usas",
-    "defaultParcelInfo": "Usaremos el paquete que has definido como el más usado en el caso de que algún artículo no tenga las dimensiones y el peso definidas. Puedes editar esta información en cualquier momento.",
-    "weight": "Peso",
-    "width": "Anchura",
-    "length": "Longitud",
-    "height": "Altura",
-    "valuePositive": "El valor debe ser mayor que 0.",
-    "saveChanges": "Guardar cambios",
-    "weightMustBePositive": "El peso debe ser un número decimal positivo.",
-    "fieldMustBePositive": "Este campo debe ser un número entero positivo."
+    "address-placeholder": "Dirección",
+    "phone": "Número de teléfono",
+    "phone-placeholder": "123 456 7777",
+    "email": "Correo electrónico",
+    "email-placeholder": "tucorreo@example.com"
   },
   "mapOrderStatuses": {
     "mapStatuses": "Sincronización de estados",
@@ -166,8 +159,6 @@
     "packlinkPrices": "Precios de Packlink",
     "percentagePacklinkPrices": "% sobre los precios de Packlink",
     "fixedPrices": "Precios fijos",
-    "save": "Guardar",
-    "cancel": "Cancelar",
     "packlinkPercent": "Porcentaje de Packlink",
     "configure": "Configurar",
     "allShippingServices": "Todos los servicios de envío",
