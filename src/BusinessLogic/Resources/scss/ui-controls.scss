@@ -402,6 +402,15 @@
     }
   }
 
+  .pl-table-resize-handle {
+    position: absolute;
+    bottom: 0;
+    width: 3px;
+    cursor: col-resize;
+    float: right;
+    right: 20px;
+  }
+
   .pl-error {
     input, select {
       border: 2px solid $color-red !important;

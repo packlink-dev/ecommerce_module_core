@@ -108,6 +108,7 @@ echo $lang ?>">
 <script src="./resources/js/TemplateService.js"></script>
 <script src="./resources/js/UtilityService.js"></script>
 <script src="./resources/js/ValidationService.js"></script>
+<script src="./resources/js/GridResizerService.js"></script>
 <script src="./resources/js/ResponseService.js"></script>
 <script src="./resources/js/FooterController.js"></script>
 <script src="./resources/js/StateController.js"></script>
