@@ -76,6 +76,7 @@ class ShippingMethodConfiguration extends DataTransferObject
             'isShipToAllCountries' => $this->isShipToAllCountries,
             'shippingCountries' => $this->shippingCountries,
             'usePacklinkPriceIfNotInRange' => $this->usePacklinkPriceIfNotInRange,
+            'pricingPolicies' => array(),
         );
 
         if ($this->pricingPolicies) {

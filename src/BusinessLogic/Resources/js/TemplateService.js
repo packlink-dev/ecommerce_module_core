@@ -34,7 +34,7 @@ if (!window.Packlink) {
          * @param {Element} [element]
          * @param {string|int} [attribute]
          *
-         * @return {Element}
+         * @return {HTMLElement}
          */
         this.getComponent = (component, element, attribute) => {
             if (!element) {

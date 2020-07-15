@@ -41,7 +41,6 @@
     line-height: 16px;
     font-weight: 400;
     font-style: normal;
-    vertical-align: baseline;
     color: $text-color;
     box-sizing: border-box;
 
@@ -93,10 +92,6 @@
   table {
     border-collapse: collapse;
     border-spacing: 0;
-
-    td:not([align]), th:not([align]) {
-      text-align: left
-    }
   }
 
   a {

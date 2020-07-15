@@ -148,6 +148,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
         self::assertCount(2, $this->shippingMethodService->getAllMethods());
+        self::assertCount(2, $this->shippingMethodService->getInactiveMethods());
 
         $this->shippingMethodService->activate($method->getId());
 

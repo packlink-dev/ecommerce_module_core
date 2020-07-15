@@ -53,7 +53,7 @@ if (!window.Packlink) {
             const submitBtn = templateService.getComponent('pl-onboarding-overview-button');
             submitBtn.disabled = !defaultParcel.weight || !defaultWarehouse.postal_code;
             submitBtn.addEventListener('click', () => {
-                state.goToState('shipping-methods');
+                state.goToState('my-shipping-services');
             });
 
             Packlink.utilityService.hideSpinner();

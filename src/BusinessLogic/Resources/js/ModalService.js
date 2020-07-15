@@ -6,7 +6,7 @@ if (!window.Packlink) {
     /**
      * @typedef ButtonConfig
      * @property {string} title
-     * @property {string[]} [cssClass]
+     * @property {string[]} [cssClasses]
      * @property {function()} onClick
      */
 
@@ -46,9 +46,9 @@ if (!window.Packlink) {
          */
         const createButton = (button) => {
             const buttonElem = document.createElement('button');
-            const cssClasses = button.cssClass ? ['pl-button', ...button.cssClass] : ['pl-button'];
+            const cssClasses = button.cssClasses ? ['pl-button', ...button.cssClasses] : ['pl-button'];
 
-            buttonElem.classList.add(cssClasses.join(' '));
+            buttonElem.className = cssClasses.join(' ');
             buttonElem.addEventListener('click', button.onClick);
             buttonElem.innerHTML = button.title;
 

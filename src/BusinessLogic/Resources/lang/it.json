@@ -152,8 +152,8 @@
     "delivered": "Consegnato",
     "cancelled": "Annullato"
   },
-  "shippingServicesSettings": {
-    "filterServices": "Filtra i servizi",
+  "shippingServices": {
+    "pickShippingService": "Add delivery services",
     "type": "Tipo",
     "national": "Nazionale",
     "international": "Internazionale",
@@ -162,10 +162,14 @@
     "express": "Espresso",
     "parcelOrigin": "Origine del pacco",
     "collection": "Ritiro a domicilio",
-    "dropOff": "Ritiro in punto corriere",
+    "dropoff": "Ritiro in punto corriere",
     "parcelDestination": "Destinazione pacco",
-    "pickUp": "Consegna al domicilio",
+    "pickup": "Consegna al domicilio",
     "delivery": "Consegna in punto corriere",
+    "packlinkPrices": "Prezzi di Packlink"
+  },
+  "shippingServicesSettings": {
+    "filterServices": "Filtra i servizi",
     "addServiceTitle": "Aggiungi il titolo del servizio",
     "titleWillBeVisible": "Questo titolo sarà visibile ai tuoi clienti",
     "serviceTitle": "Titolo del servizio",
@@ -173,7 +177,6 @@
     "showCarrierLogo": "Mostra logo del corriere ai miei clienti",
     "selectPricingPolicy": "Seleziona la politica dei prezzi",
     "choosePricingPolicy": "Scegli la politica dei prezzi da mostrare ai tuoi clienti",
-    "packlinkPrices": "Prezzi di Packlink",
     "percentagePacklinkPrices": "% dei prezzi di Packlink",
     "fixedPrices": "Prezzo fisso",
     "save": "Salva",

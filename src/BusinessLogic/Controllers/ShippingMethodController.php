@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
+use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -29,9 +30,13 @@ class ShippingMethodController
      */
     const PICKUP = 'pickup';
     /**
+     * Collection constant
+     */
+    const COLLECTION = 'collection';
+    /**
      * Home constant
      */
-    const HOME = 'home';
+    const DELIVERY = 'delivery';
     /**
      * Shipping type: national
      */
@@ -70,13 +75,27 @@ class ShippingMethodController
      */
     public function getAll()
     {
-        $all = $this->shippingMethodService->getAllMethods();
-        $result = array();
-        foreach ($all as $item) {
-            $result[] = $this->transformShippingMethodModelToDto($item);
-        }
+        return $this->getResponse($this->shippingMethodService->getAllMethods());
+    }
 
-        return $result;
+    /**
+     * Returns all shipping methods.
+     *
+     * @return ShippingMethodResponse[] Array of shipping methods.
+     */
+    public function getActive()
+    {
+        return $this->getResponse($this->shippingMethodService->getActiveMethods());
+    }
+
+    /**
+     * Returns all shipping methods.
+     *
+     * @return ShippingMethodResponse[] Array of shipping methods.
+     */
+    public function getInactive()
+    {
+        return $this->getResponse($this->shippingMethodService->getInactiveMethods());
     }
 
     /**
@@ -138,6 +157,23 @@ class ShippingMethodController
     }
 
     /**
+     * Transforms shipping methods to the response.
+     *
+     * @param ShippingMethod[] $methods Shipping methods to transform.
+     *
+     * @return ShippingMethodResponse[] Array of shipping methods.
+     */
+    protected function getResponse($methods)
+    {
+        $result = array();
+        foreach ($methods as $item) {
+            $result[] = $this->transformShippingMethodModelToDto($item);
+        }
+
+        return $result;
+    }
+
+    /**
      * Transforms ShippingMethod model class to ShippingMethod DTO.
      *
      * @param ShippingMethod $item Shipping method model to be transformed.
@@ -148,22 +184,22 @@ class ShippingMethodController
     {
         $shippingMethod = new ShippingMethodResponse();
         $shippingMethod->id = $item->getId();
-        $shippingMethod->selected = $item->isActivated();
+        $shippingMethod->name = $item->getTitle();
         $shippingMethod->logoUrl = $item->getLogoUrl();
         $shippingMethod->showLogo = $item->isDisplayLogo();
-        $shippingMethod->title = $item->isNational() ? static::NATIONAL : static::INTERNATIONAL;
+        $shippingMethod->type = $item->isNational() ? static::NATIONAL : static::INTERNATIONAL;
         $shippingMethod->carrierName = $item->getCarrierName();
-        $shippingMethod->deliveryDescription = ($item->isExpressDelivery() ? 'Express' : 'Economic') . ' '
-            . $item->getDeliveryTime();
+        $shippingMethod->deliveryDescription = mb_strtolower($item->getDeliveryTime()) . ' - '
+            . Translator::translate(
+                'shippingServices.' . ($item->isExpressDelivery() ? static::EXPRESS : static::ECONOMIC)
+            );
         $shippingMethod->deliveryType = $item->isExpressDelivery() ? static::EXPRESS : static::ECONOMIC;
-        $shippingMethod->name = $item->getTitle();
-        $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::HOME;
-        $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::PICKUP;
+        $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::COLLECTION;
+        $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::PICKUP : static::DELIVERY;
         $shippingMethod->taxClass = $item->getTaxClass();
         $shippingMethod->shippingCountries = $item->getShippingCountries();
         $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
         $shippingMethod->pricingPolicies = $item->getPricingPolicies();
-        $shippingMethod->logoUrl = $item->getLogoUrl();
 
         return $shippingMethod;
     }

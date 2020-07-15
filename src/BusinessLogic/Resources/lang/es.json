@@ -19,7 +19,9 @@
     "cancel": "Cancel",
     "continue": "Continuar",
     "complete": "Completar",
-    "edit": "Editar"
+    "add": "Añadir",
+    "edit": "Editar",
+    "delete": "Borrar"
   },
   "validation": {
     "requiredField": "Esta campo es obligatorio.",
@@ -153,8 +155,10 @@
     "cancelled": "Cancelado",
     "statusSetByPacklink": "Estado establecido por Packlink PRO."
   },
-  "shippingServicesSettings": {
-    "filterServices": "Filtrar servicios",
+  "shippingServices": {
+    "pickShippingService": "Añadir servicios de envío",
+    "filterModalTitle": "Filtros",
+    "applyFilters": "Aplicar",
     "type": "Tipo",
     "national": "Nacional",
     "international": "Internacional",
@@ -163,14 +167,23 @@
     "express": "Express",
     "parcelOrigin": "Origen",
     "collection": "Recogida",
-    "dropOff": "Drop off",
+    "dropoff": "Drop off",
     "parcelDestination": "Destino",
-    "pickUp": "Pick up",
+    "pickup": "Pick up",
     "delivery": "Entrega",
+    "serviceTitle": "Nombre del servicio",
+    "carrier": "Transportista",
+    "carrierLogo": "Logo del transportista",
+    "transitTime": "Tiempo de tránsito",
+    "origin": "Origen",
+    "destination": "Destino",
+    "myPrices": "Mis precios",
+    "packlinkPrices": "Precios de Packlink"
+  },
+  "shippingServicesSettings": {
+    "filterServices": "Filtrar servicios",
     "addServiceTitle": "Añadir nombre de servicio",
     "titleWillBeVisible": "Este nombre será visible para tus clientes.",
-    "serviceTitle": "Nombre del servicio",
-    "carrierLogo": "Logo del transportista",
     "showCarrierLogo": "Mostrar logo del transportista a mis clientes.",
     "selectPricingPolicy": "Seleccionar política de precios",
     "choosePricingPolicy": "Elige la política de precios para mostrar a tus clientes.",
@@ -183,10 +196,6 @@
     "selectedShippingServices": "Servicios de envío seleccionados",
     "select": "Seleccionar",
     "shippingServices": "Servicios de envío",
-    "carrier": "Transportista",
-    "transitTime": "Tiempo de tránsito",
-    "origin": "Origen",
-    "destination": "Destino",
     "showingPercentsResults": "Mostrando %s resultados",
     "setPricingRule": "Establece como fijar el precio",
     "increase": "Incrementar",

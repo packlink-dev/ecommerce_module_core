@@ -110,7 +110,6 @@ echo $lang ?>">
 <script src="./resources/js/ValidationService.js"></script>
 <script src="./resources/js/GridResizerService.js"></script>
 <script src="./resources/js/ResponseService.js"></script>
-<script src="./resources/js/FooterController.js"></script>
 <script src="./resources/js/StateController.js"></script>
 <script src="./resources/js/PageControllerFactory.js"></script>
 
@@ -128,91 +127,89 @@ echo $lang ?>">
 <script src="./resources/js/SystemInfoController.js"></script>
 <script src="./resources/js/OrderStatusMappingController.js"></script>
 
-<script src="./resources/js/ShippingMethodsController.js"></script>
-<!--suppress JSCheckFunctionSignatures -->
+<script src="./resources/js/MyShippingServicesController.js"></script>
+<script src="./resources/js/PickShippingServiceController.js"></script>
+<script src="./resources/js/ShippingServicesRenderer.js"></script>
+
 <script>
     <?php
     $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/Resources/';
     ?>
-    document.addEventListener('DOMContentLoaded', () => {
-        Packlink.translations = {
-            default: <?php echo file_get_contents($baseResourcesPath . 'lang/en.json') ?>,
-            current: <?php $langFile = $baseResourcesPath . 'lang/' . $lang . '.json';
-            echo file_exists($langFile) ? file_get_contents($langFile) : ''
-            ?>,
-        };
+    document.addEventListener(
+        'DOMContentLoaded',
+        () => {
+            Packlink.translations = {
+                default: <?php echo file_get_contents($baseResourcesPath . 'lang/en.json') ?>,
+                current: <?php $langFile = $baseResourcesPath . 'lang/' . $lang . '.json';
+                echo file_exists($langFile) ? file_get_contents($langFile) : ''
+                ?>,
+            };
 
-        Packlink.models = {};
-
-        Packlink.successMsgs = {
-            shippingMethodSaved: 'Shipping service successfully saved.'
-        };
-
-        Packlink.state = new Packlink.StateController(
-            {
-                scrollConfiguration: {
-                    rowHeight: 75,
-                    scrollOffset: 0
+            const pageConfiguration = {
+                'login': {
+                    submit: "<?php getUrl('Login', 'login') ?>",
+                    listOfCountriesUrl: "<?php getUrl('Country', 'get') ?>",
+                    logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>"
                 },
+                'register': {
+                    getRegistrationData: "<?php getUrl('Registration', 'get') ?>",
+                    submit: "<?php getUrl('Registration', 'post') ?>"
+                },
+                'onboarding-state': {
+                    getState: "<?php getUrl('Onboarding', 'getCurrentState') ?>"
+                },
+                'onboarding-welcome': {},
+                'onboarding-overview': {
+                    defaultParcelGet: "<?php getUrl('DefaultParcel', 'getDefaultParcel') ?>",
+                    defaultWarehouseGet: "<?php getUrl('DefaultWarehouse', 'getDefaultWarehouse') ?>"
+                },
+                'default-parcel': {
+                    getUrl: "<?php getUrl('DefaultParcel', 'getDefaultParcel') ?>",
+                    submitUrl: "<?php getUrl('DefaultParcel', 'setDefaultParcel') ?>"
+                },
+                'default-warehouse': {
+                    getUrl: "<?php getUrl('DefaultWarehouse', 'getDefaultWarehouse') ?>",
+                    getSupportedCountriesUrl: "<?php getUrl('DefaultWarehouse', 'getSupportedCountries') ?>",
+                    submitUrl: "<?php getUrl('DefaultWarehouse', 'setDefaultWarehouse') ?>",
+                    searchPostalCodesUrl: "<?php getUrl('DefaultWarehouse', 'searchPostalCodes') ?>"
+                },
+                'configuration': {
+                    getDataUrl: "<?php getUrl('Configuration', 'getData')?>"
+                },
+                'system-info': {
+                    getStatusUrl: "<?php getUrl('Debug', 'getStatus') ?>",
+                    setStatusUrl: "<?php getUrl('Debug', 'setStatus') ?>"
+                },
+                'order-status-mapping': {
+                    getMappingAndStatusesUrl: "<?php getUrl('OrderStatusMapping', 'getMappingAndStatuses') ?>",
+                    setUrl: "<?php getUrl('OrderStatusMapping', 'setMappings') ?>"
+                },
+                'my-shipping-services': {
+                    getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>"
+                },
+                'pick-shipping-service': {
+                    getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>"
+                },
+                'edit-shipping-service': {
+                    hasTaxConfiguration: false,
+                    hasCountryConfiguration: true,
+                    canDisplayCarrierLogos: true
+                }
+            };
 
-                hasTaxConfiguration: false,
-                hasCountryConfiguration: true,
-                logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>",
-
-                stateUrl: "<?php getUrl('ModuleState', 'getCurrentState') ?>",
-
-                // login and register
-                loginUrl: "<?php getUrl('Login', 'login') ?>",
-                listOfCountriesUrl: "<?php getUrl('Country', 'get') ?>",
-                registrationDataUrl: "<?php getUrl('Registration', 'get') ?>",
-                registrationSubmitUrl: "<?php getUrl('Registration', 'post') ?>",
-
-                // onboarding
-                getOnboardingStateUrl: "<?php getUrl('Onboarding', 'getCurrentState') ?>",
-
-                // parcel
-                defaultParcelGetUrl: "<?php getUrl('DefaultParcel', 'getDefaultParcel') ?>",
-                defaultParcelSubmitUrl: "<?php getUrl('DefaultParcel', 'setDefaultParcel') ?>",
-
-                // warehouse
-                defaultWarehouseGetUrl: "<?php getUrl('DefaultWarehouse', 'getDefaultWarehouse') ?>",
-                getSupportedCountriesUrl: "<?php getUrl('DefaultWarehouse', 'getSupportedCountries') ?>",
-                defaultWarehouseSubmitUrl: "<?php getUrl('DefaultWarehouse', 'setDefaultWarehouse') ?>",
-                defaultWarehouseSearchPostalCodesUrl: "<?php getUrl('DefaultWarehouse', 'searchPostalCodes') ?>",
-
-                // configuration
-                configurationGetDataUrl: "<?php getUrl('Configuration', 'getData')?>",
-
-                // system info
-                debugGetStatusUrl: "<?php getUrl('Debug', 'getStatus') ?>",
-                debugSetStatusUrl: "<?php getUrl('Debug', 'setStatus') ?>",
-
-                // order status mapping
-                orderStatusMappingsGetMappingsAndStatusesUrl: "<?php getUrl(
-                    'OrderStatusMapping',
-                    'getMappingAndStatuses'
-                ) ?>",
-                orderStatusMappingsSaveUrl: "<?php getUrl('OrderStatusMapping', 'setMappings') ?>",
-
-                // shipping services
-                dashboardGetStatusUrl: "<?php getUrl('Dashboard', 'getStatus') ?>",
-                shippingMethodsGetStatusUrl: "<?php getUrl('ShippingMethods', 'getTaskStatus') ?>",
-                shippingMethodsGetAllUrl: "<?php getUrl('ShippingMethods', 'getAll') ?>",
-                shippingMethodsActivateUrl: "<?php getUrl('ShippingMethods', 'activate') ?>",
-                shippingMethodsDeactivateUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
-                shippingMethodsSaveUrl: "<?php getUrl('ShippingMethods', 'save') ?>",
-                autoConfigureStartUrl: "<?php getUrl('AutoConfigure', 'start') ?>",
-                getShippingCountriesUrl: "<?php getUrl('ShippingCountries', 'getAll') ?>",
-
-                templates: {
-                    'pl-login-page': {
-                        'pl-main-page-holder': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'templates/login.html')
-                        ) ?>
-                    },
-                    'pl-register-page': {
-                        'pl-main-page-holder': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'templates/register.html')
+            Packlink.state = new Packlink.StateController(
+                {
+                    stateUrl: "<?php getUrl('ModuleState', 'getCurrentState') ?>",
+                    pageConfiguration: pageConfiguration,
+                    templates: {
+                        'pl-login-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/login.html')
+                            ) ?>
+                        },
+                        'pl-register-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/register.html')
                             ) ?>
                         },
                         'pl-register-modal': <?php echo json_encode(
@@ -233,38 +230,51 @@ echo $lang ?>">
                                 file_get_contents($baseResourcesPath . 'templates/default-parcel.html')
                             ) ?>
                         },
-                    'pl-default-warehouse-page': {
-                        'pl-main-page-holder': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'templates/default-warehouse.html')
-                        ) ?>
-                    },
-                    'pl-configuration-page': {
-                        'pl-main-page-holder': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'templates/configuration.html')
+                        'pl-default-warehouse-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/default-warehouse.html')
+                            ) ?>
+                        },
+                        'pl-configuration-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/configuration.html')
+                            ) ?>,
+                            'pl-header-section': ''
+                        },
+                        'pl-order-status-mapping-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/order-status-mapping.html')
+                            ) ?>,
+                            'pl-header-section': ''
+                        },
+                        'pl-system-info-modal': <?php echo json_encode(
+                            file_get_contents($baseResourcesPath . 'templates/system-info-modal.html')
                         ) ?>,
-                        'pl-header-section': ''
-                    },
-                    'pl-order-status-mapping-page': {
-                        'pl-main-page-holder': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'templates/order-status-mapping.html')
-                        ) ?>,
-                        'pl-header-section': ''
-                    },
-                    'pl-system-info-modal': <?php echo json_encode(
-                        file_get_contents($baseResourcesPath . 'templates/system-info-modal.html')
-                    ) ?>,
-                    'pl-shipping-methods-page': {
-                        'pl-main-page-holder': '',
-                        'pl-header-section': <?php echo json_encode(
-                            file_get_contents($baseResourcesPath . 'templates/shipping-methods-header.html')
-                        ) ?>
-                    }
+                        'pl-my-shipping-services-page': {
+                            'pl-main-page-holder': '',
+                            'pl-header-section': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/shipping-methods-header.html')
+                            ) ?>
+                        },
+                        'pl-pick-service-page': {
+                            'pl-header-section': '',
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/pick-shipping-services.html')
+                            ) ?>,
+                            'pl-shipping-services-table': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/shipping-services-table.html')
+                            ) ?>,
+                            'pl-shipping-services-list': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/shipping-services-list.html')
+                            ) ?>
+                        }
                     },
                 }
             );
 
             Packlink.state.display();
-        }, false
+        },
+        false
     );
 </script>
 </body>

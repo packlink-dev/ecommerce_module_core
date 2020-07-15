@@ -67,13 +67,31 @@ class ShippingMethodService extends BaseService
     }
 
     /**
-     * Returns all shipping methods for current user.
+     * Returns all configured shipping methods for current user.
      *
-     * @return ShippingMethod[] All shipping methods.
+     * @return ShippingMethod[] Active shipping methods.
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getActiveMethods()
     {
         $filter = $this->setFilterCondition(new QueryFilter(), 'activated', Operators::EQUALS, true);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $filter->orderBy('carrierName');
+
+        return $this->select($filter);
+    }
+
+    /**
+     * Returns all shipping methods that are not configured.
+     *
+     * @return ShippingMethod[] Inactive shipping methods.
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function getInactiveMethods()
+    {
+        $filter = $this->setFilterCondition(new QueryFilter(), 'activated', Operators::EQUALS, false);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $filter->orderBy('carrierName');
 
         return $this->select($filter);
     }

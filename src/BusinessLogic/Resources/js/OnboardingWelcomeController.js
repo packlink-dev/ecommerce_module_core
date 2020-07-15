@@ -22,6 +22,8 @@ if (!window.Packlink) {
                     'nextState': 'default-warehouse',
                 });
             });
+
+            Packlink.utilityService.hideSpinner();
         };
     }
 

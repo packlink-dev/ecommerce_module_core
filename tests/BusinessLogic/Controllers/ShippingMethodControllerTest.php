@@ -146,14 +146,13 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $instance = new ShippingMethodResponse();
         $instance->id = 12;
         $instance->name = 'First name test';
-        $instance->title = 'title';
+        $instance->type = 'national';
         $instance->carrierName = 'carrier';
         $instance->deliveryDescription = 'description';
         $instance->parcelOrigin = 'pick-up';
         $instance->parcelDestination = 'drop-off';
         $instance->logoUrl = 'url';
         $instance->showLogo = false;
-        $instance->selected = false;
         $instance->pricingPolicies[] = ShippingPricePolicy::fromArray(
             array(
                 'range_type' => ShippingPricePolicy::RANGE_PRICE,
@@ -168,14 +167,13 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertNotEmpty($data);
         self::assertEquals($instance->id, $data['id']);
         self::assertEquals($instance->name, $data['name']);
-        self::assertEquals($instance->title, $data['title']);
+        self::assertEquals($instance->type, $data['type']);
         self::assertEquals($instance->carrierName, $data['carrierName']);
         self::assertEquals($instance->deliveryDescription, $data['deliveryDescription']);
         self::assertEquals($instance->parcelOrigin, $data['parcelOrigin']);
         self::assertEquals($instance->parcelDestination, $data['parcelDestination']);
         self::assertEquals($instance->logoUrl, $data['logoUrl']);
         self::assertEquals($instance->showLogo, $data['showLogo']);
-        self::assertEquals($instance->selected, $data['selected']);
         self::assertCount(1, $instance->pricingPolicies);
     }
 

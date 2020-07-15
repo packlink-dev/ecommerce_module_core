@@ -45,7 +45,7 @@ if (!window.Packlink) {
                 backButton = mainPage.querySelector('.pl-sub-header button');
 
             backButton.addEventListener('click', () => {
-                state.goToState('shipping-methods');
+                state.goToState('my-shipping-services');
             });
 
             mainPage.querySelector('#pl-navigate-order-status').addEventListener('click', () => {

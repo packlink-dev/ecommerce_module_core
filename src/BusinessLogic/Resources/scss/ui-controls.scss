@@ -78,13 +78,6 @@
       }
     }
 
-    &.pl-small {
-      padding: 5px;
-      width: 100px;
-      min-width: 100px;
-      margin: 0;
-    }
-
     &.pl-button-inverted {
       background-color: $color-white;
       color: $color-navy-dark;
@@ -100,6 +93,41 @@
       color: $color-gray;
       background-color: $color-light;
       pointer-events: none;
+    }
+
+    &.pl-small {
+      padding: 5px;
+      width: 100px;
+      min-width: 100px;
+      margin: 5px 0;
+    }
+  }
+
+  .pl-icon-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: $icon-button-size;
+    height: $icon-button-size;
+    min-width: $icon-button-size;
+    margin: 0;
+
+    i {
+      font-size: 20px;
+      width: auto;
+      color: $color-blue;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      i {
+        color: $color-white;
+      }
     }
   }
 
@@ -392,8 +420,7 @@
       .pl-modal-footer {
         display: flex;
         flex-direction: row;
-        border-top: 1px solid $border-color;
-        padding: 20px 0;
+        padding: 20px 0 0;
 
         .pl-button + .pl-button {
           margin-left: 10px;
@@ -425,6 +452,87 @@
       color: $color-red;
     }
   }
+
+  .pl-shipping-services-table {
+    width: 100%;
+
+    th {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+
+      &.pl-text-center {
+        text-align: center;
+      }
+    }
+
+    td {
+      font-weight: 600;
+
+      .pl-service-name {
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+    }
+
+    tr {
+      border-top: solid 1px $border-light;
+      border-bottom: solid 1px $border-light;
+    }
+
+    th, td {
+      padding: 15px 20px;
+      text-align: left;
+    }
+  }
+
+  .pl-shipping-services-list {
+    display: none;
+  }
+
+  .pl-shipping-services-list-item {
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    background-color: $color-white;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    margin: 5px;
+    padding: 13px;
+
+    .pl-service-header {
+      border-bottom: 1px dashed $border-color;
+      flex-direction: row;
+      padding-bottom: 13px;
+
+      .pl-service-name {
+        flex-grow: 1;
+        padding-left: 15px;
+        align-items: flex-start;
+        justify-content: center;
+
+        #pl-service-name {
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+      }
+    }
+
+    .pl-wrap-items {
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 13px 0 0;
+
+      .pl-service-property {
+        min-width: 170px;
+        margin-bottom: 13px;
+
+        .pl-property-title {
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
 }
 
 // mobile rules
@@ -435,10 +543,36 @@
     }
 
     .pl-header-holder {
-
       .pl-button {
         display: none;
       }
+    }
+
+    .pl-shipping-services-list-item {
+      .pl-wrap-items .pl-service-property {
+        min-width: 50%;
+      }
+
+      .pl-button {
+        width: 100%;
+
+        &.pl-small {
+          padding: 11px;
+        }
+      }
+    }
+  }
+}
+
+// mobile and tablet rules
+@media (max-width: 1280px) {
+  #pl-page {
+    .pl-shipping-services-table {
+      display: none;
+    }
+
+    .pl-shipping-services-list {
+      display: flex;
     }
   }
 }

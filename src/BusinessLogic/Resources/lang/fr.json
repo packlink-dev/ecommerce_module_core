@@ -152,8 +152,8 @@
     "delivered": "Délivré",
     "cancelled": "Annulé"
   },
-  "shippingServicesSettings": {
-    "filterServices": "Filtrer les services",
+  "shippingServices": {
+    "pickShippingService": "Add delivery services",
     "type": "Type",
     "national": "National",
     "international": "International",
@@ -162,10 +162,14 @@
     "express": "Express",
     "parcelOrigin": "Origine du colis",
     "collection": "Collecte à domicile",
-    "dropOff": "Dépôt en point relais",
+    "dropoff": "Dépôt en point relais",
     "parcelDestination": "Destination du colis",
-    "pickUp": "Point de retrait",
+    "pickup": "Point de retrait",
     "delivery": "Livraison à domicile",
+    "packlinkPrices": "Prix Packlink"
+  },
+  "shippingServicesSettings": {
+    "filterServices": "Filtrer les services",
     "addServiceTitle": "Ajouter un titre de service",
     "titleWillBeVisible": "Ce titre sera visible par vos clients",
     "serviceTitle": "Titre du service",
@@ -173,7 +177,6 @@
     "showCarrierLogo": "Montrer le logo du transporteur à mes clients",
     "selectPricingPolicy": "Sélectionner une politique de prix",
     "choosePricingPolicy": "Choisir la politique de prix à montrer à vos clients",
-    "packlinkPrices": "Prix Packlink",
     "percentagePacklinkPrices": "% des prix Packlink",
     "fixedPrices": "Prix fixes",
     "save": "Enregistrer",

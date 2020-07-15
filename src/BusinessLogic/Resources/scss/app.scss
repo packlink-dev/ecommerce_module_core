@@ -210,6 +210,64 @@
       }
     }
   }
+
+  .pl-services-filter-wrapper {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+
+  .pl-pick-shipping-services-page {
+    #pl-open-filter-button {
+      display: none;
+    }
+  }
+
+  .pl-filter {
+    padding: 20px 0;
+
+    &.pl-filter-selected {
+      display: none;
+    }
+
+    .pl-filter-title {
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      text-align: left;
+      color: $text-heading-color;
+      font-weight: bold;
+    }
+
+    .pl-filter-options {
+      flex-direction: row;
+      justify-content: space-between;
+
+      .pl-filter-option {
+        padding: 6px 13px;
+        border: 1px solid $border-color;
+        border-radius: 13px;
+        cursor: pointer;
+        color: $input-control-color;
+
+        &.pl-selected {
+          border-color: $color-blue;
+          background-color: $color-blue;
+          color: $color-white;
+        }
+
+        & + .pl-filter-option {
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+
+  .pl-modal {
+    .pl-filter:not(:last-child) {
+      padding-bottom: 32px;
+    }
+  }
 }
 
 // mobile rules
@@ -249,5 +307,45 @@
         }
       }
     }
+  }
+}
+
+// tablet and mobile rules
+@media (max-width: 1280px) {
+  #pl-page {
+    .pl-services-filter-wrapper {
+      justify-content: flex-start;
+
+      .pl-filter:not(.pl-filter-selected) {
+        display: none;
+      }
+
+      .pl-filter-selected {
+        flex-direction: row;
+        display: flex;
+
+        .pl-filter-option {
+          flex-direction: row;
+
+          &::after {
+            content: 'X';
+            margin-left: 5px;
+            margin-top: 1px;
+          }
+        }
+      }
+    }
+
+    .pl-pick-shipping-services-page {
+      #pl-open-filter-button {
+        display: flex;
+      }
+    }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
   }
 }

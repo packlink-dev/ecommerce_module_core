@@ -8,6 +8,7 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 /**
  * Class CarrierService
+ *
  * @package Packlink\DemoUI\Services\BusinessLogic
  */
 class CarrierService implements ShopShippingMethodService
@@ -22,9 +23,9 @@ class CarrierService implements ShopShippingMethodService
      */
     public function getCarrierLogoFilePath($carrierName)
     {
-        $assetsRepo = new UrlService();
+        $image = str_replace(' ', '-', mb_strtolower($carrierName));
 
-        return $assetsRepo->getResourceUrl("images/carriers/{$carrierName}.jpg");
+        return UrlService::getResourceUrl("images/carriers/{$image}.png");
     }
 
     /**

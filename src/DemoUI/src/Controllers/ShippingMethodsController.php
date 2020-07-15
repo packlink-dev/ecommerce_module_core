@@ -2,36 +2,51 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\DemoUI\Controllers\Models\Request;
 
 /**
  * Class ShippingMethodsController
+ *
  * @package Packlink\DemoUI\Controllers
  */
-class ShippingMethodsController
+class ShippingMethodsController extends BaseHttpController
 {
     /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     * @var \Packlink\BusinessLogic\Controllers\ShippingMethodController
      */
-    public function getAll(Request $request)
+    private $controller;
+
+    /**
+     * ShippingMethodsController constructor.
+     */
+    public function __construct()
     {
-        echo json_encode(array());
+        $this->controller = new ShippingMethodController();
     }
 
     /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     * Gets active services.
      */
-    public function getTaskStatus(Request $request)
+    public function getActive()
     {
-        echo json_encode(array('status' => 'completed'));
+        $this->outputDtoEntities($this->controller->getActive());
     }
 
     /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     * Gets inactive services.
      */
-    public function activate(Request $request)
+    public function getInactive()
     {
+        $this->outputDtoEntities($this->controller->getInactive());
+    }
 
+    /**
+     * Gets the status of the get services task auto configuration.
+     */
+    public function getTaskStatus()
+    {
+        $this->output(array('status' => 'completed'));
     }
 
     /**
@@ -39,7 +54,9 @@ class ShippingMethodsController
      */
     public function deactivate(Request $request)
     {
+        $payload = $request->getPayload();
 
+        $this->output(array('status' => $this->controller->deactivate($payload['id'])));
     }
 
     /**
