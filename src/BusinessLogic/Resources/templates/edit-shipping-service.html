@@ -1,12 +1,93 @@
 <div class="pl-pick-shipping-services-page pl-page-config">
-    <div class="pl-flex-expand">
-        <header class="pl-sub-header">
-            <button id="pl-back-button" class="pl-icon-button">
-                <i class="material-icons">keyboard_backspace</i>
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1>{$shippingServices.configureService}</h1>
+    </header>
+    <form id="pl-edit-service-form" class="pl-page-padding pl-page-content pl-medium-page">
+        <section>
+            <div class="pl-section-title">
+                {$shippingServices.serviceTitle}
+            </div>
+            <div class="pl-section-subtitle">
+                {$shippingServices.serviceTitleDescription}
+            </div>
+            <div class="pl-form-group">
+                <input id="pl-service-title" type="text" name="name"
+                       data-type="text" data-required="true"/>
+                <label for="pl-service-title">
+                    {$shippingServices.serviceTitle}
+                </label>
+            </div>
+            <div class="pl-checkbox pl-hidden" id="pl-show-logo-group">
+                <input type="checkbox" name="showLogo" id="pl-show-logo">
+                <label for="pl-show-logo">{$shippingServices.showCarrierLogo}</label>
+            </div>
+        </section>
+        <section>
+            <div class="pl-section-title">
+                {$shippingServices.pricePolicy}
+            </div>
+            <div class="pl-section-subtitle">
+                {$shippingServices.pricePolicyDescription}
+            </div>
+            <div class="pl-switch">
+                <label for="pl-configure-prices-button">
+                    <strong>{$shippingServices.configurePricePolicy}</strong>
+                </label>
+                <div class="pl-switch-button" id="pl-configure-prices-button">
+                    <i class="pl-switch-on material-icons">toggle_on</i>
+                    <i class="pl-switch-off material-icons">toggle_off</i>
+                </div>
+            </div>
+            <div id="pl-pricing-policies">
+                // created policies go here //
+            </div>
+        </section>
+        <section id="pl-add-price-section">
+            <div id="pl-first-service-description">
+                {$shippingServices.firstPricePolicyDescription}
+            </div>
+            <button type="button" class="pl-button pl-button-secondary pl-top-separate">
             </button>
-            <h1>{$shippingServices.configureService}</h1>
-        </header>
-        <div class="pl-flex-left">
-        </div>
+        </section>
+        <section id="pl-tax-class-section" class="pl-hidden">
+            <div class="pl-section-title">
+                {$shippingServices.taxClassTitle}
+            </div>
+            <div class="pl-form-group">
+                <select class="pl-with-label"
+                        name="tax"
+                        id="pl-tax-class-select"
+                        data-required="true">
+                </select>
+                <i class="material-icons">expand_more</i>
+                <label for="pl-tax-class-select" class="pl-text-input-label">
+                    {$shippingServices.tax}
+                </label>
+            </div>
+        </section>
+        <section id="pl-countries-section" class="pl-hidden">
+            <div class="pl-section-title">
+                {$shippingServices.serviceCountriesTitle}
+            </div>
+            <div class="pl-section-subtitle">
+                {$shippingServices.serviceCountriesDescription}
+            </div>
+            <div class="pl-row-orientation pl-top-separate">
+                <button id="pl-select-countries" class="pl-button pl-button-secondary pl-no-margin">
+                    {$shippingServices.openCountries}
+                </button>
+                <span id="pl-selected-countries" class="pl-left-separate">
+                    {$shippingServices.allCountriesSelected}
+                </span>
+            </div>
+        </section>
+    </form>
+    <div class="pl-page-buttons">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+            {$general.saveChanges}
+        </button>
     </div>
 </div>

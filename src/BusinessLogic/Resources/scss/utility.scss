@@ -45,12 +45,20 @@
     margin-bottom: 26px;
   }
 
+  .pl-top-separate {
+    margin-top: 20px;
+  }
+
   .pl-bottom-separate {
     margin-bottom: 36px;
   }
 
   .pl-left-separate {
     margin-left: 20px;
+  }
+
+  .pl-right-separate {
+    margin-right: 20px;
   }
 
   .pl-page-padding {
@@ -62,7 +70,9 @@
   }
 
   .pl-row-orientation {
+    display: flex;
     flex-direction: row;
+    align-items: center;
   }
 
   .pl-flex-left {
@@ -79,7 +89,7 @@
   }
 
   .pl-no-margin {
-    margin: 0;
+    margin: 0 !important;
   }
 
   .pl-center {
@@ -138,6 +148,11 @@
 
   .pl-block {
     display: block;
+  }
+
+  .pl-split-content {
+    justify-content: space-between;
+    flex-direction: row;
   }
 }
 

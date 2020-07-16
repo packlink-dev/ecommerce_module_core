@@ -6,6 +6,7 @@ if (!window.Packlink) {
     /**
      * @typedef ShippingService
      * @property {string} id
+     * @property {boolean} activated
      * @property {string} name
      * @property {string} logoUrl
      * @property {string} type
@@ -14,7 +15,11 @@ if (!window.Packlink) {
      * @property {string} deliveryDescription
      * @property {'dropoff'|'collection'} parcelOrigin
      * @property {'pickup'|'delivery'} parcelDestination
+     * @property {boolean} showLogo
+     * @property {string} taxClass
      * @property {[]} pricingPolicies
+     * @property {[]} shippingCountries
+     * @property {boolean} isShipToAllCountries
      */
 
     /**

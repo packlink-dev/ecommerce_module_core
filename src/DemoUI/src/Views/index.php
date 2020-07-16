@@ -193,7 +193,9 @@ echo $lang ?>">
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",
-                    hasTaxConfiguration: false,
+                    saveServiceUrl: "<?php getUrl('ShippingMethods', 'save') ?>",
+                    getTaxClassesUrl: "<?php getUrl('ShippingMethods', 'getTaxClasses') ?>",
+                    hasTaxConfiguration: true,
                     hasCountryConfiguration: true,
                     canDisplayCarrierLogos: true
                 }

@@ -41,9 +41,9 @@ if (!window.Packlink) {
          * @return {boolean}
          */
         this.validateForm = (form) => {
-            const inputs = utilityService.toArray(form.getElementsByTagName('input')).concat(
-                utilityService.toArray(form.getElementsByTagName('select'))
-                ),
+            const inputElements = utilityService.toArray(form.getElementsByTagName('input')),
+                selects = utilityService.toArray(form.getElementsByTagName('select')),
+                inputs = inputElements.concat(selects),
                 length = inputs.length;
 
             let result = true;

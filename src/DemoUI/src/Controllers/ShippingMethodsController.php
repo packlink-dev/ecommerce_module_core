@@ -2,7 +2,9 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\Tax\TaxClass;
 use Packlink\DemoUI\Controllers\Models\Request;
 
 /**
@@ -72,10 +74,29 @@ class ShippingMethodsController extends BaseHttpController
     }
 
     /**
+     * A mockup for getting system tax classes.
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function getTaxClasses()
+    {
+        $taxClass1 = TaxClass::fromArray(array('label' => 'Full Rate (20%)', 'value' => 1));
+        $taxClass2 = TaxClass::fromArray(array('label' => 'Half Rate (10%)', 'value' => 2));
+        $taxClass3 = TaxClass::fromArray(array('label' => 'Tax Free', 'value' => 0));
+
+        $this->outputDtoEntities(array($taxClass1, $taxClass2, $taxClass3));
+    }
+
+    /**
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function save(Request $request)
     {
+        $shippingMethod = ShippingMethodConfiguration::fromArray($request->getPayload());
+        $response = $this->controller->save($shippingMethod);
 
+        $this->output($response ? $response->toArray() : array());
     }
 }
