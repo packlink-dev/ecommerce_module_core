@@ -99,6 +99,25 @@ class ShippingMethodController
     }
 
     /**
+     * Returns shipping method with the given ID.
+     *
+     * @param int $id Shipping method ID.
+     *
+     * @return ShippingMethodResponse|null Shipping method.
+     */
+    public function getShippingMethod($id)
+    {
+        $model = $this->shippingMethodService->getShippingMethod($id);
+        if (!$model) {
+            Logger::logWarning("Shipping method with id {$id} not found!");
+
+            return null;
+        }
+
+        return $this->transformShippingMethodModelToDto($model);
+    }
+
+    /**
      * Validates and stores shipping method.
      *
      * @param ShippingMethodConfiguration $shippingMethod Shipping method object.
@@ -184,6 +203,7 @@ class ShippingMethodController
     {
         $shippingMethod = new ShippingMethodResponse();
         $shippingMethod->id = $item->getId();
+        $shippingMethod->activated = $item->isActivated();
         $shippingMethod->name = $item->getTitle();
         $shippingMethod->logoUrl = $item->getLogoUrl();
         $shippingMethod->showLogo = $item->isDisplayLogo();

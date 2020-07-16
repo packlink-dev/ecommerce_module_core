@@ -178,7 +178,8 @@
     "origin": "Origin",
     "destination": "Destination",
     "myPrices": "My prices",
-    "packlinkPrices": "Packlink prices"
+    "packlinkPrices": "Packlink prices",
+    "configureService": "Set up service"
   },
   "shippingServicesSettings": {
     "filterServices": "Filter services",

@@ -130,6 +130,7 @@ echo $lang ?>">
 <script src="./resources/js/MyShippingServicesController.js"></script>
 <script src="./resources/js/PickShippingServiceController.js"></script>
 <script src="./resources/js/ShippingServicesRenderer.js"></script>
+<script src="./resources/js/EditServiceController.js"></script>
 
 <script>
     <?php
@@ -190,7 +191,8 @@ echo $lang ?>">
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>"
                 },
-                'edit-shipping-service': {
+                'edit-service': {
+                    getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",
                     hasTaxConfiguration: false,
                     hasCountryConfiguration: true,
                     canDisplayCarrierLogos: true
@@ -267,8 +269,14 @@ echo $lang ?>">
                             'pl-shipping-services-list': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'templates/shipping-services-list.html')
                             ) ?>
+                        },
+                        'pl-edit-service-page': {
+                            'pl-header-section': '',
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/edit-shipping-service.html')
+                            ) ?>
                         }
-                    },
+                    }
                 }
             );
 

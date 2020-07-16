@@ -50,6 +50,18 @@ class ShippingMethodsController extends BaseHttpController
     }
 
     /**
+     * Gets a single service.
+     *
+     * @param \Packlink\DemoUI\Controllers\Models\Request $request
+     */
+    public function getService(Request $request)
+    {
+        $method = $this->controller->getShippingMethod((int)$request->getQuery('id'));
+
+        $this->output($method ? $method->toArray() : array());
+    }
+
+    /**
      * @param \Packlink\DemoUI\Controllers\Models\Request $request
      */
     public function deactivate(Request $request)
