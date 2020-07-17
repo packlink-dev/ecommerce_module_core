@@ -60,6 +60,12 @@ class ShippingMethodConfiguration extends DataTransferObject
      * @var array
      */
     public $shippingCountries = array();
+    /**
+     * Indicates if the method is activated.
+     *
+     * @var bool
+     */
+    public $activated = false;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -77,6 +83,7 @@ class ShippingMethodConfiguration extends DataTransferObject
             'shippingCountries' => $this->shippingCountries,
             'usePacklinkPriceIfNotInRange' => $this->usePacklinkPriceIfNotInRange,
             'pricingPolicies' => array(),
+            'activated' => $this->activated,
         );
 
         if ($this->pricingPolicies) {
@@ -101,11 +108,11 @@ class ShippingMethodConfiguration extends DataTransferObject
         $result = new static();
 
         $result->id = $raw['id'];
+        $result->activated = (bool)static::getDataValue($raw, 'activated', false);
         $result->name = $raw['name'];
         $result->showLogo = $raw['showLogo'];
         $result->taxClass = isset($raw['taxClass']) ? $raw['taxClass'] : null;
-        $result->usePacklinkPriceIfNotInRange = isset($raw['usePacklinkPriceIfNotInRange'])
-            ? (bool)$raw['usePacklinkPriceIfNotInRange'] : true;
+        $result->usePacklinkPriceIfNotInRange = (bool)static::getDataValue($raw, 'usePacklinkPriceIfNotInRange', false);
 
         if (isset($raw['isShipToAllCountries']) && is_bool($raw['isShipToAllCountries'])) {
             $result->isShipToAllCountries = $raw['isShipToAllCountries'];

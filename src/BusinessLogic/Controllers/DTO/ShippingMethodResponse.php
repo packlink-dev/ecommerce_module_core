@@ -51,12 +51,6 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
      * @var string
      */
     public $parcelDestination;
-    /**
-     * Indicates if the method is activated.
-     *
-     * @var bool
-     */
-    public $activated = false;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -75,7 +69,6 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
                 'parcelOrigin' => $this->parcelOrigin,
                 'parcelDestination' => $this->parcelDestination,
                 'logoUrl' => $this->logoUrl,
-                'activated' => $this->activated,
             )
         );
     }

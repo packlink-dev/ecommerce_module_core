@@ -315,7 +315,7 @@ class ShippingCostCalculator
         }
 
         // if no policy can be applied because of range, use base cost if it is set that way
-        if ($cost === PHP_INT_MAX && $method->isUseWhenOutOfRange()) {
+        if ($cost === PHP_INT_MAX && $method->isUsePacklinkPriceIfNotInRange()) {
             $cost = $baseCost;
         }
 

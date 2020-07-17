@@ -237,6 +237,7 @@ class ShippingMethodController
         $model->setTaxClass($configuration->taxClass);
         $model->setShipToAllCountries($configuration->isShipToAllCountries);
         $model->setShippingCountries($configuration->shippingCountries);
+        $model->setActivated($configuration->activated);
 
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);

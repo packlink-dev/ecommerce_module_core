@@ -36,7 +36,7 @@ class ShippingMethod extends Entity
         'expressDelivery',
         'deliveryTime',
         'national',
-        'useWhenOutOfRange',
+        'usePacklinkPriceIfNotInRange',
         'taxClass',
         'isShipToAllCountries',
         'shippingCountries',
@@ -118,7 +118,7 @@ class ShippingMethod extends Entity
      *
      * @var bool
      */
-    protected $useWhenOutOfRange = true;
+    protected $usePacklinkPriceIfNotInRange = true;
     /**
      * Shop tax class.
      *
@@ -132,13 +132,13 @@ class ShippingMethod extends Entity
      */
     protected $shippingServices = array();
     /**
-     * Flag that denotes whether is shipping to all countries allowed.
+     * Flag that denotes whether is shipping to all countries selected.
      *
      * @var boolean
      */
     protected $isShipToAllCountries;
     /**
-     * If `isShipToAllCountries` set to FALSe than this array contains list of countries where shipping is allowed.
+     * If `isShipToAllCountries` set to FALSE, then this array contains list of countries where shipping is allowed.
      *
      * @var array
      */
@@ -155,10 +155,10 @@ class ShippingMethod extends Entity
     {
         parent::inflate($data);
 
-        if (isset($data['useWhenOutOfRange']) && is_bool($data['useWhenOutOfRange'])) {
-            $this->useWhenOutOfRange = $data['useWhenOutOfRange'];
+        if (isset($data['usePacklinkPriceIfNotInRange']) && is_bool($data['usePacklinkPriceIfNotInRange'])) {
+            $this->usePacklinkPriceIfNotInRange = $data['usePacklinkPriceIfNotInRange'];
         } else {
-            $this->useWhenOutOfRange = true;
+            $this->usePacklinkPriceIfNotInRange = true;
         }
 
         if (isset($data['isShipToAllCountries']) && is_bool($data['isShipToAllCountries'])) {
@@ -579,18 +579,18 @@ class ShippingMethod extends Entity
      *
      * @return bool Flag that denotes whether Packlink price should be used when all policies are out of range.
      */
-    public function isUseWhenOutOfRange()
+    public function isUsePacklinkPriceIfNotInRange()
     {
-        return $this->useWhenOutOfRange;
+        return $this->usePacklinkPriceIfNotInRange;
     }
 
     /**
      * Sets a flag that denotes whether Packlink price should be used when all policies are out of range.
      *
-     * @param bool $useWhenOutOfRange Out-of-range behavior.
+     * @param bool $usePacklinkPriceIfNotInRange Out-of-range behavior.
      */
-    public function setUseWhenOutOfRange($useWhenOutOfRange)
+    public function setUsePacklinkPriceIfNotInRange($usePacklinkPriceIfNotInRange)
     {
-        $this->useWhenOutOfRange = $useWhenOutOfRange;
+        $this->usePacklinkPriceIfNotInRange = $usePacklinkPriceIfNotInRange;
     }
 }

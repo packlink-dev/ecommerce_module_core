@@ -334,7 +334,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $fixedPricePolicies[] = array(10, 20, 12);
         $fixedPricePolicies[] = array(5, 10, 12);
         $shippingMethod = $this->prepareFixedPricePolicyShippingMethod(1, $fixedPricePolicies);
-        $shippingMethod->setUseWhenOutOfRange(false);
+        $shippingMethod->setUsePacklinkPriceIfNotInRange(false);
         $this->shippingMethodService->save($shippingMethod);
 
         $this->httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
@@ -730,7 +730,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             )
         );
         $shippingMethod = $this->addShippingMethod(1);
-        $shippingMethod->setUseWhenOutOfRange($fallbackToDefault);
+        $shippingMethod->setUsePacklinkPriceIfNotInRange($fallbackToDefault);
         $shippingMethod->addPricingPolicy($policy);
         $this->shippingMethodService->save($shippingMethod);
 
