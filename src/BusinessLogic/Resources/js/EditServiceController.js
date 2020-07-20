@@ -205,7 +205,12 @@ if (!window.Packlink) {
          */
         const setPricingPolicies = () => {
             const pricingPolicies = templateService.getComponent('pl-pricing-policies'),
-                addServiceButton = document.querySelector('#pl-add-price-section button');
+                addServiceButton = document.querySelector('#pl-add-price-section button'),
+                policySwitchButton = templateService.getComponent('pl-configure-prices-button'),
+                pricingSection = templateService.getComponent('pl-add-price-section');
+
+            utilityService.showElement(pricingSection);
+            policySwitchButton.classList.add('pl-selected');
 
             utilityService.hideElement(templateService.getComponent('pl-first-service-description'));
             utilityService.showElement(pricingPolicies);
@@ -213,9 +218,8 @@ if (!window.Packlink) {
 
             pricingPolicies.innerHTML = '';
 
-            serviceModel.pricingPolicies.forEach((policy) => {
-                pricingPolicies.innerHTML += '<button class="pl-edit-pricing-policy">Edit</button>' +
-                    '<button class="pl-clear-pricing-policy">Clear</button>';
+            serviceModel.pricingPolicies.forEach((policy, index) => {
+                pricingPolicies.innerHTML += getPricingPolicyTemplate(policy, index);
             });
 
             let editBtns = pricingPolicies.getElementsByClassName('pl-edit-pricing-policy');
@@ -272,12 +276,12 @@ if (!window.Packlink) {
                                 'range_type': form['range_type'].value,
                                 'from_weight': (form['range_type'].value === '1' || form['range_type'].value === '2') ?
                                     form['from_weight'].value : null,
-                                'to_weight': (form['range_type'].value === '1' || form['range_type'].value === '2') ?
-                                    form['to_weight'].value : null,
+                                'to_weight': ((form['range_type'].value === '1' || form['range_type'].value === '2') &&
+                                    form['to_weight'].value !== '') ? form['to_weight'].value : null,
                                 'from_price': (form['range_type'].value === '0' || form['range_type'].value === '2') ?
                                     form['from_price'].value : null,
-                                'to_price': (form['range_type'].value === '0' || form['range_type'].value === '2') ?
-                                    form['to_price'].value : null,
+                                'to_price': ((form['range_type'].value === '0' || form['range_type'].value === '2') &&
+                                    form['to_price'].value !== '') ? form['to_price'].value : null,
                                 'pricing_policy': form['pricing_policy'].value,
                                 'increase': form['increase'].checked,
                                 'change_percent': form['pricing_policy'].value === '1' ? form['change_percent'].value : null,
@@ -294,7 +298,8 @@ if (!window.Packlink) {
                             ajaxService.post(
                                 configuration.saveServiceUrl,
                                 serviceModel,
-                                () => {
+                                (response) => {
+                                    serviceModel = response;
                                     bindService(serviceModel);
                                     modal.close();
                                 },
@@ -312,7 +317,7 @@ if (!window.Packlink) {
                     }
                 ],
                 onOpen: () => {
-                    setPricingPolicyInitialState(currentPolicy);
+                    setPricingPolicyInitialState(currentPolicy, policyIndex);
                 }
             });
 
@@ -347,12 +352,15 @@ if (!window.Packlink) {
          * Sets pricing policy form initial state.
          *
          * @param {ShippingPricingPolicy | null} pricingPolicy
+         * @param {number} index
          */
-        const setPricingPolicyInitialState = (pricingPolicy) => {
+        const setPricingPolicyInitialState = (pricingPolicy, index) => {
             let priceRangeSelect = templateService.getComponent('pl-range-type-select');
             let pricingPolicySelect = templateService.getComponent('pl-pricing-policy-select');
+            let currentIndex = serviceModel.pricingPolicies.length + 1;
 
             if (pricingPolicy !== null) {
+                currentIndex = index + 1;
                 priceRangeSelect.value = pricingPolicy.range_type;
                 templateService.getComponent('pl-from-weight').value = pricingPolicy.from_weight;
                 templateService.getComponent('pl-to-weight').value = pricingPolicy.to_weight;
@@ -363,6 +371,9 @@ if (!window.Packlink) {
                 templateService.getComponent('pl-change-percent').value = pricingPolicy.change_percent;
                 templateService.getComponent('pl-fixed-price').value = pricingPolicy.fixed_price;
             }
+
+            templateService.getComponent('pl-pricing-policy-title').innerHTML =
+                translator.translate('shippingServices.singlePricePolicy') + ' ' + currentIndex.toString();
 
             setPriceRangeSection();
             setPricingPolicySection();
@@ -499,7 +510,6 @@ if (!window.Packlink) {
             if (parseInt(pricingPolicy['range_type'].value) === 1 || parseInt(pricingPolicy['range_type'].value) === 2) {
                 if (!validationService.validateRequiredField(pricingPolicy['from_weight']) ||
                     !validationService.validateNumber(pricingPolicy['from_weight']) ||
-                    !validationService.validateRequiredField(pricingPolicy['to_weight']) ||
                     !validationService.validateNumber(pricingPolicy['to_weight'])
                 ) {
                     return false;
@@ -531,6 +541,71 @@ if (!window.Packlink) {
             }
 
             return true;
+        };
+
+        /**
+         * Get pricing policy template.
+         *
+         * @param {ShippingPricingPolicy} policy
+         * @param {number} index
+         *
+         * @returns {string}
+         */
+        const getPricingPolicyTemplate = (policy, index) => {
+            return '<div>' +
+                translator.translate('shippingServices.singlePricePolicy') + ' ' + (index + 1).toString() +
+                '<div class="pl-range-type-wrapper">' + getPolicyRangeTypeLabel(policy) + ': ' +
+                (policy.from_weight !== null ? translator.translate('shippingServices.from') + ' ' + policy.from_weight + ' Kg ' : '') +
+                (policy.to_weight !== null ? translator.translate('shippingServices.to') + ' ' + policy.to_weight + ' Kg ' : '') +
+                (parseInt(policy.range_type) === 2 ? translator.translate('shippingServices.and') + ' ' : ' ') +
+                (policy.from_price !== null ? translator.translate('shippingServices.from') + ' ' + policy.from_price + ' € ' : '') +
+                (policy.to_price !== null ? translator.translate('shippingServices.to') + ' ' + policy.to_price + ' € ' : '') +
+                '</div>' +
+                '<div class="pl-pricing-policy-wrapper">' +
+                getPricingPolicyLabel(policy) +
+                (policy.change_percent !== null ?
+                    ': ' + (policy.increase ? translator.translate('increase') + ' ' + translator.translate('by')
+                    : (translator.translate('decrease') + ' ' + translator.translate('by'))) +
+                    ' ' + policy.change_percent + ' % ' : '') +
+                (policy.fixed_price !== null ? ': €' + policy.fixed_price : '') +
+                '</div>' +
+                '<button class="pl-edit-pricing-policy pl-small pl-button-secondary">Edit</button>' +
+                '<button class="pl-clear-pricing-policy pl-small pl-button-inverted pl-button-clear">Clear</button>' +
+                '</div>';
+        };
+
+        /**
+         * Get range type label
+         * @param {ShippingPricingPolicy} policy
+         * @returns {string}
+         */
+        const getPolicyRangeTypeLabel = (policy) => {
+            let rangeType = translator.translate('shippingServices.priceRange');
+            if (parseInt(policy.range_type) === 1) {
+                rangeType = translator.translate('shippingServices.weightRange');
+            }
+            else if (parseInt(policy.range_type) === 2) {
+                rangeType = translator.translate('shippingServices.weightAndPriceRange');
+            }
+
+            return rangeType;
+        };
+
+        /**
+         * Get range type label
+         * @param {ShippingPricingPolicy} policy
+         * @returns {string}
+         */
+        const getPricingPolicyLabel = (policy) => {
+            let result = translator.translate('shippingServices.packlinkPrice');
+            if (parseInt(policy.pricing_policy) === 1) {
+                result = translator.translate('shippingServices.percentagePacklinkPrices');
+            }
+            else if (parseInt(policy.pricing_policy) === 2) {
+                result = translator.translate('shippingServices.fixedPrices');
+            }
+
+            return result;
         };
     }
 

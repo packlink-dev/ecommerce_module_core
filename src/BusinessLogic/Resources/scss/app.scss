@@ -285,6 +285,12 @@
   #pl-fixed-price {
     width: 215px;
   }
+
+  .pl-button-inverted {
+    &.pl-button-clear {
+      color: $color-blue;
+    }
+  }
 }
 
 // mobile rules

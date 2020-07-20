@@ -213,9 +213,10 @@
     "select": "Elige",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "invalidRange": "Invalid range",
     "increase": "Incrementar",
-    "reduce": "Reducir"
+    "reduce": "Reducir",
+    "and": "y",
+    "by": "Por"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtrar servicios",
@@ -233,7 +234,6 @@
     "shippingServices": "Servicios de envío",
     "showingPercentsResults": "Mostrando %s resultados",
     "setPricingRule": "Establece como fijar el precio",
-    "by": "Por",
     "addPriceForWeightCriteria": "Añade el precio para cada peso",
     "addPriceForPriceCriteria": "Por favor, añade precio para cada criterio",
     "fixedPricesTotalWeight": "Precios fijos en función del peso total",

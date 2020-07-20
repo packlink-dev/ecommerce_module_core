@@ -216,7 +216,9 @@
     "cancel": "Cancel",
     "invalidRange": "Invalid range",
     "increase": "Increase",
-    "reduce": "Reduce"
+    "reduce": "Reduce",
+    "and": "and",
+    "by": "By"
   },
   "shippingServicesSettings": {
     "filterServices": "Filter services",
@@ -233,7 +235,6 @@
     "shippingServices": "Shipping Services",
     "showingPercentsResults": "Showing %s results",
     "setPricingRule": "Please set pricing rule",
-    "by": "By",
     "addPriceForWeightCriteria": "Please add price for each weight criteria",
     "addPriceForPriceCriteria": "Please add price for each price criteria",
     "fixedPricesTotalWeight": "Fixed prices based on total weight",
