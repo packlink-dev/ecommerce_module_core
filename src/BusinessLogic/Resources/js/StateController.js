@@ -4,27 +4,32 @@ if (!window.Packlink) {
 
 (function () {
     /**
+     * @typedef StateConfiguration
+     * @property {string} [pagePlaceholder]
+     * @property {{}} pageConfiguration
+     * @property {string} stateUrl
+     * @property {{}} templates
+     * @property {string} baseResourcesUrl
+     */
+
+    /**
      * Main controller of the application.
      *
-     * @param {{
-     *      pagePlaceholder: string?,
-     *      pageConfiguration: {},
-     *      stateUrl: string,
-     *      templates: {}
-     * }} configuration
+     * @param {StateConfiguration} configuration
      *
      * @constructor
      */
     function StateController(configuration) {
-        let pageControllerFactory = Packlink.pageControllerFactory;
-        let ajaxService = Packlink.ajaxService;
-        let utilityService = Packlink.utilityService;
-        let templateService = Packlink.templateService;
+        const pageControllerFactory = Packlink.pageControllerFactory,
+            ajaxService = Packlink.ajaxService,
+            utilityService = Packlink.utilityService,
+            templateService = Packlink.templateService;
         let context = '';
         let currentState = '';
         let previousState = '';
 
         this.display = () => {
+            templateService.setBaseResourceUrl(configuration.baseResourcesUrl);
             if (configuration.pagePlaceholder) {
                 templateService.setMainPlaceholder(configuration.pagePlaceholder);
             }
@@ -32,17 +37,6 @@ if (!window.Packlink) {
             templateService.setTemplates(configuration.templates);
 
             ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
-        };
-
-        /**
-         * Opens configuration page that corresponds to particular step.
-         *
-         * @param {string} step
-         */
-        this.startStep = (step) => {
-            utilityService.disableInputMask();
-            let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
-            controller.display();
         };
 
         /**
@@ -89,7 +83,6 @@ if (!window.Packlink) {
                 case 'login':
                     this.goToState('login');
                     break;
-
                 case 'onBoarding':
                     this.goToState('onboarding-state');
                     break;

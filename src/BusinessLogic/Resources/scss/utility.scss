@@ -45,6 +45,11 @@
     margin-bottom: 26px;
   }
 
+  .pl-separate-horizontally {
+    margin-left: 26px;
+    margin-right: 26px;
+  }
+
   .pl-top-separate {
     margin-top: 20px;
   }
@@ -90,6 +95,10 @@
 
   .pl-no-margin {
     margin: 0 !important;
+  }
+
+  .pl-no-border {
+    border-color: transparent !important;
   }
 
   .pl-center {

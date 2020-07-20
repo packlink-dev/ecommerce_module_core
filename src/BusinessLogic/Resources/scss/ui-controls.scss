@@ -73,7 +73,6 @@
       background-color: $color-white;
 
       &:hover {
-        color: $color-blue-darker;
         border: 1px solid $color-blue-darker;
       }
     }
@@ -482,6 +481,12 @@
         margin-right: 20px;
       }
 
+      .pl-modal-subtitle {
+        color: $text-heading-light-color;
+        font-size: 16px;
+        line-height: 19px;
+      }
+
       .pl-modal-body {
         margin: 20px 0;
         align-items: flex-start;
@@ -600,6 +605,16 @@
           font-weight: 600;
           text-transform: uppercase;
         }
+      }
+    }
+
+    .pl-service-buttons {
+      flex-direction: row;
+
+      .pl-button {
+        padding: 5px 15px;
+        min-width: auto;
+        margin: 0 10px 0 0;
       }
     }
   }
