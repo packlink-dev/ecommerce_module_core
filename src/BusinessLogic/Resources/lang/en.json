@@ -29,6 +29,7 @@
     "invalidEmail": "This field must be valid email.",
     "shortPassword": "The password must be at least %s characters long.",
     "invalidPhone": "This field must be valid phone number.",
+    "maxLength": "The field cannot have more than %s characters.",
     "numeric": "Value must be valid number.",
     "greaterThanZero": "Value must be greater than 0.",
     "nonNegative": "Field cannot have a negative value.",
