@@ -5,85 +5,93 @@ if (!window.Packlink) {
 (function (window, document, localStorage) {
     /**
      *
-     * @param table Element
      * @constructor
      */
-    function GridResizerService(table) {
+    function GridResizerService() {
+        const minColumnWidth = 150;
+        let columns = [];
+        let headerBeingResized
+        let table;
 
-        this.init = () => {
-            if (table === null || table.dataset.id === undefined) {
+        /**
+         * Initializes the given table if exists.
+         * @param {HTMLTableElement} tableEl Element
+         */
+        this.init = (tableEl) => {
+            table = tableEl;
+
+            if (table === null || table.id === undefined) {
                 return;
             }
-            const minColumnWidth = 150;
-            let columns = localStorage.getItem(table.dataset.id) ? JSON.parse(localStorage.getItem(table.dataset.id)) : [];
-            let headerBeingResized;
 
-            /**
-             * Handles resizing.
-             *
-             * @param e
-             *
-             * @returns {number}
-             */
-            const onMouseMove = (e) => requestAnimationFrame(() => {
-                const width = e.clientX - (headerBeingResized !== null ? headerBeingResized.offsetLeft : 0);
-                const column = columns.find(({ header }) => header === headerBeingResized);
-                column.size = Math.max(minColumnWidth, width) + 'px'; // Enforce our minimum
+            columns = localStorage.getItem(table.id) ? JSON.parse(localStorage.getItem(table.id)) : [];
 
-                headerBeingResized.width = column.size;
+            let initialColumns = [];
+
+            table.querySelectorAll('th:not(:last-child)').forEach((header, index) => {
+                let cellWidth = header.offsetWidth + 'px';
+
+                if (columns.length > 0) {
+                    const column = columns[index];
+                    cellWidth = column.size + 'px';
+                }
+
+                header.style.width = cellWidth;
+                initialColumns.push({
+                    header,
+                    size: cellWidth,
+                });
+                header.innerHTML += '<span class="pl-table-resize-handle pl-rotate-90 material-icons">vertical_align_center</span>';
+                header.querySelector('.pl-table-resize-handle').addEventListener('mousedown', initResize);
             });
 
-            /**
-             * Cleans up and sets the new width value to localStorage.
-             */
-            const onMouseUp = () => {
-                // Clean up.
-                window.removeEventListener('mousemove', onMouseMove);
-                window.removeEventListener('mouseup', onMouseUp);
-                headerBeingResized.classList.remove('header--being-resized');
-                headerBeingResized = null;
-                if (columns !== null) {
-                    localStorage.setItem(table.dataset.id, JSON.stringify(columns));
-                }
-            };
-
-            /**
-             * Attaches the event handlers and marks header that is being resized.
-             *
-             * @param target
-             */
-            const initResize = ({ target }) => {
-                headerBeingResized = target.parentNode;
-                window.addEventListener('mousemove', onMouseMove);
-                window.addEventListener('mouseup', onMouseUp);
-                headerBeingResized.classList.add('header--being-resized');
-            };
-
-            (() => {
-                let initialColumns = [];
-
-                document.querySelectorAll('th').forEach((header, index) => {
-                    let cellWidth = header.offsetWidth + 'px';
-
-                    if (columns.length > 0) {
-                        const column = columns[index];
-                        cellWidth = column.size + 'px';
-                    }
-
-                    // noinspection JSDeprecatedSymbols
-                    header.width = cellWidth + 'px';
-                    initialColumns.push({
-                        header,
-                        size: cellWidth,
-                    });
-                    header.innerHTML += '<span class="pl-table-resize-handle material-icons">code</span>';
-                    header.querySelector('.pl-table-resize-handle').addEventListener('mousedown', initResize);
-                });
-
-                columns = initialColumns;
-            })();
+            columns = initialColumns;
         }
+
+        /**
+         * Handles resizing.
+         *
+         * @param {Event} e
+         *
+         * @returns {number}
+         */
+        const onMouseMove = (e) => requestAnimationFrame(() => {
+            table.classList.add('pl-disable-selection');
+            const width = e.clientX - (headerBeingResized !== null ? headerBeingResized.offsetLeft : 0);
+            const column = columns.find(({ header }) => header === headerBeingResized);
+            if (!column) {
+                return;
+            }
+            column.size = Math.max(minColumnWidth, width) + 'px'; // Enforce our minimum
+
+            headerBeingResized.style.width = column.size;
+        });
+
+        /**
+         * Cleans up and sets the new width value to localStorage.
+         */
+        const onMouseUp = () => {
+            // Clean up.
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            headerBeingResized = null;
+            table.classList.remove('pl-disable-selection');
+            if (columns !== null) {
+                localStorage.setItem(table.id, JSON.stringify(columns));
+            }
+        };
+
+        /**
+         * Attaches the event handlers and marks header that is being resized.
+         *
+         * @param {Event} event
+         */
+        const initResize = (event) => {
+            headerBeingResized = event.target.parentNode;
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+        };
     }
 
-    Packlink.GridResizerService = GridResizerService;
+    Packlink.GridResizerService = new GridResizerService();
 })(window, document, window.localStorage);
