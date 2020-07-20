@@ -15,6 +15,19 @@ if (!window.Packlink) {
      */
 
     /**
+     * @typedef ShippingPricingPolicy
+     * @property {int} range_type
+     * @property {float} from_weight
+     * @property {float} to_weight
+     * @property {float} from_price
+     * @property {float} to_price
+     * @property {int} pricing_policy
+     * @property {boolean} increase
+     * @property {float} change_percent
+     * @property {float} fixed_price
+     */
+
+    /**
      * @param {EditServiceControllerConfiguration} configuration
      * @constructor
      */
@@ -38,6 +51,18 @@ if (!window.Packlink) {
             'tax',
         ];
 
+        const pricingPolicyModelFields = [
+            'range_type',
+            'from_weight',
+            'to_weight',
+            'from_price',
+            'to_price',
+            'pricing_policy',
+            'increase',
+            'change_percent',
+            'fixed_price',
+        ];
+
         /**
          * Displays page content.
          *
@@ -49,7 +74,8 @@ if (!window.Packlink) {
 
             const mainPage = templateService.getMainPage(),
                 backButton = mainPage.querySelector('.pl-sub-header button'),
-                policySwitchButton = templateService.getComponent('pl-configure-prices-button');
+                policySwitchButton = templateService.getComponent('pl-configure-prices-button'),
+                addServiceButton = document.querySelector('#pl-add-price-section button');
 
             backButton.addEventListener('click', () => {
                 state.goToState('my-shipping-services');
@@ -58,6 +84,10 @@ if (!window.Packlink) {
             policySwitchButton.addEventListener('click', () => {
                 policySwitchButton.classList.toggle('pl-selected');
                 handlePolicySwitchButton(policySwitchButton);
+            });
+
+            addServiceButton.addEventListener('click', (event) => {
+                initializePricingPolicyModal(event);
             });
 
             handlePolicySwitchButton(policySwitchButton);
@@ -72,17 +102,7 @@ if (!window.Packlink) {
             const form = templateService.getComponent('pl-edit-service-form');
             serviceModel = service;
 
-            for (const field of modelFields) {
-                let input = form[field];
-                input.addEventListener('blur', (event) => {
-                    // noinspection JSCheckFunctionSignatures
-                    validationService.validateInputField(event.target);
-                }, true);
-                input.addEventListener('input', (event) => {
-                    // noinspection JSCheckFunctionSignatures
-                    validationService.removeError(event.target);
-                }, true);
-            }
+            setFormValidation(form, modelFields);
 
             templateService.getComponent('pl-service-title').value = service.name;
 
@@ -100,6 +120,10 @@ if (!window.Packlink) {
 
             if (configuration.hasCountryConfiguration) {
                 setCountrySelection();
+            }
+
+            if (serviceModel.pricingPolicies.length > 0) {
+                setPricingPolicies();
             }
 
             templateService.getComponent('pl-page-submit-btn').addEventListener('click', save);
@@ -143,18 +167,16 @@ if (!window.Packlink) {
             if (btn.classList.contains('pl-selected')) {
                 utilityService.showElement(pricingSection);
                 if (serviceModel.pricingPolicies.length > 0) {
-                    utilityService.hideElement(firstServiceDescription);
-                    addServiceButton.innerHTML = translator.translate('shippingServices.addAnotherPolicy');
+                    setPricingPolicies();
                 } else {
                     utilityService.showElement(firstServiceDescription);
+                    utilityService.hideElement(pricingPoliciesSection);
                     addServiceButton.innerHTML = translator.translate('shippingServices.addFirstPolicy');
                 }
             } else {
                 utilityService.hideElement(pricingSection);
                 utilityService.hideElement(pricingPoliciesSection);
             }
-
-            addServiceButton.addEventListener('click', addNewPolicy);
         };
 
         /**
@@ -179,15 +201,122 @@ if (!window.Packlink) {
         };
 
         /**
-         * Handles click on Add new policy button.
+         * Sets pricing policies section.
+         */
+        const setPricingPolicies = () => {
+            const pricingPolicies = templateService.getComponent('pl-pricing-policies'),
+                addServiceButton = document.querySelector('#pl-add-price-section button');
+
+            utilityService.hideElement(templateService.getComponent('pl-first-service-description'));
+            utilityService.showElement(pricingPolicies);
+            addServiceButton.innerHTML = translator.translate('shippingServices.addAnotherPolicy');
+
+            pricingPolicies.innerHTML = '';
+
+            serviceModel.pricingPolicies.forEach((policy) => {
+                pricingPolicies.innerHTML += '<button class="pl-edit-pricing-policy">Edit</button>' +
+                    '<button class="pl-clear-pricing-policy">Clear</button>';
+            });
+
+            let editBtns = pricingPolicies.getElementsByClassName('pl-edit-pricing-policy');
+            for (let i = 0; i < editBtns.length; i++)  {
+                editBtns[i].addEventListener('click', (event) => {
+                    initializePricingPolicyModal(event, i);
+                });
+            }
+
+            let clearBtns = pricingPolicies.getElementsByClassName('pl-clear-pricing-policy');
+            for (let i = 0; i < clearBtns.length; i++)  {
+                clearBtns[i].addEventListener('click', (event) => {
+                    event.preventDefault();
+                    serviceModel.pricingPolicies.splice(i, 1);
+                    ajaxService.post(
+                        configuration.saveServiceUrl,
+                        serviceModel,
+                        () => {
+                            bindService(serviceModel);
+                        },
+                        Packlink.responseService.errorHandler
+                    );
+                    return false;
+                });
+            }
+        };
+
+        /**
+         * Sets initial state to pricing policy form in modal.
          *
          * @param {Event} event
-         * @return {boolean}
+         * @param {int | null} policyIndex
+         *
+         * @returns {boolean}
          */
-        const addNewPolicy = (event) => {
+        const initializePricingPolicyModal = (event, policyIndex = null) => {
             event.preventDefault();
+            let currentPolicy = policyIndex !== null ? serviceModel.pricingPolicies[policyIndex] : null;
 
-            // open modal
+            let modal = new Packlink.modalService({
+                content: templateService.getTemplate('pl-pricing-policy-modal'),
+                canClose: false,
+                buttons: [
+                    {
+                        title: translator.translate('shippingServices.save'),
+                        cssClasses: ['pl-button-primary'],
+                        onClick: () => {
+                            const form = templateService.getComponent('pl-pricing-policy-form');
+                            if (!validatePricingPolicyForm(form)) {
+                                return;
+                            }
+
+                            const pricingPolicy = {
+                                'range_type': form['range_type'].value,
+                                'from_weight': (form['range_type'].value === '1' || form['range_type'].value === '2') ?
+                                    form['from_weight'].value : null,
+                                'to_weight': (form['range_type'].value === '1' || form['range_type'].value === '2') ?
+                                    form['to_weight'].value : null,
+                                'from_price': (form['range_type'].value === '0' || form['range_type'].value === '2') ?
+                                    form['from_price'].value : null,
+                                'to_price': (form['range_type'].value === '0' || form['range_type'].value === '2') ?
+                                    form['to_price'].value : null,
+                                'pricing_policy': form['pricing_policy'].value,
+                                'increase': form['increase'].checked,
+                                'change_percent': form['pricing_policy'].value === '1' ? form['change_percent'].value : null,
+                                'fixed_price': form['pricing_policy'].value === '2' ? form['fixed_price'].value : null,
+                            };
+
+                            if (currentPolicy === null) {
+                                serviceModel.pricingPolicies.push(pricingPolicy);
+                            }
+                            else {
+                                serviceModel.pricingPolicies[policyIndex] = pricingPolicy;
+                            }
+
+                            ajaxService.post(
+                                configuration.saveServiceUrl,
+                                serviceModel,
+                                () => {
+                                    bindService(serviceModel);
+                                    modal.close();
+                                },
+                                Packlink.responseService.errorHandler
+                            );
+
+                        }
+                    },
+                    {
+                        title: translator.translate('shippingServices.cancel'),
+                        cssClasses: ['pl-button-secondary'],
+                        onClick: () => {
+                            modal.close();
+                        }
+                    }
+                ],
+                onOpen: () => {
+                    setPricingPolicyInitialState(currentPolicy);
+                }
+            });
+
+            modal.open();
 
             return false;
         };
@@ -212,6 +341,196 @@ if (!window.Packlink) {
                     Packlink.responseService.errorHandler
                 );
             }
+        };
+
+        /**
+         * Sets pricing policy form initial state.
+         *
+         * @param {ShippingPricingPolicy | null} pricingPolicy
+         */
+        const setPricingPolicyInitialState = (pricingPolicy) => {
+            let priceRangeSelect = templateService.getComponent('pl-range-type-select');
+            let pricingPolicySelect = templateService.getComponent('pl-pricing-policy-select');
+
+            if (pricingPolicy !== null) {
+                priceRangeSelect.value = pricingPolicy.range_type;
+                templateService.getComponent('pl-from-weight').value = pricingPolicy.from_weight;
+                templateService.getComponent('pl-to-weight').value = pricingPolicy.to_weight;
+                templateService.getComponent('pl-from-price').value = pricingPolicy.from_price;
+                templateService.getComponent('pl-to-price').value = pricingPolicy.to_price;
+                pricingPolicySelect.value = pricingPolicy.pricing_policy;
+                templateService.getComponent('pl-increase').checked = pricingPolicy.increase;
+                templateService.getComponent('pl-change-percent').value = pricingPolicy.change_percent;
+                templateService.getComponent('pl-fixed-price').value = pricingPolicy.fixed_price;
+            }
+
+            setPriceRangeSection();
+            setPricingPolicySection();
+            setIncreaseToggle();
+            priceRangeSelect.addEventListener('change', setPriceRangeSection);
+            pricingPolicySelect.addEventListener('change', setPricingPolicySection);
+            templateService.getComponent('pl-price-percentage-increase').addEventListener('click', (event) => {
+                handleIncreaseToggleChange(event, true);
+            });
+            templateService.getComponent('pl-price-percentage-decrease').addEventListener('click', (event) => {
+                handleIncreaseToggleChange(event, false);
+            });
+
+            setFormValidation(templateService.getComponent('pl-pricing-policy-form'), pricingPolicyModelFields);
+        }
+
+        /**
+         * Sets form validation.
+         *
+         * @param form
+         * @param fields
+         */
+        const setFormValidation = (form, fields) => {
+            for (const field of fields) {
+                let input = form[field];
+                input.addEventListener('blur', (event) => {
+                    // noinspection JSCheckFunctionSignatures
+                    validationService.validateInputField(event.target);
+                }, true);
+                input.addEventListener('input', (event) => {
+                    // noinspection JSCheckFunctionSignatures
+                    validationService.removeError(event.target);
+                }, true);
+            }
+        }
+
+        /**
+         * Sets price range section.
+         */
+        const setPriceRangeSection = () => {
+            let priceRangeSelect = templateService.getComponent('pl-range-type-select');
+            let fromToPriceWrapper = templateService.getComponent('pl-from-to-price-wrapper');
+            let fromToWeightWrapper = templateService.getComponent('pl-from-to-weight-wrapper');
+
+            utilityService.showElement(fromToPriceWrapper);
+            utilityService.showElement(fromToWeightWrapper);
+
+            if (parseInt(priceRangeSelect.value) === 0) {
+                utilityService.hideElement(fromToWeightWrapper);
+            }
+            else if (parseInt(priceRangeSelect.value) === 1) {
+                utilityService.hideElement(fromToPriceWrapper);
+            }
+        };
+
+        /**
+         * Sets pricing policy section.
+         */
+        const setPricingPolicySection = () => {
+            let pricingPolicySelect = templateService.getComponent('pl-pricing-policy-select');
+            let pricePercentageWrapper = templateService.getComponent('pl-price-percentage-wrapper');
+            let fixedPriceWrapper = templateService.getComponent('pl-price-fixed-wrapper');
+
+            utilityService.hideElement(fixedPriceWrapper);
+            utilityService.hideElement(pricePercentageWrapper);
+
+            if (parseInt(pricingPolicySelect.value) === 1) {
+                utilityService.showElement(pricePercentageWrapper);
+            }
+            else if (parseInt(pricingPolicySelect.value) === 2) {
+                utilityService.showElement(fixedPriceWrapper);
+            }
+        };
+
+        /**
+         * Sets increase toggle based on selected option.
+         */
+        const setIncreaseToggle = () => {
+            const increaseButton = templateService.getComponent('pl-price-percentage-increase');
+            const decreaseButton = templateService.getComponent('pl-price-percentage-decrease');
+            const increaseElement = templateService.getComponent('pl-increase');
+            increaseButton.classList.remove('pl-button-primary', 'pl-button-secondary');
+            decreaseButton.classList.remove('pl-button-primary', 'pl-button-secondary');
+
+            if (increaseElement.checked) {
+                increaseButton.classList.add('pl-button-primary');
+                decreaseButton.classList.add('pl-button-secondary');
+            }
+            else {
+                increaseButton.classList.add('pl-button-secondary');
+                decreaseButton.classList.add('pl-button-primary');
+            }
+        };
+
+        /**
+         * Toggle changed event handler.
+         *
+         * @param {Event} event
+         * @param {boolean} isChecked
+         * @returns {boolean}
+         */
+        const handleIncreaseToggleChange = (event, isChecked) => {
+            templateService.getComponent('pl-increase').checked = isChecked;
+            setIncreaseToggle();
+            event.preventDefault();
+            return false;
+        };
+
+        /**
+         * Validates pricing policy form.
+         *
+         * @param {HTMLElement} pricingPolicy
+         *
+         * @returns {boolean}
+         */
+        const validatePricingPolicyForm = (pricingPolicy) => {
+            if (parseInt(pricingPolicy['range_type'].value) === 0 || parseInt(pricingPolicy['range_type'].value) === 2) {
+                if (!validationService.validateRequiredField(pricingPolicy['from_price']) ||
+                    !validationService.validateNumber(pricingPolicy['from_price']) ||
+                    !validationService.validateNumber(pricingPolicy['to_price'])
+                ) {
+                    return false;
+                }
+
+                if (parseFloat(pricingPolicy['from_price'].value) >= parseFloat(pricingPolicy['to_price'].value)) {
+                    validationService.setError(
+                        pricingPolicy['to_price'],
+                        translator.translate('shippingServices.invalidRange')
+                    );
+                    return false;
+                }
+            }
+
+            if (parseInt(pricingPolicy['range_type'].value) === 1 || parseInt(pricingPolicy['range_type'].value) === 2) {
+                if (!validationService.validateRequiredField(pricingPolicy['from_weight']) ||
+                    !validationService.validateNumber(pricingPolicy['from_weight']) ||
+                    !validationService.validateRequiredField(pricingPolicy['to_weight']) ||
+                    !validationService.validateNumber(pricingPolicy['to_weight'])
+                ) {
+                    return false;
+                }
+
+                if (parseFloat(pricingPolicy['from_weight'].value) >= parseFloat(pricingPolicy['to_weight'].value)) {
+                    validationService.setError(
+                        pricingPolicy['to_weight'],
+                        translator.translate('shippingServices.invalidRange')
+                    );
+                    return false;
+                }
+            }
+
+            if (parseInt(pricingPolicy['pricing_policy'].value) === 1) {
+                if (!validationService.validateRequiredField(pricingPolicy['change_percent']) ||
+                    !validationService.validateNumber(pricingPolicy['change_percent'])
+                ) {
+                    return false;
+                }
+            }
+
+            if (parseInt(pricingPolicy['pricing_policy'].value) === 2) {
+                if (!validationService.validateRequiredField(pricingPolicy['fixed_price']) ||
+                    !validationService.validateNumber(pricingPolicy['fixed_price'])
+                ) {
+                    return false;
+                }
+            }
+
+            return true;
         };
     }
 

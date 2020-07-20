@@ -238,7 +238,7 @@ class ShippingMethodController
         $model->setShipToAllCountries($configuration->isShipToAllCountries);
         $model->setShippingCountries($configuration->shippingCountries);
         $model->setActivated($configuration->activated);
-
+        $model->resetPricingPolicies();
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }

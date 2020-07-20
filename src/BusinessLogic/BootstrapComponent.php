@@ -26,6 +26,7 @@ use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\User\UserAccountService;
@@ -201,5 +202,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         FrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
         FrontDtoFactory::register(RegistrationRequest::CLASS_KEY, RegistrationRequest::CLASS_NAME);
         FrontDtoFactory::register(RegistrationLegalPolicy::CLASS_KEY, RegistrationLegalPolicy::CLASS_NAME);
+        FrontDtoFactory::register(ShippingPricePolicy::CLASS_KEY, ShippingPricePolicy::CLASS_NAME);
     }
 }

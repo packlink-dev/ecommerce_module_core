@@ -155,6 +155,25 @@
     }
   }
 
+  .pl-form-group-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin-top: 15px;
+    &.pl-last-child-border-none {
+      .pl-form-group:not(:first-child) {
+        margin-top: 0;
+        input {
+          border-left: none;
+        }
+      }
+    }
+    &.pl-border-radius-none {
+      button {
+        border-radius: 0;
+      }
+    }
+  }
+
   .pl-form-group {
     position: relative;
     border: none;
@@ -484,17 +503,14 @@
   }
 
   .pl-table-resize-handle {
-    position: absolute;
-    bottom: 0;
     width: 3px;
     cursor: col-resize;
     float: right;
-    right: 20px;
   }
 
   .pl-error {
     input, select {
-      border: 2px solid $color-red !important;
+      border: 1px solid $color-red !important;
     }
 
     label, i {

@@ -277,7 +277,10 @@ echo $lang ?>">
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'templates/edit-shipping-service.html')
                             ) ?>
-                        }
+                        },
+                        'pl-pricing-policy-modal': <?php echo json_encode(
+                            file_get_contents($baseResourcesPath . 'templates/pricing-policy-modal.html')
+                        ) ?>,
                     }
                 }
             );

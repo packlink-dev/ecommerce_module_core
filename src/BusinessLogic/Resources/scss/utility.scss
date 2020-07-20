@@ -154,6 +154,19 @@
     justify-content: space-between;
     flex-direction: row;
   }
+
+  .pl-disable-selection {
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer */
+    -khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
+    -webkit-user-select: none; /* Chrome, Safari, and Opera */
+    -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
+  }
+
+  .pl-rotate-90 {
+    transform: rotate(90deg);
+    transform-origin: top;
+  }
 }
 
 // mobile rules
