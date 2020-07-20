@@ -61,12 +61,17 @@ if (!window.Packlink) {
          */
         const applyFilter = () => {
             setSelectedFiltersToPage();
-            const filteredServices = filterServices();
-            const table = templateService.getComponent('pl-shipping-services-table').querySelector('tbody');
-            const list = templateService.getComponent('pl-shipping-services-list').querySelector('.pl-shipping-services-list');
+            const filteredServices = filterServices(),
+                table = templateService.getComponent('pl-shipping-services-table'),
+                list = templateService.getComponent('pl-shipping-services-list').querySelector('.pl-shipping-services-list'),
+                render = (elem, id, tag) => {
+                    Packlink.ShippingServicesRenderer.render(elem, id, tag, filteredServices, false, handleServiceAction);
+                };
 
-            Packlink.ShippingServicesRenderer.render(table, 'pl-shipping-services-row', 'tr', filteredServices, false, handleServiceAction);
-            Packlink.ShippingServicesRenderer.render(list, 'pl-shipping-services-list-item', 'div', filteredServices, false, handleServiceAction);
+            render(table.querySelector('tbody'), 'pl-shipping-services-row', 'tr');
+            render(list, 'pl-shipping-services-list-item', 'div');
+            // noinspection JSCheckFunctionSignatures
+            Packlink.GridResizerService.init(table);
         };
 
         /**

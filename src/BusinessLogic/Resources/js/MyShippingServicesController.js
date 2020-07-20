@@ -50,15 +50,19 @@ if (!window.Packlink) {
          * @param {ShippingService[]} services
          */
         const bindServices = (services) => {
-            activeServices = services;
-            const table = templateService.getComponent('pl-shipping-services-table');
-            const list = templateService.getComponent('pl-shipping-services-list');
+            const table = templateService.getComponent('pl-shipping-services-table'),
+                list = templateService.getComponent('pl-shipping-services-list'),
+                render = (elem, id, tag) => {
+                    Packlink.ShippingServicesRenderer.render(elem, id, tag, activeServices, true, handleServiceAction);
+                };
 
-            const render = Packlink.ShippingServicesRenderer.render;
-            render(table.querySelector('tbody'), 'pl-shipping-services-row', 'tr', services, true, handleServiceAction);
-            render(list.querySelector('.pl-shipping-services-list'), 'pl-shipping-services-list-item', 'div', services, true, handleServiceAction);
+            activeServices = services;
+            render(table.querySelector('tbody'), 'pl-shipping-services-row', 'tr');
+            render(list.querySelector('.pl-shipping-services-list'), 'pl-shipping-services-list-item', 'div');
 
             if (services.length !== 0) {
+                // noinspection JSCheckFunctionSignatures
+                Packlink.GridResizerService.init(table);
                 utilityService.showElement(table);
                 utilityService.showElement(list);
                 utilityService.hideElement(templateService.getComponent('pl-no-shipping-services'));
