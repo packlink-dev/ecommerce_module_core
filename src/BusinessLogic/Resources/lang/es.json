@@ -156,6 +156,11 @@
     "statusSetByPacklink": "Estado establecido por Packlink PRO."
   },
   "shippingServices": {
+    "myServices": "Mis servicios de envío",
+    "noServicesTitle": "Solo queda añadir tus servicios de envío",
+    "noServicesDescription": "Se mostrarán a tu cliente en el momento del checkout, así podrá elegir qué transportista le llevará su paquete. Lo configuras ahora y no tienes que preocuparte por nada más, puedes cambiarlo siempre que quieras para renovar o ampliar servicios de envío.",
+    "addService": "Añadir servicio",
+    "addNewService": "Añadir nuevo servicio",
     "pickShippingService": "Añadir servicios de envío",
     "filterModalTitle": "Filtros",
     "applyFilters": "Aplicar",

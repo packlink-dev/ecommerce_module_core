@@ -6,7 +6,7 @@ if (!window.Packlink) {
     /**
      * Handles login page logic.
      *
-     * @param {{submit: string, listOfCountriesUrl: string, logoPath: string}} configuration
+     * @param {{submit: string, listOfCountriesUrl: string}} configuration
      * @constructor
      */
     function LoginController(configuration) {
@@ -65,7 +65,6 @@ if (!window.Packlink) {
             let registerModalController = new Packlink.RegisterModalController(
                 'pl-modal-mask',
                 configuration.listOfCountriesUrl,
-                configuration.logoPath
             );
             registerModalController.display();
 

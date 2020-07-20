@@ -291,6 +291,42 @@
       color: $color-blue;
     }
   }
+
+  .pl-my-shipping-services-page {
+    header {
+      background-color: #1A77C2;
+      color: $color-white;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 25px 21px;
+    }
+
+    .pl-no-services {
+      img {
+        height: 176px;
+      }
+
+      .pl-no-services-description {
+        max-width: 420px;
+        margin-left: 60px;
+        text-align: left;
+
+        p {
+          margin: 20px 0;
+        }
+
+        button {
+          padding: 16px;
+          margin: 0;
+          max-width: 200px;
+        }
+      }
+    }
+
+    .pl-page-buttons {
+      display: none;
+    }
+  }
 }
 
 // mobile rules
@@ -328,6 +364,30 @@
         > :first-child {
           padding-bottom: 20px;
         }
+      }
+    }
+
+    .pl-my-shipping-services-page {
+      .pl-no-services {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+
+        .pl-no-services-description {
+          margin: 20px 0 0;
+
+          h1 {
+            text-align: center;
+          }
+
+          button {
+            display: none;
+          }
+        }
+      }
+
+      .pl-page-buttons {
+        display: flex;
       }
     }
   }

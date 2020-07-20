@@ -139,9 +139,7 @@ if (!window.Packlink) {
         const populateTaxClasses = (taxClasses) => {
             const taxSelector = templateService.getComponent('pl-tax-class-select');
 
-            while (taxSelector.firstChild) {
-                taxSelector.firstChild.remove();
-            }
+            templateService.clearComponent(taxSelector);
 
             taxClasses.forEach(taxClass => {
                 const option = document.createElement('option');

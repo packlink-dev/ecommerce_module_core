@@ -56,10 +56,21 @@ if (!window.Packlink) {
         };
 
         /**
+         *
+         * @param {KeyboardEvent} event
+         */
+        const closeOnEsc = (event) => {
+            if (event.key === 'Escape') {
+                this.close();
+            }
+        };
+
+        /**
          * Closes the modal.
          */
         this.close = () => {
             if (!config.onClose || config.onClose()) {
+                window.removeEventListener('keyup', closeOnEsc);
                 modal.remove();
             }
         };
@@ -81,6 +92,7 @@ if (!window.Packlink) {
             if (config.canClose === false) {
                 utilityService.hideElement(closeBtn);
             } else {
+                window.addEventListener('keyup', closeOnEsc);
                 closeBtn.addEventListener('click', this.close);
                 modal.addEventListener('click', (event) => {
                     if (event.target.id === 'pl-modal-mask') {

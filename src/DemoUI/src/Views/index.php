@@ -186,7 +186,8 @@ echo $lang ?>">
                     setUrl: "<?php getUrl('OrderStatusMapping', 'setMappings') ?>"
                 },
                 'my-shipping-services': {
-                    getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>"
+                    getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
+                    deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>"
@@ -203,6 +204,7 @@ echo $lang ?>">
 
             Packlink.state = new Packlink.StateController(
                 {
+                    baseResourcesUrl: "<?php echo UrlService::getResourceUrl() ?>",
                     stateUrl: "<?php getUrl('ModuleState', 'getCurrentState') ?>",
                     pageConfiguration: pageConfiguration,
                     templates: {
@@ -255,9 +257,17 @@ echo $lang ?>">
                             file_get_contents($baseResourcesPath . 'templates/system-info-modal.html')
                         ) ?>,
                         'pl-my-shipping-services-page': {
-                            'pl-main-page-holder': '',
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/my-shipping-services.html')
+                            ) ?>,
                             'pl-header-section': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'templates/shipping-methods-header.html')
+                                file_get_contents($baseResourcesPath . 'templates/shipping-services-header.html')
+                            ) ?>,
+                            'pl-shipping-services-table': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/shipping-services-table.html')
+                            ) ?>,
+                            'pl-shipping-services-list': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/shipping-services-list.html')
                             ) ?>
                         },
                         'pl-pick-service-page': {
