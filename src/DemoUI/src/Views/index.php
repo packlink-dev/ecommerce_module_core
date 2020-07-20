@@ -203,6 +203,7 @@ echo $lang ?>">
 
             Packlink.state = new Packlink.StateController(
                 {
+                    baseResourcesUrl: "<?php echo UrlService::getResourceUrl() ?>",
                     stateUrl: "<?php getUrl('ModuleState', 'getCurrentState') ?>",
                     pageConfiguration: pageConfiguration,
                     templates: {
