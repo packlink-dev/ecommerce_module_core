@@ -221,7 +221,9 @@
     "increase": "Incrementar",
     "reduce": "Reducir",
     "and": "y",
-    "by": "Por"
+    "by": "Por",
+    "edit": "Editar",
+    "clear": "Borrar"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtrar servicios",

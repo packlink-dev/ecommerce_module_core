@@ -327,6 +327,11 @@
       display: none;
     }
   }
+
+  .pl-saved-pricing-policies-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 }
 
 // mobile rules

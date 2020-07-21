@@ -551,24 +551,34 @@ if (!window.Packlink) {
          */
         const getPricingPolicyTemplate = (policy, index) => {
             return '<div>' +
-                translator.translate('shippingServices.singlePricePolicy') + ' ' + (index + 1).toString() +
-                '<div class="pl-range-type-wrapper">' + getPolicyRangeTypeLabel(policy) + ': ' +
+                '<label for="pl-price-range-wrapper">' +
+                '<strong>' +
+                translator.translate('shippingServices.singlePricePolicy') + ' ' + (index + 1).toString() + '' +
+                '</strong>' +
+                '</label>' +
+                '<div class="pl-range-type-wrapper pl-saved-pricing-policies-wrapper pl-separate-top-small" ' +
+                'id="pl-price-range-wrapper">' +
+                getPolicyRangeTypeLabel(policy) + ': ' +
                 (policy.from_weight !== null ? translator.translate('shippingServices.from') + ' ' + policy.from_weight + ' Kg ' : '') +
                 (policy.to_weight !== null ? translator.translate('shippingServices.to') + ' ' + policy.to_weight + ' Kg ' : '') +
                 (parseInt(policy.range_type) === 2 ? translator.translate('shippingServices.and') + ' ' : ' ') +
                 (policy.from_price !== null ? translator.translate('shippingServices.from') + ' ' + policy.from_price + ' € ' : '') +
                 (policy.to_price !== null ? translator.translate('shippingServices.to') + ' ' + policy.to_price + ' € ' : '') +
+                '<button class="pl-edit-pricing-policy pl-small pl-button-secondary pl-no-margin">' +
+                translator.translate('shippingServices.edit') +
+                '</button>' +
                 '</div>' +
-                '<div class="pl-pricing-policy-wrapper">' +
+                '<div class="pl-pricing-policy-wrapper pl-saved-pricing-policies-wrapper pl-separate-top-small">' +
                 getPricingPolicyLabel(policy) +
                 (policy.change_percent !== null ?
                     ': ' + (policy.increase ? translator.translate('increase') + ' ' + translator.translate('by')
                     : (translator.translate('decrease') + ' ' + translator.translate('by'))) +
                     ' ' + policy.change_percent + ' % ' : '') +
                 (policy.fixed_price !== null ? ': €' + policy.fixed_price : '') +
+                '<button class="pl-clear-pricing-policy pl-small pl-button-inverted pl-button-clear pl-no-margin">' +
+                translator.translate('shippingServices.clear') +
+                '</button>' +
                 '</div>' +
-                '<button class="pl-edit-pricing-policy pl-small pl-button-secondary">Edit</button>' +
-                '<button class="pl-clear-pricing-policy pl-small pl-button-inverted pl-button-clear">Clear</button>' +
                 '</div>';
         };
 
