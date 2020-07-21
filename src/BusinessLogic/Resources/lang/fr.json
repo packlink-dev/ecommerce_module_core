@@ -181,7 +181,8 @@
     "price": "Prix",
     "select": "Sélectionner",
     "save": "Enregistrer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "accept": "Accepter"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtrer les services",
@@ -209,7 +210,6 @@
     "shippingServiceSuccessfullySaved": "Service de livraison enregistré avec succès.",
     "congrats": "Félicitations! Votre premier service d'envoi a été créé avec succès.",
     "disablePreviousCarriers": "Afin de vous offrir le meilleur service possible, il est important que vous désactiviez vos transporteurs antérieurs. Voulez vous les désactiver? (Recommandé)",
-    "accept": "Accepter",
     "shippingMethodSuccessfullySelected.": "Mode d'envoi sélectionné avec succès.",
     "failedToDeselectShippingMethod": "Échec de l'annulation du service d'envoi.",
     "shippingMethodSuccessfullyDeselected": "Service d'envoi annulé avec succès.",

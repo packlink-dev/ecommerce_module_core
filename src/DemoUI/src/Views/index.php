@@ -196,6 +196,7 @@ echo $lang ?>">
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",
                     saveServiceUrl: "<?php getUrl('ShippingMethods', 'save') ?>",
                     getTaxClassesUrl: "<?php getUrl('ShippingMethods', 'getTaxClasses') ?>",
+                    getCountriesListUrl: "<?php getUrl('Country', 'getShippingCountries') ?>",
                     hasTaxConfiguration: true,
                     hasCountryConfiguration: true,
                     canDisplayCarrierLogos: true
@@ -290,6 +291,9 @@ echo $lang ?>">
                         },
                         'pl-pricing-policy-modal': <?php echo json_encode(
                             file_get_contents($baseResourcesPath . 'templates/pricing-policy-modal.html')
+                        ) ?>,
+                        'pl-countries-selection-modal': <?php echo json_encode(
+                            file_get_contents($baseResourcesPath . 'templates/countries-selection-modal.html')
                         ) ?>,
                     }
                 }

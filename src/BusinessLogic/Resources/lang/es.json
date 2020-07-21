@@ -223,7 +223,11 @@
     "and": "y",
     "by": "Por",
     "edit": "Editar",
-    "clear": "Borrar"
+    "clear": "Borrar",
+    "accept": "Aceptar",
+    "selectAllCountries": "Selecionar todos los países",
+    "selectCountriesHeader": "Países permitidos para tu servicio <br> de envío",
+    "selectCountriesSubheader": "Selecciona la disponibilidad de al menos un país y <br> añade tantos como necesites"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtrar servicios",
@@ -251,7 +255,6 @@
     "shippingServiceSuccessfullySaved": "Servicio de envío guardado.",
     "congrats": "¡Enhorabuena! Ya tienes tu primer servicio de envío.",
     "disablePreviousCarriers": "Para poder ofrecerte el mejor servicio, es importante que deshabilites a tus transportistas anteriores. ¿Quieres que los desactivemos? (recomendado)",
-    "accept": "Aceptar",
     "shippingMethodSuccessfullySelected.": "Servicio de envío seleccionado correctamente.",
     "failedToDeselectShippingMethod": "Error al anular la selección de servicio de envío.",
     "shippingMethodSuccessfullyDeselected": "Servicio de envío correctamente deseleccionado.",

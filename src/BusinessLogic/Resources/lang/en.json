@@ -228,7 +228,11 @@
     "and": "and",
     "by": "By",
     "edit": "Edit",
-    "clear": "Clear"
+    "clear": "Clear",
+    "accept": "Accept",
+    "selectAllCountries": "All selected countries",
+    "selectCountriesHeader": "Countries supported for your <br> shipping service",
+    "selectCountriesSubheader": "Select availability of at least one country and add <br> as many required"
   },
   "shippingServicesSettings": {
     "filterServices": "Filter services",
@@ -254,7 +258,6 @@
     "shippingServiceSuccessfullySaved": "Shipping service successfully saved.",
     "congrats": "Congrats! Your first Shipping Method has been successfully created.",
     "disablePreviousCarriers": "In order to offer you the best possible service, its important to disable your previous carriers. Do you want us to disable them? (recommended)",
-    "accept": "Accept",
     "shippingMethodSuccessfullySelected.": "Shipping method successfully selected.",
     "failedToDeselectShippingMethod": "Failed to deselect shipping method.",
     "shippingMethodSuccessfullyDeselected": "Shipping method successfully deselected.",

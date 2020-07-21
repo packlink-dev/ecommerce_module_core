@@ -332,6 +332,20 @@
     flex-direction: row;
     justify-content: space-between;
   }
+
+  .pl-country-checkbox-wrapper {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+  }
+
+  .pl-shipping-country-selection-wrapper {
+    max-height: 500px;
+    overflow: auto;
+  }
+
+  .pl-shipping-country-selected {
+    background: $border-light;
+  }
 }
 
 // mobile rules

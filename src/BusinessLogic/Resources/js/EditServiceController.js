@@ -8,6 +8,7 @@ if (!window.Packlink) {
      * @property {string} getServiceUrl
      * @property {string} saveServiceUrl
      * @property {string} getTaxClassesUrl
+     * @property {string} getCountriesListUrl
      * @property {boolean} hasTaxConfiguration
      * @property {boolean} hasCountryConfiguration
      * @property {boolean} canDisplayCarrierLogos
@@ -90,7 +91,7 @@ if (!window.Packlink) {
                 initializePricingPolicyModal(event);
             });
 
-            handlePolicySwitchButton(policySwitchButton);
+            //handlePolicySwitchButton(policySwitchButton);
         };
 
         /**
@@ -192,6 +193,8 @@ if (!window.Packlink) {
 
             utilityService.showElement(section);
             button.innerHTML = translator.translate('shippingServices.openCountries');
+
+            button.addEventListener('click', openCountriesSelectionModal);
 
             if (selectedCountries === 0 || serviceModel.isShipToAllCountries) {
                 label.innerHTML = translator.translate('shippingServices.allCountriesSelected');
@@ -546,6 +549,66 @@ if (!window.Packlink) {
         };
 
         /**
+         * Opens countries selection modal.
+         *
+         * @param {Event} event
+         * @returns {boolean}
+         */
+        const openCountriesSelectionModal = (event) => {
+            event.preventDefault();
+            let modal = new Packlink.modalService({
+                content: templateService.getTemplate('pl-countries-selection-modal'),
+                canClose: false,
+                title: translator.translate('shippingServices.selectCountriesHeader'),
+                buttons: [
+                    {
+                        title: translator.translate('shippingServices.accept'),
+                        cssClasses: ['pl-button-primary'],
+                        onClick: () => {
+                            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
+                                allCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input'),
+                                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
+                            serviceModel.shippingCountries = [];
+                            serviceModel.isShipToAllCountries =  allCountries.length === selectedCountries.length;
+
+                            if (!serviceModel.isShipToAllCountries) {
+                                selectedCountries.forEach(
+                                    (input) => {
+                                        serviceModel.shippingCountries.push(input.name);
+                                    }
+                                );
+                            }
+                            ajaxService.post(
+                                configuration.saveServiceUrl,
+                                serviceModel,
+                                (response) => {
+                                    serviceModel = response;
+                                    bindService(serviceModel);
+                                    modal.close();
+                                },
+                                Packlink.responseService.errorHandler
+                            );
+                        }
+                    },
+                    {
+                        title: translator.translate('shippingServices.cancel'),
+                        cssClasses: ['pl-button-secondary'],
+                        onClick: () => {
+                            modal.close();
+                        }
+                    }
+                ],
+                onOpen: () => {
+                    ajaxService.get(configuration.getCountriesListUrl, setCountriesSelectionInitialState);
+                }
+            });
+
+            modal.open();
+
+            return false;
+        };
+
+        /**
          * Get pricing policy template.
          *
          * @param {ShippingPricingPolicy} policy
@@ -587,7 +650,7 @@ if (!window.Packlink) {
         };
 
         /**
-         * Get range type label
+         * Gets range type label.
          * @param {ShippingPricingPolicy} policy
          * @returns {string}
          */
@@ -604,7 +667,7 @@ if (!window.Packlink) {
         };
 
         /**
-         * Get range type label
+         * Gets range type label.
          * @param {ShippingPricingPolicy} policy
          * @returns {string}
          */
@@ -618,6 +681,95 @@ if (!window.Packlink) {
             }
 
             return result;
+        };
+
+        /**
+         * Sets countries selection initial state.
+         *
+         * @param {[{value: string, label: string}]} listOfCountries
+         */
+        const setCountriesSelectionInitialState = (listOfCountries) => {
+            const shippingCountryWrapper = templateService.getComponent('pl-shipping-country-selection-wrapper');
+            shippingCountryWrapper.innerHTML = '';
+            listOfCountries.forEach((country) => {
+                shippingCountryWrapper.innerHTML += '<section class="pl-checkbox pl-country-checkbox-wrapper pl-no-margin">' +
+                    '<input type="checkbox" name="' + country.value + '" id="pl-' + country.value + '">' +
+                    '<label for="pl-' + country.value + '">' +
+                    country.label +
+                    '</label>' +
+                    '</section>';
+            });
+
+            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
+                countryInputs = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input');
+
+            countriesSelectionForm['isShipToAllCountries'].checked = serviceModel.isShipToAllCountries;
+
+            if (serviceModel.isShipToAllCountries) {
+                countryInputs.forEach((input) => {
+                    input.checked = true;
+                });
+            }
+            else {
+                serviceModel.shippingCountries.forEach((country) => {
+                    countriesSelectionForm[country].checked = true;
+                });
+
+                handleCountrySelectionChanged();
+            }
+
+            countryInputs.forEach((input) => {
+                markSelectedCountry(input);
+
+                input.addEventListener('change', () => {
+                    markSelectedCountry(input);
+                    handleCountrySelectionChanged();
+                });
+            });
+
+            countriesSelectionForm['isShipToAllCountries'].addEventListener('change', (event) => {
+                const label = templateService.getComponent('pl-check-all-countries');
+                countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input').forEach((input) => {
+                    input.checked =  event.target.checked;
+                    if (!input.checked) {
+                        label.innerHTML = translator.translate('shippingServices.selectAllCountries');
+                    }
+                    markSelectedCountry(input);
+                });
+            });
+        };
+
+        /**
+         * Handles country selection changed.
+         */
+        const handleCountrySelectionChanged = () => {
+            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form')
+            const selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
+            const label = templateService.getComponent('pl-check-all-countries');
+            const countryInputs = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input');
+            countriesSelectionForm['isShipToAllCountries'].checked = selectedCountries.length > 0;
+
+            if (selectedCountries.length === countryInputs.length || selectedCountries.length === 0) {
+                label.innerHTML = translator.translate('shippingServices.selectAllCountries');
+            } else if (selectedCountries.length === 1) {
+                label.innerHTML = translator.translate('shippingServices.oneCountrySelected');
+            } else {
+                label.innerHTML = translator.translate('shippingServices.selectedCountries', [selectedCountries.length]);
+            }
+        }
+
+        /**
+         * Marks selected country.
+         *
+         * @param {HTMLInputElement} input
+         */
+        const markSelectedCountry = (input) => {
+            let inputWrapper = input.parentElement;
+
+            inputWrapper.classList.remove('pl-shipping-country-selected');
+            if (input.checked) {
+                inputWrapper.classList.add('pl-shipping-country-selected');
+            }
         };
     }
 
