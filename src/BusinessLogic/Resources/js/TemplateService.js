@@ -80,7 +80,9 @@ if (!window.Packlink) {
          *
          * @return {string} HTML as string.
          */
-        this.getTemplate = (templateId) => Packlink.translationService.translateHtml(templates[templateId]);
+        this.getTemplate = (templateId) => this.replaceResourcesUrl(
+            Packlink.translationService.translateHtml(templates[templateId])
+        );
 
         /**
          * Sets current template in the page.

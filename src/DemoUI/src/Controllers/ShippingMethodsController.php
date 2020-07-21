@@ -2,8 +2,11 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\Language\Translator;
+use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\Tax\TaxClass;
 use Packlink\DemoUI\Controllers\Models\Request;
 
@@ -98,5 +101,21 @@ class ShippingMethodsController extends BaseHttpController
         $response = $this->controller->save($shippingMethod);
 
         $this->output($response ? $response->toArray() : array());
+    }
+
+    public function disableCarriers()
+    {
+        /** @var ShopShippingMethodService $carrierService */
+        $carrierService = ServiceRegister::getService(ShopShippingMethodService::CLASS_NAME);
+        if ($carrierService->disableShopServices()) {
+            $this->output(
+                array(
+                    'success' => true,
+                    'message' => Translator::translate('shippingServices.successfullyDisabledShippingMethods'),
+                )
+            );
+        } else {
+            throw new \RuntimeException(Translator::translate('shippingServices.failedToDisableShippingMethods'));
+        }
     }
 }

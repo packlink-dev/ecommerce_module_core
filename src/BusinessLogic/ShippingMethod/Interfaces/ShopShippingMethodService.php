@@ -65,4 +65,11 @@ interface ShopShippingMethodService
      * @return string
      */
     public function getCarrierLogoFilePath($carrierName);
+
+    /**
+     * Disables shop shipping services/carriers.
+     *
+     * @return boolean TRUE if operation succeeded; otherwise, false.
+     */
+    public function disableShopServices();
 }

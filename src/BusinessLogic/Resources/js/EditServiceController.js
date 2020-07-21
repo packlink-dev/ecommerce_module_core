@@ -316,7 +316,7 @@ if (!window.Packlink) {
                         }
                     },
                     {
-                        title: translator.translate('shippingServices.cancel'),
+                        title: translator.translate('general.cancel'),
                         cssClasses: ['pl-button-secondary'],
                         onClick: () => {
                             modal.close();
@@ -564,14 +564,14 @@ if (!window.Packlink) {
                 title: translator.translate('shippingServices.selectCountriesHeader'),
                 buttons: [
                     {
-                        title: translator.translate('shippingServices.accept'),
+                        title: translator.translate('general.accept'),
                         cssClasses: ['pl-button-primary'],
                         onClick: () => {
                             const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
                                 allCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input'),
                                 selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
                             serviceModel.shippingCountries = [];
-                            serviceModel.isShipToAllCountries =  allCountries.length === selectedCountries.length;
+                            serviceModel.isShipToAllCountries = allCountries.length === selectedCountries.length;
 
                             if (!serviceModel.isShipToAllCountries) {
                                 selectedCountries.forEach(
@@ -593,7 +593,7 @@ if (!window.Packlink) {
                         }
                     },
                     {
-                        title: translator.translate('shippingServices.cancel'),
+                        title: translator.translate('general.cancel'),
                         cssClasses: ['pl-button-secondary'],
                         onClick: () => {
                             modal.close();

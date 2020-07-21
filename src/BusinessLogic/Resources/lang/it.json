@@ -13,7 +13,10 @@
     "help": "Aiuto",
     "downloadSystemInfoFile": "Scarica il file di informazioni del sistema",
     "curlIsNotInstalled": "cURL non installato o abilitato nella tua installazione PHP. È necessario per il corretto funzionamento dell’attività in background. Installalo e aggiorna la pagina.",
-    "loading": "Caricamento in corso..."
+    "loading": "Caricamento in corso...",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "accept": "Accetto"
   },
   "validation": {
     "requiredField": "Questo campo è obbligatorio.",
@@ -153,6 +156,8 @@
     "cancelled": "Annullato"
   },
   "shippingServices": {
+    "successfullyDisabledShippingMethods": "Servizi di spedizione disattivati correttamente.",
+    "failedToDisableShippingMethods": "Impossibile disattivare i servizi di spedizione.",
     "pickShippingService": "Add delivery services",
     "type": "Tipo",
     "national": "Nazionale",
@@ -180,10 +185,7 @@
     "from": "Da",
     "to": "A",
     "price": "Prezzo",
-    "select": "Sélectionner",
-    "save": "Salva",
-    "cancel": "Annulla",
-    "accept": "Accetto"
+    "select": "Sélectionner"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtra i servizi",
@@ -216,8 +218,6 @@
     "shippingMethodSuccessfullyDeselected": "Servizio di spedizione deselezionato correttamente.",
     "failedToSaveShippingMethod": "Impossibile salvare il metodo di servizio.",
     "failedToActivateShippingMethod": "Impossibile attivare il servizio di spedizione.",
-    "failedToDisableShippingMethods": "Impossibile disattivare i servizi di spedizione.",
-    "successfullyDisabledShippingMethods": "Servizi di spedizione disattivati correttamente.",
     "successfullyDeletedShippingMethods": "Servizio di spedizione eliminato correttamente.",
     "shippingMethodsDeleteFailed": "Errore nella cancellazione del servizio di spedizione."
   },

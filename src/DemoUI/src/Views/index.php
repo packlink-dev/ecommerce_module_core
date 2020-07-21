@@ -187,7 +187,8 @@ echo $lang ?>">
                 },
                 'my-shipping-services': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
-                    deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
+                    deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
+                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>"
@@ -271,6 +272,9 @@ echo $lang ?>">
                                 file_get_contents($baseResourcesPath . 'templates/shipping-services-list.html')
                             ) ?>
                         },
+                        'pl-disable-carriers-modal': <?php echo json_encode(
+                            file_get_contents($baseResourcesPath . 'templates/disable-carriers-modal.html')
+                        ) ?>,
                         'pl-pick-service-page': {
                             'pl-header-section': '',
                             'pl-main-page-holder': <?php echo json_encode(

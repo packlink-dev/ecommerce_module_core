@@ -82,4 +82,14 @@ class CarrierService implements ShopShippingMethodService
     {
         return true;
     }
+
+    /**
+     * Disables shop shipping services/carriers.
+     *
+     * @return boolean TRUE if operation succeeded; otherwise, false.
+     */
+    public function disableShopServices()
+    {
+        return true;
+    }
 }

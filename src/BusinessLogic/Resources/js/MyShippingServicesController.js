@@ -79,7 +79,28 @@ if (!window.Packlink) {
 
             if (config && config.from === 'edit') {
                 if (config.newService === true && services.length === 1 && configuration.disableCarriersUrl) {
-                    // display modal for disabling carriers
+                    const modal = new Packlink.modalService({
+                        canClose: false,
+                        content: templateService.getTemplate('pl-disable-carriers-modal'),
+                        buttons: [
+                            {
+                                title: translator.translate('general.accept'),
+                                cssClasses: ['pl-button-primary'],
+                                onClick: () => {
+                                    ajaxService.post(configuration.disableCarriersUrl, {}, modal.close, Packlink.responseService.errorHandler);
+                                }
+                            },
+                            {
+                                title: translator.translate('general.cancel'),
+                                cssClasses: ['pl-button-secondary'],
+                                onClick: () => {
+                                    modal.close();
+                                }
+                            }
+                        ]
+                    });
+
+                    modal.open();
                 } else {
                     showMessageModal(
                         translator.translate('shippingServices.addedSuccessTitle'),

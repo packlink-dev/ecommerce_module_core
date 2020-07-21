@@ -13,7 +13,10 @@
     "help": "Hilfe",
     "downloadSystemInfoFile": "Systeminfodatei herunterladen",
     "curlIsNotInstalled": "cURL ist in Ihrer PHP-Installation nicht installiert oder aktiviert. Dies ist jedoch erforderlich, damit die Hintergrundaufgabe funktioniert. Bitte installieren Sie es und aktualisieren Sie diese Seite.",
-    "loading": "Lädt..."
+    "loading": "Lädt...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "accept": "Akzeptieren"
   },
   "validation": {
     "requiredField": "Dies ist ein Pflichtfeld.",
@@ -153,6 +156,8 @@
     "cancelled": "Storniert"
   },
   "shippingServices": {
+    "successfullyDisabledShippingMethods": "Versanddienste erfolgreich deaktiviert.",
+    "failedToDisableShippingMethods": "Versanddienste konnten nicht deaktiviert werden.",
     "pickShippingService": "Add delivery services",
     "type": "Typ",
     "national": "National",
@@ -179,10 +184,7 @@
     "from": "Von",
     "to": "Bis",
     "price": "Preis",
-    "select": "Auswählen",
-    "save": "Speichern",
-    "cancel": "Abbrechen",
-    "accept": "Akzeptieren"
+    "select": "Auswählen"
   },
   "shippingServicesSettings": {
     "filterServices": "Versanddienste filtern",
@@ -215,8 +217,6 @@
     "shippingMethodSuccessfullyDeselected": "Versanddienst erfolgreich abgewählt.",
     "failedToSaveShippingMethod": "Versanddienst konnte nicht gespeichert werden.",
     "failedToActivateShippingMethod": "Versanddienst konnte nicht aktiviert werden.",
-    "failedToDisableShippingMethods": "Versanddienste konnten nicht deaktiviert werden.",
-    "successfullyDisabledShippingMethods": "Versanddienste erfolgreich deaktiviert.",
     "successfullyDeletedShippingMethods": "Versanddienste erfolgreich gelöscht.",
     "shippingMethodsDeleteFailed": "Versanddienste konnten nicht gelöscht werden."
   },
