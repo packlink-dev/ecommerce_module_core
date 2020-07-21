@@ -125,6 +125,10 @@ if (!window.Packlink) {
             if (serviceModel.pricingPolicies.length > 0) {
                 setPricingPolicies();
             }
+            else {
+                const policySwitchButton = templateService.getComponent('pl-configure-prices-button');
+                handlePolicySwitchButton(policySwitchButton);
+            }
 
             templateService.getComponent('pl-page-submit-btn').addEventListener('click', save);
 
