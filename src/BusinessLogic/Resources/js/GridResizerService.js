@@ -2,13 +2,14 @@ if (!window.Packlink) {
     window.Packlink = {};
 }
 
-(function (window, document, localStorage) {
+(function (window, document, localStorage, templateService) {
     /**
      *
      * @constructor
      */
     function GridResizerService() {
-        const minColumnWidth = 150;
+        const minColumnWidth = 170;
+        const page = templateService.getMainPage();
         let columns = [];
         let headerBeingResized
         let table;
@@ -20,7 +21,7 @@ if (!window.Packlink) {
         this.init = (tableEl) => {
             table = tableEl;
 
-            if (table === null || table.id === undefined) {
+            if (table === null || !table.id === undefined) {
                 return;
             }
 
@@ -56,7 +57,7 @@ if (!window.Packlink) {
          * @returns {number}
          */
         const onMouseMove = (e) => requestAnimationFrame(() => {
-            table.classList.add('pl-disable-selection');
+            page.classList.add('pl-disable-selection');
             const width = e.clientX - (headerBeingResized !== null ? headerBeingResized.offsetLeft : 0);
             const column = columns.find(({ header }) => header === headerBeingResized);
             if (!column) {
@@ -75,7 +76,7 @@ if (!window.Packlink) {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
             headerBeingResized = null;
-            table.classList.remove('pl-disable-selection');
+            page.classList.remove('pl-disable-selection');
             if (columns !== null) {
                 localStorage.setItem(table.id, JSON.stringify(columns));
             }
@@ -94,4 +95,4 @@ if (!window.Packlink) {
     }
 
     Packlink.GridResizerService = new GridResizerService();
-})(window, document, window.localStorage);
+})(window, document, window.localStorage, Packlink.templateService);
