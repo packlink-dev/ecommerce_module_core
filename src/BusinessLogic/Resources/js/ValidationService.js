@@ -14,7 +14,8 @@ if (!window.Packlink) {
         number: 'number',
         email: 'email',
         phone: 'phone',
-        password: 'password'
+        password: 'password',
+        text: 'text'
     };
 
     const validationRule = {
@@ -80,6 +81,8 @@ if (!window.Packlink) {
                     return this.validatePhone(input);
                 case inputType.password:
                     return this.validatePasswordLength(input);
+                case inputType.text:
+                    return this.validateMaxLength(input);
             }
 
             return true;
@@ -181,6 +184,20 @@ if (!window.Packlink) {
             input.value.length < input.dataset.minLength,
             'validation.shortPassword',
             [input.dataset.minLength]
+        );
+
+        /**
+         * Validates if the input field is longer than a specified number of characters.
+         * If so, adds the error mark on field.
+         *
+         * @param {HTMLInputElement} input
+         * @return {boolean}
+         */
+        this.validateMaxLength = (input) => validateField(
+            input,
+            input.dataset.maxLength && input.value.length > input.dataset.maxLength,
+            'validation.maxLength',
+            [input.dataset.maxLength]
         );
 
         /**
