@@ -161,6 +161,8 @@
     "noServicesDescription": "Se mostrarán a tu cliente en el momento del checkout, así podrá elegir qué transportista le llevará su paquete. Lo configuras ahora y no tienes que preocuparte por nada más, puedes cambiarlo siempre que quieras para renovar o ampliar servicios de envío.",
     "addService": "Añadir servicio",
     "addNewService": "Añadir nuevo servicio",
+    "addedSuccessTitle": "Servicio de envío añadido correctamente",
+    "addedSuccessDescription": "Podrás editarlo desde la sección <strong>\"Mis servicios\"</strong>.",
     "pickShippingService": "Añadir servicios de envío",
     "filterModalTitle": "Filtros",
     "applyFilters": "Aplicar",

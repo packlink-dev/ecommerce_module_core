@@ -45,6 +45,7 @@ if (!window.Packlink) {
          * @type ShippingService
          */
         let serviceModel = {};
+        let newService = false;
 
         const modelFields = [
             'name',
@@ -79,7 +80,7 @@ if (!window.Packlink) {
                 addServiceButton = document.querySelector('#pl-add-price-section button');
 
             backButton.addEventListener('click', () => {
-                state.goToState('my-shipping-services');
+                state.goToState('pick-shipping-service');
             });
 
             policySwitchButton.addEventListener('click', () => {
@@ -102,6 +103,7 @@ if (!window.Packlink) {
         const bindService = (service) => {
             const form = templateService.getComponent('pl-edit-service-form');
             serviceModel = service;
+            newService = !service.activated;
 
             setFormValidation(form, modelFields);
 
@@ -346,7 +348,7 @@ if (!window.Packlink) {
                     configuration.saveServiceUrl,
                     serviceModel,
                     () => {
-                        state.goToState('my-shipping-services');
+                        state.goToState('my-shipping-services', {from: 'edit', newService: newService});
                     },
                     Packlink.responseService.errorHandler
                 );
