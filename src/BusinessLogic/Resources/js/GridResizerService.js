@@ -2,14 +2,15 @@ if (!window.Packlink) {
     window.Packlink = {};
 }
 
-(function (window, document, localStorage, templateService) {
+(function (window, document, localStorage) {
     /**
      *
      * @constructor
      */
     function GridResizerService() {
-        const minColumnWidth = 170;
-        const page = templateService.getMainPage();
+        const minColumnWidth = 150;
+        const templateService = Packlink.templateService;
+        const page = templateService.getComponent('pl-page');
         let columns = [];
         let headerBeingResized
         let table;
@@ -21,7 +22,7 @@ if (!window.Packlink) {
         this.init = (tableEl) => {
             table = tableEl;
 
-            if (table === null || !table.id === undefined) {
+            if (table === null || !table.id) {
                 return;
             }
 
@@ -34,7 +35,7 @@ if (!window.Packlink) {
 
                 if (columns.length > 0) {
                     const column = columns[index];
-                    cellWidth = column.size + 'px';
+                    cellWidth = column.size;
                 }
 
                 header.style.width = cellWidth;
@@ -42,7 +43,7 @@ if (!window.Packlink) {
                     header,
                     size: cellWidth,
                 });
-                header.innerHTML += '<span class="pl-table-resize-handle pl-rotate-90 material-icons">vertical_align_center</span>';
+                header.innerHTML += '<span class="pl-table-resize-handle material-icons">vertical_align_center</span>';
                 header.querySelector('.pl-table-resize-handle').addEventListener('mousedown', initResize);
             });
 
@@ -95,4 +96,4 @@ if (!window.Packlink) {
     }
 
     Packlink.GridResizerService = new GridResizerService();
-})(window, document, window.localStorage, Packlink.templateService);
+})(window, document, window.localStorage);

@@ -510,7 +510,13 @@
   .pl-table-resize-handle {
     width: 3px;
     cursor: col-resize;
-    float: right;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 20px !important;
+    transform-origin: top;
+    color: $color-gray;
   }
 
   .pl-error {
