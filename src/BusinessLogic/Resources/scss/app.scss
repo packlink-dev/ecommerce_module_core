@@ -301,30 +301,30 @@
       padding: 25px 21px;
     }
 
-    .pl-no-services {
-      img {
-        height: 176px;
-      }
-
-      .pl-no-services-description {
-        max-width: 420px;
-        margin-left: 60px;
-        text-align: left;
-
-        p {
-          margin: 20px 0;
-        }
-
-        button {
-          padding: 16px;
-          margin: 0;
-          max-width: 200px;
-        }
-      }
-    }
-
     .pl-page-buttons {
       display: none;
+    }
+  }
+
+  .pl-no-services {
+    img {
+      height: 176px;
+    }
+
+    .pl-no-services-description {
+      max-width: 420px;
+      margin-left: 60px;
+      text-align: left;
+
+      p {
+        margin: 20px 0;
+      }
+
+      button {
+        padding: 16px;
+        margin: 0;
+        max-width: 200px;
+      }
     }
   }
 

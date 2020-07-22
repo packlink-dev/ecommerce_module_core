@@ -191,7 +191,9 @@ echo $lang ?>">
                     disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
                 },
                 'pick-shipping-service': {
-                    getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>"
+                    getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>",
+                    getTaskStatusUrl: "<?php getUrl('ShippingMethods', 'getTaskStatus') ?>",
+                    startAutoConfigureUrl: "<?php getUrl('AutoConfigure', 'start') ?>"
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",

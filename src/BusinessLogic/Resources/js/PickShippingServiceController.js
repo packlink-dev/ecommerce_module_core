@@ -4,14 +4,22 @@ if (!window.Packlink) {
 
 (function () {
     /**
-     * @param {{getServicesUrl: string}} configuration
+     * @typedef PickShippingServiceControllerConfiguration
+     * @property {string} getServicesUrl
+     * @property {string} getTaskStatusUrl
+     * @property {string} startAutoConfigureUrl
+     */
+
+    /**
+     * @param {PickShippingServiceControllerConfiguration} configuration
      * @constructor
      */
     function PickShippingServiceController(configuration) {
 
         const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
-            translationService = Packlink.translationService,
+            translator = Packlink.translationService,
+            utilityService = Packlink.utilityService,
             state = Packlink.state,
             templateId = 'pl-pick-service-page';
 
@@ -21,13 +29,18 @@ if (!window.Packlink) {
          */
         let shippingServices;
         let desktopMode = true;
+        /**
+         * @type ModalService
+         */
+        let noServicesModal;
 
         /**
          * Displays page content.
          */
         this.display = function () {
+            utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getServicesUrl, bindServices);
+            ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
 
             const mainPage = templateService.getMainPage(),
                 backButton = mainPage.querySelector('.pl-sub-header button');
@@ -44,6 +57,86 @@ if (!window.Packlink) {
             });
 
             mainPage.querySelector('#pl-open-filter-button').addEventListener('click', showFilterModal);
+        };
+
+        /**
+         * Checks the status of the update shipping services task.
+         *
+         * @param {{status: string}} response
+         */
+        const checkServicesStatus = (response) => {
+            if (response.status === 'completed') {
+                ajaxService.get(configuration.getServicesUrl, bindServices);
+            } else if (response.status === 'failed') {
+                showNoServicesModal();
+            } else {
+                setTimeout(
+                    function () {
+                        ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
+                    },
+                    1000
+                );
+            }
+        };
+
+        /**
+         * Shows the modal with the no services message.
+         */
+        const showNoServicesModal = () => {
+            utilityService.hideSpinner();
+            if (!noServicesModal) {
+                noServicesModal = new Packlink.modalService({
+                    title: translator.translate('shippingServices.failedGettingServicesTitle'),
+                    content: '<p class="pl-modal-subtitle">' + translator.translate('shippingServices.failedGettingServicesSubtitle') + '</p>',
+                    canClose: false,
+                    buttons: [
+                        {
+                            title: translator.translate('shippingServices.retry'),
+                            cssClasses: ['pl-button-primary'],
+                            onClick: () => {
+                                startAutoConfigure();
+                            }
+                        },
+                        {
+                            title: translator.translate('general.cancel'),
+                            cssClasses: ['pl-button-secondary'],
+                            onClick: () => {
+                                hideNoServicesModal();
+                                state.goToState('my-shipping-services');
+                            }
+                        },
+                    ]
+                });
+            }
+
+            noServicesModal.open();
+        };
+
+        /**
+         * Shows the block with the no services message.
+         */
+        const hideNoServicesModal = () => {
+            noServicesModal.close();
+        };
+
+        /**
+         * Starts the auto-configure process.
+         */
+        const startAutoConfigure = () => {
+            hideNoServicesModal();
+            utilityService.showSpinner();
+            ajaxService.get(
+                configuration.startAutoConfigureUrl,
+                (response) => {
+                    if (response.success) {
+                        hideNoServicesModal();
+                        ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
+                    } else {
+                        showNoServicesModal();
+                    }
+                },
+                showNoServicesModal
+            );
         };
 
         /**
@@ -72,6 +165,8 @@ if (!window.Packlink) {
             render(list, 'pl-shipping-services-list-item', 'div');
             // noinspection JSCheckFunctionSignatures
             Packlink.GridResizerService.init(table);
+
+            utilityService.hideSpinner();
         };
 
         /**
@@ -105,11 +200,11 @@ if (!window.Packlink) {
         const showFilterModal = () => {
             // noinspection JSCheckFunctionSignatures
             const modal = new Packlink.modalService({
-                title: translationService.translate('shippingServices.filterModalTitle'),
+                title: translator.translate('shippingServices.filterModalTitle'),
                 content: templateService.getMainPage().querySelector('.pl-services-filter-wrapper').innerHTML,
                 buttons: [
                     {
-                        title: translationService.translate('shippingServices.applyFilters'),
+                        title: translator.translate('shippingServices.applyFilters'),
                         cssClasses: ['pl-button-primary'],
                         onClick: (event) => {
                             applyModalFilter(event.target.parentElement.parentElement);
@@ -186,8 +281,8 @@ if (!window.Packlink) {
                     newDiv.classList.add('pl-selected');
                     newDiv.dataset.filter = filterType;
                     newDiv.dataset.option = appliedFilter[filterType];
-                    newDiv.innerHTML = translationService.translate('shippingServices.' + filterType).toUpperCase()
-                        + ': ' + translationService.translate('shippingServices.' + appliedFilter[filterType]);
+                    newDiv.innerHTML = translator.translate('shippingServices.' + filterType).toUpperCase()
+                        + ': ' + translator.translate('shippingServices.' + appliedFilter[filterType]);
                     newDiv.addEventListener('click', () => {
                         appliedFilter[filterType] = null;
                         newDiv.remove();

@@ -2,9 +2,12 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\Controllers\UpdateShippingServicesTaskStatusController;
 use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\Tax\TaxClass;
@@ -51,7 +54,20 @@ class ShippingMethodsController extends BaseHttpController
      */
     public function getTaskStatus()
     {
-        $this->output(array('status' => 'completed'));
+        if (count($this->controller->getAll()) > 0) {
+            $this->output(array('status' => QueueItem::COMPLETED));
+
+            return;
+        }
+
+        try {
+            $controller = new UpdateShippingServicesTaskStatusController();
+            $status = $controller->getLastTaskStatus();
+        } catch (BaseException $e) {
+            $status = QueueItem::FAILED;
+        }
+
+        $this->output(array('status' => $status));
     }
 
     /**
@@ -103,6 +119,9 @@ class ShippingMethodsController extends BaseHttpController
         $this->output($response ? $response->toArray() : array());
     }
 
+    /**
+     * Disables shop carriers.
+     */
     public function disableCarriers()
     {
         /** @var ShopShippingMethodService $carrierService */

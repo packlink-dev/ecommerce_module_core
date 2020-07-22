@@ -3,23 +3,21 @@
 namespace Packlink\DemoUI\Controllers;
 
 use Packlink\BusinessLogic\Controllers\AutoConfigurationController;
-use Packlink\DemoUI\Controllers\Models\Request;
 
 /**
- * Class AutoConfigureController
+ * Class AutoConfigureController.
+ *
  * @package Packlink\DemoUI\Controllers
  */
-class AutoConfigureController
+class AutoConfigureController extends BaseHttpController
 {
     /**
-     * @param \Packlink\DemoUI\Controllers\Models\Request $request
-     *
-     * @return string (encoded JSON)
+     * Starts the auto-configuration process.
      */
-    public function start(Request $request)
+    public function start()
     {
         $controller = new AutoConfigurationController();
 
-        echo json_encode(array('success' => $controller->start(true)));
+        $this->output(array('success' => $controller->start(true)));
     }
 }
