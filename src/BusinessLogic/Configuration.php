@@ -54,33 +54,6 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     }
 
     /**
-     * Checks if any shipment has been created on Packlink.
-     *
-     * @return bool True if a shipment has been created; FALSE otherwise.
-     */
-    public function isFirstShipmentDraftCreated()
-    {
-        $value = $this->getConfigValue('isFirstShipmentDraftCreated');
-
-        // If the value is null, that implies that the user has been registered
-        // before tracking of this flag has been implemented.
-        // For such users we will return true,
-        // since this flag is used to enqueue schedules if its value is false, and already registered
-        // users have schedules since the schedules are created when they've registered in the app.
-        return ($value || $value === null);
-    }
-
-    /**
-     * Sets the flag that indicates that the first shipment has been created to true.
-     *
-     * @param bool $status
-     */
-    public function setFirstShipmentDraftCreated($status = true)
-    {
-        $this->saveConfigValue('isFirstShipmentDraftCreated', $status);
-    }
-
-    /**
      * Returns web-hook callback URL for current system.
      *
      * @return string Web-hook callback URL.
@@ -224,7 +197,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     /**
      * Returns default Warehouse object.
      *
-     * @return \Packlink\BusinessLogic\Warehouse\Warehouse|null Default warehouse object.
+     * @return Warehouse|null Default warehouse object.
      * @noinspection PhpDocMissingThrowsInspection
      */
     public function getDefaultWarehouse()
@@ -239,7 +212,7 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     /**
      * Sets default Warehouse object.
      *
-     * @param \Packlink\BusinessLogic\Warehouse\Warehouse $warehouse Default warehouse object.
+     * @param Warehouse $warehouse Default warehouse object.
      */
     public function setDefaultWarehouse(Warehouse $warehouse)
     {

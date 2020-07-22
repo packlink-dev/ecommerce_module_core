@@ -18,6 +18,8 @@ use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
  * Class UpdateShipmentDataTask.
  *
  * @package Packlink\BusinessLogic\Tasks
+ *
+ * @deprecated The webhooks must be utilized to track shipment data updates.
  */
 class UpdateShipmentDataTask extends Task
 {

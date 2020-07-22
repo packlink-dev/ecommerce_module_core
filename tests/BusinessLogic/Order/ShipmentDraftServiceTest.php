@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Order;
 
+use DateTime;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
@@ -72,7 +73,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
         );
 
         $timeProvider = new TestTimeProvider();
-        $timeProvider->setCurrentLocalTime(new \DateTime('2019-10-18 17:55:00'));
+        $timeProvider->setCurrentLocalTime(new DateTime('2019-10-18 17:55:00'));
 
         TestServiceRegister::registerService(
             TimeProvider::CLASS_NAME,
@@ -188,32 +189,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
         $this->assertEquals(QueueItem::QUEUED, $draftStatus->status);
         $this->assertEmpty($draftStatus->message);
-    }
-
-    public function testSchedulesCreated()
-    {
-        // arrange
-        $this->shopConfig->setFirstShipmentDraftCreated(false);
-
-        // act
-        $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
-
-        // assert
-        $schedules = $this->getScheduleRepository()->select();
-        $this->assertCount(3, $schedules);
-    }
-
-    public function testSchedulesNotCreated()
-    {
-        // arrange
-        $this->shopConfig->setFirstShipmentDraftCreated(true);
-
-        // act
-        $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
-
-        // assert
-        $schedules = $this->getScheduleRepository()->select();
-        $this->assertCount(0, $schedules);
     }
 
     public function testSchedulesNotCreatedForCurrentUsers()
