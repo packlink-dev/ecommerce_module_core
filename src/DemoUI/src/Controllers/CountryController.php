@@ -24,13 +24,18 @@ class CountryController extends BaseHttpController
      */
     public function getShippingCountries()
     {
-        $this->output( array(
-            array('value'=> 'de', 'label'=> 'Germany'),
-            array('value'=> 'en', 'label'=> 'England'),
-            array('value'=> 'es', 'label'=> 'Spain'),
-            array('value'=> 'fr', 'label'=> 'France'),
-            array('value'=> 'it', 'label'=> 'Italia'),
-            array('value'=> 'rs', 'label'=> 'Serbia'),
-        ));
+        /** @var CountryService $countryService */
+        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        $result = array();
+
+        /**
+         * @var string $code
+         * @var \Packlink\BusinessLogic\Country\Country $country
+         */
+        foreach ($countryService->getSupportedCountries() as $code => $country) {
+            $result[] = array('value' => $code, 'label' => $country->name);
+        }
+
+        $this->output($result);
     }
 }

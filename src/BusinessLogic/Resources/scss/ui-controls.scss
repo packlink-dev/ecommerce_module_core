@@ -158,14 +158,17 @@
     display: flex;
     flex-direction: row;
     margin-top: 15px;
+
     &.pl-last-child-border-none {
       .pl-form-group:not(:first-child) {
         margin-top: 0;
+
         input {
           border-left: none;
         }
       }
     }
+
     &.pl-border-radius-none {
       button {
         border-radius: 0;
@@ -358,6 +361,8 @@
     label {
       cursor: pointer;
       text-align: left;
+      align-items: center;
+      display: flex;
     }
 
     &.pl-error {
@@ -437,7 +442,6 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 20px;
     background-color: $color-little-transparent;
     z-index: 100;
     display: flex;
@@ -450,7 +454,6 @@
       max-height: 100%;
       flex-flow: column;
       align-items: center;
-      padding: 20px 40px;
       position: relative;
       margin: 0 auto;
       box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2);
@@ -465,6 +468,7 @@
         font-weight: 600;
         color: $color-blue;
         cursor: pointer;
+        z-index: 1;
 
         i {
           color: $color-blue;
@@ -478,7 +482,7 @@
         font-weight: bold;
         line-height: 22px;
         text-align: center;
-        margin-right: 20px;
+        padding: 20px 40px 0;
       }
 
       .pl-modal-subtitle {
@@ -488,36 +492,33 @@
       }
 
       .pl-modal-body {
-        margin: 20px 0;
+        padding: 20px 40px;
         align-items: flex-start;
         justify-content: flex-start;
         width: 100%;
         overflow: hidden auto;
+
+        &.pl-full-width {
+          padding: 20px 0;
+        }
       }
 
       .pl-modal-footer {
+        padding: 0 40px 20px;
         display: flex;
         flex-direction: row;
-        padding: 20px 0 0;
+        justify-content: center;
+        width: 100%;
 
-        .pl-button + .pl-button {
-          margin-left: 10px;
+        .pl-button {
+          margin-top: 0;
+
+          & + .pl-button {
+            margin-left: 10px;
+          }
         }
       }
     }
-  }
-
-  .pl-table-resize-handle {
-    width: 3px;
-    cursor: col-resize;
-    position: absolute;
-    right: -11px;
-    top: 50%;
-    transform: translateY(-50%) rotate(90deg);
-    font-size: 20px !important;
-    transform-origin: top;
-    color: $color-gray;
-    z-index: 1;
   }
 
   .pl-error {
@@ -538,10 +539,32 @@
   .pl-shipping-services-table {
     width: 100%;
 
+    thead tr {
+      th {
+        background-color: $border-light;
+        z-index: 1;
+
+        .pl-table-resize-handle {
+          width: 20px;
+          cursor: col-resize;
+          position: absolute;
+          right: -11px;
+          top: 50%;
+          transform: rotate(90deg);
+          font-size: 20px;
+          transform-origin: top;
+          color: $color-gray;
+          z-index: 2;
+        }
+      }
+    }
+
     th {
       font-size: 12px;
       font-weight: bold;
       text-transform: uppercase;
+      position: sticky;
+      top: 0;
 
       &.pl-text-center {
         text-align: center;
@@ -656,6 +679,26 @@
 
         &.pl-small {
           padding: 11px;
+        }
+      }
+    }
+
+    .pl-modal-mask {
+      .pl-modal {
+        .pl-modal-title {
+          padding: 20px 20px 0;
+        }
+
+        .pl-modal-body {
+          padding: 20px;
+        }
+
+        .pl-modal-footer {
+          padding: 0 20px 20px;
+
+          .pl-button {
+            min-width: 50%;
+          }
         }
       }
     }

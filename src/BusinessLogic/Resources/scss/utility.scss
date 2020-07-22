@@ -74,6 +74,12 @@
     margin-right: 20px;
   }
 
+  .pl-page-content {
+    height: 100%;
+    overflow: auto;
+    margin-bottom: 10px;
+  }
+
   .pl-page-padding {
     padding: 20px;
   }
@@ -189,13 +195,11 @@
     }
 
     .pl-page-content {
-      height: 100%;
-      overflow: auto;
       margin-bottom: 100px;
     }
 
     .pl-page-buttons {
-      position: fixed;
+      position: absolute;
       bottom: 0;
       width: 100%;
       padding: 20px;

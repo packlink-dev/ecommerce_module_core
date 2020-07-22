@@ -145,9 +145,9 @@ if (!window.Packlink) {
             const modal = new Packlink.modalService({
                 content: templateService.replaceResourcesUrl(
                     '<div class="pl-center pl-separate-horizontally">' +
-                    '<img src="{$BASE_URL$}/images/checklist.png" alt="" class="pl-bottom-separate">' +
+                    '<img src="{$BASE_URL$}/images/checklist.png" alt="">' +
                     '<h1 class="pl-modal-title pl-no-margin">' + title + '</h1>' +
-                    '<p class="pl-modal-subtitle pl-top-separate">' + message + '</p>' +
+                    '<p class="pl-modal-subtitle pl-separate-vertically">' + message + '</p>' +
                     '</div>'
                 )
             });

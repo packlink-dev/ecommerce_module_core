@@ -1,11 +1,9 @@
 <div class="pl-center pl-full-width">
     <form id="pl-pricing-policy-form">
         <section>
-            <div class="pl-section-title pl-text-left" id="pl-pricing-policy-title">
-
-            </div>
+            <div class="pl-section-title pl-text-left" id="pl-pricing-policy-title"></div>
             <div class="pl-top-separate pl-text-left">
-                1- {$shippingServices.rangeTypeExplanation}
+                {$shippingServices.rangeTypeExplanation}
             </div>
             <div class="pl-form-group">
                 <select class="pl-with-label"
@@ -54,7 +52,7 @@
                 </div>
             </div>
             <div class="pl-top-separate pl-text-left">
-                2- {$shippingServices.pricePolicyExplanation}
+                {$shippingServices.pricePolicyExplanation}
             </div>
             <div class="pl-form-group">
                 <select class="pl-with-label"
@@ -85,7 +83,7 @@
                         <input type="text" id="pl-change-percent" name="change_percent" placeholder="5"
                                data-type="number" data-validation-rule="nonNegative" data-required="true"/>
                         <label for="pl-change-percent">
-                            {$shippingServices.select} %
+                            {$shippingServices.select} (%)
                         </label>
                     </div>
                 </div>
@@ -93,9 +91,9 @@
             <div class="pl-form-group" id="pl-price-fixed-wrapper">
                 <div class="pl-form-group pl-fixed-width-input">
                     <input type="text" id="pl-fixed-price" name="fixed_price" placeholder="5"
-                           data-type="number" data-validation-rule="greaterThanZero"/>
+                           data-type="number" data-validation-rule="nonNegative"/>
                     <label for="pl-fixed-price">
-                        {$shippingServices.select} %
+                        {$shippingServices.price} (€)
                     </label>
                 </div>
             </div>

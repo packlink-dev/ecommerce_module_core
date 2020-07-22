@@ -68,7 +68,7 @@ if (!window.Packlink) {
         /**
          * Displays page content.
          *
-         * @param {{id: string}} config
+         * @param {{id: string, fromPick: boolean}} config
          */
         this.display = function (config) {
             templateService.setCurrentTemplate(templateId);
@@ -80,7 +80,7 @@ if (!window.Packlink) {
                 addServiceButton = document.querySelector('#pl-add-price-section button');
 
             backButton.addEventListener('click', () => {
-                state.goToState('pick-shipping-service');
+                state.goToState(config.fromPick ? 'pick-shipping-service' : 'my-shipping-services');
             });
 
             policySwitchButton.addEventListener('click', () => {
@@ -127,8 +127,7 @@ if (!window.Packlink) {
 
             if (serviceModel.pricingPolicies.length > 0) {
                 setPricingPolicies();
-            }
-            else {
+            } else {
                 const policySwitchButton = templateService.getComponent('pl-configure-prices-button');
                 handlePolicySwitchButton(policySwitchButton);
             }
@@ -230,14 +229,14 @@ if (!window.Packlink) {
             });
 
             let editBtns = pricingPolicies.getElementsByClassName('pl-edit-pricing-policy');
-            for (let i = 0; i < editBtns.length; i++)  {
+            for (let i = 0; i < editBtns.length; i++) {
                 editBtns[i].addEventListener('click', (event) => {
                     initializePricingPolicyModal(event, i);
                 });
             }
 
             let clearBtns = pricingPolicies.getElementsByClassName('pl-clear-pricing-policy');
-            for (let i = 0; i < clearBtns.length; i++)  {
+            for (let i = 0; i < clearBtns.length; i++) {
                 clearBtns[i].addEventListener('click', (event) => {
                     event.preventDefault();
                     serviceModel.pricingPolicies.splice(i, 1);
@@ -271,7 +270,7 @@ if (!window.Packlink) {
                 canClose: false,
                 buttons: [
                     {
-                        title: translator.translate('shippingServices.save'),
+                        title: translator.translate('general.save'),
                         cssClasses: ['pl-button-primary'],
                         onClick: () => {
                             const form = templateService.getComponent('pl-pricing-policy-form');
@@ -297,8 +296,7 @@ if (!window.Packlink) {
 
                             if (currentPolicy === null) {
                                 serviceModel.pricingPolicies.push(pricingPolicy);
-                            }
-                            else {
+                            } else {
                                 serviceModel.pricingPolicies[policyIndex] = pricingPolicy;
                             }
 
@@ -395,7 +393,7 @@ if (!window.Packlink) {
             });
 
             setFormValidation(templateService.getComponent('pl-pricing-policy-form'), pricingPolicyModelFields);
-        }
+        };
 
         /**
          * Sets form validation.
@@ -415,7 +413,7 @@ if (!window.Packlink) {
                     validationService.removeError(event.target);
                 }, true);
             }
-        }
+        };
 
         /**
          * Sets price range section.
@@ -430,8 +428,7 @@ if (!window.Packlink) {
 
             if (parseInt(priceRangeSelect.value) === 0) {
                 utilityService.hideElement(fromToWeightWrapper);
-            }
-            else if (parseInt(priceRangeSelect.value) === 1) {
+            } else if (parseInt(priceRangeSelect.value) === 1) {
                 utilityService.hideElement(fromToPriceWrapper);
             }
         };
@@ -449,8 +446,7 @@ if (!window.Packlink) {
 
             if (parseInt(pricingPolicySelect.value) === 1) {
                 utilityService.showElement(pricePercentageWrapper);
-            }
-            else if (parseInt(pricingPolicySelect.value) === 2) {
+            } else if (parseInt(pricingPolicySelect.value) === 2) {
                 utilityService.showElement(fixedPriceWrapper);
             }
         };
@@ -468,8 +464,7 @@ if (!window.Packlink) {
             if (increaseElement.checked) {
                 increaseButton.classList.add('pl-button-primary');
                 decreaseButton.classList.add('pl-button-secondary');
-            }
-            else {
+            } else {
                 increaseButton.classList.add('pl-button-secondary');
                 decreaseButton.classList.add('pl-button-primary');
             }
@@ -561,6 +556,7 @@ if (!window.Packlink) {
             let modal = new Packlink.modalService({
                 content: templateService.getTemplate('pl-countries-selection-modal'),
                 canClose: false,
+                fullWidthBody: true,
                 title: translator.translate('shippingServices.selectCountriesHeader'),
                 buttons: [
                     {
@@ -619,36 +615,33 @@ if (!window.Packlink) {
          * @returns {string}
          */
         const getPricingPolicyTemplate = (policy, index) => {
-            return '<div>' +
+            return translator.translateHtml('<div class="pl-top-separate">' +
                 '<label for="pl-price-range-wrapper">' +
-                '<strong>' +
-                translator.translate('shippingServices.singlePricePolicy') + ' ' + (index + 1).toString() + '' +
+                '<strong>{$shippingServices.singlePricePolicy}' + ' ' + (index + 1).toString() + '' +
                 '</strong>' +
                 '</label>' +
                 '<div class="pl-range-type-wrapper pl-saved-pricing-policies-wrapper pl-separate-top-small" ' +
                 'id="pl-price-range-wrapper">' +
                 getPolicyRangeTypeLabel(policy) + ': ' +
-                (policy.from_weight !== null ? translator.translate('shippingServices.from') + ' ' + policy.from_weight + ' Kg ' : '') +
-                (policy.to_weight !== null ? translator.translate('shippingServices.to') + ' ' + policy.to_weight + ' Kg ' : '') +
-                (parseInt(policy.range_type) === 2 ? translator.translate('shippingServices.and') + ' ' : ' ') +
-                (policy.from_price !== null ? translator.translate('shippingServices.from') + ' ' + policy.from_price + ' € ' : '') +
-                (policy.to_price !== null ? translator.translate('shippingServices.to') + ' ' + policy.to_price + ' € ' : '') +
+                (policy.from_weight !== null ? '{$shippingServices.from}' + ' ' + policy.from_weight + ' Kg ' : '') +
+                (policy.to_weight !== null ? '{$shippingServices.to}' + ' ' + policy.to_weight + ' Kg ' : '') +
+                (parseInt(policy.range_type) === 2 ? '{$shippingServices.and}' + ' ' : ' ') +
+                (policy.from_price !== null ? '{$shippingServices.from}' + ' ' + policy.from_price + ' € ' : '') +
+                (policy.to_price !== null ? '{$shippingServices.to}' + ' ' + policy.to_price + ' € ' : '') +
                 '<button class="pl-edit-pricing-policy pl-small pl-button-secondary pl-no-margin">' +
-                translator.translate('shippingServices.edit') +
+                '{$general.edit}' +
                 '</button>' +
                 '</div>' +
                 '<div class="pl-pricing-policy-wrapper pl-saved-pricing-policies-wrapper pl-separate-top-small">' +
                 getPricingPolicyLabel(policy) +
                 (policy.change_percent !== null ?
-                    ': ' + (policy.increase ? translator.translate('increase') + ' ' + translator.translate('by')
-                    : (translator.translate('decrease') + ' ' + translator.translate('by'))) +
-                    ' ' + policy.change_percent + ' % ' : '') +
-                (policy.fixed_price !== null ? ': €' + policy.fixed_price : '') +
+                    ': ' + '{$shippingServices.' + (policy.increase ? 'increase' : 'reduce') + '}' + ' ' + '{$shippingServices.by}'
+                    + ' ' + policy.change_percent + ' % ' : '') +
+                (policy.fixed_price !== null ? ': ' + policy.fixed_price + ' €' : '') +
                 '<button class="pl-clear-pricing-policy pl-small pl-button-inverted pl-button-clear pl-no-margin">' +
-                translator.translate('shippingServices.clear') +
-                '</button>' +
+                '{$general.delete}</button>' +
                 '</div>' +
-                '</div>';
+                '</div>');
         };
 
         /**
@@ -660,8 +653,7 @@ if (!window.Packlink) {
             let rangeType = translator.translate('shippingServices.priceRange');
             if (parseInt(policy.range_type) === 1) {
                 rangeType = translator.translate('shippingServices.weightRange');
-            }
-            else if (parseInt(policy.range_type) === 2) {
+            } else if (parseInt(policy.range_type) === 2) {
                 rangeType = translator.translate('shippingServices.weightAndPriceRange');
             }
 
@@ -677,8 +669,7 @@ if (!window.Packlink) {
             let result = translator.translate('shippingServices.packlinkPrice');
             if (parseInt(policy.pricing_policy) === 1) {
                 result = translator.translate('shippingServices.percentagePacklinkPrices');
-            }
-            else if (parseInt(policy.pricing_policy) === 2) {
+            } else if (parseInt(policy.pricing_policy) === 2) {
                 result = translator.translate('shippingServices.fixedPrices');
             }
 
@@ -694,12 +685,12 @@ if (!window.Packlink) {
             const shippingCountryWrapper = templateService.getComponent('pl-shipping-country-selection-wrapper');
             shippingCountryWrapper.innerHTML = '';
             listOfCountries.forEach((country) => {
-                shippingCountryWrapper.innerHTML += '<section class="pl-checkbox pl-country-checkbox-wrapper pl-no-margin">' +
+                shippingCountryWrapper.innerHTML += '<div class="pl-checkbox pl-country-checkbox-wrapper pl-no-margin">' +
                     '<input type="checkbox" name="' + country.value + '" id="pl-' + country.value + '">' +
                     '<label for="pl-' + country.value + '">' +
                     country.label +
                     '</label>' +
-                    '</section>';
+                    '</div>';
             });
 
             const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
@@ -711,8 +702,7 @@ if (!window.Packlink) {
                 countryInputs.forEach((input) => {
                     input.checked = true;
                 });
-            }
-            else {
+            } else {
                 serviceModel.shippingCountries.forEach((country) => {
                     countriesSelectionForm[country].checked = true;
                 });
@@ -732,7 +722,7 @@ if (!window.Packlink) {
             countriesSelectionForm['isShipToAllCountries'].addEventListener('change', (event) => {
                 const label = templateService.getComponent('pl-check-all-countries');
                 countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input').forEach((input) => {
-                    input.checked =  event.target.checked;
+                    input.checked = event.target.checked;
                     if (!input.checked) {
                         label.innerHTML = translator.translate('shippingServices.selectAllCountries');
                     }
@@ -745,7 +735,7 @@ if (!window.Packlink) {
          * Handles country selection changed.
          */
         const handleCountrySelectionChanged = () => {
-            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form')
+            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form');
             const selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
             const label = templateService.getComponent('pl-check-all-countries');
             const countryInputs = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input');
@@ -758,7 +748,7 @@ if (!window.Packlink) {
             } else {
                 label.innerHTML = translator.translate('shippingServices.selectedCountries', [selectedCountries.length]);
             }
-        }
+        };
 
         /**
          * Marks selected country.

@@ -21,6 +21,7 @@ if (!window.Packlink) {
      * @property {boolean} [footer=false] Indicates whether to use footer. Defaults to false.
      * @property {boolean} [canClose=true] Indicates whether to use an (X) button or click outside the modal
      * to close it. Defaults to true.
+     * @property {boolean} [fullWidthBody=false] Indicates whether to make body full width
      */
 
     /**
@@ -111,6 +112,9 @@ if (!window.Packlink) {
             }
 
             body.innerHTML = config.content;
+            if (configuration.fullWidthBody) {
+                body.classList.add('pl-full-width');
+            }
 
             if (config.footer === false || !config.buttons) {
                 utilityService.hideElement(footer);

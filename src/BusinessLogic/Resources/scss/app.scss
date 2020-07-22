@@ -331,20 +331,24 @@
   .pl-saved-pricing-policies-wrapper {
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
   }
 
   .pl-country-checkbox-wrapper {
-    padding-top: 15px !important;
-    padding-bottom: 15px !important;
+    padding: 15px;
   }
 
   .pl-shipping-country-selection-wrapper {
     max-height: 500px;
     overflow: auto;
+
+    > * {
+      border-bottom: 1px solid $border-light;
+    }
   }
 
   .pl-shipping-country-selected {
-    background: $border-light;
+    background-color: $border-light;
   }
 }
 

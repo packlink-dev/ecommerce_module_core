@@ -36,9 +36,14 @@ echo $lang ?>">
 
         body {
             display: flex;
+            padding: 20px;
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
             aside {
                 display: none;
             }

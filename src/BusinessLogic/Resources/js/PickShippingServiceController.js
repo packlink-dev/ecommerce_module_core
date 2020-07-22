@@ -175,7 +175,7 @@ if (!window.Packlink) {
          * @param {string} serviceId
          */
         const handleServiceAction = (serviceId) => {
-            state.goToState('edit-service', {id: serviceId});
+            state.goToState('edit-service', {id: serviceId, fromPick: true});
         };
 
         /**
