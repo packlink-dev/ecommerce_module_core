@@ -298,6 +298,9 @@ echo $lang ?>">
                             'pl-header-section': '',
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'templates/edit-shipping-service.html')
+                            ) ?>,
+                            'pl-pricing-policies': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/pricing-policies-list.html')
                             ) ?>
                         },
                         'pl-pricing-policy-modal': <?php echo json_encode(

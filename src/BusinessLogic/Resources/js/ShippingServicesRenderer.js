@@ -20,6 +20,7 @@ if (!window.Packlink) {
      * @property {[]} pricingPolicies
      * @property {[]} shippingCountries
      * @property {boolean} isShipToAllCountries
+     * @property {boolean} usePacklinkPriceIfNotInRange
      */
 
     /**

@@ -158,20 +158,21 @@
     display: flex;
     flex-direction: row;
     margin-top: 15px;
-
-    &.pl-last-child-border-none {
-      .pl-form-group:not(:first-child) {
-        margin-top: 0;
-
-        input {
-          border-left: none;
-        }
-      }
+    .pl-form-group + .pl-form-group {
+      margin-top: 0;
+      margin-left: -1px;
     }
+  }
 
-    &.pl-border-radius-none {
-      button {
-        border-radius: 0;
+  .pl-button-group {
+    flex-direction: row;
+    button {
+      border-radius: 0;
+      &:first-child {
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-child {
+        border-radius: 0 4px 4px 0;
       }
     }
   }
@@ -646,6 +647,13 @@
         min-width: auto;
         margin: 0 10px 0 0;
       }
+    }
+  }
+
+  .pl-button-group {
+    button {
+      height: 58px;
+      min-width: 110px;
     }
   }
 }

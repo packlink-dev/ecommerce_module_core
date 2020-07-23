@@ -65,6 +65,18 @@ if (!window.Packlink) {
             'fixed_price',
         ];
 
+        const rangeTypes = {
+            'price' : 0,
+            'weight': 1,
+            'weightAndPrice': 2
+        };
+
+        const pricingPolicies = {
+            'packlink' : 0,
+            'percent': 1,
+            'fixed': 2
+        };
+
         /**
          * Displays page content.
          *
@@ -88,11 +100,7 @@ if (!window.Packlink) {
                 handlePolicySwitchButton(policySwitchButton);
             });
 
-            addServiceButton.addEventListener('click', (event) => {
-                initializePricingPolicyModal(event);
-            });
-
-            //handlePolicySwitchButton(policySwitchButton);
+            addServiceButton.addEventListener('click', initializePricingPolicyModal);
         };
 
         /**
@@ -131,6 +139,8 @@ if (!window.Packlink) {
                 const policySwitchButton = templateService.getComponent('pl-configure-prices-button');
                 handlePolicySwitchButton(policySwitchButton);
             }
+
+            templateService.getComponent('pl-use-packlink-price-if-not-in-range').checked = serviceModel.usePacklinkPriceIfNotInRange;
 
             templateService.getComponent('pl-page-submit-btn').addEventListener('click', save);
 
@@ -178,6 +188,7 @@ if (!window.Packlink) {
                     addServiceButton.innerHTML = translator.translate('shippingServices.addFirstPolicy');
                 }
             } else {
+                utilityService.hideElement(templateService.getComponent('pl-use-packlink-price-wrapper'));
                 utilityService.hideElement(pricingSection);
                 utilityService.hideElement(pricingPoliciesSection);
             }
@@ -222,11 +233,7 @@ if (!window.Packlink) {
             utilityService.showElement(pricingPolicies);
             addServiceButton.innerHTML = translator.translate('shippingServices.addAnotherPolicy');
 
-            pricingPolicies.innerHTML = '';
-
-            serviceModel.pricingPolicies.forEach((policy, index) => {
-                pricingPolicies.innerHTML += getPricingPolicyTemplate(policy, index);
-            });
+            renderPricingPolicies();
 
             let editBtns = pricingPolicies.getElementsByClassName('pl-edit-pricing-policy');
             for (let i = 0; i < editBtns.length; i++) {
@@ -238,19 +245,11 @@ if (!window.Packlink) {
             let clearBtns = pricingPolicies.getElementsByClassName('pl-clear-pricing-policy');
             for (let i = 0; i < clearBtns.length; i++) {
                 clearBtns[i].addEventListener('click', (event) => {
-                    event.preventDefault();
-                    serviceModel.pricingPolicies.splice(i, 1);
-                    ajaxService.post(
-                        configuration.saveServiceUrl,
-                        serviceModel,
-                        () => {
-                            bindService(serviceModel);
-                        },
-                        Packlink.responseService.errorHandler
-                    );
-                    return false;
+                    deletePricingPolicy(event, i);
                 });
             }
+
+            utilityService.showElement(templateService.getComponent('pl-use-packlink-price-wrapper'));
         };
 
         /**
@@ -272,45 +271,8 @@ if (!window.Packlink) {
                     {
                         title: translator.translate('general.save'),
                         cssClasses: ['pl-button-primary'],
-                        onClick: () => {
-                            const form = templateService.getComponent('pl-pricing-policy-form');
-                            if (!validatePricingPolicyForm(form)) {
-                                return;
-                            }
-
-                            const pricingPolicy = {
-                                'range_type': form['range_type'].value,
-                                'from_weight': (form['range_type'].value === '1' || form['range_type'].value === '2') ?
-                                    form['from_weight'].value : null,
-                                'to_weight': ((form['range_type'].value === '1' || form['range_type'].value === '2') &&
-                                    form['to_weight'].value !== '') ? form['to_weight'].value : null,
-                                'from_price': (form['range_type'].value === '0' || form['range_type'].value === '2') ?
-                                    form['from_price'].value : null,
-                                'to_price': ((form['range_type'].value === '0' || form['range_type'].value === '2') &&
-                                    form['to_price'].value !== '') ? form['to_price'].value : null,
-                                'pricing_policy': form['pricing_policy'].value,
-                                'increase': form['increase'].checked,
-                                'change_percent': form['pricing_policy'].value === '1' ? form['change_percent'].value : null,
-                                'fixed_price': form['pricing_policy'].value === '2' ? form['fixed_price'].value : null,
-                            };
-
-                            if (currentPolicy === null) {
-                                serviceModel.pricingPolicies.push(pricingPolicy);
-                            } else {
-                                serviceModel.pricingPolicies[policyIndex] = pricingPolicy;
-                            }
-
-                            ajaxService.post(
-                                configuration.saveServiceUrl,
-                                serviceModel,
-                                (response) => {
-                                    serviceModel = response;
-                                    bindService(serviceModel);
-                                    modal.close();
-                                },
-                                Packlink.responseService.errorHandler
-                            );
-
+                        onClick: () =>  {
+                            savePricingPolicy(currentPolicy, policyIndex, modal)
                         }
                     },
                     {
@@ -332,6 +294,72 @@ if (!window.Packlink) {
         };
 
         /**
+         * Deletes pricing policy from memory.
+         *
+         * @param {Event} event
+         * @param {number} i
+         * @returns {boolean}
+         */
+        const deletePricingPolicy = (event, i) => {
+            event.preventDefault();
+            serviceModel.pricingPolicies.splice(i, 1);
+            bindService(serviceModel);
+            return false;
+        };
+
+        /**
+         * Saves pricing policy
+         * @param {ShippingPricingPolicy | null} currentPolicy
+         * @param {number} policyIndex
+         * @param {ModalService} modal
+         */
+        const savePricingPolicy = (currentPolicy, policyIndex, modal) => {
+            const form = templateService.getComponent('pl-pricing-policy-form');
+            if (!validatePricingPolicyForm(form)) {
+                return;
+            }
+
+            let pricingPolicy = {};
+            pricingPolicyModelFields.forEach(function (field) {
+                pricingPolicy[field] = form[field].value !== '' ? form[field].value : null;
+            });
+
+            pricingPolicy.increase = form['increase'].checked;
+            removeUnneededFieldsFromModel(pricingPolicy);
+
+            if (currentPolicy === null) {
+                serviceModel.pricingPolicies.push(pricingPolicy);
+            } else {
+                serviceModel.pricingPolicies[policyIndex] = pricingPolicy;
+            }
+
+            bindService(serviceModel);
+            modal.close();
+        };
+
+        /**
+         * Removes not needed fields from model.
+         *
+         * @param {ShippingPricingPolicy} pricingPolicy
+         */
+        const removeUnneededFieldsFromModel = (pricingPolicy) => {
+            if (parseInt(pricingPolicy.range_type) === rangeTypes.price) {
+                pricingPolicy.from_weight = null;
+                pricingPolicy.to_weight = null;
+            } else if (parseInt(pricingPolicy.range_type) === rangeTypes.weight) {
+                pricingPolicy.from_price = null;
+                pricingPolicy.to_price = null;
+            }
+
+            if (parseInt(pricingPolicy.pricing_policy) !== pricingPolicies.percent) {
+                pricingPolicy.change_percent = null;
+
+            } else if (parseInt(pricingPolicy.pricing_policy) !== pricingPolicies.fixed) {
+                pricingPolicy.fixed_price = null;
+            }
+        }
+
+        /**
          * Saves the service.
          */
         const save = () => {
@@ -341,6 +369,7 @@ if (!window.Packlink) {
                 serviceModel.showLogo = form['showLogo'].checked;
                 serviceModel.name = form['name'].value;
                 serviceModel.taxClass = form['tax'].value;
+                serviceModel.usePacklinkPriceIfNotInRange = form['usePacklinkPriceIfNotInRange'].checked;
 
                 ajaxService.post(
                     configuration.saveServiceUrl,
@@ -362,23 +391,24 @@ if (!window.Packlink) {
         const setPricingPolicyInitialState = (pricingPolicy, index) => {
             let priceRangeSelect = templateService.getComponent('pl-range-type-select');
             let pricingPolicySelect = templateService.getComponent('pl-pricing-policy-select');
+            let pricingPolicyForm = templateService.getComponent('pl-pricing-policy-form');
             let currentIndex = serviceModel.pricingPolicies.length + 1;
 
             if (pricingPolicy !== null) {
                 currentIndex = index + 1;
-                priceRangeSelect.value = pricingPolicy.range_type;
-                templateService.getComponent('pl-from-weight').value = pricingPolicy.from_weight;
-                templateService.getComponent('pl-to-weight').value = pricingPolicy.to_weight;
-                templateService.getComponent('pl-from-price').value = pricingPolicy.from_price;
-                templateService.getComponent('pl-to-price').value = pricingPolicy.to_price;
-                pricingPolicySelect.value = pricingPolicy.pricing_policy;
-                templateService.getComponent('pl-increase').checked = pricingPolicy.increase;
-                templateService.getComponent('pl-change-percent').value = pricingPolicy.change_percent;
-                templateService.getComponent('pl-fixed-price').value = pricingPolicy.fixed_price;
+                pricingPolicyForm['range_type'].value = pricingPolicy.range_type;
+                pricingPolicyForm['from_weight'].value = pricingPolicy.from_weight;
+                pricingPolicyForm['to_weight'].value = pricingPolicy.to_weight;
+                pricingPolicyForm['from_price'].value = pricingPolicy.from_price;
+                pricingPolicyForm['to_price'].value = pricingPolicy.to_price;
+                pricingPolicyForm['pricing_policy'].value = pricingPolicy.pricing_policy;
+                pricingPolicyForm['increase'].checked = pricingPolicy.increase;
+                pricingPolicyForm['change_percent'].value = pricingPolicy.change_percent;
+                pricingPolicyForm['fixed_price'].value = pricingPolicy.fixed_price;
             }
 
             templateService.getComponent('pl-pricing-policy-title').innerHTML =
-                translator.translate('shippingServices.singlePricePolicy') + ' ' + currentIndex.toString();
+                translator.translate('shippingServices.singlePricePolicy', [currentIndex]);
 
             setPriceRangeSection();
             setPricingPolicySection();
@@ -398,8 +428,8 @@ if (!window.Packlink) {
         /**
          * Sets form validation.
          *
-         * @param form
-         * @param fields
+         * @param {HTMLElement} form
+         * @param {string[]} fields
          */
         const setFormValidation = (form, fields) => {
             for (const field of fields) {
@@ -426,9 +456,9 @@ if (!window.Packlink) {
             utilityService.showElement(fromToPriceWrapper);
             utilityService.showElement(fromToWeightWrapper);
 
-            if (parseInt(priceRangeSelect.value) === 0) {
+            if (parseInt(priceRangeSelect.value) === rangeTypes.price) {
                 utilityService.hideElement(fromToWeightWrapper);
-            } else if (parseInt(priceRangeSelect.value) === 1) {
+            } else if (parseInt(priceRangeSelect.value) === rangeTypes.weight) {
                 utilityService.hideElement(fromToPriceWrapper);
             }
         };
@@ -444,9 +474,9 @@ if (!window.Packlink) {
             utilityService.hideElement(fixedPriceWrapper);
             utilityService.hideElement(pricePercentageWrapper);
 
-            if (parseInt(pricingPolicySelect.value) === 1) {
+            if (parseInt(pricingPolicySelect.value) === pricingPolicies.percent) {
                 utilityService.showElement(pricePercentageWrapper);
-            } else if (parseInt(pricingPolicySelect.value) === 2) {
+            } else if (parseInt(pricingPolicySelect.value) === pricingPolicies.fixed) {
                 utilityService.showElement(fixedPriceWrapper);
             }
         };
@@ -492,52 +522,55 @@ if (!window.Packlink) {
          * @returns {boolean}
          */
         const validatePricingPolicyForm = (pricingPolicy) => {
-            if (parseInt(pricingPolicy['range_type'].value) === 0 || parseInt(pricingPolicy['range_type'].value) === 2) {
-                if (!validationService.validateRequiredField(pricingPolicy['from_price']) ||
-                    !validationService.validateNumber(pricingPolicy['from_price']) ||
-                    !validationService.validateNumber(pricingPolicy['to_price'])
+            const rangeType = parseInt(pricingPolicy['range_type'].value),
+                currentPricingPolicy = parseInt(pricingPolicy['pricing_policy'].value);
+
+            if (!validateRange(rangeType, pricingPolicy['from_price'], pricingPolicy['to_price'], rangeTypes.price) ||
+                !validateRange(rangeType, pricingPolicy['from_weight'], pricingPolicy['to_weight'], rangeTypes.weight)
+            ) {
+                return false;
+            }
+
+            if (currentPricingPolicy === pricingPolicies.percent &&
+                (!validationService.validateRequiredField(pricingPolicy['change_percent']) ||
+                    !validationService.validateNumber(pricingPolicy['change_percent']))
+            ) {
+                return false;
+            }
+
+            if (currentPricingPolicy === pricingPolicies.fixed &&
+                (!validationService.validateRequiredField(pricingPolicy['fixed_price']) ||
+                    !validationService.validateNumber(pricingPolicy['fixed_price']))
+            ) {
+                return false;
+            }
+
+            return true;
+        };
+
+        /**
+         * Validates the given range.
+         *
+         * @param {int} currentRangeType
+         * @param {HTMLInputElement} fromRange
+         * @param {HTMLInputElement} toRange
+         * @param {int} rangeTypeCondition
+         * @returns {boolean}
+         */
+        const validateRange = (currentRangeType, fromRange, toRange, rangeTypeCondition) => {
+            if (currentRangeType === rangeTypeCondition || currentRangeType === rangeTypes.weightAndPrice) {
+                if (!validationService.validateRequiredField(fromRange) ||
+                    !validationService.validateNumber(fromRange) ||
+                    !validationService.validateNumber(toRange)
                 ) {
                     return false;
                 }
 
-                if (parseFloat(pricingPolicy['from_price'].value) >= parseFloat(pricingPolicy['to_price'].value)) {
+                if (parseFloat(fromRange.value) >= parseFloat(toRange.value)) {
                     validationService.setError(
-                        pricingPolicy['to_price'],
+                        toRange,
                         translator.translate('shippingServices.invalidRange')
                     );
-                    return false;
-                }
-            }
-
-            if (parseInt(pricingPolicy['range_type'].value) === 1 || parseInt(pricingPolicy['range_type'].value) === 2) {
-                if (!validationService.validateRequiredField(pricingPolicy['from_weight']) ||
-                    !validationService.validateNumber(pricingPolicy['from_weight']) ||
-                    !validationService.validateNumber(pricingPolicy['to_weight'])
-                ) {
-                    return false;
-                }
-
-                if (parseFloat(pricingPolicy['from_weight'].value) >= parseFloat(pricingPolicy['to_weight'].value)) {
-                    validationService.setError(
-                        pricingPolicy['to_weight'],
-                        translator.translate('shippingServices.invalidRange')
-                    );
-                    return false;
-                }
-            }
-
-            if (parseInt(pricingPolicy['pricing_policy'].value) === 1) {
-                if (!validationService.validateRequiredField(pricingPolicy['change_percent']) ||
-                    !validationService.validateNumber(pricingPolicy['change_percent'])
-                ) {
-                    return false;
-                }
-            }
-
-            if (parseInt(pricingPolicy['pricing_policy'].value) === 2) {
-                if (!validationService.validateRequiredField(pricingPolicy['fixed_price']) ||
-                    !validationService.validateNumber(pricingPolicy['fixed_price'])
-                ) {
                     return false;
                 }
             }
@@ -563,29 +596,7 @@ if (!window.Packlink) {
                         title: translator.translate('general.accept'),
                         cssClasses: ['pl-button-primary'],
                         onClick: () => {
-                            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
-                                allCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input'),
-                                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
-                            serviceModel.shippingCountries = [];
-                            serviceModel.isShipToAllCountries = allCountries.length === selectedCountries.length;
-
-                            if (!serviceModel.isShipToAllCountries) {
-                                selectedCountries.forEach(
-                                    (input) => {
-                                        serviceModel.shippingCountries.push(input.name);
-                                    }
-                                );
-                            }
-                            ajaxService.post(
-                                configuration.saveServiceUrl,
-                                serviceModel,
-                                (response) => {
-                                    serviceModel = response;
-                                    bindService(serviceModel);
-                                    modal.close();
-                                },
-                                Packlink.responseService.errorHandler
-                            );
+                            saveCountriesSelection(modal);
                         }
                     },
                     {
@@ -607,41 +618,51 @@ if (!window.Packlink) {
         };
 
         /**
-         * Get pricing policy template.
+         * Saves countries selection.
          *
-         * @param {ShippingPricingPolicy} policy
-         * @param {number} index
-         *
-         * @returns {string}
+         * @param {ModalService} modal
          */
-        const getPricingPolicyTemplate = (policy, index) => {
-            return translator.translateHtml('<div class="pl-top-separate">' +
-                '<label for="pl-price-range-wrapper">' +
-                '<strong>{$shippingServices.singlePricePolicy}' + ' ' + (index + 1).toString() + '' +
-                '</strong>' +
-                '</label>' +
-                '<div class="pl-range-type-wrapper pl-saved-pricing-policies-wrapper pl-separate-top-small" ' +
-                'id="pl-price-range-wrapper">' +
-                getPolicyRangeTypeLabel(policy) + ': ' +
-                (policy.from_weight !== null ? '{$shippingServices.from}' + ' ' + policy.from_weight + ' Kg ' : '') +
-                (policy.to_weight !== null ? '{$shippingServices.to}' + ' ' + policy.to_weight + ' Kg ' : '') +
-                (parseInt(policy.range_type) === 2 ? '{$shippingServices.and}' + ' ' : ' ') +
-                (policy.from_price !== null ? '{$shippingServices.from}' + ' ' + policy.from_price + ' € ' : '') +
-                (policy.to_price !== null ? '{$shippingServices.to}' + ' ' + policy.to_price + ' € ' : '') +
-                '<button class="pl-edit-pricing-policy pl-small pl-button-secondary pl-no-margin">' +
-                '{$general.edit}' +
-                '</button>' +
-                '</div>' +
-                '<div class="pl-pricing-policy-wrapper pl-saved-pricing-policies-wrapper pl-separate-top-small">' +
-                getPricingPolicyLabel(policy) +
-                (policy.change_percent !== null ?
-                    ': ' + '{$shippingServices.' + (policy.increase ? 'increase' : 'reduce') + '}' + ' ' + '{$shippingServices.by}'
-                    + ' ' + policy.change_percent + ' % ' : '') +
-                (policy.fixed_price !== null ? ': ' + policy.fixed_price + ' €' : '') +
-                '<button class="pl-clear-pricing-policy pl-small pl-button-inverted pl-button-clear pl-no-margin">' +
-                '{$general.delete}</button>' +
-                '</div>' +
-                '</div>');
+        const saveCountriesSelection = (modal) => {
+            const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
+                allCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input'),
+                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
+            serviceModel.shippingCountries = [];
+            serviceModel.isShipToAllCountries = allCountries.length === selectedCountries.length;
+
+            if (!serviceModel.isShipToAllCountries) {
+                selectedCountries.forEach(
+                    (input) => {
+                        serviceModel.shippingCountries.push(input.name);
+                    }
+                );
+            }
+
+            bindService(serviceModel);
+            modal.close();
+        };
+
+        const renderPricingPolicies = () => {
+            const pricingPolicies = templateService.getComponent('pl-pricing-policies')
+            const parent = pricingPolicies.querySelector('.pl-pricing-policies');
+            parent.innerHTML = '';
+
+            serviceModel.pricingPolicies.forEach((policy, index) => {
+                const template = templateService.getComponent('pl-pricing-policy-list-item'),
+                    itemEl = document.createElement('div');
+
+                itemEl.innerHTML = template.innerHTML;
+
+                parent.appendChild(itemEl);
+
+                itemEl.querySelector('#pl-price-range-title').innerHTML =
+                    translator.translate('shippingServices.singlePricePolicy', [index + 1]);
+
+                itemEl.querySelector('#pl-price-range-wrapper span').innerHTML =
+                    getPolicyRangeTypeLabel(policy);
+
+                itemEl.querySelector('#pl-price-policy-range-wrapper span').innerHTML =
+                    getPricingPolicyLabel(policy);
+            });
         };
 
         /**
@@ -650,11 +671,18 @@ if (!window.Packlink) {
          * @returns {string}
          */
         const getPolicyRangeTypeLabel = (policy) => {
-            let rangeType = translator.translate('shippingServices.priceRange');
-            if (parseInt(policy.range_type) === 1) {
-                rangeType = translator.translate('shippingServices.weightRange');
-            } else if (parseInt(policy.range_type) === 2) {
-                rangeType = translator.translate('shippingServices.weightAndPriceRange');
+            const toWeight = policy.to_weight !== null ? policy.to_weight : '-';
+            const toPrice = policy.to_price !== null ? policy.to_price : '-';
+
+            let rangeType = translator.translate('shippingServices.priceRangeWithData', [policy.from_price, toPrice]);
+
+            if (parseInt(policy.range_type) === rangeTypes.weight) {
+                rangeType = translator.translate('shippingServices.weightRangeWithData', [policy.from_weight, toWeight]);
+            } else if (parseInt(policy.range_type) === rangeTypes.weightAndPrice) {
+                rangeType = translator.translate(
+                    'shippingServices.weightAndPriceRangeWithData',
+                    [policy.from_weight, toWeight, policy.from_price, toPrice]
+                );
             }
 
             return rangeType;
@@ -667,10 +695,13 @@ if (!window.Packlink) {
          */
         const getPricingPolicyLabel = (policy) => {
             let result = translator.translate('shippingServices.packlinkPrice');
-            if (parseInt(policy.pricing_policy) === 1) {
-                result = translator.translate('shippingServices.percentagePacklinkPrices');
-            } else if (parseInt(policy.pricing_policy) === 2) {
-                result = translator.translate('shippingServices.fixedPrices');
+            if (parseInt(policy.pricing_policy) === pricingPolicies.percent) {
+                result = translator.translate('' +
+                    'shippingServices.percentagePacklinkPricesWithData',
+                    [translator.translate('shippingServices.' + (policy.increase ? 'increase' : 'reduce')), policy.change_percent]
+                );
+            } else if (parseInt(policy.pricing_policy) === pricingPolicies.fixed) {
+                result = translator.translate('shippingServices.fixedPricesWithData', [policy.fixed_price]);
             }
 
             return result;
@@ -710,25 +741,8 @@ if (!window.Packlink) {
                 handleCountrySelectionChanged();
             }
 
-            countryInputs.forEach((input) => {
-                markSelectedCountry(input);
-
-                input.addEventListener('change', () => {
-                    markSelectedCountry(input);
-                    handleCountrySelectionChanged();
-                });
-            });
-
-            countriesSelectionForm['isShipToAllCountries'].addEventListener('change', (event) => {
-                const label = templateService.getComponent('pl-check-all-countries');
-                countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input').forEach((input) => {
-                    input.checked = event.target.checked;
-                    if (!input.checked) {
-                        label.innerHTML = translator.translate('shippingServices.selectAllCountries');
-                    }
-                    markSelectedCountry(input);
-                });
-            });
+            setCountryChangeEvents(countryInputs);
+            setShipToAllCountriesChangeEvent(countriesSelectionForm);
         };
 
         /**
@@ -748,6 +762,40 @@ if (!window.Packlink) {
             } else {
                 label.innerHTML = translator.translate('shippingServices.selectedCountries', [selectedCountries.length]);
             }
+        };
+
+        /**
+         * Sets event listeners for country change.
+         *
+         * @param {[HTMLInputElement]}countryInputs
+         */
+        const setCountryChangeEvents = (countryInputs) => {
+            countryInputs.forEach((input) => {
+                markSelectedCountry(input);
+
+                input.addEventListener('change', () => {
+                    markSelectedCountry(input);
+                    handleCountrySelectionChanged();
+                });
+            });
+        };
+
+        /**
+         * Sets event listener for shipToAllCountries checkbox.
+         *
+         * @param {HTMLFormElement} countriesSelectionForm
+         */
+        const setShipToAllCountriesChangeEvent = (countriesSelectionForm) => {
+            countriesSelectionForm['isShipToAllCountries'].addEventListener('change', (event) => {
+                const label = templateService.getComponent('pl-check-all-countries');
+                countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input').forEach((input) => {
+                    input.checked = event.target.checked;
+                    if (!input.checked) {
+                        label.innerHTML = translator.translate('shippingServices.selectAllCountries');
+                    }
+                    markSelectedCountry(input);
+                });
+            });
         };
 
         /**

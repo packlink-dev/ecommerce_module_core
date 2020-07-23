@@ -71,13 +71,15 @@
             <div class="pl-form-group" id="pl-price-percentage-wrapper">
                 <div>{$shippingServices.increaseExplanation}</div>
                 <div>{$shippingServices.reduceExplanation}</div>
-                <div class="pl-form-group-wrapper pl-border-radius-none">
-                    <button id="pl-price-percentage-increase" class="pl-button pl-button-primary pl-no-margin">
-                        {$shippingServices.increase}
-                    </button>
-                    <button id="pl-price-percentage-decrease" class="pl-button pl-button-secondary pl-no-margin">
-                        {$shippingServices.reduce}
-                    </button>
+                <div class="pl-form-group-wrapper">
+                    <div class="pl-button-group">
+                        <button id="pl-price-percentage-increase" class="pl-button pl-button-primary pl-no-margin">
+                            {$shippingServices.increase}
+                        </button>
+                        <button id="pl-price-percentage-decrease" class="pl-button pl-button-secondary pl-no-margin">
+                            {$shippingServices.reduce}
+                        </button>
+                    </div>
                     <input type="hidden" name="increase" id="pl-increase" checked>
                     <div class="pl-form-group pl-left-separate pl-change-percent-wrapper">
                         <input type="text" id="pl-change-percent" name="change_percent" placeholder="5"

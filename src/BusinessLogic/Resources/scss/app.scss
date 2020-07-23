@@ -269,11 +269,6 @@
     }
   }
 
-  #pl-price-percentage-increase, #pl-price-percentage-decrease {
-    height: 58px;
-    min-width: 110px;
-  }
-
   .pl-form-group {
     &:not(:first-child) {
       &.pl-change-percent-wrapper {
@@ -326,12 +321,6 @@
         max-width: 200px;
       }
     }
-  }
-
-  .pl-saved-pricing-policies-wrapper {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
   }
 
   .pl-country-checkbox-wrapper {

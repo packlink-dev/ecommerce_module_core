@@ -216,7 +216,10 @@
     "priceRange": "Rango de precio",
     "weightRange": "Rango de peso",
     "weightAndPriceRange": "Rango de peso y precio",
-    "singlePricePolicy": "Política de precio",
+    "priceRangeWithData": "Rango de precio: desde €%s hasta €%s",
+    "weightRangeWithData": "Rango de peso: desde %s Kg hasta %s Kg",
+    "weightAndPriceRangeWithData": "Rango de peso y precio: desde %s Kg hasta %s Kg y desde %s € hasta %s €",
+    "singlePricePolicy": "Política de precio %s",
     "pricePolicyExplanation": "2- Elige una política de precios y configúrala.",
     "packlinkPrice": "Precio Packlink",
     "percentagePacklinkPrices": "% de los precio de Packlink",
@@ -226,11 +229,11 @@
     "select": "Elige",
     "increase": "incrementar",
     "reduce": "reducir",
-    "and": "y",
     "by": "por",
     "selectAllCountries": "Selecionar todos los países",
     "selectCountriesHeader": "Países permitidos para tu servicio <br> de envío",
-    "selectCountriesSubheader": "Selecciona la disponibilidad de al menos un país y <br> añade tantos como necesites"
+    "selectCountriesSubheader": "Selecciona la disponibilidad de al menos un país y <br> añade tantos como necesites",
+    "usePacklinkRange": "Para el resto de rangos, aplicar precios Packlink"
   },
   "shippingServicesSettings": {
     "filterServices": "Filtrar servicios",
