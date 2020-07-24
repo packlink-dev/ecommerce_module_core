@@ -28,6 +28,18 @@ class ResolverController
 
         header('Content-Type: application/json');
 
+        if (!$controller->isAuthenticated()) {
+            http_response_code(401);
+            echo json_encode(
+                array(
+                    'success' => false,
+                    'error' => 'Unauthorized.',
+                )
+            );
+
+            return;
+        }
+
         try {
             if (method_exists($controller, $action)) {
                 $controller->$action(new Request($query, $payload, $headers));

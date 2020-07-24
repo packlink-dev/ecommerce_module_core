@@ -10,6 +10,11 @@ namespace Packlink\DemoUI\Controllers;
 class ModuleStateController extends BaseHttpController
 {
     /**
+     * @var bool
+     */
+    protected $requiresAuthentication = false;
+
+    /**
      * Gets current app state.
      */
     public function getCurrentState()

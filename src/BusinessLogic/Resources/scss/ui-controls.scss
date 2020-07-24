@@ -331,6 +331,7 @@
     border: 1px solid transparent;
     border-radius: .25rem;
     flex-direction: row;
+    align-items: center;
 
     &.pl-alert-danger {
       color: $color-red;

@@ -14,6 +14,10 @@ use Packlink\DemoUI\Controllers\Models\Request;
 class RegistrationController extends BaseHttpController
 {
     /**
+     * @var bool
+     */
+    protected $requiresAuthentication = false;
+    /**
      * @var RegistrationControllerBase
      */
     private $controller;

@@ -8,10 +8,16 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 /**
  * Class LoginController
+ *
  * @package Packlink\DemoUI\Controllers
  */
 class LoginController extends BaseHttpController
 {
+    /**
+     * @var bool
+     */
+    protected $requiresAuthentication = false;
+
     /**
      * Handles login POST request.
      *

@@ -14,9 +14,18 @@ use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 class BaseHttpController
 {
     /**
+     * @var bool
+     */
+    protected $requiresAuthentication = true;
+    /**
      * @var ConfigurationService
      */
     private $configService;
+
+    public function isAuthenticated()
+    {
+        return !$this->requiresAuthentication || $this->getConfigService()->getAuthorizationToken();
+    }
 
     /**
      * Gets the configuration service instance.
