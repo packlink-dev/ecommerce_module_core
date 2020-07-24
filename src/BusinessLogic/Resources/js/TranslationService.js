@@ -56,7 +56,10 @@ if (!window.Packlink) {
 
             let i = 0;
             return text.replace(/%s/g, function () {
-                return params[i++] || '%s';
+                const param = params[i] !== undefined ? params[i] : '%s';
+                i++;
+
+                return param;
             });
         };
 

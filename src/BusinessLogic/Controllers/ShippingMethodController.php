@@ -220,6 +220,7 @@ class ShippingMethodController
         $shippingMethod->shippingCountries = $item->getShippingCountries();
         $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
         $shippingMethod->pricingPolicies = $item->getPricingPolicies();
+        $shippingMethod->usePacklinkPriceIfNotInRange = $item->isUsePacklinkPriceIfNotInRange();
 
         return $shippingMethod;
     }
@@ -239,6 +240,7 @@ class ShippingMethodController
         $model->setShippingCountries($configuration->shippingCountries);
         $model->setActivated($configuration->activated);
         $model->resetPricingPolicies();
+        $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }

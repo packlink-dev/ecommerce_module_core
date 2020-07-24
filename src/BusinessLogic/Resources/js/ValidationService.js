@@ -36,6 +36,26 @@ if (!window.Packlink) {
             utilityService = Packlink.utilityService;
 
         /**
+         * Sets form validation.
+         *
+         * @param {HTMLElement} form
+         * @param {string[]} fields
+         */
+        this.setFormValidation = (form, fields) => {
+            for (const field of fields) {
+                let input = form[field];
+                input.addEventListener('blur', (event) => {
+                    // noinspection JSCheckFunctionSignatures
+                    this.validateInputField(event.target);
+                }, true);
+                input.addEventListener('input', (event) => {
+                    // noinspection JSCheckFunctionSignatures
+                    this.removeError(event.target);
+                }, true);
+            }
+        };
+
+        /**
          * Validates form. Validates all input and select elements by using data attributes as rules.
          *
          * @param {Element} form
