@@ -140,6 +140,7 @@ if (!window.Packlink) {
             currentCountry = countryInput.value;
             currentPostalCode = '';
             currentCity = '';
+            postalCodeInput.value = '-';
         };
 
 
