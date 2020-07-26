@@ -404,17 +404,6 @@
     }
   }
 
-  .pl-input-mask {
-    display: block;
-    background-color: $color-semi-transparent;
-    z-index: 100;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: absolute;
-  }
-
   .pl-spinner {
     position: absolute;
     z-index: 500;

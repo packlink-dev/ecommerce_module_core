@@ -92,14 +92,13 @@ if (!window.Packlink) {
                     buttons: [
                         {
                             title: translator.translate('shippingServices.retry'),
-                            cssClasses: ['pl-button-primary'],
+                            primary: true,
                             onClick: () => {
                                 startAutoConfigure();
                             }
                         },
                         {
                             title: translator.translate('general.cancel'),
-                            cssClasses: ['pl-button-secondary'],
                             onClick: () => {
                                 hideNoServicesModal();
                                 state.goToState('my-shipping-services');
@@ -205,7 +204,7 @@ if (!window.Packlink) {
                 buttons: [
                     {
                         title: translator.translate('shippingServices.applyFilters'),
-                        cssClasses: ['pl-button-primary'],
+                        primary: true,
                         onClick: (event) => {
                             applyModalFilter(event.target.parentElement.parentElement);
                             modal.close();

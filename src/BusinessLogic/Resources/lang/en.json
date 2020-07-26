@@ -22,7 +22,8 @@
     "complete": "Complete",
     "add": "Add",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "discard": "Discard"
   },
   "validation": {
     "requiredField": "This field is required.",
@@ -241,7 +242,8 @@
     "selectAllCountries": "All selected countries",
     "selectCountriesHeader": "Countries supported for your <br> shipping service",
     "selectCountriesSubheader": "Select availability of at least one country and add <br> as many required",
-    "usePacklinkRange": "For all other ranges, apply Packlink prices"
+    "usePacklinkRange": "For all other ranges, apply Packlink prices",
+    "discardChangesQuestion": "There are unsaved changes.<br>Are you sure you want to go back and discard them?"
   },
   "shippingServicesSettings": {
     "filterServices": "Filter services",

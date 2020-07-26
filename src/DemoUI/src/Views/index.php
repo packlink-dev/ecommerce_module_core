@@ -67,9 +67,6 @@ echo $lang ?>">
 
     <main id="pl-main-page-holder"></main>
 
-    <footer id="pl-footer-extension-point"></footer>
-
-    <div class="pl-input-mask pl-hidden" id="pl-input-mask"></div>
     <div class="pl-spinner pl-hidden" id="pl-spinner">
         <div></div>
     </div>

@@ -8,6 +8,11 @@ use Packlink\BusinessLogic\Country\CountryService;
 class CountryController extends BaseHttpController
 {
     /**
+     * @var bool
+     */
+    protected $requiresAuthentication = false;
+
+    /**
      * Returns list of Packlink supported countries.
      */
     public function get()

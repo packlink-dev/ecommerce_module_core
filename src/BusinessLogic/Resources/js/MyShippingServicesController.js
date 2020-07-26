@@ -101,14 +101,13 @@ if (!window.Packlink) {
                 buttons: [
                     {
                         title: translator.translate('general.accept'),
-                        cssClasses: ['pl-button-primary'],
+                        primary: true,
                         onClick: () => {
                             ajaxService.post(configuration.disableCarriersUrl, {}, modal.close, Packlink.responseService.errorHandler);
                         }
                     },
                     {
                         title: translator.translate('general.cancel'),
-                        cssClasses: ['pl-button-secondary'],
                         onClick: () => {
                             modal.close();
                         }

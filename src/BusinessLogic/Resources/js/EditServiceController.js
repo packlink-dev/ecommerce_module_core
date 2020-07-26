@@ -45,6 +45,10 @@ if (!window.Packlink) {
          * @type ShippingService
          */
         let serviceModel = {};
+        /**
+         * @type ShippingService|null
+         */
+        let originalServiceModel = null;
         let newService = false;
 
         const modelFields = [
@@ -80,7 +84,7 @@ if (!window.Packlink) {
                 addServiceButton = document.querySelector('#pl-add-price-section button');
 
             backButton.addEventListener('click', () => {
-                state.goToState(config.fromPick ? 'pick-shipping-service' : 'my-shipping-services');
+                goBack(config.fromPick);
             });
 
             policySwitchButton.addEventListener('click', () => {
@@ -92,6 +96,45 @@ if (!window.Packlink) {
         };
 
         /**
+         * Navigates to the previous page.
+         *
+         * @param {boolean} fromPickServicesPage
+         */
+        const goBack = (fromPickServicesPage) => {
+            const prevState = fromPickServicesPage ? 'pick-shipping-service' : 'my-shipping-services';
+
+            if (JSON.stringify(serviceModel) !== JSON.stringify(originalServiceModel)) {
+                const modal = new Packlink.modalService({
+                    content: '<div class="pl-text-center">' +
+                        '<p class="pl-modal-subtitle pl-separate-vertically">' +
+                        translator.translate('shippingServices.discardChangesQuestion') + '</p>' +
+                        '</div>',
+                    canClose: false,
+                    buttons: [
+                        {
+                            title: translator.translate('general.discard'),
+                            onClick: () => {
+                                modal.close();
+                                state.goToState(prevState);
+                            }
+                        },
+                        {
+                            title: translator.translate('general.cancel'),
+                            primary: true,
+                            onClick: () => {
+                                modal.close();
+                            }
+                        }
+                    ]
+                });
+
+                modal.open();
+            } else {
+                state.goToState(prevState);
+            }
+        };
+
+        /**
          * Binds service.
          *
          * @param {ShippingService} service
@@ -99,17 +142,25 @@ if (!window.Packlink) {
         const bindService = (service) => {
             const form = templateService.getComponent('pl-edit-service-form');
             serviceModel = service;
+            if (!originalServiceModel) {
+                originalServiceModel = utilityService.cloneObject(service);
+            }
+
             newService = !service.activated;
 
             validationService.setFormValidation(form, modelFields);
 
-            templateService.getComponent('pl-service-title').value = service.name;
+            form['name'].value = service.name;
+            form['name'].addEventListener('blur', () => {
+                service.name = form['name'].value;
+            });
 
             if (configuration.canDisplayCarrierLogos) {
-                const showLogoBtn = templateService.getComponent('pl-show-logo');
-
                 utilityService.showElement(templateService.getComponent('pl-show-logo-group'));
-                showLogoBtn.checked = service.showLogo;
+                form['showLogo'].checked = service.showLogo;
+                form['showLogo'].addEventListener('change', () => {
+                    serviceModel.showLogo = form['showLogo'].checked;
+                });
             }
 
             if (configuration.hasTaxConfiguration) {
@@ -128,7 +179,12 @@ if (!window.Packlink) {
                 handlePolicySwitchButton(policySwitchButton);
             }
 
-            templateService.getComponent('pl-use-packlink-price-if-not-in-range').checked = serviceModel.usePacklinkPriceIfNotInRange;
+            if (form['usePacklinkPriceIfNotInRange']) {
+                form['usePacklinkPriceIfNotInRange'].checked = serviceModel.usePacklinkPriceIfNotInRange;
+                form['usePacklinkPriceIfNotInRange'].addEventListener('change', () => {
+                    serviceModel.usePacklinkPriceIfNotInRange = form['usePacklinkPriceIfNotInRange'].checked;
+                });
+            }
 
             templateService.getComponent('pl-page-submit-btn').addEventListener('click', save);
 
@@ -153,6 +209,10 @@ if (!window.Packlink) {
             });
 
             taxSelector.value = serviceModel.taxClass || taxClasses[0].value;
+
+            taxSelector.addEventListener('change', () => {
+                serviceModel.taxClass = taxSelector.value;
+            });
         };
 
         /**
@@ -283,10 +343,6 @@ if (!window.Packlink) {
             const form = templateService.getComponent('pl-edit-service-form');
             if (validationService.validateForm(form)) {
                 serviceModel.activated = true;
-                serviceModel.showLogo = form['showLogo'].checked;
-                serviceModel.name = form['name'].value;
-                serviceModel.taxClass = form['tax'].value;
-                serviceModel.usePacklinkPriceIfNotInRange = form['usePacklinkPriceIfNotInRange'].checked;
 
                 ajaxService.post(
                     configuration.saveServiceUrl,
