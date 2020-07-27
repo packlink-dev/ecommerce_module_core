@@ -73,16 +73,8 @@
       background-color: $color-white;
 
       &:hover {
-        color: $color-blue-darker;
         border: 1px solid $color-blue-darker;
       }
-    }
-
-    &.pl-small {
-      padding: 5px;
-      width: 100px;
-      min-width: 100px;
-      margin: 0;
     }
 
     &.pl-button-inverted {
@@ -100,6 +92,88 @@
       color: $color-gray;
       background-color: $color-light;
       pointer-events: none;
+    }
+
+    &.pl-small {
+      padding: 5px;
+      width: 100px;
+      min-width: 100px;
+      margin: 5px 0;
+    }
+  }
+
+  .pl-icon-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: $icon-button-size;
+    height: $icon-button-size;
+    min-width: $icon-button-size;
+    margin: 0;
+
+    i {
+      font-size: 20px;
+      width: auto;
+      color: $color-blue;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      i {
+        color: $color-white;
+      }
+    }
+  }
+
+  section {
+    border-bottom: 1px solid $border-light;
+    padding: 20px 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    .pl-section-title {
+      font-weight: 600;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .pl-section-subtitle {
+      display: block;
+    }
+
+    .pl-button {
+      padding: 8px 12px
+    }
+  }
+
+  .pl-form-group-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin-top: 15px;
+    .pl-form-group + .pl-form-group {
+      margin-top: 0;
+      margin-left: -1px;
+    }
+  }
+
+  .pl-button-group {
+    flex-direction: row;
+    button {
+      border-radius: 0;
+      &:first-child {
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-child {
+        border-radius: 0 4px 4px 0;
+      }
     }
   }
 
@@ -257,6 +331,7 @@
     border: 1px solid transparent;
     border-radius: .25rem;
     flex-direction: row;
+    align-items: center;
 
     &.pl-alert-danger {
       color: $color-red;
@@ -288,6 +363,8 @@
     label {
       cursor: pointer;
       text-align: left;
+      align-items: center;
+      display: flex;
     }
 
     &.pl-error {
@@ -297,15 +374,34 @@
     }
   }
 
-  .pl-input-mask {
-    display: block;
-    background-color: $color-semi-transparent;
-    z-index: 100;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: absolute;
+  .pl-switch {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .pl-switch-button {
+      cursor: pointer;
+
+      .pl-switch-on, .pl-switch-off {
+        font-size: 56px;
+      }
+
+      .pl-switch-on {
+        color: $color-blue;
+        display: none;
+      }
+
+      &.pl-selected {
+        .pl-switch-on {
+          display: block;
+        }
+
+        .pl-switch-off {
+          display: none;
+        }
+      }
+    }
   }
 
   .pl-spinner {
@@ -337,7 +433,6 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 20px;
     background-color: $color-little-transparent;
     z-index: 100;
     display: flex;
@@ -350,7 +445,6 @@
       max-height: 100%;
       flex-flow: column;
       align-items: center;
-      padding: 20px 40px;
       position: relative;
       margin: 0 auto;
       box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2);
@@ -365,6 +459,7 @@
         font-weight: 600;
         color: $color-blue;
         cursor: pointer;
+        z-index: 1;
 
         i {
           color: $color-blue;
@@ -378,25 +473,40 @@
         font-weight: bold;
         line-height: 22px;
         text-align: center;
-        margin-right: 20px;
+        padding: 20px 40px 0;
+      }
+
+      .pl-modal-subtitle {
+        color: $text-heading-light-color;
+        font-size: 16px;
+        line-height: 19px;
       }
 
       .pl-modal-body {
-        margin: 20px 0;
+        padding: 20px 40px;
         align-items: flex-start;
         justify-content: flex-start;
         width: 100%;
         overflow: hidden auto;
+
+        &.pl-full-width {
+          padding: 20px 0;
+        }
       }
 
       .pl-modal-footer {
+        padding: 0 40px 20px;
         display: flex;
         flex-direction: row;
-        border-top: 1px solid $border-color;
-        padding: 20px 0;
+        justify-content: center;
+        width: 100%;
 
-        .pl-button + .pl-button {
-          margin-left: 10px;
+        .pl-button {
+          margin-top: 0;
+
+          & + .pl-button {
+            margin-left: 10px;
+          }
         }
       }
     }
@@ -404,7 +514,7 @@
 
   .pl-error {
     input, select {
-      border: 2px solid $color-red !important;
+      border: 1px solid $color-red !important;
     }
 
     label, i {
@@ -416,6 +526,126 @@
       color: $color-red;
     }
   }
+
+  .pl-shipping-services-table {
+    width: 100%;
+
+    thead tr {
+      th {
+        background-color: $border-light;
+        z-index: 1;
+
+        .pl-table-resize-handle {
+          width: 20px;
+          cursor: col-resize;
+          position: absolute;
+          right: -11px;
+          top: 50%;
+          transform: rotate(90deg);
+          font-size: 20px;
+          transform-origin: top;
+          color: $color-gray;
+          z-index: 2;
+        }
+      }
+    }
+
+    th {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      position: sticky;
+      top: 0;
+
+      &.pl-text-center {
+        text-align: center;
+      }
+    }
+
+    td {
+      font-weight: 600;
+
+      .pl-service-name {
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+    }
+
+    tr {
+      border-top: solid 1px $border-light;
+      border-bottom: solid 1px $border-light;
+    }
+
+    th, td {
+      padding: 15px 20px;
+      text-align: left;
+    }
+  }
+
+  .pl-shipping-services-list {
+    display: none;
+  }
+
+  .pl-shipping-services-list-item {
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    background-color: $color-white;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    margin: 5px;
+    padding: 13px;
+
+    .pl-service-header {
+      border-bottom: 1px dashed $border-color;
+      flex-direction: row;
+      padding-bottom: 13px;
+
+      .pl-service-name {
+        flex-grow: 1;
+        padding-left: 15px;
+        align-items: flex-start;
+        justify-content: center;
+
+        #pl-service-name {
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+      }
+    }
+
+    .pl-wrap-items {
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 13px 0 0;
+
+      .pl-service-property {
+        min-width: 170px;
+        margin-bottom: 13px;
+
+        .pl-property-title {
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+      }
+    }
+
+    .pl-service-buttons {
+      flex-direction: row;
+
+      .pl-button {
+        padding: 5px 15px;
+        min-width: auto;
+        margin: 0 10px 0 0;
+      }
+    }
+  }
+
+  .pl-button-group {
+    button {
+      height: 58px;
+      min-width: 110px;
+    }
+  }
 }
 
 // mobile rules
@@ -425,11 +655,63 @@
       width: 100%;
     }
 
-    .pl-header-holder {
+    section {
+      .pl-button {
+        width: auto;
+      }
+    }
 
+    .pl-header-holder {
       .pl-button {
         display: none;
       }
+    }
+
+    .pl-shipping-services-list-item {
+      .pl-wrap-items .pl-service-property {
+        min-width: 50%;
+      }
+
+      .pl-button {
+        width: 100%;
+
+        &.pl-small {
+          padding: 11px;
+        }
+      }
+    }
+
+    .pl-modal-mask {
+      .pl-modal {
+        .pl-modal-title {
+          padding: 20px 20px 0;
+        }
+
+        .pl-modal-body {
+          padding: 20px;
+        }
+
+        .pl-modal-footer {
+          padding: 0 20px 20px;
+
+          .pl-button {
+            min-width: 50%;
+          }
+        }
+      }
+    }
+  }
+}
+
+// mobile and tablet rules
+@media (max-width: 1280px) {
+  #pl-page {
+    .pl-shipping-services-table {
+      display: none;
+    }
+
+    .pl-shipping-services-list {
+      display: flex;
     }
   }
 }

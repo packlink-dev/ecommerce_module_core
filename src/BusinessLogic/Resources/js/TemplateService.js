@@ -9,7 +9,22 @@ if (!window.Packlink) {
          */
         let templates = {};
         let mainPlaceholder = '#pl-main-page-holder';
+        this.baseResourceUrl = '';
 
+        /**
+         * Sets the base resource URL.
+         *
+         * @param {string} url
+         */
+        this.setBaseResourceUrl = (url) => {
+            this.baseResourceUrl = url;
+        };
+
+        /**
+         * Sets the main page placeholder. If not set, defaults to the one set in this service.
+         *
+         * @param {string} placeholder
+         */
         this.setMainPlaceholder = (placeholder) => {
             mainPlaceholder = placeholder;
         };
@@ -20,6 +35,7 @@ if (!window.Packlink) {
          * @returns {Element}
          */
         this.getMainPage = () => document.querySelector(mainPlaceholder);
+
         /**
          * Gets the header of the page.
          *
@@ -34,7 +50,7 @@ if (!window.Packlink) {
          * @param {Element} [element]
          * @param {string|int} [attribute]
          *
-         * @return {Element}
+         * @return {HTMLElement}
          */
         this.getComponent = (component, element, attribute) => {
             if (!element) {
@@ -46,24 +62,6 @@ if (!window.Packlink) {
             }
 
             return element.querySelector('[' + component + '="' + attribute + '"]');
-        };
-
-        /**
-         * Retrieves all nodes with specified attribute.
-         *
-         * @param {string} attribute
-         * @param {Element} [element]
-         *
-         * @return {NodeListOf<Element>}
-         */
-        this.getComponentsByAttribute = (attribute, element) => {
-            let selector = '[' + attribute + ']';
-
-            if (!element) {
-                return document.querySelectorAll(selector);
-            }
-
-            return element.querySelectorAll(selector);
         };
 
         /**
@@ -82,7 +80,9 @@ if (!window.Packlink) {
          *
          * @return {string} HTML as string.
          */
-        this.getTemplate = (templateId) => Packlink.translationService.translateHtml(templates[templateId]);
+        this.getTemplate = (templateId) => this.replaceResourcesUrl(
+            Packlink.translationService.translateHtml(templates[templateId])
+        );
 
         /**
          * Sets current template in the page.
@@ -94,10 +94,18 @@ if (!window.Packlink) {
                 const component = this.getComponent(extensionPointId);
 
                 if (component) {
-                    component.innerHTML = html ? Packlink.translationService.translateHtml(html) : '';
+                    component.innerHTML = this.replaceResourcesUrl(html ? Packlink.translationService.translateHtml(html) : '');
                 }
             }
         };
+
+        /**
+         * Replaces all resources URL placeholders with the correct URL.
+         *
+         * @param {string} html
+         * @return {string}
+         */
+        this.replaceResourcesUrl = (html) => html.replace(/{\$BASE_URL\$}/g, this.baseResourceUrl);
 
         /**
          * Removes component's children.

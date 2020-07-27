@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -54,7 +56,10 @@ var Packlink = window.Packlink || {};
 
             let i = 0;
             return text.replace(/%s/g, function () {
-                return params[i++] || '%s';
+                const param = params[i] !== undefined ? params[i] : '%s';
+                i++;
+
+                return param;
             });
         };
 

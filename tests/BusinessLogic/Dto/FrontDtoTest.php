@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Dto;
 
+use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\EmptyFrontDto;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\FooDto;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
@@ -11,7 +12,7 @@ use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
  *
  * @package Logeecom\Tests\BusinessLogic\Dto
  */
-class FrontDtoTest extends BaseDtoTest
+class FrontDtoTest extends BaseTestWithServices
 {
     /**
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException

@@ -6,7 +6,7 @@ if (!window.Packlink) {
     /**
      * @typedef ButtonConfig
      * @property {string} title
-     * @property {string[]} [cssClass]
+     * @property {boolean} [primary]
      * @property {function()} onClick
      */
 
@@ -21,6 +21,7 @@ if (!window.Packlink) {
      * @property {boolean} [footer=false] Indicates whether to use footer. Defaults to false.
      * @property {boolean} [canClose=true] Indicates whether to use an (X) button or click outside the modal
      * to close it. Defaults to true.
+     * @property {boolean} [fullWidthBody=false] Indicates whether to make body full width
      */
 
     /**
@@ -46,9 +47,9 @@ if (!window.Packlink) {
          */
         const createButton = (button) => {
             const buttonElem = document.createElement('button');
-            const cssClasses = button.cssClass ? ['pl-button', ...button.cssClass] : ['pl-button'];
+            const cssClasses = ['pl-button', button.primary ? 'pl-button-primary' : 'pl-button-secondary'];
 
-            buttonElem.classList.add(cssClasses.join(' '));
+            buttonElem.className = cssClasses.join(' ');
             buttonElem.addEventListener('click', button.onClick);
             buttonElem.innerHTML = button.title;
 
@@ -56,10 +57,21 @@ if (!window.Packlink) {
         };
 
         /**
+         *
+         * @param {KeyboardEvent} event
+         */
+        const closeOnEsc = (event) => {
+            if (event.key === 'Escape') {
+                this.close();
+            }
+        };
+
+        /**
          * Closes the modal.
          */
         this.close = () => {
             if (!config.onClose || config.onClose()) {
+                window.removeEventListener('keyup', closeOnEsc);
                 modal.remove();
             }
         };
@@ -81,6 +93,7 @@ if (!window.Packlink) {
             if (config.canClose === false) {
                 utilityService.hideElement(closeBtn);
             } else {
+                window.addEventListener('keyup', closeOnEsc);
                 closeBtn.addEventListener('click', this.close);
                 modal.addEventListener('click', (event) => {
                     if (event.target.id === 'pl-modal-mask') {
@@ -99,6 +112,9 @@ if (!window.Packlink) {
             }
 
             body.innerHTML = config.content;
+            if (configuration.fullWidthBody) {
+                body.classList.add('pl-full-width');
+            }
 
             if (config.footer === false || !config.buttons) {
                 utilityService.hideElement(footer);

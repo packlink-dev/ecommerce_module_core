@@ -23,22 +23,6 @@ if (!window.Packlink) {
         };
 
         /**
-         * Enables input mask. This mask disables input fields, buttons, checkboxes etc.
-         * Mask has z-index of 100, therefore an element that has to be excluded from input mask
-         * has to have z-index greater than 100;
-         */
-        this.enableInputMask = () => {
-            this.showElement(document.getElementById('pl-input-mask'));
-        };
-
-        /**
-         * Disables input mask.
-         */
-        this.disableInputMask = () => {
-            this.hideElement(document.getElementById('pl-input-mask'));
-        };
-
-        /**
          * Enables loading spinner.
          */
         this.showSpinner = () => {

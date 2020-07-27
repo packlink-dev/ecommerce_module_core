@@ -140,8 +140,8 @@ if (!window.Packlink) {
             currentCountry = countryInput.value;
             currentPostalCode = '';
             currentCity = '';
+            postalCodeInput.value = '-';
         };
-
 
         /**
          * Constructs postal code input and attaches event handlers to it.

@@ -41,7 +41,6 @@
     line-height: 16px;
     font-weight: 400;
     font-style: normal;
-    vertical-align: baseline;
     color: $text-color;
     box-sizing: border-box;
 
@@ -64,6 +63,10 @@
     &::before, &::after {
       box-sizing: border-box;
     }
+  }
+
+  br {
+    margin-bottom: 10px;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -93,10 +96,6 @@
   table {
     border-collapse: collapse;
     border-spacing: 0;
-
-    td:not([align]), th:not([align]) {
-      text-align: left
-    }
   }
 
   a {

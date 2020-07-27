@@ -4,124 +4,32 @@ if (!window.Packlink) {
 
 (function () {
     /**
+     * @typedef StateConfiguration
+     * @property {string} [pagePlaceholder]
+     * @property {{}} pageConfiguration
+     * @property {string} stateUrl
+     * @property {{}} templates
+     * @property {string} baseResourcesUrl
+     */
+
+    /**
      * Main controller of the application.
      *
-     * @param {{
-     *      pagePlaceholder: string,
-     *      pageConfiguration: array,
-     *      scrollConfiguration: {scrollOffset: number, rowHeight: number},
-     *      hasTaxConfiguration: boolean,
-     *      hasCountryConfiguration: boolean,
-     *      canDisplayCarrierLogos: boolean,
-     *      shippingServiceMaxTitleLength: number,
-     *      stateUrl: string,
-     *      loginUrl: string,
-     *      listOfCountriesUrl: string,
-     *      registrationDataUrl: string,
-     *      registrationSubmitUrl: string,
-     *      getOnboardingStateUrl: string,
-     *      autoConfigureStartUrl: string,
-     *      dashboardGetStatusUrl: string,
-     *      defaultParcelGetUrl: string,
-     *      defaultParcelSubmitUrl: string,
-     *      defaultWarehouseGetUrl: string,
-     *      getSupportedCountriesUrl: string,
-     *      defaultWarehouseSubmitUrl: string,
-     *      defaultWarehouseSearchPostalCodesUrl: string,
-     *      debugGetStatusUrl: string,
-     *      debugSetStatusUrl: string,
-     *      shippingMethodsGetAllUrl: string,
-     *      shippingMethodsGetStatusUrl: string,
-     *      shippingMethodsGetTaxClassesUrl: string,
-     *      shippingMethodsSaveUrl: string,
-     *      shippingMethodsActivateUrl: string,
-     *      shippingMethodsDeactivateUrl: string,
-     *      shopShippingMethodCountGetUrl: string,
-     *      shopShippingMethodsDisableUrl: string,
-     *      orderStatusMappingsGetMappingsAndStatusesUrl: string,
-     *      orderStatusMappingsSaveUrl: string,
-     *      getShippingCountriesUrl: string,
-     *      configurationGetDataUrl: string,
-     *      logoPath: string,
-     *      templates: {}
-     * }} configuration
+     * @param {StateConfiguration} configuration
      *
      * @constructor
      */
     function StateController(configuration) {
-        let pageControllerFactory = Packlink.pageControllerFactory;
-        let ajaxService = Packlink.ajaxService;
-        let utilityService = Packlink.utilityService;
-        let templateService = Packlink.templateService;
+        const pageControllerFactory = Packlink.pageControllerFactory,
+            ajaxService = Packlink.ajaxService,
+            utilityService = Packlink.utilityService,
+            templateService = Packlink.templateService;
         let context = '';
         let currentState = '';
         let previousState = '';
 
-        let pageConfiguration = {
-            'login': {
-                submit: configuration.loginUrl,
-                listOfCountriesUrl: configuration.listOfCountriesUrl,
-                logoPath: configuration.logoPath
-            },
-            'register': {
-                getRegistrationData: configuration.registrationDataUrl,
-                submit: configuration.registrationSubmitUrl
-            },
-            'onboarding-state': {
-                getState: configuration.getOnboardingStateUrl
-            },
-            'onboarding-welcome': {},
-            'onboarding-overview': {
-                defaultParcelGet: configuration.defaultParcelGetUrl,
-                defaultWarehouseGet: configuration.defaultWarehouseGetUrl
-            },
-            'default-parcel': {
-                getUrl: configuration.defaultParcelGetUrl,
-                submitUrl: configuration.defaultParcelSubmitUrl
-            },
-            'default-warehouse': {
-                getUrl: configuration.defaultWarehouseGetUrl,
-                getSupportedCountriesUrl: configuration.getSupportedCountriesUrl,
-                submitUrl: configuration.defaultWarehouseSubmitUrl,
-                searchPostalCodesUrl: configuration.defaultWarehouseSearchPostalCodesUrl
-            },
-            'configuration': {
-                getDataUrl: configuration.configurationGetDataUrl
-            },
-            'system-info': {
-                getStatusUrl: configuration.debugGetStatusUrl,
-                setStatusUrl: configuration.debugSetStatusUrl
-            },
-            'order-status-mapping': {
-                getMappingAndStatusesUrl: configuration.orderStatusMappingsGetMappingsAndStatusesUrl,
-                setUrl: configuration.orderStatusMappingsSaveUrl
-            },
-            'shipping-methods': {
-                getDashboardStatusUrl: configuration.dashboardGetStatusUrl,
-                getAllMethodsUrl: configuration.shippingMethodsGetAllUrl,
-                getMethodsStatusUrl: configuration.shippingMethodsGetStatusUrl,
-                activateUrl: configuration.shippingMethodsActivateUrl,
-                deactivateUrl: configuration.shippingMethodsDeactivateUrl,
-                saveUrl: configuration.shippingMethodsSaveUrl,
-                rowHeight: configuration.scrollConfiguration.rowHeight,
-                scrollOffset: configuration.scrollConfiguration.scrollOffset,
-                maxTitleLength: configuration.shippingServiceMaxTitleLength,
-                getShopShippingMethodCountUrl: configuration.shopShippingMethodCountGetUrl,
-                disableShopShippingMethodsUrl: configuration.shopShippingMethodsDisableUrl,
-                autoConfigureStartUrl: configuration.autoConfigureStartUrl,
-                hasTaxConfiguration: configuration.hasTaxConfiguration,
-                getTaxClassesUrl: configuration.shippingMethodsGetTaxClassesUrl,
-                canDisplayCarrierLogos: configuration.canDisplayCarrierLogos,
-                getShippingCountries: configuration.getShippingCountriesUrl,
-                hasCountryConfiguration: configuration.hasCountryConfiguration
-            }
-        };
-
-        if (typeof configuration.pageConfiguration !== 'undefined') {
-            pageConfiguration = {...pageConfiguration, ...configuration.pageConfiguration};
-        }
-
         this.display = () => {
+            templateService.setBaseResourceUrl(configuration.baseResourcesUrl);
             if (configuration.pagePlaceholder) {
                 templateService.setMainPlaceholder(configuration.pagePlaceholder);
             }
@@ -129,17 +37,6 @@ if (!window.Packlink) {
             templateService.setTemplates(configuration.templates);
 
             ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
-        };
-
-        /**
-         * Opens configuration page that corresponds to particular step.
-         *
-         * @param {string} step
-         */
-        this.startStep = (step) => {
-            utilityService.disableInputMask();
-            let controller = pageControllerFactory.getInstance(step, getControllerConfiguration(step, true));
-            controller.display();
         };
 
         /**
@@ -186,12 +83,11 @@ if (!window.Packlink) {
                 case 'login':
                     this.goToState('login');
                     break;
-
                 case 'onBoarding':
                     this.goToState('onboarding-state');
                     break;
                 default:
-                    this.goToState('shipping-methods');
+                    this.goToState('my-shipping-services');
                     break;
             }
         };
@@ -204,7 +100,7 @@ if (!window.Packlink) {
          * @return {{}}
          */
         const getControllerConfiguration = (controller, fromStep = false) => {
-            let config = utilityService.cloneObject(pageConfiguration[controller]);
+            let config = utilityService.cloneObject(configuration.pageConfiguration[controller]);
 
             setContext();
             config.context = context;

@@ -10,11 +10,11 @@ namespace Packlink\BusinessLogic\Controllers\DTO;
 class ShippingMethodResponse extends ShippingMethodConfiguration
 {
     /**
-     * Shipping method title.
+     * Shipping method type (national/international).
      *
      * @var string
      */
-    public $title;
+    public $type;
     /**
      * Shipping carrier name.
      *
@@ -51,12 +51,6 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
      * @var string
      */
     public $parcelDestination;
-    /**
-     * Selected flag.
-     *
-     * @var bool
-     */
-    public $selected = false;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -68,14 +62,13 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
         return array_merge(
             parent::toArray(),
             array(
-                'title' => $this->title,
+                'type' => $this->type,
                 'carrierName' => $this->carrierName,
                 'deliveryDescription' => $this->deliveryDescription,
                 'deliveryType' => $this->deliveryType,
                 'parcelOrigin' => $this->parcelOrigin,
                 'parcelDestination' => $this->parcelDestination,
                 'logoUrl' => $this->logoUrl,
-                'selected' => $this->selected,
             )
         );
     }

@@ -14,7 +14,7 @@ class Composer
         $map = array(
             $fromBase . 'js' => $toBase . 'js',
             $fromBase . 'css' => $toBase . 'css',
-            $fromBase . 'img' => $toBase . 'images',
+            $fromBase . 'images' => $toBase . 'images',
         );
 
         foreach ($map as $from => $to) {

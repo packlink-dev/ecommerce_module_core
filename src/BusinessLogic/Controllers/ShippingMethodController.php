@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
+use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -29,9 +30,13 @@ class ShippingMethodController
      */
     const PICKUP = 'pickup';
     /**
+     * Collection constant
+     */
+    const COLLECTION = 'collection';
+    /**
      * Home constant
      */
-    const HOME = 'home';
+    const DELIVERY = 'delivery';
     /**
      * Shipping type: national
      */
@@ -48,17 +53,6 @@ class ShippingMethodController
      * Shipping delivery type: economic
      */
     const ECONOMIC = 'economic';
-    /**
-     * Allowed policies.
-     *
-     * @var array
-     */
-    private static $policies = array(
-        ShippingMethod::PRICING_POLICY_PACKLINK,
-        ShippingMethod::PRICING_POLICY_PERCENT,
-        ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT,
-        ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE,
-    );
     /**
      * Shipping method service.
      *
@@ -81,13 +75,46 @@ class ShippingMethodController
      */
     public function getAll()
     {
-        $all = $this->shippingMethodService->getAllMethods();
-        $result = array();
-        foreach ($all as $item) {
-            $result[] = $this->transformShippingMethodModelToDto($item);
+        return $this->getResponse($this->shippingMethodService->getAllMethods());
+    }
+
+    /**
+     * Returns all shipping methods.
+     *
+     * @return ShippingMethodResponse[] Array of shipping methods.
+     */
+    public function getActive()
+    {
+        return $this->getResponse($this->shippingMethodService->getActiveMethods());
+    }
+
+    /**
+     * Returns all shipping methods.
+     *
+     * @return ShippingMethodResponse[] Array of shipping methods.
+     */
+    public function getInactive()
+    {
+        return $this->getResponse($this->shippingMethodService->getInactiveMethods());
+    }
+
+    /**
+     * Returns shipping method with the given ID.
+     *
+     * @param int $id Shipping method ID.
+     *
+     * @return ShippingMethodResponse|null Shipping method.
+     */
+    public function getShippingMethod($id)
+    {
+        $model = $this->shippingMethodService->getShippingMethod($id);
+        if (!$model) {
+            Logger::logWarning("Shipping method with id {$id} not found!");
+
+            return null;
         }
 
-        return $result;
+        return $this->transformShippingMethodModelToDto($model);
     }
 
     /**
@@ -99,10 +126,6 @@ class ShippingMethodController
      */
     public function save(ShippingMethodConfiguration $shippingMethod)
     {
-        if (!$this->isValid($shippingMethod)) {
-            return null;
-        }
-
         $model = $this->shippingMethodService->getShippingMethod($shippingMethod->id);
         if (!$model) {
             Logger::logError("Shipping method with id {$shippingMethod->id} not found!");
@@ -117,10 +140,9 @@ class ShippingMethodController
             return $this->transformShippingMethodModelToDto($model);
         } catch (\Exception $e) {
             Logger::logError($e->getMessage(), 'Core', $shippingMethod->toArray());
-            $result = null;
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -154,6 +176,23 @@ class ShippingMethodController
     }
 
     /**
+     * Transforms shipping methods to the response.
+     *
+     * @param ShippingMethod[] $methods Shipping methods to transform.
+     *
+     * @return ShippingMethodResponse[] Array of shipping methods.
+     */
+    protected function getResponse($methods)
+    {
+        $result = array();
+        foreach ($methods as $item) {
+            $result[] = $this->transformShippingMethodModelToDto($item);
+        }
+
+        return $result;
+    }
+
+    /**
      * Transforms ShippingMethod model class to ShippingMethod DTO.
      *
      * @param ShippingMethod $item Shipping method model to be transformed.
@@ -164,47 +203,26 @@ class ShippingMethodController
     {
         $shippingMethod = new ShippingMethodResponse();
         $shippingMethod->id = $item->getId();
-        $shippingMethod->selected = $item->isActivated();
+        $shippingMethod->activated = $item->isActivated();
+        $shippingMethod->name = $item->getTitle();
         $shippingMethod->logoUrl = $item->getLogoUrl();
         $shippingMethod->showLogo = $item->isDisplayLogo();
-        $shippingMethod->title = $item->isNational() ? static::NATIONAL : static::INTERNATIONAL;
+        $shippingMethod->type = $item->isNational() ? static::NATIONAL : static::INTERNATIONAL;
         $shippingMethod->carrierName = $item->getCarrierName();
-        $shippingMethod->deliveryDescription = ($item->isExpressDelivery() ? 'Express' : 'Economic') . ' '
-            . $item->getDeliveryTime();
+        $shippingMethod->deliveryDescription = mb_strtolower($item->getDeliveryTime()) . ' - '
+            . Translator::translate(
+                'shippingServices.' . ($item->isExpressDelivery() ? static::EXPRESS : static::ECONOMIC)
+            );
         $shippingMethod->deliveryType = $item->isExpressDelivery() ? static::EXPRESS : static::ECONOMIC;
-        $shippingMethod->name = $item->getTitle();
-        $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::DROP_OFF : static::HOME;
-        $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::PICKUP;
+        $shippingMethod->parcelOrigin = $item->isDepartureDropOff() ? static::DROP_OFF : static::COLLECTION;
+        $shippingMethod->parcelDestination = $item->isDestinationDropOff() ? static::PICKUP : static::DELIVERY;
         $shippingMethod->taxClass = $item->getTaxClass();
         $shippingMethod->shippingCountries = $item->getShippingCountries();
         $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
-
-        $shippingMethod->pricePolicy = $item->getPricingPolicy();
-        $shippingMethod->percentPricePolicy = $item->getPercentPricePolicy();
-        $shippingMethod->fixedPriceByWeightPolicy = $item->getFixedPriceByWeightPolicy();
-        $shippingMethod->fixedPriceByValuePolicy = $item->getFixedPriceByValuePolicy();
-
-        $shippingMethod->logoUrl = $item->getLogoUrl();
+        $shippingMethod->pricingPolicies = $item->getPricingPolicies();
+        $shippingMethod->usePacklinkPriceIfNotInRange = $item->isUsePacklinkPriceIfNotInRange();
 
         return $shippingMethod;
-    }
-
-    /**
-     * Validates shipping method data.
-     *
-     * @param ShippingMethodConfiguration $data Shipping method data object.
-     *
-     * @return bool Returns true if shipping method data is valid, false otherwise.
-     */
-    private function isValid(ShippingMethodConfiguration $data)
-    {
-        return !(!isset($data->id, $data->name, $data->showLogo, $data->pricePolicy)
-            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_PERCENT && !isset($data->percentPricePolicy))
-            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT
-                && empty($data->fixedPriceByWeightPolicy))
-            || ($data->pricePolicy === ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE
-                && empty($data->fixedPriceByValuePolicy))
-            || (!is_bool($data->showLogo) || !in_array($data->pricePolicy, static::$policies, false)));
     }
 
     /**
@@ -220,19 +238,11 @@ class ShippingMethodController
         $model->setTaxClass($configuration->taxClass);
         $model->setShipToAllCountries($configuration->isShipToAllCountries);
         $model->setShippingCountries($configuration->shippingCountries);
-        switch ($configuration->pricePolicy) {
-            case ShippingMethod::PRICING_POLICY_PACKLINK:
-                $model->setPacklinkPricePolicy();
-                break;
-            case ShippingMethod::PRICING_POLICY_PERCENT:
-                $model->setPercentPricePolicy($configuration->percentPricePolicy);
-                break;
-            case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT:
-                $model->setFixedPriceByWeightPolicy($configuration->fixedPriceByWeightPolicy);
-                break;
-            case ShippingMethod::PRICING_POLICY_FIXED_PRICE_BY_VALUE:
-                $model->setFixedPriceByValuePolicy($configuration->fixedPriceByValuePolicy);
-                break;
+        $model->setActivated($configuration->activated);
+        $model->resetPricingPolicies();
+        $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
+        foreach ($configuration->pricingPolicies as $policy) {
+            $model->addPricingPolicy($policy);
         }
     }
 }

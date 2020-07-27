@@ -49,7 +49,7 @@
   }
 
   .pl-register-country-list-wrapper {
-    margin-top: 15px;
+    padding-top: 15px;
     min-width: 300px;
     width: 100%;
     display: flex;
@@ -210,6 +210,129 @@
       }
     }
   }
+
+  .pl-services-filter-wrapper {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+
+  .pl-pick-shipping-services-page {
+    #pl-open-filter-button {
+      display: none;
+    }
+  }
+
+  .pl-filter {
+    padding: 20px 0;
+
+    &.pl-filter-selected {
+      display: none;
+    }
+
+    .pl-filter-title {
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      text-align: left;
+      color: $text-heading-color;
+      font-weight: bold;
+    }
+
+    .pl-filter-options {
+      flex-direction: row;
+      justify-content: space-between;
+
+      .pl-filter-option {
+        padding: 6px 13px;
+        border: 1px solid $border-color;
+        border-radius: 13px;
+        cursor: pointer;
+        color: $input-control-color;
+
+        &.pl-selected {
+          border-color: $color-blue;
+          background-color: $color-blue;
+          color: $color-white;
+        }
+
+        & + .pl-filter-option {
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+
+  .pl-modal {
+    .pl-filter:not(:last-child) {
+      padding-bottom: 32px;
+    }
+  }
+
+  .pl-form-group {
+    &:not(:first-child) {
+      &.pl-change-percent-wrapper {
+        margin-top: 0;
+      }
+    }
+  }
+
+  #pl-fixed-price {
+    width: 215px;
+  }
+
+  .pl-my-shipping-services-page {
+    header {
+      background-color: #1A77C2;
+      color: $color-white;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 25px 21px;
+    }
+
+    .pl-page-buttons {
+      display: none;
+    }
+  }
+
+  .pl-no-services {
+    img {
+      height: 176px;
+    }
+
+    .pl-no-services-description {
+      max-width: 420px;
+      margin-left: 60px;
+      text-align: left;
+
+      p {
+        margin: 20px 0;
+      }
+
+      button {
+        padding: 16px;
+        margin: 0;
+        max-width: 200px;
+      }
+    }
+  }
+
+  .pl-country-checkbox-wrapper {
+    padding: 15px;
+  }
+
+  .pl-shipping-country-selection-wrapper {
+    max-height: 500px;
+    overflow: auto;
+
+    > * {
+      border-bottom: 1px solid $border-light;
+    }
+  }
+
+  .pl-shipping-country-selected {
+    background-color: $border-light;
+  }
 }
 
 // mobile rules
@@ -249,5 +372,69 @@
         }
       }
     }
+
+    .pl-my-shipping-services-page {
+      .pl-no-services {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+
+        .pl-no-services-description {
+          margin: 20px 0 0;
+
+          h1 {
+            text-align: center;
+          }
+
+          button {
+            display: none;
+          }
+        }
+      }
+
+      .pl-page-buttons {
+        display: flex;
+      }
+    }
+  }
+}
+
+// tablet and mobile rules
+@media (max-width: 1280px) {
+  #pl-page {
+    .pl-services-filter-wrapper {
+      justify-content: flex-start;
+
+      .pl-filter:not(.pl-filter-selected) {
+        display: none;
+      }
+
+      .pl-filter-selected {
+        flex-direction: row;
+        display: flex;
+
+        .pl-filter-option {
+          flex-direction: row;
+
+          &::after {
+            content: 'X';
+            margin-left: 5px;
+            margin-top: 1px;
+          }
+        }
+      }
+    }
+
+    .pl-pick-shipping-services-page {
+      #pl-open-filter-button {
+        display: flex;
+      }
+    }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
   }
 }

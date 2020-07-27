@@ -114,4 +114,14 @@ class TestShopShippingMethodService implements ShopShippingMethodService
     {
         return 'tmp://' . $carrierName;
     }
+
+    /**
+     * Disables shop shipping services/carriers.
+     *
+     * @return boolean TRUE if operation succeeded; otherwise, false.
+     */
+    public function disableShopServices()
+    {
+        return true;
+    }
 }

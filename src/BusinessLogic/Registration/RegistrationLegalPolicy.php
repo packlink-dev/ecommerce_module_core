@@ -116,9 +116,9 @@ class RegistrationLegalPolicy extends FrontDto
 
         foreach (array('data_processing', 'terms_and_conditions') as $key) {
             if ($payload[$key] === false) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
+                static::setInvalidFieldError(
                     $key,
+                    $validationErrors,
                     Translator::translate('validation.invalidFieldValue', array('true'))
                 );
             }

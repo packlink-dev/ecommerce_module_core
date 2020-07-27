@@ -24,6 +24,10 @@
     margin-right: auto;
   }
 
+  .pl-small-width {
+    max-width: 410px;
+  }
+
   .pl-hidden {
     display: none !important;
   }
@@ -45,12 +49,34 @@
     margin-bottom: 26px;
   }
 
+  .pl-separate-top-small {
+    margin-top: 2px;
+  }
+
+  .pl-separate-horizontally {
+    margin-left: 26px;
+    margin-right: 26px;
+  }
+
+  .pl-top-separate {
+    margin-top: 20px;
+  }
+
   .pl-bottom-separate {
     margin-bottom: 36px;
   }
 
   .pl-left-separate {
     margin-left: 20px;
+  }
+
+  .pl-right-separate {
+    margin-right: 20px;
+  }
+
+  .pl-page-content {
+    overflow: auto;
+    margin-bottom: 10px;
   }
 
   .pl-page-padding {
@@ -62,7 +88,9 @@
   }
 
   .pl-row-orientation {
+    display: flex;
     flex-direction: row;
+    align-items: center;
   }
 
   .pl-flex-left {
@@ -74,11 +102,20 @@
     justify-content: flex-start;
   }
 
+  .pl-separate-content {
+    justify-content: space-between;
+  }
+
   .pl-no-margin {
-    margin: 0;
+    margin: 0 !important;
+  }
+
+  .pl-no-border {
+    border-color: transparent !important;
   }
 
   .pl-center {
+    display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -88,37 +125,20 @@
     align-items: flex-start;
   }
 
+  .pl-wrap-items {
+    flex-wrap: wrap;
+  }
+
   .pl-header-text-wrapper {
     line-height: 22px;
     font-size: 22px;
   }
 
-  .pl-icon-button {
-    border: none;
-    background: transparent;
-    padding: 0;
-    width: $icon-button-size;
-    height: $icon-button-size;
-    min-width: $icon-button-size;
+  .pl-small {
+    padding: 5px;
+    width: 100px;
+    min-width: 100px;
     margin: 0;
-
-    i {
-      font-size: 20px;
-      width: auto;
-      color: $color-blue;
-    }
-
-    &:focus {
-      outline: none;
-    }
-
-    &:hover {
-      cursor: pointer;
-
-      i {
-        color: $color-white;
-      }
-    }
   }
 
   .pl-no-wrap {
@@ -151,6 +171,19 @@
   .pl-block {
     display: block;
   }
+
+  .pl-split-content {
+    justify-content: space-between;
+    flex-direction: row;
+  }
+
+  &.pl-disable-selection {
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer */
+    -khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
+    -webkit-user-select: none; /* Chrome, Safari, and Opera */
+    -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
+  }
 }
 
 // mobile rules
@@ -161,13 +194,11 @@
     }
 
     .pl-page-content {
-      height: 100%;
-      overflow: auto;
       margin-bottom: 100px;
     }
 
     .pl-page-buttons {
-      position: fixed;
+      position: absolute;
       bottom: 0;
       width: 100%;
       padding: 20px;

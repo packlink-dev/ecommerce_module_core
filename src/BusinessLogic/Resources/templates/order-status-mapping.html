@@ -5,17 +5,19 @@
         </button>
         <h1>{$orderStatusMapping.title}</h1>
     </header>
-    <div class="pl-flex-left pl-page-padding pl-page-content pl-medium-page">
-        <p class="pl-page-info pl-bottom-separate">
-            {$orderStatusMapping.description}
-        </p>
-        <div id="pl-order-status-mappings" class="pl-full-width">
-            <div class="pl-order-status-mappings-header pl-status-mapping">
-                <div class="pl-half-width pl-block">
-                    {$orderStatusMapping.packlinkProShipmentStatus}
-                </div>
-                <div class="pl-half-width pl-system-order-status pl-block">
-                    {$orderStatusMapping.systemOrderStatus}
+    <div class="pl-page-content pl-page-padding">
+        <div class="pl-medium-page">
+            <p class="pl-page-info pl-bottom-separate">
+                {$orderStatusMapping.description}
+            </p>
+            <div id="pl-order-status-mappings" class="pl-full-width">
+                <div class="pl-order-status-mappings-header pl-status-mapping">
+                    <div class="pl-half-width pl-block">
+                        {$orderStatusMapping.packlinkProShipmentStatus}
+                    </div>
+                    <div class="pl-half-width pl-system-order-status pl-block">
+                        {$orderStatusMapping.systemOrderStatus}
+                    </div>
                 </div>
             </div>
         </div>
