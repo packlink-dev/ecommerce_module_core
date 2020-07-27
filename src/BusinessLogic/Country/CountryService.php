@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class CountryProvider
@@ -40,77 +41,77 @@ class CountryService extends BaseService
             'name' => 'Spain',
             'code' => 'ES',
             'postal_code' => '28001',
-            'registration_link' => 'https://auth.packlink.com/es-ES/{integration}/registro?platform_country=ES',
+            'registration_link' => 'https://auth.packlink.com/es-ES/{integration}/registro',
             'platform_country' => 'ES',
         ),
         'DE' => array(
             'name' => 'Germany',
             'code' => 'DE',
             'postal_code' => '10115',
-            'registration_link' => 'https://auth.packlink.com/de-DE/{integration}/registrieren?platform_country=DE',
+            'registration_link' => 'https://auth.packlink.com/de-DE/{integration}/registrieren',
             'platform_country' => 'DE',
         ),
         'FR' => array(
             'name' => 'France',
             'code' => 'FR',
             'postal_code' => '75001',
-            'registration_link' => 'https://auth.packlink.com/fr-FR/{integration}/inscription?platform_country=FR',
+            'registration_link' => 'https://auth.packlink.com/fr-FR/{integration}/inscription',
             'platform_country' => 'FR',
         ),
         'IT' => array(
             'name' => 'Italy',
             'code' => 'IT',
             'postal_code' => '00118',
-            'registration_link' => 'https://auth.packlink.com/it-IT/{integration}/registro?platform_country=IT',
+            'registration_link' => 'https://auth.packlink.com/it-IT/{integration}/registro',
             'platform_country' => 'IT',
         ),
         'AT' => array(
             'name' => 'Austria',
             'code' => 'AT',
             'postal_code' => '1010',
-            'registration_link' => 'https://auth.packlink.com/de-DE/{integration}/registrieren?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/de-DE/{integration}/registrieren',
             'platform_country' => 'UN',
         ),
         'NL' => array(
             'name' => 'Netherlands',
             'code' => 'NL',
             'postal_code' => '1011',
-            'registration_link' => 'https://auth.packlink.com/nl-NL/{integration}/registrieren?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/nl-NL/{integration}/registrieren',
             'platform_country' => 'UN',
         ),
         'BE' => array(
             'name' => 'Belgium',
             'code' => 'BE',
             'postal_code' => '1000',
-            'registration_link' => 'https://auth.packlink.com/nl-NL/{integration}/registrieren?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/nl-NL/{integration}/registrieren',
             'platform_country' => 'UN',
         ),
         'PT' => array(
             'name' => 'Portugal',
             'code' => 'PT',
             'postal_code' => '1000-017',
-            'registration_link' => 'https://auth.packlink.com/pt-PT/{integration}/registo?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/pt-PT/{integration}/registo',
             'platform_country' => 'UN',
         ),
         'TR' => array(
             'name' => 'Turkey',
             'code' => 'TR',
             'postal_code' => '06010',
-            'registration_link' => 'https://auth.packlink.com/tr-TR/{integration}/kayıt-yap?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/tr-TR/{integration}/kayıt-yap',
             'platform_country' => 'UN',
         ),
         'IE' => array(
             'name' => 'Ireland',
             'code' => 'IE',
             'postal_code' => 'D1',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register',
             'platform_country' => 'UN',
         ),
         'GB' => array(
             'name' => 'United Kingdom',
             'code' => 'GB',
             'postal_code' => 'E1 6AN',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register?platform_country=UN',
+            'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register',
             'platform_country' => 'UN',
         ),
         'HU' => array(
@@ -149,12 +150,13 @@ class CountryService extends BaseService
     /**
      * Returns a list of supported country DTOs.
      *
-     * @return \Packlink\BusinessLogic\Country\Country[]
+     * @param bool $associative Indicates whether the result should be an associative array.
      *
+     * @return \Packlink\BusinessLogic\Country\Country[]
      * @noinspection PhpUnhandledExceptionInspection
      * @noinspection PhpDocMissingThrowsInspection
      */
-    public function getSupportedCountries()
+    public function getSupportedCountries($associative = true)
     {
         $countries = array();
         $configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
@@ -165,11 +167,12 @@ class CountryService extends BaseService
                     '{integration}',
                     $integration,
                     $country['registration_link']
-                ) . '&platform=PRO';
+                ) . '?platform=PRO&platform_country=' . $country['platform_country'];
 
+            $country['name'] = Translator::translate('register.' . $country['code']);
             $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
         }
 
-        return $countries;
+        return $associative ? $countries : array_values($countries);
     }
 }

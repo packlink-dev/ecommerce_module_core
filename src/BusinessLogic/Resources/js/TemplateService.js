@@ -1,40 +1,63 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     function TemplateService() {
         /**
-         * Retrieves template children by template id.
-         *
-         * @param {string} template
-         * @return {HTMLCollection | null}
+         * The configuration object for all templates.
          */
-        this.getTemplate = function (template) {
-            let temp = document.getElementById(template);
+        let templates = {};
+        let mainPlaceholder = '#pl-main-page-holder';
+        this.baseResourceUrl = '';
 
-            if (!temp) {
-                return null;
-            }
-
-            let clone = temp.cloneNode(true);
-
-            return clone.children;
+        /**
+         * Sets the base resource URL.
+         *
+         * @param {string} url
+         */
+        this.setBaseResourceUrl = (url) => {
+            this.baseResourceUrl = url;
         };
 
         /**
-         * Retrieves component by it's id or attribute.
+         * Sets the main page placeholder. If not set, defaults to the one set in this service.
+         *
+         * @param {string} placeholder
+         */
+        this.setMainPlaceholder = (placeholder) => {
+            mainPlaceholder = placeholder;
+        };
+
+        /**
+         * Gets the main page DOM element.
+         *
+         * @returns {Element}
+         */
+        this.getMainPage = () => document.querySelector(mainPlaceholder);
+
+        /**
+         * Gets the header of the page.
+         *
+         * @return {HTMLElement}
+         */
+        this.getHeader = () => document.getElementById('pl-main-header');
+
+        /**
+         * Retrieves component by its id or attribute.
          *
          * @param {string} component
          * @param {Element} [element]
          * @param {string|int} [attribute]
          *
-         * @return {Element}
+         * @return {HTMLElement}
          */
-        this.getComponent = function (component, element, attribute) {
-            if (typeof element === 'undefined') {
+        this.getComponent = (component, element, attribute) => {
+            if (!element) {
                 return document.getElementById(component);
             }
 
-            if (typeof attribute === 'undefined') {
+            if (!attribute) {
                 return element.querySelector('#' + component);
             }
 
@@ -42,94 +65,57 @@ var Packlink = window.Packlink || {};
         };
 
         /**
-         * Retrieves all nodes with specified attribute.
+         * Sets the content templates.
          *
-         * @param {string} attribute
-         * @param {Element} [element]
-         *
-         * @return {NodeListOf<Element>}
+         * @param {{}} configuration
          */
-        this.getComponentsByAttribute = function (attribute, element) {
-            let selector = '[' + attribute + ']';
-
-            if (typeof element === 'undefined') {
-                return document.querySelectorAll(selector);
-            }
-
-            return element.querySelectorAll(selector);
+        this.setTemplates = (configuration) => {
+            templates = configuration;
         };
 
         /**
-         * Changes currently active page.
+         * Gets the template with translated text.
          *
-         * @param {string} template
-         * @param {string} [extensionPointIdentifier]
-         * @param {boolean} [clearExtensionPoint=true]
+         * @param {string} templateId
          *
-         * @return {Element}
+         * @return {string} HTML as string.
          */
-        this.setTemplate = function (template, extensionPointIdentifier, clearExtensionPoint) {
-            if (typeof extensionPointIdentifier === 'undefined') {
-                extensionPointIdentifier = 'pl-content-extension-point';
+        this.getTemplate = (templateId) => this.replaceResourcesUrl(
+            Packlink.translationService.translateHtml(templates[templateId])
+        );
+
+        /**
+         * Sets current template in the page.
+         *
+         * @param {string} templateId
+         */
+        this.setCurrentTemplate = (templateId) => {
+            for (let [extensionPointId, html] of Object.entries(templates[templateId])) {
+                const component = this.getComponent(extensionPointId);
+
+                if (component) {
+                    component.innerHTML = this.replaceResourcesUrl(html ? Packlink.translationService.translateHtml(html) : '');
+                }
             }
-
-            if (typeof clearExtensionPoint === 'undefined') {
-                clearExtensionPoint = true;
-            }
-
-            let extensionPoint = this.getComponent(extensionPointIdentifier);
-
-            if (clearExtensionPoint) {
-                this.clearComponent(extensionPoint);
-            }
-
-            let templateElements = this.getTemplate(template);
-            while (templateElements && templateElements.length) {
-                extensionPoint.appendChild(templateElements[0]);
-            }
-
-            return extensionPoint;
         };
+
+        /**
+         * Replaces all resources URL placeholders with the correct URL.
+         *
+         * @param {string} html
+         * @return {string}
+         */
+        this.replaceResourcesUrl = (html) => html.replace(/{\$BASE_URL\$}/g, this.baseResourceUrl);
 
         /**
          * Removes component's children.
          *
          * @param {Element} component
          */
-        this.clearComponent = function (component) {
+        this.clearComponent = (component) => {
             while (component.firstChild) {
                 component.removeChild(component.firstChild);
             }
-        };
-
-        /**
-         * Sets error for input.
-         *
-         * @param {Element} input
-         * @param {string} message
-         */
-        this.setError = function (input, message) {
-            this.removeError(input);
-
-            let errorTemplate = this.getTemplate('pl-error-template')[0];
-            let msgField = this.getComponent('pl-error-text', errorTemplate);
-            msgField.innerHTML = message;
-            input.after(errorTemplate);
-            input.classList.add('pl-error');
-        };
-
-        /**
-         * Removes error from input element.
-         *
-         * @param {Element} input
-         */
-        this.removeError = function (input) {
-            let firstSibling = input.nextSibling;
-            if (firstSibling && firstSibling.getAttribute && firstSibling.getAttribute('data-pl-element') === 'error') {
-                firstSibling.remove();
-            }
-
-            input.classList.remove('pl-error');
         };
     }
 

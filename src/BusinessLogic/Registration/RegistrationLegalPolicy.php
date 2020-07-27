@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Registration;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class RegistrationLegalPolicy
@@ -104,25 +105,6 @@ class RegistrationLegalPolicy extends FrontDto
     }
 
     /**
-     * Checks the payload for mandatory fields. Uses `empty()` validation!
-     *
-     * @param array $payload The payload in key-value format.
-     * @param ValidationError[] $validationErrors The array of errors to populate.
-     */
-    protected static function validateRequiredFields(array $payload, array &$validationErrors)
-    {
-        foreach (static::$requiredFields as $field) {
-            if (!array_key_exists($field, $payload)) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_REQUIRED_FIELD,
-                    $field,
-                    'Field is required.'
-                );
-            }
-        }
-    }
-
-    /**
      * Generates validation errors for the payload.
      *
      * @param array $payload The payload in key-value format.
@@ -134,10 +116,10 @@ class RegistrationLegalPolicy extends FrontDto
 
         foreach (array('data_processing', 'terms_and_conditions') as $key) {
             if ($payload[$key] === false) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
+                static::setInvalidFieldError(
                     $key,
-                    'Field must be set to true.'
+                    $validationErrors,
+                    Translator::translate('validation.invalidFieldValue', array('true'))
                 );
             }
         }

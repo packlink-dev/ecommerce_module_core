@@ -1,0 +1,36 @@
+<div class="pl-login-page pl-flex-expand">
+    <div class="pl-flex-expand pl-page-padding pl-medium-page pl-center">
+        <div class="pl-bottom-separate">
+            <h1 class="pl-text-center">
+                {$login.welcome}
+            </h1>
+            <p class="pl-text-center">
+                {$login.connectYourService}
+            </p>
+        </div>
+        <form method="POST" name="plLoginForm" id="pl-login-form" class="pl-full-width">
+            <div class="pl-form-group">
+                <input type="text" id="pl-login-api-key" name="apiKey" placeholder="abcdefgh12345676789"/>
+                <label for="pl-login-api-key">
+                    {$login.apiKey}
+                </label>
+            </div>
+            <button id="pl-login-button" type="submit" name="login" class="pl-button pl-button-primary" disabled>
+                {$login.validateApiKey}
+            </button>
+        </form>
+    </div>
+    <div class="pl-full-width pl-login-footer pl-page-padding pl-text-center">
+        <div class="pl-medium-page">
+            <div>
+                <strong>{$login.dontHaveAccount}</strong>
+            </div>
+            <div class="pl-desktop-only">
+                {$login.chooseYourCountry}
+            </div>
+            <button type="submit" name="register" class="pl-button pl-button-inverted" id="pl-go-to-register">
+                {$login.registerMe}
+            </button>
+        </div>
+    </div>
+</div>

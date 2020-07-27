@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Http\DTO;
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class ParcelInfo.
@@ -107,24 +108,36 @@ class ParcelInfo extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
-        $options = array('options' => array('min_range' => 0));
         foreach (array('width', 'length', 'height') as $field) {
-            if (!empty($payload[$field]) && filter_var($payload[$field], FILTER_VALIDATE_INT, $options) === false) {
-                $validationErrors[] = static::getValidationError(
-                    ValidationError::ERROR_INVALID_FIELD,
-                    $field,
-                    ucfirst($field) . ' must be a positive integer.'
-                );
-            }
+            static::validateNumber($payload, $field, $validationErrors, FILTER_VALIDATE_INT);
         }
 
-        if (!empty($payload['weight'])
-            && (filter_var($payload['weight'], FILTER_VALIDATE_FLOAT) === false || $payload['weight'] <= 0)
-        ) {
-            $validationErrors[] = static::getValidationError(
-                ValidationError::ERROR_INVALID_FIELD,
-                'weight',
-                'Weight must be a positive decimal number.'
+        static::validateNumber($payload, 'weight', $validationErrors, FILTER_VALIDATE_FLOAT);
+    }
+
+    /**
+     * Validates if the given value is a number.
+     *
+     * @param array $payload
+     * @param string $field The field key.
+     * @param ValidationError[] $validationErrors The list of validation errors to alter.
+     * @param int $filter Validation filter
+     */
+    private static function validateNumber(array $payload, $field, array &$validationErrors, $filter)
+    {
+        if (!static::isFieldSet($payload, $field)) {
+            // required field validation already happened
+            return;
+        }
+
+        $value = filter_var($payload[$field], $filter);
+        if ($value === false) {
+            static::setInvalidFieldError($field, $validationErrors, Translator::translate('validation.integer'));
+        } elseif ($value <= 0) {
+            static::setInvalidFieldError(
+                $field,
+                $validationErrors,
+                Translator::translate('validation.greaterThanZero')
             );
         }
     }

@@ -1,0 +1,47 @@
+<div class="pl-shipping-services-list">
+
+</div>
+<template id="pl-shipping-services-list-item">
+    <div class="pl-shipping-services-list-item">
+        <div class="pl-service-header">
+            <img id="pl-carrier-logo" src="" alt="">
+            <div class="pl-text-left pl-service-name">
+                <div id="pl-service-name"></div>
+                <div id="pl-service-policy"></div>
+            </div>
+        </div>
+        <div class="pl-wrap-items">
+            <div class="pl-service-property">
+                <div class="pl-property-title">{$shippingServices.transitTime}</div>
+                <div id="pl-service-delivery-description" class="pl-property-value"></div>
+            </div>
+            <div class="pl-service-property">
+                <div class="pl-property-title">{$shippingServices.type}</div>
+                <div id="pl-service-type" class="pl-property-value"></div>
+            </div>
+            <div class="pl-service-property" id="pl-service-origin">
+                <div class="pl-property-title">{$shippingServices.parcelOrigin}</div>
+                <div class="pl-property-value" id="pl-origin-collection">
+                    <span>{$shippingServices.collection}</span>
+                </div>
+                <div class="pl-property-value" id="pl-origin-dropoff">
+                    <span>{$shippingServices.dropoff}</span>
+                </div>
+            </div>
+            <div class="pl-service-property" id="pl-service-destination">
+                <div class="pl-property-title">{$shippingServices.parcelDestination}</div>
+                <div class="pl-property-value" id="pl-destination-pickup">
+                    <span>{$shippingServices.pickup}</span>
+                </div>
+                <div class="pl-property-value" id="pl-destination-delivery">
+                    <span>{$shippingServices.delivery}</span>
+                </div>
+            </div>
+        </div>
+        <div class="pl-service-buttons" id="pl-service-actions">
+            <button class="pl-button pl-button-primary" id="pl-add-service">{$general.add}</button>
+            <button class="pl-button pl-button-secondary pl-no-border" id="pl-delete-service">{$general.delete}</button>
+            <button class="pl-button pl-button-primary" id="pl-edit-service">{$general.edit}</button>
+        </div>
+    </div>
+</template>

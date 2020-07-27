@@ -67,4 +67,21 @@ class ShipmentStatus
                 return self::STATUS_PENDING;
         }
     }
+
+    /**
+     * Gets possible shipment statuses.
+     *
+     * @return string[]
+     */
+    public static function getPossibleStatuses()
+    {
+        return array(
+            self::STATUS_PENDING,
+            self::STATUS_ACCEPTED,
+            self::STATUS_READY,
+            self::STATUS_IN_TRANSIT,
+            self::STATUS_DELIVERED,
+            self::STATUS_CANCELLED,
+        );
+    }
 }
