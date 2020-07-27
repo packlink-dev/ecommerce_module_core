@@ -143,7 +143,6 @@ if (!window.Packlink) {
             postalCodeInput.value = '-';
         };
 
-
         /**
          * Constructs postal code input and attaches event handlers to it.
          *
