@@ -10,7 +10,7 @@ if (!window.Packlink) {
          * @param {string} controller
          * @param {object} configuration
          */
-        this.getInstance = function (controller, configuration) {
+        this.getInstance = (controller, configuration) => {
             let parts = controller.split('-');
             let name = '';
             for (let part of parts) {
