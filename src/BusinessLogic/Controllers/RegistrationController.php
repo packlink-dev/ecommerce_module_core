@@ -54,8 +54,6 @@ class RegistrationController
      */
     public function getRegisterData($country)
     {
-        $country = !empty($country) ? $country : self::DEFAULT_COUNTRY;
-
         /** @var RegistrationInfoService $registrationInfoService */
         $registrationInfoService = ServiceRegister::getService(RegistrationInfoService::CLASS_NAME);
         $registrationData = $registrationInfoService->getRegistrationInfoData();
@@ -65,8 +63,10 @@ class RegistrationController
             'email' => $registrationData->getEmail(),
             'phone' => $registrationData->getPhone(),
             'source' => $registrationData->getSource(),
-            'termsAndConditionsUrl' => self::$termsAndConditionsUrls[$country],
-            'privacyPolicyUrl' => self::$privacyPolicyUrls[$country],
+            'termsAndConditionsUrl' => !empty(self::$termsAndConditionsUrls[$country]) ?
+                self::$termsAndConditionsUrls[$country] : self::$termsAndConditionsUrls[self::DEFAULT_COUNTRY],
+            'privacyPolicyUrl' => !empty(self::$privacyPolicyUrls[$country]) ?
+                self::$privacyPolicyUrls[$country] : self::$privacyPolicyUrls[self::DEFAULT_COUNTRY],
         );
     }
 
