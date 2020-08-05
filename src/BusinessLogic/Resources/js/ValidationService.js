@@ -59,9 +59,10 @@ if (!window.Packlink) {
          * Validates form. Validates all input and select elements by using data attributes as rules.
          *
          * @param {Element} form
+         * @param {string[]} excludedElementNames
          * @return {boolean}
          */
-        this.validateForm = (form) => {
+        this.validateForm = (form, excludedElementNames = []) => {
             const inputElements = utilityService.toArray(form.getElementsByTagName('input')),
                 selects = utilityService.toArray(form.getElementsByTagName('select')),
                 inputs = inputElements.concat(selects),
@@ -70,6 +71,9 @@ if (!window.Packlink) {
             let result = true;
 
             for (let i = 0; i < length; i++) {
+                if (excludedElementNames.indexOf(inputs[i].name) >= 0) {
+                    continue;
+                }
                 result &= this.validateInputField(inputs[i]);
             }
 

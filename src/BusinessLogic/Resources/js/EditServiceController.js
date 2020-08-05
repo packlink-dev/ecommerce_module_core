@@ -341,7 +341,13 @@ if (!window.Packlink) {
          */
         const save = () => {
             const form = templateService.getComponent('pl-edit-service-form');
-            if (validationService.validateForm(form)) {
+            let excludedElementNames = [];
+
+            if (!configuration.hasTaxConfiguration) {
+                excludedElementNames.push('tax');
+            }
+
+            if (validationService.validateForm(form, excludedElementNames)) {
                 serviceModel.activated = true;
 
                 ajaxService.post(
