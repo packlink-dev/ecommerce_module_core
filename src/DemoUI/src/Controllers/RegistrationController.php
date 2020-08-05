@@ -32,10 +32,12 @@ class RegistrationController extends BaseHttpController
 
     /**
      * Handles GET request.
+     *
+     * @param \Packlink\DemoUI\Controllers\Models\Request $request
      */
-    public function get()
+    public function get(Request $request)
     {
-        $this->output($this->controller->getRegisterData());
+        $this->output($this->controller->getRegisterData($request->getQuery('country')));
     }
 
     /**

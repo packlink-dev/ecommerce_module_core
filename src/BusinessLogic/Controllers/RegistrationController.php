@@ -9,10 +9,13 @@ use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\BusinessLogic\Utility\UrlService;
 
 class RegistrationController
 {
+    /**
+     * string
+     */
+    const DEFAULT_COUNTRY = 'ES';
     /**
      * @var Configuration
      */
@@ -45,10 +48,14 @@ class RegistrationController
     /**
      * Gets the data needed for a registration page.
      *
+     * @param string $country
+     *
      * @return array
      */
-    public function getRegisterData()
+    public function getRegisterData($country)
     {
+        $country = !empty($country) ? $country : self::DEFAULT_COUNTRY;
+
         /** @var RegistrationInfoService $registrationInfoService */
         $registrationInfoService = ServiceRegister::getService(RegistrationInfoService::CLASS_NAME);
         $registrationData = $registrationInfoService->getRegistrationInfoData();
@@ -58,8 +65,8 @@ class RegistrationController
             'email' => $registrationData->getEmail(),
             'phone' => $registrationData->getPhone(),
             'source' => $registrationData->getSource(),
-            'termsAndConditionsUrl' => $this->getTermsAndConditionsUrl(),
-            'privacyPolicyUrl' => $this->getPrivacyPolicyUrl(),
+            'termsAndConditionsUrl' => self::$termsAndConditionsUrls[$country],
+            'privacyPolicyUrl' => self::$privacyPolicyUrls[$country],
         );
     }
 
@@ -126,30 +133,6 @@ class RegistrationController
         }
 
         return $this->configService;
-    }
-
-    /**
-     * Returns URL for Packlink terms and conditions in user's preferred language.
-     *
-     * @return string
-     */
-    private function getTermsAndConditionsUrl()
-    {
-        $locale = UrlService::getUrlLocaleKey();
-
-        return self::$termsAndConditionsUrls[$locale];
-    }
-
-    /**
-     * Returns URL for Packlink privacy policy in user's preferred language.
-     *
-     * @return string
-     */
-    private function getPrivacyPolicyUrl()
-    {
-        $locale = UrlService::getUrlLocaleKey();
-
-        return self::$privacyPolicyUrls[$locale];
     }
 
     /**

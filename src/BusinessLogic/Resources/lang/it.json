@@ -61,7 +61,7 @@
     "getToKnowYou": "Vogliamo conoscerti meglio per adattarci a te e preparare una proposta personalizzata per te",
     "monthlyShipmentVolume": "Quante spedizioni fai solitamente al mese?",
     "phone": "Phone number",
-    "termsAndConditions": "Accetto i <a href=\"%s\" target=\"_blank\">Termini del servizio</a> e l’<a href=\"%s\" target=\"_blank\">Informativa sulla privacy</a> di Packlink",
+    "termsAndConditions": "<pre>Accetto i <a href=\"%s\" target=\"_blank\">Termini del servizio</a> e l’<a href=\"%s\" target=\"_blank\">Informativa sulla privacy</a> di Packlink</pre>",
     "marketingEmails": "Autorizzo Packlink Shipping S.L. a inviarmi comunicazioni commerciali via email",
     "submit": "Registrati",
     "chooseYourCountry": "Choose your country",
