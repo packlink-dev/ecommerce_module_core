@@ -350,6 +350,7 @@ if (!window.Packlink) {
             if (validationService.validateForm(form, excludedElementNames)) {
                 serviceModel.activated = true;
 
+                Packlink.utilityService.showSpinner();
                 ajaxService.post(
                     configuration.saveServiceUrl,
                     serviceModel,
