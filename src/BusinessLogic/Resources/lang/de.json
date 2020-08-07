@@ -33,7 +33,8 @@
     "invalidLanguage": "Field is not a valid language.",
     "invalidPlatformCountry": "Field is not a valid platform country.",
     "invalidUrl": "Field must be a valid URL.",
-    "invalidFieldValue": "Field must be set to \"%s\"."
+    "invalidFieldValue": "Field must be set to \"%s\".",
+    "invalidMaxValue": "Maximal allowed value is %s."
   },
   "login": {
     "dontHaveAccount?": "Sie haben noch kein Benutzerkonto?",
@@ -44,12 +45,6 @@
     "apiKey": "API-Schlüssel",
     "logIn": "Login",
     "apiKeyIncorrect": "Falscher API-Schlüssel"
-  },
-  "validation": {
-    "requiredField": "Dies ist ein Pflichtfeld.",
-    "invalidEmail": "Das Feld muss eine gültige E-Mail-Adresse sein.",
-    "shortPassword": "Das Passwort muss mindestens %s Zeichen haben.",
-    "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein."
   },
   "register": {
     "logIn": "Log in",
