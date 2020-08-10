@@ -96,6 +96,9 @@ if (!window.Packlink) {
 
             input.addEventListener('change', () => {
                 enableSubmit();
+                if (componentSelector === 'pl-register-terms-and-conditions' && !input.checked) {
+                    templateService.getComponent('pl-register-button').disabled = true;
+                }
             });
         };
 
