@@ -80,11 +80,6 @@ if (!window.Packlink) {
             if (config && config.from === 'edit') {
                 if (config.newService === true && services.length === 1 && configuration.disableCarriersUrl) {
                     displayDisableShopServicesModal();
-                } else {
-                    showMessageModal(
-                        translator.translate('shippingServices.addedSuccessTitle'),
-                        translator.translate('shippingServices.addedSuccessDescription')
-                    );
                 }
             }
 
