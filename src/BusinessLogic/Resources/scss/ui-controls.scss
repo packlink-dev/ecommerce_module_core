@@ -216,7 +216,7 @@
         padding: 13px 16px;
       }
 
-      ::placeholder, ::-webkit-input-placeholder {
+      &::placeholder, &::-webkit-input-placeholder {
         color: $color-light;
       }
     }
