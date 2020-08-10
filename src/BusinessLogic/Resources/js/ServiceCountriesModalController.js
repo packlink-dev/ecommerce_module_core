@@ -110,7 +110,10 @@ if (!window.Packlink) {
                 });
             } else {
                 serviceModel.shippingCountries.forEach((country) => {
-                    countriesSelectionForm[country].checked = true;
+                    const cBox = countriesSelectionForm.querySelector('#pl-' + country);
+                    if (cBox) {
+                        cBox.checked = true;
+                    }
                 });
 
                 handleCountrySelectionChanged();
