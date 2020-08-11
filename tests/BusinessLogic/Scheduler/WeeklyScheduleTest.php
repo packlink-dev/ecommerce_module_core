@@ -21,7 +21,7 @@ class WeeklyScheduleTest extends TestCase
     public $nowTime;
     /**
      * Weekly schedule instance
-     * @var \Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule
+     * @var WeeklySchedule
      */
     public $weeklySchedule;
     /**
@@ -46,7 +46,6 @@ class WeeklyScheduleTest extends TestCase
         $this->weeklySchedule->setHour(3);
         $this->weeklySchedule->setMinute(0);
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
         $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 21);
@@ -70,7 +69,6 @@ class WeeklyScheduleTest extends TestCase
      */
     public function testNextScheduleOnSpecificWeekDayNext()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 26);
@@ -78,7 +76,7 @@ class WeeklyScheduleTest extends TestCase
 
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -86,7 +84,6 @@ class WeeklyScheduleTest extends TestCase
      */
     public function testNextScheduleOnDifferentDays()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 26);
@@ -95,17 +92,17 @@ class WeeklyScheduleTest extends TestCase
         $this->setMonday();
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
 
         $this->setWednesday();
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
 
         $this->setSunday();
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -113,7 +110,6 @@ class WeeklyScheduleTest extends TestCase
      */
     private function setMonday()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
         $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 19); // Monday
@@ -127,7 +123,6 @@ class WeeklyScheduleTest extends TestCase
      */
     private function setWednesday()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
         $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 21); // Wednesday
@@ -141,7 +136,6 @@ class WeeklyScheduleTest extends TestCase
      */
     private function setSunday()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
         $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 25); // Sunday
@@ -163,7 +157,30 @@ class WeeklyScheduleTest extends TestCase
 
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+    }
+
+    /**
+     * @throws \Exception Throws this exception when unable to create DateTime object
+     */
+    public function testNextScheduleForSundayInSunday()
+    {
+        // Set current date to sunday
+        $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
+        $nowDateTime->setDate(2020, 8, 9);
+        $nowDateTime->setTime(13, 42, 5);
+        $this->setCurrentDateTime($nowDateTime);
+
+        $this->weeklySchedule->setDay(7);
+        $expected = new \DateTime();
+        $expected->setTimezone(new \DateTimeZone('UTC'));
+        $expected->setDate(2020, 8, 16);
+        $expected->setTime(3, 0);
+
+        $this->weeklySchedule->setNextSchedule();
+        $nextSchedule = $this->weeklySchedule->getNextSchedule();
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -180,7 +197,7 @@ class WeeklyScheduleTest extends TestCase
 
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -198,7 +215,7 @@ class WeeklyScheduleTest extends TestCase
 
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -215,7 +232,7 @@ class WeeklyScheduleTest extends TestCase
 
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -232,7 +249,7 @@ class WeeklyScheduleTest extends TestCase
 
         $this->weeklySchedule->setNextSchedule();
         $nextSchedule = $this->weeklySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
+        self::assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
@@ -244,7 +261,6 @@ class WeeklyScheduleTest extends TestCase
      */
     private function setCurrentDateTime(\DateTime $dateTime)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $timeProvider = new TestTimeProvider();
         $timeProvider->setCurrentLocalTime($dateTime);
         $this->nowTime = $dateTime;
