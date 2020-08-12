@@ -173,11 +173,13 @@ if (!window.Packlink) {
         /**
          * Handles a successful registration request.
          *
-         * @param {{success: boolean}} response
+         * @param {{success: boolean, message: string}} response
          */
         const successfulRegister = (response) => {
             if (response.success) {
                 state.goToState('onboarding-state');
+            } else {
+                responseService.errorHandler(response);
             }
         };
     }
