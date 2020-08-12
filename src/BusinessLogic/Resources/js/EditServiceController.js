@@ -50,6 +50,7 @@ if (!window.Packlink) {
          */
         let originalServiceModel = null;
         let newService = false;
+        let fromPick = false;
 
         const modelFields = [
             'name',
@@ -75,6 +76,7 @@ if (!window.Packlink) {
          * @param {{id: string, fromPick: boolean}} config
          */
         this.display = (config) => {
+            fromPick = config.fromPick;
             templateService.setCurrentTemplate(templateId);
             ajaxService.get(configuration.getServiceUrl + '&id=' + config.id, bindService);
 
@@ -355,7 +357,11 @@ if (!window.Packlink) {
                     configuration.saveServiceUrl,
                     serviceModel,
                     () => {
-                        state.goToState('my-shipping-services', {from: 'edit', newService: newService});
+                        if (fromPick) {
+                            state.goToState('pick-shipping-service', {from: 'edit', newService: newService});
+                        } else {
+                            state.goToState('my-shipping-services');
+                        }
                     },
                     Packlink.responseService.errorHandler
                 );

@@ -4,7 +4,7 @@ if (!window.Packlink) {
 
 (function () {
     /**
-     * @param {{getServicesUrl: string, deleteServiceUrl: string, [disableCarriersUrl]: string}} configuration
+     * @param {{getServicesUrl: string, deleteServiceUrl: string}} configuration
      * @constructor
      */
     function MyShippingServicesController(configuration) {
@@ -22,14 +22,11 @@ if (!window.Packlink) {
         /**
          * Displays page content.
          *
-         * @param {{from: string, newService: boolean}} config
          */
-        this.display = function (config) {
+        this.display = function () {
             utilityService.showSpinner();
             templateService.setCurrentTemplate('pl-my-shipping-services-page');
-            ajaxService.get(configuration.getServicesUrl, (response) => {
-                bindServices(response, config);
-            });
+            ajaxService.get(configuration.getServicesUrl, bindServices);
 
             const header = templateService.getHeader(),
                 settingsMenu = header.querySelector('.pl-configuration-menu'),
@@ -52,9 +49,8 @@ if (!window.Packlink) {
          * Binds services.
          *
          * @param {ShippingService[]} services
-         * @param {{from: string, newService: boolean}} [config]
          */
-        const bindServices = (services, config) => {
+        const bindServices = (services) => {
             const table = templateService.getComponent('pl-shipping-services-table'),
                 list = templateService.getComponent('pl-shipping-services-list'),
                 render = (elem, id, tag) => {
@@ -77,40 +73,7 @@ if (!window.Packlink) {
                 utilityService.showElement(templateService.getComponent('pl-no-shipping-services'));
             }
 
-            if (config && config.from === 'edit') {
-                if (config.newService === true && services.length === 1 && configuration.disableCarriersUrl) {
-                    displayDisableShopServicesModal();
-                }
-            }
-
             utilityService.hideSpinner();
-        };
-
-        /**
-         * Displays the modal for disabling shop shipping services.
-         */
-        const displayDisableShopServicesModal = () => {
-            const modal = new Packlink.modalService({
-                canClose: false,
-                content: templateService.getTemplate('pl-disable-carriers-modal'),
-                buttons: [
-                    {
-                        title: translator.translate('general.accept'),
-                        primary: true,
-                        onClick: () => {
-                            ajaxService.post(configuration.disableCarriersUrl, {}, modal.close, Packlink.responseService.errorHandler);
-                        }
-                    },
-                    {
-                        title: translator.translate('general.cancel'),
-                        onClick: () => {
-                            modal.close();
-                        }
-                    }
-                ]
-            });
-
-            modal.open();
         };
 
         /**
