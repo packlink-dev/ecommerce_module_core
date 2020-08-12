@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\ShippingMethod;
 
+use Exception;
+use InvalidArgumentException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
@@ -136,7 +138,7 @@ class ShippingCostCalculator
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         try {
             $services = $proxy->getShippingServicesDeliveryDetails($searchParams);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $services = array();
         }
 
@@ -154,7 +156,7 @@ class ShippingCostCalculator
             return $result;
         }
 
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
             'No service is available for shipping method '
             . $method->getId() . ' for given destination country ' . $toCountry
             . ' and given packages ' . json_encode($packages)
@@ -374,9 +376,9 @@ class ShippingCostCalculator
      */
     private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice)
     {
-        $byPrice = $policy->fromPrice <= $totalPrice && (empty($policy->toPrice) || $totalPrice < $policy->toPrice);
+        $byPrice = $policy->fromPrice <= $totalPrice && (empty($policy->toPrice) || $totalPrice <= $policy->toPrice);
         $byWeight = $policy->fromWeight <= $totalWeight
-            && (empty($policy->toWeight) || $totalWeight < $policy->toWeight);
+            && (empty($policy->toWeight) || $totalWeight <= $policy->toWeight);
 
         switch ($policy->rangeType) {
             case ShippingPricePolicy::RANGE_PRICE:
