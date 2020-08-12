@@ -2,11 +2,13 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
+use Exception;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
 use Packlink\BusinessLogic\Language\Translator;
+use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -59,6 +61,12 @@ class ShippingMethodController
      * @var ShippingMethodService
      */
     private $shippingMethodService;
+    /**
+     * Shop shipping method service.
+     *
+     * @var \Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService
+     */
+    private $shopShippingService;
 
     /**
      * DashboardController constructor.
@@ -66,6 +74,7 @@ class ShippingMethodController
     public function __construct()
     {
         $this->shippingMethodService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
+        $this->shopShippingService = ServiceRegister::getService(ShopShippingMethodService::CLASS_NAME);
     }
 
     /**
@@ -134,11 +143,19 @@ class ShippingMethodController
         }
 
         try {
+            $canAddBackupService = $shippingMethod->activated && !$this->shippingMethodService->isAnyMethodActive();
+
             $this->updateModelData($shippingMethod, $model);
             $this->shippingMethodService->save($model);
 
-            return $this->transformShippingMethodModelToDto($model);
-        } catch (\Exception $e) {
+            $result = $this->transformShippingMethodModelToDto($model);
+
+            if ($canAddBackupService) {
+                $this->shopShippingService->addBackupShippingMethod(ShippingMethod::fromArray($result->toArray()));
+            }
+
+            return $result;
+        } catch (Exception $e) {
             Logger::logError($e->getMessage(), 'Core', $shippingMethod->toArray());
         }
 
