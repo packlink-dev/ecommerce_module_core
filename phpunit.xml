@@ -10,7 +10,11 @@
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
+            <directory suffix=".php">./src/BusinessLogic</directory>
+            <directory suffix=".php">./src/Infrastructure</directory>
         </whitelist>
+        <blacklist>
+            <directory>./src/DemoUI</directory>
+        </blacklist>
     </filter>
 </phpunit>

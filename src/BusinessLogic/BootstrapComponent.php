@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic;
 
+use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
@@ -164,6 +165,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             TranslationServiceInterface::CLASS_NAME,
             function () {
                 return new TranslationService();
+            }
+        );
+
+        ServiceRegister::registerService(
+            AutoTestService::CLASS_NAME,
+            function () {
+                return new AutoTestService();
             }
         );
     }
