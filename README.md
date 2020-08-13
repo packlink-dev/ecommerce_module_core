@@ -26,3 +26,7 @@ Also, in commit dialog you must choose at least these options:
 -   Check TODO
 
 This will also run analysis on commit but only on changed files.
+
+### Resource compilation
+To compile resources in the root directory execute the following command:
+`php cssCompile.php`
