@@ -312,7 +312,9 @@ class ShippingCostCalculator
         $cost = PHP_INT_MAX;
         foreach ($pricingPolicies as $policy) {
             if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice)) {
-                $cost = min($cost, self::calculateCost($policy, $baseCost));
+                $cost = self::calculateCost($policy, $baseCost);
+
+                break;
             }
         }
 
