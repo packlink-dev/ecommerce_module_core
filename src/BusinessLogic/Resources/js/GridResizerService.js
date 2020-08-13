@@ -29,8 +29,9 @@ if (!window.Packlink) {
             columns = localStorage.getItem(table.id) ? JSON.parse(localStorage.getItem(table.id)) : [];
 
             let initialColumns = [];
+            const headersSelector = 'th:not(:last-child):not(:nth-child(' + (table.querySelectorAll('th').length - 1) +'))';
 
-            table.querySelectorAll('th:not(:last-child)').forEach((header, index) => {
+            table.querySelectorAll(headersSelector).forEach((header, index) => {
                 let cellWidth = header.offsetWidth + 'px';
 
                 if (columns.length > 0) {
@@ -43,6 +44,10 @@ if (!window.Packlink) {
                     header,
                     size: cellWidth,
                 });
+                const resizeHandler = header.querySelector('.pl-table-resize-handle');
+                if (resizeHandler) {
+                    resizeHandler.parentNode.removeChild(resizeHandler);
+                }
                 header.innerHTML += '<span class="pl-table-resize-handle material-icons">vertical_align_center</span>';
                 header.querySelector('.pl-table-resize-handle').addEventListener('mousedown', initResize);
             });
