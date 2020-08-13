@@ -78,7 +78,7 @@ if (!window.Packlink) {
             } else {
                 setTimeout(
                     function () {
-                        ajaxService.get(configuration.getTaskStatusUrl, () => { checkServicesStatus(response, config) });
+                        ajaxService.get(configuration.getTaskStatusUrl, (res) => { checkServicesStatus(res, config) });
                     },
                     1000
                 );
