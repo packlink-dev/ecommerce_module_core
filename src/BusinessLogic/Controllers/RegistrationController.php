@@ -31,6 +31,14 @@ class RegistrationController
         'DE' => 'https://pro.packlink.de/agb/',
         'FR' => 'https://pro.packlink.fr/conditions-generales/',
         'IT' => 'https://pro.packlink.it/termini-condizioni/',
+        'AT' => 'https://support-pro.packlink.com/hc/de/articles/360010011480',
+        'NL' => 'https://support-pro.packlink.com/hc/nl/articles/360010011480',
+        'BE' => 'https://support-pro.packlink.com/hc/nl/articles/360010011480',
+        'PT' => 'https://support-pro.packlink.com/hc/pt/articles/360010011480',
+        'TR' => 'https://support-pro.packlink.com/hc/tr/articles/360010011480',
+        'IE' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
+        'GB' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
+        'HU' => 'https://support-pro.packlink.com/hc/hu/articles/360010011480',
     );
     /**
      * List of terms and conditions URLs for different country codes.
@@ -39,10 +47,18 @@ class RegistrationController
      */
     private static $privacyPolicyUrls = array(
         'EN' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'ES' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'DE' => 'https://support-pro.packlink.com/hc/de/articles/360010011560',
-        'FR' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'IT' => 'https://support-pro.packlink.com/hc/it/articles/360010011560',
+        'ES' => 'https://support-pro.packlink.com/hc/es-es/articles/360010011560-Pol%C3%ADtica-de-Privacidad',
+        'DE' => 'https://support-pro.packlink.com/hc/de/articles/360010011560-Datenschutzerkl%C3%A4rung-der-Packlink-Shipping-S-L-',
+        'FR' => 'https://support-pro.packlink.com/hc/fr-fr/articles/360010011560-Politique-de-confidentialit%C3%A9',
+        'IT' => 'https://support-pro.packlink.com/hc/it/articles/360010011560-Politica-di-Privacy',
+        'AT' => 'https://support-pro.packlink.com/hc/de/articles/360010011480',
+        'NL' => 'https://support-pro.packlink.com/hc/nl/articles/360010011560',
+        'BE' => 'https://support-pro.packlink.com/hc/nl/articles/360010011560',
+        'PT' => 'https://support-pro.packlink.com/hc/pt/articles/360010011560',
+        'TR' => 'https://support-pro.packlink.com/hc/tr/articles/360010011560',
+        'IE' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
+        'GB' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
+        'HU' => 'https://support-pro.packlink.com/hc/hu/articles/360010011560',
     );
 
     /**
