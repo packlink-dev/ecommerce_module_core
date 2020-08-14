@@ -267,8 +267,8 @@ if (!window.Packlink) {
                     return false;
                 }
 
-                if (!pricingPolicy['increase'].checked && pricingPolicy['change_percent'].value > 100) {
-                    validationService.setError(pricingPolicy['change_percent'], translator.translate('validation.invalidMaxValue', [100]))
+                if (!pricingPolicy['increase'].checked && pricingPolicy['change_percent'].value > 99) {
+                    validationService.setError(pricingPolicy['change_percent'], translator.translate('validation.invalidMaxValue', [99]))
                     return false;
                 }
             }

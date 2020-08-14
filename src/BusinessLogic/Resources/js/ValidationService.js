@@ -246,7 +246,13 @@ if (!window.Packlink) {
                 parent = templateService.getMainPage();
             }
 
-            this.setError(parent.querySelector(fieldSelector), message);
+            const inputEl = parent.querySelector(fieldSelector);
+            if (!inputEl) {
+                utilityService.showFlashMessage(message + '. Field: ' + fieldSelector, 'danger', 7000);
+            } else {
+                this.setError(inputEl, message);
+
+            }
         };
 
         /**
