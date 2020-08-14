@@ -812,6 +812,9 @@
   height: 58px;
   min-width: 110px;
 }
+#pl-page pre {
+  white-space: normal;
+}
 @media (max-width: 768px) {
   #pl-page button, #pl-page .pl-button {
     width: 100%;
@@ -1127,6 +1130,13 @@
 }
 #pl-page .pl-shipping-country-selected {
   background-color: #f5f5f5;
+}
+#pl-page #pl-countries-alert-wrapper {
+  position: relative;
+  display: none;
+}
+#pl-page #pl-countries-alert-wrapper.visible {
+  display: flex;
 }
 @media (max-width: 768px) {
   #pl-page .pl-main-logo {
