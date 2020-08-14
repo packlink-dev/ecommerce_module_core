@@ -8,12 +8,16 @@ if (!window.Packlink) {
      * @constructor
      */
     function GridResizerService() {
-        const minColumnWidth = 150;
-        const templateService = Packlink.templateService;
-        const page = templateService.getComponent('pl-page');
-        let columns = [];
-        let headerBeingResized
-        let table;
+        const templateService = Packlink.templateService,
+            page = templateService.getComponent('pl-page');
+
+        let columns = [],
+            table,
+            pageX,
+            currentColumn,
+            nextColumn,
+            currentColumnWidth,
+            nextColumnWidth;
 
         /**
          * Initializes the given table if exists.
@@ -29,9 +33,9 @@ if (!window.Packlink) {
             columns = localStorage.getItem(table.id) ? JSON.parse(localStorage.getItem(table.id)) : [];
 
             let initialColumns = [];
-            const headersSelector = 'th:not(:last-child):not(:nth-child(' + (table.querySelectorAll('th').length - 1) +'))';
+            const headers = table.querySelectorAll('th:not(:last-child)');
 
-            table.querySelectorAll(headersSelector).forEach((header, index) => {
+            headers.forEach((header, index) => {
                 let cellWidth = header.offsetWidth + 'px';
 
                 if (columns.length > 0) {
@@ -44,59 +48,72 @@ if (!window.Packlink) {
                     header,
                     size: cellWidth,
                 });
+
+                if (index === headers.length - 1) {
+                    return;
+                }
+
                 const resizeHandler = header.querySelector('.pl-table-resize-handle');
                 if (resizeHandler) {
                     resizeHandler.parentNode.removeChild(resizeHandler);
                 }
                 header.innerHTML += '<span class="pl-table-resize-handle material-icons">vertical_align_center</span>';
-                header.querySelector('.pl-table-resize-handle').addEventListener('mousedown', initResize);
+
+                header.addEventListener('mousedown', onMouseDown);
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup',onMouseUp );
             });
 
             columns = initialColumns;
         }
 
         /**
-         * Handles resizing.
+         * Handles mouse down event.
          *
-         * @param {Event} e
-         *
-         * @returns {number}
+         * @param {MouseEvent} event
          */
-        const onMouseMove = (e) => requestAnimationFrame(() => {
-            page.classList.add('pl-disable-selection');
-            const width = e.clientX - (headerBeingResized !== null ? headerBeingResized.offsetLeft : 0);
-            const column = columns.find(({ header }) => header === headerBeingResized);
-            if (!column) {
-                return;
-            }
-            column.size = Math.max(minColumnWidth, width) + 'px'; // Enforce our minimum
+        const onMouseDown = (event) => {
+            currentColumn = event.target.parentElement;
+            nextColumn = currentColumn.nextElementSibling;
+            pageX = event.pageX;
 
-            headerBeingResized.style.width = column.size;
-        });
-
-        /**
-         * Cleans up and sets the new width value to localStorage.
-         */
-        const onMouseUp = () => {
-            // Clean up.
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
-            headerBeingResized = null;
-            page.classList.remove('pl-disable-selection');
-            if (columns !== null) {
-                localStorage.setItem(table.id, JSON.stringify(columns));
+            currentColumnWidth = currentColumn.offsetWidth;
+            if (nextColumn) {
+                nextColumnWidth = nextColumn.offsetWidth;
             }
         };
 
         /**
-         * Attaches the event handlers and marks header that is being resized.
+         * Handles mouse move event.
          *
-         * @param {Event} event
+         * @param {MouseEvent} event
          */
-        const initResize = (event) => {
-            headerBeingResized = event.target.parentNode;
-            window.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mouseup', onMouseUp);
+        const onMouseMove = (event) => {
+            if (currentColumn) {
+                page.classList.add('pl-disable-selection');
+
+                const diffX = event.pageX - pageX;
+
+                if (nextColumn) {
+                    const next = columns.find(({ header }) => header === nextColumn);
+                    next.size = (nextColumnWidth - (diffX)) + 'px';
+                    nextColumn.style.width = next.size;
+                }
+
+                const current = columns.find(({ header }) => header === currentColumn);
+                current.size = (currentColumnWidth + diffX) + 'px';
+                currentColumn.style.width = current.size;
+            }
+        };
+
+        const onMouseUp = () => {
+            page.classList.remove('pl-disable-selection');
+            localStorage.setItem(table.id, JSON.stringify(columns));
+            currentColumn = undefined;
+            nextColumn = undefined;
+            pageX = undefined;
+            nextColumnWidth = undefined;
+            currentColumnWidth = undefined;
         };
     }
 
