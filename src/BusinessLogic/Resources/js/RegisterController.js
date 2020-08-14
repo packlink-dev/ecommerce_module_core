@@ -39,7 +39,8 @@ if (!window.Packlink) {
 
             templateService.getComponent('pl-go-to-login', registerPage).addEventListener('click', goToLogin);
 
-            templateService.getComponent('pl-register-platform-country', registerPage).value = country;
+            templateService.getComponent('pl-register-platform-country', registerPage).value =
+                additionalConfig.hasOwnProperty('platform_country') ? additionalConfig.platform_country : 'ES';
 
             initInputField('pl-register-email');
             initInputField('pl-register-password');

@@ -70,7 +70,7 @@ if (!window.Packlink) {
          */
         const handleCountrySelected = (country) => {
             modal.close();
-            Packlink.state.goToState('register', {country: country.code});
+            Packlink.state.goToState('register', {country: country.code, platform_country: country.platform_country});
         };
 
         /**
