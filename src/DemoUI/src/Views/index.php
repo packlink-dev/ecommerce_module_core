@@ -5,7 +5,7 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-Configuration::setCurrentLanguage('es');
+Configuration::setCurrentLanguage('en');
 $lang = Configuration::getCurrentLanguage() ?: 'en';
 
 function getUrl($controller, $action)

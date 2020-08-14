@@ -419,7 +419,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         $packages[0]->weight = 10;
         $cost = $this->getShippingCosts($packages, $id);
-        self::assertEquals(10, $cost, 'Calculated cost is wrong!');
+        self::assertEquals(12, $cost, 'Calculated cost is wrong!');
 
         $packages[0]->weight = 14;
         $cost = $this->getShippingCosts($packages, $id);
@@ -427,7 +427,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         $packages[0]->weight = 20;
         $cost = $this->getShippingCosts($packages, $id);
-        self::assertEquals(8, $cost, 'Calculated cost is wrong!');
+        self::assertEquals(10, $cost, 'Calculated cost is wrong!');
 
         $packages[0]->weight = 25;
         $cost = $this->getShippingCosts($packages, $id);
@@ -448,7 +448,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         $packages[0]->weight = 10;
         $costs = $this->getShippingCosts($packages);
-        self::assertEquals(10, $costs[$method->getId()], 'Calculated cost is wrong!');
+        self::assertEquals(12, $costs[$method->getId()], 'Calculated cost is wrong!');
 
         $packages[0]->weight = 14;
         $costs = $this->getShippingCosts($packages);
@@ -456,7 +456,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         $packages[0]->weight = 20;
         $costs = $this->getShippingCosts($packages);
-        self::assertEquals(8, $costs[$method->getId()], 'Calculated cost is wrong!');
+        self::assertEquals(10, $costs[$method->getId()], 'Calculated cost is wrong!');
 
         $packages[0]->weight = 25;
         $costs = $this->getShippingCosts($packages);

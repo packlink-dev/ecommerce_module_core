@@ -460,7 +460,7 @@
   padding: 13px 16px;
 }
 #pl-page .pl-form-group input::placeholder, #pl-page .pl-form-group input::-webkit-input-placeholder {
-  color: #e1e1e1;
+  color: #cbcbcb;
 }
 #pl-page .pl-form-group select {
   border: 1px solid #d7d7d7;
@@ -851,6 +851,7 @@
   }
   #pl-page .pl-shipping-services-list {
     display: flex;
+    flex: 0 0 auto;
   }
 }
 @media (min-width: 769px) and (max-width: 1280px) {
@@ -1042,6 +1043,7 @@
   width: 100%;
   justify-content: space-between;
   padding: 0 20px;
+  flex: 0 0 auto;
 }
 #pl-page .pl-pick-shipping-services-page #pl-open-filter-button {
   display: none;
