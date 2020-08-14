@@ -334,6 +334,14 @@
   .pl-shipping-country-selected {
     background-color: $border-light;
   }
+
+  #pl-countries-alert-wrapper {
+    position: relative;
+    display: none;
+    &.visible {
+      display: flex;
+    }
+  }
 }
 
 // mobile rules

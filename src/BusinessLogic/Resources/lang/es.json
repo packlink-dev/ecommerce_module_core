@@ -244,7 +244,8 @@
     "selectCountriesHeader": "Países permitidos para tu servicio <br> de envío",
     "selectCountriesSubheader": "Selecciona la disponibilidad de al menos un país y <br> añade tantos como necesites",
     "usePacklinkRange": "Para el resto de rangos, aplicar precios Packlink",
-    "discardChangesQuestion": ""
+    "discardChangesQuestion": "",
+    "atLeastOneCountry": ""
   },
   "orderListAndDetails": {
     "packlinkOrderDraft": "Borrador del pedido de Packlink",

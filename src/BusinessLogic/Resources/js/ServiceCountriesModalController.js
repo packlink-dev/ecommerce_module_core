@@ -66,17 +66,24 @@ if (!window.Packlink) {
         const saveCountriesSelection = (modal, onSave) => {
             const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
                 allCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input'),
-                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
-            serviceModel.shippingCountries = [];
-            serviceModel.isShipToAllCountries = allCountries.length === selectedCountries.length;
+                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked'),
+                isShipToAllCountries = allCountries.length === selectedCountries.length;
 
-            if (!serviceModel.isShipToAllCountries) {
+            if (!isShipToAllCountries) {
+                if (selectedCountries.length === 0) {
+                    showValidationMessage();
+                    return;
+                }
+
+                serviceModel.shippingCountries = [];
                 selectedCountries.forEach(
                     (input) => {
                         serviceModel.shippingCountries.push(input.name);
                     }
                 );
             }
+
+            serviceModel.isShipToAllCountries = isShipToAllCountries;
 
             onSave(serviceModel);
             modal.close();
@@ -189,6 +196,19 @@ if (!window.Packlink) {
                 inputWrapper.classList.add('pl-shipping-country-selected');
             }
         };
+
+        const showValidationMessage = () => {
+            const errorMsg = templateService.getComponent('pl-countries-alert-wrapper');
+            errorMsg.querySelector('.material-icons').addEventListener('click', hideValidationMessage);
+            hideValidationMessage();
+            errorMsg.classList.add('visible');
+            setTimeout(hideValidationMessage, 7000);
+        };
+
+        const hideValidationMessage = () => {
+            const errorMsg = templateService.getComponent('pl-countries-alert-wrapper');
+            errorMsg.classList.remove('visible');
+        }
     }
 
     Packlink.ServiceCountriesModalController = ServiceCountriesModalController;
