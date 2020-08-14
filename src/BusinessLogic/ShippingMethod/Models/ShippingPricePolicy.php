@@ -117,6 +117,14 @@ class ShippingPricePolicy extends FrontDto
      */
     public static function fromArray(array $data)
     {
+        if (isset($data['range_type'])) {
+            $data['range_type'] = (int) $data['range_type'];
+        }
+
+        if (isset($data['pricing_policy'])) {
+            $data['pricing_policy'] = (int) $data['pricing_policy'];
+        }
+
         $result = parent::fromArray($data);
 
         $result->rangeType = (int)static::getDataValue($data, 'range_type');
