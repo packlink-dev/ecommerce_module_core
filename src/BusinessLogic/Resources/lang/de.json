@@ -244,7 +244,7 @@
     "selectCountriesHeader": "Länder, die von Ihrem <br> Versanddienst unterstützt werden",
     "selectCountriesSubheader": "Wählen Sie die Verfügbarkeit von mindestens einem Land aus und fügen Sie <br> beliebig viele hinzu",
     "usePacklinkRange": "Für alle anderen Bereiche gelten die Packlink-Preise",
-    "discardChangesQuestion": "Es gibt nicht gespeicherte Änderungen.<br>Sind Sie sicher, dass Sie zurückgehen und sie verwerfen möchten?".
+    "discardChangesQuestion": "Es gibt nicht gespeicherte Änderungen.<br>Sind Sie sicher, dass Sie zurückgehen und sie verwerfen möchten?",
     "atLeastOneCountry": ""
   },
   "orderListAndDetails": {
