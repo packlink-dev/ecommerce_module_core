@@ -24,7 +24,7 @@ if (!window.Packlink) {
             ajaxService = Packlink.ajaxService,
             utilityService = Packlink.utilityService,
             templateService = Packlink.templateService;
-        let context = '';
+
         let currentState = '';
         let previousState = '';
 
@@ -46,6 +46,8 @@ if (!window.Packlink) {
          * @param {object|null} additionalConfig
          */
         this.goToState = (controller, additionalConfig = null) => {
+            CleverReach.StateUUIDService.setStateUUID(Math.random().toString(36))
+
             let dp = pageControllerFactory.getInstance(
                 controller,
                 getControllerConfiguration(controller)
@@ -60,18 +62,6 @@ if (!window.Packlink) {
         };
 
         this.getPreviousState = () => previousState;
-
-        /**
-         * Returns context.
-         */
-        this.getContext = () => context;
-
-        /**
-         * Sets context.
-         */
-        const setContext = () => {
-            context = Math.random().toString(36);
-        };
 
         /**
          * Opens a specific page based on the current state.
@@ -101,9 +91,6 @@ if (!window.Packlink) {
          */
         const getControllerConfiguration = (controller, fromStep = false) => {
             let config = utilityService.cloneObject(configuration.pageConfiguration[controller]);
-
-            setContext();
-            config.context = context;
 
             if (fromStep) {
                 config.fromStep = true;
