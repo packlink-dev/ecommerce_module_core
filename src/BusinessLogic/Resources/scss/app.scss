@@ -167,6 +167,12 @@
     }
   }
 
+  .pl-page-onboarding {
+    .pl-page-buttons {
+      text-align: center;
+    }
+  }
+
   .pl-page-config {
     width: 100%;
     flex-grow: 1;
@@ -181,7 +187,7 @@
       margin-right: 0;
     }
 
-    .pl-text-center, .pl-page-buttons {
+    .pl-text-center {
       text-align: center;
     }
   }
@@ -325,7 +331,7 @@
   }
 
   .pl-shipping-country-selection-wrapper {
-    max-height: 500px;
+    max-height: 320px;
     overflow: auto;
 
     > * {

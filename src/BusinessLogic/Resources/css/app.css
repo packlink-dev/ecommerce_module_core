@@ -218,7 +218,6 @@
 }
 #pl-page .pl-page-buttons {
   display: block;
-  text-align: center;
   padding: 0 20px 20px;
 }
 #pl-page .pl-error-text {
@@ -795,12 +794,10 @@
   justify-content: space-between;
   padding: 13px 0 0;
 }
-
 #pl-page .pl-shipping-services-list-item .pl-wrap-items .pl-service-property {
   min-width: 170px;
   margin-bottom: 13px;
 }
-
 #pl-page .pl-shipping-services-list-item .pl-wrap-items .pl-service-property .pl-property-title {
   font-weight: 600;
   text-transform: uppercase;
@@ -809,33 +806,26 @@
   letter-spacing: 0;
   line-height: 16px;
 }
-
 #pl-page .pl-shipping-services-list-item .pl-wrap-items .pl-service-property .pl-property-value {
   color: #5d5d5d;
 }
-
 #pl-page .pl-shipping-services-list-item .pl-service-buttons {
   flex-direction: row;
 }
-
 #pl-page .pl-shipping-services-list-item .pl-service-buttons .pl-button {
   padding: 5px 15px;
   min-width: auto;
 }
-
 #pl-page .pl-shipping-services-list-item .pl-service-buttons .pl-button:not(.pl-hidden) + .pl-button {
   margin-left: 10px;
 }
-
 #pl-page .pl-button-group button {
   height: 58px;
   min-width: 110px;
 }
-
 #pl-page pre {
   white-space: normal;
 }
-
 @media (max-width: 768px) {
   #pl-page button, #pl-page .pl-button {
     width: 100%;
@@ -1027,6 +1017,11 @@
   color: #717c87;
   margin-right: 5px;
 }
+
+#pl-page .pl-page-onboarding .pl-page-buttons {
+  text-align: center;
+}
+
 #pl-page .pl-page-config {
   width: 100%;
   flex-grow: 1;
@@ -1035,13 +1030,16 @@
   text-align: left;
   margin-left: 10px;
 }
+
 #pl-page .pl-page-config .pl-small-page, #pl-page .pl-page-config .pl-medium-page {
   margin-left: 0;
   margin-right: 0;
 }
-#pl-page .pl-page-config .pl-text-center, #pl-page .pl-page-config .pl-page-buttons {
+
+#pl-page .pl-page-config .pl-text-center {
   text-align: center;
 }
+
 #pl-page .pl-status-mapping {
   width: 100%;
   flex-direction: row;
@@ -1147,7 +1145,7 @@
   padding: 15px;
 }
 #pl-page .pl-shipping-country-selection-wrapper {
-  max-height: 500px;
+  max-height: 320px;
   overflow: auto;
 }
 #pl-page .pl-shipping-country-selection-wrapper > * {
