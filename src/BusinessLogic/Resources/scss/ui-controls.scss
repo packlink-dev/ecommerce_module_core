@@ -222,15 +222,16 @@
     }
 
     select {
-      border: 1px solid $border-color;
-      line-height: 50px;
-      background-color: $color-white;
-      color: $input-control-color;
-      font-size: 14px;
-      width: 100%;
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
+      border: 1px solid $border-color;
+      line-height: 22px;
+      background: $color-white;
+      color: $input-control-color;
+      font-size: 14px;
+      width: 100%;
+      padding: 14px 11px 13px;
 
       &:focus {
         border: 1px solid $color-blue;
@@ -238,11 +239,7 @@
       }
 
       &.pl-with-label {
-        padding: 7px 0 0 11px;
-
-        & ~ i {
-          top: 18px;
-        }
+        padding-top: 21px;
       }
     }
 
@@ -255,8 +252,15 @@
       height: $icon-button-size;
     }
 
+    .pl-with-label {
+      & ~ i {
+        top: 18px;
+      }
+    }
+
     select + i {
       cursor: default;
+      pointer-events: none;
     }
 
     .pl-autocomplete-list {
@@ -442,7 +446,8 @@
     .pl-modal {
       background: $color-white;
       display: flex;
-      max-height: 100%;
+      max-height: 90%;
+      max-width: 90%;
       flex-flow: column;
       align-items: center;
       position: relative;
@@ -592,7 +597,7 @@
     background-color: $color-white;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     flex-direction: column;
-    margin: 5px;
+    margin-bottom: 10px;
     padding: 13px;
 
     .pl-service-header {
@@ -718,6 +723,7 @@
     .pl-shipping-services-list {
       display: flex;
       flex: 0 0 auto;
+      padding: 10px;
     }
   }
 }

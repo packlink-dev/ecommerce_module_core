@@ -45,7 +45,9 @@ if (!window.Packlink) {
         this.display = function (config) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getTaskStatusUrl, (response) => { checkServicesStatus(response, config)});
+            ajaxService.get(configuration.getTaskStatusUrl, (response) => {
+                checkServicesStatus(response, config);
+            });
 
             const mainPage = templateService.getMainPage(),
                 backButton = mainPage.querySelector('.pl-sub-header button');
@@ -72,13 +74,17 @@ if (!window.Packlink) {
          */
         const checkServicesStatus = (response, config) => {
             if (response.status === 'completed') {
-                ajaxService.get(configuration.getServicesUrl, (services) => { bindServices(services, config) });
+                ajaxService.get(configuration.getServicesUrl, (services) => {
+                    bindServices(services, config);
+                });
             } else if (response.status === 'failed') {
                 showNoServicesModal();
             } else {
                 setTimeout(
                     function () {
-                        ajaxService.get(configuration.getTaskStatusUrl, (res) => { checkServicesStatus(res, config) });
+                        ajaxService.get(configuration.getTaskStatusUrl, (res) => {
+                            checkServicesStatus(res, config);
+                        });
                     },
                     1000
                 );
@@ -158,8 +164,7 @@ if (!window.Packlink) {
                 if (config && config.from === 'edit') {
                     if (config.newService === true && activeServices.length === 1 && configuration.disableCarriersUrl) {
                         displayDisableShopServicesModal();
-                    }
-                    else {
+                    } else {
                         const modal = new Packlink.modalService({
                             content: templateService.replaceResourcesUrl(
                                 '<div class="pl-center pl-separate-horizontally">' +
@@ -232,7 +237,7 @@ if (!window.Packlink) {
             // noinspection JSCheckFunctionSignatures
             const modal = new Packlink.modalService({
                 title: translator.translate('shippingServices.filterModalTitle'),
-                content: templateService.getMainPage().querySelector('.pl-services-filter-wrapper').innerHTML,
+                content: '<div class="pl-filters-wrapper">' + templateService.getMainPage().querySelector('.pl-services-filter-wrapper').innerHTML + '</div>',
                 buttons: [
                     {
                         title: translator.translate('shippingServices.applyFilters'),
@@ -312,8 +317,7 @@ if (!window.Packlink) {
                     newDiv.classList.add('pl-selected');
                     newDiv.dataset.filter = filterType;
                     newDiv.dataset.option = appliedFilter[filterType];
-                    newDiv.innerHTML = translator.translate('shippingServices.' + filterType).toUpperCase()
-                        + ': ' + translator.translate('shippingServices.' + appliedFilter[filterType]);
+                    newDiv.innerHTML = translator.translate('shippingServices.' + appliedFilter[filterType]);
                     newDiv.addEventListener('click', () => {
                         appliedFilter[filterType] = null;
                         newDiv.remove();

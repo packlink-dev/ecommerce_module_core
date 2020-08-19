@@ -214,15 +214,23 @@
   .pl-services-filter-wrapper {
     flex-direction: row;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 0 20px;
     flex: 0 0 auto;
+
+    .pl-filter:not(:last-child) {
+      margin-right: 32px;
+    }
   }
 
   .pl-pick-shipping-services-page {
     #pl-open-filter-button {
       display: none;
     }
+  }
+
+  .pl-modal .pl-filters-wrapper {
+    width: 300px;
   }
 
   .pl-filter {
@@ -242,7 +250,7 @@
 
     .pl-filter-options {
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: flex-start;
 
       .pl-filter-option {
         padding: 6px 13px;
@@ -261,12 +269,6 @@
           margin-left: 12px;
         }
       }
-    }
-  }
-
-  .pl-modal {
-    .pl-filter:not(:last-child) {
-      padding-bottom: 32px;
     }
   }
 
@@ -412,7 +414,7 @@
 @media (max-width: 1280px) {
   #pl-page {
     .pl-services-filter-wrapper {
-      justify-content: flex-start;
+      padding: 0 10px;
 
       .pl-filter:not(.pl-filter-selected) {
         display: none;
@@ -421,6 +423,7 @@
       .pl-filter-selected {
         flex-direction: row;
         display: flex;
+        padding: 10px 0 0;
 
         .pl-filter-option {
           flex-direction: row;
