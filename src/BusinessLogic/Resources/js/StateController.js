@@ -46,7 +46,7 @@ if (!window.Packlink) {
          * @param {object|null} additionalConfig
          */
         this.goToState = (controller, additionalConfig = null) => {
-            CleverReach.StateUUIDService.setStateUUID(Math.random().toString(36))
+            Packlink.StateUUIDService.setStateUUID(Math.random().toString(36));
 
             let dp = pageControllerFactory.getInstance(
                 controller,

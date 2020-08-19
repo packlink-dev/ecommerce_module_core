@@ -46,7 +46,7 @@ if (!window.Packlink) {
          */
         this.call = function (method, url, data, onSuccess, onError) {
             const request = getRequest();
-            const callUUID = CleverReach.StateUUIDService.getStateUUID();
+            const callUUID = Packlink.StateUUIDService.getStateUUID();
 
             if (!onError) {
                 onError = Packlink.responseService.errorHandler;
@@ -60,7 +60,7 @@ if (!window.Packlink) {
             request.onreadystatechange = function () {
                 // "this" is XMLHttpRequest
                 if (this.readyState === 4) {
-                    if (callUUID !== CleverReach.StateUUIDService.getStateUUID()) {
+                    if (callUUID !== Packlink.StateUUIDService.getStateUUID()) {
                         // Obsolete response. The app has changed the original state that issued the call.
 
                         return;

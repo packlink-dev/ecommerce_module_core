@@ -1,17 +1,19 @@
-var CleverReach = window.CleverReach || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
-(()=>{
+(() => {
     function StateUUIDService() {
         let currentState = '';
 
         this.setStateUUID = (state) => {
             currentState = state;
-        }
+        };
 
         this.getStateUUID = () => {
             return currentState;
-        }
+        };
     }
 
-    CleverReach.StateUUIDService = new StateUUIDService();
+    Packlink.StateUUIDService = new StateUUIDService();
 })();
