@@ -630,6 +630,14 @@
         .pl-property-title {
           font-weight: 600;
           text-transform: uppercase;
+          color: $color-gray;
+          font-size: 12px;
+          letter-spacing: 0;
+          line-height: 16px;
+        }
+
+        .pl-property-value {
+          color: $input-control-color;
         }
       }
     }
@@ -640,7 +648,10 @@
       .pl-button {
         padding: 5px 15px;
         min-width: auto;
-        margin: 0 10px 0 0;
+      }
+
+      .pl-button:not(.pl-hidden) + .pl-button {
+        margin-left: 10px;
       }
     }
   }
