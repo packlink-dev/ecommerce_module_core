@@ -113,7 +113,7 @@
     "description-onboarding": "We will use this address to create <strong>a default sender for all shipments.</strong> You will be able to edit it whenever you wish via the settings tab.",
     "title-config": "Default sender address",
     "description-config": "We will use this address to create <strong>a default sender for all shipments.</strong> You can edit it at any time.",
-    "alias": "Sender name",
+    "alias": "Warehouse name",
     "alias-placeholder": "Main warehouse",
     "name": "Name of contact person",
     "name-placeholder": "Name",
