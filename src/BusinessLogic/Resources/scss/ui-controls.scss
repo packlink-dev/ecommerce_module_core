@@ -254,6 +254,8 @@
     }
 
     .pl-with-label {
+      max-width: none;
+
       & ~ i {
         top: 18px;
       }
