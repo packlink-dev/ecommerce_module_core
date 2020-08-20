@@ -15,6 +15,7 @@
       .pl-button {
         padding: 10px 13px;
         text-transform: none;
+        margin: 0;
       }
     }
 
@@ -681,7 +682,9 @@
       }
     }
 
-    .pl-header-holder {
+    header .pl-header-holder {
+      justify-content: flex-end;
+
       .pl-button {
         display: none;
       }

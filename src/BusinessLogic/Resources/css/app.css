@@ -288,6 +288,7 @@
 #pl-page header .pl-header-holder .pl-button {
   padding: 10px 13px;
   text-transform: none;
+  margin: 0;
 }
 #pl-page header.pl-sub-header {
   border-color: #f5f5f5;
@@ -826,22 +827,32 @@
 #pl-page pre {
   white-space: normal;
 }
+
 @media (max-width: 768px) {
   #pl-page button, #pl-page .pl-button {
     width: 100%;
   }
+
   #pl-page section .pl-button {
     width: auto;
   }
-  #pl-page .pl-header-holder .pl-button {
+
+  #pl-page header .pl-header-holder {
+    justify-content: flex-end;
+  }
+
+  #pl-page header .pl-header-holder .pl-button {
     display: none;
   }
+
   #pl-page .pl-shipping-services-list-item .pl-wrap-items .pl-service-property {
     min-width: 50%;
   }
+
   #pl-page .pl-shipping-services-list-item .pl-button {
     width: 100%;
   }
+
   #pl-page .pl-shipping-services-list-item .pl-button.pl-small {
     padding: 11px;
   }
@@ -1176,51 +1187,40 @@
     padding-right: 15px;
     padding-left: 20px;
   }
-
   #pl-page .pl-configuration-page .pl-footer {
     flex-direction: column;
   }
-
   #pl-page .pl-configuration-page .pl-footer > :first-child {
     padding-bottom: 20px;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-no-services {
     flex-direction: column;
     justify-content: flex-start;
     padding-bottom: 0;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-no-services img {
     max-height: 40%;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-no-services .pl-no-services-description {
     margin: 20px 0 0;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-no-services .pl-no-services-description h1 {
     text-align: center;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-no-services .pl-no-services-description button {
     display: none;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-no-services .pl-no-services-description p {
     margin-bottom: 0;
   }
-
   #pl-page .pl-my-shipping-services-page .pl-page-buttons {
     display: flex;
   }
 }
-
 @media (max-width: 1280px) {
   #pl-page .pl-services-filter-wrapper {
     padding: 0 10px;
   }
-
   #pl-page .pl-services-filter-wrapper .pl-filter:not(.pl-filter-selected) {
     display: none;
   }
