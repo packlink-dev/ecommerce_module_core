@@ -84,8 +84,8 @@
     "HU": "Hungary"
   },
   "onboardingWelcome": {
-    "header": "Vamos a configurar tu información básica <br> para poder hacer envíos",
-    "steps": "Son solo dos pasos, los necesitamos para ofrecerte los servicios <br> de transporte que más se adaptan a tus necesidades.",
+    "header": "Vamos a configurar tu información básica para poder hacer envíos",
+    "steps": "Son solo dos pasos, los necesitamos para ofrecerte los servicios de transporte que más se adaptan a tus necesidades.",
     "stepOne": "Configurar los detalles del paquete",
     "stepTwo": "Configurar la dirección del remitente",
     "startSetUp": "Comenzar con la configuración"

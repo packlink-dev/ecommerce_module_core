@@ -84,8 +84,8 @@
     "HU": "Hungary"
   },
   "onboardingWelcome": {
-    "header": "Configurez vos informations de base afin<br>d’effectuer des envois",
-    "steps": "Il ne vous reste que deux étapes pour savoir quel<br>transporteur répond le mieux à vos besoins",
+    "header": "Configurez vos informations de base afin d’effectuer des envois",
+    "steps": "Il ne vous reste que deux étapes pour savoir quel transporteur répond le mieux à vos besoins",
     "stepOne": "Configurez les informations sur le colis",
     "stepTwo": "Configurez l’adresse de l’émetteur",
     "startSetUp": "Démarrez la configuration"

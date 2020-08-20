@@ -6,6 +6,10 @@
 @import "icons";
 
 #pl-page {
+  #pl-main-header {
+    height: 90px;
+  }
+
   .pl-onboarding-list {
     width: 100%;
     justify-content: flex-start;
@@ -39,7 +43,7 @@
     }
   }
 
-  .pl-parcel-wrapper, .pl-wh-wrapper {
+  .pl-parcel-wrapper {
     align-items: flex-start;
     min-width: 100%;
   }

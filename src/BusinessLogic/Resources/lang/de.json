@@ -84,8 +84,8 @@
     "HU": "Hungary"
   },
   "onboardingWelcome": {
-    "header": "Richten Sie nun die grundlegenden Informationen ein, damit<br>Sie Versendungen vornehmen können",
-    "steps": "In nur zwei Schritten können wir Ihnen den <br>Spediteur anbieten, der all Ihre Anforderungen erfüllt",
+    "header": "Richten Sie nun die grundlegenden Informationen ein, damit Sie Versendungen vornehmen können",
+    "steps": "In nur zwei Schritten können wir Ihnen den Spediteur anbieten, der all Ihre Anforderungen erfüllt",
     "stepOne": "Paketangaben einfügen",
     "stepTwo": "Absenderadresse eingeben",
     "startSetUp": "Einrichten beginnen"

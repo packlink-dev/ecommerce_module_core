@@ -27,6 +27,7 @@ if (!window.Packlink) {
          * The main entry point for controller.
          */
         this.display = (additionalConfig) => {
+            utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
             country = additionalConfig.hasOwnProperty('country') ? additionalConfig.country : 'ES';
 
@@ -76,6 +77,7 @@ if (!window.Packlink) {
                 );
 
             termsAndConditionsLabel.querySelector('label').innerHTML += termsTranslation;
+            utilityService.hideSpinner();
         };
 
         /**

@@ -84,8 +84,8 @@
     "HU": "Hungary"
   },
   "onboardingWelcome": {
-    "header": "È necessario impostare alcuni dati di base così che<br>potrai effettuare spedizioni",
-    "steps": "Si tratta di due semplici passaggi che dobbiamo completare per offrirti la<br>compagnia di trasporto che più si adatta alle tue esigenze",
+    "header": "È necessario impostare alcuni dati di base così che potrai effettuare spedizioni",
+    "steps": "Si tratta di due semplici passaggi che dobbiamo completare per offrirti la compagnia di trasporto che più si adatta alle tue esigenze",
     "stepOne": "Imposta i dettagli del pacco",
     "stepTwo": "Imposta l’indirizzo del mittente",
     "startSetUp": "Avvia la configurazione"

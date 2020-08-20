@@ -15,6 +15,7 @@ if (!window.Packlink) {
     function ServiceCountriesModalController(configuration) {
         const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
+            utilityService = Packlink.utilityService,
             translator = Packlink.translationService;
 
         /**
@@ -28,6 +29,7 @@ if (!window.Packlink) {
          * @param {{service: ShippingService, onSave: function(ShippingService)}} config
          */
         this.display = (config) => {
+            utilityService.showSpinner();
             serviceModel = config.service;
             const modal = new Packlink.modalService({
                 content: templateService.getTemplate('pl-countries-selection-modal'),
@@ -128,6 +130,7 @@ if (!window.Packlink) {
 
             setCountryChangeEvents(countryInputs);
             setShipToAllCountriesChangeEvent(countriesSelectionForm);
+            utilityService.hideSpinner();
         };
 
         /**

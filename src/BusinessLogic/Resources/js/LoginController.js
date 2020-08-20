@@ -35,6 +35,7 @@ if (!window.Packlink) {
 
             templateService.getComponent('pl-login-form', loginPage).addEventListener('submit', login);
             templateService.getComponent('pl-go-to-register', loginPage).addEventListener('click', goToRegister);
+            Packlink.utilityService.hideSpinner();
         };
 
         /**

@@ -28,6 +28,7 @@ if (!window.Packlink) {
         const ajaxService = Packlink.ajaxService,
             translator = Packlink.translationService,
             templateService = Packlink.templateService,
+            utilityService = Packlink.utilityService,
             modal = new Packlink.modalService({
                 title: translator.translate('register.chooseYourCountry'),
                 content: Packlink.templateService.getTemplate('pl-register-modal'),
@@ -61,6 +62,8 @@ if (!window.Packlink) {
                 countryElement.firstElementChild.addEventListener('click', () => handleCountrySelected(country));
                 countryList.appendChild(countryElement.firstElementChild);
             });
+
+            utilityService.hideSpinner();
         };
 
         /**
@@ -99,6 +102,7 @@ if (!window.Packlink) {
          * The main entry point for controller.
          */
         this.display = () => {
+            utilityService.showSpinner();
             modal.open();
         };
     }

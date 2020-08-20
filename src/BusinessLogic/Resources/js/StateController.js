@@ -54,6 +54,7 @@ if (!window.Packlink) {
             );
 
             if (dp) {
+                utilityService.showSpinner();
                 dp.display(additionalConfig);
             }
 
