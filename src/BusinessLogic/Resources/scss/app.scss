@@ -393,8 +393,12 @@
     .pl-my-shipping-services-page {
       .pl-no-services {
         flex-direction: column;
-        align-items: center;
         justify-content: flex-start;
+        padding-bottom: 0;
+
+        img {
+          max-height: 40%;
+        }
 
         .pl-no-services-description {
           margin: 20px 0 0;
@@ -405,6 +409,10 @@
 
           button {
             display: none;
+          }
+
+          p {
+            margin-bottom: 0;
           }
         }
       }
