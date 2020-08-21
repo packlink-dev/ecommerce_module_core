@@ -171,7 +171,7 @@ if (!window.Packlink) {
         /**
          * Sets event listener for shipToAllCountries checkbox.
          *
-         * @param {HTMLFormElement} countriesSelectionForm
+         * @param {HTMLElement} countriesSelectionForm
          */
         const setShipToAllCountriesChangeEvent = (countriesSelectionForm) => {
             countriesSelectionForm['isShipToAllCountries'].addEventListener('change', (event) => {
@@ -210,7 +210,9 @@ if (!window.Packlink) {
 
         const hideValidationMessage = () => {
             const errorMsg = templateService.getComponent('pl-countries-alert-wrapper');
-            errorMsg.classList.remove('visible');
+            if (errorMsg) {
+                errorMsg.classList.remove('visible');
+            }
         }
     }
 

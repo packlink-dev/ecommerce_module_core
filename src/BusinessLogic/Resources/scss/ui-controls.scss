@@ -246,8 +246,8 @@
     i {
       position: absolute;
       right: 10px;
-      top: 50%;
-      margin-top: calc(-1 * #{$icon-button-size} / 2);
+      top: $input-height/2;
+      margin-top: (-1 * $icon-button-size / 2);
       color: $border-color;
       width: $icon-button-size;
       height: $icon-button-size;
@@ -286,9 +286,9 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
+    width: $checkbox-size;
+    min-width: $checkbox-size;
+    height: $checkbox-size;
     border: 1px solid $border-color;
     position: relative;
 
@@ -310,6 +310,9 @@
         content: '\2713';
         margin: 0;
         font: bold 20px/24px pl-proxima-nova;
+        width: $checkbox-size;
+        min-width: $checkbox-size;
+        height: $checkbox-size;
       }
     }
   }

@@ -182,6 +182,8 @@ if (!window.Packlink) {
                         modal.open();
                     }
                 }
+
+                utilityService.hideSpinner();
             });
         };
 
@@ -201,8 +203,6 @@ if (!window.Packlink) {
             render(list, 'pl-shipping-services-list-item', 'div');
             // noinspection JSCheckFunctionSignatures
             Packlink.GridResizerService.init(table);
-
-            utilityService.hideSpinner();
         };
 
         /**
@@ -383,7 +383,16 @@ if (!window.Packlink) {
                         title: translator.translate('general.accept'),
                         primary: true,
                         onClick: () => {
-                            ajaxService.post(configuration.disableCarriersUrl, {}, modal.close, Packlink.responseService.errorHandler);
+                            utilityService.showSpinner();
+                            ajaxService.post(
+                                configuration.disableCarriersUrl,
+                                {},
+                                () => {
+                                    utilityService.hideSpinner();
+                                    modal.close();
+                                },
+                                Packlink.responseService.errorHandler
+                            );
                         }
                     },
                     {

@@ -166,7 +166,7 @@
   margin-right: 20px;
 }
 #pl-page .pl-page-content {
-  overflow: auto;
+  overflow: hidden auto;
   margin-bottom: 10px;
 }
 #pl-page .pl-page-padding {
@@ -487,8 +487,8 @@
 #pl-page .pl-form-group i {
   position: absolute;
   right: 10px;
-  top: 50%;
-  margin-top: calc(-1 * 24px / 2);
+  top: 28px;
+  margin-top: -12px;
   color: #d7d7d7;
   width: 24px;
   height: 24px;
@@ -543,6 +543,9 @@
   content: '\2713';
   margin: 0;
   font: bold 20px/24px pl-proxima-nova;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
 }
 #pl-page .pl-alert-wrapper {
   position: absolute;
