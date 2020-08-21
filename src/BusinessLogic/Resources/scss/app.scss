@@ -268,15 +268,12 @@
         border-radius: 13px;
         cursor: pointer;
         color: $input-control-color;
+        margin-right: 12px;
 
         &.pl-selected {
           border-color: $color-blue;
           background-color: $color-blue;
           color: $color-white;
-        }
-
-        & + .pl-filter-option {
-          margin-left: 12px;
         }
       }
     }
@@ -441,10 +438,18 @@
       .pl-filter-selected {
         flex-direction: row;
         display: flex;
-        padding: 10px 0 0;
+        padding: 0;
+
+        .pl-filter-options {
+          flex-wrap: wrap;
+        }
 
         .pl-filter-option {
           flex-direction: row;
+
+          &.pl-selected {
+            margin-top: 10px;
+          }
 
           &::after {
             content: 'X';

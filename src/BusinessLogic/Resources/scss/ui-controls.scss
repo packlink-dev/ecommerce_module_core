@@ -4,6 +4,7 @@
     padding: 20px;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 
     .pl-header-holder {
       justify-content: space-between;

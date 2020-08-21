@@ -12,16 +12,17 @@
     width: 50%;
   }
 
-  .pl-medium-page {
-    max-width: 540px;
+  .pl-small-page, .pl-medium-page {
     margin-left: auto;
     margin-right: auto;
   }
 
+  .pl-medium-page {
+    max-width: 540px;
+  }
+
   .pl-small-page {
     max-width: 410px;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .pl-small-width {
@@ -209,11 +210,5 @@
       width: 100%;
       max-width: 100%;
     }
-  }
-}
-
-// tablet rules
-@media (min-width: 769px) and (max-width: 1280px) {
-  #pl-page {
   }
 }

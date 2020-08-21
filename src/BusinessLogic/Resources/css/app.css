@@ -54,6 +54,9 @@
 #pl-page *::before, #pl-page *::after {
   box-sizing: border-box;
 }
+#pl-page main {
+  background-color: #fff;
+}
 #pl-page br {
   margin-bottom: 10px;
 }
@@ -114,15 +117,17 @@
   display: inline-flex;
   width: 50%;
 }
-#pl-page .pl-medium-page {
-  max-width: 540px;
+
+#pl-page .pl-small-page, #pl-page .pl-medium-page {
   margin-left: auto;
   margin-right: auto;
 }
+
+#pl-page .pl-medium-page {
+  max-width: 540px;
+}
 #pl-page .pl-small-page {
   max-width: 410px;
-  margin-left: auto;
-  margin-right: auto;
 }
 #pl-page .pl-small-width {
   max-width: 410px;
@@ -273,13 +278,12 @@
     max-width: 100%;
   }
 }
-@media (min-width: 769px) and (max-width: 1280px) {
-}
 #pl-page header {
   border-bottom: 1px solid #d7d7d7;
   padding: 20px;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 #pl-page header .pl-header-holder {
   justify-content: space-between;
@@ -1028,11 +1032,9 @@
   margin-left: 0;
   margin-right: 0;
 }
-
 #pl-page .pl-page-config .pl-page-info {
   text-align: left;
 }
-
 #pl-page .pl-status-mapping {
   width: 100%;
   flex-direction: row;
@@ -1093,14 +1095,12 @@
   border-radius: 13px;
   cursor: pointer;
   color: #5d5d5d;
+  margin-right: 12px;
 }
 #pl-page .pl-filter .pl-filter-options .pl-filter-option.pl-selected {
   border-color: #2095f2;
   background-color: #2095f2;
   color: #fff;
-}
-#pl-page .pl-filter .pl-filter-options .pl-filter-option + .pl-filter-option {
-  margin-left: 12px;
 }
 #pl-page .pl-form-group:not(:first-child).pl-change-percent-wrapper {
   margin-top: 0;
@@ -1214,10 +1214,16 @@
   #pl-page .pl-services-filter-wrapper .pl-filter-selected {
     flex-direction: row;
     display: flex;
-    padding: 10px 0 0;
+    padding: 0;
+  }
+  #pl-page .pl-services-filter-wrapper .pl-filter-selected .pl-filter-options {
+    flex-wrap: wrap;
   }
   #pl-page .pl-services-filter-wrapper .pl-filter-selected .pl-filter-option {
     flex-direction: row;
+  }
+  #pl-page .pl-services-filter-wrapper .pl-filter-selected .pl-filter-option.pl-selected {
+    margin-top: 10px;
   }
   #pl-page .pl-services-filter-wrapper .pl-filter-selected .pl-filter-option::after {
     content: 'X';
