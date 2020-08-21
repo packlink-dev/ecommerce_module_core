@@ -169,25 +169,20 @@
   overflow: auto;
   margin-bottom: 10px;
 }
-
 #pl-page .pl-page-padding {
   padding: 20px;
 }
-
 #pl-page .pl-flex-expand {
   flex-grow: 1;
 }
-
 #pl-page .pl-no-shrink {
   flex-shrink: 0;
 }
-
 #pl-page .pl-row-orientation {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-
 #pl-page .pl-flex-left {
   align-items: flex-start;
   justify-content: flex-start;
@@ -444,9 +439,12 @@
   align-items: start;
   flex-shrink: 0;
 }
-#pl-page .pl-form-group.pl-half-width {
+
+#pl-page .pl-form-group.pl-half-width, #pl-page .pl-form-group .pl-half-width {
   width: 50%;
+  min-width: 50%;
 }
+
 #pl-page .pl-form-group:not(:first-child) {
   margin-top: 12px;
 }
@@ -505,7 +503,7 @@
   background-color: #fff;
   border: 1px solid #d7d7d7;
   width: 100%;
-  margin-top: 57px;
+  margin-top: 56px;
   position: absolute;
   z-index: 1;
   max-height: 200px;
@@ -820,11 +818,17 @@
   padding: 5px 15px;
   min-width: auto;
 }
+
 #pl-page .pl-shipping-services-list-item .pl-service-buttons .pl-button:not(.pl-hidden) + .pl-button {
   margin-left: 10px;
 }
+
+#pl-page .pl-button-group {
+  padding-right: 10px;
+}
+
 #pl-page .pl-button-group button {
-  height: 58px;
+  height: 56px;
   min-width: 110px;
 }
 #pl-page pre {

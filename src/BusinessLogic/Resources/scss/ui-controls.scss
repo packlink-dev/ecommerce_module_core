@@ -190,8 +190,9 @@
     align-items: start;
     flex-shrink: 0;
 
-    &.pl-half-width {
+    &.pl-half-width, .pl-half-width {
       width: 50%;
+      min-width: 50%;
     }
 
     &:not(:first-child) {
@@ -208,7 +209,7 @@
     }
 
     input, select {
-      height: 56px;
+      height: $input-height;
       background: $color-white;
       border-radius: 0;
       border: 1px solid $border-color;
@@ -261,7 +262,7 @@
       background-color: $color-white;
       border: 1px solid $border-color;
       width: 100%;
-      margin-top: 57px;
+      margin-top: $input-height;
       position: absolute;
       z-index: 1;
       max-height: 200px;
@@ -380,7 +381,7 @@
       cursor: pointer;
 
       .pl-switch-on, .pl-switch-off {
-        font-size: 56px;
+        font-size: $input-height;
       }
 
       .pl-switch-on {
@@ -649,8 +650,10 @@
   }
 
   .pl-button-group {
+    padding-right: 10px;
+
     button {
-      height: 58px;
+      height: $input-height;
       min-width: 110px;
     }
   }
