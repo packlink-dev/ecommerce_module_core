@@ -17,30 +17,30 @@
                 </label>
             </div>
             <div class="pl-form-group-wrapper pl-last-child-border-none" id="pl-from-to-weight-wrapper">
-                <div class="pl-form-group">
+                <div class="pl-form-group pl-half-width">
                     <input type="text" id="pl-from-weight" name="from_weight" placeholder="0"
                            data-type="number" data-validation-rule="nonNegative" data-required="true"/>
                     <label for="pl-from-weight">
                         {$shippingServices.from} (kg)
                     </label>
                 </div>
-                <div class="pl-form-group">
+                <div class="pl-form-group pl-half-width">
                     <input type="text" id="pl-to-weight" name="to_weight" placeholder="1"
-                           data-type="number" data-validation-rule="nonNegative" />
+                           data-type="number" data-validation-rule="nonNegative"/>
                     <label for="pl-to-weight">
                         {$shippingServices.to} (kg)
                     </label>
                 </div>
             </div>
             <div class="pl-form-group-wrapper pl-last-child-border-none" id="pl-from-to-price-wrapper">
-                <div class="pl-form-group">
+                <div class="pl-form-group pl-half-width">
                     <input type="text" id="pl-from-price" name="from_price" placeholder="0"
                            data-type="number" data-validation-rule="nonNegative" data-required="true"/>
                     <label for="pl-from-price">
                         {$shippingServices.from} (€)
                     </label>
                 </div>
-                <div class="pl-form-group">
+                <div class="pl-form-group pl-half-width">
                     <input type="text" id="pl-to-price" name="to_price" placeholder="1"
                            data-type="number" data-validation-rule="nonNegative"/>
                     <label for="pl-to-price">
@@ -66,7 +66,7 @@
                 <div>{$shippingServices.increaseExplanation}</div>
                 <div>{$shippingServices.reduceExplanation}</div>
                 <div class="pl-form-group-wrapper">
-                    <div class="pl-button-group">
+                    <div class="pl-button-group pl-half-width">
                         <button id="pl-price-percentage-increase" class="pl-button pl-button-primary pl-no-margin">
                             {$shippingServices.increase}
                         </button>
@@ -75,8 +75,9 @@
                         </button>
                     </div>
                     <input type="hidden" name="increase" id="pl-increase" checked>
-                    <div class="pl-form-group pl-left-separate pl-change-percent-wrapper">
+                    <div class="pl-form-group pl-change-percent-wrapper pl-half-width">
                         <input type="text" id="pl-change-percent" name="change_percent" placeholder="5"
+                               class="pl-left-separate"
                                data-type="number" data-validation-rule="nonNegative" data-required="true"/>
                         <label for="pl-change-percent">
                             {$shippingServices.select} (%)
@@ -85,7 +86,7 @@
                 </div>
             </div>
             <div class="pl-form-group" id="pl-price-fixed-wrapper">
-                <div class="pl-form-group pl-fixed-width-input">
+                <div class="pl-form-group pl-half-width">
                     <input type="text" id="pl-fixed-price" name="fixed_price" placeholder="5"
                            data-type="number" data-validation-rule="nonNegative"/>
                     <label for="pl-fixed-price">

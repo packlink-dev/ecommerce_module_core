@@ -117,12 +117,10 @@
   display: inline-flex;
   width: 50%;
 }
-
 #pl-page .pl-small-page, #pl-page .pl-medium-page {
   margin-left: auto;
   margin-right: auto;
 }
-
 #pl-page .pl-medium-page {
   max-width: 540px;
 }
@@ -428,18 +426,27 @@
 #pl-page .pl-button-group button:first-child {
   border-radius: 4px 0 0 4px;
 }
+
 #pl-page .pl-button-group button:last-child {
   border-radius: 0 4px 4px 0;
 }
+
 #pl-page .pl-form-group {
   position: relative;
   border: none;
   width: 100%;
   align-items: start;
+  flex-shrink: 0;
 }
+
+#pl-page .pl-form-group.pl-half-width {
+  width: 50%;
+}
+
 #pl-page .pl-form-group:not(:first-child) {
   margin-top: 12px;
 }
+
 #pl-page .pl-form-group label {
   position: absolute;
   top: 8px;
@@ -920,7 +927,7 @@
   width: 200px;
 }
 #pl-page .pl-register-country-list-wrapper {
-  padding-top: 15px;
+  margin: 15px 0 0;
   min-width: 300px;
   width: 100%;
   display: flex;
@@ -936,6 +943,7 @@
   font-size: 15px;
   text-transform: uppercase;
   cursor: pointer;
+  flex-shrink: 0;
 }
 #pl-page .pl-register-country-list-wrapper .pl-country:hover {
   background-color: rgba(216, 216, 216, 0.8);
@@ -1104,9 +1112,6 @@
 }
 #pl-page .pl-form-group:not(:first-child).pl-change-percent-wrapper {
   margin-top: 0;
-}
-#pl-page #pl-fixed-price {
-  width: 215px;
 }
 #pl-page .pl-my-shipping-services-page header {
   background-color: #1a77c2;

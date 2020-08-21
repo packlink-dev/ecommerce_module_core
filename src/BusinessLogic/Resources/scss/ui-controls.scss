@@ -188,6 +188,11 @@
     border: none;
     width: 100%;
     align-items: start;
+    flex-shrink: 0;
+
+    &.pl-half-width {
+      width: 50%;
+    }
 
     &:not(:first-child) {
       margin-top: 12px;

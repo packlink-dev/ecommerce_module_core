@@ -53,7 +53,7 @@
   }
 
   .pl-register-country-list-wrapper {
-    padding-top: 15px;
+    margin: 15px 0 0;
     min-width: 300px;
     width: 100%;
     display: flex;
@@ -69,6 +69,7 @@
       font-size: 15px;
       text-transform: uppercase;
       cursor: pointer;
+      flex-shrink: 0;
 
       &:hover {
         background-color: $color-little-transparent;
@@ -285,10 +286,6 @@
         margin-top: 0;
       }
     }
-  }
-
-  #pl-fixed-price {
-    width: 215px;
   }
 
   .pl-my-shipping-services-page {
