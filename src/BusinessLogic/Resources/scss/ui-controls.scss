@@ -498,6 +498,7 @@
         flex-direction: row;
         justify-content: center;
         width: 100%;
+        flex-shrink: 0;
 
         .pl-button {
           margin-top: 0;
