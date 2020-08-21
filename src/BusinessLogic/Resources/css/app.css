@@ -1028,9 +1028,11 @@
   margin-left: 0;
   margin-right: 0;
 }
-#pl-page .pl-page-config .pl-text-center {
-  text-align: center;
+
+#pl-page .pl-page-config .pl-page-info {
+  text-align: left;
 }
+
 #pl-page .pl-status-mapping {
   width: 100%;
   flex-direction: row;
