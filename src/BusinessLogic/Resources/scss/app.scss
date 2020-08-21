@@ -101,6 +101,7 @@
     padding: 24px 30px 32px;
     background-color: $color-navy-dark;
     color: $color-white;
+    flex-shrink: 0;
 
     * {
       color: $color-white;

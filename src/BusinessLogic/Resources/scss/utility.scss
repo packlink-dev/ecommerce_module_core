@@ -88,6 +88,10 @@
     flex-grow: 1;
   }
 
+  .pl-no-shrink {
+    flex-shrink: 0;
+  }
+
   .pl-row-orientation {
     display: flex;
     flex-direction: row;
