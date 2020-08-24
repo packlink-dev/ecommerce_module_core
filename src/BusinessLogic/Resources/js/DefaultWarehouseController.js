@@ -107,7 +107,7 @@ if (!window.Packlink) {
             countryInput = templateService.getComponent('pl-default-warehouse-country', page);
 
             let defaultOption = document.createElement('option');
-            defaultOption.value = 'UN';
+            defaultOption.value = '';
             defaultOption.innerText = ' ';
             countryInput.appendChild(defaultOption);
 
@@ -131,6 +131,7 @@ if (!window.Packlink) {
             }
 
             countryInput.addEventListener('change', onCountryChange);
+            postalCodeInput.disabled = countryInput.value === '';
         };
 
         /**
@@ -141,6 +142,7 @@ if (!window.Packlink) {
             currentPostalCode = '';
             currentCity = '';
             postalCodeInput.value = '-';
+            postalCodeInput.disabled = countryInput.value === '';
         };
 
         /**

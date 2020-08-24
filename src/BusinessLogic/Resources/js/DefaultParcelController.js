@@ -64,22 +64,14 @@ if (!window.Packlink) {
          * @param {Parcel} response
          */
         this.constructPage = (response) => {
-            const page = templateService.getMainPage();
             templateService.setCurrentTemplate(this.pageId);
 
-            for (let field of this.modelFields) {
-                let input = page.querySelector('[name=' + field + ']');
-                input.addEventListener('blur', (event) => {
-                    // noinspection JSCheckFunctionSignatures
-                    validationService.validateInputField(event.target);
-                }, true);
-                input.addEventListener('input', (event) => {
-                    // noinspection JSCheckFunctionSignatures
-                    validationService.removeError(event.target);
-                }, true);
+            const form = templateService.getMainPage().querySelector('form');
+            validationService.setFormValidation(form, this.modelFields);
 
+            for (let field of this.modelFields) {
                 if (response[field]) {
-                    input.value = response[field];
+                    form[field].value = response[field];
                 }
             }
 
