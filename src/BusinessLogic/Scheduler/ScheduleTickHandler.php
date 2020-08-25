@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\Configuration;
 
@@ -27,6 +28,10 @@ class ScheduleTickHandler
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $task = $queueService->findLatestByType('ScheduleCheckTask');
         $threshold = $configService->getSchedulerTimeThreshold();
+
+        if ($task && in_array($task->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)) {
+            return;
+        }
 
         if ($task === null || $task->getQueueTimestamp() + $threshold < time()) {
             $task = new ScheduleCheckTask();

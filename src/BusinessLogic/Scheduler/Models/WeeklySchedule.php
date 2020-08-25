@@ -57,7 +57,8 @@ class WeeklySchedule extends Schedule
     protected function calculateNextSchedule()
     {
         $now = $this->now();
-        $day = ($this->getDay() ?: 0) % 7;
+        $day = ($this->getDay() ?: 1) % 7;
+        $day = $day ?: 7;
 
         if ($this->isLastWeek()) {
             $year = (int)date('Y', $now->getTimestamp());
