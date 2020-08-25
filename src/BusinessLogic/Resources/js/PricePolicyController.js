@@ -261,11 +261,16 @@ if (!window.Packlink) {
                 return false;
             }
 
-            if (currentPricingPolicy === pricingPolicies.percent &&
-                (!validationService.validateRequiredField(pricingPolicy['change_percent']) ||
-                    !validationService.validateNumber(pricingPolicy['change_percent']))
-            ) {
-                return false;
+            if (currentPricingPolicy === pricingPolicies.percent) {
+                if (!validationService.validateRequiredField(pricingPolicy['change_percent']) ||
+                    !validationService.validateNumber(pricingPolicy['change_percent'])) {
+                    return false;
+                }
+
+                if (!pricingPolicy['increase'].checked && pricingPolicy['change_percent'].value > 99) {
+                    validationService.setError(pricingPolicy['change_percent'], translator.translate('validation.invalidMaxValue', [99]))
+                    return false;
+                }
             }
 
             return !(currentPricingPolicy === pricingPolicies.fixed

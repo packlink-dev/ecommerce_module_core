@@ -5,7 +5,7 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-Configuration::setCurrentLanguage('es');
+Configuration::setCurrentLanguage('en');
 $lang = Configuration::getCurrentLanguage() ?: 'en';
 
 function getUrl($controller, $action)
@@ -135,6 +135,7 @@ echo $lang ?>">
 <script src="./resources/js/EditServiceController.js"></script>
 <script src="./resources/js/ServiceCountriesModalController.js"></script>
 <script src="./resources/js/PricePolicyController.js"></script>
+<script src="./resources/js/StateUUIDService.js"></script>
 
 <script>
     <?php
@@ -192,12 +193,13 @@ echo $lang ?>">
                 'my-shipping-services': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
-                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>",
+                    getActiveServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     getTaskStatusUrl: "<?php getUrl('ShippingMethods', 'getTaskStatus') ?>",
-                    startAutoConfigureUrl: "<?php getUrl('AutoConfigure', 'start') ?>"
+                    startAutoConfigureUrl: "<?php getUrl('AutoConfigure', 'start') ?>",
+                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",

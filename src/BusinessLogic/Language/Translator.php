@@ -6,8 +6,9 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Language\Interfaces\TranslationService as TranslationServiceInterface;
 
 /**
- * Class Translator
- * @package CleverReach\BusinessLogic\Language
+ * Class Translator.
+ *
+ * @package Packlink\BusinessLogic\Language
  */
 class Translator
 {

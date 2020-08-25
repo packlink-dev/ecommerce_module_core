@@ -15,6 +15,7 @@ if (!window.Packlink) {
     function ServiceCountriesModalController(configuration) {
         const templateService = Packlink.templateService,
             ajaxService = Packlink.ajaxService,
+            utilityService = Packlink.utilityService,
             translator = Packlink.translationService;
 
         /**
@@ -28,6 +29,7 @@ if (!window.Packlink) {
          * @param {{service: ShippingService, onSave: function(ShippingService)}} config
          */
         this.display = (config) => {
+            utilityService.showSpinner();
             serviceModel = config.service;
             const modal = new Packlink.modalService({
                 content: templateService.getTemplate('pl-countries-selection-modal'),
@@ -66,17 +68,24 @@ if (!window.Packlink) {
         const saveCountriesSelection = (modal, onSave) => {
             const countriesSelectionForm = templateService.getComponent('pl-countries-selection-form'),
                 allCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input'),
-                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked');
-            serviceModel.shippingCountries = [];
-            serviceModel.isShipToAllCountries = allCountries.length === selectedCountries.length;
+                selectedCountries = countriesSelectionForm.querySelectorAll('.pl-shipping-country-selection-wrapper input:checked'),
+                isShipToAllCountries = allCountries.length === selectedCountries.length;
 
-            if (!serviceModel.isShipToAllCountries) {
+            if (!isShipToAllCountries) {
+                if (selectedCountries.length === 0) {
+                    showValidationMessage();
+                    return;
+                }
+
+                serviceModel.shippingCountries = [];
                 selectedCountries.forEach(
                     (input) => {
                         serviceModel.shippingCountries.push(input.name);
                     }
                 );
             }
+
+            serviceModel.isShipToAllCountries = isShipToAllCountries;
 
             onSave(serviceModel);
             modal.close();
@@ -110,7 +119,10 @@ if (!window.Packlink) {
                 });
             } else {
                 serviceModel.shippingCountries.forEach((country) => {
-                    countriesSelectionForm[country].checked = true;
+                    const cBox = countriesSelectionForm.querySelector('#pl-' + country);
+                    if (cBox) {
+                        cBox.checked = true;
+                    }
                 });
 
                 handleCountrySelectionChanged();
@@ -118,6 +130,7 @@ if (!window.Packlink) {
 
             setCountryChangeEvents(countryInputs);
             setShipToAllCountriesChangeEvent(countriesSelectionForm);
+            utilityService.hideSpinner();
         };
 
         /**
@@ -158,7 +171,7 @@ if (!window.Packlink) {
         /**
          * Sets event listener for shipToAllCountries checkbox.
          *
-         * @param {HTMLFormElement} countriesSelectionForm
+         * @param {HTMLElement} countriesSelectionForm
          */
         const setShipToAllCountriesChangeEvent = (countriesSelectionForm) => {
             countriesSelectionForm['isShipToAllCountries'].addEventListener('change', (event) => {
@@ -186,6 +199,21 @@ if (!window.Packlink) {
                 inputWrapper.classList.add('pl-shipping-country-selected');
             }
         };
+
+        const showValidationMessage = () => {
+            const errorMsg = templateService.getComponent('pl-countries-alert-wrapper');
+            errorMsg.querySelector('.material-icons').addEventListener('click', hideValidationMessage);
+            hideValidationMessage();
+            errorMsg.classList.add('visible');
+            setTimeout(hideValidationMessage, 7000);
+        };
+
+        const hideValidationMessage = () => {
+            const errorMsg = templateService.getComponent('pl-countries-alert-wrapper');
+            if (errorMsg) {
+                errorMsg.classList.remove('visible');
+            }
+        }
     }
 
     Packlink.ServiceCountriesModalController = ServiceCountriesModalController;

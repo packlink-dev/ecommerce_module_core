@@ -111,7 +111,7 @@ class CountryService extends BaseService
             'name' => 'United Kingdom',
             'code' => 'GB',
             'postal_code' => 'E1 6AN',
-            'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register',
+            'registration_link' => 'https://auth.packlink.com/en-GB/{integration}/register?platform_country=UN',
             'platform_country' => 'UN',
         ),
         'HU' => array(

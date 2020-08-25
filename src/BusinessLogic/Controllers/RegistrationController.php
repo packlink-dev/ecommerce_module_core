@@ -9,10 +9,13 @@ use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\BusinessLogic\Utility\UrlService;
 
 class RegistrationController
 {
+    /**
+     * string
+     */
+    const DEFAULT_COUNTRY = 'ES';
     /**
      * @var Configuration
      */
@@ -28,6 +31,14 @@ class RegistrationController
         'DE' => 'https://pro.packlink.de/agb/',
         'FR' => 'https://pro.packlink.fr/conditions-generales/',
         'IT' => 'https://pro.packlink.it/termini-condizioni/',
+        'AT' => 'https://support-pro.packlink.com/hc/de/articles/360010011480',
+        'NL' => 'https://support-pro.packlink.com/hc/nl/articles/360010011480',
+        'BE' => 'https://support-pro.packlink.com/hc/nl/articles/360010011480',
+        'PT' => 'https://support-pro.packlink.com/hc/pt/articles/360010011480',
+        'TR' => 'https://support-pro.packlink.com/hc/tr/articles/360010011480',
+        'IE' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
+        'GB' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
+        'HU' => 'https://support-pro.packlink.com/hc/hu/articles/360010011480',
     );
     /**
      * List of terms and conditions URLs for different country codes.
@@ -36,18 +47,28 @@ class RegistrationController
      */
     private static $privacyPolicyUrls = array(
         'EN' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'ES' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'DE' => 'https://support-pro.packlink.com/hc/de/articles/360010011560',
-        'FR' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'IT' => 'https://support-pro.packlink.com/hc/it/articles/360010011560',
+        'ES' => 'https://support-pro.packlink.com/hc/es-es/articles/360010011560-Pol%C3%ADtica-de-Privacidad',
+        'DE' => 'https://support-pro.packlink.com/hc/de/articles/360010011560-Datenschutzerkl%C3%A4rung-der-Packlink-Shipping-S-L-',
+        'FR' => 'https://support-pro.packlink.com/hc/fr-fr/articles/360010011560-Politique-de-confidentialit%C3%A9',
+        'IT' => 'https://support-pro.packlink.com/hc/it/articles/360010011560-Politica-di-Privacy',
+        'AT' => 'https://support-pro.packlink.com/hc/de/articles/360010011480',
+        'NL' => 'https://support-pro.packlink.com/hc/nl/articles/360010011560',
+        'BE' => 'https://support-pro.packlink.com/hc/nl/articles/360010011560',
+        'PT' => 'https://support-pro.packlink.com/hc/pt/articles/360010011560',
+        'TR' => 'https://support-pro.packlink.com/hc/tr/articles/360010011560',
+        'IE' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
+        'GB' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
+        'HU' => 'https://support-pro.packlink.com/hc/hu/articles/360010011560',
     );
 
     /**
      * Gets the data needed for a registration page.
      *
+     * @param string $country
+     *
      * @return array
      */
-    public function getRegisterData()
+    public function getRegisterData($country)
     {
         /** @var RegistrationInfoService $registrationInfoService */
         $registrationInfoService = ServiceRegister::getService(RegistrationInfoService::CLASS_NAME);
@@ -58,8 +79,10 @@ class RegistrationController
             'email' => $registrationData->getEmail(),
             'phone' => $registrationData->getPhone(),
             'source' => $registrationData->getSource(),
-            'termsAndConditionsUrl' => $this->getTermsAndConditionsUrl(),
-            'privacyPolicyUrl' => $this->getPrivacyPolicyUrl(),
+            'termsAndConditionsUrl' => !empty(self::$termsAndConditionsUrls[$country]) ?
+                self::$termsAndConditionsUrls[$country] : self::$termsAndConditionsUrls[self::DEFAULT_COUNTRY],
+            'privacyPolicyUrl' => !empty(self::$privacyPolicyUrls[$country]) ?
+                self::$privacyPolicyUrls[$country] : self::$privacyPolicyUrls[self::DEFAULT_COUNTRY],
         );
     }
 
@@ -126,30 +149,6 @@ class RegistrationController
         }
 
         return $this->configService;
-    }
-
-    /**
-     * Returns URL for Packlink terms and conditions in user's preferred language.
-     *
-     * @return string
-     */
-    private function getTermsAndConditionsUrl()
-    {
-        $locale = UrlService::getUrlLocaleKey();
-
-        return self::$termsAndConditionsUrls[$locale];
-    }
-
-    /**
-     * Returns URL for Packlink privacy policy in user's preferred language.
-     *
-     * @return string
-     */
-    private function getPrivacyPolicyUrl()
-    {
-        $locale = UrlService::getUrlLocaleKey();
-
-        return self::$privacyPolicyUrls[$locale];
     }
 
     /**

@@ -44,7 +44,7 @@ class RegistrationControllerTest extends BaseTestWithServices
 
     public function testGetRegisterData()
     {
-        $data = $this->registrationController->getRegisterData();
+        $data = $this->registrationController->getRegisterData('ES');
 
         $this->assertEquals('test@test.com', $data['email']);
         $this->assertEquals('1111111111111', $data['phone']);

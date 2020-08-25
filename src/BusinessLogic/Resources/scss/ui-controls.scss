@@ -4,6 +4,7 @@
     padding: 20px;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 
     .pl-header-holder {
       justify-content: space-between;
@@ -15,6 +16,7 @@
       .pl-button {
         padding: 10px 13px;
         text-transform: none;
+        margin: 0;
       }
     }
 
@@ -158,6 +160,7 @@
     display: flex;
     flex-direction: row;
     margin-top: 15px;
+
     .pl-form-group + .pl-form-group {
       margin-top: 0;
       margin-left: -1px;
@@ -166,11 +169,14 @@
 
   .pl-button-group {
     flex-direction: row;
+
     button {
       border-radius: 0;
+
       &:first-child {
         border-radius: 4px 0 0 4px;
       }
+
       &:last-child {
         border-radius: 0 4px 4px 0;
       }
@@ -182,9 +188,15 @@
     border: none;
     width: 100%;
     align-items: start;
+    flex-shrink: 0;
+
+    &.pl-half-width, .pl-half-width {
+      width: 50%;
+      min-width: 50%;
+    }
 
     &:not(:first-child) {
-      margin-top: 15px;
+      margin-top: 12px;
     }
 
     label {
@@ -196,60 +208,46 @@
       font-size: 12px;
     }
 
-    input {
-      background-color: $color-white;
+    input, select {
+      height: $input-height;
+      background: $color-white;
       border-radius: 0;
       border: 1px solid $border-color;
-      padding: 21px 16px 13px;
       color: $input-control-color;
+      line-height: 22px;
+      font-size: 14px;
       width: 100%;
       margin: 0;
       box-shadow: unset;
-      line-height: 22px;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      padding: 21px 15px 13px;
+      max-width: none;
+
+      &.compact {
+        padding-top: 13px;
+      }
 
       &:focus {
         border: 1px solid $color-blue;
         outline: none;
       }
 
-      &.compact {
-        padding: 13px 16px;
-      }
-
-      ::placeholder, ::-webkit-input-placeholder {
-        color: $color-light;
+      &::placeholder, &::-webkit-input-placeholder {
+        color: #CBCBCB;
       }
     }
 
     select {
-      border: 1px solid $border-color;
-      line-height: 50px;
-      background-color: $color-white;
-      color: $input-control-color;
-      font-size: 12px;
-      width: 100%;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-
-      &:focus {
-        border: 1px solid $color-blue;
-        outline: none;
-      }
-
-      &.pl-with-label {
-        padding: 7px 0 0 11px;
-
-        & ~ i {
-          top: 18px;
-        }
-      }
+      -moz-padding-start: 11px;
     }
 
     i {
       position: absolute;
       right: 10px;
-      top: 14px;
+      top: $input-height/2;
+      margin-top: (-1 * $icon-button-size / 2);
       color: $border-color;
       width: $icon-button-size;
       height: $icon-button-size;
@@ -257,13 +255,14 @@
 
     select + i {
       cursor: default;
+      pointer-events: none;
     }
 
     .pl-autocomplete-list {
       background-color: $color-white;
       border: 1px solid $border-color;
       width: 100%;
-      margin-top: 57px;
+      margin-top: $input-height;
       position: absolute;
       z-index: 1;
       max-height: 200px;
@@ -284,12 +283,12 @@
   }
 
   input[type=checkbox] {
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    width: $checkbox-size;
+    min-width: $checkbox-size;
+    height: $checkbox-size;
     border: 1px solid $border-color;
     position: relative;
 
@@ -304,15 +303,16 @@
     &:checked {
       background-color: $color-blue;
       border-color: $color-blue;
+      text-align: center;
 
       &:before {
         color: $color-white;
         content: '\2713';
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        font-size: 20px;
-        font-weight: bold;
+        margin: 0;
+        font: bold 20px/24px pl-proxima-nova;
+        width: $checkbox-size;
+        min-width: $checkbox-size;
+        height: $checkbox-size;
       }
     }
   }
@@ -384,7 +384,7 @@
       cursor: pointer;
 
       .pl-switch-on, .pl-switch-off {
-        font-size: 56px;
+        font-size: $input-height;
       }
 
       .pl-switch-on {
@@ -442,7 +442,8 @@
     .pl-modal {
       background: $color-white;
       display: flex;
-      max-height: 100%;
+      max-height: 90%;
+      max-width: 90%;
       flex-flow: column;
       align-items: center;
       position: relative;
@@ -500,6 +501,7 @@
         flex-direction: row;
         justify-content: center;
         width: 100%;
+        flex-shrink: 0;
 
         .pl-button {
           margin-top: 0;
@@ -555,7 +557,7 @@
       font-weight: bold;
       text-transform: uppercase;
       position: sticky;
-      top: 0;
+      top: -1px;
 
       &.pl-text-center {
         text-align: center;
@@ -592,7 +594,7 @@
     background-color: $color-white;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     flex-direction: column;
-    margin: 5px;
+    margin-bottom: 10px;
     padding: 13px;
 
     .pl-service-header {
@@ -625,6 +627,14 @@
         .pl-property-title {
           font-weight: 600;
           text-transform: uppercase;
+          color: $color-gray;
+          font-size: 12px;
+          letter-spacing: 0;
+          line-height: 16px;
+        }
+
+        .pl-property-value {
+          color: $input-control-color;
         }
       }
     }
@@ -635,16 +645,25 @@
       .pl-button {
         padding: 5px 15px;
         min-width: auto;
-        margin: 0 10px 0 0;
+      }
+
+      .pl-button:not(.pl-hidden) + .pl-button {
+        margin-left: 10px;
       }
     }
   }
 
   .pl-button-group {
+    padding-right: 10px;
+
     button {
-      height: 58px;
+      height: $input-height;
       min-width: 110px;
     }
+  }
+
+  pre {
+    white-space: normal;
   }
 }
 
@@ -661,7 +680,9 @@
       }
     }
 
-    .pl-header-holder {
+    header .pl-header-holder {
+      justify-content: flex-end;
+
       .pl-button {
         display: none;
       }
@@ -685,6 +706,7 @@
       .pl-modal {
         .pl-modal-title {
           padding: 20px 20px 0;
+          max-width: 90%;
         }
 
         .pl-modal-body {
@@ -712,6 +734,8 @@
 
     .pl-shipping-services-list {
       display: flex;
+      flex: 0 0 auto;
+      padding: 10px;
     }
   }
 }

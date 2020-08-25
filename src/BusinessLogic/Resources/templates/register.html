@@ -1,5 +1,5 @@
 <div class="pl-register-page pl-flex-expand">
-    <div class="pl-flex-expand pl-page-padding pl-medium-page">
+    <div class="pl-flex-expand pl-page-padding pl-medium-page pl-no-shrink">
         <div class="pl-bottom-separate">
             <h1 class="pl-text-center">
                 {$register.startEnjoying}
@@ -32,10 +32,7 @@
                     {$register.getToKnowYou}
                 </p>
                 <div class="pl-form-group" id="pl-register-delivery-volume">
-                    <select class="pl-with-label"
-                            name="estimated_delivery_volume"
-                            id="pl-register-shipment-volume"
-                            data-required="true">
+                    <select name="estimated_delivery_volume" id="pl-register-shipment-volume" data-required="true">
                         <option disabled selected value></option>
                         <option value="1 - 10">1 - 10</option>
                         <option value="11 - 50">11 - 50</option>

@@ -50,6 +50,7 @@ if (!window.Packlink) {
          */
         let originalServiceModel = null;
         let newService = false;
+        let fromPick = false;
 
         const modelFields = [
             'name',
@@ -75,6 +76,7 @@ if (!window.Packlink) {
          * @param {{id: string, fromPick: boolean}} config
          */
         this.display = (config) => {
+            fromPick = config.fromPick;
             templateService.setCurrentTemplate(templateId);
             ajaxService.get(configuration.getServiceUrl + '&id=' + config.id, bindService);
 
@@ -341,14 +343,25 @@ if (!window.Packlink) {
          */
         const save = () => {
             const form = templateService.getComponent('pl-edit-service-form');
-            if (validationService.validateForm(form)) {
+            let excludedElementNames = [];
+
+            if (!configuration.hasTaxConfiguration) {
+                excludedElementNames.push('tax');
+            }
+
+            if (validationService.validateForm(form, excludedElementNames)) {
                 serviceModel.activated = true;
 
+                Packlink.utilityService.showSpinner();
                 ajaxService.post(
                     configuration.saveServiceUrl,
                     serviceModel,
                     () => {
-                        state.goToState('my-shipping-services', {from: 'edit', newService: newService});
+                        if (fromPick) {
+                            state.goToState('pick-shipping-service', {from: 'edit', newService: newService});
+                        } else {
+                            state.goToState('my-shipping-services');
+                        }
                     },
                     Packlink.responseService.errorHandler
                 );

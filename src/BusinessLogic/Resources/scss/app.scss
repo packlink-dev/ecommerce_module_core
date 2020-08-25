@@ -6,6 +6,10 @@
 @import "icons";
 
 #pl-page {
+  #pl-main-header {
+    height: 90px;
+  }
+
   .pl-onboarding-list {
     width: 100%;
     justify-content: flex-start;
@@ -39,7 +43,7 @@
     }
   }
 
-  .pl-parcel-wrapper, .pl-wh-wrapper {
+  .pl-parcel-wrapper {
     align-items: flex-start;
     min-width: 100%;
   }
@@ -49,7 +53,7 @@
   }
 
   .pl-register-country-list-wrapper {
-    padding-top: 15px;
+    margin: 15px 0 0;
     min-width: 300px;
     width: 100%;
     display: flex;
@@ -65,6 +69,7 @@
       font-size: 15px;
       text-transform: uppercase;
       cursor: pointer;
+      flex-shrink: 0;
 
       &:hover {
         background-color: $color-little-transparent;
@@ -96,6 +101,7 @@
     padding: 24px 30px 32px;
     background-color: $color-navy-dark;
     color: $color-white;
+    flex-shrink: 0;
 
     * {
       color: $color-white;
@@ -167,6 +173,12 @@
     }
   }
 
+  .pl-page-onboarding {
+    .pl-page-buttons {
+      text-align: center;
+    }
+  }
+
   .pl-page-config {
     width: 100%;
     flex-grow: 1;
@@ -181,7 +193,7 @@
       margin-right: 0;
     }
 
-    .pl-text-center, .pl-page-buttons {
+    .pl-page-info {
       text-align: left;
     }
   }
@@ -214,14 +226,23 @@
   .pl-services-filter-wrapper {
     flex-direction: row;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 0 20px;
+    flex: 0 0 auto;
+
+    .pl-filter:not(:last-child) {
+      margin-right: 32px;
+    }
   }
 
   .pl-pick-shipping-services-page {
     #pl-open-filter-button {
       display: none;
     }
+  }
+
+  .pl-modal .pl-filters-wrapper {
+    width: 300px;
   }
 
   .pl-filter {
@@ -241,7 +262,7 @@
 
     .pl-filter-options {
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: flex-start;
 
       .pl-filter-option {
         padding: 6px 13px;
@@ -249,23 +270,14 @@
         border-radius: 13px;
         cursor: pointer;
         color: $input-control-color;
+        margin-right: 12px;
 
         &.pl-selected {
           border-color: $color-blue;
           background-color: $color-blue;
           color: $color-white;
         }
-
-        & + .pl-filter-option {
-          margin-left: 12px;
-        }
       }
-    }
-  }
-
-  .pl-modal {
-    .pl-filter:not(:last-child) {
-      padding-bottom: 32px;
     }
   }
 
@@ -275,10 +287,6 @@
         margin-top: 0;
       }
     }
-  }
-
-  #pl-fixed-price {
-    width: 215px;
   }
 
   .pl-my-shipping-services-page {
@@ -322,7 +330,7 @@
   }
 
   .pl-shipping-country-selection-wrapper {
-    max-height: 500px;
+    max-height: 320px;
     overflow: auto;
 
     > * {
@@ -332,6 +340,14 @@
 
   .pl-shipping-country-selected {
     background-color: $border-light;
+  }
+
+  #pl-countries-alert-wrapper {
+    position: relative;
+    display: none;
+    &.visible {
+      display: flex;
+    }
   }
 }
 
@@ -376,8 +392,12 @@
     .pl-my-shipping-services-page {
       .pl-no-services {
         flex-direction: column;
-        align-items: center;
         justify-content: flex-start;
+        padding-bottom: 0;
+
+        img {
+          max-height: 40%;
+        }
 
         .pl-no-services-description {
           margin: 20px 0 0;
@@ -388,6 +408,10 @@
 
           button {
             display: none;
+          }
+
+          p {
+            margin-bottom: 0;
           }
         }
       }
@@ -403,7 +427,7 @@
 @media (max-width: 1280px) {
   #pl-page {
     .pl-services-filter-wrapper {
-      justify-content: flex-start;
+      padding: 0 10px;
 
       .pl-filter:not(.pl-filter-selected) {
         display: none;
@@ -412,9 +436,18 @@
       .pl-filter-selected {
         flex-direction: row;
         display: flex;
+        padding: 0;
+
+        .pl-filter-options {
+          flex-wrap: wrap;
+        }
 
         .pl-filter-option {
           flex-direction: row;
+
+          &.pl-selected {
+            margin-top: 10px;
+          }
 
           &::after {
             content: 'X';

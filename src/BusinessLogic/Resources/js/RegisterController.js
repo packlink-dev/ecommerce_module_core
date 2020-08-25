@@ -27,10 +27,11 @@ if (!window.Packlink) {
          * The main entry point for controller.
          */
         this.display = (additionalConfig) => {
+            utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
             country = additionalConfig.hasOwnProperty('country') ? additionalConfig.country : 'ES';
 
-            ajaxService.get(configuration.getRegistrationData, populateInitialValues);
+            ajaxService.get(configuration.getRegistrationData + '&country=' + country, populateInitialValues);
 
             const registerPage = templateService.getMainPage();
 
@@ -39,7 +40,8 @@ if (!window.Packlink) {
 
             templateService.getComponent('pl-go-to-login', registerPage).addEventListener('click', goToLogin);
 
-            templateService.getComponent('pl-register-platform-country', registerPage).value = country;
+            templateService.getComponent('pl-register-platform-country', registerPage).value =
+                additionalConfig.hasOwnProperty('platform_country') ? additionalConfig.platform_country : 'ES';
 
             initInputField('pl-register-email');
             initInputField('pl-register-password');
@@ -75,6 +77,7 @@ if (!window.Packlink) {
                 );
 
             termsAndConditionsLabel.querySelector('label').innerHTML += termsTranslation;
+            utilityService.hideSpinner();
         };
 
         /**
@@ -96,6 +99,9 @@ if (!window.Packlink) {
 
             input.addEventListener('change', () => {
                 enableSubmit();
+                if (componentSelector === 'pl-register-terms-and-conditions' && !input.checked) {
+                    templateService.getComponent('pl-register-button').disabled = true;
+                }
             });
         };
 
@@ -170,11 +176,13 @@ if (!window.Packlink) {
         /**
          * Handles a successful registration request.
          *
-         * @param {{success: boolean}} response
+         * @param {{success: boolean, message: string}} response
          */
         const successfulRegister = (response) => {
             if (response.success) {
                 state.goToState('onboarding-state');
+            } else {
+                responseService.errorHandler(response);
             }
         };
     }

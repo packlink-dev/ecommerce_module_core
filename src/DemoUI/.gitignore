@@ -3,5 +3,4 @@ vendor
 src/Views/resources/js/
 src/Views/resources/images/
 src/Views/resources/css/location/
-src/Views/resources/css/app.css
-src/Views/resources/css/.gitkeep
+src/Views/resources/css/*

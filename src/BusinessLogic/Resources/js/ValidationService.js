@@ -59,9 +59,10 @@ if (!window.Packlink) {
          * Validates form. Validates all input and select elements by using data attributes as rules.
          *
          * @param {Element} form
+         * @param {string[]} excludedElementNames
          * @return {boolean}
          */
-        this.validateForm = (form) => {
+        this.validateForm = (form, excludedElementNames = []) => {
             const inputElements = utilityService.toArray(form.getElementsByTagName('input')),
                 selects = utilityService.toArray(form.getElementsByTagName('select')),
                 inputs = inputElements.concat(selects),
@@ -70,6 +71,9 @@ if (!window.Packlink) {
             let result = true;
 
             for (let i = 0; i < length; i++) {
+                if (excludedElementNames.indexOf(inputs[i].name) >= 0) {
+                    continue;
+                }
                 result &= this.validateInputField(inputs[i]);
             }
 
@@ -242,7 +246,13 @@ if (!window.Packlink) {
                 parent = templateService.getMainPage();
             }
 
-            this.setError(parent.querySelector(fieldSelector), message);
+            const inputEl = parent.querySelector(fieldSelector);
+            if (!inputEl) {
+                utilityService.showFlashMessage(message + '. Field: ' + fieldSelector, 'danger', 7000);
+            } else {
+                this.setError(inputEl, message);
+
+            }
         };
 
         /**

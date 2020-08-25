@@ -46,6 +46,7 @@ if (!window.Packlink) {
          */
         this.call = function (method, url, data, onSuccess, onError) {
             const request = getRequest();
+            const callUUID = Packlink.StateUUIDService.getStateUUID();
 
             if (!onError) {
                 onError = Packlink.responseService.errorHandler;
@@ -59,6 +60,12 @@ if (!window.Packlink) {
             request.onreadystatechange = function () {
                 // "this" is XMLHttpRequest
                 if (this.readyState === 4) {
+                    if (callUUID !== Packlink.StateUUIDService.getStateUUID()) {
+                        // Obsolete response. The app has changed the original state that issued the call.
+
+                        return;
+                    }
+
                     if (this.status >= 200 && this.status < 300) {
                         if (onSuccess) {
                             onSuccess(JSON.parse(this.responseText || '{}'));

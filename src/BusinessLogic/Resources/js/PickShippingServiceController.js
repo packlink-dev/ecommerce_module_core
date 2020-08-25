@@ -6,8 +6,11 @@ if (!window.Packlink) {
     /**
      * @typedef PickShippingServiceControllerConfiguration
      * @property {string} getServicesUrl
+     * @property {string} getActiveServicesUrl
      * @property {string} getTaskStatusUrl
      * @property {string} startAutoConfigureUrl
+     * @property {string} disableCarriersUrl
+     * @property {boolean} newService
      */
 
     /**
@@ -36,11 +39,15 @@ if (!window.Packlink) {
 
         /**
          * Displays page content.
+         *
+         *  @param {{from: string, newService: boolean}} config
          */
-        this.display = function () {
+        this.display = function (config) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
+            ajaxService.get(configuration.getTaskStatusUrl, (response) => {
+                checkServicesStatus(response, config);
+            });
 
             const mainPage = templateService.getMainPage(),
                 backButton = mainPage.querySelector('.pl-sub-header button');
@@ -63,16 +70,21 @@ if (!window.Packlink) {
          * Checks the status of the update shipping services task.
          *
          * @param {{status: string}} response
+         * @param {{from: string, newService: boolean}} config
          */
-        const checkServicesStatus = (response) => {
+        const checkServicesStatus = (response, config) => {
             if (response.status === 'completed') {
-                ajaxService.get(configuration.getServicesUrl, bindServices);
+                ajaxService.get(configuration.getServicesUrl, (services) => {
+                    bindServices(services, config);
+                });
             } else if (response.status === 'failed') {
                 showNoServicesModal();
             } else {
                 setTimeout(
                     function () {
-                        ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
+                        ajaxService.get(configuration.getTaskStatusUrl, (res) => {
+                            checkServicesStatus(res, config);
+                        });
                     },
                     1000
                 );
@@ -142,10 +154,37 @@ if (!window.Packlink) {
          * Binds services.
          *
          * @param {ShippingService[]} services
+         * @param {{from: string, newService: boolean}} config
          */
-        const bindServices = (services) => {
+        const bindServices = (services, config) => {
             shippingServices = services;
             applyFilter();
+
+            ajaxService.get(configuration.getActiveServicesUrl, (activeServices) => {
+                if (config && config.from === 'edit') {
+                    if (config.newService === true && activeServices.length === 1 && configuration.disableCarriersUrl) {
+                        displayDisableShopServicesModal();
+                    } else {
+                        const modal = new Packlink.modalService({
+                            content: templateService.replaceResourcesUrl(
+                                '<div class="pl-center pl-separate-horizontally">' +
+                                '<img src="{$BASE_URL$}/images/checklist.png" alt="">' +
+                                '<h1 class="pl-modal-title pl-no-margin">' +
+                                translator.translate('shippingServices.addedSuccessTitle') +
+                                '</h1>' +
+                                '<p class="pl-modal-subtitle pl-separate-vertically">' +
+                                translator.translate('shippingServices.addedSuccessDescription')
+                                + '</p>' +
+                                '</div>'
+                            )
+                        });
+
+                        modal.open();
+                    }
+                }
+
+                utilityService.hideSpinner();
+            });
         };
 
         /**
@@ -164,8 +203,6 @@ if (!window.Packlink) {
             render(list, 'pl-shipping-services-list-item', 'div');
             // noinspection JSCheckFunctionSignatures
             Packlink.GridResizerService.init(table);
-
-            utilityService.hideSpinner();
         };
 
         /**
@@ -200,7 +237,7 @@ if (!window.Packlink) {
             // noinspection JSCheckFunctionSignatures
             const modal = new Packlink.modalService({
                 title: translator.translate('shippingServices.filterModalTitle'),
-                content: templateService.getMainPage().querySelector('.pl-services-filter-wrapper').innerHTML,
+                content: '<div class="pl-filters-wrapper">' + templateService.getMainPage().querySelector('.pl-services-filter-wrapper').innerHTML + '</div>',
                 buttons: [
                     {
                         title: translator.translate('shippingServices.applyFilters'),
@@ -280,8 +317,7 @@ if (!window.Packlink) {
                     newDiv.classList.add('pl-selected');
                     newDiv.dataset.filter = filterType;
                     newDiv.dataset.option = appliedFilter[filterType];
-                    newDiv.innerHTML = translator.translate('shippingServices.' + filterType).toUpperCase()
-                        + ': ' + translator.translate('shippingServices.' + appliedFilter[filterType]);
+                    newDiv.innerHTML = translator.translate('shippingServices.' + appliedFilter[filterType]);
                     newDiv.addEventListener('click', () => {
                         appliedFilter[filterType] = null;
                         newDiv.remove();
@@ -333,6 +369,42 @@ if (!window.Packlink) {
                 setFilterFromButton(btn);
                 applyFilter();
             }
+        };
+
+        /**
+         * Displays the modal for disabling shop shipping services.
+         */
+        const displayDisableShopServicesModal = () => {
+            const modal = new Packlink.modalService({
+                canClose: false,
+                content: templateService.getTemplate('pl-disable-carriers-modal'),
+                buttons: [
+                    {
+                        title: translator.translate('general.accept'),
+                        primary: true,
+                        onClick: () => {
+                            utilityService.showSpinner();
+                            ajaxService.post(
+                                configuration.disableCarriersUrl,
+                                {},
+                                () => {
+                                    utilityService.hideSpinner();
+                                    modal.close();
+                                },
+                                Packlink.responseService.errorHandler
+                            );
+                        }
+                    },
+                    {
+                        title: translator.translate('general.cancel'),
+                        onClick: () => {
+                            modal.close();
+                        }
+                    }
+                ]
+            });
+
+            modal.open();
         };
     }
 

@@ -117,14 +117,22 @@ class ShippingPricePolicy extends FrontDto
      */
     public static function fromArray(array $data)
     {
+        if (isset($data['range_type'])) {
+            $data['range_type'] = (int) $data['range_type'];
+        }
+
+        if (isset($data['pricing_policy'])) {
+            $data['pricing_policy'] = (int) $data['pricing_policy'];
+        }
+
         $result = parent::fromArray($data);
 
-        $result->rangeType = static::getDataValue($data, 'range_type');
+        $result->rangeType = (int)static::getDataValue($data, 'range_type');
         $result->fromWeight = static::getDataValue($data, 'from_weight', null);
         $result->toWeight = static::getDataValue($data, 'to_weight', null);
         $result->fromPrice = static::getDataValue($data, 'from_price', null);
         $result->toPrice = static::getDataValue($data, 'to_price', null);
-        $result->pricingPolicy = static::getDataValue($data, 'pricing_policy');
+        $result->pricingPolicy = (int)static::getDataValue($data, 'pricing_policy');
         $result->increase = static::getDataValue($data, 'increase', false);
         $result->changePercent = static::getDataValue($data, 'change_percent', null);
         $result->fixedPrice = static::getDataValue($data, 'fixed_price', null);

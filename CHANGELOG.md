@@ -3,6 +3,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+## [3.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.2...v3.0.0) - 2020-08-25
+### Changed
+- Module redesign with new pricing policy.
+
+## [2.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.1...v2.2.2) - 2020-08-28
+### Changed
+- Fix bug in weekly schedule for schedules setup to run on Sundays
+
+## [2.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.0...v2.2.1) - 2020-07-28
+### Changed
+- Prevent schedule check task from being enqueued if not necessary
+
+## [2.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.3...v2.2.0) - 2020-07-22
+### Changed
+- `UpdateShipmentData` task has been declared as deprecated.
+- `UpdateShipmentData` task will not be scheduled anymore in core.
+- BREAKING: Methods `isFirstShipmentDraftCreated` and `setFirstShipmentDraftCreated` have been removed from `Configuration`
+Integration should check if said methods have been utilized and remove them.
+
 ## [2.1.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.2...v2.1.3) - 2020-06-25
 ### Added
 - Added additional data (seller user ID and order ID) when creating order shipment draft.

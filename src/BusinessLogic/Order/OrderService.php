@@ -180,7 +180,10 @@ class OrderService extends BaseService
                 $trackingHistory
             );
         } catch (HttpBaseException $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
+            Logger::logWarning($e->getMessage(), 'Core', array(
+                'referenceId' => $shipment->reference,
+                'trace' => $e->getTraceAsString(),
+            ));
         } catch (OrderShipmentDetailsNotFound $e) {
             Logger::logInfo($e->getMessage(), 'Core', array('referenceId' => $shipment->reference));
         } catch (OrderNotFound $e) {
