@@ -196,21 +196,46 @@
 #pl-page .pl-no-margin {
   margin: 0 !important;
 }
+
 #pl-page .pl-no-border {
   border-color: transparent !important;
 }
+
 #pl-page .pl-center {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
+
+#pl-page #pl-origin-collection svg {
+  width: 24px;
+  height: 23px;
+}
+
+#pl-page #pl-origin-dropoff svg {
+  width: 25px;
+  height: 23px;
+}
+
+#pl-page #pl-destination-pickup svg {
+  width: 24px;
+  height: 22px;
+}
+
+#pl-page #pl-destination-delivery svg {
+  width: 27px;
+  height: 22px;
+}
+
 #pl-page .pl-flex-start {
   align-items: flex-start;
 }
+
 #pl-page .pl-wrap-items {
   flex-wrap: wrap;
 }
+
 #pl-page .pl-header-text-wrapper {
   line-height: 22px;
   font-size: 22px;
