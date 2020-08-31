@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.0...v3.0.1) - 2020-08-31
+### Changed
+- Fix origin and destination icon size on services page.
+- Fix icons on the settings page.
+- Fix issue with adding a query parameter to url in register controller.
+- Fix translation issue in italian.
+
 ## [3.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.2...v3.0.0) - 2020-08-25
 ### Changed
 - Module redesign with new pricing policy.
