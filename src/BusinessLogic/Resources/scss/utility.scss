@@ -126,6 +126,36 @@
     text-align: center;
   }
 
+  #pl-origin-collection svg {
+    width: 24px;
+    height: 23px;
+  }
+
+  #pl-origin-dropoff svg {
+    width: 25px;
+    height: 23px;
+  }
+
+  #pl-destination-pickup svg {
+    width: 24px;
+    height: 22px;
+  }
+
+  #pl-destination-delivery svg {
+    width: 27px;
+    height: 22px;
+  }
+
+  #pl-navigate-warehouse svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  #pl-navigate-parcel svg {
+    width: 23px;
+    height: 22px;
+  }
+
   .pl-flex-start {
     align-items: flex-start;
   }

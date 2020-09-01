@@ -31,7 +31,9 @@ if (!window.Packlink) {
             templateService.setCurrentTemplate(templateId);
             country = additionalConfig.hasOwnProperty('country') ? additionalConfig.country : 'ES';
 
-            ajaxService.get(configuration.getRegistrationData + '&country=' + country, populateInitialValues);
+            let getDataUrl = new URL(configuration.getRegistrationData);
+            getDataUrl.searchParams.append('country', country);
+            ajaxService.get(getDataUrl.toString(), populateInitialValues);
 
             const registerPage = templateService.getMainPage();
 
