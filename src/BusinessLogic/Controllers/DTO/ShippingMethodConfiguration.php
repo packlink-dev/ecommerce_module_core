@@ -126,10 +126,12 @@ class ShippingMethodConfiguration extends DataTransferObject
             $result->shippingCountries = array();
         }
 
-        if (!empty($raw['pricingPolicies'])) {
+        if (!empty($raw['pricingPolicies']) && is_array($raw['pricingPolicies'])) {
             foreach ($raw['pricingPolicies'] as $policy) {
                 $result->pricingPolicies[] = ShippingPricePolicy::fromArray($policy);
             }
+        } else {
+            $result->pricingPolicies = array();
         }
 
         return $result;
