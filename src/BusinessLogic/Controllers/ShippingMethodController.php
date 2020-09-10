@@ -151,7 +151,7 @@ class ShippingMethodController
             $result = $this->transformShippingMethodModelToDto($model);
 
             if ($canAddBackupService) {
-                $this->shopShippingService->addBackupShippingMethod(ShippingMethod::fromArray($result->toArray()));
+                $this->shopShippingService->addBackupShippingMethod(ShippingMethod::fromArray($model->toArray()));
             }
 
             return $result;

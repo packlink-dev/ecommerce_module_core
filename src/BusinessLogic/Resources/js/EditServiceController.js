@@ -78,7 +78,9 @@ if (!window.Packlink) {
         this.display = (config) => {
             fromPick = config.fromPick;
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getServiceUrl + '&id=' + config.id, bindService);
+            let getServiceUrl = new URL(configuration.getServiceUrl);
+            getServiceUrl.searchParams.append('id', config.id);
+            ajaxService.get(getServiceUrl.toString(), bindService);
 
             const mainPage = templateService.getMainPage(),
                 backButton = mainPage.querySelector('.pl-sub-header button'),
