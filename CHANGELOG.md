@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.1...v3.0.2) - 2020-09-10
+### Changed
+- Fix get service url.
+- Fix issue with adding backup service.
+- Fix deserialization of Shipping Method Configuration.
+
 ## [3.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.0...v3.0.1) - 2020-08-31
 ### Changed
 - Fix origin and destination icon size on services page.
