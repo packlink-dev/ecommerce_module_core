@@ -83,6 +83,8 @@ if (!window.Packlink) {
                 }
             };
 
+            request.setRequestHeader('Accept', 'application/json');
+
             if (method === 'POST') {
                 this.internalPerformPost(request, data);
             } else {
