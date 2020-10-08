@@ -30,13 +30,8 @@ class DtoValidator
      */
     public static function isPhoneValid($phone)
     {
-        $regex = '/^(\ |\+|\/|\.\|-|\(|\)|\d)+$/m';
-        $phoneError = !preg_match($regex, $phone);
+        $regex = '/^[0-9|\/\-\s \+\.\(\)]+$/i';
 
-        $digits = '/\d/m';
-        $match = preg_match_all($digits, $phone, $matches);
-        $phoneError |= $match === false || $match < 3;
-
-        return !$phoneError;
+        return preg_match($regex, $phone);
     }
 }
