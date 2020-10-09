@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.3...v3.0.4) - 2020-10-09
+### Changed
+- Fix issue with phone validation.
+- Send setup event when first service is activated.
+
 ## [3.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.2...v3.0.3) - 2020-09-23
 ### Changed
 - Ajax service request headers enhancements
