@@ -143,14 +143,15 @@ class ShippingMethodController
         }
 
         try {
-            $canAddBackupService = $shippingMethod->activated && !$this->shippingMethodService->isAnyMethodActive();
+            $isFirstServiceActivated = $shippingMethod->activated && !$this->shippingMethodService->isAnyMethodActive();
 
             $this->updateModelData($shippingMethod, $model);
             $this->shippingMethodService->save($model);
 
             $result = $this->transformShippingMethodModelToDto($model);
 
-            if ($canAddBackupService) {
+            if ($isFirstServiceActivated) {
+                AnalyticsController::sendSetupEvent();
                 $this->shopShippingService->addBackupShippingMethod(ShippingMethod::fromArray($model->toArray()));
             }
 
