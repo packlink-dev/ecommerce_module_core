@@ -32,6 +32,6 @@ class DtoValidator
     {
         $regex = '/^[0-9|\/\-\s \+\.\(\)]+$/i';
 
-        return preg_match($regex, $phone);
+        return !empty($phone) && preg_match($regex, $phone);
     }
 }
