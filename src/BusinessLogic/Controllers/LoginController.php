@@ -2,11 +2,11 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
+use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
-use RuntimeException;
 
 /**
  * Class LoginController
@@ -20,8 +20,6 @@ class LoginController
      * @param $apiKey
      *
      * @return bool
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function login($apiKey)
     {
@@ -31,7 +29,7 @@ class LoginController
             /** @var UserAccountService $userAccountService */
             $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
             $result = $userAccountService->login($apiKey);
-        } catch (RuntimeException $e) {
+        } catch (Exception $e) {
             /** @var ConfigurationService $configService */
             $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
             if ($configService->getAuthorizationToken() !== null) {
