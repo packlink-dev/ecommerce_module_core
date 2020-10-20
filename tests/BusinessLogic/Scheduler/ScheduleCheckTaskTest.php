@@ -307,6 +307,68 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testEnqueuingAllNonRecurringScheduledTasks()
+    {
+        $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+
+        $schedule = new HourlySchedule(new FooTask());
+        $schedule->setRecurring(false);
+        $schedule->setHour(13);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+
+        $schedule = new HourlySchedule(new FooTask());
+        $schedule->setRecurring(false);
+        $schedule->setHour(14);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+
+        $nowDateTime = new \DateTime('2018-03-22T14:42:05');
+        $this->timeProvider->setCurrentLocalTime($nowDateTime);
+        $this->syncTask->execute();
+
+        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
+        $queueItems = $this->queueStorage->select();
+        $this->assertCount(2, $queueItems);
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     */
+    public function testEnqueuingOnlyOneRecurringScheduledTask()
+    {
+        $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
+
+        $schedule = new HourlySchedule(new FooTask());
+        $schedule->setRecurring(true);
+        $schedule->setHour(13);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+
+        $schedule = new HourlySchedule(new FooTask());
+        $schedule->setRecurring(true);
+        $schedule->setHour(14);
+        $schedule->setNextSchedule();
+        $repository->save($schedule);
+
+        $nowDateTime = new \DateTime('2018-03-22T14:42:05');
+        $this->timeProvider->setCurrentLocalTime($nowDateTime);
+        $this->syncTask->execute();
+
+        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
+        $queueItems = $this->queueStorage->select();
+        $this->assertCount(1, $queueItems);
+    }
+
+    /**
      * @param string $newStatus
      * @param int $expectedCount
      *
