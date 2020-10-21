@@ -69,6 +69,7 @@ class ScheduleCheckTask extends Task
             try {
                 $latestTask = $queueService->findLatestByType($task->getType(), $schedule->getContext());
                 if ($latestTask
+                    && $schedule->isRecurring()
                     && in_array($latestTask->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)
                 ) {
                     // do not enqueue task if it is already scheduled for execution
