@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
+### Added
+- Added missing carrier logos. Integrations should refresh their shipping services after updating to this Core version in order to assign these logos to their respective shipping services.
 
 ## [3.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.4...v3.0.5) - 2020-10-21
 ### Changed
