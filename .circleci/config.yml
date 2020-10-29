@@ -4,9 +4,15 @@ executors:
   php-5_6:
     docker:
       - image: circleci/php:5.6
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_TOKEN
   php-7_2:
     docker:
       - image: circleci/php:7.2
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_TOKEN
 jobs:
   tests-5_6:
     executor: php-5_6
@@ -42,10 +48,14 @@ workflows:
   ecommerce_module_core:
     jobs:
       - tests-5_6:
+          context:
+            - packlink-dockerhub
           filters:
             tags:
               only: /.*/
       - tests-7_2:
+          context:
+            - packlink-dockerhub
           filters:
             tags:
               only: /.*/
