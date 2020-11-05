@@ -3,13 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
-### Changed
-- Fixed setting warehouse postal code and city from the module
-
-## [3.0.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.5...v3.0.6) - 2020-11-03
+## [3.0.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.5...v3.0.6) - 2020-11-05
 ### Added
 - Added missing carrier logos. Integrations should refresh their shipping services after updating to this Core version in order to assign these logos to their respective shipping services.
+- Fixed setting warehouse postal code and city from the module
 
 ## [3.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.4...v3.0.5) - 2020-10-21
 ### Changed
