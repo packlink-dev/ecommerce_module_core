@@ -140,7 +140,13 @@ class Warehouse extends FrontDto
         /** @var static $instance */
         $instance = parent::fromArray($raw);
         $instance->default = static::getDataValue($raw, 'default_selection', false);
-        $instance->postalCode = static::getDataValue($raw, 'postal_code');
+        $zipCity = explode(' - ', static::getDataValue($raw, 'postal_code'));
+        if (count($zipCity) === 2) {
+            $instance->postalCode = $zipCity[0];
+            $instance->city = $zipCity[1];
+        } else {
+            $instance->postalCode = static::getDataValue($raw, 'postal_code');
+        }
 
         return $instance;
     }
