@@ -181,7 +181,6 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
         $this->insertQueueItems();
         $repository = RepositoryRegistry::getQueueItemRepository();
 
-        $this->assertCount(1, $repository->findOldestQueuedItems(Priority::LOW));
         $this->assertCount(1, $repository->findOldestQueuedItems(Priority::NORMAL));
     }
 
