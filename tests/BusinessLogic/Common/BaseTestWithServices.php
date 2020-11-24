@@ -23,6 +23,7 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Language\TranslationService;
+use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -109,6 +110,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             \Packlink\BusinessLogic\Language\Interfaces\TranslationService::CLASS_NAME,
             function () {
                 return new TranslationService();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            PostalCodeTransformer::CLASS_NAME,
+            function () {
+                return new PostalCodeTransformer();
             }
         );
 

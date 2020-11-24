@@ -13,21 +13,6 @@ use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
  */
 class PostalCodeTransformerTest extends BaseTestWithServices
 {
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        TestServiceRegister::registerService(
-            PostalCodeTransformer::CLASS_NAME,
-            function () {
-                return new PostalCodeTransformer();
-            }
-        );
-    }
-
     public function testTransformingUnsupportedCountry()
     {
         /** @var PostalCodeTransformer $postalCodeTransformer */
