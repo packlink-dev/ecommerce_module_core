@@ -8,6 +8,7 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\ShippingMethod\Exceptions\FixedPriceValueOutOfBoundsException;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
@@ -83,9 +84,8 @@ class ShippingCostCalculator
 
         $result = array();
         $package = self::preparePackages($packages);
-        $params = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, array($package));
         try {
-            $response = self::getProxy()->getShippingServicesDeliveryDetails($params);
+            $response = self::getPacklinkServices($fromCountry, $fromZip, $toCountry, $toZip, $package);
 
             $result = self::calculateShippingCostsPerShippingMethod(
                 $shippingMethods,
@@ -112,7 +112,7 @@ class ShippingCostCalculator
     /**
      * Returns cheapest service in shipping method.
      *
-     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $method
+     * @param ShippingMethod $method
      * @param string $fromCountry From country code.
      * @param string $fromZip From zip code.
      * @param string $toCountry To country code.
@@ -130,12 +130,9 @@ class ShippingCostCalculator
         array $packages
     ) {
         $package = self::preparePackages($packages);
-        $searchParams = new ShippingServiceSearch(null, $fromCountry, $fromZip, $toCountry, $toZip, array($package));
 
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
         try {
-            $services = $proxy->getShippingServicesDeliveryDetails($searchParams);
+            $services = self::getPacklinkServices($fromCountry, $fromZip, $toCountry, $toZip, $package);
         } catch (\Exception $e) {
             $services = array();
         }
@@ -175,9 +172,68 @@ class ShippingCostCalculator
     }
 
     /**
+     * Returns available Packlink services for the given departure and destination information.
+     * Transforms destination postal code to a supported format, if the country is supported for postal code transformation.
+     * In case of a 400 response, the request to Packlink API is reattempted with original destination postal code.
+     *
+     * @param string $fromCountry Departure country code.
+     * @param string $fromZip Departure zip code.
+     * @param string $toCountry Destination country code.
+     * @param string $toZip Destination zip code.
+     * @param Package $package
+     *
+     * @return array
+     *
+     * @throws HttpBaseException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    protected static function getPacklinkServices($fromCountry, $fromZip, $toCountry, $toZip, $package)
+    {
+        $transformedPostalCode = '';
+
+        try {
+            /** @var PostalCodeTransformer $postalCodeTransformer */
+            $postalCodeTransformer = ServiceRegister::getService(PostalCodeTransformer::CLASS_NAME);
+            $transformedPostalCode = $postalCodeTransformer->transform($toCountry, $toZip);
+            $searchParams = new ShippingServiceSearch(
+                null,
+                $fromCountry,
+                $fromZip,
+                $toCountry,
+                $transformedPostalCode,
+                array($package)
+            );
+
+            return self::getProxy()->getShippingServicesDeliveryDetails($searchParams);
+        } catch (HttpBaseException $e) {
+            if ($toZip !== $transformedPostalCode
+                && $e->getCode() === 400
+                && $e->getMessage() === 'Location not valid for the input data'
+            ) {
+                $searchParams = new ShippingServiceSearch(
+                    null,
+                    $fromCountry,
+                    $fromZip,
+                    $toCountry,
+                    $toZip,
+                    array($package)
+                );
+
+                return self::getProxy()->getShippingServicesDeliveryDetails($searchParams);
+            }
+
+            throw $e;
+        } catch (\InvalidArgumentException $e) {
+            return array();
+        }
+    }
+
+    /**
      * Calculates shipping method cost based on given criteria.
      *
-     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $shippingMethod
+     * @param ShippingMethod $shippingMethod
      * @param float $totalAmount
      *
      * @param int $serviceId
@@ -393,7 +449,7 @@ class ShippingCostCalculator
     }
 
     /**
-     * @param \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod $method
+     * @param ShippingMethod $method
      * @param $totalAmount
      * @param $totalWeight
      *
