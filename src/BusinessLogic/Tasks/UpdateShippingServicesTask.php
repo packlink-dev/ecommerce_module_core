@@ -5,8 +5,7 @@ namespace Packlink\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Country\Country;
-use Packlink\BusinessLogic\Country\CountryService;
+use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -24,7 +23,7 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 class UpdateShippingServicesTask extends Task
 {
     /**
-     * @var CountryService
+     * @var WarehouseCountryService
      */
     private $countryService;
 
@@ -96,7 +95,7 @@ class UpdateShippingServicesTask extends Task
             $sourceCountryCode = $config->getUserInfo()->country;
         }
 
-        $supportedCountries = $this->getSupportedCountriesForServices();
+        $supportedCountries = $this->getCountryService()->getSupportedCountries();
         $sourceCountry = $supportedCountries[$sourceCountryCode];
 
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
@@ -210,32 +209,8 @@ class UpdateShippingServicesTask extends Task
             return false;
         }
 
-        $supportedCountries = $this->getSupportedCountriesForServices();
-
-        return $config->getDefaultWarehouse() !== null || array_key_exists($userInfo->country, $supportedCountries);
-    }
-
-    /**
-     * Returns supported countries for available services.
-     *
-     * @return \Packlink\BusinessLogic\Country\Country[]
-     *
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     */
-    protected function getSupportedCountriesForServices()
-    {
-        $supportedCountries = $this->getCountryService()->getSupportedCountries();
-        $supportedCountries['US'] = Country::fromArray(
-            array(
-                'name' => 'United States',
-                'code' => 'US',
-                'postal_code' => '10001',
-                'registration_link' => 'https://pro.packlink.com/register',
-                'platform_country' => 'UN',
-            )
-        );
-
-        return $supportedCountries;
+        return $config->getDefaultWarehouse() !== null
+            || $this->getCountryService()->isCountrySupported($userInfo->country);
     }
 
     /**
@@ -286,12 +261,12 @@ class UpdateShippingServicesTask extends Task
     /**
      * Returns an instance of country service.
      *
-     * @return \Packlink\BusinessLogic\Country\CountryService
+     * @return WarehouseCountryService
      */
     protected function getCountryService()
     {
         if ($this->countryService === null) {
-            $this->countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+            $this->countryService = ServiceRegister::getService(WarehouseCountryService::CLASS_NAME);
         }
 
         return $this->countryService;

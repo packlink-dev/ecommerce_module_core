@@ -3,14 +3,13 @@
 namespace Packlink\BusinessLogic\Country;
 
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
-use Packlink\BusinessLogic\DTO\FrontDto;
 
 /**
- * Class Country
+ * Class RegistrationCountry
  *
  * @package Packlink\BusinessLogic\Country
  */
-class Country extends FrontDto
+class RegistrationCountry extends Country
 {
     /**
      * Fully qualified name of this class.
@@ -19,25 +18,20 @@ class Country extends FrontDto
     /**
      * Unique class key.
      */
-    const CLASS_KEY = 'country';
+    const CLASS_KEY = 'registration_country';
+
     /**
-     * Country name in English.
+     * Registration link for the country.
      *
      * @var string
      */
-    public $name;
+    public $registrationLink;
     /**
-     * 2-letter country code.
+     * 2-letter platform country code.
      *
      * @var string
      */
-    public $code;
-    /**
-     * Capital city postal code.
-     *
-     * @var string
-     */
-    public $postalCode;
+    public $platformCountry;
 
     /**
      * Fields for this DTO.
@@ -48,6 +42,8 @@ class Country extends FrontDto
         'name',
         'code',
         'postal_code',
+        'registration_link',
+        'platform_country',
     );
     /**
      * Required fields for DTO to be valid.
@@ -58,6 +54,8 @@ class Country extends FrontDto
         'name',
         'code',
         'postal_code',
+        'registration_link',
+        'platform_country',
     );
 
     /**
@@ -74,7 +72,8 @@ class Country extends FrontDto
         /** @var static $instance */
         $instance = parent::fromArray($raw);
 
-        $instance->postalCode = static::getDataValue($raw, 'postal_code');
+        $instance->registrationLink = static::getDataValue($raw, 'registration_link');
+        $instance->platformCountry = static::getDataValue($raw, 'platform_country');
 
         return $instance;
     }
@@ -88,7 +87,10 @@ class Country extends FrontDto
     {
         return array_merge(
             parent::toArray(),
-            array('postal_code' => $this->postalCode)
+            array(
+                'registration_link' => $this->registrationLink,
+                'platform_country' => $this->platformCountry,
+            )
         );
     }
 }

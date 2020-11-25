@@ -19,6 +19,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
+use Packlink\BusinessLogic\Country\RegistrationCountry;
+use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -90,6 +92,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             }
         );
 
+        TestServiceRegister::registerService(
+            WarehouseCountryService::CLASS_NAME,
+            function () {
+                return WarehouseCountryService::getInstance();
+            }
+        );
+
         $queueService = new TestQueueService();
         TestServiceRegister::registerService(
             QueueService::CLASS_NAME,
@@ -126,6 +135,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestFrontDtoFactory::register(ParcelInfo::CLASS_KEY, ParcelInfo::CLASS_NAME);
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
         TestFrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
+        TestFrontDtoFactory::register(RegistrationCountry::CLASS_KEY, RegistrationCountry::CLASS_NAME);
     }
 
     protected function tearDown()

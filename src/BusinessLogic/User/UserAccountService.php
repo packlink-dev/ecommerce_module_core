@@ -10,7 +10,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Country\CountryService;
+use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -137,8 +137,8 @@ class UserAccountService extends BaseService
             }
 
             if ($warehouse !== null) {
-                /** @var CountryService $countryService */
-                $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+                /** @var WarehouseCountryService $countryService */
+                $countryService = ServiceRegister::getService(WarehouseCountryService::CLASS_NAME);
 
                 if ($countryService->isCountrySupported($warehouse->country)) {
                     $this->getConfigService()->setDefaultWarehouse($warehouse);
