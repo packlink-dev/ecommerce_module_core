@@ -31,20 +31,4 @@ class CountryServiceTest extends BaseTestWithServices
             $countries['ES']->registrationLink
         );
     }
-
-    public function testSupportedCountry()
-    {
-        /** @var CountryService $service */
-        $service = ServiceRegister::getService(CountryService::CLASS_NAME);
-
-        $this->assertTrue($service->isCountrySupported('ES'));
-    }
-
-    public function testUnsupportedCountry()
-    {
-        /** @var CountryService $service */
-        $service = ServiceRegister::getService(CountryService::CLASS_NAME);
-
-        $this->assertFalse($service->isCountrySupported('RS'));
-    }
 }
