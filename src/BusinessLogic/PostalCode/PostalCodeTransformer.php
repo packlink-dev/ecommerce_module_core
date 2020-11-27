@@ -29,7 +29,7 @@ class PostalCodeTransformer
      * @var array
      */
     private $map = array(
-        'UK' => array(
+        'GB' => array(
             '** ***',
             '*** ***',
             '**** ***',
