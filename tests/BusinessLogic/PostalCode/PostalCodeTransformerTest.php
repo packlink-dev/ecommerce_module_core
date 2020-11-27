@@ -52,10 +52,10 @@ class PostalCodeTransformerTest extends BaseTestWithServices
         /** @var PostalCodeTransformer $postalCodeTransformer */
         $postalCodeTransformer = TestServiceRegister::getService(PostalCodeTransformer::CLASS_NAME);
 
-        $transformedPostalCode = $postalCodeTransformer->transform('UK', 'SW1A1');
+        $transformedPostalCode = $postalCodeTransformer->transform('GB', 'SW1A1');
         self::assertEquals('SW 1A1', $transformedPostalCode);
 
-        $transformedPostalCode = $postalCodeTransformer->transform('UK', 'SW1A1AA');
+        $transformedPostalCode = $postalCodeTransformer->transform('GB', 'SW1A1AA');
         self::assertEquals('SW1A 1AA', $transformedPostalCode);
 
         $transformedPostalCode = $postalCodeTransformer->transform('NL', '1011AS');
@@ -73,10 +73,10 @@ class PostalCodeTransformerTest extends BaseTestWithServices
         /** @var PostalCodeTransformer $postalCodeTransformer */
         $postalCodeTransformer = TestServiceRegister::getService(PostalCodeTransformer::CLASS_NAME);
 
-        $transformedPostalCode = $postalCodeTransformer->transform('UK', 'SW-1A-1');
+        $transformedPostalCode = $postalCodeTransformer->transform('GB', 'SW-1A-1');
         self::assertEquals('SW 1A1', $transformedPostalCode);
 
-        $transformedPostalCode = $postalCodeTransformer->transform('UK', 'S W1A1AA');
+        $transformedPostalCode = $postalCodeTransformer->transform('GB', 'S W1A1AA');
         self::assertEquals('SW1A 1AA', $transformedPostalCode);
 
         $transformedPostalCode = $postalCodeTransformer->transform('NL', '1011A-S');
