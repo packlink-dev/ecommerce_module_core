@@ -2,6 +2,9 @@
 
 namespace Packlink\BusinessLogic\PostalCode;
 
+use InvalidArgumentException;
+use Logeecom\Infrastructure\Logger\Logger;
+
 /**
  * Class PostalCodeTransformer
  *
@@ -9,16 +12,6 @@ namespace Packlink\BusinessLogic\PostalCode;
  */
 class PostalCodeTransformer
 {
-    /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
-    /**
-     * Singleton instance of this class.
-     *
-     * @var static
-     */
-    protected static $instance;
     /**
      * The map of the country codes and their supported formats.
      *
@@ -28,7 +21,7 @@ class PostalCodeTransformer
      *
      * @var array
      */
-    private $map = array(
+    protected static $map = array(
         'GB' => array(
             '** ***',
             '*** ***',
@@ -58,15 +51,15 @@ class PostalCodeTransformer
      *
      * @return string
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function transform($countryCode, $postalCode)
+    public static function transform($countryCode, $postalCode)
     {
-        if (!array_key_exists($countryCode, $this->map)) {
+        if (!array_key_exists($countryCode, static::$map)) {
             return $postalCode;
         }
 
-        $supportedFormats = $this->map[$countryCode];
+        $supportedFormats = static::$map[$countryCode];
 
         foreach ($supportedFormats as $supportedFormat) {
             if (preg_match_all('/[a-zA-Z\d]/', $postalCode) === substr_count($supportedFormat, '*')) {
@@ -75,11 +68,13 @@ class PostalCodeTransformer
                     return substr($postalCode, 0, 5);
                 }
 
-                return $this->transformToFormat($postalCode, $supportedFormat);
+                return static::transformToFormat($postalCode, $supportedFormat);
             }
         }
 
-        throw new \InvalidArgumentException('Invalid postal code provided');
+        Logger::logWarning("Invalid postal code $postalCode for country $countryCode provided for postal code transformation");
+
+        throw new InvalidArgumentException('Invalid postal code provided');
     }
 
     /**
@@ -91,7 +86,7 @@ class PostalCodeTransformer
      *
      * @return string
      */
-    private function transformToFormat($postalCode, $format)
+    private static function transformToFormat($postalCode, $format)
     {
         if (preg_replace('/[a-zA-Z\d]/', '*', $postalCode) === $format) {
             return $postalCode;

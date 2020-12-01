@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Location;
 
+use InvalidArgumentException;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -161,6 +162,37 @@ class LocationServiceTest extends BaseTestWithServices
         $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
         $this->httpClient->setMockResponses($this->getMockLocations());
         $locations = $locationService->getLocations(1, 'FR', '75008');
+
+        $this->assertEmpty($locations);
+    }
+
+    public function testGetLocationsForInvalidPostalCode()
+    {
+        $this->initShippingMethod(true);
+        $this->initWarehouse();
+
+        /** @var LocationService $locationService */
+        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
+        $locations = $locationService->getLocations(1, 'NL', '1011ASZ');
+
+        $this->assertEmpty($locations);
+    }
+
+    public function testGetLocationsForTransformedPostalCode()
+    {
+        $this->httpClient->setMockResponses(array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-NL.json')
+                ),
+            )
+        );
+
+        $this->initShippingMethod(true);
+        $this->initWarehouse();
+
+        /** @var LocationService $locationService */
+        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
+        $locations = $locationService->getLocations(1, 'NL', '1011AS');
 
         $this->assertEmpty($locations);
     }
