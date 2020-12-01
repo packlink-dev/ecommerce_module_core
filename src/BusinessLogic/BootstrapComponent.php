@@ -23,7 +23,6 @@ use Packlink\BusinessLogic\Language\TranslationService;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
-use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\Registration\RegistrationLegalPolicy;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
@@ -182,13 +181,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             AutoTestService::CLASS_NAME,
             function () {
                 return new AutoTestService();
-            }
-        );
-
-        ServiceRegister::registerService(
-            PostalCodeTransformer::CLASS_NAME,
-            function () {
-                return new PostalCodeTransformer();
             }
         );
     }

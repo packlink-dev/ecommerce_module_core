@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\ShippingMethod;
 use Exception;
 use InvalidArgumentException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
@@ -183,9 +184,7 @@ class ShippingCostCalculator
         $transformedPostalCode = '';
 
         try {
-            /** @var PostalCodeTransformer $postalCodeTransformer */
-            $postalCodeTransformer = ServiceRegister::getService(PostalCodeTransformer::CLASS_NAME);
-            $transformedPostalCode = $postalCodeTransformer->transform($toCountry, $toZip);
+            $transformedPostalCode = PostalCodeTransformer::transform($toCountry, $toZip);
             $searchParams = new ShippingServiceSearch(
                 null,
                 $fromCountry,
@@ -201,6 +200,8 @@ class ShippingCostCalculator
                 && $e->getCode() === 400
                 && $e->getMessage() === 'Location not valid for the input data'
             ) {
+                Logger::logWarning("Request with transformed postal code $transformedPostalCode for $toCountry country resulted in a unsuccessful response.");
+
                 $searchParams = new ShippingServiceSearch(
                     null,
                     $fromCountry,
@@ -214,7 +215,7 @@ class ShippingCostCalculator
             }
 
             throw $e;
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return array();
         }
     }
