@@ -109,10 +109,10 @@ class ParcelInfo extends FrontDto
         parent::doValidate($payload, $validationErrors);
 
         foreach (array('width', 'length', 'height') as $field) {
-            static::validateNumber($payload, $field, $validationErrors, FILTER_VALIDATE_INT);
+            static::validateNumber($payload, $field, $validationErrors, true);
         }
 
-        static::validateNumber($payload, 'weight', $validationErrors, FILTER_VALIDATE_FLOAT);
+        static::validateNumber($payload, 'weight', $validationErrors, false);
     }
 
     /**
@@ -121,17 +121,17 @@ class ParcelInfo extends FrontDto
      * @param array $payload
      * @param string $field The field key.
      * @param ValidationError[] $validationErrors The list of validation errors to alter.
-     * @param int $filter Validation filter
+     * @param boolean $isIntValue If true, value must be an integer. If false, value can be integer or float.
      */
-    private static function validateNumber(array $payload, $field, array &$validationErrors, $filter)
+    private static function validateNumber(array $payload, $field, array &$validationErrors, $isIntValue)
     {
         if (!static::isFieldSet($payload, $field)) {
             // required field validation already happened
             return;
         }
 
-        $value = filter_var($payload[$field], $filter);
-        if ($value === false) {
+        $value = $payload[$field];
+        if ($isIntValue && !is_int($value) || !$isIntValue && !(is_float($value) || is_int($value))) {
             static::setInvalidFieldError($field, $validationErrors, Translator::translate('validation.integer'));
         } elseif ($value <= 0) {
             static::setInvalidFieldError(

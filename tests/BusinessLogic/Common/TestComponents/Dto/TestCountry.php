@@ -19,7 +19,7 @@ class TestCountry extends Country
     public function __construct()
     {
         $this->name = 'Mauritius';
-        $this->code = 'mu';
+        $this->code = 'MU';
         $this->postalCode = '42602';
     }
 }

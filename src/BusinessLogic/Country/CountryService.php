@@ -124,18 +124,6 @@ class CountryService extends BaseService
     );
 
     /**
-     * Returns whether the country with provided ISO code is in a list of supported countries.
-     *
-     * @param string $isoCode Two-letter country code.
-     *
-     * @return bool
-     */
-    public function isCountrySupported($isoCode)
-    {
-        return array_key_exists($isoCode, static::$supportedCountries);
-    }
-
-    /**
      * Checks if given country is one of the four base countries ('ES', 'DE', 'FR', 'IT').
      *
      * @param string $countryCode Country ISO-2 code.
@@ -152,7 +140,8 @@ class CountryService extends BaseService
      *
      * @param bool $associative Indicates whether the result should be an associative array.
      *
-     * @return \Packlink\BusinessLogic\Country\Country[]
+     * @return RegistrationCountry[]
+     *
      * @noinspection PhpUnhandledExceptionInspection
      * @noinspection PhpDocMissingThrowsInspection
      */
@@ -169,8 +158,8 @@ class CountryService extends BaseService
                     $country['registration_link']
                 ) . '?platform=PRO&platform_country=' . $country['platform_country'];
 
-            $country['name'] = Translator::translate('register.' . $country['code']);
-            $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
+            $country['name'] = Translator::translate('countries.' . $country['code']);
+            $countries[$country['code']] = FrontDtoFactory::get(RegistrationCountry::CLASS_KEY, $country);
         }
 
         return $associative ? $countries : array_values($countries);

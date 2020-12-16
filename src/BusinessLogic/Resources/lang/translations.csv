@@ -63,18 +63,28 @@ register,submit,Register,Regístrate,Registrieren,S'inscrire,Registrati
 register,chooseYourCountry,Choose your country,Elige tu país,Wählen Sie Ihr Land aus,Sélectionnez votre pays,Scegli il paese
 register,searchCountry,Search country,Busca el país,Land suchen,Rechercher un pays,Cerca paese
 register,invalidDeliveryVolume,Field is not a valid delivery volume.,El campo no contiene un volumen de entrega válido.,Das Feld enthält keinen gültigen Lieferumfang.,Le champ ne contient pas de volume de livraison valide.,Il campo non contiene un volume di consegna valido.
-register,ES,Spain,España,Spain,Spain,Spain
-register,DE,Germany,Alemania,Germany,Germany,Germany
-register,FR,France,Francia,France,France,France
-register,IT,Italy,Italia,Italy,Italy,Italy
-register,AT,Austria,Austria,Austria,Austria,Austria
-register,NL,Netherlands,Netherlands,Netherlands,Netherlands,Netherlands
-register,BE,Belgium,Belgium,Belgium,Belgium,Belgium
-register,PT,Portugal,Portugal,Portugal,Portugal,Portugal
-register,TR,Turkey,Turkey,Turkey,Turkey,Turkey
-register,IE,Ireland,Irlanda,Ireland,Ireland,Ireland
-register,GB,Great Britain,Great Britain,Great Britain,Great Britain,Great Britain
-register,HU,Hungary,Hungary,Hungary,Hungary,Hungary
+countries,ES,Spain,España,Spanien,Espagne,Spagna
+countries,DE,Germany,Alemania,Deutschland,Allemagne,Germania
+countries,FR,France,Francia,Frankreich,France,Francia
+countries,IT,Italy,Italia,Italien,Italie,Italia
+countries,AT,Austria,Austria,Österreich,Autriche,Austria
+countries,NL,Netherlands,Países Bajos,Niederlande,Pays-Bas,Paesi Bassi
+countries,BE,Belgium,Bélgica,Belgien,Belgique,Belgio
+countries,PT,Portugal,Portugal,Portugal,Portugal,Portogallo
+countries,TR,Turkey,Turquía,Türkei,Turquie,Turchia
+countries,IE,Ireland,Irlanda,Irland,Irlande,Irlanda
+countries,GB,Great Britain,Reino Unido,Vereinigtes Königreich,Royaume-Uni,Regno Unito
+countries,HU,Hungary,Hungría,Ungarn,Hongrie,Ungheria
+countries,PL,Poland,Polonia,Polen,Pologne,Polonia
+countries,CH,Switzerland,Suiza,Schweiz,Suisse,Svizzera
+countries,LU,Luxembourg,Luxemburgo,Luxemburg,Luxembourg,Lussemburgo
+countries,AR,Argentina,Argentina,Argentinien,Argentine,Argentina
+countries,US,United States,Estados Unidos,Vereinigte Staaten,États Unis,Stati Uniti
+countries,BO,Bolivia,Bolivia,Bolivien,Bolivie,Bolivia
+countries,MX,Mexico,México,Mexiko,Mexique,Messico
+countries,CL,Chile,Chile,Chile,Chili,Chile
+countries,CZ,Czech Republic,Republica checa,Tschechien,République Tchèque,Repubblica Ceca
+countries,SE,Sweden,Suecia,Schweden,Suède,Svezia
 onboardingWelcome,header,Let's set up basic information so that<br>you can make shipments,Vamos a configurar tu información básica <br> para poder hacer envíos,"Richten Sie nun die grundlegenden Informationen ein, damit<br>Sie Versendungen vornehmen können",Configurez vos informations de base afin<br>d’effectuer des envois,È necessario impostare alcuni dati di base così che<br>potrai effettuare spedizioni
 onboardingWelcome,steps,It's just two steps that we need to go through to offer you the<br>carrier that best suits your needs,"Son solo dos pasos, los necesitamos para ofrecerte los servicios <br> de transporte que más se adaptan a tus necesidades.","In nur zwei Schritten können wir Ihnen den <br>Spediteur anbieten, der all Ihre Anforderungen erfüllt",Il ne vous reste que deux étapes pour savoir quel<br>transporteur répond le mieux à vos besoins,Si tratta di due semplici passaggi che dobbiamo completare per offrirti la<br>compagnia di trasporto che più si adatta alle tue esigenze
 onboardingWelcome,stepOne,Set parcel details,Configurar los detalles del paquete,Paketangaben einfügen,Configurez les informations sur le colis,Imposta i dettagli del pacco

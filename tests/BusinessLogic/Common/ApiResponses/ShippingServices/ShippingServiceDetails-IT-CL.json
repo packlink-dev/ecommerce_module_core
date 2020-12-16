@@ -1,0 +1,206 @@
+[
+  {
+    "has_adult_signature": false,
+    "currency": "EUR",
+    "carrier_name": "TNT",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "5000.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "has_proof_of_delivery": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20255,
+    "logo_id": "tnt",
+    "carrier_product_id": "IT_TNT_4_PRO",
+    "is_own_contract": false,
+    "service_info": [
+      {
+        "text": "service-card.service-info.printer",
+        "icon": "printer"
+      }
+    ],
+    "has_print_in_store": false,
+    "price": {
+      "currency": "EUR",
+      "total_price": 126.07,
+      "tax_price": 0,
+      "base_price": 126.07
+    },
+    "first_estimated_delivery_date": "2020/12/02",
+    "max_dimensions_message": null,
+    "customs_required": true,
+    "name": "Express",
+    "transit_time": "4 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 10,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "96",
+    "available_dates": {
+      "2020/12/04": "[08:00 , 18:00]",
+      "2020/12/14": "[08:00 , 18:00]",
+      "2020/12/10": "[08:00 , 18:00]",
+      "2020/11/30": "[08:00 , 18:00]",
+      "2020/12/09": "[08:00 , 18:00]",
+      "2020/12/07": "[08:00 , 18:00]",
+      "2020/12/11": "[08:00 , 18:00]",
+      "2020/11/26": "[08:00 , 18:00]",
+      "2020/11/27": "[08:00 , 18:00]",
+      "2020/12/03": "[08:00 , 18:00]",
+      "2020/12/02": "[08:00 , 18:00]",
+      "2020/12/01": "[08:00 , 18:00]"
+    },
+    "url_terms_and_conditions": "https://www.tnt.com/express/it_it/site/home/Condizioni-generali-trasporto.html",
+    "base_price": "126.07"
+  },
+  {
+    "has_adult_signature": false,
+    "currency": "EUR",
+    "carrier_name": "UPS",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "5000.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "express",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "has_proof_of_delivery": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20937,
+    "logo_id": "ups",
+    "carrier_product_id": "IT_UPS_6",
+    "is_own_contract": false,
+    "service_info": [
+      {
+        "text": "service-card.service-info.printer",
+        "icon": "printer"
+      }
+    ],
+    "has_print_in_store": false,
+    "price": {
+      "currency": "EUR",
+      "total_price": 128.47,
+      "tax_price": 0,
+      "base_price": 128.47
+    },
+    "first_estimated_delivery_date": "2020/11/30",
+    "max_dimensions_message": null,
+    "customs_required": true,
+    "name": "Express Saver",
+    "transit_time": "2 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 10,
+      "time_unit": "HOURS"
+    },
+    "transit_hours": "48",
+    "available_dates": {
+      "2020/12/04": "[09:00 , 17:00]",
+      "2020/12/14": "[09:00 , 17:00]",
+      "2020/12/10": "[09:00 , 17:00]",
+      "2020/11/30": "[09:00 , 17:00]",
+      "2020/12/09": "[09:00 , 17:00]",
+      "2020/12/07": "[09:00 , 17:00]",
+      "2020/12/11": "[09:00 , 17:00]",
+      "2020/11/26": "[09:00 , 17:00]",
+      "2020/11/27": "[09:00 , 17:00]",
+      "2020/12/03": "[09:00 , 17:00]",
+      "2020/12/02": "[09:00 , 17:00]",
+      "2020/12/01": "[09:00 , 17:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "128.47"
+  },
+  {
+    "has_adult_signature": false,
+    "currency": "EUR",
+    "carrier_name": "STARPACK",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "5000.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "standard",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "has_proof_of_delivery": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 21103,
+    "logo_id": "starpack",
+    "carrier_product_id": "IT_SKYNET_1",
+    "is_own_contract": false,
+    "service_info": [
+      {
+        "text": "service-card.service-info.printer",
+        "icon": "printer"
+      }
+    ],
+    "has_print_in_store": false,
+    "price": {
+      "currency": "EUR",
+      "total_price": 145.43,
+      "tax_price": 0,
+      "base_price": 145.43
+    },
+    "first_estimated_delivery_date": "2020/12/04",
+    "max_dimensions_message": null,
+    "customs_required": true,
+    "name": "Air Courier",
+    "transit_time": "5 DAYS",
+    "country": "IT",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "time_left_first_available_date": {
+      "time_value": 1,
+      "time_unit": "DAYS"
+    },
+    "transit_hours": "120",
+    "available_dates": {
+      "2020/11/27": "[09:00 , 18:00]",
+      "2020/12/14": "[09:00 , 18:00]",
+      "2020/12/15": "[09:00 , 18:00]",
+      "2020/12/10": "[09:00 , 18:00]",
+      "2020/11/30": "[09:00 , 18:00]",
+      "2020/12/09": "[09:00 , 18:00]",
+      "2020/12/07": "[09:00 , 18:00]",
+      "2020/12/11": "[09:00 , 18:00]",
+      "2020/12/04": "[09:00 , 18:00]",
+      "2020/12/03": "[09:00 , 18:00]",
+      "2020/12/02": "[09:00 , 18:00]",
+      "2020/12/01": "[09:00 , 18:00]"
+    },
+    "url_terms_and_conditions": null,
+    "base_price": "145.43"
+  }
+]

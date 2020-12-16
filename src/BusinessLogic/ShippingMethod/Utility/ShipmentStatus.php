@@ -61,6 +61,8 @@ class ShipmentStatus
             case 'CARRIER_PENDING':
             case 'RETRY':
                 return self::STATUS_ACCEPTED;
+            case 'CANCELED':
+                return self::STATUS_CANCELLED;
             case 'AWAITING_COMPLETION':
             case 'READY_TO_PURCHASE':
             default:

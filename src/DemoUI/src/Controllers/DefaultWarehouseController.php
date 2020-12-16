@@ -3,7 +3,7 @@
 namespace Packlink\DemoUI\Controllers;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Country\CountryService;
+use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 use Packlink\DemoUI\Controllers\Models\Request;
@@ -50,8 +50,8 @@ class DefaultWarehouseController extends BaseHttpController
      */
     public function getSupportedCountries()
     {
-        /** @var CountryService $countryService */
-        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        /** @var WarehouseCountryService $countryService */
+        $countryService = ServiceRegister::getService(WarehouseCountryService::CLASS_NAME);
         $supportedCountries = $countryService->getSupportedCountries(false);
 
         $this->outputDtoEntities($supportedCountries);
