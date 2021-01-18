@@ -33,6 +33,15 @@ class PostalCodeTransformerTest extends BaseTestWithServices
         $transformedPostalCode = PostalCodeTransformer::transform('UK', 'SW1A 1AA');
         self::assertEquals('SW1A 1AA', $transformedPostalCode);
 
+        $transformedPostalCode = PostalCodeTransformer::transform('IM', 'SW1A 1AA');
+        self::assertEquals('SW1A 1AA', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('JE', 'SW1A 1AA');
+        self::assertEquals('SW1A 1AA', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('GG', 'SW1A 1AA');
+        self::assertEquals('SW1A 1AA', $transformedPostalCode);
+
         $transformedPostalCode = PostalCodeTransformer::transform('NL', '1011 AS');
         self::assertEquals('1011 AS', $transformedPostalCode);
 
@@ -54,6 +63,24 @@ class PostalCodeTransformerTest extends BaseTestWithServices
         self::assertEquals('SW 1A1', $transformedPostalCode);
 
         $transformedPostalCode = PostalCodeTransformer::transform('GB', 'SW1A1AA');
+        self::assertEquals('SW1A 1AA', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('IM', 'SW1A1');
+        self::assertEquals('SW 1A1', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('IM', 'SW1A1AA');
+        self::assertEquals('SW1A 1AA', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('JE', 'SW1A1');
+        self::assertEquals('SW 1A1', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('JE', 'SW1A1AA');
+        self::assertEquals('SW1A 1AA', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('GG', 'SW1A1');
+        self::assertEquals('SW 1A1', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('GG', 'SW1A1AA');
         self::assertEquals('SW1A 1AA', $transformedPostalCode);
 
         $transformedPostalCode = PostalCodeTransformer::transform('NL', '1011AS');
