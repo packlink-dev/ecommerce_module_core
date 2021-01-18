@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
+### Added
+- Added additional ISO codes to the postal code transformer.
+
+## [2.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.2...v2.3.0) - 2020-12-17
+### Added
+- Added postal code transformer service that transforms postal code into supported postal code format for some countries.
+
+### Changed
+- Changed logic in the shipping cost calculator to use postal code transformer for the delivery postal code before retrieving services from the Packlink API.
+- Separated country service into two services which deal with registration and warehouse countries separately. Separated country DTO into two DTOs, with base country DTO and registration country DTO, which adds additional information (registration link and platform country).
+- Modified user account service, update shipping services task, and warehouse controller to work with warehouse country service instead of country service.
 
 ## [2.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.1...v2.2.2) - 2020-02-28
 ### Changed

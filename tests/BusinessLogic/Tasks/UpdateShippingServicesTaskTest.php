@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\Tests\BusinessLogic\Tasks;
+namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
@@ -252,6 +252,15 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
                 new HttpResponse(200, array(), '[]'),
                 new HttpResponse(200, array(), '[]'),
                 new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
             )
         );
 
@@ -308,8 +317,17 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-TR')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-IE')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-GB')),
-            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-US')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-HU')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-PL')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-CH')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-LU')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-AR')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-US')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-BO')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-MX')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-CL')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-CZ')),
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-SE')),
         );
     }
 

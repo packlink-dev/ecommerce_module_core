@@ -15,7 +15,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\FixedPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\PercentPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
-use Packlink\Tests\BusinessLogic\Tasks\UpdateShippingServicesTaskTest;
+use Logeecom\Tests\BusinessLogic\Tasks\UpdateShippingServicesTaskTest;
 
 /**
  * Class ShippingMethodControllerTest

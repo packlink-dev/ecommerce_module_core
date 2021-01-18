@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Location;
 
+use InvalidArgumentException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
@@ -10,6 +11,7 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException;
+use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
@@ -95,10 +97,18 @@ class LocationService extends BaseService
                 $packages
             );
 
-            $locations = $this->proxy->getLocations($cheapestService->serviceId, $toCountry, $toPostCode);
+            if ($cheapestService === null) {
+                return array();
+            }
+
+            $locations = $this->proxy->getLocations(
+                $cheapestService->serviceId,
+                $toCountry,
+                PostalCodeTransformer::transform($toCountry, $toPostCode)
+            );
 
             $result = $this->transformCollectionToResponse($locations);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
         } catch (HttpBaseException $e) {
         }
 
