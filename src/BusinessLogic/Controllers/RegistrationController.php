@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
@@ -20,6 +21,10 @@ class RegistrationController
      * @var Configuration
      */
     protected $configService;
+    /**
+     * @var BrandConfigurationService
+     */
+    protected $brandConfigurationService;
     /**
      * List of terms and conditions URLs for different country codes.
      *
@@ -74,6 +79,8 @@ class RegistrationController
         $registrationInfoService = ServiceRegister::getService(RegistrationInfoService::CLASS_NAME);
         $registrationData = $registrationInfoService->getRegistrationInfoData();
 
+        $brand = $this->getBrandConfigurationService()->get();
+
         return array(
             'context' => $this->getConfigService()->getContext(),
             'email' => $registrationData->getEmail(),
@@ -83,6 +90,8 @@ class RegistrationController
                 self::$termsAndConditionsUrls[$country] : self::$termsAndConditionsUrls[self::DEFAULT_COUNTRY],
             'privacyPolicyUrl' => !empty(self::$privacyPolicyUrls[$country]) ?
                 self::$privacyPolicyUrls[$country] : self::$privacyPolicyUrls[self::DEFAULT_COUNTRY],
+            'platform_country' => in_array($country, $brand->platformCountries, true) ?
+                $country : $brand->platformCountries[0],
         );
     }
 
@@ -149,6 +158,20 @@ class RegistrationController
         }
 
         return $this->configService;
+    }
+
+    /**
+     * Returns an instance of brand configuration service.
+     *
+     * @return BrandConfigurationService
+     */
+    protected function getBrandConfigurationService()
+    {
+        if ($this->brandConfigurationService === null) {
+            $this->brandConfigurationService = ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+        }
+
+        return $this->brandConfigurationService;
     }
 
     /**
