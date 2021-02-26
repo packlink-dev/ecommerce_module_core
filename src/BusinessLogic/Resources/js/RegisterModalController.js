@@ -10,9 +10,7 @@ if (!window.Packlink) {
      * @typedef {{
      *  name: string,
      *  code: string,
-     *  postal_code: string,
-     *  registration_link: string,
-     *  platform_country: string
+     *  postal_code: string
      * }} Country
      */
 
