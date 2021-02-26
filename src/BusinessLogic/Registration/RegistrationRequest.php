@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Registration;
 
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Language\Translator;
@@ -54,7 +56,7 @@ class RegistrationRequest extends FrontDto
      */
     public $language;
     /**
-     * Platform (only supported platform is "PRO").
+     * Platform.
      *
      * @var string
      */
@@ -257,12 +259,23 @@ class RegistrationRequest extends FrontDto
             static::setInvalidFieldError('source', $validationErrors, Translator::translate('validation.invalidUrl'));
         }
 
-        if (!empty($payload['platform']) && $payload['platform'] !== 'PRO') {
+        $brand = static::getBrandConfigurationService()->get();
+
+        if (!empty($payload['platform']) && $payload['platform'] !== $brand->platformCode) {
             static::setInvalidFieldError(
                 'platform',
                 $validationErrors,
-                Translator::translate('validation.invalidFieldValue', array('PRO'))
+                Translator::translate('validation.invalidFieldValue', array($brand->platformCode))
             );
         }
+    }
+
+    /**
+     * @return BrandConfigurationService
+     */
+    private static function getBrandConfigurationService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
     }
 }

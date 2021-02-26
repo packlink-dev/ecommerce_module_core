@@ -3,6 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Http\DTO\Draft\AdditionalData;
 use Packlink\BusinessLogic\Http\DTO\Draft\Address;
 use Packlink\BusinessLogic\Http\DTO\Draft\DraftPrice;
@@ -31,7 +33,7 @@ class Draft extends DataTransferObject
      *
      * @var string
      */
-    public $platform = 'PRO';
+    public $platform;
     /**
      * Unique platform country identifier.
      *
@@ -147,6 +149,17 @@ class Draft extends DataTransferObject
      * @var DraftPrice
      */
     public $price;
+
+    /**
+     * Draft constructor.
+     */
+    public function __construct()
+    {
+        /** @var BrandConfigurationService $service */
+        $service = ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+
+        $this->platform = $service->get()->platformCode;
+    }
 
     /**
      * Transforms DTO to its array format suitable for http client.

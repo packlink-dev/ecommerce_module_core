@@ -17,6 +17,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueS
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\Brands\Packlink\PacklinkConfigurationService;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\RegistrationCountry;
@@ -118,6 +120,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             \Packlink\BusinessLogic\Language\Interfaces\TranslationService::CLASS_NAME,
             function () {
                 return new TranslationService();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            BrandConfigurationService::CLASS_NAME,
+            function () {
+                return new PacklinkConfigurationService();
             }
         );
 
