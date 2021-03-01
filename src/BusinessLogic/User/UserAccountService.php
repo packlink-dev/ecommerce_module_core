@@ -9,6 +9,8 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
+use Packlink\BusinessLogic\Brand\Exceptions\PlatformCountryNotSupportedByBrandException;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
@@ -47,6 +49,12 @@ class UserAccountService extends BaseService
      * @var Proxy
      */
     private $proxy;
+    /**
+     * BrandConfigurationService instance.
+     *
+     * @var BrandConfigurationService
+     */
+    private $brandConfigurationService;
 
     /**
      * Validates provided API key and initializes user's data.
@@ -57,6 +65,7 @@ class UserAccountService extends BaseService
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws PlatformCountryNotSupportedByBrandException
      */
     public function login($apiKey)
     {
@@ -159,9 +168,16 @@ class UserAccountService extends BaseService
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws PlatformCountryNotSupportedByBrandException
      */
     protected function initializeUser(User $user)
     {
+        $brand = $this->getBrandConfigurationService()->get();
+
+        if (!in_array($user->country, $brand->platformCountries, true)) {
+            throw new PlatformCountryNotSupportedByBrandException('Platform country not supported by brand!');
+        }
+
         $this->getConfigService()->setUserInfo($user);
         $defaultQueueName = $this->getConfigService()->getDefaultQueueName();
 
@@ -267,5 +283,19 @@ class UserAccountService extends BaseService
         }
 
         return $this->configuration;
+    }
+
+    /**
+     * Returns an instance of brand configuration service.
+     *
+     * @return BrandConfigurationService
+     */
+    protected function getBrandConfigurationService()
+    {
+        if ($this->brandConfigurationService === null) {
+            $this->brandConfigurationService = ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+        }
+
+        return $this->brandConfigurationService;
     }
 }

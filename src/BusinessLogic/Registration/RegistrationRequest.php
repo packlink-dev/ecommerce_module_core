@@ -211,6 +211,8 @@ class RegistrationRequest extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
+        $brand = static::getBrandConfigurationService()->get();
+
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
             static::setInvalidFieldError('email', $validationErrors, Translator::translate('validation.invalidEmail'));
         }
@@ -246,7 +248,7 @@ class RegistrationRequest extends FrontDto
         }
 
         if (!empty($payload['platform_country'])
-            && !in_array($payload['platform_country'], static::$supportedPlatformCountries, true)
+            && !in_array($payload['platform_country'], $brand->platformCountries, true)
         ) {
             static::setInvalidFieldError(
                 'platform_country',
@@ -258,8 +260,6 @@ class RegistrationRequest extends FrontDto
         if (!empty($payload['source']) && filter_var($payload['source'], FILTER_VALIDATE_URL) === false) {
             static::setInvalidFieldError('source', $validationErrors, Translator::translate('validation.invalidUrl'));
         }
-
-        $brand = static::getBrandConfigurationService()->get();
 
         if (!empty($payload['platform']) && $payload['platform'] !== $brand->platformCode) {
             static::setInvalidFieldError(

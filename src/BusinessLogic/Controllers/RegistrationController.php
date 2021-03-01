@@ -106,10 +106,13 @@ class RegistrationController
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     * @throws \Packlink\BusinessLogic\Brand\Exceptions\PlatformCountryNotSupportedByBrandException
      */
     public function register(array $payload)
     {
-        $payload['platform'] = 'PRO';
+        $brand = $this->getBrandConfigurationService()->get();
+
+        $payload['platform'] = $brand->platformCode;
         $payload['language'] = $this->getLanguage();
 
         if (isset($payload['source'])) {
