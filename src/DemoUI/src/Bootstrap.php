@@ -17,7 +17,9 @@ use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
+use Packlink\Brands\Packlink\PacklinkConfigurationService;
 use Packlink\BusinessLogic\BootstrapComponent;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -27,6 +29,7 @@ use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\User\UserAccountService;
+use Packlink\DemoUI\Brands\Acme\AcmeConfigurationService;
 use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
@@ -112,6 +115,7 @@ class Bootstrap extends BootstrapComponent
         parent::initServices();
 
         static::$instance->initInstanceServices();
+        static::$instance->initBrandService();
     }
 
     /**
@@ -196,5 +200,28 @@ class Bootstrap extends BootstrapComponent
                 return $instance->registrationInfoService;
             }
         );
+    }
+
+    protected function initBrandService()
+    {
+        $brandPlatformCode = getenv('PL_PLATFORM');
+
+        switch ($brandPlatformCode) {
+            case 'PRO':
+                ServiceRegister::registerService(
+                    BrandConfigurationService::CLASS_NAME,
+                    function () {
+                        return new PacklinkConfigurationService();
+                    }
+                );
+                break;
+            case 'ACME':
+                ServiceRegister::registerService(
+                    BrandConfigurationService::CLASS_NAME,
+                    function () {
+                        return new AcmeConfigurationService();
+                    }
+                );
+        }
     }
 }

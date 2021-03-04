@@ -4,3 +4,7 @@ src/Views/PRO/resources/js/
 src/Views/PRO/resources/images/
 src/Views/PRO/resources/css/location/
 src/Views/PRO/resources/css/*
+src/Views/ACME/resources/js/
+src/Views/ACME/resources/images/
+src/Views/ACME/resources/css/location/
+src/Views/ACME/resources/css/*
