@@ -36,13 +36,9 @@ class WarehouseCountryService extends CountryService
     public function getSupportedCountries($associative = true)
     {
         $countries = $this->getBrandConfigurationService()->get()->warehouseCountries;
+        $formattedCountries = $this->formatCountries($countries);
 
-        foreach ($countries as $country) {
-            $country['name'] = Translator::translate('countries.' . $country['code']);
-            $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
-        }
-
-        return $associative ? $countries : array_values($countries);
+        return $associative ? $formattedCountries : array_values($formattedCountries);
     }
 
     /**

@@ -5,6 +5,8 @@ namespace Packlink\BusinessLogic\Country;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Language\Translator;
 
@@ -62,15 +64,32 @@ class CountryService extends BaseService
      */
     public function getSupportedCountries($associative = true)
     {
-        $countries = array();
         $brand = $this->getBrandConfigurationService()->get();
-
-        foreach ($brand->registrationCountries as $country) {
-            $country['name'] = Translator::translate('countries.' . $country['code']);
-            $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
-        }
+        $countries = $this->formatCountries($brand->registrationCountries);
 
         return $associative ? $countries : array_values($countries);
+    }
+
+    /**
+     * Formats country DTOs.
+     *
+     * @param $countries
+     *
+     * @return Country[]
+     *
+     * @throws FrontDtoNotRegisteredException
+     * @throws FrontDtoValidationException
+     */
+    protected function formatCountries($countries)
+    {
+        $formattedCountries = array();
+
+        foreach ($countries as $country) {
+            $country['name'] = Translator::translate('countries.' . $country['code']);
+            $formattedCountries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
+        }
+
+        return $formattedCountries;
     }
 
     /**

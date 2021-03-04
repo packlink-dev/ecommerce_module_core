@@ -8,6 +8,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added additional ISO codes to the postal code transformer.
 - Added missing carrier logos for Italy and Spain.
 
+**BREAKING CHANGES**
+Whitelabel project changes:
+
+## Added
+- Added BrandConfigurationService.
+- Added PacklinkConfigurationService.
+
+### Changed
+- Removed hardcoded source value from ShippingServiceSearch.
+- Removed hardcoded platform code from Proxy, Draft and RegistrationRequest.
+- Removed platform country code from RegisterModalController.js.
+- Added platform_country to RegistrationController:getRegisterData response.
+- RegisterController.js function populateInitialValues() populates platform_country.
+- Registration link and platform country removed from CountryService::$supportedCountries.
+- Removed Packlink\BusinessLogic\Country\RegistrationCountry.
+- Added validation for platform country in RegistrationRequest::doValidate and UserAccountService::initializeUser.
+- Removed $supportedCountries from CountryService and WarehouseCountryService.
+
 ## [3.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.6...v3.1.0) - 2020-12-11
 ### Added
 - Added postal code transformer service that transforms postal code into supported postal code format for some countries.
