@@ -9,7 +9,7 @@ class Composer
     public static function postUpdate()
     {
         $fromBase = __DIR__ . '/../../BusinessLogic/Resources/';
-        $toBase = __DIR__ . '/../src/Views/resources/';
+        $toBase = __DIR__ . '/../src/Views/PRO/resources/';
 
         $map = array(
             $fromBase . 'js' => $toBase . 'js',

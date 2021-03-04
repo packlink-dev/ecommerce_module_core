@@ -3,7 +3,7 @@
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Packlink\DemoUI\Services\Integration\UrlService;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 Configuration::setCurrentLanguage('en');
 $lang = Configuration::getCurrentLanguage() ?: 'en';
@@ -139,7 +139,7 @@ echo $lang ?>">
 
 <script>
     <?php
-    $baseResourcesPath = __DIR__ . '/../../../BusinessLogic/Resources/';
+    $baseResourcesPath = __DIR__ . '/../../../../BusinessLogic/Resources/';
     ?>
     document.addEventListener(
         'DOMContentLoaded',

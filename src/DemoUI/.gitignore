@@ -1,6 +1,6 @@
 # Custom content
 vendor
-src/Views/resources/js/
-src/Views/resources/images/
-src/Views/resources/css/location/
-src/Views/resources/css/*
+src/Views/PRO/resources/js/
+src/Views/PRO/resources/images/
+src/Views/PRO/resources/css/location/
+src/Views/PRO/resources/css/*
