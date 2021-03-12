@@ -9,14 +9,29 @@ class Composer
     public static function postUpdate()
     {
         $fromBase = __DIR__ . '/../../BusinessLogic/Resources/';
-        $toBase = __DIR__ . '/../src/Views/PRO/resources/';
+        $toBasePacklink = __DIR__ . '/../src/Views/PRO/resources/';
+        $toBaseAcme = __DIR__ . '/../src/Views/ACME/resources/';
 
-        $map = array(
-            $fromBase . 'js' => $toBase . 'js',
-            $fromBase . 'css' => $toBase . 'css',
-            $fromBase . 'images' => $toBase . 'images',
-        );
+        static::copy(array(
+            $fromBase . 'js' => $toBasePacklink . 'js',
+            $fromBase . 'css' => $toBasePacklink . 'css',
+            $fromBase . 'images' => $toBasePacklink . 'images',
+        ));
 
+        static::copy( array(
+            $fromBase . 'js' => $toBaseAcme . 'js',
+            $fromBase . 'css' => $toBaseAcme . 'css',
+            $fromBase . 'images' => $toBaseAcme . 'images',
+        ));
+    }
+
+    /**
+     * Copies directories according to data provided by $map parameter.
+     *
+     * @param array $map
+     */
+    private static function copy($map)
+    {
         foreach ($map as $from => $to) {
             self::copyDirectory($from, $to);
         }
