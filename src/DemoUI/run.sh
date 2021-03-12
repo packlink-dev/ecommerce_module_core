@@ -2,11 +2,7 @@
 
 composer install
 
-PL_PLATFORM="$1"
-
-if [ "$PL_PLATFORM" = "" ]; then
-  PL_PLATFORM = "PRO"
-fi
+PL_PLATFORM="${1:-"PRO"}"
 
 export PL_PLATFORM
 
