@@ -11,11 +11,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 **BREAKING CHANGES**
 Whitelabel project changes:
 
-## Added
-- Added BrandConfigurationService.
+### Added
+- Added BrandConfigurationService. Integration should register PacklinkConfigurationService instance for Packlink brand or adequate implementation for other brand(s) during the bootstraping.
 - Added PacklinkConfigurationService.
+- Added FileResolverService. Integration should initialize FileResolverService with an array of folders where source files should be searched for.
 
 ### Changed
+
+Following changes will work properly once BrandConfigurationService is registered in Bootstrap:
 - Removed hardcoded source value from ShippingServiceSearch.
 - Removed hardcoded platform code from Proxy, Draft and RegistrationRequest.
 - Removed platform country code from RegisterModalController.js.

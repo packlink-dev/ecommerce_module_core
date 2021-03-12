@@ -1,0 +1,6 @@
+{
+  "testKey": "testValueFr",
+  "namespace": {
+    "nestedKeyWithPlaceholder": "Nested key fr."
+  }
+}
