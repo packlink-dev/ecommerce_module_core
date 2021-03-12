@@ -192,7 +192,7 @@ class RegistrationController
             'it' => 'it_IT',
         );
 
-        $locale = Configuration::getCurrentLanguage();
+        $locale = Configuration::getUICountryCode();
         $language = 'en_GB';
 
         if (array_key_exists($locale, $supportedLanguages)) {

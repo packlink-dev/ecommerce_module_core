@@ -9,6 +9,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,6 +19,27 @@ use PHPUnit\Framework\TestCase;
  */
 class TranslationServiceTest extends TestCase
 {
+    private static $englishValues = array(
+        'rs' => array(),
+        'en' => array(
+            'testKey' => 'testValueEn 2',
+            'testKey1' => 'testValueEn1',
+            'testKey2' => 'testValueEn2'
+        )
+    );
+    private static $englishAndFrenchValues = array(
+        'fr' => array(
+            'testKey' => 'testValueFr',
+            'namespace' => array(
+                'nestedKeyWithPlaceholder' => 'Nested key fr.'
+            )
+        ),
+        'en' => array(
+            'testKey' => 'testValueEn 2',
+            'testKey1' => 'testValueEn1',
+            'testKey2' => 'testValueEn2'
+        ),
+    );
     private $translationService;
 
     /**
@@ -28,11 +50,17 @@ class TranslationServiceTest extends TestCase
     {
         parent::setUp();
 
-        $baseFilePath = __DIR__ . '/Translations/';
-        $this->translationService = new TestTranslationService($baseFilePath);
+        $fileResolverService = new FileResolverService(
+            array(
+                __DIR__ . '/Translations',
+                __DIR__ . '/../FileResolver/Translations',
+            )
+        );
+
+        $this->translationService = new TestCountryService($fileResolverService);
 
         $configuration = new TestShopConfiguration();
-        Configuration::setCurrentLanguage('de');
+        Configuration::setUICountryCode('de');
 
         new TestServiceRegister(
             array(
@@ -44,12 +72,12 @@ class TranslationServiceTest extends TestCase
     }
 
     /**
-     * Tests translation function when current language is not set in config service.
+     * Tests getText function when current language is not set in config service.
      */
     public function testTranslateCurrentLanguageNotSet()
     {
         $configuration = new TestShopConfiguration();
-        Configuration::setCurrentLanguage(null);
+        Configuration::setUICountryCode(null);
         $logger = new TestShopLogger();
         $timeProvider = new TestTimeProvider();
 
@@ -67,18 +95,18 @@ class TranslationServiceTest extends TestCase
             )
         );
 
-        $translation = $this->translationService->translate('testKey');
+        $translation = $this->translationService->getText('testKey');
 
         $this->assertStringStartsWith('testValueEn', $translation);
     }
 
     /**
-     * Tests translation function when non existing key is tried to be translated for not supported language.
+     * Tests getText function when non existing key is tried to be translated for not supported language.
      */
     public function testTranslateNotSupportedLanguage()
     {
         $configuration = new TestShopConfiguration();
-        Configuration::setCurrentLanguage('rs');
+        Configuration::setUICountryCode('rs');
         $logger = new TestShopLogger();
         $timeProvider = new TestTimeProvider();
 
@@ -96,53 +124,73 @@ class TranslationServiceTest extends TestCase
             )
         );
 
-        $translation = $this->translationService->translate('testKey');
+        $translation = $this->translationService->getText('testKey');
 
         $this->assertStringStartsWith('testValueEn', $translation);
     }
 
     /**
-     * Tests translation function when non existing key is tried to be translated.
+     * Tests getText function when non existing key is tried to be translated.
      */
     public function testTranslateNonExistingKey()
     {
         $nonExistingKey = 'noKey';
-        $translation = $this->translationService->translate($nonExistingKey);
+        $translation = $this->translationService->getText($nonExistingKey);
 
         $this->assertEquals($nonExistingKey, $translation);
     }
 
     /**
-     * Tests translation function when non existing key in current language is tried to be translated. Key exists in the
+     * Tests getText function when non existing key in current language is tried to be translated. Key exists in the
      * fallback language.
      */
     public function testTranslateFallbackToEnglish()
     {
         $key = 'testKey1';
-        $translation = $this->translationService->translate($key);
+        $translation = $this->translationService->getText($key);
 
         $this->assertEquals('testValueEn1', $translation);
     }
 
     /**
-     * Tests translation function when non existing key is tried to be translated.
+     * Tests getText function when non existing key is tried to be translated.
      */
     public function testTranslateToGerman()
     {
         $key = 'testKey';
-        $translation = $this->translationService->translate($key);
+        $translation = $this->translationService->getText($key);
 
         $this->assertEquals('testValueDe', $translation);
     }
 
     /**
-     * Tests translation function with existing nested key with placeholders.
+     * Tests getText function with existing nested key with placeholders.
      */
     public function testTranslateToGermanNestedKeyWithPlaceholders()
     {
         $key = 'namespace.nestedKeyWithPlaceholder';
-        $translation = $this->translationService->translate($key, array(1, 2));
+        $translation = $this->translationService->getText($key, array(1, 2));
 
         $this->assertEquals('Test1 1, test2 2.', $translation);
+    }
+
+    /**
+     * Tests getTranslation function with existing language.
+     */
+    public function testGetTranslations()
+    {
+        $translations = $this->translationService->getTranslations('fr');
+
+        $this->assertEquals(static::$englishAndFrenchValues, $translations);
+    }
+
+    /**
+     * Tests getTranslation function with non existing language.
+     */
+    public function testGetTranslationsWithNonExistingLanguage()
+    {
+        $translations = $this->translationService->getTranslations('rs');
+
+        $this->assertEquals(static::$englishValues, $translations);
     }
 }

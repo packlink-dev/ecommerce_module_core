@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Common;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -23,9 +24,10 @@ use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Language\TranslationService;
+use Packlink\BusinessLogic\Language\CountryService as CountryTranslationService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -116,9 +118,22 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         );
 
         TestServiceRegister::registerService(
-            \Packlink\BusinessLogic\Language\Interfaces\TranslationService::CLASS_NAME,
+            FileResolverService::CLASS_NAME,
             function () {
-                return new TranslationService();
+                return new FileResolverService(
+                    array(
+                        __DIR__ . '/../../../src/BusinessLogic/Resources/countries'
+                    )
+                );
+            }
+        );
+
+        TestServiceRegister::registerService(
+            \Packlink\BusinessLogic\Language\Interfaces\CountryService::CLASS_NAME,
+            function () {
+                $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
+
+                return new CountryTranslationService($fileResolverService);
             }
         );
 

@@ -11,6 +11,10 @@ namespace Packlink\BusinessLogic\FileResolver;
 class FileResolverService
 {
     /**
+     * Class name.
+     */
+    const CLASS_NAME = __CLASS__;
+    /**
      * Array of folders where the source files should be searched for.
      *
      * @var array

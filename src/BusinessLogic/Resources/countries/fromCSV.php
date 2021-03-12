@@ -35,7 +35,7 @@ function fromCsv()
 function exportJson($lang, $data)
 {
     file_put_contents(
-        __DIR__ . "/$lang.json",
+        __DIR__ . "/fromCSV.php",
         str_replace(
             '    ',
             '  ',

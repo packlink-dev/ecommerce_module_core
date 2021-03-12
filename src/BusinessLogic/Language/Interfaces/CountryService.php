@@ -3,11 +3,11 @@
 namespace Packlink\BusinessLogic\Language\Interfaces;
 
 /**
- * Interface TranslationService
+ * Interface CountryService
  *
  * @package Packlink\BusinessLogic\Language\Interfaces
  */
-interface TranslationService
+interface CountryService
 {
     /**
      * Class name.
@@ -28,5 +28,15 @@ interface TranslationService
      *
      * @return string A translated string if translation is found; otherwise, the input key.
      */
-    public function translate($key, array $arguments = array());
+    public function getText($key, array $arguments = array());
+
+    /**
+     * Fetches translations for a specific country (provided by $countryCode parameter)
+     * and default country.
+     *
+     * @param string $countryCode
+     *
+     * @return array
+     */
+    public function getTranslations($countryCode);
 }

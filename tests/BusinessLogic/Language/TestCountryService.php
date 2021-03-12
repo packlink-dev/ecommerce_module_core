@@ -2,18 +2,18 @@
 
 namespace Logeecom\Tests\BusinessLogic\Language;
 
-use Packlink\BusinessLogic\Language\TranslationService;
+use Packlink\BusinessLogic\Language\CountryService;
 
 /**
  * Class TestTranslationService.
  *
  * @package BusinessLogic\Language
  */
-class TestTranslationService extends TranslationService
+class TestCountryService extends CountryService
 {
-    public function __construct($translationsFileBasePath = null)
+    public function __construct($fileResolverService)
     {
-        parent::__construct($translationsFileBasePath);
+        parent::__construct($fileResolverService);
 
         // reset translations for each instance.
         static::$translations = array();

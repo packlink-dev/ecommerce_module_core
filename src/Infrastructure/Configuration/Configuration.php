@@ -63,21 +63,21 @@ abstract class Configuration extends Singleton
     protected $repository;
 
     /**
-     * Retrieves current language.
+     * Retrieves current UI country code.
      *
      * @return string
      */
-    public static function getCurrentLanguage()
+    public static function getUICountryCode()
     {
         return self::$currentLanguage;
     }
 
     /**
-     * Sets current language.
+     * Sets current UI country code.
      *
      * @param string $currentLanguage
      */
-    public static function setCurrentLanguage($currentLanguage)
+    public static function setUICountryCode($currentLanguage)
     {
         self::$currentLanguage = $currentLanguage;
     }

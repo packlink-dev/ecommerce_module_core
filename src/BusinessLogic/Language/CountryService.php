@@ -2,17 +2,16 @@
 
 namespace Packlink\BusinessLogic\Language;
 
-use Exception;
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\Logger\Logger;
-use Packlink\BusinessLogic\Language\Interfaces\TranslationService as BaseService;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
+use Packlink\BusinessLogic\Language\Interfaces\CountryService as BaseService;
 
 /**
- * Class TranslationService.
+ * Class CountryService
  *
  * @package Packlink\BusinessLogic\Language
  */
-class TranslationService implements BaseService
+class CountryService implements BaseService
 {
     /**
      * Default language.
@@ -27,9 +26,9 @@ class TranslationService implements BaseService
     protected static $translations = array();
 
     /**
-     * @var string $translationsFileBasePath
+     * @var FileResolverService
      */
-    protected $translationsFileBasePath;
+    protected $fileResolverService;
 
     /**
      * @var string
@@ -39,15 +38,11 @@ class TranslationService implements BaseService
     /**
      * TranslationService constructor.
      *
-     * @param string|null $translationsFileBasePath
+     * @param FileResolverService $fileResolverService
      */
-    public function __construct($translationsFileBasePath = null)
+    public function __construct(FileResolverService $fileResolverService)
     {
-        $this->translationsFileBasePath = $translationsFileBasePath;
-
-        if (empty($this->translationsFileBasePath)) {
-            $this->translationsFileBasePath = __DIR__ . '/../Resources/lang';
-        }
+        $this->fileResolverService = $fileResolverService;
     }
 
     /**
@@ -64,9 +59,9 @@ class TranslationService implements BaseService
      *
      * @return string A translated string if translation is found; otherwise, the input key.
      */
-    public function translate($key, array $arguments = array())
+    public function getText($key, array $arguments = array())
     {
-        $this->currentLanguage = Configuration::getCurrentLanguage() ?: static::DEFAULT_LANG;
+        $this->currentLanguage = Configuration::getUICountryCode() ?: static::DEFAULT_LANG;
 
         if (empty(static::$translations[$this->currentLanguage])) {
             $this->initializeTranslations();
@@ -86,42 +81,47 @@ class TranslationService implements BaseService
     }
 
     /**
+     * Fetches translations for a specific country (provided by $countryCode parameter)
+     * and default country.
+     *
+     * @param string $countryCode
+     *
+     * @return array
+     */
+    public function getTranslations($countryCode)
+    {
+        $translations[$countryCode] = $this->fileResolverService->getContent($countryCode);
+        $translations[static::DEFAULT_LANG] = $this->fileResolverService->getContent(static::DEFAULT_LANG);
+
+        return $translations;
+    }
+
+    /**
      * Initializes the translations from a file to in-memory map.
      */
     protected function initializeTranslations()
     {
         $languageLowerCase = strtolower($this->currentLanguage);
-        $this->translationsFileBasePath = rtrim($this->translationsFileBasePath, '/') . '/';
-        $translationFilePath = "{$this->translationsFileBasePath}{$languageLowerCase}.json";
-        $this->initializeLanguage($translationFilePath, $this->currentLanguage);
+        $this->initializeLanguage($languageLowerCase);
         $this->initializeFallbackLanguage();
     }
 
     /**
      * Initializes the language to translations dictionary.
      *
-     * @param $translationFilePath
      * @param $language
      */
-    protected function initializeLanguage($translationFilePath, $language)
+    protected function initializeLanguage($language)
     {
-        try {
-            $serializedJson = file_get_contents($translationFilePath);
-        } catch (Exception $ex) {
-            $serializedJson = false;
-            Logger::logWarning($ex->getMessage());
-        }
+        $translations = $this->fileResolverService->getContent($language);
 
-        if ($serializedJson !== false) {
-            $translations = json_decode($serializedJson, true);
-            foreach ($translations as $groupKey => $group) {
-                if (is_array($group)) {
-                    foreach ($group as $key => $value) {
-                        static::$translations[$language][$groupKey . '.' . $key] = $value;
-                    }
-                } else {
-                    static::$translations[$language][$groupKey] = $group;
+        foreach ($translations as $groupKey => $group) {
+            if (is_array($group)) {
+                foreach ($group as $key => $value) {
+                    static::$translations[$language][$groupKey . '.' . $key] = $value;
                 }
+            } else {
+                static::$translations[$language][$groupKey] = $group;
             }
         }
     }
@@ -132,9 +132,7 @@ class TranslationService implements BaseService
     protected function initializeFallbackLanguage()
     {
         if (strtolower($this->currentLanguage) !== static::DEFAULT_LANG) {
-            $defaultLang = static::DEFAULT_LANG;
-            $translationFilePath = "{$this->translationsFileBasePath}{$defaultLang}.json";
-            $this->initializeLanguage($translationFilePath, static::DEFAULT_LANG);
+            $this->initializeLanguage(static::DEFAULT_LANG);
         }
     }
 

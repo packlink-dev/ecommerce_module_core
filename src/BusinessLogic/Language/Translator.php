@@ -3,7 +3,7 @@
 namespace Packlink\BusinessLogic\Language;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Language\Interfaces\TranslationService as TranslationServiceInterface;
+use Packlink\BusinessLogic\Language\Interfaces\CountryService as TranslationServiceInterface;
 
 /**
  * Class Translator.
@@ -27,7 +27,7 @@ class Translator
      */
     public static function translate($key, array $arguments = array())
     {
-        return static::getTranslationService()->translate($key, $arguments);
+        return static::getTranslationService()->getText($key, $arguments);
     }
 
     /**

@@ -5,8 +5,8 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-Configuration::setCurrentLanguage('en');
-$lang = Configuration::getCurrentLanguage() ?: 'en';
+Configuration::setUICountryCode('en');
+$lang = Configuration::getUICountryCode() ?: 'en';
 
 function getUrl($controller, $action)
 {
@@ -145,8 +145,8 @@ echo $lang ?>">
         'DOMContentLoaded',
         () => {
             Packlink.translations = {
-                default: <?php echo file_get_contents($baseResourcesPath . 'lang/en.json') ?>,
-                current: <?php $langFile = $baseResourcesPath . 'lang/' . $lang . '.json';
+                default: <?php echo file_get_contents($baseResourcesPath . 'countries/en.json') ?>,
+                current: <?php $langFile = $baseResourcesPath . 'countries/' . $lang . '.json';
                 echo file_exists($langFile) ? file_get_contents($langFile) : ''
                 ?>,
             };

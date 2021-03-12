@@ -15,8 +15,14 @@ Whitelabel project changes:
 - Added BrandConfigurationService. Integration should register PacklinkConfigurationService instance for Packlink brand or adequate implementation for other brand(s) during the bootstraping.
 - Added PacklinkConfigurationService.
 - Added FileResolverService. Integration should initialize FileResolverService with an array of folders where source files should be searched for.
+- Added new method getTranslations to \Packlink\BusinessLogic\Language\TranslationService (service renamed to CountryService).
 
 ### Changed
+
+- \Packlink\BusinessLogic\Language\TranslationService renamed to CountryService.
+- TranslationService::translate renamed to CountryService::getText.
+- Files from Resources/lang moved to Resources/countries. In integration, change path to translations to fit new folder names in core.
+- Configuration::getCurrentLanguage and Configuration::setCurrentLanguage changed to Configuration::getUICountryCode and Configuration::setUICountryCode.
 
 Following changes will work properly once BrandConfigurationService is registered in Bootstrap:
 - Removed hardcoded source value from ShippingServiceSearch.
