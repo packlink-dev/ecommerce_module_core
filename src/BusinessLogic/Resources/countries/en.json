@@ -89,6 +89,8 @@
     "monthlyShipmentVolume": "What is your monthly shipment volume?",
     "phone": "Phone number",
     "termsAndConditions": "<pre>I accept the <a href=\"%s\" target=\"_blank\">Terms of Service</a> and the <a href=\"%s\" target=\"_blank\">Privacy Policy</a> of Packlink</pre>",
+    "termsAndConditionsUrl": "https://support-pro.packlink.com/hc/en-gb/articles/360010011480",
+    "privacyPolicyUrl": "https://support-pro.packlink.com/hc/en-gb/articles/360010011560",
     "marketingEmails": "I authorise Packlink Shipping S.L. to send me commercial communications by e-mail",
     "submit": "Register",
     "chooseYourCountry": "Choose your country",
@@ -151,7 +153,10 @@
     "parcel": "Default parcel",
     "help": "Help",
     "contactUs": "Contact us at:",
-    "systemInfo": "System information"
+    "systemInfo": "System information",
+    "helpUrl": "https://support-pro.packlink.com/hc/en-gb",
+    "contactUrl": "business@packlink.com",
+    "contactUrlMail": "mailto::business@packlink.com"
   },
   "systemInfo": {
     "title": "System information file <br>and debug mode",
@@ -288,7 +293,8 @@
     "bulkFailCreateFail": "Unable to create bulk labels file",
     "draftOrderDelayed": "Creation of the draft is delayed",
     "completeServicesSetup": "You need to complete the services setup to create order draft.",
-    "sendWithPacklink": "Send with Packlink"
+    "sendWithPacklink": "Send with Packlink",
+    "shipmentUrl": "https://pro.packlink.en/private/shipments/"
   },
   "checkoutProcess": {
     "choseDropOffLocation": "This shipping service supports delivery to pre-defined drop-off locations. Please choose location that suits you the most by clicking on the \"Select drop-off location\" button.",

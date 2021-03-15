@@ -33,24 +33,6 @@ class CountryService extends BaseService
      * @var BrandConfigurationService
      */
     protected $brandConfigurationService;
-    /**
-     * List of four default countries.
-     *
-     * @var array
-     */
-    protected static $baseCountries = array('ES', 'DE', 'FR', 'IT');
-
-    /**
-     * Checks if given country is one of the four base countries ('ES', 'DE', 'FR', 'IT').
-     *
-     * @param string $countryCode Country ISO-2 code.
-     *
-     * @return bool
-     */
-    public function isBaseCountry($countryCode)
-    {
-        return in_array(strtoupper($countryCode), static::$baseCountries, true);
-    }
 
     /**
      * Returns a list of supported country DTOs.

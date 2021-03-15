@@ -89,6 +89,8 @@
     "monthlyShipmentVolume": "Quante spedizioni fai solitamente al mese?",
     "phone": "Numero di telefono",
     "termsAndConditions": "<pre>Accetto i <a href=\"%s\" target=\"_blank\">Termini del servizio</a> e l’<a href=\"%s\" target=\"_blank\">Informativa sulla privacy</a> di Packlink</pre>",
+    "termsAndConditionsUrl": "https://pro.packlink.it/termini-condizioni/",
+    "privacyPolicyUrl": "https://support-pro.packlink.com/hc/it/articles/360010011560-Politica-di-Privacy",
     "marketingEmails": "Autorizzo Packlink Shipping S.L. a inviarmi comunicazioni commerciali via email",
     "submit": "Registrati",
     "chooseYourCountry": "Scegli il paese",
@@ -151,7 +153,10 @@
     "parcel": "Pacco predefinito",
     "help": "Aiuto",
     "contactUs": "Contattaci:",
-    "systemInfo": "Informazioni del sistema"
+    "systemInfo": "Informazioni del sistema",
+    "helpUrl": "https://support-pro.packlink.com/hc/it",
+    "contactUrl": "business@packlink.com",
+    "contactUrlMail": "mailto::business@packlink.com"
   },
   "systemInfo": {
     "title": "File di informazioni del sistema <br>e modalità debug",
@@ -288,7 +293,8 @@
     "bulkFailCreateFail": "Impossibile creare il file di etichette in blocco",
     "draftOrderDelayed": "La creazione della bozza è stata ritardata",
     "completeServicesSetup": "You need to complete the services setup to create order draft.",
-    "sendWithPacklink": "Send with Packlink"
+    "sendWithPacklink": "Send with Packlink",
+    "shipmentUrl": "https://pro.packlink.it/private/shipments/"
   },
   "checkoutProcess": {
     "choseDropOffLocation": "Questo servizio di spedizione supporta la consegna a punti corriere predefiniti. Scegli la località più adatta a te, facendo clic sul pulsante \"Seleziona punto corriere\".",

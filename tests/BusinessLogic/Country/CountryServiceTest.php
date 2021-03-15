@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Country;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Packlink\BusinessLogic\Country\CountryService;
@@ -15,6 +16,7 @@ class CountryServiceTest extends BaseTestWithServices
 {
     public function testGetSupportedCountries()
     {
+        Configuration::setUICountryCode('en');
         /** @var CountryService $service */
         $service = ServiceRegister::getService(CountryService::CLASS_NAME);
 

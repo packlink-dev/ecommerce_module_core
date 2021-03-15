@@ -89,6 +89,8 @@
     "monthlyShipmentVolume": "Wie hoch ist Ihr monatliches Sendungsaufkommen?",
     "phone": "Telefonnummer",
     "termsAndConditions": "<pre>Ich akzeptiere die <a href=\"%s\" target=\"_blank\">Nutzungsbedingungen</a> und die <a href=\"%s\" target=\"_blank\">Datenschutzerklärung</a> von Packlink</pre>",
+    "termsAndConditionsUrl": "https://pro.packlink.de/agb/",
+    "privacyPolicyUrl": "https://support-pro.packlink.com/hc/de/articles/360010011560-Datenschutzerkl%%C3%%A4rung-der-Packlink-Shipping-S-L-",
     "marketingEmails": "Ich ermächtige Packlink Shipping S.L., mir kommerzielle Mitteilungen per E-Mail zuzusenden",
     "submit": "Registrieren",
     "chooseYourCountry": "Wählen Sie Ihr Land aus",
@@ -151,7 +153,10 @@
     "parcel": "Standardpaket",
     "help": "Hilfe",
     "contactUs": "Kontaktieren Sie uns:",
-    "systemInfo": "Systeminformationen"
+    "systemInfo": "Systeminformationen",
+    "helpUrl": "https://support-pro.packlink.com/hc/de",
+    "contactUrl": "business@packlink.com",
+    "contactUrlMail": "mailto::business@packlink.com"
   },
   "systemInfo": {
     "title": "Systeminfodatei <br>und debug mode",
@@ -288,7 +293,8 @@
     "bulkFailCreateFail": "Die Datei der Versandetiketten konnte nicht erstellt werden",
     "draftOrderDelayed": "Die Erstellung des Entwurfs verzögert sich",
     "completeServicesSetup": "You need to complete the services setup to create order draft.",
-    "sendWithPacklink": "Send with Packlink"
+    "sendWithPacklink": "Send with Packlink",
+    "shipmentUrl": "https://pro.packlink.de/private/shipments/"
   },
   "checkoutProcess": {
     "choseDropOffLocation": "Dieser Versanddienst unterstützt die Zustellung an vordefinierte Abgabestellen. Bitte wählen Sie den für Sie günstigsten Ort aus, indem Sie auf \"Abgabestelle auswählen\" klicken.",

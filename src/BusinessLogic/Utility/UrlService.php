@@ -26,9 +26,9 @@ class UrlService
         $userInfo = $configService->getUserInfo();
         $currentLang = $configService::getUICountryCode();
 
-        if ($userInfo !== null && in_array($userInfo->country, array('ES', 'DE', 'FR', 'IT'), true)) {
+        if ($userInfo !== null) {
             $locale = $userInfo->country;
-        } elseif (in_array(strtoupper($currentLang), array('ES', 'DE', 'FR', 'IT'), true)) {
+        } elseif ($currentLang) {
             $locale = strtoupper($currentLang);
         }
 

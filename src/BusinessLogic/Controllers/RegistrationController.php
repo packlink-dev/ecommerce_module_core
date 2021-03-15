@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\Language\Interfaces\CountryService;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
@@ -26,45 +27,9 @@ class RegistrationController
      */
     protected $brandConfigurationService;
     /**
-     * List of terms and conditions URLs for different country codes.
-     *
-     * @var array
+     * @var CountryService
      */
-    private static $termsAndConditionsUrls = array(
-        'EN' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
-        'ES' => 'https://pro.packlink.es/terminos-y-condiciones/',
-        'DE' => 'https://pro.packlink.de/agb/',
-        'FR' => 'https://pro.packlink.fr/conditions-generales/',
-        'IT' => 'https://pro.packlink.it/termini-condizioni/',
-        'AT' => 'https://support-pro.packlink.com/hc/de/articles/360010011480',
-        'NL' => 'https://support-pro.packlink.com/hc/nl/articles/360010011480',
-        'BE' => 'https://support-pro.packlink.com/hc/nl/articles/360010011480',
-        'PT' => 'https://support-pro.packlink.com/hc/pt/articles/360010011480',
-        'TR' => 'https://support-pro.packlink.com/hc/tr/articles/360010011480',
-        'IE' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
-        'GB' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011480',
-        'HU' => 'https://support-pro.packlink.com/hc/hu/articles/360010011480',
-    );
-    /**
-     * List of terms and conditions URLs for different country codes.
-     *
-     * @var array
-     */
-    private static $privacyPolicyUrls = array(
-        'EN' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'ES' => 'https://support-pro.packlink.com/hc/es-es/articles/360010011560-Pol%C3%ADtica-de-Privacidad',
-        'DE' => 'https://support-pro.packlink.com/hc/de/articles/360010011560-Datenschutzerkl%C3%A4rung-der-Packlink-Shipping-S-L-',
-        'FR' => 'https://support-pro.packlink.com/hc/fr-fr/articles/360010011560-Politique-de-confidentialit%C3%A9',
-        'IT' => 'https://support-pro.packlink.com/hc/it/articles/360010011560-Politica-di-Privacy',
-        'AT' => 'https://support-pro.packlink.com/hc/de/articles/360010011480',
-        'NL' => 'https://support-pro.packlink.com/hc/nl/articles/360010011560',
-        'BE' => 'https://support-pro.packlink.com/hc/nl/articles/360010011560',
-        'PT' => 'https://support-pro.packlink.com/hc/pt/articles/360010011560',
-        'TR' => 'https://support-pro.packlink.com/hc/tr/articles/360010011560',
-        'IE' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'GB' => 'https://support-pro.packlink.com/hc/en-gb/articles/360010011560',
-        'HU' => 'https://support-pro.packlink.com/hc/hu/articles/360010011560',
-    );
+    protected $countryService;
 
     /**
      * Gets the data needed for a registration page.
@@ -75,6 +40,7 @@ class RegistrationController
      */
     public function getRegisterData($country)
     {
+        Configuration::setUICountryCode(strtolower($country));
         /** @var RegistrationInfoService $registrationInfoService */
         $registrationInfoService = ServiceRegister::getService(RegistrationInfoService::CLASS_NAME);
         $registrationData = $registrationInfoService->getRegistrationInfoData();
@@ -86,10 +52,8 @@ class RegistrationController
             'email' => $registrationData->getEmail(),
             'phone' => $registrationData->getPhone(),
             'source' => $registrationData->getSource(),
-            'termsAndConditionsUrl' => !empty(self::$termsAndConditionsUrls[$country]) ?
-                self::$termsAndConditionsUrls[$country] : self::$termsAndConditionsUrls[self::DEFAULT_COUNTRY],
-            'privacyPolicyUrl' => !empty(self::$privacyPolicyUrls[$country]) ?
-                self::$privacyPolicyUrls[$country] : self::$privacyPolicyUrls[self::DEFAULT_COUNTRY],
+            'termsAndConditionsUrl' => $this->getCountryService()->getText('register.termsAndConditionsUrl'),
+            'privacyPolicyUrl' => $this->getCountryService()->getText('register.privacyPolicyUrl'),
             'platform_country' => in_array($country, $brand->platformCountries, true) ?
                 $country : $brand->platformCountries[0],
         );
@@ -175,6 +139,20 @@ class RegistrationController
         }
 
         return $this->brandConfigurationService;
+    }
+
+    /**
+     * Returns an instance of country service.
+     *
+     * @return CountryService
+     */
+    protected function getCountryService()
+    {
+        if ($this->countryService === null) {
+            $this->countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        }
+
+        return $this->countryService;
     }
 
     /**
