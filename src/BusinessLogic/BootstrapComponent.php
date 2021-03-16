@@ -175,6 +175,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             function () {
                 return new FileResolverService(
                     array(
+                        __DIR__ . '/../Brands/Packlink/Resources/countries',
                         __DIR__ . '/Resources/countries',
                     )
                 );

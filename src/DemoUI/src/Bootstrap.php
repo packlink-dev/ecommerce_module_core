@@ -21,6 +21,7 @@ use Packlink\Brands\Packlink\PacklinkConfigurationService;
 use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
@@ -198,6 +199,18 @@ class Bootstrap extends BootstrapComponent
             RegistrationInfoService::CLASS_NAME,
             function () use ($instance) {
                 return $instance->registrationInfoService;
+            }
+        );
+
+        ServiceRegister::registerService(
+            FileResolverService::CLASS_NAME,
+            function () {
+                return new FileResolverService(
+                    array(
+                        __DIR__ . '/../../Brands/Packlink/Resources/countries',
+                        __DIR__ . '/../../BusinessLogic/Resources/countries',
+                    )
+                );
             }
         );
     }

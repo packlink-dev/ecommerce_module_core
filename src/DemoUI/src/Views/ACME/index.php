@@ -1,6 +1,7 @@
 <?php
 
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
@@ -11,6 +12,18 @@ $lang = Configuration::getUICountryCode() ?: 'en';
 function getUrl($controller, $action)
 {
     echo UrlService::getEndpointUrl($controller, $action);
+}
+
+function getTranslations($language)
+{
+    $fileResolver = new FileResolverService(
+        array(
+            __DIR__ . '/../../../../BusinessLogic/Resources/countries',
+            __DIR__ . '/../../../../Brands/Packlink/Resources/countries',
+        )
+    );
+
+    echo json_encode($fileResolver->getContent($language));
 }
 
 ?>
@@ -145,10 +158,8 @@ echo $lang ?>">
         'DOMContentLoaded',
         () => {
             Packlink.translations = {
-                default: <?php echo file_get_contents($baseResourcesPath . 'countries/en.json') ?>,
-                current: <?php $langFile = $baseResourcesPath . 'countries/' . $lang . '.json';
-                echo file_exists($langFile) ? file_get_contents($langFile) : ''
-                ?>,
+                default: <?php getTranslations('en') ?>,
+                current: <?php getTranslations($lang); ?>,
             };
 
             const pageConfiguration = {
