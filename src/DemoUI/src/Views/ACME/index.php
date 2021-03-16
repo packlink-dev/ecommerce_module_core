@@ -19,7 +19,7 @@ function getTranslations($language)
     $fileResolver = new FileResolverService(
         array(
             __DIR__ . '/../../../../BusinessLogic/Resources/countries',
-            __DIR__ . '/../../../../Brands/Packlink/Resources/countries',
+            __DIR__ . '/../../Brands/Acme/Resources/countries',
         )
     );
 

@@ -22,6 +22,7 @@ use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
+use Packlink\BusinessLogic\Language\Interfaces\CountryService;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
@@ -116,7 +117,7 @@ class Bootstrap extends BootstrapComponent
         parent::initServices();
 
         static::$instance->initInstanceServices();
-        static::$instance->initBrandService();
+        static::$instance->initBrandDependentServices();
     }
 
     /**
@@ -201,21 +202,9 @@ class Bootstrap extends BootstrapComponent
                 return $instance->registrationInfoService;
             }
         );
-
-        ServiceRegister::registerService(
-            FileResolverService::CLASS_NAME,
-            function () {
-                return new FileResolverService(
-                    array(
-                        __DIR__ . '/../../Brands/Packlink/Resources/countries',
-                        __DIR__ . '/../../BusinessLogic/Resources/countries',
-                    )
-                );
-            }
-        );
     }
 
-    protected function initBrandService()
+    protected function initBrandDependentServices()
     {
         $brandPlatformCode = getenv('PL_PLATFORM');
 
@@ -227,6 +216,18 @@ class Bootstrap extends BootstrapComponent
                         return new PacklinkConfigurationService();
                     }
                 );
+
+                ServiceRegister::registerService(
+                    FileResolverService::CLASS_NAME,
+                    function () {
+                        return new FileResolverService(
+                            array(
+                                __DIR__ . '/../../BusinessLogic/Resources/countries',
+                                __DIR__ . '/../../Brands/Packlink/Resources/countries',
+                            )
+                        );
+                    }
+                );
                 break;
             case 'ACME':
                 ServiceRegister::registerService(
@@ -235,6 +236,28 @@ class Bootstrap extends BootstrapComponent
                         return new AcmeConfigurationService();
                     }
                 );
+
+                ServiceRegister::registerService(
+                    FileResolverService::CLASS_NAME,
+                    function () {
+                        return new FileResolverService(
+                            array(
+                                __DIR__ . '/../../BusinessLogic/Resources/countries',
+                                __DIR__ . '/Brands/Acme/Resources/countries',
+                            )
+                        );
+                    }
+                );
         }
+
+        ServiceRegister::registerService(
+            CountryService::CLASS_NAME,
+            function () {
+                /** @var FileResolverService $fileResolverService */
+                $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
+
+                return new \Packlink\BusinessLogic\Language\CountryService($fileResolverService);
+            }
+        );
     }
 }
