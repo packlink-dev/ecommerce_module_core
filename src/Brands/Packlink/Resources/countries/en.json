@@ -1,0 +1,57 @@
+{
+  "general": {
+    "packlinkPro": "Packlink PRO Shipping",
+    "saveUp": "Save up to 70% on your shipping costs. No fixed fees, no minimum shipping volume required. Manage all your shipments in a single platform.",
+    "packlinkShipping": "Packlink Shipping S.L.",
+    "noContract": "No contract needed! More than 300 transport services into a single platform. You can connect all your ecommerce and manage all your shipments in Packlink PRO.",
+    "developedAndManaged": "Developed and managed by Packlink"
+  },
+  "login": {
+    "welcome": "Welcome to Packlink PRO",
+    "connectYourService": "Connect your service using your key. You'll find it in the <br><strong>\"Packlink Pro API Key\"</strong> section of the <strong>\"Settings\"</strong>."
+  },
+  "register": {
+    "startEnjoying": "Start enjoying Packlink PRO!",
+    "termsAndConditions": "<pre>I accept the <a href=\"%s\" target=\"_blank\">Terms of Service</a> and the <a href=\"%s\" target=\"_blank\">Privacy Policy</a> of Packlink</pre>",
+    "termsAndConditionsUrl": "https://support-pro.packlink.com/hc/en-gb/articles/360010011480",
+    "privacyPolicyUrl": "https://support-pro.packlink.com/hc/en-gb/articles/360010011560",
+    "marketingEmails": "I authorise Packlink Shipping S.L. to send me commercial communications by e-mail"
+  },
+  "configuration": {
+    "helpUrl": "https://support-pro.packlink.com/hc/en-gb",
+    "contactUrl": "business@packlink.com",
+    "contactUrlMail": "mailto::business@packlink.com"
+  },
+  "orderStatusMapping": {
+    "description": "With Packlink you can update your %s order status with shipping information. <br>You can edit it at any time.",
+    "packlinkProShipmentStatus": "Packlink PRO <strong>SHIPMENT</strong> STATUS"
+  },
+  "shippingServices": {
+    "packlinkPrices": "Packlink prices",
+    "pricePolicyDescription": "The default <strong>will be Packlink's basic prices.</strong> But you can configure these in a more precise way below.",
+    "packlinkPrice": "Packlink Price",
+    "percentagePacklinkPrices": "% of Packlink prices",
+    "percentagePacklinkPricesWithData": "% of Packlink prices: %s by %s%",
+    "usePacklinkRange": "For all other ranges, apply Packlink prices"
+  },
+  "orderListAndDetails": {
+    "packlinkOrderDraft": "Packlink order draft",
+    "printShipmentLabels": "Print Packlink PRO Shipment Labels",
+    "packlinkReferenceNumber": "Packlink reference number",
+    "packlinkShippingPrice": "Packlink shipping price",
+    "viewOnPacklink": "View on Packlink PRO",
+    "draftIsBeingCreated": "Draft is currently being created in Packlink PRO",
+    "createOrderDraft": "Create order draft in Packlink PRO",
+    "packlinkShipping": "Packlink Shipping",
+    "sendWithPacklink": "Send with Packlink",
+    "shipmentUrl": "https://pro.packlink.en/private/shipments/"
+  },
+  "systemLogMessages": {
+    "webhookReceived": "Webhook from Packlink received."
+  },
+  "autoTest": {
+    "moduleAutoTest": "PacklinkPRO module auto-test",
+    "useThisPageTestConfiguration": "Use this page to test the system configuration and PacklinkPRO module services.",
+    "openModule": "Open PacklinkPRO module"
+  }
+}
