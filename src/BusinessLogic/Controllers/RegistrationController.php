@@ -92,6 +92,7 @@ class RegistrationController
      * @param array $payload
      *
      * @return bool A flag indicating whether the registration was successful.
+     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
@@ -101,7 +102,7 @@ class RegistrationController
     public function register(array $payload)
     {
         $payload['platform'] = 'PRO';
-        $payload['language'] = $this->getLanguage();
+        $payload['language'] = $this->getLanguage($payload['platform_country']);
 
         if (isset($payload['source'])) {
             $payload['source'] = 'https://' . str_replace(array('http://', 'https://'), '', $payload['source']);
@@ -152,25 +153,25 @@ class RegistrationController
     }
 
     /**
-     * Returns shop language in format which Packlink expects.
+     * Returns shop language in format which Packlink expects, based on user's platform country.
+     *
+     * @param string $platformCountry
      *
      * @return string
      */
-    private function getLanguage()
+    private function getLanguage($platformCountry)
     {
         $supportedLanguages = array(
-            'en' => 'en_GB',
-            'es' => 'es_ES',
-            'de' => 'de_DE',
-            'fr' => 'fr_FR',
-            'it' => 'it_IT',
+            'ES' => 'es_ES',
+            'DE' => 'de_DE',
+            'FR' => 'fr_FR',
+            'IT' => 'it_IT',
         );
 
-        $locale = Configuration::getCurrentLanguage();
         $language = 'en_GB';
 
-        if (array_key_exists($locale, $supportedLanguages)) {
-            $language = $supportedLanguages[$locale];
+        if (array_key_exists($platformCountry, $supportedLanguages)) {
+            $language = $supportedLanguages[$platformCountry];
         }
 
         return $language;

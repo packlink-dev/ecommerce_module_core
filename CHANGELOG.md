@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added additional ISO codes to the postal code transformer.
 - Added missing carrier logos for Italy and Spain.
 
+### Changed
+- Changed setting the language based on user's platform country instead of current shop language during the registration process.
+
 ## [3.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.6...v3.1.0) - 2020-12-11
 ### Added
 - Added postal code transformer service that transforms postal code into supported postal code format for some countries.
