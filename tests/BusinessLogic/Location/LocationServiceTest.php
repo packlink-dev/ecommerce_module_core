@@ -166,37 +166,6 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEmpty($locations);
     }
 
-    public function testGetLocationsForInvalidPostalCode()
-    {
-        $this->initShippingMethod(true);
-        $this->initWarehouse();
-
-        /** @var LocationService $locationService */
-        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
-        $locations = $locationService->getLocations(1, 'NL', '1011ASZ');
-
-        $this->assertEmpty($locations);
-    }
-
-    public function testGetLocationsForTransformedPostalCode()
-    {
-        $this->httpClient->setMockResponses(array(
-                new HttpResponse(
-                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-NL.json')
-                ),
-            )
-        );
-
-        $this->initShippingMethod(true);
-        $this->initWarehouse();
-
-        /** @var LocationService $locationService */
-        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
-        $locations = $locationService->getLocations(1, 'NL', '1011AS');
-
-        $this->assertEmpty($locations);
-    }
-
     /**
      * @expectedException \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
      *
