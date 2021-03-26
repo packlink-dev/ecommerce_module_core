@@ -570,6 +570,30 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         self::assertEmpty($this->shippingMethodService->getShippingCosts('', '', '', '', array(), 10));
     }
 
+    public function testCostCalculationForInvalidDestinationPostalCode()
+    {
+        $packages = array(Package::defaultPackage());
+
+        self::assertEmpty($this->shippingMethodService->getShippingCosts('IT', '00118', 'US', '10018-00056', $packages, 10));
+    }
+
+    public function testCostCalculationForInvalidTransformedPostalCode()
+    {
+        $this->httpClient->setMockResponses(array(
+                new HttpResponse(
+                    400, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/locationNotValid.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-US.json')
+                ),
+            )
+        );
+
+        $packages = array(Package::defaultPackage());
+
+        self::assertEmpty($this->shippingMethodService->getShippingCosts('IT', '00118', 'US', '10018-0005', $packages, 10));
+    }
+
     public function testCostCalculationForUnknownDepartureAndDestination()
     {
         $this->httpClient->setMockResponses(array(new HttpResponse(400, array(), '')));
