@@ -1,0 +1,101 @@
+<div class="pl-center pl-full-width pl-flex-expand pl-no-shrink">
+    <form id="pl-pricing-policy-form">
+        <section>
+            <div class="pl-section-title pl-text-left" id="pl-pricing-policy-title"></div>
+            <div class="pl-top-separate pl-text-left">
+                {$shippingServices.rangeTypeExplanation}
+            </div>
+            <div class="pl-form-group">
+                <select name="range_type" id="pl-range-type-select" data-required="true">
+                    <option value="0">{$shippingServices.priceRange}</option>
+                    <option value="1">{$shippingServices.weightRange}</option>
+                    <option value="2">{$shippingServices.weightAndPriceRange}</option>
+                </select>
+                <i class="material-icons">expand_more</i>
+                <label for="pl-range-type-select" class="pl-text-input-label">
+                    {$shippingServices.rangeType}
+                </label>
+            </div>
+            <div class="pl-form-group-wrapper pl-last-child-border-none" id="pl-from-to-weight-wrapper">
+                <div class="pl-form-group pl-half-width">
+                    <input type="text" id="pl-from-weight" name="from_weight" placeholder="0"
+                           data-type="number" data-validation-rule="nonNegative" data-required="true"/>
+                    <label for="pl-from-weight">
+                        {$shippingServices.from} (kg)
+                    </label>
+                </div>
+                <div class="pl-form-group pl-half-width">
+                    <input type="text" id="pl-to-weight" name="to_weight" placeholder="1"
+                           data-type="number" data-validation-rule="nonNegative"/>
+                    <label for="pl-to-weight">
+                        {$shippingServices.to} (kg)
+                    </label>
+                </div>
+            </div>
+            <div class="pl-form-group-wrapper pl-last-child-border-none" id="pl-from-to-price-wrapper">
+                <div class="pl-form-group pl-half-width">
+                    <input type="text" id="pl-from-price" name="from_price" placeholder="0"
+                           data-type="number" data-validation-rule="nonNegative" data-required="true"/>
+                    <label for="pl-from-price">
+                        {$shippingServices.from} (€)
+                    </label>
+                </div>
+                <div class="pl-form-group pl-half-width">
+                    <input type="text" id="pl-to-price" name="to_price" placeholder="1"
+                           data-type="number" data-validation-rule="nonNegative"/>
+                    <label for="pl-to-price">
+                        {$shippingServices.to} (€)
+                    </label>
+                </div>
+            </div>
+            <div class="pl-top-separate pl-text-left">
+                {$shippingServices.pricePolicyExplanation}
+            </div>
+            <div class="pl-form-group">
+                <select name="pricing_policy" id="pl-pricing-policy-select" data-required="true">
+                    <option value="0">{$shippingServices.packlinkPrice}</option>
+                    <option value="1">{$shippingServices.percentagePacklinkPrices}</option>
+                    <option value="2">{$shippingServices.fixedPrices}</option>
+                </select>
+                <i class="material-icons">expand_more</i>
+                <label for="pl-pricing-policy-select" class="pl-text-input-label">
+                    {$shippingServices.pricePolicy}
+                </label>
+            </div>
+            <div class="pl-form-group" id="pl-price-percentage-wrapper">
+                <div>{$shippingServices.increaseExplanation}</div>
+                <div>{$shippingServices.reduceExplanation}</div>
+                <div class="pl-form-group-wrapper pl-full-width">
+                    <div class="pl-button-group pl-half-width">
+                        <button id="pl-price-percentage-increase"
+                                class="pl-button pl-button-primary pl-no-margin pl-half-width">
+                            {$shippingServices.increase}
+                        </button>
+                        <button id="pl-price-percentage-decrease"
+                                class="pl-button pl-button-secondary pl-no-margin pl-half-width">
+                            {$shippingServices.reduce}
+                        </button>
+                    </div>
+                    <input type="hidden" name="increase" id="pl-increase" checked>
+                    <div class="pl-form-group pl-change-percent-wrapper pl-half-width">
+                        <input type="text" id="pl-change-percent" name="change_percent" placeholder="5"
+                               class="pl-left-separate"
+                               data-type="number" data-validation-rule="nonNegative" data-required="true"/>
+                        <label for="pl-change-percent">
+                            {$shippingServices.select} (%)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="pl-form-group" id="pl-price-fixed-wrapper">
+                <div class="pl-form-group pl-half-width">
+                    <input type="text" id="pl-fixed-price" name="fixed_price" placeholder="5"
+                           data-type="number" data-validation-rule="nonNegative"/>
+                    <label for="pl-fixed-price">
+                        {$shippingServices.price} (€)
+                    </label>
+                </div>
+            </div>
+        </section>
+    </form>
+</div>

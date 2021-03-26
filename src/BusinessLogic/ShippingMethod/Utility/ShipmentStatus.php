@@ -61,10 +61,29 @@ class ShipmentStatus
             case 'CARRIER_PENDING':
             case 'RETRY':
                 return self::STATUS_ACCEPTED;
+            case 'CANCELED':
+                return self::STATUS_CANCELLED;
             case 'AWAITING_COMPLETION':
             case 'READY_TO_PURCHASE':
             default:
                 return self::STATUS_PENDING;
         }
+    }
+
+    /**
+     * Gets possible shipment statuses.
+     *
+     * @return string[]
+     */
+    public static function getPossibleStatuses()
+    {
+        return array(
+            self::STATUS_PENDING,
+            self::STATUS_ACCEPTED,
+            self::STATUS_READY,
+            self::STATUS_IN_TRANSIT,
+            self::STATUS_DELIVERED,
+            self::STATUS_CANCELLED,
+        );
     }
 }

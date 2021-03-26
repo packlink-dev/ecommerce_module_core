@@ -21,6 +21,8 @@ use Logeecom\Infrastructure\TaskExecution\QueueService;
  */
 class AutoTestService
 {
+    const CLASS_NAME = __CLASS__;
+
     /**
      * Configuration service instance.
      *

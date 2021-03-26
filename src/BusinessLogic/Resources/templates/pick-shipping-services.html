@@ -1,0 +1,76 @@
+<div class="pl-pick-shipping-services-page pl-page-config">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <div class="pl-row-orientation pl-separate-content pl-full-width">
+            <h1>{$shippingServices.pickShippingService}</h1>
+            <button id="pl-open-filter-button" class="pl-icon-button">
+                <i class="material-icons">filter_alt</i>
+            </button>
+        </div>
+    </header>
+    <div class="pl-flex-left pl-page-content pl-no-margin" id="pl-shipping-services-wrapper">
+        <div class="pl-services-filter-wrapper">
+            <div class="pl-filter">
+                <div class="pl-filter-title">
+                    {$shippingServices.type}
+                </div>
+                <div class="pl-filter-options">
+                    <div class="pl-filter-option" data-filter="type" data-option="national">
+                        {$shippingServices.national}
+                    </div>
+                    <div class="pl-filter-option" data-filter="type" data-option="international">
+                        {$shippingServices.international}
+                    </div>
+                </div>
+            </div>
+            <div class="pl-filter">
+                <div class="pl-filter-title">
+                    {$shippingServices.deliveryType}
+                </div>
+                <div class="pl-filter-options">
+                    <div class="pl-filter-option" data-filter="deliveryType" data-option="economic">
+                        {$shippingServices.economic}
+                    </div>
+                    <div class="pl-filter-option" data-filter="deliveryType" data-option="express">
+                        {$shippingServices.express}
+                    </div>
+                </div>
+            </div>
+            <div class="pl-filter">
+                <div class="pl-filter-title">
+                    {$shippingServices.parcelOrigin}
+                </div>
+                <div class="pl-filter-options">
+                    <div class="pl-filter-option" data-filter="parcelOrigin" data-option="collection">
+                        {$shippingServices.collection}
+                    </div>
+                    <div class="pl-filter-option" data-filter="parcelOrigin" data-option="dropoff">
+                        {$shippingServices.dropoff}
+                    </div>
+                </div>
+            </div>
+            <div class="pl-filter">
+                <div class="pl-filter-title">
+                    {$shippingServices.parcelDestination}
+                </div>
+                <div class="pl-filter-options">
+                    <div class="pl-filter-option" data-filter="parcelDestination" data-option="pickup">
+                        {$shippingServices.pickup}
+                    </div>
+                    <div class="pl-filter-option" data-filter="parcelDestination" data-option="delivery">
+                        {$shippingServices.delivery}
+                    </div>
+                </div>
+            </div>
+            <div class="pl-filter pl-filter-selected">
+                <div class="pl-filter-options"></div>
+            </div>
+        </div>
+        <div id="pl-shipping-services-table" class="pl-full-width">
+        </div>
+        <div id="pl-shipping-services-list" class="pl-full-width">
+        </div>
+    </div>
+</div>

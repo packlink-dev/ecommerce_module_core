@@ -780,7 +780,7 @@ class QueueItem extends Entity
      */
     public static function getAvailablePriorities()
     {
-        return array(Priority::LOW, Priority::NORMAL, Priority::HIGH);
+        return array(Priority::HIGH, Priority::NORMAL, Priority::LOW);
     }
 
     /**

@@ -1,0 +1,78 @@
+<div class="pl-default-warehouse-page pl-full-width">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1 id="pl-page-title" class="pl-text-center pl-full-width">
+        </h1>
+    </header>
+    <div class="pl-page-content pl-page-padding">
+        <form method="POST" id="pl-warehouse-form" class="pl-small-page">
+            <p class="pl-text-center pl-page-info pl-bottom-separate">
+            </p>
+            <div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-alias" name="alias"
+                           placeholder="{$defaultWarehouse.alias-placeholder}"
+                           data-required="true"/>
+                    <label for="pl-default-warehouse-alias">{$defaultWarehouse.alias}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-name" name="name"
+                           placeholder="{$defaultWarehouse.name-placeholder}"
+                           data-required="true"/>
+                    <label for="pl-default-warehouse-name">{$defaultWarehouse.name}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-surname" name="surname"
+                           placeholder="{$defaultWarehouse.surname-placeholder}"
+                           data-required="true"/>
+                    <label for="pl-default-warehouse-surname">{$defaultWarehouse.surname}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-company" name="company"
+                           placeholder="{$defaultWarehouse.company-placeholder}"/>
+                    <label for="pl-default-warehouse-company">{$defaultWarehouse.company}</label>
+                </div>
+                <div class="pl-form-group">
+                    <select id="pl-default-warehouse-country" name="country" data-required="true">
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label for="pl-default-warehouse-country">{$defaultWarehouse.country}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-postal_code" name="postal_code"
+                           placeholder="{$defaultWarehouse.postal_code-placeholder}"
+                           data-required="true"
+                           autocomplete="no"/>
+                    <label for="pl-default-warehouse-postal_code">{$defaultWarehouse.postal_code}</label>
+                    <i class="material-icons">search</i>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-address" name="address"
+                           placeholder="{$defaultWarehouse.address-placeholder}"
+                           data-required="true"/>
+                    <label for="pl-default-warehouse-address">{$defaultWarehouse.address}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-phone" name="phone"
+                           placeholder="{$defaultWarehouse.phone-placeholder}"
+                           data-required="true"
+                           data-type="phone"/>
+                    <label for="pl-default-warehouse-phone">{$defaultWarehouse.phone}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-warehouse-email" name="email"
+                           placeholder="{$defaultWarehouse.email-placeholder}"
+                           data-required="true"
+                           data-type="email"/>
+                    <label for="pl-default-warehouse-email">{$defaultWarehouse.email}</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="pl-page-buttons">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+        </button>
+    </div>
+</div>

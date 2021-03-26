@@ -1,0 +1,42 @@
+<div class="pl-order-status-mapping-page pl-page-config">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1>{$orderStatusMapping.title}</h1>
+    </header>
+    <div class="pl-page-content pl-page-padding">
+        <form class="pl-medium-page">
+            <p class="pl-page-info pl-bottom-separate">
+                {$orderStatusMapping.description}
+            </p>
+            <div id="pl-order-status-mappings" class="pl-full-width">
+                <div class="pl-order-status-mappings-header pl-status-mapping">
+                    <div class="pl-half-width pl-block">
+                        {$orderStatusMapping.packlinkProShipmentStatus}
+                    </div>
+                    <div class="pl-half-width pl-system-order-status pl-block">
+                        {$orderStatusMapping.systemOrderStatus}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="pl-page-buttons pl-flex-left">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+            {$general.saveChanges}
+        </button>
+    </div>
+</div>
+<template id="pl-status-mapping-template">
+    <div class="pl-status-mapping">
+        <div class="pl-half-width">
+            <span class="pl-flex-expand pl-packlink-status pl-all-caps"></span>
+            <i class="material-icons pl-separation-indicator">chevron_right</i>
+        </div>
+        <div class="pl-half-width pl-form-group">
+            <select class="pl-all-caps compact"></select>
+            <i class="material-icons">expand_more</i>
+        </div>
+    </div>
+</template>

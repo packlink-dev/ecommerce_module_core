@@ -1,0 +1,24 @@
+<div class="pl-pricing-policies">
+
+</div>
+<template id="pl-pricing-policy-list-item">
+    <div class="pl-top-separate">
+        <label for="pl-price-range-wrapper">
+            <strong id="pl-price-range-title"></strong>
+        </label>
+        <div class="pl-range-type-wrapper pl-row-orientation pl-separate-content pl-separate-top-small"
+             id="pl-price-range-wrapper">
+            <span class="pl-right-separate"></span>
+            <button class="pl-edit-pricing-policy pl-small pl-button pl-button-secondary pl-no-margin">
+                {$general.edit}
+            </button>
+        </div>
+        <div class="pl-pricing-policy-wrapper pl-row-orientation pl-separate-content pl-separate-top-small"
+             id="pl-price-policy-range-wrapper">
+            <span class="pl-right-separate"></span>
+            <button class="pl-clear-pricing-policy pl-small pl-button pl-button-secondary pl-no-border pl-no-margin">
+                {$general.delete}
+            </button>
+        </div>
+    </div>
+</template>

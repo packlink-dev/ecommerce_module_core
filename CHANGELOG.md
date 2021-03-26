@@ -3,30 +3,71 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [3.1.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.1.0...v3.1.1) - 2021-03-26
 ### Added
 - Added additional ISO codes to the postal code transformer.
-
-## [2.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.2...v2.3.0) - 2020-12-17
-### Added
-- Added postal code transformer service that transforms postal code into supported postal code format for some countries.
+- Added missing carrier logos for Italy and Spain.
 
 ### Changed
+- Changed setting the language based on user's platform country instead of current shop language during the registration process.
+
+## [3.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.6...v3.1.0) - 2020-12-11
+### Added
+- Added postal code transformer service that transforms postal code into supported postal code format for some countries.
+- Added missing carrier logo for DPD Portugal.
+
+### Changed
+- Changed how the default parcel is validated.
 - Changed logic in the shipping cost calculator to use postal code transformer for the delivery postal code before retrieving services from the Packlink API.
 - Separated country service into two services which deal with registration and warehouse countries separately. Separated country DTO into two DTOs, with base country DTO and registration country DTO, which adds additional information (registration link and platform country).
 - Modified user account service, update shipping services task, and warehouse controller to work with warehouse country service instead of country service.
 
-## [2.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.1...v2.2.2) - 2020-02-28
+## [3.0.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.5...v3.0.6) - 2020-11-05
+### Added
+- Added missing carrier logos. Integrations should refresh their shipping services after updating to this Core version in order to assign these logos to their respective shipping services.
+- Fixed setting warehouse postal code and city from the module
+
+## [3.0.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.4...v3.0.5) - 2020-10-21
+### Changed
+- Fix issue with execution starting logic of multiple non-recurring schedules
+
+## [3.0.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.3...v3.0.4) - 2020-10-09
+### Changed
+- Fix issue with phone validation.
+- Send setup event when first service is activated.
+
+## [3.0.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.2...v3.0.3) - 2020-09-23
+### Changed
+- Ajax service request headers enhancements
+
+## [3.0.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.1...v3.0.2) - 2020-09-10
+### Changed
+- Fix get service url.
+- Fix issue with adding backup service.
+- Fix deserialization of Shipping Method Configuration.
+
+## [3.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.0...v3.0.1) - 2020-08-31
+### Changed
+- Fix origin and destination icon size on services page.
+- Fix icons on the settings page.
+- Fix issue with adding a query parameter to url in register controller.
+- Fix translation issue in italian.
+
+## [3.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.2...v3.0.0) - 2020-08-25
+### Changed
+- Module redesign with new pricing policy.
+
+## [2.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.1...v2.2.2) - 2020-08-28
 ### Changed
 - Fix bug in weekly schedule for schedules setup to run on Sundays
 
-## [2.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.0...v2.2.1) - 2020-02-28
+## [2.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.2.0...v2.2.1) - 2020-07-28
 ### Changed
 - Prevent schedule check task from being enqueued if not necessary
 
-## [2.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.3...v2.2.0) - 2020-02-22
+## [2.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v2.1.3...v2.2.0) - 2020-07-22
 ### Changed
-- `UpdateShipmentData` task has been declared as depricated.
+- `UpdateShipmentData` task has been declared as deprecated.
 - `UpdateShipmentData` task will not be scheduled anymore in core.
 - BREAKING: Methods `isFirstShipmentDraftCreated` and `setFirstShipmentDraftCreated` have been removed from `Configuration`
 Integration should check if said methods have been utilized and remove them.

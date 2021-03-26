@@ -1,0 +1,48 @@
+<div class="pl-default-parcel-page pl-full-width">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1 id="pl-page-title" class="pl-text-center pl-full-width"></h1>
+    </header>
+    <div class="pl-page-content pl-page-padding">
+        <form method="POST" id="pl-parcel-form" class="pl-small-page">
+            <p class="pl-text-center pl-page-info pl-bottom-separate">
+            </p>
+            <div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-parcel-weight" name="weight" placeholder="1"
+                           data-type="number" data-validation-rule="greaterThanZero" data-required="true"/>
+                    <label for="pl-default-parcel-weight">
+                        {$defaultParcel.weight} (kg)
+                    </label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-parcel-height" name="height" placeholder="20"
+                           data-type="number" data-validation-rule="integer,greaterThanZero" data-required="true"/>
+                    <label for="pl-default-parcel-height">
+                        {$defaultParcel.height} (cm)
+                    </label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-parcel-width" name="width" placeholder="20"
+                           data-type="number" data-validation-rule="integer,greaterThanZero" data-required="true"/>
+                    <label for="pl-default-parcel-width">
+                        {$defaultParcel.width} (cm)
+                    </label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-parcel-length" name="length" placeholder="20"
+                           data-type="number" data-validation-rule="integer,greaterThanZero" data-required="true"/>
+                    <label for="pl-default-parcel-length">
+                        {$defaultParcel.length} (cm)
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="pl-page-buttons">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+        </button>
+    </div>
+</div>

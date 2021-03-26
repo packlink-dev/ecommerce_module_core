@@ -107,7 +107,10 @@ class WebHookEventHandler extends BaseService
             /** @var \Packlink\BusinessLogic\Http\DTO\Shipment $shipment */
             $shipment = $proxy->getShipment($eventData->shipment_reference);
         } catch (HttpBaseException $e) {
-            Logger::logError($e->getMessage(), 'Core', array('referenceId' => $eventData->shipment_reference));
+            Logger::logWarning($e->getMessage(), 'Core', array(
+                'referenceId' => $eventData->shipment_reference,
+                'trace' => $e->getTraceAsString(),
+            ));
 
             return;
         }

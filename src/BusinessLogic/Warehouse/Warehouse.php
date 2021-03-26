@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Warehouse;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\Utility\DtoValidator;
 
 /**
@@ -139,7 +140,13 @@ class Warehouse extends FrontDto
         /** @var static $instance */
         $instance = parent::fromArray($raw);
         $instance->default = static::getDataValue($raw, 'default_selection', false);
-        $instance->postalCode = static::getDataValue($raw, 'postal_code');
+        $zipCity = explode(' - ', static::getDataValue($raw, 'postal_code'));
+        if (count($zipCity) === 2) {
+            $instance->postalCode = $zipCity[0];
+            $instance->city = $zipCity[1];
+        } else {
+            $instance->postalCode = static::getDataValue($raw, 'postal_code');
+        }
 
         return $instance;
     }
@@ -171,7 +178,7 @@ class Warehouse extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'email',
-                'Field must be a valid email.'
+                Translator::translate('validation.invalidEmail')
             );
         }
 
@@ -179,7 +186,7 @@ class Warehouse extends FrontDto
             $validationErrors[] = static::getValidationError(
                 ValidationError::ERROR_INVALID_FIELD,
                 'phone',
-                'Field must be a valid phone number.'
+                Translator::translate('validation.invalidPhone')
             );
         }
     }

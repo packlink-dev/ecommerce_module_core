@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     /**
@@ -43,7 +45,12 @@ var Packlink = window.Packlink || {};
          * @param {function} [onError]
          */
         this.call = function (method, url, data, onSuccess, onError) {
-            let request = getRequest();
+            const request = getRequest();
+            const callUUID = Packlink.StateUUIDService.getStateUUID();
+
+            if (!onError) {
+                onError = Packlink.responseService.errorHandler;
+            }
 
             url = url.replace('https:', '');
             url = url.replace('http:', '');
@@ -53,21 +60,30 @@ var Packlink = window.Packlink || {};
             request.onreadystatechange = function () {
                 // "this" is XMLHttpRequest
                 if (this.readyState === 4) {
-                    if (this.status >= 200 && this.status < 300) {
-                        onSuccess(JSON.parse(this.responseText || '{}'));
-                    } else {
-                        if (typeof onError !== 'undefined') {
-                            let response = this.responseText;
-                            try {
-                                response = JSON.parse(this.responseText || '{}');
-                            } catch (e) {
-                            }
+                    if (callUUID !== Packlink.StateUUIDService.getStateUUID()) {
+                        // Obsolete response. The app has changed the original state that issued the call.
 
-                            onError(response);
+                        return;
+                    }
+
+                    if (this.status >= 200 && this.status < 300) {
+                        if (onSuccess) {
+                            onSuccess(JSON.parse(this.responseText || '{}'));
                         }
+                    } else if (onError) {
+                        let response = this.responseText;
+                        try {
+                            response = JSON.parse(this.responseText || '{}');
+                        } catch (e) {
+                        }
+
+                        onError(response);
+
                     }
                 }
             };
+
+            request.setRequestHeader('Accept', 'application/json');
 
             if (method === 'POST') {
                 this.internalPerformPost(request, data);

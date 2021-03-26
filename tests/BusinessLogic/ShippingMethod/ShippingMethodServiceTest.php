@@ -1,10 +1,9 @@
 <?php
 
-namespace Packlink\Tests\BusinessLogic\Tasks;
+namespace Logeecom\Tests\BusinessLogic\ShippingMethod;
 
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
@@ -149,6 +148,7 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
         self::assertCount(2, $this->shippingMethodService->getAllMethods());
+        self::assertCount(2, $this->shippingMethodService->getInactiveMethods());
 
         $this->shippingMethodService->activate($method->getId());
 

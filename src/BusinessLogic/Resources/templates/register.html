@@ -1,0 +1,92 @@
+<div class="pl-register-page pl-flex-expand">
+    <div class="pl-flex-expand pl-page-padding pl-medium-page pl-no-shrink">
+        <div class="pl-bottom-separate">
+            <h1 class="pl-text-center">
+                {$register.startEnjoying}
+            </h1>
+            <p class="pl-text-center">
+                {$register.registerAccount}
+            </p>
+        </div>
+        <form method="POST" name="plRegisterForm" id="pl-register-form" class="pl-full-width">
+            <div>
+                <div class="pl-form-group">
+                    <input id="pl-register-email" type="email" class="form-control" name="email"
+                           data-type="email" data-required="true"/>
+                    <label for="pl-register-email">
+                        {$register.email}
+                    </label>
+                </div>
+                <div class="pl-form-group pl-bottom-separate">
+                    <input id="pl-register-password"
+                           type="password"
+                           class="form-control"
+                           name="password"
+                           data-min-length="6"
+                           data-type="password" data-required="true"/>
+                    <label for="pl-register-password">
+                        {$register.password}
+                    </label>
+                </div>
+                <p class="pl-text-center">
+                    {$register.getToKnowYou}
+                </p>
+                <div class="pl-form-group" id="pl-register-delivery-volume">
+                    <select name="estimated_delivery_volume" id="pl-register-shipment-volume" data-required="true">
+                        <option disabled selected value></option>
+                        <option value="1 - 10">1 - 10</option>
+                        <option value="11 - 50">11 - 50</option>
+                        <option value="51 - 100">51 - 100</option>
+                        <option value="101 - 200">101 - 200</option>
+                        <option value="> 200">> 200</option>
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label for="pl-register-shipment-volume" class="pl-text-input-label">
+                        {$register.monthlyShipmentVolume}
+                    </label>
+                </div>
+                <div class="pl-form-group">
+                    <input id="pl-register-phone" type="text" class="form-control" name="phone"
+                           data-type="phone" data-required="true"/>
+                    <label for="pl-register-phone">
+                        {$register.phone}
+                    </label>
+                </div>
+            </div>
+            <div>
+                <button id="pl-register-button" type="submit" name="register"
+                        class="pl-button pl-button-primary"
+                        disabled>
+                    {$register.submit}
+                </button>
+            </div>
+            <div class="pl-legal-policies pl-flex-start">
+                <div class="pl-checkbox" id="pl-register-terms-and-conditions-label">
+                    <input type="checkbox" name="terms_and_conditions" id="pl-register-terms-and-conditions"
+                           data-required="true"
+                           tabindex="-1"
+                    >
+                    <label for="pl-register-terms-and-conditions"></label>
+                </div>
+            </div>
+            <div class="pl-legal-policies pl-marketing-emails-wrapper pl-flex-start">
+                <div class="pl-checkbox">
+                    <input type="checkbox" name="marketing_emails" id="pl-register-marketing-emails" tabindex="-1">
+                    <label for="pl-register-marketing-emails">{$register.marketingEmails}</label>
+                </div>
+            </div>
+            <div class="pl-hidden">
+                <input type="hidden" name="platform_country" id="pl-register-platform-country"/>
+                <input type="hidden" name="source" id="pl-register-source"/>
+            </div>
+        </form>
+    </div>
+    <div class="pl-full-width pl-login-footer pl-page-padding">
+        <div class="pl-medium-page pl-text-center">
+            <strong>{$register.haveAccount}</strong>
+            <button type="submit" name="login" class="pl-button pl-button-inverted" id="pl-go-to-login">
+                {$register.logIn}
+            </button>
+        </div>
+    </div>
+</div>

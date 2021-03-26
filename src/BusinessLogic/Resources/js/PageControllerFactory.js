@@ -1,4 +1,6 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     function PageControllerFactory() {
@@ -8,7 +10,7 @@ var Packlink = window.Packlink || {};
          * @param {string} controller
          * @param {object} configuration
          */
-        this.getInstance = function (controller, configuration) {
+        this.getInstance = (controller, configuration) => {
             let parts = controller.split('-');
             let name = '';
             for (let part of parts) {
