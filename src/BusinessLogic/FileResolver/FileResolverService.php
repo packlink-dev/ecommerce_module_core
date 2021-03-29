@@ -52,11 +52,13 @@ class FileResolverService
             $serializedJson = file_get_contents($filePath);
 
             if ($serializedJson) {
-                $content[] = json_decode($serializedJson, true);
+                $array = json_decode($serializedJson, true);
+                /** @noinspection SlowArrayOperationsInLoopInspection */
+                $content = array_replace_recursive($content, $array);
             }
         }
 
-        return $content === array() ? $content : $this->mergeFileContent($content);
+        return $content;
     }
 
     /**
@@ -77,48 +79,5 @@ class FileResolverService
     public function getFolders()
     {
         return $this->folders;
-    }
-
-    /**
-     * Merges content of source files.
-     *
-     * @param array $content
-     *
-     * @return array
-     */
-    protected function mergeFileContent($content)
-    {
-        $mergedContent = array_shift($content);
-
-        foreach ($content as $fileContent) {
-            $mergedContent = $this->mergeDistinct($mergedContent, $fileContent);
-        }
-
-        return $mergedContent;
-    }
-
-    /**
-     * Performs array merge similar to array_merge_recursive,
-     * but instead of converting values with duplicate keys to arrays,
-     * it overwrites them with the value from the second array.
-     *
-     * @param array $array1
-     * @param array $array2
-     *
-     * @return mixed
-     */
-    protected function mergeDistinct(&$array1, &$array2)
-    {
-        $merged = $array1;
-
-        foreach ($array2 as $key => &$value) {
-            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
-                $merged[$key] = $this->mergeDistinct($merged[$key], $value);
-            } else {
-                $merged[$key] = $value;
-            }
-        }
-
-        return $merged;
     }
 }
