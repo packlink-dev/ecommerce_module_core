@@ -18,7 +18,7 @@ Whitelabel project changes:
 - Added BrandConfigurationService. Integration should register PacklinkConfigurationService instance for Packlink brand or adequate implementation for other brand(s) during the bootstraping.
 - Added PacklinkConfigurationService.
 - Added FileResolverService. Integration should initialize FileResolverService with an array of folders where source files should be searched for.
-- Added new method getTranslations to \Packlink\BusinessLogic\Language\TranslationService (service renamed to CountryService).
+- Added new method getLabels to \Packlink\BusinessLogic\CountryLabels\CountryService.
 
 ### Changed
 
@@ -37,6 +37,7 @@ Following changes will work properly once BrandConfigurationService is registere
 - Removed Packlink\BusinessLogic\Country\RegistrationCountry.
 - Added validation for platform country in RegistrationRequest::doValidate and UserAccountService::initializeUser.
 - Removed $supportedCountries from CountryService and WarehouseCountryService.
+- Packlink\BusinessLogic\Language\TranslationService renamed to CountryService and moved to CountryLabels directory.
 
 ## [3.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.6...v3.1.0) - 2020-12-11
 ### Added

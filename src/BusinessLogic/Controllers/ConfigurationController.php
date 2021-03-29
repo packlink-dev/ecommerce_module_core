@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Language\Interfaces\CountryService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\Utility\UrlService;
 
 /**

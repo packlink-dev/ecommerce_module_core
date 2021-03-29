@@ -18,8 +18,8 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Language\Interfaces\CountryService as TranslationServiceInterface;
-use Packlink\BusinessLogic\Language\CountryService as CountryTranslationService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
+use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -183,12 +183,12 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         );
 
         ServiceRegister::registerService(
-            TranslationServiceInterface::CLASS_NAME,
+            LabelServiceInterface::CLASS_NAME,
             function () {
                 /** @var FileResolverService $fileResolverService */
                 $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
 
-                return new CountryTranslationService($fileResolverService);
+                return new CountryLabelService($fileResolverService);
             }
         );
 

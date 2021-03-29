@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Tests\BusinessLogic\Language;
+namespace Logeecom\Tests\BusinessLogic\CountryLabels;
 
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -13,11 +13,11 @@ use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class TranslationServiceTest
+ * Class CountryLabelsServiceTest
  *
  * @package BusinessLogic\Language
  */
-class TranslationServiceTest extends TestCase
+class CountryLabelsServiceTest extends TestCase
 {
     private static $englishValues = array(
         'rs' => array(),
@@ -40,7 +40,7 @@ class TranslationServiceTest extends TestCase
             'testKey2' => 'testValueEn2'
         ),
     );
-    private $translationService;
+    private $testCountryService;
 
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -52,12 +52,12 @@ class TranslationServiceTest extends TestCase
 
         $fileResolverService = new FileResolverService(
             array(
-                __DIR__ . '/Translations',
+                __DIR__ . '/Labels',
                 __DIR__ . '/../FileResolver/Translations',
             )
         );
 
-        $this->translationService = new TestCountryService($fileResolverService);
+        $this->testCountryService = new TestCountryService($fileResolverService);
 
         $configuration = new TestShopConfiguration();
         Configuration::setUICountryCode('de');
@@ -95,7 +95,7 @@ class TranslationServiceTest extends TestCase
             )
         );
 
-        $translation = $this->translationService->getText('testKey');
+        $translation = $this->testCountryService->getText('testKey');
 
         $this->assertStringStartsWith('testValueEn', $translation);
     }
@@ -124,7 +124,7 @@ class TranslationServiceTest extends TestCase
             )
         );
 
-        $translation = $this->translationService->getText('testKey');
+        $translation = $this->testCountryService->getText('testKey');
 
         $this->assertStringStartsWith('testValueEn', $translation);
     }
@@ -135,7 +135,7 @@ class TranslationServiceTest extends TestCase
     public function testTranslateNonExistingKey()
     {
         $nonExistingKey = 'noKey';
-        $translation = $this->translationService->getText($nonExistingKey);
+        $translation = $this->testCountryService->getText($nonExistingKey);
 
         $this->assertEquals($nonExistingKey, $translation);
     }
@@ -147,7 +147,7 @@ class TranslationServiceTest extends TestCase
     public function testTranslateFallbackToEnglish()
     {
         $key = 'testKey1';
-        $translation = $this->translationService->getText($key);
+        $translation = $this->testCountryService->getText($key);
 
         $this->assertEquals('testValueEn1', $translation);
     }
@@ -158,7 +158,7 @@ class TranslationServiceTest extends TestCase
     public function testTranslateToGerman()
     {
         $key = 'testKey';
-        $translation = $this->translationService->getText($key);
+        $translation = $this->testCountryService->getText($key);
 
         $this->assertEquals('testValueDe', $translation);
     }
@@ -169,7 +169,7 @@ class TranslationServiceTest extends TestCase
     public function testTranslateToGermanNestedKeyWithPlaceholders()
     {
         $key = 'namespace.nestedKeyWithPlaceholder';
-        $translation = $this->translationService->getText($key, array(1, 2));
+        $translation = $this->testCountryService->getText($key, array(1, 2));
 
         $this->assertEquals('Test1 1, test2 2.', $translation);
     }
@@ -179,7 +179,7 @@ class TranslationServiceTest extends TestCase
      */
     public function testGetTranslations()
     {
-        $translations = $this->translationService->getTranslations('fr');
+        $translations = $this->testCountryService->getLabels('fr');
 
         $this->assertEquals(static::$englishAndFrenchValues, $translations);
     }
@@ -189,7 +189,7 @@ class TranslationServiceTest extends TestCase
      */
     public function testGetTranslationsWithNonExistingLanguage()
     {
-        $translations = $this->translationService->getTranslations('rs');
+        $translations = $this->testCountryService->getLabels('rs');
 
         $this->assertEquals(static::$englishValues, $translations);
     }

@@ -36,7 +36,7 @@ class FileResolverServiceTest extends TestCase
 
         $this->fileResolverService = new FileResolverService(
             array(
-                __DIR__ . '/../Language/Translations',
+                __DIR__ . '/../CountryLabels/Labels',
                 __DIR__ . '/Translations'
             )
         );
@@ -83,7 +83,7 @@ class FileResolverServiceTest extends TestCase
 
         $this->assertEquals(
             array(
-                __DIR__ . '/../Language/Translations',
+                __DIR__ . '/../CountryLabels/Labels',
                 __DIR__ . '/Translations',
                 __DIR__
             ),

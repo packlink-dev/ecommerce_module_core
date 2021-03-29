@@ -1,11 +1,11 @@
 <?php
 
-namespace Logeecom\Tests\BusinessLogic\Language;
+namespace Logeecom\Tests\BusinessLogic\CountryLabels;
 
-use Packlink\BusinessLogic\Language\CountryService;
+use Packlink\BusinessLogic\CountryLabels\CountryService;
 
 /**
- * Class TestTranslationService.
+ * Class TestCountryService.
  *
  * @package BusinessLogic\Language
  */
@@ -16,6 +16,6 @@ class TestCountryService extends CountryService
         parent::__construct($fileResolverService);
 
         // reset translations for each instance.
-        static::$translations = array();
+        static::$labels = array();
     }
 }

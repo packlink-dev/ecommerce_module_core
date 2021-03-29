@@ -1,10 +1,14 @@
 <?php
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Packlink\BusinessLogic\FileResolver\FileResolverService;
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\DemoUI\Bootstrap;
 use Packlink\DemoUI\Services\Integration\UrlService;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
+
+Bootstrap::init();
 
 Configuration::setUICountryCode('en');
 $lang = Configuration::getUICountryCode() ?: 'en';
@@ -16,14 +20,14 @@ function getUrl($controller, $action)
 
 function getTranslations($language)
 {
-    $fileResolver = new FileResolverService(
-        array(
-            __DIR__ . '/../../../../BusinessLogic/Resources/countries',
-            __DIR__ . '/../../Brands/Acme/Resources/countries',
-        )
-    );
+    /** @var CountryService $countryService */
+    $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-    echo json_encode($fileResolver->getContent($language));
+    $labels = $countryService->getLabels($language);
+    $defaultLabels = json_encode($labels['en']);
+    $currentLanguageLabels = json_encode($labels[$language]);
+
+    echo 'default: ' . $defaultLabels . ', current: ' . $currentLanguageLabels;
 }
 
 ?>
@@ -158,8 +162,7 @@ echo $lang ?>">
         'DOMContentLoaded',
         () => {
             Packlink.translations = {
-                default: <?php getTranslations('en') ?>,
-                current: <?php getTranslations($lang); ?>,
+                <?php getTranslations($lang); ?>
             };
 
             const pageConfiguration = {

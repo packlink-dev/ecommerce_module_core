@@ -22,7 +22,7 @@ use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
-use Packlink\BusinessLogic\Language\Interfaces\CountryService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
@@ -256,7 +256,7 @@ class Bootstrap extends BootstrapComponent
                 /** @var FileResolverService $fileResolverService */
                 $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
 
-                return new \Packlink\BusinessLogic\Language\CountryService($fileResolverService);
+                return new \Packlink\BusinessLogic\CountryLabels\CountryService($fileResolverService);
             }
         );
     }

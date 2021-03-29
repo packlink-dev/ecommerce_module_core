@@ -27,7 +27,7 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Language\CountryService as CountryTranslationService;
+use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -129,11 +129,12 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         );
 
         TestServiceRegister::registerService(
-            \Packlink\BusinessLogic\Language\Interfaces\CountryService::CLASS_NAME,
+            \Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService::CLASS_NAME,
             function () {
                 $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
 
-                return new CountryTranslationService($fileResolverService);
+                /** @noinspection PhpParamsInspection */
+                return new CountryLabelService($fileResolverService);
             }
         );
 
