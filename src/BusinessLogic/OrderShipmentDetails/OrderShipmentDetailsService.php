@@ -272,14 +272,15 @@ class OrderShipmentDetailsService extends BaseService
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $userInfo = $configService->getUserInfo();
+        $countryCode = 'en';
 
-        if($userInfo) {
-            Configuration::setUICountryCode(strtolower($userInfo->country));
+        if ($userInfo) {
+            $countryCode = $userInfo->country;
         }
 
         /** @var CountryService $countryService */
         $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-        return  $countryService->getText('orderListAndDetails.shipmentUrl') . $reference;
+        return $countryService->getLabels(strtolower($countryCode), 'orderListAndDetails.shipmentUrl') . $reference;
     }
 }

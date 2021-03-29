@@ -83,17 +83,29 @@ class CountryService implements BaseService
     /**
      * Fetches labels for a specific country (provided by $countryCode parameter)
      * and default country.
+     * If parameter key is not set, fetches all labels for country.
+     * If parameter key is set, fetches label for specified key.
      *
      * @param string $countryCode
+     * @param string $key
      *
-     * @return array
+     * @return array|string
      */
-    public function getLabels($countryCode)
+    public function getLabels($countryCode, $key = '')
     {
-        $labels[$countryCode] = $this->fileResolverService->getContent($countryCode);
-        $labels[static::DEFAULT_LANG] = $this->fileResolverService->getContent(static::DEFAULT_LANG);
+        if (!$key) {
+            $labels[$countryCode] = $this->fileResolverService->getContent($countryCode);
+            $labels[static::DEFAULT_LANG] = $this->fileResolverService->getContent(static::DEFAULT_LANG);
 
-        return $labels;
+            return $labels;
+        }
+
+        $uiCountryCode = Configuration::getUICountryCode();
+        Configuration::setUICountryCode($countryCode);
+        $label = $this->getText($key);
+        Configuration::setUICountryCode($uiCountryCode);
+
+        return $label;
     }
 
     /**

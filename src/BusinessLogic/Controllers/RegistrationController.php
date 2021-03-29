@@ -40,7 +40,6 @@ class RegistrationController
      */
     public function getRegisterData($country)
     {
-        Configuration::setUICountryCode(strtolower($country));
         /** @var RegistrationInfoService $registrationInfoService */
         $registrationInfoService = ServiceRegister::getService(RegistrationInfoService::CLASS_NAME);
         $registrationData = $registrationInfoService->getRegistrationInfoData();
@@ -52,8 +51,8 @@ class RegistrationController
             'email' => $registrationData->getEmail(),
             'phone' => $registrationData->getPhone(),
             'source' => $registrationData->getSource(),
-            'termsAndConditionsUrl' => $this->getCountryService()->getText('register.termsAndConditionsUrl'),
-            'privacyPolicyUrl' => $this->getCountryService()->getText('register.privacyPolicyUrl'),
+            'termsAndConditionsUrl' => $this->getCountryService()->getLabels(strtolower($country), 'register.termsAndConditionsUrl'),
+            'privacyPolicyUrl' => $this->getCountryService()->getLabels(strtolower($country), 'register.privacyPolicyUrl'),
             'platform_country' => in_array($country, $brand->platformCountries, true) ?
                 $country : $brand->platformCountries[0],
         );

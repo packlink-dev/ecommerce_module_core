@@ -35,8 +35,9 @@ interface CountryService
      * and default country.
      *
      * @param string $countryCode
+     * @param string $key
      *
      * @return array
      */
-    public function getLabels($countryCode);
+    public function getLabels($countryCode, $key = '');
 }
