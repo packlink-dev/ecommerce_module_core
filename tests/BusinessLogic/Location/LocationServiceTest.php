@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Location;
 
+use InvalidArgumentException;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;

@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [3.1.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.1.0...v3.1.1) - 2021-03-26
 ### Added
 - Added additional ISO codes to the postal code transformer.
 - Added missing carrier logos for Italy and Spain.
+
+### Changed
+- Changed setting the language based on user's platform country instead of current shop language during the registration process.
 
 **BREAKING CHANGES**
 Whitelabel project changes:
