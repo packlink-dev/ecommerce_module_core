@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\ShippingMethod\Models;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
-use Packlink\BusinessLogic\ShippingMethod\Validation\PricingPolicyValidator;
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 
 /**
  * This class represents shipping service from Packlink with specific data for integration.
@@ -18,22 +18,6 @@ class ShippingMethod extends Entity
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
-    /**
-     * Indicates that Packlink pricing policy is used.
-     */
-    const PRICING_POLICY_PACKLINK = 1;
-    /**
-     * Indicates that percent from Packlink price pricing policy is used.
-     */
-    const PRICING_POLICY_PERCENT = 2;
-    /**
-     * Indicates that fixed price by weight range pricing policy is used.
-     */
-    const PRICING_POLICY_FIXED_PRICE_BY_WEIGHT = 3;
-    /**
-     * Indicates that fixed price by value range pricing policy is used.
-     */
-    const PRICING_POLICY_FIXED_PRICE_BY_VALUE = 4;
     /**
      * Array of field names.
      *
@@ -52,7 +36,7 @@ class ShippingMethod extends Entity
         'expressDelivery',
         'deliveryTime',
         'national',
-        'pricingPolicy',
+        'usePacklinkPriceIfNotInRange',
         'taxClass',
         'isShipToAllCountries',
         'shippingCountries',
@@ -124,29 +108,17 @@ class ShippingMethod extends Entity
      */
     protected $national = false;
     /**
-     * Pricing policy used. Defaults to @see self::PRICING_POLICY_PACKLINK.
+     * An array of pricing policies used.
      *
-     * @var int
+     * @var array
      */
-    protected $pricingPolicy = self::PRICING_POLICY_PACKLINK;
+    protected $pricingPolicies = array();
     /**
-     * Array of fixed price by weight policy data.
+     * Indicates whether to use Packlink prices when none of the set pricing policies is in range.
      *
-     * @var FixedPricePolicy[]
+     * @var bool
      */
-    protected $fixedPriceByWeightPolicy;
-    /**
-     * Array of fixed price by value policy data.
-     *
-     * @var FixedPricePolicy[]
-     */
-    protected $fixedPriceByValuePolicy;
-    /**
-     * Percent price policy data.
-     *
-     * @var PercentPricePolicy
-     */
-    protected $percentPricePolicy;
+    protected $usePacklinkPriceIfNotInRange = true;
     /**
      * Shop tax class.
      *
@@ -160,13 +132,13 @@ class ShippingMethod extends Entity
      */
     protected $shippingServices = array();
     /**
-     * Flag that denotes whether is shipping to all countries allowed.
+     * Flag that denotes whether is shipping to all countries selected.
      *
      * @var boolean
      */
     protected $isShipToAllCountries;
     /**
-     * If `isShipToAllCountries` set to FALSe than this array contains list of countries where shipping is allowed.
+     * If `isShipToAllCountries` set to FALSE, then this array contains list of countries where shipping is allowed.
      *
      * @var array
      */
@@ -176,10 +148,18 @@ class ShippingMethod extends Entity
      * Transforms raw array data to this entity instance.
      *
      * @param array $data Raw array data.
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public function inflate(array $data)
     {
         parent::inflate($data);
+
+        if (isset($data['usePacklinkPriceIfNotInRange']) && is_bool($data['usePacklinkPriceIfNotInRange'])) {
+            $this->usePacklinkPriceIfNotInRange = $data['usePacklinkPriceIfNotInRange'];
+        } else {
+            $this->usePacklinkPriceIfNotInRange = true;
+        }
 
         if (isset($data['isShipToAllCountries']) && is_bool($data['isShipToAllCountries'])) {
             $this->isShipToAllCountries = $data['isShipToAllCountries'];
@@ -193,20 +173,11 @@ class ShippingMethod extends Entity
             $this->shippingCountries = array();
         }
 
-        if (!$this->getPricingPolicy()) {
-            $this->pricingPolicy = static::PRICING_POLICY_PACKLINK;
-        }
-
-        if (!empty($data['fixedPriceByWeightPolicy'])) {
-            $this->setFixedPriceByWeightPolicy($this->inflateFixedPricePolicy($data, 'fixedPriceByWeightPolicy'));
-        }
-
-        if (!empty($data['fixedPriceByValuePolicy'])) {
-            $this->setFixedPriceByValuePolicy($this->inflateFixedPricePolicy($data, 'fixedPriceByValuePolicy'));
-        }
-
-        if (!empty($data['percentPricePolicy'])) {
-            $this->setPercentPricePolicy(PercentPricePolicy::fromArray($data['percentPricePolicy']));
+        if (isset($data['pricingPolicies'])) {
+            $this->pricingPolicies = FrontDtoFactory::getFromBatch(
+                ShippingPricePolicy::CLASS_KEY,
+                $data['pricingPolicies']
+            );
         }
 
         if (!empty($data['shippingServices'])) {
@@ -225,20 +196,10 @@ class ShippingMethod extends Entity
     {
         $data = parent::toArray();
 
-        if ($this->fixedPriceByWeightPolicy) {
-            foreach ($this->fixedPriceByWeightPolicy as $fixedPricePolicy) {
-                $data['fixedPriceByWeightPolicy'][] = $fixedPricePolicy->toArray();
+        if ($this->pricingPolicies) {
+            foreach ($this->pricingPolicies as $policy) {
+                $data['pricingPolicies'][] = $policy->toArray();
             }
-        }
-
-        if ($this->fixedPriceByValuePolicy) {
-            foreach ($this->fixedPriceByValuePolicy as $fixedPricePolicy) {
-                $data['fixedPriceByValuePolicy'][] = $fixedPricePolicy->toArray();
-            }
-        }
-
-        if ($this->percentPricePolicy) {
-            $data['percentPricePolicy'] = $this->percentPricePolicy->toArray();
         }
 
         if ($this->shippingServices) {
@@ -526,108 +487,31 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Gets pricing policy. Value is one of the @see self::PRICING_POLICY_FIXED, @see self::PRICING_POLICY_PERCENT
-     * of @see self::PRICING_POLICY_PACKLINK.
+     * Sets new pricing policy.
      *
-     * @return int Pricing policy code.
+     * @param ShippingPricePolicy $policy
      */
-    public function getPricingPolicy()
+    public function addPricingPolicy(ShippingPricePolicy $policy)
     {
-        return $this->pricingPolicy;
-    }
-
-    /**
-     * Sets data for fixed price by weight policy.
-     *
-     * @param FixedPricePolicy[] $fixedPricePolicy
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setFixedPriceByWeightPolicy($fixedPricePolicy)
-    {
-        $fixedPricePolicy = $this->sortFixedPricePolicy($fixedPricePolicy);
-
-        PricingPolicyValidator::validateFixedPricePolicy($fixedPricePolicy);
-
-        $this->percentPricePolicy = null;
-        $this->fixedPriceByWeightPolicy = $fixedPricePolicy;
-        $this->fixedPriceByValuePolicy = null;
-        $this->pricingPolicy = self::PRICING_POLICY_FIXED_PRICE_BY_WEIGHT;
-    }
-
-    /**
-     * Gets Fixed price by weight policy data.
-     *
-     * @return FixedPricePolicy[] FixedPricePolicy array.
-     */
-    public function getFixedPriceByWeightPolicy()
-    {
-        return $this->fixedPriceByWeightPolicy;
-    }
-
-    /**
-     * Sets data for fixed price by value policy.
-     *
-     * @param FixedPricePolicy[] $fixedPricePolicy
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setFixedPriceByValuePolicy($fixedPricePolicy)
-    {
-        $fixedPricePolicy = $this->sortFixedPricePolicy($fixedPricePolicy);
-
-        PricingPolicyValidator::validateFixedPricePolicy($fixedPricePolicy, true);
-
-        $this->percentPricePolicy = null;
-        $this->fixedPriceByWeightPolicy = null;
-        $this->fixedPriceByValuePolicy = $fixedPricePolicy;
-        $this->pricingPolicy = self::PRICING_POLICY_FIXED_PRICE_BY_VALUE;
-    }
-
-    /**
-     * Gets Fixed price by value policy data.
-     *
-     * @return FixedPricePolicy[] FixedPricePolicy array.
-     */
-    public function getFixedPriceByValuePolicy()
-    {
-        return $this->fixedPriceByValuePolicy;
-    }
-
-    /**
-     * Sets Percent pricing policy.
-     *
-     * @param PercentPricePolicy $percentPricePolicy Percent price policy data.
-     */
-    public function setPercentPricePolicy($percentPricePolicy)
-    {
-        PricingPolicyValidator::validatePercentPricePolicy($percentPricePolicy);
-
-        $this->percentPricePolicy = $percentPricePolicy;
-        $this->fixedPriceByWeightPolicy = null;
-        $this->fixedPriceByValuePolicy = null;
-        $this->pricingPolicy = self::PRICING_POLICY_PERCENT;
+        $this->pricingPolicies[] = $policy;
     }
 
     /**
      * Gets Percent pricing policy data.
      *
-     * @return PercentPricePolicy PercentPricePolicy data.
+     * @return ShippingPricePolicy[] PercentPricePolicy data.
      */
-    public function getPercentPricePolicy()
+    public function getPricingPolicies()
     {
-        return $this->percentPricePolicy;
+        return $this->pricingPolicies;
     }
 
     /**
-     * Sets default Packlink pricing policy.
+     * Removes all pricing policies.
      */
-    public function setPacklinkPricePolicy()
+    public function resetPricingPolicies()
     {
-        $this->percentPricePolicy = null;
-        $this->fixedPriceByWeightPolicy = null;
-        $this->fixedPriceByValuePolicy = null;
-        $this->pricingPolicy = self::PRICING_POLICY_PACKLINK;
+        $this->pricingPolicies = array();
     }
 
     /**
@@ -655,7 +539,8 @@ class ShippingMethod extends Entity
      *
      * @param array $shippingCountries List of allowed destination countries.
      */
-    public function setShippingCountries(array $shippingCountries) {
+    public function setShippingCountries(array $shippingCountries)
+    {
         $this->shippingCountries = $shippingCountries;
     }
 
@@ -670,7 +555,7 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Retrieves flag that denotes whether shipping to all countries is enabled.
+     * Retrieves a flag that denotes whether shipping to all countries is enabled.
      *
      * @return bool Flag that denotes whether shipping to all countries is enabled.
      */
@@ -680,7 +565,7 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Sets flag that denotes whether shipping to all countries is enabled.
+     * Sets a flag that denotes whether shipping to all countries is enabled.
      *
      * @param boolean $isShipToAllCountries Flag that denotes whether shipping to all countries is enabled.
      */
@@ -690,39 +575,22 @@ class ShippingMethod extends Entity
     }
 
     /**
-     * Sorts fixed price policies by ranges.
+     * Retrieves a flag that denotes whether Packlink price should be used when all policies are out of range.
      *
-     * @param FixedPricePolicy[] $fixedPricePolicy
-     *
-     * @return FixedPricePolicy[] Sorted array.
+     * @return bool Flag that denotes whether Packlink price should be used when all policies are out of range.
      */
-    protected function sortFixedPricePolicy($fixedPricePolicy)
+    public function isUsePacklinkPriceIfNotInRange()
     {
-        usort(
-            $fixedPricePolicy,
-            function (FixedPricePolicy $first, FixedPricePolicy $second) {
-                return $first->from > $second->from;
-            }
-        );
-
-        return $fixedPricePolicy;
+        return $this->usePacklinkPriceIfNotInRange;
     }
 
     /**
-     * Inflates fixed price policies from array.
+     * Sets a flag that denotes whether Packlink price should be used when all policies are out of range.
      *
-     * @param array $data Source array.
-     * @param string $type Type of fixed price policy as a key for the source array.
-     *
-     * @return FixedPricePolicy[]
+     * @param bool $usePacklinkPriceIfNotInRange Out-of-range behavior.
      */
-    protected function inflateFixedPricePolicy($data, $type)
+    public function setUsePacklinkPriceIfNotInRange($usePacklinkPriceIfNotInRange)
     {
-        $policies = array();
-        foreach ($data[$type] as $fixedPricePolicy) {
-            $policies[] = FixedPricePolicy::fromArray($fixedPricePolicy);
-        }
-
-        return $policies;
+        $this->usePacklinkPriceIfNotInRange = $usePacklinkPriceIfNotInRange;
     }
 }

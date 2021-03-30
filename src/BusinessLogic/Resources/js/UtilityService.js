@@ -1,51 +1,39 @@
-var Packlink = window.Packlink || {};
+if (!window.Packlink) {
+    window.Packlink = {};
+}
 
 (function () {
     function UtilityService() {
         /**
-         * Adds proper event listeners to input fields in order to allow input filed label translation.
+         * Shows the HTML node.
+         *
+         * @param {HTMLElement} element
          */
-        this.configureInputElements = function () {
-            let inputContainers = document.getElementsByClassName('pl-text-input');
-
-            for (let container of inputContainers) {
-                let input = container.getElementsByTagName('input')[0];
-                if (typeof input !== 'undefined') {
-                    textInputTransformLabel(input);
-                    input.addEventListener('focus', textInputFocusHandler, true);
-                    input.addEventListener('focusout', textInputFocusHandler, true);
-                }
-            }
+        this.showElement = (element) => {
+            element.classList.remove('pl-hidden');
         };
 
         /**
-         * Enables input mask. This mask disables input fields, buttons, checkboxes etc.
-         * Mask has z-index of 100, therefore an element that has to be excluded from input mask
-         * has to have z-index greater than 100;
+         * Hides the HTML node.
+         *
+         * @param {HTMLElement} element
          */
-        this.enableInputMask = function () {
-            document.getElementById('pl-input-mask').classList.add('enabled');
-        };
-
-        /**
-         * Disables input mask.
-         */
-        this.disableInputMask = function () {
-            document.getElementById('pl-input-mask').classList.remove('enabled');
+        this.hideElement = (element) => {
+            element.classList.add('pl-hidden');
         };
 
         /**
          * Enables loading spinner.
          */
-        this.showSpinner = function () {
-            document.getElementById('pl-spinner').classList.add('enabled');
+        this.showSpinner = () => {
+            this.showElement(document.getElementById('pl-spinner'));
         };
 
         /**
          * Hides loading spinner.
          */
-        this.hideSpinner = function () {
-            document.getElementById('pl-spinner').classList.remove('enabled');
+        this.hideSpinner = () => {
+            this.hideElement(document.getElementById('pl-spinner'));
         };
 
         /**
@@ -55,29 +43,31 @@ var Packlink = window.Packlink || {};
          *
          * @param {string} message
          * @param {'danger' | 'warning' | 'success'} status
+         * @param {number} [clearAfter] Time in ms to remove alert message.
          */
-        this.showFlashMessage = function (message, status) {
-            let statuses = [
-                'warning',
-                'danger',
-                'success'
-            ];
+        this.showFlashMessage = (message, status, clearAfter) => {
+            let messageNode = document.createElement('div');
+            messageNode.innerHTML = Packlink.templateService.getComponent('pl-alert').innerHTML;
+            messageNode = messageNode.firstElementChild;
 
-            let messageNode = document.getElementById('pl-flash-message');
-            messageNode.classList.remove(...statuses);
-            messageNode.classList.add(status);
+            const alertBox = messageNode.querySelector('.pl-alert');
 
-            let textNode = document.getElementById('pl-flash-message-text');
+            alertBox.classList.add('pl-alert-' + status);
+
+            let textNode = messageNode.querySelector('.pl-alert-text');
             textNode.innerHTML = message;
 
-            let hideHandler = function () {
-                messageNode.style.display = 'none';
+            const hideHandler = () => {
+                messageNode.remove();
             };
 
-            let closeButton = document.getElementById('pl-flash-message-close-btn');
-            closeButton.addEventListener('click', hideHandler, true);
+            if (clearAfter) {
+                setTimeout(hideHandler, clearAfter);
+            }
 
-            messageNode.style.display = 'flex';
+            messageNode.addEventListener('click', hideHandler, true);
+
+            Packlink.templateService.getMainPage().appendChild(messageNode);
         };
 
         /**
@@ -89,25 +79,24 @@ var Packlink = window.Packlink || {};
          * @param {object} obj
          * @return {object}
          */
-        this.cloneObject = function (obj) {
-            return JSON.parse(JSON.stringify(obj));
-        };
+        this.cloneObject = (obj) => JSON.parse(JSON.stringify(obj));
 
         /**
          * Debounces function.
          *
          * @param {number} delay
-         * @param {function} target
-         * @return {Function}
+         * @param {function(...)} target
+         * @param {...} target function args.
+         * @return {function(...)}
          */
-        this.debounce = function (delay, target) {
+        this.debounce = (delay, target) => {
             let timerId;
-            return function (...args) {
+            return (...args) => {
                 if (timerId) {
                     clearTimeout(timerId);
                 }
 
-                timerId = setTimeout(function () {
+                timerId = setTimeout(() => {
                     target(...args);
                     timerId = null;
                 }, delay);
@@ -117,17 +106,17 @@ var Packlink = window.Packlink || {};
         /**
          * Adds given character as a prefix to the given input so that result always has the same string length.
          * If the input is "56", length is 4 and character is "0", resulting string will be "0056".
-         * If the input is "P", length is 2 and character is "-" resulting string will be "-4".
+         * If the input is "P", length is 2 and character is "-" resulting string will be "-P".
          * If the input is "40", length is 2, resulting string will be "40".
          * If the input is "TEXT", length is 2, resulting string will be "TEXT".
          *
-         * @param input A string or number to pad.
+         * @param {number|string} input A string or number to pad.
          * @param {number} length Total length of the final string.
          * @param {string} character The character to pad to the beginning. Defaults to "0".
          *
          * @returns {string} Padded string.
          */
-        this.pad = function (input, length, character) {
+        this.pad = (input, length, character) => {
             let prefix = '';
             for (let i = 0; i < length; i++) {
                 prefix += character ? character : '0';
@@ -136,25 +125,26 @@ var Packlink = window.Packlink || {};
             return (prefix + input).slice(length * -1);
         };
 
-        /** PRIVATE METHODS **/
         /**
-         * @param {Event} event
+         * Converts a collection to array.
+         *
+         * @param collection
+         * @return {[]}
          */
-        function textInputFocusHandler(event) {
-            textInputTransformLabel(event.target);
-        }
-
-        /**
-         * @param input
-         */
-        function textInputTransformLabel(input) {
-            let isSelected = document.activeElement === input || input.value,
-                spans = input.parentNode.getElementsByTagName('span');
-
-            if (spans && spans.length > 0) {
-                spans[0].className = 'pl-text-input-label' + (isSelected ? ' selected' : '');
+        this.toArray = (collection) => {
+            if (Array.prototype.from) {
+                return Array.from(collection);
             }
-        }
+
+            const result = [],
+                length = collection.length;
+
+            for (let i = 0; i < length; i++) {
+                result.push(collection[i]);
+            }
+
+            return result;
+        };
     }
 
     Packlink.utilityService = new UtilityService();

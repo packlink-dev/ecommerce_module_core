@@ -1,0 +1,473 @@
+@import "variables";
+@import "reset";
+@import "animations";
+@import "utility";
+@import "ui-controls";
+@import "icons";
+
+#pl-page {
+  #pl-main-header {
+    height: 90px;
+  }
+
+  .pl-onboarding-list {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .pl-onboarding-overview-list {
+    width: 100%;
+
+    .pl-list-item {
+      flex-direction: row;
+      align-items: center;
+      padding-bottom: 20px;
+
+      i {
+        margin-right: 10px;
+      }
+
+      & + .pl-list-item {
+        border-top: 1px solid $color-light;
+        padding-top: 20px;
+      }
+
+      .pl-item-details {
+        text-align: left;
+      }
+
+      .pl-onboarding-list-title {
+        color: $color-gray;
+        text-align: left;
+      }
+    }
+  }
+
+  .pl-parcel-wrapper {
+    align-items: flex-start;
+    min-width: 100%;
+  }
+
+  .pl-main-logo img {
+    width: 200px;
+  }
+
+  .pl-register-country-list-wrapper {
+    margin: 15px 0 0;
+    min-width: 300px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .pl-country {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      padding: 5px 0;
+      color: $color-blue;
+      font-size: 15px;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      &:hover {
+        background-color: $color-little-transparent;
+
+        .pl-country-name {
+          color: $color-blue;
+        }
+      }
+
+      .pl-country-logo {
+        width: 60px;
+      }
+
+      .pl-country-name {
+        white-space: nowrap;
+        margin-left: 15px;
+        align-items: flex-start;
+        flex-grow: 1;
+      }
+
+      img {
+        width: 35px;
+        height: 35px;
+      }
+    }
+  }
+
+  .pl-login-footer {
+    padding: 24px 30px 32px;
+    background-color: $color-navy-dark;
+    color: $color-white;
+    flex-shrink: 0;
+
+    * {
+      color: $color-white;
+    }
+  }
+
+  .pl-onboarding-welcome-steps {
+    align-items: flex-start;
+    width: 100%;
+
+    .pl-list-item {
+      padding: 20px 0;
+      width: 100%;
+      border-bottom: 1px solid $color-light;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .pl-configuration-menu {
+    padding: 5px 20px;
+    margin-right: -20px;
+    font-weight: bold;
+
+    i {
+      margin-left: 10px;
+    }
+  }
+
+  .pl-configuration-page {
+    justify-content: space-between;
+
+    .pl-config-list {
+      flex-direction: column;
+      width: 300px;
+
+      .pl-config-list-item {
+        border-bottom: 1px solid $border-light;
+        padding: 17px 0 17px 26px;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+
+        &:hover {
+          background-color: $border-light;
+          cursor: pointer;
+        }
+
+        a {
+          display: flex;
+          flex-direction: row;
+          flex-grow: 1;
+          align-items: center;
+        }
+      }
+    }
+
+    .pl-footer {
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 20px;
+
+      span {
+        color: $color-light-gray;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .pl-page-onboarding {
+    .pl-page-buttons {
+      text-align: center;
+    }
+  }
+
+  .pl-page-config {
+    width: 100%;
+    flex-grow: 1;
+
+    header.pl-sub-header h1 {
+      text-align: left;
+      margin-left: 10px;
+    }
+
+    .pl-small-page, .pl-medium-page {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .pl-page-info {
+      text-align: left;
+    }
+  }
+
+  .pl-status-mapping {
+    width: 100%;
+    flex-direction: row;
+    border-top: 1px solid $border-light;
+    border-bottom: 1px solid $border-light;
+
+    &.pl-order-status-mappings-header {
+      border: none;
+    }
+
+    .pl-half-width {
+      flex-direction: row;
+      max-width: 50%;
+      min-width: 50%;
+      align-items: center;
+      margin: 0;
+      padding: 5px 0;
+
+      .pl-separation-indicator {
+        font-size: 32px;
+        margin-right: 36px;
+      }
+    }
+  }
+
+  .pl-services-filter-wrapper {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0 20px;
+    flex: 0 0 auto;
+
+    .pl-filter:not(:last-child) {
+      margin-right: 32px;
+    }
+  }
+
+  .pl-pick-shipping-services-page {
+    #pl-open-filter-button {
+      display: none;
+    }
+  }
+
+  .pl-modal .pl-filters-wrapper {
+    width: 300px;
+  }
+
+  .pl-filter {
+    padding: 20px 0;
+
+    &.pl-filter-selected {
+      display: none;
+    }
+
+    .pl-filter-title {
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      text-align: left;
+      color: $text-heading-color;
+      font-weight: bold;
+    }
+
+    .pl-filter-options {
+      flex-direction: row;
+      justify-content: flex-start;
+
+      .pl-filter-option {
+        padding: 6px 13px;
+        border: 1px solid $border-color;
+        border-radius: 13px;
+        cursor: pointer;
+        color: $input-control-color;
+        margin-right: 12px;
+
+        &.pl-selected {
+          border-color: $color-blue;
+          background-color: $color-blue;
+          color: $color-white;
+        }
+      }
+    }
+  }
+
+  .pl-form-group {
+    &:not(:first-child) {
+      &.pl-change-percent-wrapper {
+        margin-top: 0;
+      }
+    }
+  }
+
+  .pl-my-shipping-services-page {
+    header {
+      background-color: #1A77C2;
+      color: $color-white;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 25px 21px;
+    }
+
+    .pl-page-buttons {
+      display: none;
+    }
+  }
+
+  .pl-no-services {
+    img {
+      height: 176px;
+    }
+
+    .pl-no-services-description {
+      max-width: 420px;
+      margin-left: 60px;
+      text-align: left;
+
+      p {
+        margin: 20px 0;
+      }
+
+      button {
+        padding: 16px;
+        margin: 0;
+        max-width: 200px;
+      }
+    }
+  }
+
+  .pl-country-checkbox-wrapper {
+    padding: 15px;
+  }
+
+  .pl-shipping-country-selection-wrapper {
+    max-height: 320px;
+    overflow: auto;
+
+    > * {
+      border-bottom: 1px solid $border-light;
+    }
+  }
+
+  .pl-shipping-country-selected {
+    background-color: $border-light;
+  }
+
+  #pl-countries-alert-wrapper {
+    position: relative;
+    display: none;
+    &.visible {
+      display: flex;
+    }
+  }
+}
+
+// mobile rules
+@media (max-width: 768px) {
+  #pl-page {
+    .pl-main-logo {
+      width: 100%;
+    }
+
+    .pl-register-country-list-wrapper {
+      min-width: 100%;
+    }
+
+    .pl-login-footer {
+      padding: 16px 20px;
+    }
+
+    .pl-list-item .pl-row-orientation {
+      flex-direction: column;
+    }
+
+    .pl-configuration-page {
+      .pl-config-list {
+        width: 100%;
+
+        .pl-config-list-item {
+          padding-right: 15px;
+          padding-left: 20px;
+        }
+      }
+
+      .pl-footer {
+        flex-direction: column;
+
+        > :first-child {
+          padding-bottom: 20px;
+        }
+      }
+    }
+
+    .pl-my-shipping-services-page {
+      .pl-no-services {
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-bottom: 0;
+
+        img {
+          max-height: 40%;
+        }
+
+        .pl-no-services-description {
+          margin: 20px 0 0;
+
+          h1 {
+            text-align: center;
+          }
+
+          button {
+            display: none;
+          }
+
+          p {
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .pl-page-buttons {
+        display: flex;
+      }
+    }
+  }
+}
+
+// tablet and mobile rules
+@media (max-width: 1280px) {
+  #pl-page {
+    .pl-services-filter-wrapper {
+      padding: 0 10px;
+
+      .pl-filter:not(.pl-filter-selected) {
+        display: none;
+      }
+
+      .pl-filter-selected {
+        flex-direction: row;
+        display: flex;
+        padding: 0;
+
+        .pl-filter-options {
+          flex-wrap: wrap;
+        }
+
+        .pl-filter-option {
+          flex-direction: row;
+
+          &.pl-selected {
+            margin-top: 10px;
+          }
+
+          &::after {
+            content: 'X';
+            margin-left: 5px;
+            margin-top: 1px;
+          }
+        }
+      }
+    }
+
+    .pl-pick-shipping-services-page {
+      #pl-open-filter-button {
+        display: flex;
+      }
+    }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
+  }
+}

@@ -1,0 +1,129 @@
+@font-face {
+  font-weight: 700;
+  font-family: pl-proxima-nova;
+  font-style: normal;
+  src: url("https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-BoldWeb.woff") format("woff")
+}
+
+@font-face {
+  font-weight: 600;
+  font-family: pl-proxima-nova;
+  font-style: normal;
+  src: url("https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-SemiboldWeb.woff") format("woff")
+}
+
+@font-face {
+  font-weight: 400;
+  font-family: pl-proxima-nova;
+  font-style: normal;
+  src: url("https://cdn.packlink.com/apps/giger/fonts/ProximaNova/ProximaNova-RegularWeb.woff") format("woff")
+}
+
+// CSS reset
+// We do not reset the html and body, since we need to reset only for the app's root element
+#pl-page {
+  display: flex;
+  flex-direction: column;
+  background-color: $color-white;
+  flex-grow: 1;
+  position: relative;
+
+  template {
+    display: none;
+  }
+
+  * {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    font-family: pl-proxima-nova, sans-serif;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 400;
+    font-style: normal;
+    color: $text-color;
+    box-sizing: border-box;
+
+    scrollbar-color: $color-blue $border-color;
+
+    &::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 2px;
+      background-color: $color-blue;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: $border-color;
+    }
+
+    &::before, &::after {
+      box-sizing: border-box;
+    }
+  }
+
+  main {
+    background-color: $color-white;
+  }
+
+  br {
+    margin-bottom: 10px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: $text-heading-color;
+    font-weight: bold;
+
+    br {
+      margin: 0;
+    }
+  }
+
+  h1 {
+    line-height: 22px;
+    font-size: 18px;
+  }
+
+  ul, ol {
+    list-style: none
+  }
+
+  img {
+    height: auto;
+    max-width: 100%
+  }
+
+  strong {
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  a {
+    color: #1a77c2;
+  }
+
+  a, :link, :visited {
+    text-decoration: none;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  button, .pl-button, input, select, textarea {
+    outline: none;
+
+    &:focus, &:active {
+      outline: none;
+    }
+  }
+}

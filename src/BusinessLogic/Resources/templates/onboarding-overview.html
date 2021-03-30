@@ -1,0 +1,41 @@
+<div class="pl-onboarding-overview-page pl-flex-expand pl-medium-page pl-page-onboarding">
+    <div class="pl-text-center pl-page-padding pl-page-content">
+        <div class="pl-bottom-separate">
+            <h1 class="pl-text-center">
+                {$onboardingOverview.header}
+            </h1>
+        </div>
+        <div class="pl-onboarding-overview-list">
+            <div class="pl-list-item">
+                <i class="material-icons">check</i>
+                <div class="pl-row-orientation pl-flex-expand pl-flex-left">
+                    <div class="pl-flex-expand">
+                        <div class="pl-onboarding-list-title">{$onboardingOverview.parcelDetails}</div>
+                        <div class="pl-item-details pl-text-left"></div>
+                    </div>
+                    <button class="pl-button pl-button-primary pl-small">
+                        {$onboardingOverview.complete}
+                    </button>
+                </div>
+            </div>
+            <div class="pl-list-item">
+                <i class="material-icons">check</i>
+                <div class="pl-row-orientation pl-flex-expand pl-flex-left">
+                    <div class="pl-flex-expand">
+                        <div class="pl-onboarding-list-title">{$onboardingOverview.senderAddress}</div>
+                        <div class="pl-item-details pl-text-left"></div>
+                    </div>
+                    <button class="pl-button pl-button-primary pl-small">
+                        {$onboardingOverview.complete}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pl-page-buttons">
+        <button id="pl-onboarding-overview-button" name="onboardingOverview"
+                class="pl-button pl-button-primary">
+            {$general.continue}
+        </button>
+    </div>
+</div>

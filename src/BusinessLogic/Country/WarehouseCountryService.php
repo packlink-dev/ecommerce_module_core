@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Country;
 
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class WarehouseCountryService
@@ -91,11 +92,12 @@ class WarehouseCountryService extends CountryService
      */
     public function getSupportedCountries($associative = true)
     {
-        /** @var Country[] $countries */
-        $countries = FrontDtoFactory::getFromBatch(
-            Country::CLASS_KEY,
-            array_merge(static::$supportedCountries, static::$additionalWarehouseCountries)
-        );
+        $countries = array_merge(static::$supportedCountries, static::$additionalWarehouseCountries);
+
+        foreach ($countries as $country) {
+            $country['name'] = Translator::translate('countries.' . $country['code']);
+            $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
+        }
 
         return $associative ? $countries : array_values($countries);
     }

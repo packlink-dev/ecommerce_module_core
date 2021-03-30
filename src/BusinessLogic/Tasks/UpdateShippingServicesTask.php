@@ -5,7 +5,6 @@ namespace Packlink\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
@@ -212,29 +211,6 @@ class UpdateShippingServicesTask extends Task
 
         return $config->getDefaultWarehouse() !== null
             || $this->getCountryService()->isCountrySupported($userInfo->country);
-    }
-
-    /**
-     * Returns supported countries for available services.
-     *
-     * @return \Packlink\BusinessLogic\Country\Country[]
-     *
-     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     */
-    protected function getSupportedCountriesForServices()
-    {
-        $supportedCountries = $this->getCountryService()->getSupportedCountries();
-        $supportedCountries['US'] = Country::fromArray(
-            array(
-                'name' => 'United States',
-                'code' => 'US',
-                'postal_code' => '10001',
-                'registration_link' => 'https://pro.packlink.com/register',
-                'platform_country' => 'UN',
-            )
-        );
-
-        return $supportedCountries;
     }
 
     /**

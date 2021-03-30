@@ -1,0 +1,25 @@
+<div class="pl-my-shipping-services-page pl-flex-expand">
+    <header>
+        {$shippingServices.myServices}
+    </header>
+    <div class="pl-page-content pl-flex-expand">
+        <article id="pl-no-shipping-services"
+                 class="pl-no-services pl-flex-expand pl-center pl-page-padding pl-page-content pl-hidden pl-no-margin">
+            <img src="{$BASE_URL$}/images/service_truck.png" alt="">
+            <div class="pl-no-services-description">
+                <h1>{$shippingServices.noServicesTitle}</h1>
+                <p>{$shippingServices.noServicesDescription}</p>
+                <button class="pl-button pl-button-primary pl-add-service-button">
+                    {$shippingServices.addService}
+                </button>
+            </div>
+        </article>
+        <div id="pl-shipping-services-table" class="pl-full-width">
+        </div>
+        <div id="pl-shipping-services-list" class="pl-full-width">
+        </div>
+    </div>
+    <div class="pl-page-buttons">
+        <button class="pl-button pl-button-primary pl-add-service-button">{$shippingServices.addService}</button>
+    </div>
+</div>

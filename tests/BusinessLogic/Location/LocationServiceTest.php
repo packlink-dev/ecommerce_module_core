@@ -166,6 +166,23 @@ class LocationServiceTest extends BaseTestWithServices
         $this->assertEmpty($locations);
     }
 
+    /**
+     * @expectedException \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
+     */
+    public function testLocationSearchWithUnsupportedCountry()
+    {
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '[]')));
+
+        /** @var LocationService $locationService */
+        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
+        $locationService->searchLocations('RS', 'Test');
+    }
+
     public function testGetLocationsForInvalidPostalCode()
     {
         $this->initShippingMethod(true);
@@ -195,23 +212,6 @@ class LocationServiceTest extends BaseTestWithServices
         $locations = $locationService->getLocations(1, 'NL', '1011AS');
 
         $this->assertEmpty($locations);
-    }
-
-    /**
-     * @expectedException \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
-     *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
-     */
-    public function testLocationSearchWithUnsupportedCountry()
-    {
-        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '[]')));
-
-        /** @var LocationService $locationService */
-        $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
-        $locationService->searchLocations('RS', 'Test');
     }
 
     /**

@@ -49,6 +49,14 @@ class PostalCodeTransformerTest extends BaseTestWithServices
         self::assertEquals('1000-260', $transformedPostalCode);
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testTransformingPostalCodeWithSpecialCharacters()
+    {
+        PostalCodeTransformer::transform('GB', 'SW1Ä1');
+    }
+
     public function testTransformingNonFormattedPostalCode()
     {
         $transformedPostalCode = PostalCodeTransformer::transform('GB', 'SW1A1');
@@ -85,14 +93,6 @@ class PostalCodeTransformerTest extends BaseTestWithServices
         self::assertEquals('1000', $transformedPostalCode);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testTransformingPostalCodeWithSpecialCharacters()
-    {
-        PostalCodeTransformer::transform('GB', 'SW1Ä1');
-    }
-
     public function testTransformingImproperlyFormattedPostalCode()
     {
         $transformedPostalCode = PostalCodeTransformer::transform('GB', 'SW-1A-1');
@@ -114,11 +114,9 @@ class PostalCodeTransformerTest extends BaseTestWithServices
     public function testTransformingSpecialCasePostalCode()
     {
         $transformedPostalCode = PostalCodeTransformer::transform('US', '10018-0005');
-
         self::assertEquals('10018', $transformedPostalCode);
 
         $transformedPostalCode = PostalCodeTransformer::transform('US', '10018');
-
         self::assertEquals('10018', $transformedPostalCode);
     }
 }

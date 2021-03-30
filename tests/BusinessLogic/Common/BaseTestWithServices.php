@@ -24,6 +24,7 @@ use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Language\TranslationService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -110,6 +111,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             TaskRunnerWakeup::CLASS_NAME,
             function () use ($wakeupService) {
                 return $wakeupService;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            \Packlink\BusinessLogic\Language\Interfaces\TranslationService::CLASS_NAME,
+            function () {
+                return new TranslationService();
             }
         );
 

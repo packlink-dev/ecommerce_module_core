@@ -19,6 +19,13 @@ use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnav
 abstract class Configuration extends Singleton
 {
     /**
+     * Current language.
+     *
+     * @var string
+     */
+    private static $currentLanguage;
+
+    /**
      * Fully qualified name of this interface.
      */
     const CLASS_NAME = __CLASS__;
@@ -54,6 +61,26 @@ abstract class Configuration extends Singleton
      * @var \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface
      */
     protected $repository;
+
+    /**
+     * Retrieves current language.
+     *
+     * @return string
+     */
+    public static function getCurrentLanguage()
+    {
+        return self::$currentLanguage;
+    }
+
+    /**
+     * Sets current language.
+     *
+     * @param string $currentLanguage
+     */
+    public static function setCurrentLanguage($currentLanguage)
+    {
+        self::$currentLanguage = $currentLanguage;
+    }
 
     /**
      * Retrieves integration name.

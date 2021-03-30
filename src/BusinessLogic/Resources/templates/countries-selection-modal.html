@@ -1,0 +1,21 @@
+<div class="pl-center pl-full-width">
+    <form id="pl-countries-selection-form" class="pl-full-width">
+        <section class="pl-modal-subtitle">
+            {$shippingServices.selectCountriesSubheader}
+            <div class="pl-alert-wrapper" id="pl-countries-alert-wrapper">
+                <div class="pl-alert pl-alert-danger">
+                    <span class="pl-alert-text">{$shippingServices.atLeastOneCountry}</span>
+                    <i class="material-icons">close</i>
+                </div>
+            </div>
+        </section>
+        <section class="pl-checkbox pl-country-checkbox-wrapper pl-no-margin">
+            <input type="checkbox" name="isShipToAllCountries" id="pl-is-ship-to-all-countries">
+            <label for="pl-is-ship-to-all-countries" id="pl-check-all-countries">
+                {$shippingServices.selectAllCountries}
+            </label>
+        </section>
+        <div class="pl-shipping-country-selection-wrapper" id="pl-shipping-country-selection-wrapper">
+        </div>
+    </form>
+</div>

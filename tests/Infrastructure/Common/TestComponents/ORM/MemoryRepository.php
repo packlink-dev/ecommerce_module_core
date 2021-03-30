@@ -46,7 +46,7 @@ class MemoryRepository implements RepositoryInterface
         $groups = $filter ? $this->buildConditionGroups($filter, $fieldIndexMap) : array();
 
         $all = array_filter(
-            MemoryStorage::$storage,
+            $this->getStorage(),
             function ($a) use ($type) {
                 return $a['type'] === $type;
             }
@@ -102,7 +102,7 @@ class MemoryRepository implements RepositoryInterface
      */
     public function save(Entity $entity)
     {
-        $id = MemoryStorage::generateId();
+        $id = $this->generateId();
         $entity->setId($id);
         $this->saveEntityToStorage($entity);
 
@@ -118,7 +118,8 @@ class MemoryRepository implements RepositoryInterface
      */
     public function update(Entity $entity)
     {
-        $result = $entity->getId() !== null && isset(MemoryStorage::$storage[$entity->getId()]);
+        $storage = $this->getStorage();
+        $result = $entity->getId() !== null && isset($storage[$entity->getId()]);
         if ($result) {
             $this->saveEntityToStorage($entity);
         }
@@ -135,9 +136,10 @@ class MemoryRepository implements RepositoryInterface
      */
     public function delete(Entity $entity)
     {
-        $result = $entity->getId() !== null && isset(MemoryStorage::$storage[$entity->getId()]);
+        $storage = $this->getStorage();
+        $result = $entity->getId() !== null && isset($storage[$entity->getId()]);
         if ($result) {
-            unset(MemoryStorage::$storage[$entity->getId()]);
+            $this->deleteFromStorage($entity->getId());
         }
 
         return $result;
@@ -161,6 +163,47 @@ class MemoryRepository implements RepositoryInterface
     public function setEntityClass($entityClass)
     {
         $this->entityClass = $entityClass;
+    }
+
+    /**
+     * Gets the storage.
+     *
+     * @return \Logeecom\Infrastructure\ORM\Entity[]
+     */
+    protected function getStorage()
+    {
+        return MemoryStorage::$storage;
+    }
+
+    /**
+     * Saves an item to storage.
+     *
+     * @param $key
+     * @param $item
+     */
+    protected function saveToStorage($key, $item)
+    {
+        MemoryStorage::$storage[$key] = $item;
+    }
+
+    /**
+     * Deletes an item from storage.
+     *
+     * @param $key
+     */
+    protected function deleteFromStorage($key)
+    {
+        unset(MemoryStorage::$storage[$key]);
+    }
+
+    /**
+     * Generates a new ID.
+     *
+     * @return int
+     */
+    protected function generateId()
+    {
+        return MemoryStorage::generateId();
     }
 
     /**
@@ -195,7 +238,7 @@ class MemoryRepository implements RepositoryInterface
             $storageItem['index_' . $index] = $value;
         }
 
-        MemoryStorage::$storage[$entity->getId()] = $storageItem;
+        $this->saveToStorage($entity->getId(), $storageItem);
     }
 
     /**
