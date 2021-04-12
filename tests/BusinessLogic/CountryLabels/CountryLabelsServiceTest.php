@@ -175,9 +175,9 @@ class CountryLabelsServiceTest extends TestCase
     }
 
     /**
-     * Tests getTranslation function with existing language.
+     * Tests getLabels function without key with existing language.
      */
-    public function testGetTranslations()
+    public function testGetLabels()
     {
         $translations = $this->testCountryService->getLabels('fr');
 
@@ -185,12 +185,32 @@ class CountryLabelsServiceTest extends TestCase
     }
 
     /**
-     * Tests getTranslation function with non existing language.
+     * Tests getLabels function without key with non existing language.
      */
-    public function testGetTranslationsWithNonExistingLanguage()
+    public function testGetLabelsWithNonExistingLanguage()
     {
         $translations = $this->testCountryService->getLabels('rs');
 
         $this->assertEquals(static::$englishValues, $translations);
+    }
+
+    /**
+     * Tests getLabels function with existing key with existing language.
+     */
+    public function testGetLabelsWithKey()
+    {
+        $label = $this->testCountryService->getLabels('fr', 'testKey');
+
+        $this->assertEquals('testValueFr', $label);
+    }
+
+    /**
+     * Tests getLabels function with non exiting key.
+     */
+    public function testGetLabelsWithNonExistingKey()
+    {
+        $label = $this->testCountryService->getLabels('fr', 'testKeyNonExisting');
+
+        $this->assertEquals(null, $label);
     }
 }

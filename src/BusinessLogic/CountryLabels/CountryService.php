@@ -63,11 +63,7 @@ class CountryService implements BaseService
     {
         $this->currentLanguage = Configuration::getUICountryCode() ?: static::DEFAULT_LANG;
 
-        if (empty(static::$labels[$this->currentLanguage])) {
-            $this->initializeLabels();
-        }
-
-        $result = $this->getLabel($key, $this->currentLanguage);
+        $result = $this->getLabelByCurrentLanguage($key);
 
         if ($result === null) {
             $result = $this->getLabel($key, static::DEFAULT_LANG);
@@ -100,10 +96,12 @@ class CountryService implements BaseService
             return $labels;
         }
 
-        $uiCountryCode = Configuration::getUICountryCode();
-        Configuration::setUICountryCode($countryCode);
-        $label = $this->getText($key);
-        Configuration::setUICountryCode($uiCountryCode);
+        $languageBackup = $this->currentLanguage;
+        $this->currentLanguage = $countryCode;
+
+        $label = $this->getLabelByCurrentLanguage($key);
+
+        $this->currentLanguage = $languageBackup;
 
         return $label;
     }
@@ -159,5 +157,21 @@ class CountryService implements BaseService
     protected function getLabel($key, $language)
     {
         return isset(static::$labels[$language][$key]) ? static::$labels[$language][$key] : null;
+    }
+
+    /**
+     * Gets label by current language.
+     *
+     * @param string $key The label key.
+     *
+     * @return string|null The label.
+     */
+    protected function getLabelByCurrentLanguage($key)
+    {
+        if (empty(static::$labels[$this->currentLanguage])) {
+            $this->initializeLabels();
+        }
+
+        return $this->getLabel($key, $this->currentLanguage);
     }
 }
