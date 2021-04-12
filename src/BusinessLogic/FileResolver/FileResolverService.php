@@ -52,13 +52,11 @@ class FileResolverService
             $serializedJson = file_get_contents($filePath);
 
             if ($serializedJson) {
-                $array = json_decode($serializedJson, true);
-                /** @noinspection SlowArrayOperationsInLoopInspection */
-                $content = array_replace_recursive($content, $array);
+                $content[] = json_decode($serializedJson, true);
             }
         }
 
-        return $content;
+        return $content === array() ? $content : call_user_func_array('array_replace_recursive', $content);
     }
 
     /**
