@@ -74,6 +74,7 @@ class QueueItem extends Entity
         'queueTime',
         'lastUpdateTime',
         'priority',
+        'brand',
     );
     /**
      * Queue item status.
@@ -177,6 +178,12 @@ class QueueItem extends Entity
      * @var int QueueItem execution priority.
      */
     protected $priority;
+    /**
+     * QueueItem brand.
+     *
+     * @var string
+     */
+    protected $brand;
     /**
      * Instance of time provider.
      *
@@ -698,6 +705,26 @@ class QueueItem extends Entity
     }
 
     /**
+     * Gets queue item brand.
+     *
+     * @return string
+     */
+    public function getBrand()
+    {
+        return $this->brand;
+    }
+
+    /**
+     * Sets queue item brand.
+     *
+     * @param string $brand
+     */
+    public function setBrand($brand)
+    {
+        $this->brand = $brand;
+    }
+
+    /**
      * Reconfigures underlying task.
      *
      * @throws Exceptions\QueueItemDeserializationException
@@ -751,6 +778,7 @@ class QueueItem extends Entity
         $result['failTime'] = $this->timeProvider->serializeDate($this->failTime);
         $result['earliestStartTime'] = $this->timeProvider->serializeDate($this->earliestStartTime);
         $result['priority'] = $this->getPriority();
+        $result['brand'] = $this->getBrand();
 
         return $result;
     }
@@ -771,6 +799,7 @@ class QueueItem extends Entity
         $this->finishTime = $this->timeProvider->deserializeDateString($data['finishTime']);
         $this->failTime = $this->timeProvider->deserializeDateString($data['failTime']);
         $this->earliestStartTime = $this->timeProvider->deserializeDateString($data['earliestStartTime']);
+        $this->brand = $data['brand'];
     }
 
     /**

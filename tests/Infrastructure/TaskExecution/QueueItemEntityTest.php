@@ -145,6 +145,7 @@ class QueueItemEntityTest extends TestCase
             'queueTime' => $queueTime->format(DATE_ATOM),
             'lastUpdateTime' => $lastUpdateTime->format(DATE_ATOM),
             'priority' => Priority::LOW,
+            'brand' => '',
         );
 
         $entity = QueueItem::fromArray($data);
