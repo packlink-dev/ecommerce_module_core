@@ -51,8 +51,10 @@ class RegistrationController
             'email' => $registrationData->getEmail(),
             'phone' => $registrationData->getPhone(),
             'source' => $registrationData->getSource(),
-            'termsAndConditionsUrl' => $this->getCountryService()->getLabels(strtolower($country), 'register.termsAndConditionsUrl'),
-            'privacyPolicyUrl' => $this->getCountryService()->getLabels(strtolower($country), 'register.privacyPolicyUrl'),
+            'termsAndConditionsUrl' => $this->getCountryService()
+                ->getLabel(strtolower($country), 'register.termsAndConditionsUrl', static::DEFAULT_COUNTRY),
+            'privacyPolicyUrl' => $this->getCountryService()
+                ->getLabel(strtolower($country), 'register.privacyPolicyUrl', static::DEFAULT_COUNTRY),
             'platform_country' => in_array($country, $brand->platformCountries, true) ?
                 $country : $brand->platformCountries[0],
         );

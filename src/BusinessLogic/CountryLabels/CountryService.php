@@ -63,47 +63,57 @@ class CountryService implements BaseService
     {
         $this->currentLanguage = Configuration::getUICountryCode() ?: static::DEFAULT_LANG;
 
+        $result = $this->fetchLabel($key, static::DEFAULT_LANG);
+
+        return vsprintf($result, $arguments);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLabel($countryCode, $key, $fallbackCode = self::DEFAULT_LANG)
+    {
+        $languageBackup = $this->currentLanguage;
+        $this->currentLanguage = $countryCode;
+
+        $label = $this->fetchLabel($key, $fallbackCode);
+
+        $this->currentLanguage = $languageBackup;
+
+        return $label;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllLabels($countryCode)
+    {
+        $labels[$countryCode] = $this->fileResolverService->getContent($countryCode);
+        $labels[static::DEFAULT_LANG] = $this->fileResolverService->getContent(static::DEFAULT_LANG);
+
+        return $labels;
+    }
+
+    /**
+     * @param $key
+     * @param $defaultLanguage
+     *
+     * @return string|null
+     */
+    protected function fetchLabel($key, $defaultLanguage)
+    {
         $result = $this->getLabelByCurrentLanguage($key);
 
         if ($result === null) {
-            $result = $this->getLabel($key, static::DEFAULT_LANG);
+            $this->initializeLanguage($defaultLanguage);
+            $result = $this->getLabelByKeyAndLanguage($key, $defaultLanguage);
         }
 
         if ($result === null) {
             $result = $key;
         }
 
-        return vsprintf($result, $arguments);
-    }
-
-    /**
-     * Fetches labels for a specific country (provided by $countryCode parameter)
-     * and default country.
-     * If parameter key is not set, fetches all labels for country.
-     * If parameter key is set, fetches label for specified key.
-     *
-     * @param string $countryCode
-     * @param string $key
-     *
-     * @return array|string
-     */
-    public function getLabels($countryCode, $key = '')
-    {
-        if (!$key) {
-            $labels[$countryCode] = $this->fileResolverService->getContent($countryCode);
-            $labels[static::DEFAULT_LANG] = $this->fileResolverService->getContent(static::DEFAULT_LANG);
-
-            return $labels;
-        }
-
-        $languageBackup = $this->currentLanguage;
-        $this->currentLanguage = $countryCode;
-
-        $label = $this->getLabelByCurrentLanguage($key);
-
-        $this->currentLanguage = $languageBackup;
-
-        return $label;
+        return $result;
     }
 
     /**
@@ -154,7 +164,7 @@ class CountryService implements BaseService
      *
      * @return string|null The label.
      */
-    protected function getLabel($key, $language)
+    protected function getLabelByKeyAndLanguage($key, $language)
     {
         return isset(static::$labels[$language][$key]) ? static::$labels[$language][$key] : null;
     }
@@ -172,6 +182,6 @@ class CountryService implements BaseService
             $this->initializeLabels();
         }
 
-        return $this->getLabel($key, $this->currentLanguage);
+        return $this->getLabelByKeyAndLanguage($key, $this->currentLanguage);
     }
 }

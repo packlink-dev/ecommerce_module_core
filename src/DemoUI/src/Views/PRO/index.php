@@ -23,7 +23,7 @@ function getTranslations($language)
     /** @var CountryService $countryService */
     $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-    $labels = $countryService->getLabels($language);
+    $labels = $countryService->getAllLabels($language);
     $defaultLabels = json_encode($labels['en']);
     $currentLanguageLabels = json_encode($labels[$language]);
 

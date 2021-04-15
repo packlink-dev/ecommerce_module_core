@@ -175,21 +175,21 @@ class CountryLabelsServiceTest extends TestCase
     }
 
     /**
-     * Tests getLabels function without key with existing language.
+     * Tests getAllLabels.
      */
-    public function testGetLabels()
+    public function testGetAllLabels()
     {
-        $translations = $this->testCountryService->getLabels('fr');
+        $translations = $this->testCountryService->getAllLabels('fr');
 
         $this->assertEquals(static::$englishAndFrenchValues, $translations);
     }
 
     /**
-     * Tests getLabels function without key with non existing language.
+     * Tests getAllLabels with non existing language.
      */
     public function testGetLabelsWithNonExistingLanguage()
     {
-        $translations = $this->testCountryService->getLabels('rs');
+        $translations = $this->testCountryService->getAllLabels('rs');
 
         $this->assertEquals(static::$englishValues, $translations);
     }
@@ -199,7 +199,7 @@ class CountryLabelsServiceTest extends TestCase
      */
     public function testGetLabelsWithKey()
     {
-        $label = $this->testCountryService->getLabels('fr', 'testKey');
+        $label = $this->testCountryService->getLabel('fr', 'testKey');
 
         $this->assertEquals('testValueFr', $label);
     }
@@ -209,8 +209,15 @@ class CountryLabelsServiceTest extends TestCase
      */
     public function testGetLabelsWithNonExistingKey()
     {
-        $label = $this->testCountryService->getLabels('fr', 'testKeyNonExisting');
+        $label = $this->testCountryService->getLabel('fr', 'testKeyNonExisting');
 
-        $this->assertEquals(null, $label);
+        $this->assertEquals('testKeyNonExisting', $label);
+    }
+
+    public function testGetLabelsWithFallbackCountry()
+    {
+        $label = $this->testCountryService->getLabel('en', 'namespace.nestedKeyWithPlaceholder', 'fr');
+
+        $this->assertEquals('Nested key fr.', $label);
     }
 }

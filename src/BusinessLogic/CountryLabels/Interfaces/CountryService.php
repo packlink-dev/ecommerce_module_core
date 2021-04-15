@@ -36,8 +36,18 @@ interface CountryService
      *
      * @param string $countryCode
      * @param string $key
+     * @param string $fallbackCode
+     *
+     * @return string
+     */
+    public function getLabel($countryCode, $key, $fallbackCode = '');
+
+    /**
+     * Gets all labels for provided country code and default code.
+     *
+     * @param string $countryCode
      *
      * @return array
      */
-    public function getLabels($countryCode, $key = '');
+    public function getAllLabels($countryCode);
 }

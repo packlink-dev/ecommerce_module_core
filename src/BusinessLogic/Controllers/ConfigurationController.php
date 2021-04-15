@@ -14,7 +14,7 @@ use Packlink\BusinessLogic\Utility\UrlService;
 class ConfigurationController
 {
     /**
-     * @return mixed|string
+     * @return string
      */
     public function getHelpLink()
     {
@@ -23,6 +23,6 @@ class ConfigurationController
         /** @var CountryService $countryService */
         $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-        return $countryService->getLabels(strtolower($lang), 'configuration.helpUrl');
+        return $countryService->getLabel(strtolower($lang), 'configuration.helpUrl');
     }
 }
