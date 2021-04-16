@@ -12,7 +12,8 @@ if (!window.Packlink) {
             translator = Packlink.translationService,
             ajaxService = Packlink.ajaxService,
             utilityService = Packlink.utilityService,
-            state = Packlink.state;
+            state = Packlink.state,
+            settingsButtonService = Packlink.settingsButtonService;
 
         /**
          * @type {ShippingService[]}
@@ -36,9 +37,7 @@ if (!window.Packlink) {
                 button.addEventListener('click', addServiceClick);
             });
 
-            settingsMenu.addEventListener('click', () => {
-                state.goToState('configuration');
-            });
+            settingsButtonService.displaySettings(settingsMenu, state);
         };
 
         const addServiceClick = () => {

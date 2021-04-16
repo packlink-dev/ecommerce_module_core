@@ -136,6 +136,7 @@ echo $lang ?>">
 <script src="./resources/js/ServiceCountriesModalController.js"></script>
 <script src="./resources/js/PricePolicyController.js"></script>
 <script src="./resources/js/StateUUIDService.js"></script>
+<script src="./resources/js/SettingsButtonService.js"></script>
 
 <script>
     <?php
