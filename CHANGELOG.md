@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+** BREAKING CHANGES **
+
+## Added
+- Added new js component for shipment service settings button. This is added, so we can use settings button 
+  in other components.
+
+### Changed
+- Changed logic for setting settings button in shipping service js.
+
 ## [3.1.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.1.0...v3.1.1) - 2021-03-26
 ### Added
 - Added additional ISO codes to the postal code transformer.
