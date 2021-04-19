@@ -8,7 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Added
 - Added new js component for shipment service settings button. This is added, so we can use settings button 
-  in other components.
+  in other components. Now you need to reference `SettingsButtonService` in `MyShippingServicesController.js`. Now you
+  need to call function `displaySettings` from `SettingsButtonService`in `MyShippingServicesController.js` 
+  function `display`.
 
 ### Changed
 - Changed logic for setting settings button in shipping service js.
