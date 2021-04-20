@@ -60,7 +60,7 @@ class ScheduleTickHandler
      */
     protected function enqueueCheckTask()
     {
-        $task = new ScheduleCheckTask();
+        $task = $this->getScheduleCheckTask();
         try {
             $this->getQueueService()->enqueue(
                 $this->getConfigService()->getSchedulerQueueName(),
@@ -79,6 +79,16 @@ class ScheduleTickHandler
                 )
             );
         }
+    }
+
+    /**
+     * Gets ScheduleCheckTask.
+     *
+     * @return ScheduleCheckTask
+     */
+    protected function getScheduleCheckTask()
+    {
+        return new ScheduleCheckTask();
     }
 
     /**
