@@ -1,0 +1,57 @@
+{
+  "general": {
+    "acme": "ACME Shipping",
+    "saveUp": "Sparen Sie bis zu 70% bei Ihren Versandkosten. Keine festen Gebühren, kein Mindestvolumen beim Versand. Verwalten Sie alle Ihre Sendungen auf einer einzigen Plattform.",
+    "acmeShipping": "ACME Shipping S.L.",
+    "noContract": "Ohne Vertragsbindung – Sofortiger Zugriff auf über 300 Versanddienste in einer einzigen Plattform. Verbinden Sie Ihren Onlineshop und steuern Sie alle Sendungen über ACME.",
+    "developedAndManaged": "Entwickelt und verwaltet von ACME"
+  },
+  "login": {
+    "welcome": "Willkommen zu ACME",
+    "connectYourService": "Verbinden Sie Ihren Dienst, indem Sie Ihren API-Schlüssel verwenden. Sie finden ihn unter <br><strong>„ACME API-Schlüssel“</strong> bei den <strong>„Einstellungen“</strong>."
+  },
+  "register": {
+    "startEnjoying": "Genießen Sie ab jetzt ACME!",
+    "termsAndConditions": "<pre>Ich akzeptiere die <a href=\"%s\" target=\"_blank\">Nutzungsbedingungen</a> und die <a href=\"%s\" target=\"_blank\">Datenschutzerklärung</a> von ACME</pre>",
+    "termsAndConditionsUrl": "https://en.wikipedia.org/wiki/Acme_Corporation",
+    "privacyPolicyUrl": "https://en.wikipedia.org/wiki/Acme_Corporation",
+    "marketingEmails": "Ich ermächtige ACME Shipping S.L., mir kommerzielle Mitteilungen per E-Mail zuzusenden"
+  },
+  "configuration": {
+    "helpUrl": "https://en.wikipedia.org/wiki/Acme_Corporation",
+    "contactUrl": "business@packlink.com",
+    "contactUrlMail": "mailto::business@packlink.com"
+  },
+  "orderStatusMapping": {
+    "description": "Mit ACME können Sie Ihren %s Bestellstatus mit Versandinformationen aktualisieren. <br>Sie können die Informationen jederzeit bearbeiten.",
+    "acmeShipmentStatus": "<strong>VERSANDSTATUS</strong> von ACME"
+  },
+  "shippingServices": {
+    "acmePrices": "ACME-Preise",
+    "pricePolicyDescription": "Standardmäßig werden <strong>die ACME Basispreise </strong> eingestellt sein. Sie können diese jedoch weiter unten genauer konfigurieren.",
+    "acmePrice": "ACME-Preise",
+    "percentageacmePrices": "% der ACME-Preise",
+    "percentageacmePricesWithData": "% der ACME-Preise: %s von %s%",
+    "useacmeRange": "Für alle anderen Bereiche gelten die ACME-Preise"
+  },
+  "orderListAndDetails": {
+    "acmeOrderDraft": "ACME Auftragsentwurf",
+    "printShipmentLabels": "ACME Versandetiketten drucken",
+    "acmeReferenceNumber": "ACME Referenznummer",
+    "acmeShippingPrice": "ACME Versandpreis",
+    "viewOnAcme": "Auf ACME ansehen",
+    "draftIsBeingCreated": "Der Entwurf wird gerade in ACME erstellt",
+    "createOrderDraft": "Entwurf der Bestellung in ACME erstellen",
+    "acmeShipping": "ACME Shipping",
+    "sendWithAcme": "Send with ACME",
+    "shipmentUrl": "https://pro.packlink.de/private/shipments/"
+  },
+  "systemLogMessages": {
+    "webhookReceived": "Webhook von ACME erhalten"
+  },
+  "autoTest": {
+    "moduleAutoTest": "Automatischer Test ACMEPRO-Modul",
+    "useThisPageTestConfiguration": "Auf dieser Seite können Sie die Systemkonfiguration und die Dienste des ACMEPRO-Moduls testen.",
+    "openModule": "ACMEPRO-Modul öffnen"
+  }
+}

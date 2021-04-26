@@ -42,9 +42,6 @@ if (!window.Packlink) {
 
             templateService.getComponent('pl-go-to-login', registerPage).addEventListener('click', goToLogin);
 
-            templateService.getComponent('pl-register-platform-country', registerPage).value =
-                additionalConfig.hasOwnProperty('platform_country') ? additionalConfig.platform_country : 'ES';
-
             initInputField('pl-register-email');
             initInputField('pl-register-password');
             initInputField('pl-register-phone');
@@ -60,17 +57,20 @@ if (!window.Packlink) {
          *  phone: string,
          *  source: string,
          *  termsAndConditionsUrl: string,
-         *  privacyPolicyUrl: string
+         *  privacyPolicyUrl: string,
+         *  platform_country: string
          *  }} response
          */
         const populateInitialValues = (response) => {
             const emailInput = templateService.getComponent('pl-register-email'),
                 phoneInput = templateService.getComponent('pl-register-phone'),
-                sourceInput = templateService.getComponent('pl-register-source');
+                sourceInput = templateService.getComponent('pl-register-source'),
+                platformCountry = templateService.getComponent('pl-register-platform-country');
 
             emailInput.value = response.email;
             phoneInput.value = response.phone;
             sourceInput.value = response.source;
+            platformCountry.value = response.platform_country;
 
             let termsAndConditionsLabel = templateService.getComponent('pl-register-terms-and-conditions-label'),
                 termsTranslation = translationService.translate(

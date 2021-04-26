@@ -3,6 +3,8 @@
 namespace BusinessLogic\Registration;
 
 use Logeecom\Tests\BusinessLogic\Dto\BaseDtoTest;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 
@@ -19,12 +21,15 @@ class RegistrationRequestDtoTest extends BaseDtoTest
     public function testValidRegistrationRequest()
     {
         $request = RegistrationRequest::fromArray($this->getRequest());
+        /** @var BrandConfigurationService $brandConfigurationService */
+        $brandConfigurationService = TestServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+        $brand = $brandConfigurationService->get();
 
         self::assertEquals('john.doe@example.com', $request->email);
         self::assertEquals('test1234', $request->password);
         self::assertEquals('(024) 418 52 52', $request->phone);
         self::assertEquals('1 - 10', $request->estimatedDeliveryVolume);
-        self::assertEquals('PRO', $request->platform);
+        self::assertEquals($brand->platformCode, $request->platform);
         self::assertEquals('de_DE', $request->language);
         self::assertEquals('UN', $request->platformCountry);
         self::assertEquals('http://example.com', $request->source);
@@ -144,12 +149,16 @@ class RegistrationRequestDtoTest extends BaseDtoTest
      */
     private function getRequest()
     {
+        /** @var BrandConfigurationService $brandConfigurationService */
+        $brandConfigurationService = TestServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+        $brand = $brandConfigurationService->get();
+
         return array(
             'email' => 'john.doe@example.com',
             'password' => 'test1234',
             'phone' => '(024) 418 52 52',
             'estimated_delivery_volume' => '1 - 10',
-            'platform' => 'PRO',
+            'platform' => $brand->platformCode,
             'language' => 'de_DE',
             'platform_country' => 'UN',
             'policies' => array(

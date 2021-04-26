@@ -10,13 +10,15 @@
     "autoload": {
         "psr-4": {
             "Logeecom\\Infrastructure\\": "src/Infrastructure",
-            "Packlink\\BusinessLogic\\": "src/BusinessLogic"
+            "Packlink\\BusinessLogic\\": "src/BusinessLogic",
+            "Packlink\\Brands\\": "src/Brands"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Logeecom\\Tests\\Infrastructure\\": "tests/Infrastructure",
-            "Logeecom\\Tests\\BusinessLogic\\": "tests/BusinessLogic"
+            "Logeecom\\Tests\\BusinessLogic\\": "tests/BusinessLogic",
+            "Logeecom\\Tests\\Brands\\": "tests/Brands"
         }
     },
     "require-dev": {

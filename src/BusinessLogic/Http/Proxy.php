@@ -8,6 +8,8 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
@@ -199,9 +201,11 @@ class Proxy
      */
     public function searchLocations($platformCountry, $postalZone, $query)
     {
+        $brand = $this->getBrandConfigurationService()->get();
+
         $url = 'locations/postalcodes?' . http_build_query(
                 array(
-                    'platform' => 'PRO',
+                    'platform' => $brand->platformCode,
                     'platform_country' => $platformCountry,
                     'postalzone' => $postalZone,
                     'q' => $query,
@@ -245,9 +249,11 @@ class Proxy
      */
     public function getPostalZones($countryCode, $lang = 'en')
     {
+        $brand = $this->getBrandConfigurationService()->get();
+
         $url = 'locations/postalzones/destinations?' . http_build_query(
                 array(
-                    'platform' => 'PRO',
+                    'platform' => $brand->platformCode,
                     'platform_country' => $countryCode,
                     'language' => $lang,
                 )
@@ -551,5 +557,14 @@ class Proxy
             'Ecommerce-Name' => 'X-Ecommerce-Name: ' . $this->configService->getECommerceName(),
             'Ecommerce-Version' => 'X-Ecommerce-Version: ' . $this->configService->getECommerceVersion(),
         );
+    }
+
+    /**
+     * @return BrandConfigurationService
+     */
+    private function getBrandConfigurationService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
     }
 }

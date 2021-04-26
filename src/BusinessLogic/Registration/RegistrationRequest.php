@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Registration;
 
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\FrontDto;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Language\Translator;
@@ -54,7 +56,7 @@ class RegistrationRequest extends FrontDto
      */
     public $language;
     /**
-     * Platform (only supported platform is "PRO").
+     * Platform.
      *
      * @var string
      */
@@ -209,6 +211,8 @@ class RegistrationRequest extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
+        $brand = static::getBrandConfigurationService()->get();
+
         if (!empty($payload['email']) && !DtoValidator::isEmailValid($payload['email'])) {
             static::setInvalidFieldError('email', $validationErrors, Translator::translate('validation.invalidEmail'));
         }
@@ -244,7 +248,7 @@ class RegistrationRequest extends FrontDto
         }
 
         if (!empty($payload['platform_country'])
-            && !in_array($payload['platform_country'], static::$supportedPlatformCountries, true)
+            && !in_array($payload['platform_country'], $brand->platformCountries, true)
         ) {
             static::setInvalidFieldError(
                 'platform_country',
@@ -257,12 +261,21 @@ class RegistrationRequest extends FrontDto
             static::setInvalidFieldError('source', $validationErrors, Translator::translate('validation.invalidUrl'));
         }
 
-        if (!empty($payload['platform']) && $payload['platform'] !== 'PRO') {
+        if (!empty($payload['platform']) && $payload['platform'] !== $brand->platformCode) {
             static::setInvalidFieldError(
                 'platform',
                 $validationErrors,
-                Translator::translate('validation.invalidFieldValue', array('PRO'))
+                Translator::translate('validation.invalidFieldValue', array($brand->platformCode))
             );
         }
+    }
+
+    /**
+     * @return BrandConfigurationService
+     */
+    private static function getBrandConfigurationService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
     }
 }

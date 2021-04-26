@@ -5,8 +5,8 @@ namespace Packlink\BusinessLogic\OrderShipmentDetails;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
@@ -272,15 +272,15 @@ class OrderShipmentDetailsService extends BaseService
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $userInfo = $configService->getUserInfo();
+        $countryCode = 'en';
+
+        if ($userInfo) {
+            $countryCode = $userInfo->country;
+        }
 
         /** @var CountryService $countryService */
         $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-        $userDomain = 'com';
-        if ($userInfo !== null && $countryService->isBaseCountry($userInfo->country)) {
-            $userDomain = strtolower($userInfo->country);
-        }
-
-        return "https://pro.packlink.$userDomain/private/shipments/$reference";
+        return $countryService->getLabel(strtolower($countryCode), 'orderListAndDetails.shipmentUrl') . $reference;
     }
 }

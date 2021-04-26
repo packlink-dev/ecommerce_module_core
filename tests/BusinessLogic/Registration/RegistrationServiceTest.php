@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
@@ -105,13 +106,17 @@ class RegistrationServiceTest extends BaseTestWithServices
      */
     private function getRequest()
     {
+        /** @var BrandConfigurationService $brandConfigurationService */
+        $brandConfigurationService = ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+        $brand = $brandConfigurationService->get();
+
         return RegistrationRequest::fromArray(
             array(
                 'email' => 'john.doe@example.com',
                 'password' => 'test1234',
                 'phone' => '(024) 418 52 52',
                 'estimated_delivery_volume' => '1 - 10',
-                'platform' => 'PRO',
+                'platform' => $brand->platformCode,
                 'language' => 'de_DE',
                 'platform_country' => 'UN',
                 'policies' => array(

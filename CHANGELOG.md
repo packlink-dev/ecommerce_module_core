@@ -23,6 +23,34 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Changed setting the language based on user's platform country instead of current shop language during the registration process.
 
+**BREAKING CHANGES**
+Whitelabel project changes:
+
+### Added
+- Added BrandConfigurationService. Integration should register PacklinkConfigurationService instance for Packlink brand or adequate implementation for other brand(s) during the bootstraping.
+- Added PacklinkConfigurationService.
+- Added FileResolverService. Integration should initialize FileResolverService with an array of folders where source files should be searched for.
+- Added new method getLabels to \Packlink\BusinessLogic\CountryLabels\CountryService.
+
+### Changed
+
+- \Packlink\BusinessLogic\Language\TranslationService renamed to CountryService.
+- TranslationService::translate renamed to CountryService::getText.
+- Files from Resources/lang moved to Resources/countries. In integration, change path to translations to fit new folder names in core.
+- Configuration::getCurrentLanguage and Configuration::setCurrentLanguage changed to Configuration::getUICountryCode and Configuration::setUICountryCode.
+
+Following changes will work properly once BrandConfigurationService is registered in Bootstrap:
+- Removed hardcoded source value from ShippingServiceSearch.
+- Removed hardcoded platform code from Proxy, Draft and RegistrationRequest.
+- Removed platform country code from RegisterModalController.js.
+- Added platform_country to RegistrationController:getRegisterData response.
+- RegisterController.js function populateInitialValues() populates platform_country.
+- Registration link and platform country removed from CountryService::$supportedCountries.
+- Removed Packlink\BusinessLogic\Country\RegistrationCountry.
+- Added validation for platform country in RegistrationRequest::doValidate and UserAccountService::initializeUser.
+- Removed $supportedCountries from CountryService and WarehouseCountryService.
+- Packlink\BusinessLogic\Language\TranslationService renamed to CountryService and moved to CountryLabels directory.
+
 ## [3.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.0.6...v3.1.0) - 2020-12-11
 ### Added
 - Added postal code transformer service that transforms postal code into supported postal code format for some countries.

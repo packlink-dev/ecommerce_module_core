@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\Utility\UrlService;
 
 /**
@@ -12,29 +14,15 @@ use Packlink\BusinessLogic\Utility\UrlService;
 class ConfigurationController
 {
     /**
-     * List of help URLs for different country codes.
-     *
-     * @var array
-     */
-    private static $helpUrls = array(
-        'EN' => 'https://support-pro.packlink.com/hc/en-gb',
-        'ES' => 'https://support-pro.packlink.com/hc/es-es',
-        'DE' => 'https://support-pro.packlink.com/hc/de',
-        'FR' => 'https://support-pro.packlink.com/hc/fr-fr',
-        'IT' => 'https://support-pro.packlink.com/hc/it',
-    );
-
-    /**
-     * @return mixed|string
+     * @return string
      */
     public function getHelpLink()
     {
         $lang = UrlService::getUrlLocaleKey();
 
-        if (!array_key_exists($lang, static::$helpUrls)) {
-            $lang = 'EN';
-        }
+        /** @var CountryService $countryService */
+        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-        return static::$helpUrls[$lang];
+        return $countryService->getLabel(strtolower($lang), 'configuration.helpUrl');
     }
 }
