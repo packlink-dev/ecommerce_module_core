@@ -44,7 +44,7 @@
     "createOrderDraft": "Create order draft in Packlink PRO",
     "packlinkShipping": "Packlink Shipping",
     "sendWithPacklink": "Send with Packlink",
-    "shipmentUrl": "https://pro.packlink.en/private/shipments/"
+    "shipmentUrl": "https://pro.packlink.com/private/shipments/"
   },
   "systemLogMessages": {
     "webhookReceived": "Webhook from Packlink received."
