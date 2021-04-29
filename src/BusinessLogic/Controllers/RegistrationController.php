@@ -17,7 +17,7 @@ class RegistrationController
     /**
      * string
      */
-    const DEFAULT_COUNTRY = 'ES';
+    const DEFAULT_COUNTRY = 'es';
     /**
      * @var Configuration
      */

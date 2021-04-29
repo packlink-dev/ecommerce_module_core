@@ -60,7 +60,6 @@ class ScheduleCheckTask extends Task
         foreach ($this->getSchedules() as $schedule) {
             try {
                 $this->enqueueScheduledTask($schedule);
-                $this->updateSchedule($schedule);
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
                     'Failed to enqueue task ' . ($schedule->getTask() ? $schedule->getTask()->getType() : ''),
@@ -83,6 +82,7 @@ class ScheduleCheckTask extends Task
      * @param $schedule
      *
      * @throws QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     protected function enqueueScheduledTask($schedule)
     {
@@ -104,6 +104,7 @@ class ScheduleCheckTask extends Task
         }
 
         $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext(), $task->getPriority());
+        $this->updateSchedule($schedule);
     }
 
     /**
