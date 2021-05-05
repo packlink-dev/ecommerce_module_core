@@ -12,7 +12,8 @@
       "Logeecom\\Tests\\": "../../tests",
       "Packlink\\BusinessLogic\\": "../BusinessLogic",
       "Packlink\\DemoUI\\Lib\\": "Lib",
-      "Packlink\\DemoUI\\": "src"
+      "Packlink\\DemoUI\\": "src",
+      "Packlink\\Brands\\": "../Brands"
     }
   },
   "scripts": {

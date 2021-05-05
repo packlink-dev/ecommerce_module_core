@@ -3,7 +3,7 @@
 namespace Packlink\BusinessLogic\Language;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Language\Interfaces\TranslationService as TranslationServiceInterface;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
 
 /**
  * Class Translator.
@@ -13,9 +13,9 @@ use Packlink\BusinessLogic\Language\Interfaces\TranslationService as Translation
 class Translator
 {
     /**
-     * @var TranslationServiceInterface
+     * @var LabelServiceInterface
      */
-    protected static $translationService;
+    protected static $countryService;
 
     /**
      * Translates provided string.
@@ -27,20 +27,20 @@ class Translator
      */
     public static function translate($key, array $arguments = array())
     {
-        return static::getTranslationService()->translate($key, $arguments);
+        return static::getCountryService()->getText($key, $arguments);
     }
 
     /**
      * Retrieves translation service.
      *
-     * @return TranslationServiceInterface
+     * @return LabelServiceInterface
      */
-    protected static function getTranslationService()
+    protected static function getCountryService()
     {
-        if (static::$translationService === null) {
-            static::$translationService = ServiceRegister::getService(TranslationServiceInterface::CLASS_NAME);
+        if (static::$countryService === null) {
+            static::$countryService = ServiceRegister::getService(LabelServiceInterface::CLASS_NAME);
         }
 
-        return static::$translationService;
+        return static::$countryService;
     }
 }

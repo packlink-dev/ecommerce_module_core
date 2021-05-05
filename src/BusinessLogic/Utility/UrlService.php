@@ -24,11 +24,11 @@ class UrlService
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $userInfo = $configService->getUserInfo();
-        $currentLang = $configService::getCurrentLanguage();
+        $currentLang = $configService::getUICountryCode();
 
-        if ($userInfo !== null && in_array($userInfo->country, array('ES', 'DE', 'FR', 'IT'), true)) {
+        if ($userInfo !== null) {
             $locale = $userInfo->country;
-        } elseif (in_array(strtoupper($currentLang), array('ES', 'DE', 'FR', 'IT'), true)) {
+        } elseif ($currentLang) {
             $locale = strtoupper($currentLang);
         }
 

@@ -56,48 +56,74 @@ class ScheduleCheckTask extends Task
      */
     public function execute()
     {
-        /** @var QueueService $queueService */
-        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-
         /** @var Schedule $schedule */
         foreach ($this->getSchedules() as $schedule) {
-            $task = $schedule->getTask();
-            if (!$task) {
-                continue;
-            }
-
             try {
-                $latestTask = $queueService->findLatestByType($task->getType(), $schedule->getContext());
-                if ($latestTask
-                    && $schedule->isRecurring()
-                    && in_array($latestTask->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)
-                ) {
-                    // do not enqueue task if it is already scheduled for execution
-                    continue;
-                }
-
-                $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext(), $task->getPriority());
-
-                if ($schedule->isRecurring()) {
-                    $schedule->setNextSchedule();
-                    $this->getRepository()->update($schedule);
-                } else {
-                    $this->getRepository()->delete($schedule);
-                }
+                $this->enqueueScheduledTask($schedule);
             } catch (QueueStorageUnavailableException $ex) {
                 Logger::logDebug(
-                    'Failed to enqueue task ' . $task->getType(),
+                    'Failed to enqueue task ' . ($schedule->getTask() ? $schedule->getTask()->getType() : ''),
                     'Core',
                     array(
                         'ExceptionMessage' => $ex->getMessage(),
                         'ExceptionTrace' => $ex->getTraceAsString(),
-                        'TaskData' => Serializer::serialize($task),
+                        'TaskData' => Serializer::serialize($schedule->getTask()),
                     )
                 );
             }
         }
 
         $this->reportProgress(100);
+    }
+
+    /**
+     * Enqueues scheduled task.
+     *
+     * @param $schedule
+     *
+     * @throws QueueStorageUnavailableException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    protected function enqueueScheduledTask($schedule)
+    {
+        /** @var QueueService $queueService */
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+
+        $task = $schedule->getTask();
+        if (!$task) {
+            return;
+        }
+
+        $latestTask = $queueService->findLatestByType($task->getType(), $schedule->getContext());
+        if ($latestTask
+            && $schedule->isRecurring()
+            && in_array($latestTask->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)
+        ) {
+            // do not enqueue task if it is already scheduled for execution
+            return;
+        }
+
+        $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext(), $task->getPriority());
+        $this->updateSchedule($schedule);
+    }
+
+    /**
+     * Checks if schedule is recurring.
+     * If it is - updates next schedule time,
+     * if it isn't - deletes schedule.
+     *
+     * @param $schedule
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    protected function updateSchedule($schedule)
+    {
+        if ($schedule->isRecurring()) {
+            $schedule->setNextSchedule();
+            $this->getRepository()->update($schedule);
+        } else {
+            $this->getRepository()->delete($schedule);
+        }
     }
 
     /**

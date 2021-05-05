@@ -1,0 +1,57 @@
+{
+  "general": {
+    "packlinkPro": "Packlink PRO Shipping",
+    "saveUp": "Économisez jusqu'à 70% sur vos coûts de livraison. Sans frais fixes, sans volume minimum requis. Gérez tous vos envois depuis une seule plateforme.",
+    "packlinkShipping": "Packlink Shipping S.L.",
+    "noContract": "Sans engagement, accédez immédiatement à plus de 300 services de transport sur une seule et unique plateforme. Quelque soit le nombre de points de ventes que vous avez, vous pourrez tout gérer depuis Packlink PRO.",
+    "developedAndManaged": "Développé et géré par Packlink"
+  },
+  "login": {
+    "welcome": "Bienvenue sur Packlink PRO",
+    "connectYourService": "Connectez votre service en utilisant votre clé. Vous la trouverez dans la section <br><strong>« Clé API Packlink Pro »</strong> dans <strong>« Paramètres »</strong>."
+  },
+  "register": {
+    "startEnjoying": "Commencez à utiliser Packlink PRO !",
+    "termsAndConditions": "<pre>IJ’accepte les <a href=\"%s\" target=\"_blank\">Conditions de service</a> et la <a href=\"%s\" target=\"_blank\">Politique de confidentialité</a> de Packlink</pre>",
+    "termsAndConditionsUrl": "https://pro.packlink.fr/conditions-generales/",
+    "privacyPolicyUrl": "https://support-pro.packlink.com/hc/fr-fr/articles/360010011560-Politique-de-confidentialite",
+    "marketingEmails": "J’autorise Packlink Shipping S.L. à m’envoyer des communications commerciales par courriel"
+  },
+  "configuration": {
+    "helpUrl": "https://support-pro.packlink.com/hc/fr-fr",
+    "contactUrl": "business@packlink.com",
+    "contactUrlMail": "mailto::business@packlink.com"
+  },
+  "orderStatusMapping": {
+    "description": "Avec Packlink, vous pouvez mettre à jour le statut de votre commande %s avec les informations d’expédition. <br>Vous pourrez les modifier à tout moment.",
+    "packlinkProShipmentStatus": "STATUT DE <strong>LIVRAISON</strong> Packlink PRO"
+  },
+  "shippingServices": {
+    "packlinkPrices": "Prix Packlink",
+    "pricePolicyDescription": "Les <strong>tarifs de base de Packlink seront configurés par défaut,</strong> mais vous pourrez les configurer plus en détail ci-dessous.",
+    "packlinkPrice": "Prix Packlink",
+    "percentagePacklinkPrices": "% des prix Packlink",
+    "percentagePacklinkPricesWithData": "% des prix Packlink : %s de %s%",
+    "usePacklinkRange": "Pour toutes les autres fourchettes, appliquez les prix Packlink"
+  },
+  "orderListAndDetails": {
+    "packlinkOrderDraft": "Brouillon de commande Packlink",
+    "printShipmentLabels": "Imprimer les étiquettes de livraison Packlink PRO",
+    "packlinkReferenceNumber": "Numéro de référence Packlink",
+    "packlinkShippingPrice": "Prix de livraison Packlink",
+    "viewOnPacklink": "Voir sur Packlink PRO",
+    "draftIsBeingCreated": "Le brouillon est en cours de création sur Packlink PRO",
+    "createOrderDraft": "Créer un brouillon de commande sur Packlink PRO",
+    "packlinkShipping": "Packlink Shipping",
+    "sendWithPacklink": "Send with Packlink",
+    "shipmentUrl": "https://pro.packlink.fr/private/shipments/"
+  },
+  "systemLogMessages": {
+    "webhookReceived": "Webhook de Packlink reçu"
+  },
+  "autoTest": {
+    "moduleAutoTest": "Test automatique du module PacklinkPRO",
+    "useThisPageTestConfiguration": "Utilisez cette page pour tester la configuration du système et les services du module PacklinkPRO.",
+    "openModule": "Ouvrir le module PacklinkPRO"
+  }
+}

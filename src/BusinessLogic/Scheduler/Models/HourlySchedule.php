@@ -33,6 +33,7 @@ class HourlySchedule extends Schedule
         'endMinute',
         'interval',
         'context',
+        'brand',
     );
     /**
      * Start hour of the interval.

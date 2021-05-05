@@ -11,6 +11,6 @@ session_set_cookie_params(86400);
 session_start();
 
 Bootstrap::init();
-Configuration::setCurrentLanguage('en');
+Configuration::setUICountryCode('en');
 $routingController = new ResolverController();
 $routingController->handleAction();

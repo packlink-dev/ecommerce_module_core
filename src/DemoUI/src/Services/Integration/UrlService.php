@@ -30,8 +30,9 @@ class UrlService
     public static function getResourceUrl($filePath = '')
     {
         $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+        $brandPlatformCode = getenv('PL_PLATFORM');
 
-        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/resources" . ($filePath ? '/' . $filePath : '');
+        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/$brandPlatformCode/resources" . ($filePath ? '/' . $filePath : '');
     }
 
     /**
@@ -42,7 +43,8 @@ class UrlService
     public static function getHomepage()
     {
         $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+        $brandPlatformCode = getenv('PL_PLATFORM');
 
-        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/index.php";
+        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/$brandPlatformCode/index.php";
     }
 }

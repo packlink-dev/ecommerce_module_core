@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\User;
 
+use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -151,6 +152,23 @@ class UserAccountLoginTest extends BaseTestWithServices
     }
 
     /**
+     * Test user login when platform country is not supported.
+     */
+    public function testLoginNotSupportedCountry()
+    {
+        $exceptionThrown = false;
+        $this->httpClient->setMockResponses($this->getMockResponses(true, true, false));
+
+        try {
+            $this->assertTrue($this->userAccountService->login('GoodApiKey'));
+        } catch (BaseException $e) {
+            $exceptionThrown = true;
+        }
+
+        $this->assertTrue($exceptionThrown);
+    }
+
+    /**
      * Tests user login and user initialization
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
@@ -200,14 +218,17 @@ class UserAccountLoginTest extends BaseTestWithServices
      *
      * @param bool $parcel If parcel info should be set.
      * @param bool $warehouse If warehouse info should be set.
+     * @param bool $supportedCountry If response with supported or unsupported country should be set.
      *
      * @return HttpResponse[] Array of Http responses.
      */
-    private function getMockResponses($parcel = true, $warehouse = true)
+    private function getMockResponses($parcel = true, $warehouse = true, $supportedCountry = true)
     {
         return array(
             new HttpResponse(
-                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
+                200, array(), $supportedCountry ?
+                    file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json') :
+                    file_get_contents(__DIR__ . '/../Common/ApiResponses/userUnsupportedCountry.json')
             ),
             new HttpResponse(
                 200, array(), $parcel ? file_get_contents(__DIR__ . '/../Common/ApiResponses/parcels.json') : ''

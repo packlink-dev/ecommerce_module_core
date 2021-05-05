@@ -22,63 +22,6 @@ class WarehouseCountryService extends CountryService
      * @var static
      */
     protected static $instance;
-    /**
-     * List of countries available only for warehouse selection.
-     *
-     * @var array
-     */
-    protected static $additionalWarehouseCountries = array(
-        'PL' => array(
-            'name' => 'Poland',
-            'code' => 'PL',
-            'postal_code' => '00-694',
-        ),
-        'CH' => array(
-            'name' => 'Switzerland',
-            'code' => 'CH',
-            'postal_code' => '3000',
-        ),
-        'LU' => array(
-            'name' => 'Luxembourg',
-            'code' => 'LU',
-            'postal_code' => '1009',
-        ),
-        'AR' => array(
-            'name' => 'Argentina',
-            'code' => 'AR',
-            'postal_code' => 'C1258 AAA',
-        ),
-        'US' => array(
-            'name' => 'United States',
-            'code' => 'US',
-            'postal_code' => '01223',
-        ),
-        'BO' => array(
-            'name' => 'Bolivia',
-            'code' => 'BO',
-            'postal_code' => 'La Paz',
-        ),
-        'MX' => array(
-            'name' => 'Mexico',
-            'code' => 'MX',
-            'postal_code' => '21900',
-        ),
-        'CL' => array(
-            'name' => 'Chile',
-            'code' => 'CL',
-            'postal_code' => '7500599',
-        ),
-        'CZ' => array(
-            'name' => 'Czech Republic',
-            'code' => 'CZ',
-            'postal_code' => '186 00',
-        ),
-        'SE' => array(
-            'name' => 'Sweden',
-            'code' => 'SE',
-            'postal_code' => '103 16',
-        ),
-    );
 
     /**
      * Returns a list of supported country DTOs.
@@ -92,14 +35,10 @@ class WarehouseCountryService extends CountryService
      */
     public function getSupportedCountries($associative = true)
     {
-        $countries = array_merge(static::$supportedCountries, static::$additionalWarehouseCountries);
+        $countries = $this->getBrandConfigurationService()->get()->warehouseCountries;
+        $formattedCountries = $this->formatCountries($countries);
 
-        foreach ($countries as $country) {
-            $country['name'] = Translator::translate('countries.' . $country['code']);
-            $countries[$country['code']] = FrontDtoFactory::get(Country::CLASS_KEY, $country);
-        }
-
-        return $associative ? $countries : array_values($countries);
+        return $associative ? $formattedCountries : array_values($formattedCountries);
     }
 
     /**
@@ -111,6 +50,8 @@ class WarehouseCountryService extends CountryService
      */
     public function isCountrySupported($isoCode)
     {
-        return array_key_exists($isoCode, array_merge(static::$supportedCountries, static::$additionalWarehouseCountries));
+        $countries = $this->getBrandConfigurationService()->get()->warehouseCountries;
+
+        return array_key_exists($isoCode, $countries);
     }
 }

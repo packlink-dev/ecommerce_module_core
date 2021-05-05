@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Common;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -17,14 +18,16 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueS
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\Brands\Packlink\PacklinkConfigurationService;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
-use Packlink\BusinessLogic\Country\RegistrationCountry;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Language\TranslationService;
+use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -115,9 +118,30 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         );
 
         TestServiceRegister::registerService(
-            \Packlink\BusinessLogic\Language\Interfaces\TranslationService::CLASS_NAME,
+            FileResolverService::CLASS_NAME,
             function () {
-                return new TranslationService();
+                return new FileResolverService(
+                    array(
+                        __DIR__ . '/../../../src/BusinessLogic/Resources/countries'
+                    )
+                );
+            }
+        );
+
+        TestServiceRegister::registerService(
+            \Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService::CLASS_NAME,
+            function () {
+                $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
+
+                /** @noinspection PhpParamsInspection */
+                return new CountryLabelService($fileResolverService);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            BrandConfigurationService::CLASS_NAME,
+            function () {
+                return new PacklinkConfigurationService();
             }
         );
 
@@ -127,7 +151,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestFrontDtoFactory::register(ParcelInfo::CLASS_KEY, ParcelInfo::CLASS_NAME);
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
         TestFrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
-        TestFrontDtoFactory::register(RegistrationCountry::CLASS_KEY, RegistrationCountry::CLASS_NAME);
     }
 
     protected function tearDown()

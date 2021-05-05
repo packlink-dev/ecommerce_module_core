@@ -17,8 +17,12 @@ use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
+use Packlink\Brands\Packlink\PacklinkConfigurationService;
 use Packlink\BusinessLogic\BootstrapComponent;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
@@ -27,6 +31,7 @@ use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\User\UserAccountService;
+use Packlink\DemoUI\Brands\Acme\AcmeConfigurationService;
 use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
@@ -112,6 +117,7 @@ class Bootstrap extends BootstrapComponent
         parent::initServices();
 
         static::$instance->initInstanceServices();
+        static::$instance->initBrandDependentServices();
     }
 
     /**
@@ -194,6 +200,63 @@ class Bootstrap extends BootstrapComponent
             RegistrationInfoService::CLASS_NAME,
             function () use ($instance) {
                 return $instance->registrationInfoService;
+            }
+        );
+    }
+
+    protected function initBrandDependentServices()
+    {
+        $brandPlatformCode = getenv('PL_PLATFORM');
+
+        switch ($brandPlatformCode) {
+            case 'PRO':
+                ServiceRegister::registerService(
+                    BrandConfigurationService::CLASS_NAME,
+                    function () {
+                        return new PacklinkConfigurationService();
+                    }
+                );
+
+                ServiceRegister::registerService(
+                    FileResolverService::CLASS_NAME,
+                    function () {
+                        return new FileResolverService(
+                            array(
+                                __DIR__ . '/../../BusinessLogic/Resources/countries',
+                                __DIR__ . '/../../Brands/Packlink/Resources/countries',
+                            )
+                        );
+                    }
+                );
+                break;
+            case 'ACME':
+                ServiceRegister::registerService(
+                    BrandConfigurationService::CLASS_NAME,
+                    function () {
+                        return new AcmeConfigurationService();
+                    }
+                );
+
+                ServiceRegister::registerService(
+                    FileResolverService::CLASS_NAME,
+                    function () {
+                        return new FileResolverService(
+                            array(
+                                __DIR__ . '/../../BusinessLogic/Resources/countries',
+                                __DIR__ . '/Brands/Acme/Resources/countries',
+                            )
+                        );
+                    }
+                );
+        }
+
+        ServiceRegister::registerService(
+            CountryService::CLASS_NAME,
+            function () {
+                /** @var FileResolverService $fileResolverService */
+                $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
+
+                return new \Packlink\BusinessLogic\CountryLabels\CountryService($fileResolverService);
             }
         );
     }

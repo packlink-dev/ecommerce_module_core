@@ -3,6 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 
 /**
  * This class holds search parameters that are used when searching for services
@@ -82,12 +84,16 @@ class ShippingServiceSearch extends DataTransferObject
      */
     public function toArray()
     {
+        /** @var BrandConfigurationService $brandConfigurationService */
+        $brandConfigurationService = ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+        $brand = $brandConfigurationService->get();
+
         $data = array(
             'from[country]' => $this->fromCountry,
             'from[zip]' => $this->fromZip,
             'to[country]' => $this->toCountry,
             'to[zip]' => $this->toZip,
-            'source' => 'PRO',
+            'source' => $brand->shippingServiceSource,
         );
 
         if ($this->serviceId) {

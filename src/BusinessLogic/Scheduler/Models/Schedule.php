@@ -33,7 +33,7 @@ class Schedule extends Entity
      *
      * @var array
      */
-    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'recurring', 'context');
+    protected $fields = array('id', 'queueName', 'minute', 'hour', 'day', 'month', 'recurring', 'context', 'brand');
     /**
      * Queue name where task should be queued to.
      *
@@ -82,6 +82,12 @@ class Schedule extends Entity
      * @var string
      */
     protected $context;
+    /**
+     * Schedule brand.
+     *
+     * @var string
+     */
+    protected $brand;
 
     /**
      * Schedule constructor.
@@ -310,6 +316,26 @@ class Schedule extends Entity
     public function setContext($context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * Gets schedule brand.
+     *
+     * @return string
+     */
+    public function getBrand()
+    {
+        return $this->brand;
+    }
+
+    /**
+     * Sets schedule brand.
+     *
+     * @param string $brand
+     */
+    public function setBrand($brand)
+    {
+        $this->brand = $brand;
     }
 
     /**

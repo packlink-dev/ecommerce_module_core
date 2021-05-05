@@ -406,7 +406,7 @@ class QueueService
      *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
-    private function save(
+    protected function save(
         QueueItem $queueItem,
         array $additionalWhere = array(),
         $reportStateChange = false,
@@ -478,7 +478,7 @@ class QueueService
      *
      * @return TimeProvider Time provider instance.
      */
-    private function getTimeProvider()
+    protected function getTimeProvider()
     {
         if ($this->timeProvider === null) {
             $this->timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
@@ -492,7 +492,7 @@ class QueueService
      *
      * @return TaskRunnerWakeup Task runner wakeup instance.
      */
-    private function getTaskRunnerWakeup()
+    protected function getTaskRunnerWakeup()
     {
         if ($this->taskRunnerWakeup === null) {
             $this->taskRunnerWakeup = ServiceRegister::getService(TaskRunnerWakeup::CLASS_NAME);
