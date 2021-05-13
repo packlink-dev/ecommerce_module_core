@@ -79,7 +79,7 @@ class RegistrationController
         $brand = $this->getBrandConfigurationService()->get();
 
         $payload['platform'] = $brand->platformCode;
-        $payload['language'] = $this->getLanguage();
+        $payload['language'] = $this->getLanguage($payload['platform_country']);
 
         if (isset($payload['source'])) {
             $payload['source'] = 'https://' . str_replace(array('http://', 'https://'), '', $payload['source']);
@@ -173,7 +173,6 @@ class RegistrationController
             'IT' => 'it_IT',
         );
 
-        $locale = Configuration::getUICountryCode();
         $language = 'en_GB';
 
         if (array_key_exists($platformCountry, $supportedLanguages)) {
