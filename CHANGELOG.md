@@ -3,18 +3,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+## [3.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.0...v3.2.1) - 2021-05-13
+### Changed
+ - Fixed registration form
+
 ## [3.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.1.1...v3.2.0) - 2021-04-29
 **BREAKING CHANGES**
 Whitelabel project changes:
 
 ### Added
+- Added new js component for shipment service settings button. This is added, so we can use settings button
+  in other components. Now you need to reference `SettingsButtonService` in `MyShippingServicesController.js`. Now you
+  need to call function `displaySettings` from `SettingsButtonService`in `MyShippingServicesController.js`
+  function `display`.
 - Added BrandConfigurationService. Integration should register PacklinkConfigurationService instance for Packlink brand or adequate implementation for other brand(s) during the bootstraping.
 - Added PacklinkConfigurationService.
 - Added FileResolverService. Integration should initialize FileResolverService with an array of folders where source files should be searched for.
 - Added new method getLabels to \Packlink\BusinessLogic\CountryLabels\CountryService.
 
 ### Changed
-
+- Changed logic for setting settings button in shipping service js.
 - \Packlink\BusinessLogic\Language\TranslationService renamed to CountryService.
 - TranslationService::translate renamed to CountryService::getText.
 - Files from Resources/lang moved to Resources/countries. In integration, change path to translations to fit new folder names in core.
