@@ -239,6 +239,7 @@ class ShippingMethodController
         $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
         $shippingMethod->pricingPolicies = $item->getPricingPolicies();
         $shippingMethod->usePacklinkPriceIfNotInRange = $item->isUsePacklinkPriceIfNotInRange();
+        $shippingMethod->currency = $item->getCurrency();
 
         return $shippingMethod;
     }

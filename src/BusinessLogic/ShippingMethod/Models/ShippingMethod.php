@@ -145,7 +145,8 @@ class ShippingMethod extends Entity
      */
     protected $shippingCountries;
     /**
-     * Currency code (ex. EUR, USD, GBP).
+     * Shipping method currency.
+     * The value represents a currency code (ex. EUR, USD, GBP).
      *
      * @var string
      */
