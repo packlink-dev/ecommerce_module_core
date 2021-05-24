@@ -40,6 +40,7 @@ class ShippingMethod extends Entity
         'taxClass',
         'isShipToAllCountries',
         'shippingCountries',
+        'currency',
     );
     /**
      * Carrier name.
@@ -143,6 +144,12 @@ class ShippingMethod extends Entity
      * @var array
      */
     protected $shippingCountries;
+    /**
+     * Currency code (ex. EUR, USD, GBP).
+     *
+     * @var string
+     */
+    protected $currency;
 
     /**
      * Transforms raw array data to this entity instance.
@@ -592,5 +599,25 @@ class ShippingMethod extends Entity
     public function setUsePacklinkPriceIfNotInRange($usePacklinkPriceIfNotInRange)
     {
         $this->usePacklinkPriceIfNotInRange = $usePacklinkPriceIfNotInRange;
+    }
+
+    /**
+     * Returns shipping method currency.
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Sets shipping method currency.
+     *
+     * @param string $currency
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
     }
 }
