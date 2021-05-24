@@ -282,6 +282,8 @@ class ShippingMethodEntityTest extends BaseTestWithServices
                     'increase' => false,
                     'change_percent' => null,
                     'fixed_price' => null,
+                    'system_id' => null,
+                    'uses_default' => false,
                 ),
             ),
         );

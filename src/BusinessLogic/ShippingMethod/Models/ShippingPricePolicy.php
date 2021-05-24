@@ -99,6 +99,18 @@ class ShippingPricePolicy extends FrontDto
      */
     public $fixedPrice;
     /**
+     * Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
+     *
+     * @var string|null
+     */
+    public $systemId;
+    /**
+     * Denotes whether the policy should take the fixed price from the default policy.
+     *
+     * @var bool
+     */
+    public $usesDefault;
+    /**
      * Fields for this DTO. Needed for validation and transformation from/to array.
      *
      * @var array
@@ -136,6 +148,8 @@ class ShippingPricePolicy extends FrontDto
         $result->increase = static::getDataValue($data, 'increase', false);
         $result->changePercent = static::getDataValue($data, 'change_percent', null);
         $result->fixedPrice = static::getDataValue($data, 'fixed_price', null);
+        $result->systemId = static::getDataValue($data, 'system_id', null);
+        $result->usesDefault = static::getDataValue($data, 'uses_default', false);
 
         return $result;
     }
@@ -157,6 +171,8 @@ class ShippingPricePolicy extends FrontDto
             'increase' => $this->increase,
             'change_percent' => is_null($this->changePercent) ? null : round($this->changePercent, 2),
             'fixed_price' => is_null($this->fixedPrice) ? null : round($this->fixedPrice, 2),
+            'system_id' => $this->systemId,
+            'uses_default' => $this->usesDefault,
         );
     }
 
