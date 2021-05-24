@@ -425,6 +425,7 @@ class ShippingMethodService extends BaseService
         $logoUrl = $this->shopShippingMethodService->getCarrierLogoFilePath($serviceDetails->carrierName);
         $shippingMethod->setLogoUrl($logoUrl);
         $shippingMethod->setEnabled(true);
+        $shippingMethod->setCurrency($serviceDetails->currency);
 
         $this->setShippingService($shippingMethod, $serviceDetails);
     }

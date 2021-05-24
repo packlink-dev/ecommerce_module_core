@@ -255,7 +255,8 @@ class UpdateShippingServicesTask extends Task
             && $service->national === $shippingMethod->isNational()
             && $service->expressDelivery === $shippingMethod->isExpressDelivery()
             && $service->departureDropOff === $shippingMethod->isDepartureDropOff()
-            && $service->destinationDropOff === $shippingMethod->isDestinationDropOff();
+            && $service->destinationDropOff === $shippingMethod->isDestinationDropOff()
+            && $service->currency === $shippingMethod->getCurrency();
     }
 
     /**
