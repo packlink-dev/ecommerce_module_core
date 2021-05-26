@@ -11,6 +11,11 @@ use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 interface SystemInfoService
 {
     /**
+     * Class name.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Returns system information.
      *
      * @return SystemInfo[]
