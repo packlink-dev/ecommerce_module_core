@@ -228,6 +228,7 @@ class ShippingMethodService extends BaseService
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
      * @param float $totalAmount Total cart value if calculation is done by value
+     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return float Calculated shipping cost
      */
@@ -238,7 +239,8 @@ class ShippingMethodService extends BaseService
         $toCountry,
         $toZip,
         array $packages,
-        $totalAmount
+        $totalAmount,
+        $systemId = null
     ) {
         $shippingMethod = $this->getShippingMethod($methodId);
         if ($shippingMethod === null || !$shippingMethod->isActivated()) {
@@ -257,7 +259,8 @@ class ShippingMethodService extends BaseService
             $toCountry,
             $toZip,
             $packages,
-            $totalAmount
+            $totalAmount,
+            $systemId
         );
     }
 
@@ -271,6 +274,7 @@ class ShippingMethodService extends BaseService
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
      * @param float $totalAmount Total cart value if calculation is done by value
+     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return array <p>Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
      *  array(
@@ -280,8 +284,15 @@ class ShippingMethodService extends BaseService
      *  )
      * </p>
      */
-    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages, $totalAmount)
-    {
+    public function getShippingCosts(
+        $fromCountry,
+        $fromZip,
+        $toCountry,
+        $toZip,
+        array $packages,
+        $totalAmount,
+        $systemId = null
+    ) {
         $activeMethods = $this->getActiveMethods();
         if (empty($activeMethods)) {
             return array();
@@ -294,7 +305,8 @@ class ShippingMethodService extends BaseService
             $toCountry,
             $toZip,
             $packages,
-            $totalAmount
+            $totalAmount,
+            $systemId
         );
     }
 
