@@ -164,6 +164,21 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         self::assertEmpty($this->httpClient->getHistory(), 'API should not be called for inactive service');
     }
 
+    public function testGetCostForSystem()
+    {
+        $fixedPricePolicies[] = array(0, 10, 12);
+        $shippingMethod = $this->prepareSystemPricePolicyShippingMethod(20339, $fixedPricePolicies, false, 'test');
+
+        $response = file_get_contents(
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
+        );
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        $cost = $this->getShippingCosts(null, $shippingMethod->getId(), '00118', 'IT', 9.9, 'test');
+
+        self::assertEquals(12, $cost, 'Failed to get cost from API!');
+    }
+
     public function testGetCostsFromProxy()
     {
         $shippingMethod = $this->addShippingMethod(20339);
@@ -702,6 +717,30 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     /**
      * @param int $serviceId
+     * @param array $prices
+     * @param bool $byWeight
+     * @param string|null $systemId
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
+    protected function prepareSystemPricePolicyShippingMethod(
+        $serviceId = 1,
+        array $prices = array(),
+        $byWeight = true,
+        $systemId = null
+    ) {
+        $shippingMethod = $this->addShippingMethod($serviceId);
+        foreach ($prices as $price) {
+            $shippingMethod->addPricingPolicy($this->getSystemPricePolicy($byWeight, $price[0], $price[1], $price[2], $systemId));
+        }
+
+        $this->shippingMethodService->save($shippingMethod);
+
+        return $shippingMethod;
+    }
+
+    /**
+     * @param int $serviceId
      * @param bool $increase
      * @param int $percent
      *
@@ -761,17 +800,17 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         return $shippingMethod;
     }
 
-    protected function getShippingCosts(array $packages = null, $id = '', $zip = '00127', $to = 'IT', $total = 9.9)
+    protected function getShippingCosts(array $packages = null, $id = '', $zip = '00127', $to = 'IT', $total = 9.9, $systemId = null)
     {
         if (empty($packages)) {
             $packages = array(Package::defaultPackage());
         }
 
         if ($id) {
-            return $this->shippingMethodService->getShippingCost($id, 'IT', $zip, $to, $zip, $packages, $total);
+            return $this->shippingMethodService->getShippingCost($id, 'IT', $zip, $to, $zip, $packages, $total, $systemId);
         }
 
-        return $this->shippingMethodService->getShippingCosts('IT', $zip, $to, $zip, $packages, $total);
+        return $this->shippingMethodService->getShippingCosts('IT', $zip, $to, $zip, $packages, $total, $systemId);
     }
 
     protected function getPercentPricePolicy($percent, $increase = false)
@@ -799,6 +838,20 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         );
     }
 
+    protected function getSystemPricePolicy($byWeight, $from, $to, $price, $systemId = null)
+    {
+        return $this->getPricingPolicy(
+            $byWeight ? ShippingPricePolicy::RANGE_WEIGHT : ShippingPricePolicy::RANGE_PRICE,
+            $from,
+            $to,
+            ShippingPricePolicy::POLICY_FIXED_PRICE,
+            0,
+            false,
+            $price,
+            $systemId
+        );
+    }
+
     protected function getPricingPolicy(
         $rangeType = ShippingPricePolicy::RANGE_PRICE,
         $from = 0,
@@ -806,7 +859,8 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $policy = ShippingPricePolicy::POLICY_PACKLINK,
         $changePercent = 50,
         $increase = true,
-        $fixedPrice = 20
+        $fixedPrice = 20,
+        $systemId = null
     ) {
         /** @noinspection PhpUnhandledExceptionInspection */
         return ShippingPricePolicy::fromArray(
@@ -820,6 +874,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
                 'increase' => $increase,
                 'change_percent' => $changePercent,
                 'fixed_price' => $fixedPrice,
+                'system_id' => $systemId,
             )
         );
     }

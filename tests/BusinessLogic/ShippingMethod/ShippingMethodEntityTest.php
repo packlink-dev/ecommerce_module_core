@@ -197,6 +197,24 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         );
     }
 
+    public function testSystemSpecificPricingPolicy()
+    {
+        $method = $this->assertBasicDataToArray();
+
+        $policies = $method->getPricingPolicies();
+        $policy = $policies[0];
+        $this->assertEquals('test', $policy->systemId);
+    }
+
+    public function testDefaultPolicy()
+    {
+        $method = $this->assertBasicDataToArray();
+
+        $policies = $method->getPricingPolicies();
+        $policy = $policies[0];
+        $this->assertTrue($policy->usesDefault);
+    }
+
     /**
      * Asserts basic shipping method data.
      *
@@ -282,8 +300,8 @@ class ShippingMethodEntityTest extends BaseTestWithServices
                     'increase' => false,
                     'change_percent' => null,
                     'fixed_price' => null,
-                    'system_id' => null,
-                    'uses_default' => false,
+                    'system_id' => 'test',
+                    'uses_default' => true,
                 ),
             ),
         );

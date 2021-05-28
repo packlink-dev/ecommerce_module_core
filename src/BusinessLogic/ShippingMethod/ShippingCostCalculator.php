@@ -99,7 +99,7 @@ class ShippingCostCalculator
                 $shippingMethods,
                 $response,
                 $package->weight,
-                $totalPrice.
+                $totalPrice,
                 $systemId
             );
         } catch (HttpBaseException $e) {
@@ -298,6 +298,8 @@ class ShippingCostCalculator
                     $totalPrice,
                     $service->id,
                     $service->basePrice,
+                    '',
+                    '',
                     $systemId
                 );
 
