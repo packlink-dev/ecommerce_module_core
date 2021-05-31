@@ -18,6 +18,7 @@ if (!window.Packlink) {
      * @property {boolean} showLogo
      * @property {string} taxClass
      * @property {[]} pricingPolicies
+     * @property {string} currency
      * @property {[]} shippingCountries
      * @property {boolean} isShipToAllCountries
      * @property {boolean} usePacklinkPriceIfNotInRange
@@ -71,7 +72,7 @@ if (!window.Packlink) {
             carrierLogo.setAttribute('title', service.carrierName);
 
             itemEl.querySelector('#pl-service-name').innerHTML = service.name;
-            itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices'));
+            itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices')) + ' (' + service.currency + ')';
 
             itemEl.querySelector('#pl-service-delivery-description').innerHTML = service.deliveryDescription;
             itemEl.querySelector('#pl-service-type').innerHTML = translator.translate('shippingServices.' + service.type);
