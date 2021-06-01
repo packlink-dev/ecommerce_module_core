@@ -4,7 +4,7 @@ if (!window.Packlink) {
 
 (function () {
     /**
-     * @param {{getServicesUrl: string, deleteServiceUrl: string}} configuration
+     * @param {{getServicesUrl: string, deleteServiceUrl: string, getCurrencyDetails: string, systemId: string}} configuration
      * @constructor
      */
     function MyShippingServicesController(configuration) {
@@ -21,12 +21,18 @@ if (!window.Packlink) {
         let activeServices = [];
 
         /**
+         * @type string
+         */
+        let defaultCurrency;
+
+        /**
          * Displays page content.
          *
          */
         this.display = function () {
             utilityService.showSpinner();
             templateService.setCurrentTemplate('pl-my-shipping-services-page');
+            ajaxService.get(configuration.getCurrencyDetails, getDefaultCurrency);
             ajaxService.get(configuration.getServicesUrl, bindServices);
 
             const header = templateService.getHeader(),
@@ -38,6 +44,25 @@ if (!window.Packlink) {
             });
 
             settingsButtonService.displaySettings(settingsMenu, state);
+        };
+
+        /**
+         * Retrieves system info.
+         *
+         * @param {SystemInfo[]} systemInfos
+         */
+        const getDefaultCurrency = (systemInfos) => {
+            let systemInfo = systemInfos[0];
+
+            if (configuration.systemId !== null) {
+                systemInfos.forEach((info) => {
+                    if (info.systemId === configuration.systemId) {
+                        systemInfo = info;
+                    }
+                });
+            }
+
+            defaultCurrency = systemInfo.currencies[0];
         };
 
         const addServiceClick = () => {
@@ -53,7 +78,7 @@ if (!window.Packlink) {
             const table = templateService.getComponent('pl-shipping-services-table'),
                 list = templateService.getComponent('pl-shipping-services-list'),
                 render = (elem, id, tag) => {
-                    Packlink.ShippingServicesRenderer.render(elem, id, tag, activeServices, true, handleServiceAction);
+                    Packlink.ShippingServicesRenderer.render(elem, id, tag, activeServices, true, handleServiceAction, defaultCurrency);
                 };
 
             activeServices = services;

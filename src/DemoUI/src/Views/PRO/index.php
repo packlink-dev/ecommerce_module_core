@@ -208,13 +208,17 @@ echo $lang ?>">
                 'my-shipping-services': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
+                    getCurrencyDetails: "<?php getUrl('SystemInfo', 'get') ?>",
+                    systemId: null
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>",
                     getActiveServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     getTaskStatusUrl: "<?php getUrl('ShippingMethods', 'getTaskStatus') ?>",
                     startAutoConfigureUrl: "<?php getUrl('AutoConfigure', 'start') ?>",
-                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
+                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
+                    getCurrencyDetails: "<?php getUrl('SystemInfo', 'get') ?>",
+                    systemId: null
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",

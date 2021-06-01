@@ -239,7 +239,8 @@
     "selectCountriesHeader": "Countries supported for your <br> shipping service",
     "selectCountriesSubheader": "Select availability of at least one country and add <br> as many required",
     "discardChangesQuestion": "There are unsaved changes.<br>Are you sure you want to go back and discard them?",
-    "atLeastOneCountry": "At least one country must be selected."
+    "atLeastOneCountry": "At least one country must be selected.",
+    "misconfiguration": "Service misconfiguration that can cause wrong service price is detected. Please check service configuration."
   },
   "orderListAndDetails": {
     "printed": "Printed",

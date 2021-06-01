@@ -25,6 +25,13 @@ if (!window.Packlink) {
      */
 
     /**
+     * @typedef SystemInfo
+     * @property {string} systemId
+     * @property {string} systemName
+     * @property {[]} currencies
+     */
+
+    /**
      * Renders shipping services table.
      *
      * @constructor
@@ -42,15 +49,16 @@ if (!window.Packlink) {
          * @param {ShippingService[]} services
          * @param {boolean} list
          * @param {function(id: string, action: 'add'|'edit'|'delete')} buttonAction
+         * @param {string} currency
          */
-        this.render = (parent, templateId, elementType, services, list, buttonAction) => {
+        this.render = (parent, templateId, elementType, services, list, buttonAction, currency) => {
             parent.innerHTML = '';
             services.forEach((service) => {
                 const template = templateService.getComponent(templateId),
                     itemEl = document.createElement(elementType);
 
                 itemEl.innerHTML = template.innerHTML;
-                constructItem(itemEl, service, list, buttonAction);
+                constructItem(itemEl, service, list, buttonAction, currency);
 
                 parent.appendChild(itemEl);
             });
@@ -63,9 +71,10 @@ if (!window.Packlink) {
          * @param {Element} itemEl
          * @param {ShippingService} service
          * @param {boolean} list
+         * @param {string} currency
          * @param {function(id: string, action: 'add'|'edit'|'delete')} buttonAction
          */
-        function constructItem(itemEl, service, list, buttonAction) {
+        function constructItem(itemEl, service, list, buttonAction, currency) {
             const carrierLogo = itemEl.querySelector('#pl-carrier-logo');
             carrierLogo.setAttribute('src', service.logoUrl);
             carrierLogo.setAttribute('alt', service.carrierName);
@@ -73,6 +82,9 @@ if (!window.Packlink) {
 
             itemEl.querySelector('#pl-service-name').innerHTML = service.name;
             itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices')) + ' (' + service.currency + ')';
+            if (service.currency === currency) {
+                itemEl.querySelector('#pl-misconfiguration-error').classList.add('pl-hidden');
+            }
 
             itemEl.querySelector('#pl-service-delivery-description').innerHTML = service.deliveryDescription;
             itemEl.querySelector('#pl-service-type').innerHTML = translator.translate('shippingServices.' + service.type);

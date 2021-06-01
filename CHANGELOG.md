@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
+**BREAKING CHANGES**
+### Changed
+- State controller configuration has been modified. The integrations will have to modify the index template to include the system ID and the URL to the system info controller.
 
 ## [3.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.0...v3.2.1) - 2021-05-13
 ### Changed
