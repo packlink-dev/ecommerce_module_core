@@ -142,6 +142,12 @@ class ShippingMethodController
             return null;
         }
 
+        if (!$this->shippingMethodService->isCurrencyConfigurationValid($model)) {
+            Logger::logError("Currency configurations for shipping method with id {$shippingMethod->id} are not valid!");
+
+            return null;
+        }
+
         try {
             $isFirstServiceActivated = $shippingMethod->activated && !$this->shippingMethodService->isAnyMethodActive();
 

@@ -11,9 +11,12 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
+use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
 /**
  * Class ShippingMethodService. In charge for manipulation with shipping methods and services.
@@ -44,6 +47,10 @@ class ShippingMethodService extends BaseService
      * @var RepositoryInterface
      */
     private $shippingMethodRepository;
+    /**
+     * @var SystemInfoService
+     */
+    private $systemInfoService;
 
     /**
      * ShippingMethodService constructor.
@@ -112,11 +119,11 @@ class ShippingMethodService extends BaseService
 
     /**
      * Creates new shipping method out of data received from Packlink API.
-     * This method is alias for method @see update.
-     *
-     * @param ShippingServiceDetails $serviceDetails Shipping service details with costs.
+     * This method is alias for method @param ShippingServiceDetails $serviceDetails Shipping service details with costs.
      *
      * @return ShippingMethod Created shipping method.
+     * @see update.
+     *
      */
     public function add(ShippingServiceDetails $serviceDetails)
     {
@@ -334,6 +341,50 @@ class ShippingMethodService extends BaseService
         return $this->selectOne($filter);
     }
 
+    public function isCurrencyConfigurationValid(ShippingMethod $method)
+    {
+        /** @var SystemInfoService $systemInfoService */
+        $systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $details = $systemInfoService->getSystemDetails();
+        $isValid = true;
+
+        foreach ($method->getPricingPolicies() as $policy) {
+            $isValid = $this->validateCurrencyConfigurationForPricingPolicy($policy, $details, $method->getCurrency());
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Validates currency configuration for a single pricing policy.
+     *
+     * @param ShippingPricePolicy $policy
+     * @param SystemInfo[] $details
+     * @param string $currency
+     *
+     * @return bool
+     */
+    protected function validateCurrencyConfigurationForPricingPolicy($policy, $details, $currency)
+    {
+        if ($policy->usesDefault || $policy->systemId === 'default') {
+            return true;
+        }
+
+        if ($policy->systemId === null && !$policy->usesDefault) {
+            return in_array($currency, $details[0]->currencies, true);
+        }
+
+        $detail = $this->getSystemInfoService()->getSystemInfo($policy->systemId);
+
+        if (!$detail) {
+            Logger::logError("Information for the system with id {$policy->systemId} not found!");
+
+            return true;
+        }
+
+        return in_array($currency, $detail->currencies, true);
+    }
+
     /**
      * Activates or deactivates shipping method for provided Packlink service.
      *
@@ -528,5 +579,19 @@ class ShippingMethodService extends BaseService
     protected function selectOne($filter)
     {
         return $this->shippingMethodRepository->selectOne($filter);
+    }
+
+    /**
+     * Returns an instance of system info service.
+     *
+     * @return SystemInfoService
+     */
+    private function getSystemInfoService()
+    {
+        if ($this->systemInfoService === null) {
+            $this->systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        }
+
+        return $this->systemInfoService;
     }
 }

@@ -21,4 +21,13 @@ interface SystemInfoService
      * @return SystemInfo[]
      */
     public function getSystemDetails();
+
+    /**
+     * Returns system information for a particular system, identified by the system ID.
+     *
+     * @param string $systemId
+     *
+     * @return SystemInfo|null
+     */
+    public function getSystemInfo($systemId);
 }

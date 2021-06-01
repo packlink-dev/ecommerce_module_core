@@ -40,9 +40,9 @@ if (!window.Packlink) {
         let noServicesModal;
 
         /**
-         * @type string
+         * @type string[]
          */
-        let defaultCurrency;
+        let defaultCurrencies;
 
         /**
          * Displays page content.
@@ -52,7 +52,7 @@ if (!window.Packlink) {
         this.display = function (config) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getCurrencyDetails, getDefaultCurrency);
+            ajaxService.get(configuration.getCurrencyDetails, getDefaultCurrencies);
             ajaxService.get(configuration.getTaskStatusUrl, (response) => {
                 checkServicesStatus(response, config);
             });
@@ -163,7 +163,7 @@ if (!window.Packlink) {
          *
          * @param {SystemInfo[]} systemInfos
          */
-        const getDefaultCurrency = (systemInfos) => {
+        const getDefaultCurrencies = (systemInfos) => {
             let systemInfo = systemInfos[0];
 
             if (configuration.systemId !== null) {
@@ -174,7 +174,7 @@ if (!window.Packlink) {
                 });
             }
 
-            defaultCurrency = systemInfo.currencies[0];
+            defaultCurrencies = systemInfo.currencies;
         };
 
         /**
@@ -223,7 +223,7 @@ if (!window.Packlink) {
                 table = templateService.getComponent('pl-shipping-services-table'),
                 list = templateService.getComponent('pl-shipping-services-list').querySelector('.pl-shipping-services-list'),
                 render = (elem, id, tag) => {
-                    Packlink.ShippingServicesRenderer.render(elem, id, tag, filteredServices, false, handleServiceAction, defaultCurrency);
+                    Packlink.ShippingServicesRenderer.render(elem, id, tag, filteredServices, false, handleServiceAction, defaultCurrencies);
                 };
 
             render(table.querySelector('tbody'), 'pl-shipping-services-row', 'tr');

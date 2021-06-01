@@ -25,4 +25,20 @@ class SystemInfoService implements SystemInfoServiceInterface
             'currencies' => array('EUR'),
         )));
     }
+
+    /**
+     * Returns system information for a particular system, identified by the system ID.
+     *
+     * @param string $systemId
+     *
+     * @return SystemInfo|null
+     */
+    public function getSystemInfo($systemId)
+    {
+        return SystemInfo::fromArray(array(
+            'system_id' => 'test',
+            'system_name' => 'Demo UI',
+            'currencies' => array('EUR'),
+        ));
+    }
 }
