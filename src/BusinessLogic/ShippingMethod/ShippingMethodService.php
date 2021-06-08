@@ -9,9 +9,9 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
-use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
@@ -341,15 +341,20 @@ class ShippingMethodService extends BaseService
         return $this->selectOne($filter);
     }
 
-    public function isCurrencyConfigurationValid(ShippingMethod $method)
+    /**
+     * Check whether currency configurations on pricing policies are supported by the system.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param ShippingMethod $method
+     *
+     * @return bool
+     */
+    public function isCurrencyConfigurationValid(ShippingMethodConfiguration $configuration, ShippingMethod $method)
     {
-        /** @var SystemInfoService $systemInfoService */
-        $systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
-        $details = $systemInfoService->getSystemDetails();
         $isValid = true;
 
-        foreach ($method->getPricingPolicies() as $policy) {
-            $isValid = $this->validateCurrencyConfigurationForPricingPolicy($policy, $details, $method->getCurrency());
+        foreach ($configuration->pricingPolicies as $policy) {
+            $isValid = $this->validateCurrencyConfigurationForPricingPolicy($policy, $method->getCurrency());
         }
 
         return $isValid;
@@ -359,19 +364,20 @@ class ShippingMethodService extends BaseService
      * Validates currency configuration for a single pricing policy.
      *
      * @param ShippingPricePolicy $policy
-     * @param SystemInfo[] $details
      * @param string $currency
      *
      * @return bool
      */
-    protected function validateCurrencyConfigurationForPricingPolicy($policy, $details, $currency)
+    protected function validateCurrencyConfigurationForPricingPolicy($policy, $currency)
     {
         if ($policy->usesDefault || $policy->systemId === 'default') {
             return true;
         }
 
         if ($policy->systemId === null && !$policy->usesDefault) {
-            return in_array($currency, $details[0]->currencies, true);
+            $details = $this->getSystemInfoService()->getSystemDetails();
+
+            return !empty($details) ? in_array($currency, $details[0]->currencies, true) : false;
         }
 
         $detail = $this->getSystemInfoService()->getSystemInfo($policy->systemId);
