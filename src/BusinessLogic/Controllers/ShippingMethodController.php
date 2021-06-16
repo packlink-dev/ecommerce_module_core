@@ -246,6 +246,8 @@ class ShippingMethodController
         $shippingMethod->pricingPolicies = $item->getPricingPolicies();
         $shippingMethod->usePacklinkPriceIfNotInRange = $item->isUsePacklinkPriceIfNotInRange();
         $shippingMethod->currency = $item->getCurrency();
+        $shippingMethod->fixedPrices = $item->getFixedPrices();
+        $shippingMethod->systemDefaults = $item->getSystemDefaults();
 
         return $shippingMethod;
     }
@@ -266,6 +268,8 @@ class ShippingMethodController
         $model->setActivated($configuration->activated);
         $model->resetPricingPolicies();
         $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
+        $model->setFixedPrices($configuration->fixedPrices);
+        $model->setSystemDefaults($configuration->systemDefaults);
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }

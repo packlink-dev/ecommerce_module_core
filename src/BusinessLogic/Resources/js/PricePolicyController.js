@@ -16,6 +16,12 @@ if (!window.Packlink) {
          * @type ShippingService
          */
         let serviceModel = {};
+        /**
+         * @type SystemInfo
+         */
+        let systemInfo = {};
+        let misconfigurationDetected = false;
+        let isMultistore = false;
 
         const pricingPolicyModelFields = [
             'range_type',
@@ -44,10 +50,20 @@ if (!window.Packlink) {
         /**
          * Displays page content.
          *
-         * @param {{service: ShippingService, policyIndex: number|null, onSave: function(ShippingService)}} config
+         * @param {{
+         *  service: ShippingService,
+         *  policyIndex: number|null,
+         *  misconfigurationDetected: boolean,
+         *  isMultistore: boolean,
+         *  systemInfo: SystemInfo,
+         *  onSave: function(ShippingService)
+         * }} config
          */
         this.display = function (config) {
             serviceModel = config.service;
+            misconfigurationDetected = config.misconfigurationDetected;
+            systemInfo = config.systemInfo;
+            isMultistore = config.isMultistore;
 
             const policyIndex = config.policyIndex,
                 currentPolicy = policyIndex !== null ? serviceModel.pricingPolicies[policyIndex] : null;
@@ -98,6 +114,8 @@ if (!window.Packlink) {
             });
 
             pricingPolicy.increase = form['increase'].checked;
+            pricingPolicy.system_id = isMultistore ? systemInfo.system_id : null;
+            pricingPolicy.uses_default = isMultistore ? serviceModel.systemDefaults[systemInfo.system_id] : false;
             removeUnneededFieldsFromModel(pricingPolicy);
 
             if (currentPolicy === null) {
@@ -155,6 +173,14 @@ if (!window.Packlink) {
                 pricingPolicyForm['increase'].checked = pricingPolicy.increase;
                 pricingPolicyForm['change_percent'].value = pricingPolicy.change_percent;
                 pricingPolicyForm['fixed_price'].value = pricingPolicy.fixed_price;
+            }
+
+            if (misconfigurationDetected) {
+                pricingPolicyForm['pricing_policy'].value = pricingPolicies.fixed;
+                pricingPolicyForm['pricing_policy'].disabled = true;
+                validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
+                validationService.validateInputField(pricingPolicyForm['fixed_price']);
+                validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
             }
 
             templateService.getComponent('pl-pricing-policy-title').innerHTML =

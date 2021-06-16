@@ -22,12 +22,14 @@ if (!window.Packlink) {
      * @property {[]} shippingCountries
      * @property {boolean} isShipToAllCountries
      * @property {boolean} usePacklinkPriceIfNotInRange
+     * @property {Object} fixedPrices
+     * @property {Object} systemDefaults
      */
 
     /**
      * @typedef SystemInfo
-     * @property {string} systemId
-     * @property {string} systemName
+     * @property {string} system_id
+     * @property {string} system_name
      * @property {[]} currencies
      */
 

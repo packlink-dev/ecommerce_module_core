@@ -432,6 +432,9 @@
 #pl-page section .pl-section-subtitle {
   display: block;
 }
+#pl-page section .pl-tooltip {
+  color: #867878;
+}
 #pl-page section .pl-button {
   padding: 8px 12px;
 }
@@ -744,6 +747,9 @@
 }
 #pl-page .pl-error .pl-error-message {
   margin: 8px 16px 0;
+  color: #e63f3f;
+}
+#pl-page .pl-invalid-label {
   color: #e63f3f;
 }
 #pl-page .pl-shipping-services-table {

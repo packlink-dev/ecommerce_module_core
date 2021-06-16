@@ -125,6 +125,7 @@ class Bootstrap extends BootstrapComponent
 
         static::$instance->initInstanceServices();
         static::$instance->initBrandDependentServices();
+        static::$instance->setMultistore(false);
     }
 
     /**
@@ -273,5 +274,15 @@ class Bootstrap extends BootstrapComponent
                 return new \Packlink\BusinessLogic\CountryLabels\CountryService($fileResolverService);
             }
         );
+    }
+
+    /**
+     * Sets multistore.
+     *
+     * @param bool $isMultistore
+     */
+    protected function setMultistore($isMultistore = false)
+    {
+        $this->systemInfoService->setMultistore($isMultistore);
     }
 }

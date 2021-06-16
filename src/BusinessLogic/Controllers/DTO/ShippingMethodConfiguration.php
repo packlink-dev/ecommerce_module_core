@@ -66,6 +66,20 @@ class ShippingMethodConfiguration extends DataTransferObject
      * @var bool
      */
     public $activated = false;
+    /**
+     * Key-value pairs of system info IDs and fixed prices in the default currency
+     * (used in multi-store environments when the service currency does not match the system currency).
+     *
+     * @var array
+     */
+    public $fixedPrices;
+    /**
+     * Key-value pairs of system info IDs and whether they are using default pricing policy
+     * (used in multi-store environments when the service currency does not match the system currency).
+     *
+     * @var array
+     */
+    public $systemDefaults;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -84,6 +98,8 @@ class ShippingMethodConfiguration extends DataTransferObject
             'usePacklinkPriceIfNotInRange' => $this->usePacklinkPriceIfNotInRange,
             'pricingPolicies' => array(),
             'activated' => $this->activated,
+            'fixedPrices' => $this->fixedPrices,
+            'systemDefaults' => $this->systemDefaults,
         );
 
         if ($this->pricingPolicies) {
@@ -113,6 +129,8 @@ class ShippingMethodConfiguration extends DataTransferObject
         $result->showLogo = $raw['showLogo'];
         $result->taxClass = isset($raw['taxClass']) ? $raw['taxClass'] : null;
         $result->usePacklinkPriceIfNotInRange = (bool)static::getDataValue($raw, 'usePacklinkPriceIfNotInRange', false);
+        $result->fixedPrices = static::getDataValue($raw, 'fixedPrices', array());
+        $result->systemDefaults = static::getDataValue($raw, 'systemDefaults', array());
 
         if (isset($raw['isShipToAllCountries']) && is_bool($raw['isShipToAllCountries'])) {
             $result->isShipToAllCountries = $raw['isShipToAllCountries'];

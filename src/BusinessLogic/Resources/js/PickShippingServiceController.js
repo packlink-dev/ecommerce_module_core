@@ -10,7 +10,7 @@ if (!window.Packlink) {
      * @property {string} getTaskStatusUrl
      * @property {string} startAutoConfigureUrl
      * @property {string} disableCarriersUrl
-     * @property {string} getCurrencyDetails
+     * @property {string} getCurrencyDetailsUrl
      * @property {string} systemId
      * @property {boolean} newService
      */
@@ -52,7 +52,7 @@ if (!window.Packlink) {
         this.display = function (config) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getCurrencyDetails, getDefaultCurrencies);
+            ajaxService.get(configuration.getCurrencyDetailsUrl, getDefaultCurrencies);
             ajaxService.get(configuration.getTaskStatusUrl, (response) => {
                 checkServicesStatus(response, config);
             });

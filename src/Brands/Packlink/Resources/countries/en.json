@@ -29,6 +29,12 @@
   "shippingServices": {
     "packlinkPrices": "Packlink prices",
     "pricePolicyDescription": "The default <strong>will be Packlink's basic prices.</strong> But you can configure these in a more precise way below.",
+    "misconfigurationDescription": "The default shop currency does not match service currency. Set a fixed price in shop currency as a service price.",
+    "misconfigurationFixedPrice": "Set a fixed price",
+    "requiredField": "Required",
+    "default": "Default",
+    "scope": "Scope",
+    "useDefault": "Use default fixed price",
     "packlinkPrice": "Packlink Price",
     "percentagePacklinkPrices": "% of Packlink prices",
     "percentagePacklinkPricesWithData": "% of Packlink prices: %s by %s%",

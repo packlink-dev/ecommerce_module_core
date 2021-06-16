@@ -9,6 +9,7 @@ if (!window.Packlink) {
      * @property {string} saveServiceUrl
      * @property {string} getTaxClassesUrl
      * @property {string} getCountriesListUrl
+     * @property {string} getCurrencyDetailsUrl
      * @property {boolean} hasTaxConfiguration
      * @property {boolean} hasCountryConfiguration
      * @property {boolean} canDisplayCarrierLogos
@@ -26,6 +27,8 @@ if (!window.Packlink) {
      * @property {boolean} increase
      * @property {float} change_percent
      * @property {float} fixed_price
+     * @property {string} system_id
+     * @property {string} currency
      */
 
     /**
@@ -51,24 +54,23 @@ if (!window.Packlink) {
         let originalServiceModel = null;
         let newService = false;
         let fromPick = false;
+        let systemInfos;
+        let isMultistore = false;
+        let getServiceUrl;
+        let form;
+        let pricePolicyControllers = [];
+        let currentSystem;
 
-        const modelFields = [
+        /**
+         * Shipping method fields that are required in the validation.
+         *
+         * @type {string[]}
+         */
+        let modelFields = [
             'name',
             'showLogo',
             'tax',
         ];
-
-        const rangeTypes = {
-            'price': '0',
-            'weight': '1',
-            'weightAndPrice': '2'
-        };
-
-        const pricingPolicies = {
-            'packlink': '0',
-            'percent': '1',
-            'fixed': '2'
-        };
 
         /**
          * Displays page content.
@@ -78,25 +80,17 @@ if (!window.Packlink) {
         this.display = (config) => {
             fromPick = config.fromPick;
             templateService.setCurrentTemplate(templateId);
-            let getServiceUrl = new URL(configuration.getServiceUrl);
+            form = templateService.getComponent('pl-edit-service-form');
+            getServiceUrl = new URL(configuration.getServiceUrl);
             getServiceUrl.searchParams.append('id', config.id);
-            ajaxService.get(getServiceUrl.toString(), bindService);
+            ajaxService.get(getServiceUrl.toString(), getService);
 
             const mainPage = templateService.getMainPage(),
-                backButton = mainPage.querySelector('.pl-sub-header button'),
-                policySwitchButton = templateService.getComponent('pl-configure-prices-button'),
-                addServiceButton = document.querySelector('#pl-add-price-section button');
+                backButton = mainPage.querySelector('.pl-sub-header button');
 
             backButton.addEventListener('click', () => {
                 goBack(config.fromPick);
             });
-
-            policySwitchButton.addEventListener('click', () => {
-                policySwitchButton.classList.toggle('pl-selected');
-                handlePolicySwitchButton(policySwitchButton);
-            });
-
-            addServiceButton.addEventListener('click', initializePricingPolicyModal);
         };
 
         /**
@@ -139,33 +133,121 @@ if (!window.Packlink) {
         };
 
         /**
-         * Binds service.
+         * Fetches current shipping service for editing.
          *
          * @param {ShippingService} service
          */
-        const bindService = (service) => {
-            const form = templateService.getComponent('pl-edit-service-form');
+        const getService = (service) => {
             serviceModel = service;
-            if (!originalServiceModel) {
-                originalServiceModel = utilityService.cloneObject(service);
+
+            ajaxService.get(configuration.getCurrencyDetailsUrl, initSystems);
+        };
+
+        /**
+         * Retrieves all systems with their information and initializes pricing policies for them.
+         *
+         * @param {SystemInfo[]} systemInfoResponse
+         */
+        const initSystems = (systemInfoResponse) => {
+            systemInfos = systemInfoResponse;
+
+            if (serviceModel.fixedPrices === null) {
+                serviceModel.fixedPrices = {};
             }
 
-            newService = !service.activated;
+            if (serviceModel.systemDefaults === null) {
+                serviceModel.systemDefaults = {};
+            }
 
-            validationService.setFormValidation(form, modelFields);
+            if (systemInfos.length > 1) {
+                let multistoreSelectorGroup = templateService
+                    .getComponent('pl-edit-service-form')
+                    .querySelector('#pl-multistore-selector-group');
 
-            form['name'].value = service.name;
+                isMultistore = true;
+                systemInfos.unshift({
+                    'system_id': 'default',
+                    'system_name': 'Default',
+                    'currencies': ['EUR']
+                });
+                multistoreSelectorGroup.classList.remove('pl-hidden');
+                currentSystem = 'default';
+
+                document.querySelector('#pl-scope-select').addEventListener('change', function (event) {
+                    currentSystem = event.target.value;
+                    pricePolicyControllers[currentSystem].display(form);
+                    refreshFieldValidation();
+                });
+            }
+
+            systemInfos.forEach((info) => {
+                let storePricePolicyController = new Packlink.SingleStorePricePolicyController();
+                storePricePolicyController.init({
+                    service: serviceModel,
+                    systemInfo: info,
+                    isMultistore: isMultistore,
+                    onSave: bindService
+                });
+
+                if (isMultistore) {
+                    let scopeSelector = document.querySelector('#pl-scope-select'),
+                        option = document.createElement("option");
+                    option.text = info.system_name;
+                    option.value = info.system_id;
+                    scopeSelector.add(option);
+                    if (!serviceModel.systemDefaults.hasOwnProperty(info.system_id)) {
+                        serviceModel.systemDefaults[info.system_id] = true;
+                    }
+                }
+
+                pricePolicyControllers[info.system_id] = storePricePolicyController;
+            });
+
+            currentSystem = systemInfos[0].system_id;
+
+            bindService();
+        };
+
+        /**
+         * Refreshes field validation and adds an additional field.
+         */
+        const refreshFieldValidation = () => {
+            let fieldsForValidation = modelFields,
+                field = pricePolicyControllers[currentSystem].getAdditionalFieldForValidation();
+
+            if (field !== null) {
+                fieldsForValidation.push(field);
+            }
+
+            validationService.setFormValidation(form, fieldsForValidation);
+        };
+
+        /**
+         * Binds currenct shipping service.
+         */
+        const bindService = () => {
+            if (!originalServiceModel) {
+                originalServiceModel = utilityService.cloneObject(serviceModel);
+            }
+
+            newService = !serviceModel.activated;
+
+            refreshFieldValidation();
+
+            form['name'].value = serviceModel.name;
             form['name'].addEventListener('blur', () => {
-                service.name = form['name'].value;
+                serviceModel.name = form['name'].value;
             });
 
             if (configuration.canDisplayCarrierLogos) {
                 utilityService.showElement(templateService.getComponent('pl-show-logo-group'));
-                form['showLogo'].checked = service.showLogo;
+                form['showLogo'].checked = serviceModel.showLogo;
                 form['showLogo'].addEventListener('change', () => {
                     serviceModel.showLogo = form['showLogo'].checked;
                 });
             }
+
+            pricePolicyControllers[currentSystem].display(form);
 
             if (configuration.hasTaxConfiguration) {
                 utilityService.showElement(templateService.getComponent('pl-tax-class-section'));
@@ -174,20 +256,6 @@ if (!window.Packlink) {
 
             if (configuration.hasCountryConfiguration) {
                 setCountrySelection();
-            }
-
-            if (serviceModel.pricingPolicies.length > 0) {
-                setPricingPolicies();
-            } else {
-                const policySwitchButton = templateService.getComponent('pl-configure-prices-button');
-                handlePolicySwitchButton(policySwitchButton);
-            }
-
-            if (form['usePacklinkPriceIfNotInRange']) {
-                form['usePacklinkPriceIfNotInRange'].checked = serviceModel.usePacklinkPriceIfNotInRange;
-                form['usePacklinkPriceIfNotInRange'].addEventListener('change', () => {
-                    serviceModel.usePacklinkPriceIfNotInRange = form['usePacklinkPriceIfNotInRange'].checked;
-                });
             }
 
             templateService.getComponent('pl-page-submit-btn').addEventListener('click', save);
@@ -220,33 +288,6 @@ if (!window.Packlink) {
         };
 
         /**
-         * Handles a click to a Custom pricing policy enable button.
-         *
-         * @param {HTMLElement} btn
-         */
-        const handlePolicySwitchButton = (btn) => {
-            const pricingSection = templateService.getComponent('pl-add-price-section'),
-                pricingPoliciesSection = templateService.getComponent('pl-pricing-policies'),
-                firstServiceDescription = templateService.getComponent('pl-first-service-description'),
-                addServiceButton = pricingSection.querySelector('button');
-
-            if (btn.classList.contains('pl-selected')) {
-                utilityService.showElement(pricingSection);
-                if (serviceModel.pricingPolicies.length > 0) {
-                    setPricingPolicies();
-                } else {
-                    utilityService.showElement(firstServiceDescription);
-                    utilityService.hideElement(pricingPoliciesSection);
-                    addServiceButton.innerHTML = translator.translate('shippingServices.addFirstPolicy');
-                }
-            } else {
-                utilityService.hideElement(templateService.getComponent('pl-use-packlink-price-wrapper'));
-                utilityService.hideElement(pricingSection);
-                utilityService.hideElement(pricingPoliciesSection);
-            }
-        };
-
-        /**
          * Sets countries selection labels.
          */
         const setCountrySelection = () => {
@@ -270,77 +311,6 @@ if (!window.Packlink) {
         };
 
         /**
-         * Sets pricing policies section.
-         */
-        const setPricingPolicies = () => {
-            const pricingPolicies = templateService.getComponent('pl-pricing-policies'),
-                addServiceButton = document.querySelector('#pl-add-price-section button'),
-                policySwitchButton = templateService.getComponent('pl-configure-prices-button'),
-                pricingSection = templateService.getComponent('pl-add-price-section');
-
-            utilityService.showElement(pricingSection);
-            policySwitchButton.classList.add('pl-selected');
-
-            utilityService.hideElement(templateService.getComponent('pl-first-service-description'));
-            utilityService.showElement(pricingPolicies);
-            addServiceButton.innerHTML = translator.translate('shippingServices.addAnotherPolicy');
-
-            renderPricingPolicies();
-
-            let editButtons = pricingPolicies.getElementsByClassName('pl-edit-pricing-policy');
-            utilityService.toArray(editButtons).forEach((button, index) => {
-                button.addEventListener('click', (event) => {
-                    initializePricingPolicyModal(event, index);
-                });
-            });
-
-            let clearButtons = pricingPolicies.getElementsByClassName('pl-clear-pricing-policy');
-            utilityService.toArray(clearButtons).forEach((button, index) => {
-                button.addEventListener('click', (event) => {
-                    deletePricingPolicy(event, index);
-                });
-            });
-
-            utilityService.showElement(templateService.getComponent('pl-use-packlink-price-wrapper'));
-        };
-
-        /**
-         * Sets initial state to pricing policy form in modal.
-         *
-         * @param {Event} event
-         * @param {int | null} policyIndex
-         *
-         * @returns {boolean}
-         */
-        const initializePricingPolicyModal = (event, policyIndex = null) => {
-            event.preventDefault();
-
-            const ctrl = new Packlink.PricePolicyController();
-            // noinspection JSCheckFunctionSignatures
-            ctrl.display({
-                service: serviceModel,
-                policyIndex: policyIndex,
-                onSave: bindService
-            });
-
-            return false;
-        };
-
-        /**
-         * Deletes pricing policy from memory.
-         *
-         * @param {Event} event
-         * @param {number} i
-         * @returns {boolean}
-         */
-        const deletePricingPolicy = (event, i) => {
-            event.preventDefault();
-            serviceModel.pricingPolicies.splice(i, 1);
-            bindService(serviceModel);
-            return false;
-        };
-
-        /**
          * Saves the service.
          */
         const save = () => {
@@ -351,8 +321,21 @@ if (!window.Packlink) {
                 excludedElementNames.push('tax');
             }
 
+            for (let systemId in pricePolicyControllers) {
+                let fieldName = pricePolicyControllers[systemId].getExcludedFieldForValidation();
+                if (fieldName !== null) {
+                    excludedElementNames.push(fieldName);
+                }
+            }
+
             if (validationService.validateForm(form, excludedElementNames)) {
+                let pricingPolicies = [];
+                for (let systemId in pricePolicyControllers) {
+                    pricingPolicies = pricingPolicies.concat(pricePolicyControllers[systemId].getSystemPricingPolicies());
+                }
+
                 serviceModel.activated = true;
+                serviceModel.pricingPolicies = pricingPolicies;
 
                 Packlink.utilityService.showSpinner();
                 ajaxService.post(
@@ -386,72 +369,6 @@ if (!window.Packlink) {
             });
 
             return false;
-        };
-
-        const renderPricingPolicies = () => {
-            const pricingPolicies = templateService.getComponent('pl-pricing-policies');
-            const parent = pricingPolicies.querySelector('.pl-pricing-policies');
-            parent.innerHTML = '';
-
-            serviceModel.pricingPolicies.forEach((policy, index) => {
-                const template = templateService.getComponent('pl-pricing-policy-list-item'),
-                    itemEl = document.createElement('div');
-
-                itemEl.innerHTML = template.innerHTML;
-
-                parent.appendChild(itemEl);
-
-                itemEl.querySelector('#pl-price-range-title').innerHTML =
-                    translator.translate('shippingServices.singlePricePolicy', [index + 1]);
-
-                itemEl.querySelector('#pl-price-range-wrapper span').innerHTML =
-                    getPolicyRangeTypeLabel(policy);
-
-                itemEl.querySelector('#pl-price-policy-range-wrapper span').innerHTML =
-                    getPricingPolicyLabel(policy);
-            });
-        };
-
-        /**
-         * Gets range type label.
-         * @param {ShippingPricingPolicy} policy
-         * @returns {string}
-         */
-        const getPolicyRangeTypeLabel = (policy) => {
-            const toWeight = policy.to_weight || '-';
-            const toPrice = policy.to_price || '-';
-
-            let rangeType = translator.translate('shippingServices.priceRangeWithData', [policy.from_price, toPrice]);
-
-            if (policy.range_type.toString() === rangeTypes.weight) {
-                rangeType = translator.translate('shippingServices.weightRangeWithData', [policy.from_weight, toWeight]);
-            } else if (policy.range_type.toString() === rangeTypes.weightAndPrice) {
-                rangeType = translator.translate(
-                    'shippingServices.weightAndPriceRangeWithData',
-                    [policy.from_weight, toWeight, policy.from_price, toPrice]
-                );
-            }
-
-            return rangeType;
-        };
-
-        /**
-         * Gets range type label.
-         * @param {ShippingPricingPolicy} policy
-         * @returns {string}
-         */
-        const getPricingPolicyLabel = (policy) => {
-            let result = translator.translate('shippingServices.packlinkPrice');
-            if (policy.pricing_policy.toString() === pricingPolicies.percent) {
-                result = translator.translate('' +
-                    'shippingServices.percentagePacklinkPricesWithData',
-                    [translator.translate('shippingServices.' + (policy.increase ? 'increase' : 'reduce')), policy.change_percent]
-                );
-            } else if (policy.pricing_policy.toString() === pricingPolicies.fixed) {
-                result = translator.translate('shippingServices.fixedPricesWithData', [policy.fixed_price]);
-            }
-
-            return result;
         };
     }
 

@@ -4,7 +4,7 @@ if (!window.Packlink) {
 
 (function () {
     /**
-     * @param {{getServicesUrl: string, deleteServiceUrl: string, getCurrencyDetails: string, systemId: string}} configuration
+     * @param {{getServicesUrl: string, deleteServiceUrl: string, getCurrencyDetailsUrl: string, systemId: string}} configuration
      * @constructor
      */
     function MyShippingServicesController(configuration) {
@@ -32,7 +32,7 @@ if (!window.Packlink) {
         this.display = function () {
             utilityService.showSpinner();
             templateService.setCurrentTemplate('pl-my-shipping-services-page');
-            ajaxService.get(configuration.getCurrencyDetails, getDefaultCurrencies);
+            ajaxService.get(configuration.getCurrencyDetailsUrl, getDefaultCurrencies);
             ajaxService.get(configuration.getServicesUrl, bindServices);
 
             const header = templateService.getHeader(),

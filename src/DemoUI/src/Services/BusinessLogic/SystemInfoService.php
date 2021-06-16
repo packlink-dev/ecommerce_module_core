@@ -13,17 +13,34 @@ use Packlink\BusinessLogic\SystemInformation\SystemInfoService as SystemInfoServ
 class SystemInfoService implements SystemInfoServiceInterface
 {
     /**
+     * @var bool
+     */
+    private static $isMultistore = false;
+
+    /**
      * Returns system information.
      *
      * @return SystemInfo[]
      */
     public function getSystemDetails()
     {
-        return array(SystemInfo::fromArray(array(
-            'system_id' => 'test',
-            'system_name' => 'Demo UI',
-            'currencies' => array('EUR'),
-        )));
+        $systems = array(
+            SystemInfo::fromArray(array(
+                'system_id' => 'test',
+                'system_name' => 'Demo UI',
+                'currencies' => array('GBP'),
+            )
+        ));
+
+        if (self::$isMultistore) {
+            $systems[] = SystemInfo::fromArray(array(
+                'system_id' => 'test 2',
+                'system_name' => 'Demo UI 2',
+                'currencies' => array('EUR'),
+            ));
+        }
+
+        return $systems;
     }
 
     /**
@@ -40,5 +57,15 @@ class SystemInfoService implements SystemInfoServiceInterface
             'system_name' => 'Demo UI',
             'currencies' => array('EUR'),
         ));
+    }
+
+    /**
+     * Sets multistore.
+     *
+     * @param $isMultistore
+     */
+    public function setMultistore($isMultistore)
+    {
+        self::$isMultistore = $isMultistore;
     }
 }

@@ -370,7 +370,10 @@ class ShippingMethodService extends BaseService
      */
     protected function validateCurrencyConfigurationForPricingPolicy($policy, $currency)
     {
-        if ($policy->usesDefault || $policy->systemId === 'default') {
+        if ($policy->usesDefault
+            || $policy->systemId === 'default'
+            || $policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE
+        ) {
             return true;
         }
 
