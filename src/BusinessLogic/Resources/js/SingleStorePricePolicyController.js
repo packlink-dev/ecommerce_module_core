@@ -100,6 +100,7 @@ if (!window.Packlink) {
                 scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
                 fixedPriceInput.addEventListener('input', () => {
                     setFixedPrice(fixedPriceInput.value);
+                    validationService.validateInputField(fixedPriceInput);
                     scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
                 });
                 validationService.validateInputField(fixedPriceInput);
