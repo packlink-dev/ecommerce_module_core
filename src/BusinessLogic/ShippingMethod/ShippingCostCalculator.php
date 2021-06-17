@@ -15,6 +15,7 @@ use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
 /**
  * Class ShippingCostCalculator.
@@ -388,6 +389,12 @@ class ShippingCostCalculator
 
         $cost = PHP_INT_MAX;
         foreach ($pricingPolicies as $policy) {
+            if (static::isMisconfigurationDetected($method, $policy, $systemId)) {
+                $fallbackFixedPrice = static::getFallbackFixedPrice($method, $policy, $systemId);
+
+                return $fallbackFixedPrice ?: $baseCost;
+            }
+
             if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice, $systemId)) {
                 $cost = self::calculateCost($policy, $baseCost);
 
@@ -401,6 +408,59 @@ class ShippingCostCalculator
         }
 
         return $cost !== PHP_INT_MAX ? $cost : false;
+    }
+
+    /**
+     * Returns whether misconfiguration is detected.
+     *
+     * @param ShippingMethod $method
+     * @param ShippingPricePolicy $policy
+     * @param string $systemId
+     *
+     * @return bool
+     */
+    protected static function isMisconfigurationDetected($method, $policy, $systemId = null)
+    {
+        /** @var SystemInfoService $systemInfoService */
+        $systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $systemInfo = $systemInfoService->getSystemInfo($systemId);
+
+        if ($systemInfo === null) {
+            Logger::logError("Currency configuration for system with ID $systemId not found!");
+
+            return false;
+        }
+
+        return $policy->pricingPolicy !== ShippingPricePolicy::POLICY_FIXED_PRICE
+            && !in_array($method->getCurrency(), $systemInfo->currencies, true);
+    }
+
+    /**
+     * Returns fallback fixed price when misconfiguration is detected.
+     *
+     * @param ShippingMethod $method
+     * @param ShippingPricePolicy $policy
+     * @param string $systemId
+     *
+     * @return float|null
+     */
+    protected static function getFallbackFixedPrice($method, $policy, $systemId = null)
+    {
+        $fixedPrices = $method->getFixedPrices();
+
+        if ($systemId === null && count($fixedPrices) === 1) {
+            return (float)reset($fixedPrices);
+        }
+
+        if ($policy->usesDefault && array_key_exists('default', $fixedPrices)) {
+            return (float)$fixedPrices['default'];
+        }
+
+        if (array_key_exists($systemId, $fixedPrices)) {
+            return (float)$fixedPrices[$systemId];
+        }
+
+        return null;
     }
 
     /**
