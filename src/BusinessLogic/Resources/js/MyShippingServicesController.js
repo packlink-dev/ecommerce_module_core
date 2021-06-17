@@ -33,7 +33,6 @@ if (!window.Packlink) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate('pl-my-shipping-services-page');
             ajaxService.get(configuration.getCurrencyDetailsUrl, getDefaultCurrencies);
-            ajaxService.get(configuration.getServicesUrl, bindServices);
 
             const header = templateService.getHeader(),
                 settingsMenu = header.querySelector('.pl-configuration-menu'),
@@ -56,13 +55,15 @@ if (!window.Packlink) {
 
             if (configuration.systemId !== null) {
                 systemInfos.forEach((info) => {
-                    if (info.systemId === configuration.systemId) {
+                    if (info.system_id === configuration.systemId) {
                         systemInfo = info;
                     }
                 });
             }
 
             defaultCurrencies = systemInfo.currencies;
+
+            ajaxService.get(configuration.getServicesUrl, bindServices);
         };
 
         const addServiceClick = () => {

@@ -53,7 +53,15 @@ if (!window.Packlink) {
          * @param {function(id: string, action: 'add'|'edit'|'delete')} buttonAction
          * @param {string[]} currencies
          */
-        this.render = (parent, templateId, elementType, services, list, buttonAction, currencies) => {
+        this.render = (
+            parent,
+            templateId,
+            elementType,
+            services,
+            list,
+            buttonAction,
+            currencies
+        ) => {
             parent.innerHTML = '';
             services.forEach((service) => {
                 const template = templateService.getComponent(templateId),
