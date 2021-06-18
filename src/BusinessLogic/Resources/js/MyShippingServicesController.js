@@ -55,7 +55,7 @@ if (!window.Packlink) {
 
             if (configuration.systemId !== null) {
                 systemInfos.forEach((info) => {
-                    if (info.system_id == configuration.systemId) {
+                    if (info.system_id === configuration.systemId) {
                         systemInfo = info;
                     }
                 });

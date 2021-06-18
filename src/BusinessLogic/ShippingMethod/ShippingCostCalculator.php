@@ -389,13 +389,17 @@ class ShippingCostCalculator
 
         $cost = PHP_INT_MAX;
         foreach ($pricingPolicies as $policy) {
+            if ($policy->systemId !== $systemId) {
+                continue;
+            }
+
             if (static::isMisconfigurationDetected($method, $policy, $systemId)) {
                 $fallbackFixedPrice = static::getFallbackFixedPrice($method, $policy, $systemId);
 
                 return $fallbackFixedPrice ?: $baseCost;
             }
 
-            if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice, $systemId)) {
+            if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice)) {
                 $cost = self::calculateCost($policy, $baseCost);
 
                 break;
@@ -510,16 +514,11 @@ class ShippingCostCalculator
      * @param ShippingPricePolicy $policy
      * @param float $totalWeight
      * @param float $totalPrice
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return bool
      */
-    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice, $systemId = null)
+    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice)
     {
-        if ($policy->systemId !== $systemId) {
-            return false;
-        }
-
         $byPrice = $policy->fromPrice <= $totalPrice && (empty($policy->toPrice) || $totalPrice <= $policy->toPrice);
         $byWeight = $policy->fromWeight <= $totalWeight
             && (empty($policy->toWeight) || $totalWeight <= $policy->toWeight);
