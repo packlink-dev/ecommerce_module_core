@@ -212,7 +212,7 @@ if (!window.Packlink) {
          * Refreshes field validation and adds an additional field.
          */
         const refreshFieldValidation = () => {
-            let fieldsForValidation = modelFields,
+            let fieldsForValidation = modelFields.slice(),
                 field = pricePolicyControllers[currentSystem].getAdditionalFieldForValidation();
 
             if (field !== null) {
