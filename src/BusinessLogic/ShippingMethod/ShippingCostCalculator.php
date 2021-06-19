@@ -452,6 +452,10 @@ class ShippingCostCalculator
     {
         $fixedPrices = $method->getFixedPrices();
 
+        if (empty($fixedPrices)) {
+            return null;
+        }
+
         if ($systemId === null && count($fixedPrices) === 1) {
             return (float)reset($fixedPrices);
         }

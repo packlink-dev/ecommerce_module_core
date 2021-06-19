@@ -45,7 +45,7 @@ class TestSystemInfoService implements SystemInfoServiceInterface
         return SystemInfo::fromArray(array(
             'system_id' => $systemId,
             'system_name' => 'Unit tests',
-            'currencies' => $systemId === 'valid' ? array('EUR', 'GBP') : array('GBP'),
+            'currencies' => $systemId !== 'invalid' ? array('EUR', 'GBP') : array('GBP'),
         ));
     }
 }

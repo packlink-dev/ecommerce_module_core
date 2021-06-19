@@ -354,7 +354,11 @@ class ShippingMethodService extends BaseService
         $isValid = true;
 
         foreach ($configuration->pricingPolicies as $policy) {
-            $isValid = $this->validateCurrencyConfigurationForPricingPolicy($policy, $method->getCurrency());
+            $isValid = $this->validateCurrencyConfigurationForPricingPolicy(
+                $configuration,
+                $policy,
+                $method->getCurrency()
+            );
         }
 
         return $isValid;
@@ -363,16 +367,18 @@ class ShippingMethodService extends BaseService
     /**
      * Validates currency configuration for a single pricing policy.
      *
+     * @param ShippingMethodConfiguration $configuration
      * @param ShippingPricePolicy $policy
      * @param string $currency
      *
      * @return bool
      */
-    protected function validateCurrencyConfigurationForPricingPolicy($policy, $currency)
+    protected function validateCurrencyConfigurationForPricingPolicy($configuration, $policy, $currency)
     {
         if ($policy->usesDefault
             || $policy->systemId === 'default'
             || $policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE
+            || !empty($configuration->fixedPrices[$policy->systemId])
         ) {
             return true;
         }
