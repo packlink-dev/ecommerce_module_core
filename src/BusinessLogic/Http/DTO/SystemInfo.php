@@ -32,6 +32,11 @@ class SystemInfo extends DataTransferObject
     public $currencies;
 
     /**
+     * @var array
+     */
+    public $symbols;
+
+    /**
      * Transforms raw array data to its DTO.
      *
      * @param array $raw Raw array data.
@@ -45,6 +50,7 @@ class SystemInfo extends DataTransferObject
         $instance->systemId = !empty($raw['system_id']) ? $raw['system_id'] : null;
         $instance->systemName = !empty($raw['system_name']) ? $raw['system_name'] : '';
         $instance->currencies = !empty($raw['currencies']) ? $raw['currencies'] : array();
+        $instance->symbols = !empty($raw['symbols']) ? $raw['currencies'] : array();
 
         return $instance;
     }
@@ -60,6 +66,7 @@ class SystemInfo extends DataTransferObject
             'system_id' => $this->systemId,
             'system_name' => $this->systemName,
             'currencies' => $this->currencies,
+            'symbols' => $this->symbols,
         );
     }
 }

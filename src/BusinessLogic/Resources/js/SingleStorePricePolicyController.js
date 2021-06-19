@@ -85,6 +85,7 @@ if (!window.Packlink) {
                 misconfigurationMessage = misconfigurationContainer.querySelector('.pl-section-subtitle'),
                 useDefaultSection = form.querySelector('#pl-use-default-group'),
                 fixedPriceInput = pricesSection.querySelector('#pl-misconfiguration-fixed-price'),
+                fixedPriceLabel = fixedPriceInput.parentElement.querySelector('label'),
                 policySwitchButton = pricesSection.querySelector('#pl-configure-prices-button'),
                 switchSection = pricesSection.querySelector('.pl-switch'),
                 addPriceSection = document.querySelector('#pl-add-price-section'),
@@ -95,6 +96,7 @@ if (!window.Packlink) {
             if (misconfigurationDetected || systemInfo.system_id === 'default') {
                 misconfigurationContainer.classList.remove('pl-hidden');
                 fixedPriceInput.dataset.required = 'true';
+                fixedPriceLabel.innerText += (systemInfo.system_id !== 'default' ? ' (' + systemInfo.symbols[systemInfo.currencies[0]] + ')' : '');
                 fixedPriceInput.name = 'misconfigurationFixedPrice' + systemInfo.system_id;
                 fixedPriceInput.value = getFixedPrice();
                 scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
@@ -215,6 +217,7 @@ if (!window.Packlink) {
             let pricingPolicies = [];
             serviceModel.pricingPolicies.forEach((pricingPolicy) => {
                 if (pricingPolicy.system_id === systemInfo.system_id) {
+                    pricingPolicy.uses_default = serviceModel.systemDefaults[pricingPolicy.system_id];
                     pricingPolicies.push(pricingPolicy);
                 }
             });

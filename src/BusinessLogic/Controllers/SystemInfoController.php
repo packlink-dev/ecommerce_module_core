@@ -32,6 +32,30 @@ class SystemInfoController
      */
     public function get()
     {
-        return $this->systemInfoService->getSystemDetails();
+        $systemDetails = $this->systemInfoService->getSystemDetails();
+        foreach ($systemDetails as $systemInfo) {
+            $systemInfo->symbols = $this->getCurrencySymbols($systemInfo->currencies);
+        }
+
+        return $systemDetails;
+    }
+
+    /**
+     * Returns currency symbol for the provided currency codes.
+     *
+     * @param array $currencyCodes
+     *
+     * @return array
+     */
+    protected function getCurrencySymbols($currencyCodes)
+    {
+        $currencies = json_decode(file_get_contents(__DIR__ . '/../Resources/currencies/currencies.json'), true);
+        $symbols = array();
+
+        foreach ($currencyCodes as $currencyCode) {
+            $symbols[$currencyCode] = $currencies[$currencyCode]['symbol'];
+        }
+
+        return $symbols;
     }
 }

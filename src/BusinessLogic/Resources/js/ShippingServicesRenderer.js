@@ -31,6 +31,7 @@ if (!window.Packlink) {
      * @property {string} system_id
      * @property {string} system_name
      * @property {[]} currencies
+     * @property {[]} symbols
      */
 
     /**
