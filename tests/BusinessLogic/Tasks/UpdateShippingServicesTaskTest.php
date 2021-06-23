@@ -216,6 +216,50 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function testServiceDoesNotBelongToMethodByCurrency()
+    {
+        $this->prepareAndExecuteValidTask();
+
+        $methodId = 4;
+        // update locally first
+        $this->shippingMethodService->activate($methodId);
+        $method = $this->shippingMethodService->getShippingMethod($methodId);
+        $services = $method->getShippingServices();
+        // previous price 5.98
+        $services[0]->totalPrice = 14.27;
+        $method->setShippingServices($services);
+        // add new service
+        $method->addShippingService(new ShippingService(
+            12345,
+            'new service',
+            'IT',
+            'IT',
+            12.43,
+            10.40,
+            2.03
+        ));
+        $method->setCurrency('GBP');
+        $repo = RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME);
+        $repo->update($method);
+
+        $method = $this->shippingMethodService->getShippingMethod($methodId);
+        self::assertCount(2, $method->getShippingServices());
+
+        // execute task once more. All services should be updated and invalid services should be deleted.
+        $this->httpClient->setMockResponses($this->getValidMockResponses());
+        $this->syncTask->execute();
+
+        self::assertCount(18, $this->shippingMethodService->getAllMethods());
+        self::assertEmpty($this->shippingMethodService->getActiveMethods());
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
