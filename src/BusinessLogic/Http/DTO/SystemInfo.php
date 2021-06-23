@@ -50,7 +50,7 @@ class SystemInfo extends DataTransferObject
         $instance->systemId = !empty($raw['system_id']) ? $raw['system_id'] : null;
         $instance->systemName = !empty($raw['system_name']) ? $raw['system_name'] : '';
         $instance->currencies = !empty($raw['currencies']) ? $raw['currencies'] : array();
-        $instance->symbols = !empty($raw['symbols']) ? $raw['currencies'] : array();
+        $instance->symbols = !empty($raw['symbols']) ? $raw['symbols'] : array();
 
         return $instance;
     }
