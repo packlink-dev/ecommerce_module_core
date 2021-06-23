@@ -420,6 +420,9 @@
   border-bottom: 1px solid #f5f5f5;
   padding: 20px 0;
 }
+#pl-page section .pl-tooltip {
+  color: #867878;
+}
 #pl-page section:first-child {
   padding-top: 0;
 }
@@ -431,9 +434,6 @@
 }
 #pl-page section .pl-section-subtitle {
   display: block;
-}
-#pl-page section .pl-tooltip {
-  color: #867878;
 }
 #pl-page section .pl-button {
   padding: 8px 12px;
@@ -869,6 +869,9 @@
   }
   #pl-page section .pl-button {
     width: auto;
+  }
+  #pl-page section .pl-tooltip {
+    color: #867878;
   }
   #pl-page header .pl-header-holder {
     justify-content: flex-end;

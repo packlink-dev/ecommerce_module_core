@@ -136,6 +136,10 @@
     border-bottom: 1px solid $border-light;
     padding: 20px 0;
 
+    .pl-tooltip {
+      color: #867878;
+    }
+
     &:first-child {
       padding-top: 0;
     }
@@ -529,6 +533,10 @@
     }
   }
 
+  .pl-invalid-label {
+    color: $color-red;
+  }
+
   .pl-shipping-services-table {
     width: 100%;
 
@@ -677,6 +685,10 @@
     section {
       .pl-button {
         width: auto;
+      }
+
+      .pl-tooltip {
+        color: #867878;
       }
     }
 
