@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
+use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -24,6 +25,11 @@ use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
  */
 class ShippingCostCalculator
 {
+    /**
+     * @var SystemInfo
+     */
+    protected static $systemInfo;
+
     /**
      * Calculates shipping cost for specified shipping method and delivery parameters.
      *
@@ -94,6 +100,9 @@ class ShippingCostCalculator
         $result = array();
         $package = self::preparePackages($packages);
         try {
+            /** @var SystemInfoService $systemInfoService */
+            $systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
+            static::$systemInfo = $systemInfoService->getSystemInfo($systemId);
             $response = self::getPacklinkServices($fromCountry, $fromZip, $toCountry, $toZip, $package);
 
             $result = self::calculateShippingCostsPerShippingMethod(
@@ -396,7 +405,9 @@ class ShippingCostCalculator
             if (static::isMisconfigurationDetected($method, $policy, $systemId)) {
                 $fallbackFixedPrice = static::getFallbackFixedPrice($method, $policy, $systemId);
 
-                return $fallbackFixedPrice ?: $baseCost;
+                if ($fallbackFixedPrice !== null) {
+                    return $fallbackFixedPrice;
+                }
             }
 
             if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice)) {
@@ -425,18 +436,14 @@ class ShippingCostCalculator
      */
     protected static function isMisconfigurationDetected($method, $policy, $systemId = null)
     {
-        /** @var SystemInfoService $systemInfoService */
-        $systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
-        $systemInfo = $systemInfoService->getSystemInfo($systemId);
-
-        if ($systemInfo === null) {
+        if (static::$systemInfo === null) {
             Logger::logError("Currency configuration for system with ID $systemId not found!");
 
             return false;
         }
 
         return $policy->pricingPolicy !== ShippingPricePolicy::POLICY_FIXED_PRICE
-            && !in_array($method->getCurrency(), $systemInfo->currencies, true);
+            && !in_array($method->getCurrency(), static::$systemInfo->currencies, true);
     }
 
     /**

@@ -351,17 +351,13 @@ class ShippingMethodService extends BaseService
      */
     public function isCurrencyConfigurationValid(ShippingMethodConfiguration $configuration, ShippingMethod $method)
     {
-        $isValid = true;
-
         foreach ($configuration->pricingPolicies as $policy) {
-            $isValid = $this->validateCurrencyConfigurationForPricingPolicy(
-                $configuration,
-                $policy,
-                $method->getCurrency()
-            );
+            if(!$this->validateCurrencyConfigurationForPricingPolicy($configuration, $policy, $method->getCurrency())) {
+                return false;
+            }
         }
 
-        return $isValid;
+        return true;
     }
 
     /**
