@@ -52,9 +52,8 @@ if (!window.Packlink) {
         this.display = function (config) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getCurrencyDetailsUrl, getDefaultCurrencies);
-            ajaxService.get(configuration.getTaskStatusUrl, (response) => {
-                checkServicesStatus(response, config);
+            ajaxService.get(configuration.getCurrencyDetailsUrl, (response) => {
+                getDefaultCurrencies(response, config);
             });
 
             const mainPage = templateService.getMainPage(),
@@ -162,8 +161,9 @@ if (!window.Packlink) {
          * Retrieves system info.
          *
          * @param {SystemInfo[]} systemInfos
+         * @param {{from: string, newService: boolean}} config
          */
-        const getDefaultCurrencies = (systemInfos) => {
+        const getDefaultCurrencies = (systemInfos, config) => {
             let systemInfo = systemInfos[0];
 
             if (configuration.systemId !== null) {
@@ -175,6 +175,10 @@ if (!window.Packlink) {
             }
 
             defaultCurrencies = systemInfo.currencies;
+
+            ajaxService.get(configuration.getTaskStatusUrl, (response) => {
+                checkServicesStatus(response, config);
+            });
         };
 
         /**
