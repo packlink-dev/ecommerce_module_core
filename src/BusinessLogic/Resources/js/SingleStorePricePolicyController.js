@@ -80,78 +80,14 @@ if (!window.Packlink) {
         this.display = (form) => {
             resetPricesSection(form);
 
-            let pricesSection = form.querySelector('#pl-concrete-prices-section'),
-                misconfigurationContainer = pricesSection.querySelector('#pl-misconfiguration'),
-                misconfigurationMessage = misconfigurationContainer.querySelector('.pl-section-subtitle'),
-                useDefaultSection = form.querySelector('#pl-use-default-group'),
-                fixedPriceInput = pricesSection.querySelector('#pl-misconfiguration-fixed-price'),
-                fixedPriceLabel = fixedPriceInput.parentElement.querySelector('label'),
-                policySwitchButton = pricesSection.querySelector('#pl-configure-prices-button'),
-                switchSection = pricesSection.querySelector('.pl-switch'),
-                addPriceSection = document.querySelector('#pl-add-price-section'),
-                addPriceButton = document.querySelector('#pl-add-price-section button'),
-                scopeSelector = document.querySelector('#pl-scope-select'),
-                pricingPolicies = isMultistore ? this.getSystemPricingPolicies() : serviceModel.pricingPolicies;
-
             if (misconfigurationDetected || systemInfo.system_id === 'default') {
-                misconfigurationContainer.classList.remove('pl-hidden');
-                fixedPriceInput.dataset.required = 'true';
-                fixedPriceLabel.innerText += (systemInfo.system_id !== 'default' ? ' (' + systemInfo.symbols[systemInfo.currencies[0]] + ')' : '');
-                fixedPriceInput.name = 'misconfigurationFixedPrice' + systemInfo.system_id;
-                fixedPriceInput.value = getFixedPrice();
-                scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
-                fixedPriceInput.addEventListener('input', () => {
-                    setFixedPrice(fixedPriceInput.value);
-                    validationService.validateInputField(fixedPriceInput);
-                    scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
-                });
-                validationService.validateInputField(fixedPriceInput);
+                setDefaultFixedPriceInput(form);
             }
 
             if (systemInfo.system_id === 'default') {
-                misconfigurationMessage.classList.add('pl-hidden');
-                switchSection.classList.add('pl-hidden');
-                addPriceSection.classList.add('pl-hidden');
-                useDefaultSection.classList.add('pl-hidden');
+                renderDefaultScopeConfiguration(form);
             } else {
-                if (isMultistore) {
-                    if (!misconfigurationDetected) {
-                        useDefaultSection.classList.add('pl-hidden');
-                    } else {
-                        let useDefaultCheckbox = useDefaultSection.querySelector('#pl-use-default');
-                        useDefaultCheckbox.checked = serviceModel.systemDefaults[systemInfo.system_id];
-                        fixedPriceInput.dataset.required = useDefaultCheckbox.checked ? 'false' : 'true';
-                        fixedPriceInput.disabled = useDefaultCheckbox.checked;
-                        if (useDefaultCheckbox.checked) {
-                            validationService.removeError(fixedPriceInput);
-                        }
-
-                        useDefaultCheckbox.addEventListener('change', () => {
-                            serviceModel.systemDefaults[systemInfo.system_id] = useDefaultCheckbox.checked;
-                            fixedPriceInput.dataset.required = useDefaultCheckbox.checked ? 'false' : 'true';
-                            fixedPriceInput.disabled = useDefaultCheckbox.checked;
-                            scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
-                            if (useDefaultCheckbox.checked) {
-                                validationService.removeError(fixedPriceInput);
-                            } else {
-                                validationService.validateInputField(fixedPriceInput);
-                            }
-                        });
-                    }
-                }
-
-                policySwitchButton.addEventListener('click', () => {
-                    policySwitchButton.classList.toggle('pl-selected');
-                    handlePolicySwitchButton(policySwitchButton);
-                });
-
-                if (pricingPolicies.length > 0) {
-                    policySwitchButton.classList.add('pl-selected');
-                    handlePolicySwitchButton(policySwitchButton);
-                }
-
-                addPriceButton.addEventListener('click', initializePricingPolicyModal);
-                initPricingPolicies(form);
+                renderSingleStoreConfiguration(form);
             }
         };
 
@@ -223,6 +159,116 @@ if (!window.Packlink) {
             });
 
             return pricingPolicies;
+        };
+
+        /**
+         * Renders default scope configuration.
+         *
+         * @param {HTMLElement} form
+         */
+        const renderDefaultScopeConfiguration = (form) => {
+            let pricesSection = form.querySelector('#pl-concrete-prices-section'),
+                misconfigurationContainer = pricesSection.querySelector('#pl-misconfiguration'),
+                misconfigurationMessage = misconfigurationContainer.querySelector('.pl-section-subtitle'),
+                useDefaultSection = form.querySelector('#pl-use-default-group'),
+                switchSection = pricesSection.querySelector('.pl-switch'),
+                addPriceSection = document.querySelector('#pl-add-price-section');
+
+            misconfigurationMessage.classList.add('pl-hidden');
+            switchSection.classList.add('pl-hidden');
+            addPriceSection.classList.add('pl-hidden');
+            useDefaultSection.classList.add('pl-hidden');
+        };
+
+        /**
+         * Renders single store configuration.
+         *
+         * @param {HTMLElement} form
+         */
+        const renderSingleStoreConfiguration = (form) => {
+            let pricesSection = form.querySelector('#pl-concrete-prices-section'),
+                policySwitchButton = pricesSection.querySelector('#pl-configure-prices-button'),
+                addPriceButton = document.querySelector('#pl-add-price-section button'),
+                pricingPolicies = isMultistore ? this.getSystemPricingPolicies() : serviceModel.pricingPolicies;
+
+            if (isMultistore) {
+                renderMultistoreConfiguration(form);
+            }
+
+            policySwitchButton.addEventListener('click', () => {
+                policySwitchButton.classList.toggle('pl-selected');
+                handlePolicySwitchButton(policySwitchButton);
+            });
+
+            if (pricingPolicies.length > 0) {
+                policySwitchButton.classList.add('pl-selected');
+                handlePolicySwitchButton(policySwitchButton);
+            }
+
+            addPriceButton.addEventListener('click', initializePricingPolicyModal);
+            initPricingPolicies(form);
+        }
+
+        /**
+         * Sets default fixed price input when misconfiguration is detected.
+         *
+         * @param {HTMLElement} form
+         */
+        const setDefaultFixedPriceInput = (form) => {
+            let pricesSection = form.querySelector('#pl-concrete-prices-section'),
+                fixedPriceInput = pricesSection.querySelector('#pl-misconfiguration-fixed-price'),
+                fixedPriceLabel = fixedPriceInput.parentElement.querySelector('label'),
+                scopeSelector = document.querySelector('#pl-scope-select'),
+                misconfigurationContainer = pricesSection.querySelector('#pl-misconfiguration');
+
+            misconfigurationContainer.classList.remove('pl-hidden');
+            fixedPriceInput.dataset.required = 'true';
+            fixedPriceLabel.innerText += (systemInfo.system_id !== 'default' ? ' (' + systemInfo.symbols[systemInfo.currencies[0]] + ')' : '');
+            fixedPriceInput.name = 'misconfigurationFixedPrice' + systemInfo.system_id;
+            fixedPriceInput.value = getFixedPrice();
+            scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
+            fixedPriceInput.addEventListener('input', () => {
+                setFixedPrice(fixedPriceInput.value);
+                validationService.validateInputField(fixedPriceInput);
+                scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
+            });
+            validationService.validateInputField(fixedPriceInput);
+        };
+
+        /**
+         * Renders multi-store configuration.
+         *
+         * @param {HTMLElement} form
+         */
+        const renderMultistoreConfiguration = (form) => {
+            let pricesSection = form.querySelector('#pl-concrete-prices-section'),
+                fixedPriceInput = pricesSection.querySelector('#pl-misconfiguration-fixed-price'),
+                scopeSelector = document.querySelector('#pl-scope-select'),
+                useDefaultSection = form.querySelector('#pl-use-default-group');
+
+            if (!misconfigurationDetected) {
+                useDefaultSection.classList.add('pl-hidden');
+            } else {
+                let useDefaultCheckbox = useDefaultSection.querySelector('#pl-use-default');
+                useDefaultCheckbox.checked = serviceModel.systemDefaults[systemInfo.system_id];
+                fixedPriceInput.dataset.required = useDefaultCheckbox.checked ? 'false' : 'true';
+                fixedPriceInput.disabled = useDefaultCheckbox.checked;
+                if (useDefaultCheckbox.checked) {
+                    validationService.removeError(fixedPriceInput);
+                }
+
+                useDefaultCheckbox.addEventListener('change', () => {
+                    serviceModel.systemDefaults[systemInfo.system_id] = useDefaultCheckbox.checked;
+                    fixedPriceInput.dataset.required = useDefaultCheckbox.checked ? 'false' : 'true';
+                    fixedPriceInput.disabled = useDefaultCheckbox.checked;
+                    scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
+                    if (useDefaultCheckbox.checked) {
+                        validationService.removeError(fixedPriceInput);
+                    } else {
+                        validationService.validateInputField(fixedPriceInput);
+                    }
+                });
+            }
         };
 
         /**
@@ -301,12 +347,11 @@ if (!window.Packlink) {
          * Removes system pricing policies.
          */
         const removeSystemPricingPolicies = () => {
-            serviceModel.pricingPolicies.forEach((pricingPolicy) => {
-                if (pricingPolicy.system_id === systemInfo.system_id) {
-                    let index = serviceModel.pricingPolicies.indexOf(pricingPolicy);
-                    serviceModel.pricingPolicies.splice(index, 1);
+            for (let i = serviceModel.pricingPolicies.length - 1; i >= 0; i--) {
+                if (serviceModel.pricingPolicies[i].system_id === systemInfo.system_id) {
+                    serviceModel.pricingPolicies.splice(i, 1);
                 }
-            });
+            }
         };
 
         /**
@@ -407,8 +452,9 @@ if (!window.Packlink) {
          */
         const deletePricingPolicy = (event, i) => {
             event.preventDefault();
-            this.getSystemPricingPolicies()
-            serviceModel.pricingPolicies.splice(i, 1);
+            let pricingPolicies = this.getSystemPricingPolicies()
+            pricingPolicies.splice(i, 1);
+            this.setSystemPricingPolicies(pricingPolicies);
             onSave(serviceModel);
             return false;
         };

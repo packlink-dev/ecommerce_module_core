@@ -145,7 +145,14 @@ class ShippingMethodController
         if (!$this->shippingMethodService->isCurrencyConfigurationValid($shippingMethod, $model)) {
             Logger::logWarning("Currency configurations for shipping method with id {$shippingMethod->id} are not valid!");
 
+            // Allow saving fallback fixed prices.
             $model->setFixedPrices($shippingMethod->fixedPrices);
+
+            // Allow deleting of existing pricing policies.
+            if (count($shippingMethod->pricingPolicies) < count($model->getPricingPolicies())) {
+                $this->updatePricingPolicies($shippingMethod, $model);
+            }
+
             $this->shippingMethodService->save($model);
 
             return null;
@@ -269,10 +276,21 @@ class ShippingMethodController
         $model->setShipToAllCountries($configuration->isShipToAllCountries);
         $model->setShippingCountries($configuration->shippingCountries);
         $model->setActivated($configuration->activated);
-        $model->resetPricingPolicies();
         $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
         $model->setFixedPrices($configuration->fixedPrices);
         $model->setSystemDefaults($configuration->systemDefaults);
+        $this->updatePricingPolicies($configuration, $model);
+    }
+
+    /**
+     * Updates pricing policies on the shipping method model.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param ShippingMethod $model
+     */
+    private function updatePricingPolicies(ShippingMethodConfiguration $configuration, ShippingMethod $model)
+    {
+        $model->resetPricingPolicies();
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }
