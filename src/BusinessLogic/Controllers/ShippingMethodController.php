@@ -143,7 +143,10 @@ class ShippingMethodController
         }
 
         if (!$this->shippingMethodService->isCurrencyConfigurationValid($shippingMethod, $model)) {
-            Logger::logError("Currency configurations for shipping method with id {$shippingMethod->id} are not valid!");
+            Logger::logWarning("Currency configurations for shipping method with id {$shippingMethod->id} are not valid!");
+
+            $model->setFixedPrices($shippingMethod->fixedPrices);
+            $this->shippingMethodService->save($model);
 
             return null;
         }

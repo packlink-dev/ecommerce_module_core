@@ -151,11 +151,11 @@ if (!window.Packlink) {
         const initSystems = (systemInfoResponse) => {
             systemInfos = systemInfoResponse;
 
-            if (serviceModel.fixedPrices === null) {
+            if (serviceModel.fixedPrices === null || serviceModel.fixedPrices.length === 0) {
                 serviceModel.fixedPrices = {};
             }
 
-            if (serviceModel.systemDefaults === null) {
+            if (serviceModel.systemDefaults === null || serviceModel.systemDefaults.length === 0) {
                 serviceModel.systemDefaults = {};
             }
 

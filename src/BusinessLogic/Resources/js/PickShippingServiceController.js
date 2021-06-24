@@ -40,9 +40,9 @@ if (!window.Packlink) {
         let noServicesModal;
 
         /**
-         * @type string[]
+         * @type SystemInfo
          */
-        let defaultCurrencies;
+        let systemInfo;
 
         /**
          * Displays page content.
@@ -164,7 +164,7 @@ if (!window.Packlink) {
          * @param {{from: string, newService: boolean}} config
          */
         const getDefaultCurrencies = (systemInfos, config) => {
-            let systemInfo = systemInfos[0];
+            systemInfo = systemInfos[0];
 
             if (configuration.systemId !== null) {
                 systemInfos.forEach((info) => {
@@ -173,8 +173,6 @@ if (!window.Packlink) {
                     }
                 });
             }
-
-            defaultCurrencies = systemInfo.currencies;
 
             ajaxService.get(configuration.getTaskStatusUrl, (response) => {
                 checkServicesStatus(response, config);
@@ -227,7 +225,16 @@ if (!window.Packlink) {
                 table = templateService.getComponent('pl-shipping-services-table'),
                 list = templateService.getComponent('pl-shipping-services-list').querySelector('.pl-shipping-services-list'),
                 render = (elem, id, tag) => {
-                    Packlink.ShippingServicesRenderer.render(elem, id, tag, filteredServices, false, handleServiceAction, defaultCurrencies);
+                    Packlink.ShippingServicesRenderer.render(
+                        elem,
+                        id,
+                        tag,
+                        filteredServices,
+                        false,
+                        handleServiceAction,
+                        systemInfo,
+                        'pick-shipping-services'
+                    );
                 };
 
             render(table.querySelector('tbody'), 'pl-shipping-services-row', 'tr');

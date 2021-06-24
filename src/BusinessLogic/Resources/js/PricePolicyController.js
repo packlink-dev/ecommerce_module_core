@@ -178,9 +178,9 @@ if (!window.Packlink) {
             if (misconfigurationDetected) {
                 pricingPolicyForm['pricing_policy'].value = pricingPolicies.fixed;
                 pricingPolicyForm['pricing_policy'].disabled = true;
-                validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
-                validationService.validateInputField(pricingPolicyForm['fixed_price']);
-                validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
+                if (pricingPolicy !== null) {
+                    validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
+                }
             }
 
             templateService.getComponent('pl-pricing-policy-title').innerHTML =

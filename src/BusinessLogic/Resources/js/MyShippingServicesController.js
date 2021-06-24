@@ -21,9 +21,9 @@ if (!window.Packlink) {
         let activeServices = [];
 
         /**
-         * @type string[]
+         * @type SystemInfo
          */
-        let defaultCurrencies;
+        let systemInfo;
 
         /**
          * Displays page content.
@@ -51,7 +51,7 @@ if (!window.Packlink) {
          * @param {SystemInfo[]} systemInfos
          */
         const getDefaultCurrencies = (systemInfos) => {
-            let systemInfo = systemInfos[0];
+            systemInfo = systemInfos[0];
 
             if (configuration.systemId !== null) {
                 systemInfos.forEach((info) => {
@@ -60,8 +60,6 @@ if (!window.Packlink) {
                     }
                 });
             }
-
-            defaultCurrencies = systemInfo.currencies;
 
             ajaxService.get(configuration.getServicesUrl, bindServices);
         };
@@ -79,7 +77,16 @@ if (!window.Packlink) {
             const table = templateService.getComponent('pl-shipping-services-table'),
                 list = templateService.getComponent('pl-shipping-services-list'),
                 render = (elem, id, tag) => {
-                    Packlink.ShippingServicesRenderer.render(elem, id, tag, activeServices, true, handleServiceAction, defaultCurrencies);
+                    Packlink.ShippingServicesRenderer.render(
+                        elem,
+                        id,
+                        tag,
+                        activeServices,
+                        true,
+                        handleServiceAction,
+                        systemInfo,
+                        'my-shipping-services'
+                    );
                 };
 
             activeServices = services;
