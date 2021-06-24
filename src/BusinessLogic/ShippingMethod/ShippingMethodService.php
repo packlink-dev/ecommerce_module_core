@@ -379,21 +379,38 @@ class ShippingMethodService extends BaseService
             return true;
         }
 
-        if ($policy->systemId === null && !$policy->usesDefault) {
-            $details = $this->getSystemInfoService()->getSystemDetails();
-
-            return !empty($details) ? in_array($currency, $details[0]->currencies, true) : false;
+        if ($policy->systemId === null) {
+            return $this->validateCurrencyConfigurationForSingleStore($currency);
         }
 
         $detail = $this->getSystemInfoService()->getSystemInfo($policy->systemId);
-
         if (!$detail) {
-            Logger::logError("Information for the system with id {$policy->systemId} not found!");
+            Logger::logError("Currency information for the system with id {$policy->systemId} not found!");
 
-            return true;
+            return false;
         }
 
         return in_array($currency, $detail->currencies, true);
+    }
+
+    /**
+     * Validates currency configuration for a single store.
+     *
+     * @param string $currency
+     *
+     * @return bool
+     */
+    protected function validateCurrencyConfigurationForSingleStore($currency)
+    {
+        $details = $this->getSystemInfoService()->getSystemDetails();
+
+        if (empty($details)) {
+            Logger::logError("Store currency configuration not found!");
+
+            return false;
+        }
+
+        return in_array($currency, $details[0]->currencies, true);
     }
 
     /**
