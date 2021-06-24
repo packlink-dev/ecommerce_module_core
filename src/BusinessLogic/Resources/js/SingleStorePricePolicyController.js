@@ -153,7 +153,6 @@ if (!window.Packlink) {
             let pricingPolicies = [];
             serviceModel.pricingPolicies.forEach((pricingPolicy) => {
                 if (pricingPolicy.system_id === systemInfo.system_id) {
-                    pricingPolicy.uses_default = serviceModel.systemDefaults[pricingPolicy.system_id];
                     pricingPolicies.push(pricingPolicy);
                 }
             });

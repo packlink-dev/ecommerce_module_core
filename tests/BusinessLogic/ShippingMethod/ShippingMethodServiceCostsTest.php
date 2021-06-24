@@ -212,13 +212,13 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             'invalid'
         );
 
-        self::assertEquals(5.5, $cost);
+        self::assertEquals(6.27, $cost);
     }
 
-    public function testFallbackToDefaultFixedPrice()
+    public function testUsingDefaultFixedPriceInMultistore()
     {
         $fixedPricePolicies[] = array(0, 10, 12);
-        $shippingMethod = $this->prepareSystemPercentPricePolicyThatUsesDefaultShippingMethod(
+        $shippingMethod = $this->prepareSystemPercentPricePolicyShippingMethod(
             20339,
             true,
             14,
@@ -227,6 +227,9 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $shippingMethod->setFixedPrices(array(
             'default' => 8.2,
             'invalid' => 5.5,
+        ));
+        $shippingMethod->setSystemDefaults(array(
+            'invalid' => true
         ));
 
         $response = file_get_contents(
@@ -245,7 +248,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             'invalid'
         );
 
-        self::assertEquals(8.2, $cost);
+        self::assertEquals(9.35, $cost);
     }
 
     public function testGetCostsFromProxy()
@@ -834,32 +837,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
      * @param int $serviceId
      * @param bool $increase
      * @param int $percent
-     * @param string|null $systemId
-     *
-     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
-     */
-    protected function prepareSystemPercentPricePolicyThatUsesDefaultShippingMethod(
-        $serviceId = 1,
-        $increase = false,
-        $percent = 14,
-        $systemId = null
-    ) {
-        $shippingMethod = $this->addShippingMethod($serviceId);
-        $shippingMethod->addPricingPolicy($this->getSystemPercentPricePolicyThatUsesDefault(
-            $percent,
-            $increase,
-            $systemId
-        ));
-
-        $this->shippingMethodService->save($shippingMethod);
-
-        return $shippingMethod;
-    }
-
-    /**
-     * @param int $serviceId
-     * @param bool $increase
-     * @param int $percent
      *
      * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
      */
@@ -981,24 +958,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             0,
             $systemId
         );
-    }
-
-    protected function getSystemPercentPricePolicyThatUsesDefault($percent, $increase = false, $systemId = null)
-    {
-        $policy = $this->getPricingPolicy(
-            ShippingPricePolicy::RANGE_PRICE,
-            0,
-            10,
-            ShippingPricePolicy::POLICY_PACKLINK_ADJUST,
-            $percent,
-            $increase,
-            0,
-            $systemId
-        );
-
-        $policy->usesDefault = true;
-
-        return $policy;
     }
 
     protected function getPricingPolicy(

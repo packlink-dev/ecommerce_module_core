@@ -351,6 +351,11 @@ class ShippingCostCalculator
         $systemId = null
     ) {
         $cost = PHP_INT_MAX;
+
+        if (static::isMisconfigurationDetected($shippingMethod, $systemId)) {
+            $basePrice = static::getMisconfigurationFixedPrice($shippingMethod, $systemId) ?: $basePrice;
+        }
+
         // porting to array_reduce would increase complexity of the code because inner function will need a lot of
         // parameters
         foreach ($shippingMethod->getShippingServices() as $methodService) {
@@ -398,19 +403,7 @@ class ShippingCostCalculator
 
         $cost = PHP_INT_MAX;
         foreach ($pricingPolicies as $policy) {
-            if ($policy->systemId !== $systemId) {
-                continue;
-            }
-
-            if (static::isMisconfigurationDetected($method, $policy, $systemId)) {
-                $fallbackFixedPrice = static::getFallbackFixedPrice($method, $policy, $systemId);
-
-                if ($fallbackFixedPrice !== null) {
-                    return $fallbackFixedPrice;
-                }
-            }
-
-            if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice)) {
+            if (self::canPolicyBeApplied($policy, $totalWeight, $totalPrice, $systemId)) {
                 $cost = self::calculateCost($policy, $baseCost);
 
                 break;
@@ -429,12 +422,11 @@ class ShippingCostCalculator
      * Returns whether misconfiguration is detected.
      *
      * @param ShippingMethod $method
-     * @param ShippingPricePolicy $policy
      * @param string $systemId
      *
      * @return bool
      */
-    protected static function isMisconfigurationDetected($method, $policy, $systemId = null)
+    protected static function isMisconfigurationDetected($method, $systemId = null)
     {
         if (static::$systemInfo === null) {
             Logger::logError("Currency configuration for system with ID $systemId not found!");
@@ -442,22 +434,21 @@ class ShippingCostCalculator
             return false;
         }
 
-        return $policy->pricingPolicy !== ShippingPricePolicy::POLICY_FIXED_PRICE
-            && !in_array($method->getCurrency(), static::$systemInfo->currencies, true);
+        return !in_array($method->getCurrency(), static::$systemInfo->currencies, true);
     }
 
     /**
      * Returns fallback fixed price when misconfiguration is detected.
      *
      * @param ShippingMethod $method
-     * @param ShippingPricePolicy $policy
      * @param string $systemId
      *
      * @return float|null
      */
-    protected static function getFallbackFixedPrice($method, $policy, $systemId = null)
+    protected static function getMisconfigurationFixedPrice($method, $systemId = null)
     {
         $fixedPrices = $method->getFixedPrices();
+        $systemDefaults = $method->getSystemDefaults();
 
         if (empty($fixedPrices)) {
             return null;
@@ -467,7 +458,10 @@ class ShippingCostCalculator
             return (float)reset($fixedPrices);
         }
 
-        if ($policy->usesDefault && array_key_exists('default', $fixedPrices)) {
+        if (array_key_exists('default', $fixedPrices)
+            && array_key_exists($systemId, $systemDefaults)
+            && $systemDefaults[$systemId]
+        ) {
             return (float)$fixedPrices['default'];
         }
 
@@ -525,11 +519,16 @@ class ShippingCostCalculator
      * @param ShippingPricePolicy $policy
      * @param float $totalWeight
      * @param float $totalPrice
+     * @param null $systemId
      *
      * @return bool
      */
-    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice)
+    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice, $systemId = null)
     {
+        if ($policy->systemId !== $systemId) {
+            return false;
+        }
+
         $byPrice = $policy->fromPrice <= $totalPrice && (empty($policy->toPrice) || $totalPrice <= $policy->toPrice);
         $byWeight = $policy->fromWeight <= $totalWeight
             && (empty($policy->toWeight) || $totalWeight <= $policy->toWeight);

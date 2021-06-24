@@ -145,16 +145,6 @@ class ShippingMethodController
         if (!$this->shippingMethodService->isCurrencyConfigurationValid($shippingMethod, $model)) {
             Logger::logWarning("Currency configurations for shipping method with id {$shippingMethod->id} are not valid!");
 
-            // Allow saving fallback fixed prices.
-            $model->setFixedPrices($shippingMethod->fixedPrices);
-
-            // Allow deleting of existing pricing policies.
-            if (count($shippingMethod->pricingPolicies) < count($model->getPricingPolicies())) {
-                $this->updatePricingPolicies($shippingMethod, $model);
-            }
-
-            $this->shippingMethodService->save($model);
-
             return null;
         }
 

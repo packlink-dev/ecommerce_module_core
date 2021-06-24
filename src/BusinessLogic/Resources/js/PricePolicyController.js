@@ -115,7 +115,6 @@ if (!window.Packlink) {
 
             pricingPolicy.increase = form['increase'].checked;
             pricingPolicy.system_id = isMultistore ? systemInfo.system_id : null;
-            pricingPolicy.uses_default = isMultistore ? serviceModel.systemDefaults[systemInfo.system_id] : false;
             removeUnneededFieldsFromModel(pricingPolicy);
 
             if (currentPolicy === null) {
@@ -180,6 +179,7 @@ if (!window.Packlink) {
                 pricingPolicyForm['pricing_policy'].disabled = true;
                 if (pricingPolicy !== null) {
                     validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
+                    validationService.validateInputField(pricingPolicyForm['fixed_price']);
                 }
             }
 

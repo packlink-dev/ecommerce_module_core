@@ -371,10 +371,8 @@ class ShippingMethodService extends BaseService
      */
     protected function validateCurrencyConfigurationForPricingPolicy($configuration, $policy, $currency)
     {
-        if ($policy->usesDefault
-            || $policy->systemId === 'default'
-            || $policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE
-            || !empty($configuration->fixedPrices[$policy->systemId])
+        if ($policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE
+            || $this->isFixedPriceSetForPolicy($configuration, $policy)
         ) {
             return true;
         }
@@ -391,6 +389,22 @@ class ShippingMethodService extends BaseService
         }
 
         return in_array($currency, $detail->currencies, true);
+    }
+
+    /**
+     * Returns whether a fixed price is set for policy.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param ShippingPricePolicy $policy
+     *
+     * @return bool
+     */
+    protected function isFixedPriceSetForPolicy($configuration, $policy)
+    {
+        return (!empty($configuration->systemDefaults)
+            && array_key_exists($policy->systemId, $configuration->systemDefaults)
+            && $configuration->systemDefaults[$policy->systemId]
+        ) || !empty($configuration->fixedPrices[$policy->systemId]);
     }
 
     /**

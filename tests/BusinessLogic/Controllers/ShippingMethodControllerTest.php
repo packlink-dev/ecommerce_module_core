@@ -141,7 +141,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
                 'to_price' => 20,
                 'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
                 'system_id' => 'default',
-                'uses_default' => true,
             )),
         );
         $shipment->isShipToAllCountries = true;
@@ -165,7 +164,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
                 'to_price' => 20,
                 'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
                 'system_id' => null,
-                'uses_default' => false,
             )),
         );
         $shipment->isShipToAllCountries = true;
@@ -189,7 +187,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
                 'to_price' => 20,
                 'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
                 'system_id' => 'valid',
-                'uses_default' => false,
             )),
         );
         $shipment->isShipToAllCountries = true;
@@ -213,7 +210,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
                 'to_price' => 20,
                 'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
                 'system_id' => 'valid',
-                'uses_default' => false,
             )),
             ShippingPricePolicy::fromArray(array(
                 'range_type' => ShippingPricePolicy::RANGE_PRICE,
@@ -221,7 +217,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
                 'to_price' => 20,
                 'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
                 'system_id' => 'invalid',
-                'uses_default' => false,
             )),
         );
         $shipment->isShipToAllCountries = true;
