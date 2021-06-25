@@ -11,6 +11,7 @@ use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
 /**
  * Class ShippingMethodController.
@@ -64,9 +65,13 @@ class ShippingMethodController
     /**
      * Shop shipping method service.
      *
-     * @var \Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService
+     * @var ShopShippingMethodService
      */
     private $shopShippingService;
+    /**
+     * @var SystemInfoService
+     */
+    private $systemInfoService;
 
     /**
      * DashboardController constructor.
@@ -75,6 +80,7 @@ class ShippingMethodController
     {
         $this->shippingMethodService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
         $this->shopShippingService = ServiceRegister::getService(ShopShippingMethodService::CLASS_NAME);
+        $this->systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
     }
 
     /**
@@ -142,10 +148,11 @@ class ShippingMethodController
             return null;
         }
 
-        if (!$this->shippingMethodService->isCurrencyConfigurationValid($shippingMethod, $model)) {
-            Logger::logWarning("Currency configurations for shipping method with id {$shippingMethod->id} are not valid!");
-
-            return null;
+        $details = $this->systemInfoService->getSystemDetails();
+        foreach ($details as $detail) {
+            if (!$this->shippingMethodService->isCurrencyConfigurationValidForSingleStore($detail, $shippingMethod, $model)) {
+                return null;
+            }
         }
 
         try {

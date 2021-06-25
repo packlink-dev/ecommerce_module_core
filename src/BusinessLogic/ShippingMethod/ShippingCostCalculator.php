@@ -40,7 +40,7 @@ class ShippingCostCalculator
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
      * @param float $totalPrice Total cart value if calculation is done by value
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
+     * @param string $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return float Calculated shipping cost for service if found. Otherwise, 0.0;
      */
@@ -52,7 +52,7 @@ class ShippingCostCalculator
         $toZip,
         array $packages,
         $totalPrice,
-        $systemId = null
+        $systemId
     ) {
         $data = self::getShippingCosts(
             array($shippingMethod),
@@ -79,7 +79,7 @@ class ShippingCostCalculator
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
      * @param float $totalPrice Total cart value if calculation is done by value
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
+     * @param string $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
@@ -91,7 +91,7 @@ class ShippingCostCalculator
         $toZip,
         array $packages,
         $totalPrice,
-        $systemId = null
+        $systemId
     ) {
         if (empty($shippingMethods)) {
             return array();
@@ -245,7 +245,7 @@ class ShippingCostCalculator
      * @param string $toCountry Destination country code.
      * @param float $totalWeight Package total weight.
      * @param float $totalPrice Total cart value if calculation is done by value
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
+     * @param string $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
@@ -255,7 +255,7 @@ class ShippingCostCalculator
         $toCountry,
         $totalWeight,
         $totalPrice,
-        $systemId = null
+        $systemId
     ) {
         $shippingCosts = array();
 
@@ -264,11 +264,11 @@ class ShippingCostCalculator
                 $shippingMethod,
                 $totalWeight,
                 $totalPrice,
+                $systemId,
                 0,
                 0.0,
                 $fromCountry,
-                $toCountry,
-                $systemId
+                $toCountry
             );
 
             if ($cost !== false) {
@@ -286,7 +286,7 @@ class ShippingCostCalculator
      * @param ShippingServiceDetails[] $shippingServices Array of shipping services delivery details.
      * @param float $totalWeight Package total weight.
      * @param float $totalPrice Total value if calculation is done by value
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
+     * @param string $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return array Array of shipping cost per service. Key is service id and value is shipping cost.
      */
@@ -295,7 +295,7 @@ class ShippingCostCalculator
         array $shippingServices,
         $totalWeight,
         $totalPrice,
-        $systemId = null
+        $systemId
     ) {
         $shippingCosts = array();
 
@@ -306,11 +306,11 @@ class ShippingCostCalculator
                     $method,
                     $totalWeight,
                     $totalPrice,
+                    $systemId,
                     $service->id,
                     $service->basePrice,
                     '',
-                    '',
-                    $systemId
+                    ''
                 );
 
                 if ($baseCost !== false) {
@@ -336,7 +336,7 @@ class ShippingCostCalculator
      * @param float $basePrice
      * @param string $fromCountry
      * @param string $toCountry
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
+     * @param string $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return float|bool Calculated cost or FALSE if cost cannot be calculated for the given criteria.
      */
@@ -344,15 +344,15 @@ class ShippingCostCalculator
         ShippingMethod $shippingMethod,
         $totalWeight,
         $totalPrice,
+        $systemId,
         $serviceId = 0,
         $basePrice = 0.0,
         $fromCountry = '',
-        $toCountry = '',
-        $systemId = null
+        $toCountry = ''
     ) {
         $cost = PHP_INT_MAX;
 
-        if (static::isMisconfigurationDetected($shippingMethod, $systemId)) {
+        if (static::isMisconfigurationDetected($shippingMethod)) {
             $basePrice = static::getMisconfigurationFixedPrice($shippingMethod, $systemId) ?: $basePrice;
         }
 
@@ -366,9 +366,9 @@ class ShippingCostCalculator
                 $baseCost = self::getCostForShippingService(
                     $shippingMethod,
                     $basePrice ?: $methodService->basePrice,
+                    $systemId,
                     $totalWeight,
-                    $totalPrice,
-                    $systemId
+                    $totalPrice
                 );
 
                 $cost = min($cost, $baseCost);
@@ -383,18 +383,18 @@ class ShippingCostCalculator
      *
      * @param ShippingMethod $method
      * @param float $baseCost Base cost from Packlink API or from default cost.
+     * @param string $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      * @param float $totalWeight
      * @param float $totalPrice Total amount (weight or value).
-     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return float Calculated shipping cost.
      */
     protected static function getCostForShippingService(
         ShippingMethod $method,
         $baseCost,
+        $systemId,
         $totalWeight = 0.0,
-        $totalPrice = 0.0,
-        $systemId = null
+        $totalPrice = 0.0
     ) {
         $pricingPolicies = $method->getPricingPolicies();
         if (empty($pricingPolicies)) {
@@ -422,14 +422,13 @@ class ShippingCostCalculator
      * Returns whether misconfiguration is detected.
      *
      * @param ShippingMethod $method
-     * @param string $systemId
      *
      * @return bool
      */
-    protected static function isMisconfigurationDetected($method, $systemId = null)
+    protected static function isMisconfigurationDetected($method)
     {
         if (static::$systemInfo === null) {
-            Logger::logError("Currency configuration for system with ID $systemId not found!");
+            Logger::logError("Currency configuration not found!");
 
             return false;
         }
@@ -445,7 +444,7 @@ class ShippingCostCalculator
      *
      * @return float|null
      */
-    protected static function getMisconfigurationFixedPrice($method, $systemId = null)
+    protected static function getMisconfigurationFixedPrice($method, $systemId)
     {
         $fixedPrices = $method->getFixedPrices();
         $systemDefaults = $method->getSystemDefaults();
@@ -454,7 +453,7 @@ class ShippingCostCalculator
             return null;
         }
 
-        if ($systemId === null && count($fixedPrices) === 1) {
+        if (count($fixedPrices) === 1) {
             return (float)reset($fixedPrices);
         }
 
@@ -519,11 +518,11 @@ class ShippingCostCalculator
      * @param ShippingPricePolicy $policy
      * @param float $totalWeight
      * @param float $totalPrice
-     * @param null $systemId
+     * @param string $systemId
      *
      * @return bool
      */
-    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice, $systemId = null)
+    private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice, $systemId)
     {
         if ($policy->systemId !== $systemId) {
             return false;

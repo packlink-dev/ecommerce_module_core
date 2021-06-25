@@ -12,11 +12,11 @@ use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
+use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
-use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
 /**
  * Class ShippingMethodService. In charge for manipulation with shipping methods and services.
@@ -47,10 +47,6 @@ class ShippingMethodService extends BaseService
      * @var RepositoryInterface
      */
     private $shippingMethodRepository;
-    /**
-     * @var SystemInfoService
-     */
-    private $systemInfoService;
 
     /**
      * ShippingMethodService constructor.
@@ -344,15 +340,27 @@ class ShippingMethodService extends BaseService
     /**
      * Check whether currency configurations on pricing policies are supported by the system.
      *
+     * @param SystemInfo $systemInfo
      * @param ShippingMethodConfiguration $configuration
      * @param ShippingMethod $method
      *
      * @return bool
      */
-    public function isCurrencyConfigurationValid(ShippingMethodConfiguration $configuration, ShippingMethod $method)
-    {
+    public function isCurrencyConfigurationValidForSingleStore(
+        SystemInfo $systemInfo,
+        ShippingMethodConfiguration $configuration,
+        ShippingMethod $method
+    ) {
+        if (!$this->isShippingMethodCurrencyConfigurationValidForSingleStore(
+            $configuration,
+            $systemInfo,
+            $method->getCurrency()
+        )) {
+            return false;
+        }
+
         foreach ($configuration->pricingPolicies as $policy) {
-            if(!$this->validateCurrencyConfigurationForPricingPolicy($configuration, $policy, $method->getCurrency())) {
+            if(!$this->isCurrencyConfigurationForPricingPolicyValid($policy, $systemInfo, $method->getCurrency())) {
                 return false;
             }
         }
@@ -361,70 +369,76 @@ class ShippingMethodService extends BaseService
     }
 
     /**
-     * Validates currency configuration for a single pricing policy.
+     * Returns whether the shipping method currency configuration is valid for a single store.
      *
      * @param ShippingMethodConfiguration $configuration
-     * @param ShippingPricePolicy $policy
+     * @param SystemInfo $detail
      * @param string $currency
      *
      * @return bool
      */
-    protected function validateCurrencyConfigurationForPricingPolicy($configuration, $policy, $currency)
-    {
-        if ($policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE
-            || $this->isFixedPriceSetForPolicy($configuration, $policy)
-        ) {
+    public function isShippingMethodCurrencyConfigurationValidForSingleStore(
+        ShippingMethodConfiguration $configuration,
+        SystemInfo $detail,
+        $currency
+    ) {
+        if (in_array($currency, $detail->currencies, true)) {
             return true;
         }
 
-        if ($policy->systemId === null) {
-            return $this->validateCurrencyConfigurationForSingleStore($currency);
-        }
+        $defaultPriceExists = !empty($configuration->fixedPrices)
+            && array_key_exists('default', $configuration->fixedPrices);
+        $usesDefault = !empty($configuration->systemDefaults)
+            && array_key_exists($detail->systemId, $configuration->systemDefaults)
+            && $configuration->systemDefaults[$detail->systemId];
 
-        $detail = $this->getSystemInfoService()->getSystemInfo($policy->systemId);
-        if (!$detail) {
-            Logger::logError("Currency information for the system with id {$policy->systemId} not found!");
-
+        if ($usesDefault && !$defaultPriceExists) {
             return false;
         }
 
-        return in_array($currency, $detail->currencies, true);
+        if (!$usesDefault && !$this->fixedPriceExists($configuration, $detail->systemId)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * Returns whether a fixed price is set for policy.
+     * Validates currency configuration for a single pricing policy.
      *
-     * @param ShippingMethodConfiguration $configuration
      * @param ShippingPricePolicy $policy
-     *
-     * @return bool
-     */
-    protected function isFixedPriceSetForPolicy($configuration, $policy)
-    {
-        return (!empty($configuration->systemDefaults)
-            && array_key_exists($policy->systemId, $configuration->systemDefaults)
-            && $configuration->systemDefaults[$policy->systemId]
-        ) || !empty($configuration->fixedPrices[$policy->systemId]);
-    }
-
-    /**
-     * Validates currency configuration for a single store.
-     *
+     * @param SystemInfo $systemInfo
      * @param string $currency
      *
      * @return bool
      */
-    protected function validateCurrencyConfigurationForSingleStore($currency)
-    {
-        $details = $this->getSystemInfoService()->getSystemDetails();
-
-        if (empty($details)) {
-            Logger::logError("Store currency configuration not found!");
-
-            return false;
+    protected function isCurrencyConfigurationForPricingPolicyValid(
+        ShippingPricePolicy $policy,
+        SystemInfo $systemInfo,
+        $currency
+    ) {
+        if ($policy->systemId !== $systemInfo->systemId) {
+            return true;
         }
 
-        return in_array($currency, $details[0]->currencies, true);
+        if ($policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE) {
+            return true;
+        }
+
+        return in_array($currency, $systemInfo->currencies, true);
+    }
+
+    /**
+     * Returns whether fixed price is configured for this system.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param $systemId
+     *
+     * @return bool
+     */
+    protected function fixedPriceExists(ShippingMethodConfiguration $configuration, $systemId)
+    {
+        return !empty($configuration->fixedPrices) && array_key_exists($systemId, $configuration->fixedPrices);
     }
 
     /**
@@ -621,19 +635,5 @@ class ShippingMethodService extends BaseService
     protected function selectOne($filter)
     {
         return $this->shippingMethodRepository->selectOne($filter);
-    }
-
-    /**
-     * Returns an instance of system info service.
-     *
-     * @return SystemInfoService
-     */
-    private function getSystemInfoService()
-    {
-        if ($this->systemInfoService === null) {
-            $this->systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
-        }
-
-        return $this->systemInfoService;
     }
 }

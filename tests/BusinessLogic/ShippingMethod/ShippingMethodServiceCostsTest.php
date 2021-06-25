@@ -649,7 +649,16 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     public function testNoMethodsCalculation()
     {
-        self::assertEmpty(ShippingCostCalculator::getShippingCosts(array(), '', '', '', '', array(), 10));
+        self::assertEmpty(ShippingCostCalculator::getShippingCosts(
+            array(),
+            '',
+            '',
+            '',
+            '',
+            array(),
+            10,
+            'test'
+        ));
         foreach ($this->serviceIds as $serviceId) {
             $this->shippingMethodService->deactivate($serviceId);
         }

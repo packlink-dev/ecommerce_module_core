@@ -114,7 +114,7 @@ if (!window.Packlink) {
             });
 
             pricingPolicy.increase = form['increase'].checked;
-            pricingPolicy.system_id = isMultistore ? systemInfo.system_id : null;
+            pricingPolicy.system_id = systemInfo.system_id;
             removeUnneededFieldsFromModel(pricingPolicy);
 
             if (currentPolicy === null) {
