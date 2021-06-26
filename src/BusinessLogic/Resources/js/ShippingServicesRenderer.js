@@ -100,8 +100,7 @@ if (!window.Packlink) {
             itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices')) + ' (' + service.currency + ')';
             if (currentPage === 'pick-shipping-services'
                 || systemInfo.currencies.includes(service.currency)
-                || service.fixedPrices.hasOwnProperty(systemInfo.system_id)
-                || service.fixedPrices.hasOwnProperty('default')
+                || (service.fixedPrices !== null && (service.fixedPrices.hasOwnProperty(systemInfo.system_id) || service.fixedPrices.hasOwnProperty('default')))
             ) {
                 itemEl.querySelector('#pl-misconfiguration-error').classList.add('pl-hidden');
             }
