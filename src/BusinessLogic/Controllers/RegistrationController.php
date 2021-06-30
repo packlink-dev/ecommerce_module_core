@@ -55,7 +55,8 @@ class RegistrationController
                 ->getLabel(strtolower($country), 'register.termsAndConditionsUrl', static::DEFAULT_COUNTRY),
             'privacyPolicyUrl' => $this->getCountryService()
                 ->getLabel(strtolower($country), 'register.privacyPolicyUrl', static::DEFAULT_COUNTRY),
-            'platform_country' => in_array($country, $brand->platformCountries, true) ? $country : 'UN',
+            'platform_country' => in_array($country, $brand->platformCountries, true) ?
+                $country : $brand->platformCountries[0],
         );
     }
 
