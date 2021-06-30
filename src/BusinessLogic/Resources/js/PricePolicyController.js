@@ -68,18 +68,13 @@ if (!window.Packlink) {
             const policyIndex = config.policyIndex,
                 currentPolicy = policyIndex !== null ? serviceModel.pricingPolicies[policyIndex] : null;
 
-            let template;
-            if (misconfigurationDetected) {
-                template = templateService.getTemplate('pl-pricing-policy-modal')
-                    .replaceAll('€', systemInfo.symbols[systemInfo.currencies[0]]);
-            } else {
-                template = templateService.getTemplate('pl-pricing-policy-modal')
-                    .replaceAll('€', systemInfo.symbols[serviceModel.currency]);
-            }
+            let template = templateService.getTemplate('pl-pricing-policy-modal'),
+                systemCurrency = systemInfo.currencies[0],
+                currencySymbol = systemInfo.symbols[misconfigurationDetected ? systemCurrency : serviceModel.currency];
 
             // noinspection JSCheckFunctionSignatures
             const modal = new Packlink.modalService({
-                content: template,
+                content: template.replaceAll('€', currencySymbol),
                 canClose: false,
                 buttons: [
                     {
