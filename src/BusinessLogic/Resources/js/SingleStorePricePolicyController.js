@@ -488,7 +488,7 @@ if (!window.Packlink) {
                     getPricingPolicyLabel(policy);
 
                 if (misconfigurationDetected && policy.pricing_policy.toString() !== pricingPolicyTypes.fixed) {
-                    itemEl.querySelector('#pl-price-policy-range-wrapper span').classList.add('pl-invalid-label');
+                    itemEl.querySelector('#pl-price-policy-range-wrapper span').classList.add('pl-invalid-policy');
                 }
             });
         };

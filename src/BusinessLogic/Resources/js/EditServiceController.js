@@ -328,7 +328,7 @@ if (!window.Packlink) {
                 }
             }
 
-            if (validationService.validateForm(form, excludedElementNames)) {
+            if (validationService.validateForm(form, excludedElementNames) && validateMiconfiguredPolicies()) {
                 let pricingPolicies = [];
                 for (let systemId in pricePolicyControllers) {
                     pricingPolicies = pricingPolicies.concat(pricePolicyControllers[systemId].getSystemPricingPolicies());
@@ -352,6 +352,17 @@ if (!window.Packlink) {
                 );
             }
         };
+
+        /**
+         * Validates that there are no misconfigured pricing policies.
+         *
+         * @returns {boolean}
+         */
+        const validateMiconfiguredPolicies = () => {
+            let misconfiguredPolicies = form.querySelectorAll('.pl-invalid-policy');
+
+            return misconfiguredPolicies.length === 0;
+        }
 
         /**
          * Opens countries selection modal.
