@@ -234,6 +234,8 @@ if (!window.Packlink) {
 
             if (serviceModel.activated) {
                 validationService.validateInputField(fixedPriceInput);
+            } else {
+                validationService.removeError(fixedPriceInput);
             }
         };
 
