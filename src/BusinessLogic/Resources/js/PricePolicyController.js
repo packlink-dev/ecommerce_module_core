@@ -178,8 +178,8 @@ if (!window.Packlink) {
                 pricingPolicyForm['pricing_policy'].value = pricingPolicies.fixed;
                 pricingPolicyForm['pricing_policy'].disabled = true;
                 if (pricingPolicy !== null) {
-                    validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
                     validationService.validateInputField(pricingPolicyForm['fixed_price']);
+                    validationService.validateRequiredField(pricingPolicyForm['fixed_price']);
                 }
             }
 
