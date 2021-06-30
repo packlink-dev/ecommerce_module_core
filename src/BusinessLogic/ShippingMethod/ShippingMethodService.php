@@ -334,7 +334,14 @@ class ShippingMethodService extends BaseService
             return null;
         }
 
-        return $this->selectOne($filter);
+        $methods = $this->select($filter);
+        foreach ($methods as $method) {
+            if ($method->getCurrency() === $service->currency) {
+                return $method;
+            }
+        }
+
+        return null;
     }
 
     /**
