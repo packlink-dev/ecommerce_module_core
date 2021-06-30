@@ -490,6 +490,8 @@ if (!window.Packlink) {
                 if (misconfigurationDetected && policy.pricing_policy.toString() !== pricingPolicyTypes.fixed) {
                     itemEl.querySelector('#pl-price-policy-range-wrapper span').classList.add('pl-invalid-policy');
                 }
+
+                itemEl.innerHTML = itemEl.innerHTML.replaceAll('€', systemInfo.symbols[systemInfo.currencies[0]]);
             });
         };
 
