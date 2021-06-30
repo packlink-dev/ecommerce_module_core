@@ -496,7 +496,11 @@ if (!window.Packlink) {
                     itemEl.querySelector('#pl-price-policy-range-wrapper span').classList.add('pl-invalid-policy');
                 }
 
-                itemEl.innerHTML = itemEl.innerHTML.replaceAll('€', systemInfo.symbols[systemInfo.currencies[0]]);
+                if (misconfigurationDetected) {
+                    itemEl.innerHTML = itemEl.innerHTML.replaceAll('€', systemInfo.symbols[systemInfo.currencies[0]]);
+                } else {
+                    itemEl.innerHTML = itemEl.innerHTML.replaceAll('€', systemInfo.symbols[serviceModel.currency]);
+                }
             });
         };
 
