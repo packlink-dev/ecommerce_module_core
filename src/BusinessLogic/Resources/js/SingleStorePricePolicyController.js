@@ -231,7 +231,10 @@ if (!window.Packlink) {
                 validationService.validateInputField(fixedPriceInput);
                 scopeSelector.disabled = isScopeDisabled(fixedPriceInput);
             });
-            validationService.validateInputField(fixedPriceInput);
+
+            if (serviceModel.activated) {
+                validationService.validateInputField(fixedPriceInput);
+            }
         };
 
         /**
