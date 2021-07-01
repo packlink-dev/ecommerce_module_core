@@ -19,11 +19,11 @@ class PacklinkConfigurationService implements BrandConfigurationService
      * @var string[]
      */
     protected static $supportedPlatformCountries = array(
+        'UN',
         'ES',
         'DE',
         'FR',
         'IT',
-        'UN',
     );
     /**
      * List of supported registration countries.

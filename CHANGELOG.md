@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.1...v3.2.2) - 2021-07-01
+### Changed
+- Fixed default platform country for a registration form
+
 ## [3.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.0...v3.2.1) - 2021-05-13
 ### Changed
  - Fixed registration form
