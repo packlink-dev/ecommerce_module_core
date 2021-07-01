@@ -20,6 +20,10 @@ Multi-currency support project changes:
 - Updated shipping cost calculator to allow submitting system ID during shipping cost calculation and take only the policies with that system ID into account when calculating shipping costs.
 - State controller configuration has been modified. The integrations will have to modify the index template to include the system ID and the URL to the system info controller.
 
+## [3.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.1...v3.2.2) - 2021-07-01
+### Changed
+- Fixed default platform country for a registration form
+
 ## [3.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.0...v3.2.1) - 2021-05-13
 ### Changed
  - Fixed registration form
