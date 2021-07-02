@@ -430,6 +430,22 @@ class OrderShipmentDetails extends Entity
     }
 
     /**
+     * Returns currency symbol.
+     *
+     * @return string
+     */
+    public function getCurrencySymbol()
+    {
+        $currencies = json_decode(file_get_contents(__DIR__ . '/../../Resources/currencies/currencies.json'), true);
+
+        if (array_key_exists($this->currency, $currencies)) {
+            return $currencies[$this->currency]['symbol'];
+        }
+
+        return '';
+    }
+
+    /**
      * @param string $currency
      */
     public function setCurrency($currency)

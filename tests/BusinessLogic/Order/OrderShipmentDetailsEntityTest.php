@@ -134,6 +134,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         );
         self::assertEquals(12.99, $orderDetails->getShippingCost());
         self::assertEquals('EUR', $orderDetails->getCurrency());
+        self::assertEquals('€', $orderDetails->getCurrencySymbol());
     }
 
     /**
