@@ -50,6 +50,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
                 'carrierTrackingNumbers' => $this->getTestTrackingNumbers(),
                 'carrierTrackingUrl' => 'https://www.ups.com/track?loc=it_IT&requester=WT/',
                 'shippingCost' => 12.99,
+                'currency' => 'EUR',
                 'taskId' => 312,
             )
         );
@@ -103,6 +104,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         $orderDetails->setCarrierTrackingNumbers($this->getTestTrackingNumbers());
         $orderDetails->setCarrierTrackingUrl('https://www.ups.com/track?loc=it_IT&requester=WT/');
         $orderDetails->setShippingCost(12.99);
+        $orderDetails->setCurrency('EUR');
 
         return $orderDetails;
     }
@@ -131,6 +133,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
             $orderDetails->getCarrierTrackingUrl()
         );
         self::assertEquals(12.99, $orderDetails->getShippingCost());
+        self::assertEquals('EUR', $orderDetails->getCurrency());
     }
 
     /**

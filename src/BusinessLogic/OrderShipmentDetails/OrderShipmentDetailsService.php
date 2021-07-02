@@ -158,14 +158,16 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string $shipmentReference Packlink shipment reference.
      * @param float $price Shipment price.
+     * @param string $currency
      *
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     * @throws OrderShipmentDetailsNotFound
      */
-    public function setShippingPrice($shipmentReference, $price)
+    public function setShippingPrice($shipmentReference, $price, $currency)
     {
         /** @var OrderShipmentDetails $orderDetails */
         $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
         $orderDetails->setShippingCost($price);
+        $orderDetails->setCurrency($currency);
 
         $this->repository->persist($orderDetails);
     }
