@@ -38,7 +38,8 @@
     "packlinkPrice": "Packlink Price",
     "percentagePacklinkPrices": "% of Packlink prices",
     "percentagePacklinkPricesWithData": "% of Packlink prices: %s by %s%",
-    "usePacklinkRange": "For all other ranges, apply Packlink prices"
+    "usePacklinkRange": "For all other ranges, apply Packlink prices",
+    "useFixedPrice": "For all other ranges, apply fixed price"
   },
   "orderListAndDetails": {
     "packlinkOrderDraft": "Packlink order draft",

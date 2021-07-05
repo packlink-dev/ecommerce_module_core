@@ -418,7 +418,22 @@ if (!window.Packlink) {
                 });
             });
 
-            utilityService.showElement(templateService.getComponent('pl-use-packlink-price-wrapper'));
+            setPacklinkPriceWrapper();
+        };
+
+        /**
+         * Sets Packlink price wrapper.
+         */
+        const setPacklinkPriceWrapper = function () {
+            let usePacklinkPriceWrapper = templateService.getComponent('pl-use-packlink-price-wrapper'),
+                packlinkPriceLabel = usePacklinkPriceWrapper.querySelector('label'),
+                usePacklinkRangeLabel = usePacklinkPriceWrapper.querySelector('#pl-use-packlink-range'),
+                useFixedPriceLabel = usePacklinkPriceWrapper.querySelector('#pl-use-fixed-price');
+
+            utilityService.showElement(usePacklinkPriceWrapper);
+            packlinkPriceLabel.innerText = misconfigurationDetected
+                ? useFixedPriceLabel.innerText
+                : usePacklinkRangeLabel.innerText;
         };
 
         /**
