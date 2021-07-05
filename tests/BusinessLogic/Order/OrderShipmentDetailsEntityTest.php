@@ -5,6 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\Order;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
+use Packlink\BusinessLogic\Utility\CurrencySymbolService;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -134,7 +135,7 @@ class OrderShipmentDetailsEntityTest extends TestCase
         );
         self::assertEquals(12.99, $orderDetails->getShippingCost());
         self::assertEquals('EUR', $orderDetails->getCurrency());
-        self::assertEquals('€', $orderDetails->getCurrencySymbol());
+        self::assertEquals('€', CurrencySymbolService::getCurrencySymbol($orderDetails->getCurrency()));
     }
 
     /**

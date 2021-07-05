@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
+use Packlink\BusinessLogic\Utility\CurrencySymbolService;
 
 /**
  * Class SystemInfoController
@@ -49,11 +50,10 @@ class SystemInfoController
      */
     protected function getCurrencySymbols($currencyCodes)
     {
-        $currencies = json_decode(file_get_contents(__DIR__ . '/../Resources/currencies/currencies.json'), true);
         $symbols = array();
 
         foreach ($currencyCodes as $currencyCode) {
-            $symbols[$currencyCode] = $currencies[$currencyCode]['symbol'];
+            $symbols[$currencyCode] = CurrencySymbolService::getCurrencySymbol($currencyCode);
         }
 
         return $symbols;
