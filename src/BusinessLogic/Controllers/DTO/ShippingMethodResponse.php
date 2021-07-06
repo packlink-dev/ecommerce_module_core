@@ -51,6 +51,13 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
      * @var string
      */
     public $parcelDestination;
+    /**
+     * Shipping method currency.
+     * The value represents a currency code (ex. EUR, USD, GBP).
+     *
+     * @var string
+     */
+    public $currency;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -69,6 +76,7 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
                 'parcelOrigin' => $this->parcelOrigin,
                 'parcelDestination' => $this->parcelDestination,
                 'logoUrl' => $this->logoUrl,
+                'currency' => $this->currency,
             )
         );
     }

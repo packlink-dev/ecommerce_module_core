@@ -77,6 +77,12 @@ class Shipment extends DataTransferObject
      * @var \DateTime
      */
     public $orderDate;
+    /**
+     * Currency ISO code.
+     *
+     * @var string
+     */
+    public $currency;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -99,6 +105,7 @@ class Shipment extends DataTransferObject
             'order_date' => $this->orderDate ? $this->orderDate->format('Y-m-d') : '',
             'tracking_url' => $this->carrierTrackingUrl,
             'service_id' => $this->serviceId,
+            'currency' => $this->currency,
         );
     }
 
@@ -126,6 +133,7 @@ class Shipment extends DataTransferObject
         $shipment->status = static::getDataValue($raw, 'state');
         $shipment->trackingCodes = static::getDataValue($raw, 'trackings', array());
         $shipment->price = static::getDataValue($raw, 'price', null);
+        $shipment->currency = static::getDataValue($raw, 'currency', 'EUR');
         if (is_array($shipment->price)) {
             $shipment->price = static::getDataValue($shipment->price, 'base_price');
         } else {

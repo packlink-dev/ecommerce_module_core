@@ -123,6 +123,16 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         );
     }
 
+    public function testUpdateSameServiceWithDifferentCurrency()
+    {
+        $serviceDetails = $this->getShippingServiceDetails(1);
+        $serviceDetails->currency = 'GBP';
+
+        $updatedMethod = $this->shippingMethodService->update($serviceDetails);
+
+        self::assertNotEquals($serviceDetails->id, $updatedMethod->getId());
+    }
+
     public function testDeleteMethod()
     {
         $shippingMethod = $this->shippingMethodService->add($this->getShippingServiceDetails(1));

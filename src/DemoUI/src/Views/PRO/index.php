@@ -150,6 +150,7 @@ echo $lang ?>">
 <script src="./resources/js/PickShippingServiceController.js"></script>
 <script src="./resources/js/ShippingServicesRenderer.js"></script>
 <script src="./resources/js/EditServiceController.js"></script>
+<script src="./resources/js/SingleStorePricePolicyController.js"></script>
 <script src="./resources/js/ServiceCountriesModalController.js"></script>
 <script src="./resources/js/PricePolicyController.js"></script>
 <script src="./resources/js/StateUUIDService.js"></script>
@@ -208,19 +209,24 @@ echo $lang ?>">
                 'my-shipping-services': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
+                    getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
+                    systemId: null
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>",
                     getActiveServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     getTaskStatusUrl: "<?php getUrl('ShippingMethods', 'getTaskStatus') ?>",
                     startAutoConfigureUrl: "<?php getUrl('AutoConfigure', 'start') ?>",
-                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>"
+                    disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
+                    getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
+                    systemId: null
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",
                     saveServiceUrl: "<?php getUrl('ShippingMethods', 'save') ?>",
                     getTaxClassesUrl: "<?php getUrl('ShippingMethods', 'getTaxClasses') ?>",
                     getCountriesListUrl: "<?php getUrl('Country', 'getShippingCountries') ?>",
+                    getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
                     hasTaxConfiguration: true,
                     hasCountryConfiguration: true,
                     canDisplayCarrierLogos: true

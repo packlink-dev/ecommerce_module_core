@@ -114,6 +114,9 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         self::assertEquals('DPD - 2 DAYS delivery', $method->getTitle());
         $method->setTitle('title');
         self::assertEquals('title', $method->getTitle());
+
+        $method->setCurrency('GBP');
+        self::assertEquals('GBP', $method->getCurrency());
     }
 
     public function testFromArrayShippingService()
@@ -194,6 +197,15 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         );
     }
 
+    public function testSystemSpecificPricingPolicy()
+    {
+        $method = $this->assertBasicDataToArray();
+
+        $policies = $method->getPricingPolicies();
+        $policy = $policies[0];
+        $this->assertEquals('test', $policy->systemId);
+    }
+
     /**
      * Asserts basic shipping method data.
      *
@@ -218,6 +230,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         $method->setNational($data['national']);
         $method->addShippingService(ShippingService::fromArray($data['shippingServices'][0]));
         $method->addPricingPolicy(ShippingPricePolicy::fromArray($data['pricingPolicies'][0]));
+        $method->setCurrency($data['currency']);
 
         $result = $method->toArray();
         self::assertEquals($data['carrierName'], $result['carrierName']);
@@ -233,6 +246,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         self::assertEquals($data['national'], $result['national']);
         self::assertEquals($data['shippingServices'], $result['shippingServices']);
         self::assertEquals($data['pricingPolicies'], $result['pricingPolicies']);
+        self::assertEquals($data['currency'], $result['currency']);
 
         return $method;
     }
@@ -254,6 +268,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
             'expressDelivery' => true,
             'deliveryTime' => '2 DAYS',
             'national' => true,
+            'currency' => 'USD',
             'shippingServices' => array(
                 array(
                     'serviceId' => 1234,
@@ -276,6 +291,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
                     'increase' => false,
                     'change_percent' => null,
                     'fixed_price' => null,
+                    'system_id' => 'test',
                 ),
             ),
         );

@@ -8,6 +8,7 @@ if (!window.Packlink) {
      * @property {string} [pagePlaceholder]
      * @property {{}} pageConfiguration
      * @property {string} stateUrl
+     * @property {string} systemId
      * @property {{}} templates
      * @property {string} baseResourcesUrl
      */

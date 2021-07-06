@@ -11,6 +11,7 @@ use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
 /**
  * Class ShippingMethodController.
@@ -64,9 +65,13 @@ class ShippingMethodController
     /**
      * Shop shipping method service.
      *
-     * @var \Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService
+     * @var ShopShippingMethodService
      */
     private $shopShippingService;
+    /**
+     * @var SystemInfoService
+     */
+    private $systemInfoService;
 
     /**
      * DashboardController constructor.
@@ -75,6 +80,7 @@ class ShippingMethodController
     {
         $this->shippingMethodService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
         $this->shopShippingService = ServiceRegister::getService(ShopShippingMethodService::CLASS_NAME);
+        $this->systemInfoService = ServiceRegister::getService(SystemInfoService::CLASS_NAME);
     }
 
     /**
@@ -140,6 +146,13 @@ class ShippingMethodController
             Logger::logError("Shipping method with id {$shippingMethod->id} not found!");
 
             return null;
+        }
+
+        $details = $this->systemInfoService->getSystemDetails();
+        foreach ($details as $detail) {
+            if (!$this->shippingMethodService->isCurrencyConfigurationValidForSingleStore($detail, $shippingMethod, $model)) {
+                return null;
+            }
         }
 
         try {
@@ -239,6 +252,9 @@ class ShippingMethodController
         $shippingMethod->isShipToAllCountries = $item->isShipToAllCountries();
         $shippingMethod->pricingPolicies = $item->getPricingPolicies();
         $shippingMethod->usePacklinkPriceIfNotInRange = $item->isUsePacklinkPriceIfNotInRange();
+        $shippingMethod->currency = $item->getCurrency();
+        $shippingMethod->fixedPrices = $item->getFixedPrices();
+        $shippingMethod->systemDefaults = $item->getSystemDefaults();
 
         return $shippingMethod;
     }
@@ -257,8 +273,21 @@ class ShippingMethodController
         $model->setShipToAllCountries($configuration->isShipToAllCountries);
         $model->setShippingCountries($configuration->shippingCountries);
         $model->setActivated($configuration->activated);
-        $model->resetPricingPolicies();
         $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
+        $model->setFixedPrices($configuration->fixedPrices);
+        $model->setSystemDefaults($configuration->systemDefaults);
+        $this->updatePricingPolicies($configuration, $model);
+    }
+
+    /**
+     * Updates pricing policies on the shipping method model.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param ShippingMethod $model
+     */
+    private function updatePricingPolicies(ShippingMethodConfiguration $configuration, ShippingMethod $model)
+    {
+        $model->resetPricingPolicies();
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }

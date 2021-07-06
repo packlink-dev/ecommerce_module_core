@@ -9,10 +9,13 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
+use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 
 /**
@@ -112,11 +115,11 @@ class ShippingMethodService extends BaseService
 
     /**
      * Creates new shipping method out of data received from Packlink API.
-     * This method is alias for method @see update.
-     *
-     * @param ShippingServiceDetails $serviceDetails Shipping service details with costs.
+     * This method is alias for method @param ShippingServiceDetails $serviceDetails Shipping service details with costs.
      *
      * @return ShippingMethod Created shipping method.
+     * @see update.
+     *
      */
     public function add(ShippingServiceDetails $serviceDetails)
     {
@@ -228,6 +231,7 @@ class ShippingMethodService extends BaseService
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
      * @param float $totalAmount Total cart value if calculation is done by value
+     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return float Calculated shipping cost
      */
@@ -238,7 +242,8 @@ class ShippingMethodService extends BaseService
         $toCountry,
         $toZip,
         array $packages,
-        $totalAmount
+        $totalAmount,
+        $systemId = null
     ) {
         $shippingMethod = $this->getShippingMethod($methodId);
         if ($shippingMethod === null || !$shippingMethod->isActivated()) {
@@ -257,7 +262,8 @@ class ShippingMethodService extends BaseService
             $toCountry,
             $toZip,
             $packages,
-            $totalAmount
+            $totalAmount,
+            $systemId
         );
     }
 
@@ -271,6 +277,7 @@ class ShippingMethodService extends BaseService
      * @param string $toZip Destination zip code.
      * @param Package[] $packages Array of packages if calculation is done by weight.
      * @param float $totalAmount Total cart value if calculation is done by value
+     * @param string|null $systemId Unique, ubiquitous system identifier that can be used to identify a system that the pricing policy belongs to.
      *
      * @return array <p>Key-value pairs representing shipping method identifiers and their corresponding shipping costs.
      *  array(
@@ -280,8 +287,15 @@ class ShippingMethodService extends BaseService
      *  )
      * </p>
      */
-    public function getShippingCosts($fromCountry, $fromZip, $toCountry, $toZip, array $packages, $totalAmount)
-    {
+    public function getShippingCosts(
+        $fromCountry,
+        $fromZip,
+        $toCountry,
+        $toZip,
+        array $packages,
+        $totalAmount,
+        $systemId = null
+    ) {
         $activeMethods = $this->getActiveMethods();
         if (empty($activeMethods)) {
             return array();
@@ -294,7 +308,8 @@ class ShippingMethodService extends BaseService
             $toCountry,
             $toZip,
             $packages,
-            $totalAmount
+            $totalAmount,
+            $systemId
         );
     }
 
@@ -319,7 +334,118 @@ class ShippingMethodService extends BaseService
             return null;
         }
 
-        return $this->selectOne($filter);
+        $methods = $this->select($filter);
+        foreach ($methods as $method) {
+            if ($method->getCurrency() === $service->currency) {
+                return $method;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Check whether currency configurations on pricing policies are supported by the system.
+     *
+     * @param SystemInfo $systemInfo
+     * @param ShippingMethodConfiguration $configuration
+     * @param ShippingMethod $method
+     *
+     * @return bool
+     */
+    public function isCurrencyConfigurationValidForSingleStore(
+        SystemInfo $systemInfo,
+        ShippingMethodConfiguration $configuration,
+        ShippingMethod $method
+    ) {
+        if (!$this->isShippingMethodCurrencyConfigurationValidForSingleStore(
+            $configuration,
+            $systemInfo,
+            $method->getCurrency()
+        )) {
+            return false;
+        }
+
+        foreach ($configuration->pricingPolicies as $policy) {
+            if(!$this->isCurrencyConfigurationForPricingPolicyValid($policy, $systemInfo, $method->getCurrency())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns whether the shipping method currency configuration is valid for a single store.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param SystemInfo $detail
+     * @param string $currency
+     *
+     * @return bool
+     */
+    public function isShippingMethodCurrencyConfigurationValidForSingleStore(
+        ShippingMethodConfiguration $configuration,
+        SystemInfo $detail,
+        $currency
+    ) {
+        if (in_array($currency, $detail->currencies, true)) {
+            return true;
+        }
+
+        $defaultPriceExists = !empty($configuration->fixedPrices)
+            && array_key_exists('default', $configuration->fixedPrices);
+        $usesDefault = !empty($configuration->systemDefaults)
+            && array_key_exists($detail->systemId, $configuration->systemDefaults)
+            && $configuration->systemDefaults[$detail->systemId];
+
+        if ($usesDefault && !$defaultPriceExists) {
+            return false;
+        }
+
+        if (!$usesDefault && !$this->fixedPriceExists($configuration, $detail->systemId)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validates currency configuration for a single pricing policy.
+     *
+     * @param ShippingPricePolicy $policy
+     * @param SystemInfo $systemInfo
+     * @param string $currency
+     *
+     * @return bool
+     */
+    protected function isCurrencyConfigurationForPricingPolicyValid(
+        ShippingPricePolicy $policy,
+        SystemInfo $systemInfo,
+        $currency
+    ) {
+        if ($policy->systemId !== $systemInfo->systemId) {
+            return true;
+        }
+
+        if ($policy->pricingPolicy === ShippingPricePolicy::POLICY_FIXED_PRICE) {
+            return true;
+        }
+
+        return in_array($currency, $systemInfo->currencies, true);
+    }
+
+    /**
+     * Returns whether fixed price is configured for this system.
+     *
+     * @param ShippingMethodConfiguration $configuration
+     * @param $systemId
+     *
+     * @return bool
+     */
+    protected function fixedPriceExists(ShippingMethodConfiguration $configuration, $systemId)
+    {
+        return !empty($configuration->fixedPrices) && array_key_exists($systemId, $configuration->fixedPrices);
     }
 
     /**
@@ -425,6 +551,7 @@ class ShippingMethodService extends BaseService
         $logoUrl = $this->shopShippingMethodService->getCarrierLogoFilePath($serviceDetails->carrierName);
         $shippingMethod->setLogoUrl($logoUrl);
         $shippingMethod->setEnabled(true);
+        $shippingMethod->setCurrency($serviceDetails->currency);
 
         $this->setShippingService($shippingMethod, $serviceDetails);
     }

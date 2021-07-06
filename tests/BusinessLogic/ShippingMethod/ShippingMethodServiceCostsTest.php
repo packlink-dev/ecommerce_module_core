@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\SystemInfo\TestSystemInfoService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -17,6 +18,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
 /**
  * Class ShippingMethodServiceCostsTest
@@ -72,6 +74,13 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
             PackageTransformer::CLASS_NAME,
             function () {
                 return PackageTransformer::getInstance();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            SystemInfoService::CLASS_NAME,
+            function () {
+                return new TestSystemInfoService();
             }
         );
 
@@ -162,6 +171,84 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
         self::assertEquals(0, $cost, 'Failed to get cost from API!');
         self::assertEmpty($this->httpClient->getHistory(), 'API should not be called for inactive service');
+    }
+
+    public function testGetCostForSystem()
+    {
+        $fixedPricePolicies[] = array(0, 10, 12);
+        $shippingMethod = $this->prepareSystemPricePolicyShippingMethod(20339, $fixedPricePolicies, false, 'test');
+
+        $response = file_get_contents(
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-IT-IT.json'
+        );
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        $cost = $this->getShippingCosts(null, $shippingMethod->getId(), '00118', 'IT', 9.9, 'test');
+
+        self::assertEquals(12, $cost, 'Failed to get cost from API!');
+    }
+
+    public function testMisconfiguredPolicy()
+    {
+        $fixedPricePolicies[] = array(0, 10, 12);
+        $shippingMethod = $this->prepareSystemPercentPricePolicyShippingMethod(20339, true, 14, 'invalid');
+        $shippingMethod->setFixedPrices(array(
+            'invalid' => 5.5
+        ));
+
+        $response = file_get_contents(
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServicesDetails-IT-IT.json'
+        );
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        $cost = ShippingCostCalculator::getShippingCost(
+            $shippingMethod,
+            'IT',
+            '00031',
+            'IT',
+            '00132',
+            array(),
+            10,
+            'invalid'
+        );
+
+        self::assertEquals(6.27, $cost);
+    }
+
+    public function testUsingDefaultFixedPriceInMultistore()
+    {
+        $fixedPricePolicies[] = array(0, 10, 12);
+        $shippingMethod = $this->prepareSystemPercentPricePolicyShippingMethod(
+            20339,
+            true,
+            14,
+            'invalid'
+        );
+        $shippingMethod->setFixedPrices(array(
+            'default' => 8.2,
+            'invalid' => 5.5,
+        ));
+        $shippingMethod->setSystemDefaults(array(
+            'invalid' => true
+        ));
+
+        $response = file_get_contents(
+            __DIR__ . '/../Common/ApiResponses/ShippingServices/ShippingServicesDetails-IT-IT.json'
+        );
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        $cost = ShippingCostCalculator::getShippingCost(
+            $shippingMethod,
+            'IT',
+            '00031',
+            'IT',
+            '00132',
+            array(),
+            10,
+            'invalid'
+        );
+
+        self::assertEquals(9.35, $cost);
     }
 
     public function testGetCostsFromProxy()
@@ -562,7 +649,16 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     public function testNoMethodsCalculation()
     {
-        self::assertEmpty(ShippingCostCalculator::getShippingCosts(array(), '', '', '', '', array(), 10));
+        self::assertEmpty(ShippingCostCalculator::getShippingCosts(
+            array(),
+            '',
+            '',
+            '',
+            '',
+            array(),
+            10,
+            'test'
+        ));
         foreach ($this->serviceIds as $serviceId) {
             $this->shippingMethodService->deactivate($serviceId);
         }
@@ -702,6 +798,52 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
 
     /**
      * @param int $serviceId
+     * @param array $prices
+     * @param bool $byWeight
+     * @param string|null $systemId
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
+    protected function prepareSystemPricePolicyShippingMethod(
+        $serviceId = 1,
+        array $prices = array(),
+        $byWeight = true,
+        $systemId = null
+    ) {
+        $shippingMethod = $this->addShippingMethod($serviceId);
+        foreach ($prices as $price) {
+            $shippingMethod->addPricingPolicy($this->getSystemFixedPricePolicy($byWeight, $price[0], $price[1], $price[2], $systemId));
+        }
+
+        $this->shippingMethodService->save($shippingMethod);
+
+        return $shippingMethod;
+    }
+
+    /**
+     * @param int $serviceId
+     * @param bool $increase
+     * @param int $percent
+     * @param string|null $systemId
+     *
+     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod
+     */
+    protected function prepareSystemPercentPricePolicyShippingMethod(
+        $serviceId = 1,
+        $increase = false,
+        $percent = 14,
+        $systemId = null
+    ) {
+        $shippingMethod = $this->addShippingMethod($serviceId);
+        $shippingMethod->addPricingPolicy($this->getSystemPercentPricePolicy($percent, $increase, $systemId));
+
+        $this->shippingMethodService->save($shippingMethod);
+
+        return $shippingMethod;
+    }
+
+    /**
+     * @param int $serviceId
      * @param bool $increase
      * @param int $percent
      *
@@ -761,17 +903,17 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         return $shippingMethod;
     }
 
-    protected function getShippingCosts(array $packages = null, $id = '', $zip = '00127', $to = 'IT', $total = 9.9)
+    protected function getShippingCosts(array $packages = null, $id = '', $zip = '00127', $to = 'IT', $total = 9.9, $systemId = null)
     {
         if (empty($packages)) {
             $packages = array(Package::defaultPackage());
         }
 
         if ($id) {
-            return $this->shippingMethodService->getShippingCost($id, 'IT', $zip, $to, $zip, $packages, $total);
+            return $this->shippingMethodService->getShippingCost($id, 'IT', $zip, $to, $zip, $packages, $total, $systemId);
         }
 
-        return $this->shippingMethodService->getShippingCosts('IT', $zip, $to, $zip, $packages, $total);
+        return $this->shippingMethodService->getShippingCosts('IT', $zip, $to, $zip, $packages, $total, $systemId);
     }
 
     protected function getPercentPricePolicy($percent, $increase = false)
@@ -799,6 +941,34 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         );
     }
 
+    protected function getSystemFixedPricePolicy($byWeight, $from, $to, $price, $systemId = null)
+    {
+        return $this->getPricingPolicy(
+            $byWeight ? ShippingPricePolicy::RANGE_WEIGHT : ShippingPricePolicy::RANGE_PRICE,
+            $from,
+            $to,
+            ShippingPricePolicy::POLICY_FIXED_PRICE,
+            0,
+            false,
+            $price,
+            $systemId
+        );
+    }
+
+    protected function getSystemPercentPricePolicy($percent, $increase = false, $systemId = null)
+    {
+        return $this->getPricingPolicy(
+            ShippingPricePolicy::RANGE_PRICE,
+            0,
+            10,
+            ShippingPricePolicy::POLICY_PACKLINK_ADJUST,
+            $percent,
+            $increase,
+            0,
+            $systemId
+        );
+    }
+
     protected function getPricingPolicy(
         $rangeType = ShippingPricePolicy::RANGE_PRICE,
         $from = 0,
@@ -806,7 +976,8 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         $policy = ShippingPricePolicy::POLICY_PACKLINK,
         $changePercent = 50,
         $increase = true,
-        $fixedPrice = 20
+        $fixedPrice = 20,
+        $systemId = null
     ) {
         /** @noinspection PhpUnhandledExceptionInspection */
         return ShippingPricePolicy::fromArray(
@@ -820,6 +991,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
                 'increase' => $increase,
                 'change_percent' => $changePercent,
                 'fixed_price' => $fixedPrice,
+                'system_id' => $systemId,
             )
         );
     }

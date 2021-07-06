@@ -29,6 +29,7 @@ use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
+use Packlink\BusinessLogic\Utility\CurrencySymbolService;
 
 /**
  * Class SendDraftTaskTest.
@@ -148,6 +149,8 @@ class SendDraftTaskTest extends BaseSyncTest
 
         $this->assertEquals('test', $shipmentDetails->getReference());
         $this->assertEquals(15.85, $shipmentDetails->getShippingCost());
+        $this->assertEquals('EUR', $shipmentDetails->getCurrency());
+        $this->assertEquals('€', CurrencySymbolService::getCurrencySymbol($shipmentDetails->getCurrency()));
         $this->assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus($shipmentDetails->getStatus()));
         // there should be an info message that draft is created.
         $this->assertCount(2, $this->shopLogger->loggedMessages);

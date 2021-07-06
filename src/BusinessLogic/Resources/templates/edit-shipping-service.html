@@ -30,19 +30,54 @@
                 <div class="pl-section-title">
                     {$shippingServices.pricePolicy}
                 </div>
+                <div id="pl-multistore-selector-group" class="pl-hidden">
+                    <div class="pl-form-group">
+                        <select name="scope" id="pl-scope-select">
+                        </select>
+                        <i class="material-icons">expand_more</i>
+                        <label for="pl-scope-select" class="pl-text-input-label">
+                            {$shippingServices.scope}
+                        </label>
+                    </div>
+                    <div class="pl-checkbox" id="pl-use-default-group">
+                        <input type="checkbox" name="useDefault" id="pl-use-default" checked>
+                        <label for="pl-use-default">{$shippingServices.useDefault}</label>
+                    </div>
+                </div>
+                <br>
                 <div class="pl-section-subtitle">
                     {$shippingServices.pricePolicyDescription}
                 </div>
-                <div class="pl-switch">
-                    <label for="pl-configure-prices-button">
-                        <strong>{$shippingServices.configurePricePolicy}</strong>
-                    </label>
-                    <div class="pl-switch-button" id="pl-configure-prices-button">
-                        <i class="pl-switch-on material-icons">toggle_on</i>
-                        <i class="pl-switch-off material-icons">toggle_off</i>
+                <br>
+                <div id="pl-prices-section" class="pl-hidden">
+                    <div id="pl-misconfiguration" class="pl-hidden">
+                        <div class="pl-section-subtitle">
+                            {$shippingServices.misconfigurationDescription}
+                        </div>
+                        <br>
+                        <label for="pl-configure-prices-button">
+                            <strong>{$shippingServices.misconfigurationFixedPrice}</strong> <span class="pl-tooltip">({$shippingServices.requiredField})</span>
+                        </label>
+                        <div class="pl-form-group">
+                            <div class="pl-form-group pl-half-width">
+                                <input type="text" id="pl-misconfiguration-fixed-price" name="misconfigurationFixedPrice" placeholder="5" data-type="number" data-validation-rule="nonNegative" data-pl-contains-errors="1">
+                                <label for="pl-misconfiguration-fixed-price">
+                                    {$shippingServices.fixedPrices}
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div id="pl-pricing-policies">
+                    <div class="pl-switch">
+                        <label for="pl-configure-prices-button">
+                            <strong>{$shippingServices.configurePricePolicy}</strong>
+                        </label>
+                        <div class="pl-switch-button" id="pl-configure-prices-button">
+                            <i class="pl-switch-on material-icons">toggle_on</i>
+                            <i class="pl-switch-off material-icons">toggle_off</i>
+                        </div>
+                    </div>
+                    <div id="pl-pricing-policies">
+                    </div>
                 </div>
             </section>
             <section id="pl-add-price-section">
@@ -54,6 +89,8 @@
                 <div class="pl-checkbox pl-hidden" id="pl-use-packlink-price-wrapper">
                     <input type="checkbox" name="usePacklinkPriceIfNotInRange" id="pl-use-packlink-price-if-not-in-range">
                     <label for="pl-use-packlink-price-if-not-in-range">{$shippingServices.usePacklinkRange}</label>
+                    <span class="pl-hidden" id="pl-use-packlink-range">{$shippingServices.usePacklinkRange}</span>
+                    <span class="pl-hidden" id="pl-use-fixed-price">{$shippingServices.useFixedPrice}</span>
                 </div>
             </section>
             <section id="pl-tax-class-section" class="pl-hidden">

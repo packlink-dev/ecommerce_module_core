@@ -38,6 +38,7 @@ class OrderShipmentDetails extends Entity
         'shippingCost',
         'shipmentUrl',
         'deleted',
+        'currency',
     );
     /**
      * Shop order ID.
@@ -94,6 +95,12 @@ class OrderShipmentDetails extends Entity
      */
     private $shippingCost;
     /**
+     * Currency ISO code.
+     *
+     * @var string
+     */
+    private $currency;
+    /**
      * Shipment URL.
      *
      * @var string
@@ -139,6 +146,8 @@ class OrderShipmentDetails extends Entity
                 $this->shipmentLabels = ShipmentLabel::fromBatch($data['shipmentLabels']);
             } elseif ($fieldName === 'lastStatusUpdateTime' && !empty($data['lastStatusUpdateTime'])) {
                 $this->lastStatusUpdateTime = $timeProvider->getDateTime($data['lastStatusUpdateTime']);
+            } elseif ($fieldName === 'currency') {
+                $this->currency = static::getDataValue($data, $fieldName, 'EUR');
             } else {
                 $this->$fieldName = static::getArrayValue($data, $fieldName);
             }
@@ -161,6 +170,8 @@ class OrderShipmentDetails extends Entity
                 }
             } elseif ($fieldName === 'lastStatusUpdateTime') {
                 $data[$fieldName] = $this->lastStatusUpdateTime ? $this->lastStatusUpdateTime->getTimestamp() : null;
+            } elseif ($fieldName === 'currency') {
+                $data[$fieldName] = $this->currency ?: 'EUR';
             } else {
                 $data[$fieldName] = $this->$fieldName;
             }
@@ -407,5 +418,22 @@ class OrderShipmentDetails extends Entity
     public function setShipmentUrl($shipmentUrl)
     {
         $this->shipmentUrl = $shipmentUrl;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param string $currency
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
     }
 }

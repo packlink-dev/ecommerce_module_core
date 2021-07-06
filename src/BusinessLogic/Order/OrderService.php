@@ -108,7 +108,11 @@ class OrderService extends BaseService
     public function updateShipmentData(Shipment $shipment)
     {
         /** @var OrderShipmentDetailsService $shipmentDetailsService */
-        $this->orderShipmentDetailsService->setShippingPrice($shipment->reference, (float)$shipment->price);
+        $this->orderShipmentDetailsService->setShippingPrice(
+            $shipment->reference,
+            (float)$shipment->price,
+            $shipment->currency
+        );
         $this->updateShippingStatus($shipment, ShipmentStatus::getStatus($shipment->status));
 
         if ($this->isTrackingInfoUpdatable($shipment->status)) {

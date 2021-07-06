@@ -10,6 +10,8 @@ if (!window.Packlink) {
      * @property {string} getTaskStatusUrl
      * @property {string} startAutoConfigureUrl
      * @property {string} disableCarriersUrl
+     * @property {string} getCurrencyDetailsUrl
+     * @property {string} systemId
      * @property {boolean} newService
      */
 
@@ -38,6 +40,11 @@ if (!window.Packlink) {
         let noServicesModal;
 
         /**
+         * @type SystemInfo
+         */
+        let systemInfo;
+
+        /**
          * Displays page content.
          *
          *  @param {{from: string, newService: boolean}} config
@@ -45,8 +52,8 @@ if (!window.Packlink) {
         this.display = function (config) {
             utilityService.showSpinner();
             templateService.setCurrentTemplate(templateId);
-            ajaxService.get(configuration.getTaskStatusUrl, (response) => {
-                checkServicesStatus(response, config);
+            ajaxService.get(configuration.getCurrencyDetailsUrl, (response) => {
+                getDefaultCurrencies(response, config);
             });
 
             const mainPage = templateService.getMainPage(),
@@ -151,6 +158,28 @@ if (!window.Packlink) {
         };
 
         /**
+         * Retrieves system info.
+         *
+         * @param {SystemInfo[]} systemInfos
+         * @param {{from: string, newService: boolean}} config
+         */
+        const getDefaultCurrencies = (systemInfos, config) => {
+            systemInfo = systemInfos[0];
+
+            if (configuration.systemId !== null) {
+                systemInfos.forEach((info) => {
+                    if (info.system_id === configuration.systemId) {
+                        systemInfo = info;
+                    }
+                });
+            }
+
+            ajaxService.get(configuration.getTaskStatusUrl, (response) => {
+                checkServicesStatus(response, config);
+            });
+        };
+
+        /**
          * Binds services.
          *
          * @param {ShippingService[]} services
@@ -196,7 +225,16 @@ if (!window.Packlink) {
                 table = templateService.getComponent('pl-shipping-services-table'),
                 list = templateService.getComponent('pl-shipping-services-list').querySelector('.pl-shipping-services-list'),
                 render = (elem, id, tag) => {
-                    Packlink.ShippingServicesRenderer.render(elem, id, tag, filteredServices, false, handleServiceAction);
+                    Packlink.ShippingServicesRenderer.render(
+                        elem,
+                        id,
+                        tag,
+                        filteredServices,
+                        false,
+                        handleServiceAction,
+                        systemInfo,
+                        'pick-shipping-services'
+                    );
                 };
 
             render(table.querySelector('tbody'), 'pl-shipping-services-row', 'tr');

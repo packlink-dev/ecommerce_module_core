@@ -216,6 +216,33 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function testShippingServiceGroupingByCurrency()
+    {
+        $this->prepareAndExecuteValidTask();
+
+        $methods = $this->shippingMethodService->getAllMethods();
+        $repo = RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME);
+        foreach ($methods as $method) {
+            $method->setCurrency('GBP');
+            $repo->update($method);
+        }
+
+        $this->prepareAndExecuteValidTask();
+        $methods = $this->shippingMethodService->getAllMethods();
+
+        self::assertCount(18, $methods);
+        foreach ($methods as $method) {
+            self::assertEquals('EUR', $method->getCurrency());
+        }
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException

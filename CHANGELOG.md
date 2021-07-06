@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.2...v3.3.0) - 2021-07-06
+**BREAKING CHANGES**
+Multi-currency support project changes:
+
+### Added
+- Added currency details on the shipping method and shipping method response.
+- Added a default scope which includes a default fixed price used when misconfiguration is detected.
+- Added a system info DTO, service and controller, used for fetching currency configuration for each system in a multi-store environment.
+- Added misconfiguration detection and handling to the UI.
+- Added a single store price policy JS controller that is responsible for handling price policy configurations for a single store. Integrations should include this script in the main template.
+
+### Changed
+- Changed shipping services grouping to include the currency.
+- Updated pricing policy to be system-specific by adding a system identifier to it.
+- Updated shipping cost calculator to allow submitting system ID during shipping cost calculation and take only the policies with that system ID into account when calculating shipping costs.
+- State controller configuration has been modified. The integrations will have to modify the index template to include the system ID and the URL to the system info controller.
+
 ## [3.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.1...v3.2.2) - 2021-07-01
 ### Changed
 - Fixed default platform country for a registration form

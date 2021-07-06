@@ -15,6 +15,8 @@ use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\SystemInfo\TestSystemInfoService;
 
 /**
  * Class ShippingMethodControllerTest
@@ -34,6 +36,10 @@ class ShippingMethodControllerTest extends BaseTestWithServices
      * @var TestShopShippingMethodService
      */
     public $testShopShippingMethodService;
+    /**
+     * @var TestSystemInfoService
+     */
+    public $systemInfoService;
 
     /**
      * @inheritdoc
@@ -53,6 +59,14 @@ class ShippingMethodControllerTest extends BaseTestWithServices
             ShopShippingMethodService::CLASS_NAME,
             function () use ($me) {
                 return $me->testShopShippingMethodService;
+            }
+        );
+
+        $me->systemInfoService = new TestSystemInfoService();
+        TestServiceRegister::registerService(
+            SystemInfoService::CLASS_NAME,
+            function () use ($me) {
+                return $me->systemInfoService;
             }
         );
 
@@ -109,6 +123,251 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $this->assertEquals($shipment->name, $model->name);
         $this->assertEquals($shipment->showLogo, $model->showLogo);
         $this->assertEquals($shipment->pricingPolicies, $model->pricingPolicies);
+    }
+
+    public function testDefaultCurrencyConfiguration()
+    {
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
+                'system_id' => 'default',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNotNull($this->controller->save($shipment));
+    }
+
+    public function testSingleStoreCurrencyConfiguration()
+    {
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
+                'system_id' => 'test',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNotNull($this->controller->save($shipment));
+    }
+
+    public function testMisconfiguredSingleStoreCurrencyConfiguration()
+    {
+        /** @var TestSystemInfoService $testSystemInfoService */
+        $testSystemInfoService = TestServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $testSystemInfoService->setInvalid(true);
+
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->fixedPrices = array(
+            'test' => 5
+        );
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_FIXED_PRICE,
+                'fixed_price' => 43.98,
+                'system_id' => 'test',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNotNull($this->controller->save($shipment));
+    }
+
+    public function testInvalidMisconfiguredSingleStoreCurrencyConfiguration()
+    {
+        /** @var TestSystemInfoService $testSystemInfoService */
+        $testSystemInfoService = TestServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $testSystemInfoService->setInvalid(true);
+
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_FIXED_PRICE,
+                'fixed_price' => 43.98,
+                'system_id' => 'test',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNull($this->controller->save($shipment));
+    }
+
+    public function testValidMultistoreCurrencyConfiguration()
+    {
+        /** @var TestSystemInfoService $testSystemInfoService */
+        $testSystemInfoService = TestServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $testSystemInfoService->setMultistore(true);
+
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->fixedPrices = array(
+            'test' => 5,
+            'test1' => 10,
+        );
+        $shipment->systemDefaults = array(
+            'test' => false,
+            'test1' => false,
+        );
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_FIXED_PRICE,
+                'fixed_price' => 43.98,
+                'system_id' => 'test',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNotNull($this->controller->save($shipment));
+    }
+
+    public function testNoDefaultPriceInMultistoreCurrencyConfiguration()
+    {
+        /** @var TestSystemInfoService $testSystemInfoService */
+        $testSystemInfoService = TestServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $testSystemInfoService->setMultistore(true);
+
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->fixedPrices = array(
+            'test1' => 10
+        );
+        $shipment->systemDefaults = array(
+            'test' => true,
+            'test1' => true,
+        );
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_FIXED_PRICE,
+                'fixed_price' => 43.98,
+                'system_id' => 'test',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNull($this->controller->save($shipment));
+    }
+
+    public function testFallbackToDefaultMultistoreCurrencyConfiguration()
+    {
+        /** @var TestSystemInfoService $testSystemInfoService */
+        $testSystemInfoService = TestServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $testSystemInfoService->setMultistore(true);
+
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->fixedPrices = array(
+            'default' => 10
+        );
+        $shipment->systemDefaults = array(
+            'test' => true,
+            'test1' => true,
+        );
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_FIXED_PRICE,
+                'fixed_price' => 43.98,
+                'system_id' => 'test',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNotNull($this->controller->save($shipment));
+    }
+
+    public function testInvalidMultistoreCurrencyConfiguration()
+    {
+        /** @var TestSystemInfoService $testSystemInfoService */
+        $testSystemInfoService = TestServiceRegister::getService(SystemInfoService::CLASS_NAME);
+        $testSystemInfoService->setMultistore(true);
+
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $first->id;
+        $shipment->name = 'First name test';
+        $shipment->showLogo = !$first->showLogo;
+        $shipment->pricingPolicies = array(
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
+                'system_id' => 'test',
+            )),
+            ShippingPricePolicy::fromArray(array(
+                'range_type' => ShippingPricePolicy::RANGE_PRICE,
+                'from_price' => 0,
+                'to_price' => 20,
+                'pricing_policy' => ShippingPricePolicy::POLICY_PACKLINK,
+                'system_id' => 'test1',
+            )),
+        );
+        $shipment->isShipToAllCountries = true;
+
+        self::assertNull($this->controller->save($shipment));
     }
 
     /**
@@ -263,5 +522,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $test->setUp();
         /** @noinspection PhpUnhandledExceptionInspection */
         $test->testExecuteAllNew();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->setUp();
     }
 }

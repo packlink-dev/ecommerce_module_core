@@ -18,9 +18,20 @@ if (!window.Packlink) {
      * @property {boolean} showLogo
      * @property {string} taxClass
      * @property {[]} pricingPolicies
+     * @property {string} currency
      * @property {[]} shippingCountries
      * @property {boolean} isShipToAllCountries
      * @property {boolean} usePacklinkPriceIfNotInRange
+     * @property {Object} fixedPrices
+     * @property {Object} systemDefaults
+     */
+
+    /**
+     * @typedef SystemInfo
+     * @property {string} system_id
+     * @property {string} system_name
+     * @property {[]} currencies
+     * @property {[]} symbols
      */
 
     /**
@@ -32,6 +43,8 @@ if (!window.Packlink) {
         const templateService = Packlink.templateService,
             translator = Packlink.translationService;
 
+        let currentPage;
+
         /**
          * Renders the services table.
          *
@@ -41,15 +54,27 @@ if (!window.Packlink) {
          * @param {ShippingService[]} services
          * @param {boolean} list
          * @param {function(id: string, action: 'add'|'edit'|'delete')} buttonAction
+         * @param {SystemInfo} systemInfo
+         * @param {string} page
          */
-        this.render = (parent, templateId, elementType, services, list, buttonAction) => {
+        this.render = (
+            parent,
+            templateId,
+            elementType,
+            services,
+            list,
+            buttonAction,
+            systemInfo,
+            page
+        ) => {
             parent.innerHTML = '';
+            currentPage = page;
             services.forEach((service) => {
                 const template = templateService.getComponent(templateId),
                     itemEl = document.createElement(elementType);
 
                 itemEl.innerHTML = template.innerHTML;
-                constructItem(itemEl, service, list, buttonAction);
+                constructItem(itemEl, service, list, buttonAction, systemInfo);
 
                 parent.appendChild(itemEl);
             });
@@ -62,16 +87,23 @@ if (!window.Packlink) {
          * @param {Element} itemEl
          * @param {ShippingService} service
          * @param {boolean} list
+         * @param {SystemInfo} systemInfo
          * @param {function(id: string, action: 'add'|'edit'|'delete')} buttonAction
          */
-        function constructItem(itemEl, service, list, buttonAction) {
+        function constructItem(itemEl, service, list, buttonAction, systemInfo) {
             const carrierLogo = itemEl.querySelector('#pl-carrier-logo');
             carrierLogo.setAttribute('src', service.logoUrl);
             carrierLogo.setAttribute('alt', service.carrierName);
             carrierLogo.setAttribute('title', service.carrierName);
 
             itemEl.querySelector('#pl-service-name').innerHTML = service.name;
-            itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices'));
+            itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices')) + ' (' + service.currency + ')';
+            if (currentPage === 'pick-shipping-services'
+                || systemInfo.currencies.includes(service.currency)
+                || (service.fixedPrices !== null && (service.fixedPrices.hasOwnProperty(systemInfo.system_id) || service.fixedPrices.hasOwnProperty('default')))
+            ) {
+                itemEl.querySelector('#pl-misconfiguration-error').classList.add('pl-hidden');
+            }
 
             itemEl.querySelector('#pl-service-delivery-description').innerHTML = service.deliveryDescription;
             itemEl.querySelector('#pl-service-type').innerHTML = translator.translate('shippingServices.' + service.type);

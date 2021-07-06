@@ -40,6 +40,9 @@ class ShippingMethod extends Entity
         'taxClass',
         'isShipToAllCountries',
         'shippingCountries',
+        'currency',
+        'fixedPrices',
+        'systemDefaults',
     );
     /**
      * Carrier name.
@@ -143,6 +146,27 @@ class ShippingMethod extends Entity
      * @var array
      */
     protected $shippingCountries;
+    /**
+     * Shipping method currency.
+     * The value represents a currency code (ex. EUR, USD, GBP).
+     *
+     * @var string
+     */
+    protected $currency;
+    /**
+     * Key-value pairs of system info IDs and fixed prices in the default currency
+     * (used in multi-store environments when the service currency does not match the system currency).
+     *
+     * @var array
+     */
+    public $fixedPrices;
+    /**
+     * Key-value pairs of system info IDs and whether they are using default pricing policy
+     * (used in multi-store environments when the service currency does not match the system currency).
+     *
+     * @var array
+     */
+    public $systemDefaults;
 
     /**
      * Transforms raw array data to this entity instance.
@@ -592,5 +616,65 @@ class ShippingMethod extends Entity
     public function setUsePacklinkPriceIfNotInRange($usePacklinkPriceIfNotInRange)
     {
         $this->usePacklinkPriceIfNotInRange = $usePacklinkPriceIfNotInRange;
+    }
+
+    /**
+     * Returns shipping method currency.
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Sets shipping method currency.
+     *
+     * @param string $currency
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+    }
+
+    /**
+     * Returns fixed prices.
+     *
+     * @return array
+     */
+    public function getFixedPrices()
+    {
+        return $this->fixedPrices;
+    }
+
+    /**
+     * Sets fixed prices.
+     *
+     * @param array $fixedPrices
+     */
+    public function setFixedPrices($fixedPrices)
+    {
+        $this->fixedPrices = $fixedPrices;
+    }
+
+    /**
+     * Returns system defaults.
+     *
+     * @return array
+     */
+    public function getSystemDefaults()
+    {
+        return $this->systemDefaults;
+    }
+
+    /**
+     * Sets system defaults.
+     *
+     * @param array $systemDefaults
+     */
+    public function setSystemDefaults($systemDefaults)
+    {
+        $this->systemDefaults = $systemDefaults;
     }
 }

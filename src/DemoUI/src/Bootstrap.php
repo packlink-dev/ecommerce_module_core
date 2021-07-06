@@ -36,6 +36,8 @@ use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\ShopOrderService;
+use Packlink\BusinessLogic\SystemInformation\SystemInfoService as SystemInfoServiceInterface;
+use Packlink\DemoUI\Services\BusinessLogic\SystemInfoService;
 use Packlink\DemoUI\Services\Infrastructure\LoggerService;
 
 /**
@@ -83,6 +85,10 @@ class Bootstrap extends BootstrapComponent
      * @var RegistrationInfoService
      */
     private $registrationInfoService;
+    /**
+     * @var SystemInfoService
+     */
+    private $systemInfoService;
 
     /**
      * Bootstrap constructor.
@@ -97,6 +103,7 @@ class Bootstrap extends BootstrapComponent
         $this->carrierService = new CarrierService();
         $this->userAccountService = UserAccountService::getInstance();
         $this->registrationInfoService = new TestRegistrationInfoService();
+        $this->systemInfoService = new SystemInfoService();
     }
 
     /**
@@ -118,6 +125,7 @@ class Bootstrap extends BootstrapComponent
 
         static::$instance->initInstanceServices();
         static::$instance->initBrandDependentServices();
+        static::$instance->setMultistore(false);
     }
 
     /**
@@ -202,6 +210,13 @@ class Bootstrap extends BootstrapComponent
                 return $instance->registrationInfoService;
             }
         );
+
+        ServiceRegister::registerService(
+            SystemInfoServiceInterface::CLASS_NAME,
+            function () use ($instance) {
+                return $instance->systemInfoService;
+            }
+        );
     }
 
     protected function initBrandDependentServices()
@@ -259,5 +274,15 @@ class Bootstrap extends BootstrapComponent
                 return new \Packlink\BusinessLogic\CountryLabels\CountryService($fileResolverService);
             }
         );
+    }
+
+    /**
+     * Sets multistore.
+     *
+     * @param bool $isMultistore
+     */
+    protected function setMultistore($isMultistore = false)
+    {
+        $this->systemInfoService->setMultistore($isMultistore);
     }
 }
