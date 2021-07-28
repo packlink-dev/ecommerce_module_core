@@ -89,8 +89,6 @@ class CurlHttpClient extends HttpClient
      *     request body is '1' to ensure minimal request data in case of POST, PUT, PATCH methods. This will ensure
      *     that we have the upload progress and enable the async request termination as soon as the upload is finished
      *     without waiting for a response (without downloading a body or relaying on a fixed request timeout).
-     *
-     * @return bool|string
      */
     protected function sendHttpRequestAsync($method, $url, $headers = array(), $body = '1')
     {
@@ -98,7 +96,7 @@ class CurlHttpClient extends HttpClient
         $this->setCurlSessionOptionsForAsynchronousRequest();
         $this->setCurlOptions();
 
-        return $this->executeAsynchronousRequest();
+        $this->executeAsynchronousRequest();
     }
 
     /**

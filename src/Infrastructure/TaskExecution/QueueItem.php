@@ -185,6 +185,20 @@ class QueueItem extends Entity
     private $timeProvider;
 
     /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
+
+    /**
      * QueueItem constructor.
      *
      * @param Task|null $task Associated task object.

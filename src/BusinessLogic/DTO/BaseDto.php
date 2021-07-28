@@ -29,9 +29,7 @@ abstract class BaseDto
      */
     public static function fromArray(array $raw)
     {
-        throw new \BadMethodCallException(
-            'Method "fromArray" not implemented! Given array: ' . print_r($raw, true)
-        );
+        return null;
     }
 
     /**

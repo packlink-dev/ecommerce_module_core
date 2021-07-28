@@ -88,7 +88,9 @@ if (!window.Packlink) {
 
             mappings = response.mappings;
             for (const status in statuses) {
-                mappingsDiv.appendChild(injectStatus(status, statuses[status], mappings[status], response.orderStatuses));
+                if (statuses.hasOwnProperty(status)) {
+                    mappingsDiv.appendChild(injectStatus(status, statuses[status], mappings[status], response.orderStatuses));
+                }
             }
 
             btn.addEventListener('click', saveOrderStatusMappings, true);

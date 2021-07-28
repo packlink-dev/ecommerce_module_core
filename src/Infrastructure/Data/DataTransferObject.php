@@ -22,7 +22,7 @@ abstract class DataTransferObject
      */
     public static function fromArray(array $data)
     {
-        throw new RuntimeException('Method from array not implemented');
+        return null;
     }
 
     /**

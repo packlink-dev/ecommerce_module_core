@@ -37,7 +37,7 @@ class TrackingHistory
      */
     public static function fromArray(array $raw)
     {
-        $result = new static();
+        $result = new self();
         $result->setCity($raw['city']);
         $result->setDescription($raw['description']);
         $result->setTimestamp($raw['timestamp']);

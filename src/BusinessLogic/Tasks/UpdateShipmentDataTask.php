@@ -90,7 +90,7 @@ class UpdateShipmentDataTask extends Task
      */
     public static function fromArray(array $array)
     {
-        $entity = new static();
+        $entity = new self();
 
         $entity->progress = $array['progress'];
         $entity->progressStep = $array['progress_step'];

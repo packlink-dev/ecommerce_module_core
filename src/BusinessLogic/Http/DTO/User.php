@@ -60,7 +60,7 @@ class User extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $user = new static();
+        $user = new self();
 
         $user->firstName = static::getDataValue($raw, 'name');
         $user->lastName = static::getDataValue($raw, 'surname');

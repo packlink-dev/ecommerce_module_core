@@ -65,7 +65,7 @@ class TaskRunnerStarter implements Runnable
      */
     public static function fromArray(array $array)
     {
-        return new static($array['guid']);
+        return new self($array['guid']);
     }
 
     /**

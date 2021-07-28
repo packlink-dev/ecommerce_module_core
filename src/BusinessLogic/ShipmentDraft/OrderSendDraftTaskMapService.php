@@ -46,6 +46,18 @@ class OrderSendDraftTaskMapService extends BaseService
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Retrieves Order - SendDraftTask map instance.
      *
      * @param string | int $orderId Order id in an integration system.

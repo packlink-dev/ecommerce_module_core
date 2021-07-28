@@ -31,6 +31,18 @@ class WarehouseService extends BaseService
     protected static $instance;
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Gets a warehouse.
      *
      * @param bool $createIfNotExist [optional] Indicates whether to create a new object if the default does not exist.

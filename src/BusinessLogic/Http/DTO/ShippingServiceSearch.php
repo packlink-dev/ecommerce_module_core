@@ -119,7 +119,7 @@ class ShippingServiceSearch extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new static();
+        $instance = new self();
 
         $instance->serviceId = self::getDataValue($raw, 'service_id', null);
         $instance->fromCountry = self::getDataValue($raw, 'from[country]');

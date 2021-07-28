@@ -27,6 +27,18 @@ class RegistrationService extends BaseService
     protected static $instance;
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Registers a new user on Packlink PRO.
      *
      * @param \Packlink\BusinessLogic\Registration\RegistrationRequest $request

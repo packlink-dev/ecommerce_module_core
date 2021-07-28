@@ -37,7 +37,7 @@ class UpdateShippingServicesTask extends Task
      */
     public static function fromArray(array $array)
     {
-        return new static();
+        return new self();
     }
 
     /**

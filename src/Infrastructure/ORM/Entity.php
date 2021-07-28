@@ -5,6 +5,7 @@ namespace Logeecom\Infrastructure\ORM;
 use InvalidArgumentException;
 use Logeecom\Infrastructure\Data\DataTransferObject;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
+use RuntimeException;
 
 /**
  * Class Entity.
@@ -31,6 +32,20 @@ abstract class Entity extends DataTransferObject
     protected $fields = array('id');
 
     /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        throw new RuntimeException('Method create not implemented');
+    }
+
+    /**
      * Returns full class name.
      *
      * @return string Fully qualified class name.
@@ -49,7 +64,7 @@ abstract class Entity extends DataTransferObject
      */
     public static function fromArray(array $data)
     {
-        $instance = new static();
+        $instance = static::create($data);
         $instance->inflate($data);
 
         return $instance;

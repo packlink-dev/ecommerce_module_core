@@ -28,4 +28,18 @@ class TestWarehouse extends Warehouse
         $this->email = 'default@default.com';
         $this->default = true;
     }
+
+    /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
 }

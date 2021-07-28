@@ -37,7 +37,7 @@ class TimeProvider
     public static function getInstance()
     {
         if (static::$instance === null) {
-            static::$instance = new static();
+            static::$instance = new self();
         }
 
         return static::$instance;
@@ -96,7 +96,7 @@ class TimeProvider
      */
     public function sleep($sleepTime)
     {
-        sleep($sleepTime);
+        usleep($sleepTime * 1000);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\DTO;
 use Logeecom\Infrastructure\Data\DataTransferObject;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Language\Translator;
+use RuntimeException;
 
 /**
  * Class FrontDto.
@@ -31,6 +32,20 @@ abstract class FrontDto extends DataTransferObject
     protected static $requiredFields = array();
 
     /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        throw new RuntimeException('Method create not implemented');
+    }
+
+    /**
      * Transforms raw array data to its DTO.
      *
      * @param array $raw Raw array data.
@@ -43,7 +58,7 @@ abstract class FrontDto extends DataTransferObject
     {
         static::validate($raw);
 
-        $result = new static();
+        $result = static::create($raw);
         foreach ($raw as $field => $value) {
             if (property_exists(static::CLASS_NAME, $field)) {
                 $result->$field = $value;

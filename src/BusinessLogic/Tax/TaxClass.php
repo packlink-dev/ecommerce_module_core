@@ -43,4 +43,18 @@ class TaxClass extends FrontDto
      * @var array
      */
     protected static $requiredFields = array('label', 'value');
+
+    /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
 }

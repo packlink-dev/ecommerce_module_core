@@ -78,6 +78,6 @@ class Options extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        return new static($raw['name'], $raw['value']);
+        return new self($raw['name'], $raw['value']);
     }
 }

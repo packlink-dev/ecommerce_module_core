@@ -51,7 +51,7 @@ class PostalCode extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new static();
+        $instance = new self();
 
         $instance->zipcode = !empty($raw['zipcode']) ? $raw['zipcode'] : '';
         $instance->city = !empty($raw['city']['name']) ? $raw['city']['name'] : '';
