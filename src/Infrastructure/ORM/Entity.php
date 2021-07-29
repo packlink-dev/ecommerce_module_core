@@ -5,7 +5,6 @@ namespace Logeecom\Infrastructure\ORM;
 use InvalidArgumentException;
 use Logeecom\Infrastructure\Data\DataTransferObject;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
-use RuntimeException;
 
 /**
  * Class Entity.
@@ -42,7 +41,7 @@ abstract class Entity extends DataTransferObject
      */
     public static function create(array $data)
     {
-        throw new RuntimeException('Method create not implemented');
+        return null;
     }
 
     /**
