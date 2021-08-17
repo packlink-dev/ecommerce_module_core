@@ -239,7 +239,8 @@
     "selectCountriesHeader": "Países permitidos para tu servicio <br> de envío",
     "selectCountriesSubheader": "Selecciona la disponibilidad de al menos un país y <br> añade tantos como necesites",
     "discardChangesQuestion": "Algunos cambios no se han guardado.<br>¿Estás seguro de que quieres volver e ignorar los cambios?",
-    "atLeastOneCountry": ""
+    "atLeastOneCountry": "",
+    "misconfiguration": "Debido al cambio de moneda de la tienda, debe establecer un valor de precio fijo haciendo clic en editar en el servicio de envío."
   },
   "orderListAndDetails": {
     "printed": "Impreso",

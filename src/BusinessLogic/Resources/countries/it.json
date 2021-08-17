@@ -239,7 +239,8 @@
     "selectCountriesHeader": "Paesi supportati per il tuo <br> servizio di spedizione",
     "selectCountriesSubheader": "Seleziona la disponibilità di almeno un paese e aggiungi <br> tutti quelli richiesti",
     "discardChangesQuestion": "Alcune modifiche non sono state salvate.<br>Sei sicuro di voler tornare indietro e annullarle?",
-    "atLeastOneCountry": ""
+    "atLeastOneCountry": "",
+    "misconfiguration": "A causa del cambio di valuta del negozio, devi impostare un valore di prezzo fisso cliccando “Modifica” sul servizio di spedizione."
   },
   "orderListAndDetails": {
     "printed": "Stampato",
