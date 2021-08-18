@@ -287,6 +287,7 @@ class OrderService extends BaseService
         $draft->contentValue = $order->getTotalPrice();
         $draft->priority = $order->isHighPriority();
         $draft->source = $this->configuration->getDraftSource();
+        $draft->shipmentCustomReference = $order->getId();
         $this->addPackages($order, $draft);
 
         $methodId = $order->getShippingMethodId();
