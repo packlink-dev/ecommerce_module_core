@@ -157,7 +157,9 @@
     "readyForShipping": "Ready for shipping",
     "inTransit": "In transit",
     "delivered": "Delivered",
-    "cancelled": "Canceled"
+    "cancelled": "Canceled",
+    "incident": "Incident",
+    "outForDelivery": "Out for delivery"
   },
   "shippingServices": {
     "myServices": "My shipping services",
