@@ -34,7 +34,7 @@ abstract class Singleton
     public static function getInstance()
     {
         if (static::$instance === null) {
-            static::$instance = static::create();
+            static::$instance = new static();
         }
 
         if (!(static::$instance instanceof static)) {
