@@ -59,6 +59,15 @@ class OrderShipmentDetailsEntityTest extends TestCase
         $this->validateOrderDetails($orderDetails);
     }
 
+    public function testIncidentAndOutForDeliveryStatuses()
+    {
+        $orderDetails = new OrderShipmentDetails();
+        $orderDetails->setStatus(ShipmentStatus::OUT_FOR_DELIVERY);
+        self::assertEquals($orderDetails->getStatus(), 'outForDelivery');
+        $orderDetails->setStatus(ShipmentStatus::INCIDENT);
+        self::assertEquals($orderDetails->getStatus(), 'incident');
+    }
+
     /**
      * Tests conversion of Packlink order shipment details entity object to array.
      */
