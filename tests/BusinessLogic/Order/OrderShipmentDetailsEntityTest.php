@@ -59,6 +59,9 @@ class OrderShipmentDetailsEntityTest extends TestCase
         $this->validateOrderDetails($orderDetails);
     }
 
+    /**
+     * Test new shipment statuses: INCIDENT and OUT FOR DELIVERY
+     */
     public function testIncidentAndOutForDeliveryStatuses()
     {
         $orderDetails = new OrderShipmentDetails();
