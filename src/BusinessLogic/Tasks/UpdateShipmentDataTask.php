@@ -6,13 +6,11 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
-use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
-use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
  * Class UpdateShipmentDataTask.
@@ -267,23 +265,5 @@ class UpdateShipmentDataTask extends Task
         }
 
         return $this->orderService;
-    }
-
-    /**
-     * Checks if tracking info should be updated.
-     *
-     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipment Shipment instance to be checked for updatability.
-     *
-     * @return bool TRUE if tracking info should be update; FALSE otherwise.
-     */
-    protected function isTrackingInfoUpdatable(Shipment $shipment)
-    {
-        $allowedUpdateStatuses = array(
-            ShipmentStatus::STATUS_ACCEPTED,
-            ShipmentStatus::STATUS_READY,
-            ShipmentStatus::STATUS_IN_TRANSIT,
-        );
-
-        return in_array(ShipmentStatus::getStatus($shipment->status), $allowedUpdateStatuses, true);
     }
 }

@@ -247,6 +247,7 @@ class OrderService extends BaseService
             array(
                 ShipmentStatus::STATUS_READY,
                 ShipmentStatus::STATUS_IN_TRANSIT,
+                ShipmentStatus::OUT_FOR_DELIVERY,
                 ShipmentStatus::STATUS_DELIVERED,
             ),
             true
@@ -266,6 +267,7 @@ class OrderService extends BaseService
             ShipmentStatus::STATUS_ACCEPTED,
             ShipmentStatus::STATUS_READY,
             ShipmentStatus::STATUS_IN_TRANSIT,
+            ShipmentStatus::OUT_FOR_DELIVERY,
         );
 
         return in_array(ShipmentStatus::getStatus($status), $allowedUpdateStatuses, true);
