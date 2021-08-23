@@ -322,16 +322,20 @@ if (!window.Packlink) {
             }
 
             for (let systemId in pricePolicyControllers) {
-                let fieldName = pricePolicyControllers[systemId].getExcludedFieldForValidation();
-                if (fieldName !== null) {
-                    excludedElementNames.push(fieldName);
+                if (pricePolicyControllers.hasOwnProperty(systemId)) {
+                    let fieldName = pricePolicyControllers[systemId].getExcludedFieldForValidation();
+                    if (fieldName !== null) {
+                        excludedElementNames.push(fieldName);
+                    }
                 }
             }
 
             if (validationService.validateForm(form, excludedElementNames) && validateMiconfiguredPolicies()) {
                 let pricingPolicies = [];
                 for (let systemId in pricePolicyControllers) {
-                    pricingPolicies = pricingPolicies.concat(pricePolicyControllers[systemId].getSystemPricingPolicies());
+                    if (pricePolicyControllers.hasOwnProperty(systemId)) {
+                        pricingPolicies = pricingPolicies.concat(pricePolicyControllers[systemId].getSystemPricingPolicies());
+                    }
                 }
 
                 serviceModel.activated = true;

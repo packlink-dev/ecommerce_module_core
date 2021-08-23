@@ -89,7 +89,7 @@ class ShippingService extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new static();
+        $instance = new self();
 
         $instance->id = (int)self::getDataValue($raw, 'service_id');
         $instance->enabled = (bool)self::getDataValue($raw, 'enabled');

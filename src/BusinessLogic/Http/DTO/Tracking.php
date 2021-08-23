@@ -53,7 +53,7 @@ class Tracking extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $tracking = new static();
+        $tracking = new self();
         $tracking->timestamp = static::getDataValue($raw, 'timestamp');
         $tracking->description = static::getDataValue($raw, 'description');
         $tracking->city = static::getDataValue($raw, 'city');

@@ -68,6 +68,18 @@ class OrderService extends BaseService
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Prepares shipment draft object for order with provided unique identifier.
      *
      * @param string $orderId Unique order id.
@@ -235,6 +247,7 @@ class OrderService extends BaseService
             array(
                 ShipmentStatus::STATUS_READY,
                 ShipmentStatus::STATUS_IN_TRANSIT,
+                ShipmentStatus::OUT_FOR_DELIVERY,
                 ShipmentStatus::STATUS_DELIVERED,
             ),
             true
@@ -254,6 +267,7 @@ class OrderService extends BaseService
             ShipmentStatus::STATUS_ACCEPTED,
             ShipmentStatus::STATUS_READY,
             ShipmentStatus::STATUS_IN_TRANSIT,
+            ShipmentStatus::OUT_FOR_DELIVERY,
         );
 
         return in_array(ShipmentStatus::getStatus($status), $allowedUpdateStatuses, true);
@@ -275,6 +289,7 @@ class OrderService extends BaseService
         $draft->contentValue = $order->getTotalPrice();
         $draft->priority = $order->isHighPriority();
         $draft->source = $this->configuration->getDraftSource();
+        $draft->shipmentCustomReference = $order->getId();
         $this->addPackages($order, $draft);
 
         $methodId = $order->getShippingMethodId();

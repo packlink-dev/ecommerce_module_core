@@ -22,4 +22,18 @@ class TestCountry extends Country
         $this->code = 'MU';
         $this->postalCode = '42602';
     }
+
+    /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
 }

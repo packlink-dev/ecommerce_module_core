@@ -33,6 +33,14 @@ class ShipmentStatus
      * Status when shipment is cancelled.
      */
     const STATUS_CANCELLED = 'cancelled';
+    /**
+     * Status when shipmnet is out for delivery
+     */
+    const OUT_FOR_DELIVERY = 'outForDelivery';
+    /**
+     * Status when some incident happens
+     */
+    const INCIDENT = 'incident';
 
     /**
      * Maps raw shipment status from Packlink to shipment status.
@@ -63,6 +71,10 @@ class ShipmentStatus
                 return self::STATUS_ACCEPTED;
             case 'CANCELED':
                 return self::STATUS_CANCELLED;
+            case 'OUT_FOR_DELIVERY':
+                return self::OUT_FOR_DELIVERY;
+            case 'INCIDENT' :
+                return self::INCIDENT;
             case 'AWAITING_COMPLETION':
             case 'READY_TO_PURCHASE':
             default:
@@ -84,6 +96,8 @@ class ShipmentStatus
             self::STATUS_IN_TRANSIT,
             self::STATUS_DELIVERED,
             self::STATUS_CANCELLED,
+            self::INCIDENT,
+            self::OUT_FOR_DELIVERY,
         );
     }
 }

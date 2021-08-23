@@ -67,7 +67,7 @@ class SendDraftTask extends Task
      */
     public static function fromArray(array $array)
     {
-        return new static($array['order_id']);
+        return new self($array['order_id']);
     }
 
     /**

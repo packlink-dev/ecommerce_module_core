@@ -239,7 +239,8 @@
     "selectCountriesHeader": "Pays pris en charge par votre <br> service d’expédition",
     "selectCountriesSubheader": "Sélectionnez la disponibilité d’au moins un pays et ajoutez-en <br> autant que nécessaire",
     "discardChangesQuestion": "Certaines modifications n’ont pas été enregistrées.<br>Êtes-vous sûr de vouloir revenir en arrière et de les ignorer ?",
-    "atLeastOneCountry": ""
+    "atLeastOneCountry": "",
+    "misconfiguration": "En raison du changement de devise en magasin, vous devez établir une valeur monétaire fixe en cliquant sur « Modifier » dans le service d’expédition."
   },
   "orderListAndDetails": {
     "printed": "Imprimé",

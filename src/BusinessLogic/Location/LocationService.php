@@ -64,6 +64,18 @@ class LocationService extends BaseService
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Returns array of locations for this shipping method.
      *
      * @param int $shippingMethodId Shipping method identifier.

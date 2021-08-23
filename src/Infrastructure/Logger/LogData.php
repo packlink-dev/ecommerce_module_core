@@ -95,6 +95,20 @@ class LogData extends Entity
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
+
+    /**
      * Returns entity configuration object.
      *
      * @return EntityConfiguration Configuration object.

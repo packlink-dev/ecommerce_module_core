@@ -71,7 +71,7 @@ class BrandConfiguration extends DataTransferObject
      */
     public static function fromArray(array $data)
     {
-        $result = new static();
+        $result = new self();
 
         $result->platformCode = $data['platform_code'];
         $result->shippingServiceSource = $data['shipping_service_source'];

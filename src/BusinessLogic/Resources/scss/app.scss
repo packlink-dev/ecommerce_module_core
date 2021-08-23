@@ -23,7 +23,7 @@
       align-items: center;
       padding-bottom: 20px;
 
-      i {
+      span {
         margin-right: 10px;
       }
 
@@ -128,7 +128,7 @@
     margin-right: -20px;
     font-weight: bold;
 
-    i {
+    span {
       margin-left: 10px;
     }
   }
@@ -463,11 +463,5 @@
         display: flex;
       }
     }
-  }
-}
-
-// tablet rules
-@media (min-width: 769px) and (max-width: 1280px) {
-  #pl-page {
   }
 }

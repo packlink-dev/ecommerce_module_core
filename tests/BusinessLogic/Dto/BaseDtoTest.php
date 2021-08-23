@@ -31,11 +31,10 @@ class BaseDtoTest extends TestCase
         TestFrontDtoFactory::reset();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testFromArrayNotImplemented()
     {
-        Address::fromArray(array());
+        $dto = Address::fromArray(array());
+
+        self::assertNull($dto);
     }
 }

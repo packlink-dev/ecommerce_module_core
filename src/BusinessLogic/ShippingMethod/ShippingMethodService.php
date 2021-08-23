@@ -60,6 +60,18 @@ class ShippingMethodService extends BaseService
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Returns all shipping methods for current user.
      *
      * @return ShippingMethod[] All shipping methods.

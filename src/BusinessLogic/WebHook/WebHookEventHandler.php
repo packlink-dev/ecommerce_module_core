@@ -39,6 +39,18 @@ class WebHookEventHandler extends BaseService
     );
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Validates input and handles Packlink webhook event.
      *
      * @param string $input Request input.

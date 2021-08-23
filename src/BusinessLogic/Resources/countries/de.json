@@ -239,7 +239,8 @@
     "selectCountriesHeader": "Länder, die von Ihrem <br> Versanddienst unterstützt werden",
     "selectCountriesSubheader": "Wählen Sie die Verfügbarkeit von mindestens einem Land aus und fügen Sie <br> beliebig viele hinzu",
     "discardChangesQuestion": "Es gibt nicht gespeicherte Änderungen.<br>Sind Sie sicher, dass Sie zurückgehen und sie verwerfen möchten?",
-    "atLeastOneCountry": ""
+    "atLeastOneCountry": "",
+    "misconfiguration": "Um Währungsänderungen zu speichern, müssen Sie einen Festpreiswert einstellen, indem Sie auf Versandservice \"Bearbeiten\" klicken."
   },
   "orderListAndDetails": {
     "printed": "Ausgedruckt",

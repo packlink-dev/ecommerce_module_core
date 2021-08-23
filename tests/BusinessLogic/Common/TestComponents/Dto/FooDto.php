@@ -35,4 +35,18 @@ class FooDto extends FrontDto
      * @var array
      */
     protected static $requiredFields = array('foo', 'bar');
+
+    /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
 }

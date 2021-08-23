@@ -63,6 +63,19 @@ abstract class CompositeTask extends Task
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @param array $subTasks
+     * @param $initialProgress
+     *
+     * @return CompositeTask
+     */
+    public static function create(array $subTasks, $initialProgress)
+    {
+        return null;
+    }
+
+    /**
      * Transforms array into an serializable object,
      *
      * @param array $array Data that is used to instantiate serializable object.
@@ -78,7 +91,7 @@ abstract class CompositeTask extends Task
             $tasks[] = Serializer::unserialize($task);
         }
 
-        $entity = new static($tasks, $array['initial_progress']);
+        $entity = static::create($tasks, $array['initial_progress']);
         $entity->taskProgressMap = $array['task_progress_map'];
         $entity->tasksProgressShare = $array['tasks_progress_share'];
 

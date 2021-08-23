@@ -1,25 +1,25 @@
-<table class="pl-shipping-services-table">
+<table class="pl-shipping-services-table" aria-describedby="description">
     <thead>
     <tr>
-        <th>
+        <th id="pl-carrier">
             {$shippingServices.carrier}
         </th>
-        <th>
+        <th id="pl-service-title">
             {$shippingServices.serviceTitle}
         </th>
-        <th>
+        <th id="pl-transit-time">
             {$shippingServices.transitTime}
         </th>
-        <th>
+        <th id="pl-type">
             {$shippingServices.type}
         </th>
-        <th class="pl-text-center">
+        <th class="pl-text-center" id="pl-origin">
             {$shippingServices.origin}
         </th>
-        <th class="pl-text-center">
+        <th class="pl-text-center" id="pl-destination">
             {$shippingServices.destination}
         </th>
-        <th class="pl-small"></th>
+        <th class="pl-small" id="pl-button-column"></th>
     </tr>
     </thead>
     <tbody>

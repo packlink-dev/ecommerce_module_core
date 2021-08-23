@@ -11,6 +11,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
+use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -158,6 +159,16 @@ class OrderServiceTest extends BaseTestWithServices
             . 'does not support order\'s destination country. Sending order without selected method.',
             $logMessages[1]->getMessage()
         );
+    }
+
+    /**
+     * @throws EmptyOrderException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testPrepareDraftShippingReference()
+    {
+        $draft = $this->orderService->prepareDraft('test');
+        self::assertEquals($draft->shipmentCustomReference, 'test');
     }
 
     /**

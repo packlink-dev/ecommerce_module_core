@@ -99,6 +99,20 @@ class ParcelInfo extends FrontDto
     }
 
     /**
+     * Creates instance of this class.
+     *
+     * @param array $data
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create(array $data)
+    {
+        return new self();
+    }
+
+    /**
      * Generates validation errors for the payload.
      *
      * @param array $payload The payload in key-value format.

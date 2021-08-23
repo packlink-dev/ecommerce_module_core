@@ -34,6 +34,18 @@ class ShipmentDraftService extends BaseService
     protected static $instance;
 
     /**
+     * Creates instance of this class.
+     *
+     * @return static
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
      * Enqueues the task for creating shipment draft for provided order id.
      * Ensures proper mapping between the order and the created task are persisted.
      *

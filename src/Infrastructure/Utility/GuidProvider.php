@@ -36,7 +36,7 @@ class GuidProvider
     public static function getInstance()
     {
         if (static::$instance === null) {
-            static::$instance = new static();
+            static::$instance = new self();
         }
 
         return static::$instance;
