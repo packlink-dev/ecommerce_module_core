@@ -5,7 +5,6 @@ namespace Logeecom\Infrastructure\TaskExecution;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
-use RuntimeException;
 
 /**
  * Class CompositeTask
@@ -64,19 +63,6 @@ abstract class CompositeTask extends Task
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @param array $subTasks
-     * @param $initialProgress
-     *
-     * @return CompositeTask
-     */
-    public static function create(array $subTasks, $initialProgress)
-    {
-        throw new RuntimeException('Method create not implemented');
-    }
-
-    /**
      * Transforms array into an serializable object,
      *
      * @param array $array Data that is used to instantiate serializable object.
@@ -92,7 +78,7 @@ abstract class CompositeTask extends Task
             $tasks[] = Serializer::unserialize($task);
         }
 
-        $entity = static::create($tasks, $array['initial_progress']);
+        $entity = new static($tasks, $array['initial_progress']);
         $entity->taskProgressMap = $array['task_progress_map'];
         $entity->tasksProgressShare = $array['tasks_progress_share'];
 

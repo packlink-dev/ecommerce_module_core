@@ -175,7 +175,7 @@ class ShippingServiceDetails extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new self();
+        $instance = new static();
 
         $instance->id = self::getDataValue($raw, 'id');
         $instance->carrierName = self::getDataValue($raw, 'carrier_name');

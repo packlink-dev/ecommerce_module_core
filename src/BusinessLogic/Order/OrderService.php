@@ -68,18 +68,6 @@ class OrderService extends BaseService
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Prepares shipment draft object for order with provided unique identifier.
      *
      * @param string $orderId Unique order id.

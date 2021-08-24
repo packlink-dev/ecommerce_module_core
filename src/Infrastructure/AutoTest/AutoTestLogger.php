@@ -22,18 +22,6 @@ class AutoTestLogger extends Singleton implements ShopLoggerAdapter
     protected static $instance;
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Logs a message in system.
      *
      * @param LogData $data Data to log.

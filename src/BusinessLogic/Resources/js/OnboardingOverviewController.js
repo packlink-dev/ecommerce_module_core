@@ -60,7 +60,7 @@ if (!window.Packlink) {
         }
 
         const populateSegment = (segment, data, editState, infoProvider) => {
-            const icon = segment.querySelector('span');
+            const icon = segment.querySelector('i');
             const button = segment.querySelector('button');
             const details = segment.querySelector('.pl-item-details');
 

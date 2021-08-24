@@ -84,7 +84,7 @@ class BatchTaskCleanupTask extends Task
      */
     public static function fromArray(array $array)
     {
-        return new self($array['taskStatuses'], $array['taskTypes']);
+        return new static($array['taskStatuses'], $array['taskTypes']);
     }
 
     /**

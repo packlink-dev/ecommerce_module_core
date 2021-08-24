@@ -69,18 +69,6 @@ class AsyncProcessStarterService extends Singleton implements AsyncProcessServic
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Starts given runner asynchronously (in new process/web request or similar).
      *
      * @param Runnable $runner Runner that should be started async.

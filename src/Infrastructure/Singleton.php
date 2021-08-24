@@ -2,8 +2,6 @@
 
 namespace Logeecom\Infrastructure;
 
-use RuntimeException;
-
 /**
  * Base class for all singleton implementations.
  * Every class that extends this class MUST have its own protected static field $instance!
@@ -12,13 +10,6 @@ use RuntimeException;
  */
 abstract class Singleton
 {
-    /**
-     * Singleton instance of this class.
-     *
-     * @var static
-     */
-    protected static $instance;
-
     /**
      * Hidden constructor.
      */
@@ -34,26 +25,14 @@ abstract class Singleton
     public static function getInstance()
     {
         if (static::$instance === null) {
-            static::$instance = static::create();
+            static::$instance = new static();
         }
 
         if (!(static::$instance instanceof static)) {
-            throw new RuntimeException('Wrong static instance of a singleton class.');
+            throw new \RuntimeException('Wrong static instance of a singleton class.');
         }
 
         return static::$instance;
-    }
-
-    /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        throw new RuntimeException('Method create not implemented');
     }
 
     /**

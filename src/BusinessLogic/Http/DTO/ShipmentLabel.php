@@ -58,7 +58,7 @@ class ShipmentLabel extends DataTransferObject
      */
     public static function fromArray(array $batchRaw)
     {
-        return new self(
+        return new static(
             static::getDataValue($batchRaw, 'link'),
             static::getDataValue($batchRaw, 'printed', false),
             static::getDataValue($batchRaw, 'createTime', 0)

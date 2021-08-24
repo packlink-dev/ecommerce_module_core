@@ -45,7 +45,7 @@ class SystemInfo extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new self();
+        $instance = new static();
 
         $instance->systemId = !empty($raw['system_id']) ? $raw['system_id'] : null;
         $instance->systemName = !empty($raw['system_name']) ? $raw['system_name'] : '';

@@ -59,7 +59,7 @@ class Package extends DataTransferObject
      */
     public static function defaultPackage()
     {
-        return new self(1, 10, 10, 10);
+        return new static(1, 10, 10, 10);
     }
 
     /**
@@ -71,7 +71,7 @@ class Package extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new self();
+        $instance = new static();
         $instance->weight = static::getDataValue($raw, 'weight', 0.0);
         $instance->length = static::getDataValue($raw, 'length', 0.0);
         $instance->height = static::getDataValue($raw, 'height', 0.0);

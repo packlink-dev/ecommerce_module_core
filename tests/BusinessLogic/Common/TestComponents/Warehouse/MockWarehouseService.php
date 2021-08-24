@@ -19,18 +19,6 @@ class MockWarehouseService extends WarehouseService
         return $this->getWarehouseResult;
     }
 
-    /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
     public function updateWarehouseData(array $payload)
     {
         $this->callHistory[] = array('updateWarehouseData' => array($payload));

@@ -40,7 +40,7 @@ class AutoTestTask extends Task
      */
     public static function fromArray(array $array)
     {
-        return new self($array['data']);
+        return new static($array['data']);
     }
 
     /**

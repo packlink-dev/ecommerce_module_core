@@ -24,18 +24,6 @@ class TestShopConfiguration extends Configuration
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Returns current system identifier.
      *
      * @return string Current system identifier.
