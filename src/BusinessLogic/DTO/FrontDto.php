@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\DTO;
 use Logeecom\Infrastructure\Data\DataTransferObject;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Language\Translator;
+use RuntimeException;
 
 /**
  * Class FrontDto.
@@ -41,7 +42,7 @@ abstract class FrontDto extends DataTransferObject
      */
     public static function create(array $data)
     {
-        return null;
+        throw new RuntimeException('Method create not implemented');
     }
 
     /**

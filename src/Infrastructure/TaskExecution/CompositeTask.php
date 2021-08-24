@@ -5,6 +5,7 @@ namespace Logeecom\Infrastructure\TaskExecution;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
+use RuntimeException;
 
 /**
  * Class CompositeTask
@@ -72,7 +73,7 @@ abstract class CompositeTask extends Task
      */
     public static function create(array $subTasks, $initialProgress)
     {
-        return null;
+        throw new RuntimeException('Method create not implemented');
     }
 
     /**

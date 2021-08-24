@@ -53,7 +53,7 @@ abstract class Singleton
      */
     public static function create()
     {
-        return null;
+        throw new RuntimeException('Method create not implemented');
     }
 
     /**
