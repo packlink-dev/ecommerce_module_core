@@ -174,7 +174,7 @@ if (!window.Packlink) {
                 }
             }, true);
 
-            postalCodeInput.parentElement.querySelector('span').addEventListener('click', (event) => {
+            postalCodeInput.parentElement.querySelector('i').addEventListener('click', (event) => {
                 event.stopPropagation();
                 postalCodeInput.focus();
             });

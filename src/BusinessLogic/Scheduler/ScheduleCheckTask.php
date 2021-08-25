@@ -36,7 +36,7 @@ class ScheduleCheckTask extends Task
      */
     public static function fromArray(array $array)
     {
-        return new self();
+        return new static();
     }
 
     /**

@@ -35,18 +35,6 @@ class CountryService extends BaseService
     protected $brandConfigurationService;
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Returns a list of supported country DTOs.
      *
      * @param bool $associative Indicates whether the result should be an associative array.

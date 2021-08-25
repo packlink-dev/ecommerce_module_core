@@ -118,7 +118,7 @@ class Shipment extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $shipment = new self();
+        $shipment = new static();
         $date = static::getDataValue($raw, 'order_date');
         if ($date) {
             $shipment->orderDate = \DateTime::createFromFormat('Y-m-d', $date);

@@ -62,18 +62,6 @@ class Logger extends Singleton
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Logs error message.
      *
      * @param string $message Message to log.

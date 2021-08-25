@@ -113,7 +113,7 @@
     min-width: $icon-button-size;
     margin: 0;
 
-    span {
+    i {
       font-size: 20px;
       width: auto;
       color: $color-blue;
@@ -126,7 +126,7 @@
     &:hover {
       cursor: pointer;
 
-      span {
+      i {
         color: $color-white;
       }
     }
@@ -173,12 +173,9 @@
 
   .pl-button-group {
     flex-direction: row;
-    padding-right: 10px;
 
     button {
       border-radius: 0;
-      height: $input-height;
-      min-width: 110px;
 
       &:first-child {
         border-radius: 4px 0 0 4px;
@@ -250,7 +247,7 @@
       -moz-padding-start: 11px;
     }
 
-    span {
+    i {
       position: absolute;
       right: 10px;
       top: $input-height/2;
@@ -260,7 +257,7 @@
       height: $icon-button-size;
     }
 
-    select + span {
+    select + i {
       cursor: default;
       pointer-events: none;
     }
@@ -316,7 +313,7 @@
         color: $color-white;
         content: '\2713';
         margin: 0;
-        font: bold 20px/24px pl-proxima-nova, sans-serif;
+        font: bold 20px/24px pl-proxima-nova;
         width: $checkbox-size;
         min-width: $checkbox-size;
         height: $checkbox-size;
@@ -356,7 +353,7 @@
       color: inherit;
     }
 
-    span {
+    i {
       color: inherit;
       margin-left: 20px;
     }
@@ -469,7 +466,7 @@
         cursor: pointer;
         z-index: 1;
 
-        span {
+        i {
           color: $color-blue;
           font-weight: bold;
         }
@@ -526,7 +523,7 @@
       border: 1px solid $color-red !important;
     }
 
-    label, span {
+    label, i {
       color: $color-red;
     }
 
@@ -664,6 +661,15 @@
     }
   }
 
+  .pl-button-group {
+    padding-right: 10px;
+
+    button {
+      height: $input-height;
+      min-width: 110px;
+    }
+  }
+
   pre {
     white-space: normal;
   }
@@ -743,5 +749,11 @@
       flex: 0 0 auto;
       padding: 10px;
     }
+  }
+}
+
+// tablet rules
+@media (min-width: 769px) and (max-width: 1280px) {
+  #pl-page {
   }
 }

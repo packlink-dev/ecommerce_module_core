@@ -41,7 +41,7 @@ class ShipmentDraftStatus extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $me = new self();
+        $me = new static();
         $me->status = static::getDataValue($raw, 'status');
         $me->message = static::getDataValue($raw, 'message');
 
