@@ -81,9 +81,15 @@ if (!window.Packlink) {
             fromPick = config.fromPick;
             templateService.setCurrentTemplate(templateId);
             form = templateService.getComponent('pl-edit-service-form');
-            getServiceUrl = new URL(configuration.getServiceUrl);
-            getServiceUrl.searchParams.append('id', config.id);
-            ajaxService.get(getServiceUrl.toString(), getService);
+            getServiceUrl = configuration.getServiceUrl;
+
+            if (-1 === getServiceUrl.indexOf('?')) {
+                getServiceUrl += '?id=' + config.id;
+            } else {
+                getServiceUrl += '&id=' + config.id;
+            }
+
+            ajaxService.get(getServiceUrl, getService);
 
             const mainPage = templateService.getMainPage(),
                 backButton = mainPage.querySelector('.pl-sub-header button');
