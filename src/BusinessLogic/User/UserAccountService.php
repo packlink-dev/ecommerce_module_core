@@ -57,18 +57,6 @@ class UserAccountService extends BaseService
     private $brandConfigurationService;
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Validates provided API key and initializes user's data.
      *
      * @param string $apiKey API key.

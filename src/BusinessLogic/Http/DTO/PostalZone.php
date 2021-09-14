@@ -51,7 +51,7 @@ class PostalZone extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $instance = new self();
+        $instance = new static();
 
         $instance->id = static::getDataValue($raw, 'id');
         $instance->name = static::getDataValue($raw, 'name');

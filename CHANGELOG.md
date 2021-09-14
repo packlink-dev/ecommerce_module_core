@@ -3,7 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [3.3.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.2...v3.3.3) - 2021-08-26
+**BREAKING CHANGES**
+### Changed
+- Updated order service to set order number as a shipment custom reference instead of order ID when creating a draft. Integrations need to set an order number in the `ShopOrderService::getOrderAndShippingData`.
+
+## [3.3.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.1...v3.3.2) - 2021-08-24
+### Changed
+- Reverted Shopware code review changes.
+
+## [3.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.0...v3.3.1) - 2021-08-23
+**BREAKING CHANGES**
+### Changed
+- Updated order service to set shipment custom reference when creating a draft.
+- Added additional statuses to shipment status mapper.
+- Updated codebase to adhere to the Shopware coding standards. Integrations need to update all classes that extend from the Core `Singleton` class and implement create method that will return an instance of itself.
 
 ## [3.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.2.2...v3.3.0) - 2021-07-06
 **BREAKING CHANGES**

@@ -148,6 +148,7 @@ class TestShopOrderService implements ShopOrderService
         if (!isset(static::$orders[$orderId])) {
             $order = new Order();
             $order->setId($orderId);
+            $order->setOrderNumber('testOrderNumber');
             $order->setShipment(new Shipment());
             $order->setShippingMethodId($shippingMethodId);
             $order->setShippingAddress(new Address());

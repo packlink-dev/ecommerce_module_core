@@ -43,18 +43,6 @@ class PackageTransformer extends Singleton
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Transforms array of packages into one grouped package.
      *
      * @param Package[] $packages Array of packages.

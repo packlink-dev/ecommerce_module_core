@@ -31,20 +31,6 @@ abstract class Entity extends DataTransferObject
     protected $fields = array('id');
 
     /**
-     * Creates instance of this class.
-     *
-     * @param array $data
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create(array $data)
-    {
-        return null;
-    }
-
-    /**
      * Returns full class name.
      *
      * @return string Fully qualified class name.
@@ -63,7 +49,7 @@ abstract class Entity extends DataTransferObject
      */
     public static function fromArray(array $data)
     {
-        $instance = static::create($data);
+        $instance = new static();
         $instance->inflate($data);
 
         return $instance;

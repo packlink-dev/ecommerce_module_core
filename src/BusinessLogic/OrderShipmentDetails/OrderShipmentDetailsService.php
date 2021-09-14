@@ -46,18 +46,6 @@ class OrderShipmentDetailsService extends BaseService
     }
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Retrieves order shipment details.
      *
      * @param string | int $orderId Order id in an integration system.

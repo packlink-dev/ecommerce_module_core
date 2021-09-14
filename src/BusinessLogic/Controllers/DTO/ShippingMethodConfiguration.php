@@ -121,7 +121,7 @@ class ShippingMethodConfiguration extends DataTransferObject
      */
     public static function fromArray(array $raw)
     {
-        $result = new self();
+        $result = new static();
 
         $result->id = $raw['id'];
         $result->activated = (bool)static::getDataValue($raw, 'activated', false);

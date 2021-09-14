@@ -168,7 +168,7 @@ class OrderServiceTest extends BaseTestWithServices
     public function testPrepareDraftShippingReference()
     {
         $draft = $this->orderService->prepareDraft('test');
-        self::assertEquals($draft->shipmentCustomReference, 'test');
+        self::assertEquals($draft->shipmentCustomReference, 'testOrderNumber');
     }
 
     /**

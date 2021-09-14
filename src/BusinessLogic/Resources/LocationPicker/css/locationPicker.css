@@ -136,9 +136,7 @@
     top: 16px;
     left: 15px;
     text-transform: uppercase;
-    font-weight: bold;
-    font-size: 16px;
-    font-family: Roboto, Arial, sans-serif;
+    font: bold 16px Roboto, Arial, sans-serif;
     color: #9b9b9b;
     pointer-events: none;
     white-space: nowrap;
@@ -154,9 +152,7 @@
     top: 12px;
     left: 15px;
     text-transform: uppercase;
-    font-weight: bold;
-    font-size: 12px;
-    font-family: Roboto, Arial, sans-serif;
+    font: bold 12px Roboto, Arial, sans-serif;
     color: #5d5d5d;
     pointer-events: none;
     transition: all .25s ease-in;
@@ -188,7 +184,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    pointer-events: none;
 }
 
 .lp-location-wrapper > *:not(.street) {
@@ -202,6 +197,10 @@
     overflow: visible;
     margin: 16px 10px 10px 0;
     width: 100%;
+}
+
+.lp-location-wrapper > * {
+    pointer-events: none;
 }
 
 .lp-location-wrapper .excluded {

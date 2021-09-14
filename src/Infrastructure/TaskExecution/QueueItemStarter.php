@@ -54,7 +54,7 @@ class QueueItemStarter implements Runnable
      */
     public static function fromArray(array $array)
     {
-        return new self($array['queue_item_id']);
+        return new static($array['queue_item_id']);
     }
 
     /**

@@ -29,18 +29,6 @@ class ConfigurationService extends Configuration
     protected static $instance;
 
     /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * Gets max inactivity period for a task in seconds.
      * After inactivity period is passed, system will fail such task as expired.
      *

@@ -32,20 +32,6 @@ class Process extends Entity
     protected $runner;
 
     /**
-     * Creates instance of this class.
-     *
-     * @param array $data
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create(array $data)
-    {
-        return new self();
-    }
-
-    /**
      * Sets raw array data to this entity instance properties.
      *
      * @param array $data Raw array data with keys 'id', 'guid' and 'runner'.

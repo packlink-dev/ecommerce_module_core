@@ -69,7 +69,7 @@ class TaskCleanupTask extends Task
      */
     public static function fromArray(array $array)
     {
-        return new self(
+        return new static(
             $array['task_type'],
             !empty($array['task_statuses']) ? $array['task_statuses'] : array(),
             $array['task_age']

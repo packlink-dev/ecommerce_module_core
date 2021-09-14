@@ -93,7 +93,7 @@ class ShippingService
      */
     public static function fromArray($data)
     {
-        return new self(
+        return new static(
             $data['serviceId'],
             $data['serviceName'],
             $data['departure'],
@@ -113,7 +113,7 @@ class ShippingService
      */
     public static function fromServiceDetails(ShippingServiceDetails $shippingServiceDetails)
     {
-        return new self(
+        return new static(
             $shippingServiceDetails->id,
             $shippingServiceDetails->serviceName,
             $shippingServiceDetails->departureCountry,

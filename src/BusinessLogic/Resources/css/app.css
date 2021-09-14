@@ -402,7 +402,7 @@
   min-width: 24px;
   margin: 0;
 }
-#pl-page .pl-icon-button span {
+#pl-page .pl-icon-button i {
   font-size: 20px;
   width: auto;
   color: #2095f2;
@@ -413,7 +413,7 @@
 #pl-page .pl-icon-button:hover {
   cursor: pointer;
 }
-#pl-page .pl-icon-button:hover span {
+#pl-page .pl-icon-button:hover i {
   color: #fff;
 }
 #pl-page section {
@@ -449,12 +449,9 @@
 }
 #pl-page .pl-button-group {
   flex-direction: row;
-  padding-right: 10px;
 }
 #pl-page .pl-button-group button {
   border-radius: 0;
-  height: 56px;
-  min-width: 110px;
 }
 #pl-page .pl-button-group button:first-child {
   border-radius: 4px 0 0 4px;
@@ -514,7 +511,7 @@
 #pl-page .pl-form-group select {
   -moz-padding-start: 11px;
 }
-#pl-page .pl-form-group span {
+#pl-page .pl-form-group i {
   position: absolute;
   right: 10px;
   top: 28px;
@@ -523,7 +520,7 @@
   width: 24px;
   height: 24px;
 }
-#pl-page .pl-form-group select + span {
+#pl-page .pl-form-group select + i {
   cursor: default;
   pointer-events: none;
 }
@@ -572,7 +569,7 @@
   color: #fff;
   content: '\2713';
   margin: 0;
-  font: bold 20px/24px pl-proxima-nova, sans-serif;
+  font: bold 20px/24px pl-proxima-nova;
   width: 20px;
   min-width: 20px;
   height: 20px;
@@ -605,7 +602,7 @@
 #pl-page .pl-alert .pl-alert-text {
   color: inherit;
 }
-#pl-page .pl-alert span {
+#pl-page .pl-alert i {
   color: inherit;
   margin-left: 20px;
 }
@@ -701,7 +698,7 @@
   cursor: pointer;
   z-index: 1;
 }
-#pl-page .pl-modal-mask .pl-modal .pl-modal-close-button span {
+#pl-page .pl-modal-mask .pl-modal .pl-modal-close-button i {
   color: #2095f2;
   font-weight: bold;
 }
@@ -745,7 +742,7 @@
 #pl-page .pl-error input, #pl-page .pl-error select {
   border: 1px solid #e63f3f !important;
 }
-#pl-page .pl-error label, #pl-page .pl-error span {
+#pl-page .pl-error label, #pl-page .pl-error i {
   color: #e63f3f;
 }
 #pl-page .pl-error .pl-error-message {
@@ -856,6 +853,13 @@
 #pl-page .pl-shipping-services-list-item .pl-service-buttons .pl-button:not(.pl-hidden) + .pl-button {
   margin-left: 10px;
 }
+#pl-page .pl-button-group {
+  padding-right: 10px;
+}
+#pl-page .pl-button-group button {
+  height: 56px;
+  min-width: 110px;
+}
 #pl-page pre {
   white-space: normal;
 }
@@ -908,8 +912,10 @@
     padding: 10px;
   }
 }
+@media (min-width: 769px) and (max-width: 1280px) {
+}
 #pl-page .material-icons {
-  font-family: 'Material Icons Outlined', sans-serif;
+  font-family: 'Material Icons Outlined';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -938,7 +944,7 @@
   align-items: center;
   padding-bottom: 20px;
 }
-#pl-page .pl-onboarding-overview-list .pl-list-item span {
+#pl-page .pl-onboarding-overview-list .pl-list-item i {
   margin-right: 10px;
 }
 #pl-page .pl-onboarding-overview-list .pl-list-item + .pl-list-item {
@@ -1023,7 +1029,7 @@
   margin-right: -20px;
   font-weight: bold;
 }
-#pl-page .pl-configuration-menu span {
+#pl-page .pl-configuration-menu i {
   margin-left: 10px;
 }
 #pl-page .pl-configuration-page {
@@ -1272,4 +1278,6 @@
   #pl-page .pl-pick-shipping-services-page #pl-open-filter-button {
     display: flex;
   }
+}
+@media (min-width: 769px) and (max-width: 1280px) {
 }

@@ -11,15 +11,4 @@ use Logeecom\Infrastructure\AutoTest\AutoTestLogger;
  */
 class TestAutoTestLogger extends AutoTestLogger
 {
-    /**
-     * Creates instance of this class.
-     *
-     * @return static
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public static function create()
-    {
-        return new self();
-    }
 }
