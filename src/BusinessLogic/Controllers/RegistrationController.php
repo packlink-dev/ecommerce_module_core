@@ -92,7 +92,7 @@ class RegistrationController
             'terms_and_conditions' => $acceptedTermsAndConditions,
             'data_processing' => $acceptedTermsAndConditions,
             'marketing_emails' => $acceptedMarketingEmails,
-            'marketing_calls' => $acceptedMarketingEmails,
+            'marketing_calls' => true,
         );
 
         /** @var RegistrationRequest $request */
