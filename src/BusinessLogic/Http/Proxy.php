@@ -301,6 +301,10 @@ class Proxy
 
         $shippingDetails = ShippingServiceDetails::fromBatch($body);
 
+        if (!$this->configService->dropOffShippingServicesSupported()) {
+            return $this->getShippingServicesDeliveryDetailsWithoutDropOffServices($shippingDetails, $params);
+        }
+
         foreach ($shippingDetails as $shippingDetail) {
             $shippingDetail->departureCountry = $params->fromCountry;
             $shippingDetail->destinationCountry = $params->toCountry;
@@ -438,6 +442,29 @@ class Proxy
         } catch (HttpBaseException $e) {
             Logger::logWarning('Could not send analytics data. Exception: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * @param $shippingDetails
+     * @param $params
+     * @return array
+     */
+    protected function getShippingServicesDeliveryDetailsWithoutDropOffServices($shippingDetails, $params)
+    {
+        $newShippingDetails = array();
+
+        foreach ($shippingDetails as $shippingDetail) {
+            if ($shippingDetail->destinationDropOff) {
+                continue;
+            } else {
+                $shippingDetail->departureCountry = $params->fromCountry;
+                $shippingDetail->destinationCountry = $params->toCountry;
+                $shippingDetail->national = $params->toCountry === $params->fromCountry;
+                $newShippingDetails[] = $shippingDetail;
+            }
+        }
+
+        return $newShippingDetails;
     }
 
     /**
