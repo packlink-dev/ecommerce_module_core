@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [3.3.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.5...v3.3.6) - 2022-02-09
 ### Changed
-- Updated marketing calls flag to always be set to true when registering a new client.
+- Updated marketing calls flag to always be set to true when registering a new client through modules.
 
 ## [3.3.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.4...v3.3.5) - 2022-01-31
 ### Added
