@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.3.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.6...v3.3.7) - 2022-04-04
+### Changed
+- Fixed a frontend issue when adding/deleting pricing policies on the module edit service page.
+
 ## [3.3.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.5...v3.3.6) - 2022-02-09
 ### Changed
 - Updated marketing calls flag to always be set to true when registering a new client through modules.
