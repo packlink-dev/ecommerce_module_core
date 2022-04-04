@@ -54,6 +54,16 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     }
 
     /**
+     * Determines whether the drop-off shipping services are system supported.
+     *
+     * @return bool
+     */
+    public function dropOffShippingServicesSupported()
+    {
+        return true;
+    }
+
+    /**
      * Returns web-hook callback URL for current system.
      *
      * @return string Web-hook callback URL.
