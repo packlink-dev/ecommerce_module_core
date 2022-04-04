@@ -337,10 +337,14 @@ if (!window.Packlink) {
             }
 
             if (validationService.validateForm(form, excludedElementNames) && validateMiconfiguredPolicies()) {
-                let pricingPolicies = [];
-                for (let systemId in pricePolicyControllers) {
-                    if (pricePolicyControllers.hasOwnProperty(systemId)) {
-                        pricingPolicies = pricingPolicies.concat(pricePolicyControllers[systemId].getSystemPricingPolicies());
+                let pricingPolicies = [],
+                    pricingPoliciesEnabled = document.querySelector('.pl-switch .pl-switch-button.pl-selected .pl-switch-on');
+
+                if (pricingPoliciesEnabled) {
+                    for (let systemId in pricePolicyControllers) {
+                        if (pricePolicyControllers.hasOwnProperty(systemId)) {
+                            pricingPolicies = pricingPolicies.concat(pricePolicyControllers[systemId].getSystemPricingPolicies());
+                        }
                     }
                 }
 
