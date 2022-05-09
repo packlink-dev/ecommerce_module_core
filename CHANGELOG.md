@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [3.3.8](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.7...v3.3.8) - 2022-05-09
 ### Added
-- Added carrier logo for Colis Prive and Shop2Shop shipping services.
+- Added carrier logos for Colis Prive and Shop2Shop shipping services.
 
 ## [3.3.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.6...v3.3.7) - 2022-04-04
 ### Changed
