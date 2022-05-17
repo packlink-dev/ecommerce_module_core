@@ -110,6 +110,36 @@ class AsyncBatchStarter implements Runnable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->batchSize = $data['batchSize'];
+        $this->addIndex = $data['addIndex'];
+
+        $runners = array();
+        $subBatches = array();
+        foreach ($data['runners'] as $runner) {
+            $runners[] = Serializer::unserialize($runner);
+        }
+
+        foreach ($data['subBatches'] as $subBatch) {
+            $subBatches[] = Serializer::unserialize($subBatch);
+        }
+
+        $this->runners = $runners;
+        $this->subBatches = $subBatches;
+    }
+
+    /**
      * AsyncBatchStarter constructor.
      *
      * @param int $batchSize

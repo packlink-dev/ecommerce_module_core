@@ -114,6 +114,25 @@ class UpdateShipmentDataTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->progress = $data['progress'];
+        $this->progressStep = $data['progress_step'];
+        $this->references = $data['references'];
+        $this->orderStatuses = $data['order_statuses'];
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()

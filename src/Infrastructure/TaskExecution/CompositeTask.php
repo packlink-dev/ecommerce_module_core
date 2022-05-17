@@ -107,6 +107,33 @@ abstract class CompositeTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->initialProgress = $data['initial_progress'];
+        $this->taskProgressMap = $data['task_progress_map'];
+        $this->tasksProgressShare = $data['tasks_progress_share'];
+
+        $tasks = array();
+        foreach ($data['tasks'] as $task) {
+            $tasks[] = Serializer::serialize($task);
+        }
+
+        $this->tasks = $tasks;
+
+        $this->registerSubTasksEvents();
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()

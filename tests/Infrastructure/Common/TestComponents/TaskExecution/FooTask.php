@@ -59,6 +59,24 @@ class FooTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->dependency1 = $data['dependency_1'];
+        $this->dependency2 = $data['dependency_2'];
+        $this->methodsCallCount = $data['method_call_count'];
+    }
+
+    /**
      * String representation of object
      *
      * @return string the string representation of the object or null

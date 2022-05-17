@@ -54,6 +54,22 @@ class AutoTestTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->data = $data['data'];
+    }
+
+    /**
      * String representation of object.
      *
      * @return string The string representation of the object or null.

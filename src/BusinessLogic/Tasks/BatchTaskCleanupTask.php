@@ -88,6 +88,23 @@ class BatchTaskCleanupTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->taskStatuses = $data['taskStatuses'];
+        $this->taskTypes = $data['taskTypes'];
+    }
+
+    /**
      * Executes the task.
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException

@@ -20,7 +20,7 @@ class JsonSerializer extends Serializer
      */
     protected function doSerialize($data)
     {
-        if (!method_exists($data, 'toArray')) {
+        if (!in_array(gettype($data), ['object', 'string'], true) || !method_exists($data, 'toArray')) {
             if ($data instanceof \stdClass) {
                 $data->className = get_class($data);
             }

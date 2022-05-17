@@ -81,6 +81,22 @@ class SendDraftTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->orderId = $data['order_id'];
+    }
+
+    /**
      * String representation of object
      *
      * @return string the string representation of the object or null

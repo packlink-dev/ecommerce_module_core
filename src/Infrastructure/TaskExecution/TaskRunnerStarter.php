@@ -79,6 +79,22 @@ class TaskRunnerStarter implements Runnable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->guid = $data['guid'];
+    }
+
+    /**
      * String representation of object.
      *
      * @inheritdoc
