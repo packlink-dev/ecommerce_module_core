@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased changes
+## [3.3.8](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.7...v3.3.8) - 2022-05-09
 ### Added
-- Added __serialize() and __unserialize() methods to Serializable interface in order to add compatibility with PHP8.1.
-- Implemented __serialize() and __unserialize() methods in all classes that implement Serializable interface.
+- Added carrier logos for Colis Prive and Shop2Shop shipping services.
+
+## [3.3.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.6...v3.3.7) - 2022-04-04
+### Changed
+- Fixed a frontend issue when adding/deleting pricing policies on the module edit service page.
 
 ## [3.3.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.5...v3.3.6) - 2022-02-09
 ### Changed
