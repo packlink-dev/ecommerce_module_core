@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased changes
+### Added
+- Added __serialize() and __unserialize() methods to Serializable interface in order to add compatibility with PHP8.1.
+- Implemented __serialize() and __unserialize() methods in all classes that implement Serializable interface.
+
 ## [3.3.8](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.7...v3.3.8) - 2022-05-09
 ### Added
 - Added carrier logos for Colis Prive and Shop2Shop shipping services.
