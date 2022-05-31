@@ -25,4 +25,16 @@ interface Serializable extends \Serializable
      * @return array Array representation of a serializable object.
      */
     public function toArray();
+
+    /**
+     * @return array
+     */
+    public function __serialize();
+
+    /**
+     * @param array $data
+     *
+     * @return void
+     */
+    public function __unserialize($data);
 }

@@ -89,6 +89,24 @@ class TaskCleanupTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->taskType = $data['task_type'];
+        $this->taskStatuses = $data['task_statuses'];
+        $this->taskAge = $data['task_age'];
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()

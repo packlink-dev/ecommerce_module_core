@@ -51,6 +51,21 @@ class UpdateShippingServicesTask extends Task
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+    }
+
+    /**
      * Gets all local methods and remote services and synchronizes data.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException

@@ -32,4 +32,19 @@ class AbortTask extends Task
     {
         return array();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+    }
 }

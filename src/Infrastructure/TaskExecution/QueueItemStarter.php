@@ -68,6 +68,22 @@ class QueueItemStarter implements Runnable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->queueItemId = $data['queue_item_id'];
+    }
+
+    /**
      * @inheritdoc
      */
     public function serialize()

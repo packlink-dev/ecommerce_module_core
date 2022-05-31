@@ -60,6 +60,23 @@ class FakeRunnable implements Runnable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function __serialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize($data)
+    {
+        $this->testProperty = $data['testProperty'];
+        $this->callHistory = $data['callHistory'];
+    }
+
+    /**
      * Starts runnable run logic.
      */
     public function run()
