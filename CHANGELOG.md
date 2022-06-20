@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased changes
+### Changed
+- In FrontDtoValidationException constructor, fourth parameter type changed from object to \Exception.
+
 ## [3.3.9](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.8...v3.3.9) - 2022-05-30
 ### Added
 - Added `__serialize` and `__unserialize` methods to `Serializable` interface in order to add compatibility with PHP8.1.
