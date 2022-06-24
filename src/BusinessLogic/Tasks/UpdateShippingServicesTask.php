@@ -172,7 +172,14 @@ class UpdateShippingServicesTask extends Task
         }
 
         $this->reportProgress(80);
+        $this->reportProgress(80);
+        $batch = 0;
         foreach ($apiServices as $service) {
+            $batch++;
+            if ($batch === 20) {
+                $this->reportAlive();
+                $batch = 0;
+            }
             $this->getShippingMethodService()->add($service);
         }
     }
