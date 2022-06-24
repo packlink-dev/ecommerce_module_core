@@ -170,8 +170,7 @@ class UpdateShippingServicesTask extends Task
             $progress += $progressStep;
             $this->reportProgress($progress);
         }
-
-        $this->reportProgress(80);
+        
         $this->reportProgress(80);
         $batch = 0;
         foreach ($apiServices as $service) {
