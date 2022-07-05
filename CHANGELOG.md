@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased changes
 ## [3.3.10](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.9...v3.3.10) - 2022-06-27
+### Changed
 - In `FrontDtoValidationException` constructor, fourth parameter type changed from object to `\Exception`.
 - Added keep alive mechanism in `UpdateShippingServicesTask` in case there are too many shipping services that need to be synchronized.
 
