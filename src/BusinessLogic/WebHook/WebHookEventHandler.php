@@ -36,6 +36,7 @@ class WebHookEventHandler extends BaseService
         'shipment.label.fail',
         'shipment.tracking.update',
         'shipment.delivered',
+        'shipment.carrier.delivered',
     );
 
     /**
@@ -145,7 +146,13 @@ class WebHookEventHandler extends BaseService
     {
         return in_array(
             $eventName,
-            array('shipment.carrier.success', 'shipment.delivered', 'shipment.label.ready', 'shipment.tracking.update'),
+            array(
+                'shipment.carrier.success',
+                'shipment.delivered',
+                'shipment.carrier.delivered',
+                'shipment.label.ready',
+                'shipment.tracking.update'
+            ),
             true
         );
     }
