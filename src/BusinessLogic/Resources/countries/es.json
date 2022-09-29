@@ -26,7 +26,7 @@
     "invalidEmail": "El campo debe ser un correo electrónico válido.",
     "shortPassword": "La contraseña debe contener %s caracteres como mínimo.",
     "invalidPhone": "Este campo deber ser un número de teléfono válido.",
-    "maxLength": "Este campo no puede tener más de % caracteres.",
+    "maxLength": "Este campo no puede tener más de %s caracteres.",
     "numeric": "Debe ser un valor numérico.",
     "greaterThanZero": "El valor debe ser mayor que 0.",
     "nonNegative": "Field cannot have a negative value.",

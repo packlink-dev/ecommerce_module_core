@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased changes
+
+## [3.3.11](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.10...v3.3.11) - 2022-09-26
+### Added
+- Added 'shipment.carrier.delivered' event to the list of valid events that are handled by webhook handler.
+
 ## [3.3.10](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.9...v3.3.10) - 2022-06-27
+### Changed
 - In `FrontDtoValidationException` constructor, fourth parameter type changed from object to `\Exception`.
 - Added keep alive mechanism in `UpdateShippingServicesTask` in case there are too many shipping services that need to be synchronized.
 
