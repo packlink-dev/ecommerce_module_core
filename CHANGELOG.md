@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased changes
 
+## [3.3.12](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.11...v3.3.12) - 2023-01-31
+### Changed
+- In `DtoValidator` email is now trimmed before validation.
+- Changed Chrome version to latest in curl user agent.
+
 ## [3.3.11](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.10...v3.3.11) - 2022-09-26
 ### Added
 - Added 'shipment.carrier.delivered' event to the list of valid events that are handled by webhook handler.
