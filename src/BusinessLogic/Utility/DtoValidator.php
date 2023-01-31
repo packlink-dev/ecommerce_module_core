@@ -18,7 +18,7 @@ class DtoValidator
      */
     public static function isEmailValid($email)
     {
-        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+        return filter_var(trim($email), FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
