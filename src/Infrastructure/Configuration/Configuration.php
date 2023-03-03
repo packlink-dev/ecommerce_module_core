@@ -553,6 +553,7 @@ abstract class Configuration extends Singleton
             /** @noinspection PhpUnhandledExceptionInspection */
             $filter->where('systemId', '=', $this->getCurrentSystemId());
         }
+        $filter->orderBy('id');
 
         /** @var ConfigEntity $config */
         $config = $this->getRepository()->selectOne($filter);
