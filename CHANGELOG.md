@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased changes
 
+## [3.3.14](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.13...v3.3.14) - 2023-05-09
+### Changed
+- Fixed shipment url opened when 'View on Packlink' button is clicked on order
+
 ## [3.3.13](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.12...v3.3.13) - 2023-03-08
 ### Added
 - Explicitly added order by id to the get config entity query for compatibility with Percona database
