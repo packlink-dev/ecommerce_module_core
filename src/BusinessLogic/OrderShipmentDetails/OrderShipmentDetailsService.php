@@ -283,6 +283,6 @@ class OrderShipmentDetailsService extends BaseService
         /** @var CountryService $countryService */
         $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
 
-        return $countryService->getLabel(strtolower($countryCode), 'orderListAndDetails.shipmentUrl') . $reference;
+        return $countryService->getLabel(strtolower($countryCode), 'orderListAndDetails.shipmentUrl') . 'all?q=' . $reference;
     }
 }
