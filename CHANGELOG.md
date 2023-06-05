@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased changes
+### Changed
+- Update link to order draft on Packlink
 
-## [3.3.14](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.13...v3.3.14) - 2023-06-05
+## [3.3.14](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.13...v3.3.14) - 2023-05-09
 ### Changed
 - Fixed shipment url opened when 'View on Packlink' button is clicked on order
 
