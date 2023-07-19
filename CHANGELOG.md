@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.3.16](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.15...v3.3.16) - 2023-07-17
+### Changed
+- Modify regular expression pattern for phone validation to support invisible characters
+
 ## [3.3.15](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.14...v3.3.15) - 2023-06-05
 ### Changed
 - Update link to order draft on Packlink
