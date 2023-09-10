@@ -524,7 +524,7 @@ class ShippingCostCalculator
      */
     private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice, $systemId)
     {
-        if ($policy->systemId !== $systemId) {
+        if ((string)$policy->systemId !== $systemId) {
             return false;
         }
 
