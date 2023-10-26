@@ -110,7 +110,9 @@ class ShippingCostCalculator
                 $response,
                 $package->weight,
                 $totalPrice,
-                $systemId
+                $systemId,
+                $fromCountry,
+                $toCountry
             );
         } catch (HttpBaseException $e) {
             // Fallback when API is not available.
@@ -295,7 +297,9 @@ class ShippingCostCalculator
         array $shippingServices,
         $totalWeight,
         $totalPrice,
-        $systemId
+        $systemId,
+        $fromCountry,
+        $toCountry
     ) {
         $shippingCosts = array();
 
@@ -309,8 +313,8 @@ class ShippingCostCalculator
                     $systemId,
                     $service->id,
                     $service->basePrice,
-                    '',
-                    ''
+                    $fromCountry,
+                    $toCountry
                 );
 
                 if ($baseCost !== false) {
@@ -359,8 +363,8 @@ class ShippingCostCalculator
         // porting to array_reduce would increase complexity of the code because inner function will need a lot of
         // parameters
         foreach ($shippingMethod->getShippingServices() as $methodService) {
-            if (($serviceId !== 0 && $methodService->serviceId === $serviceId)
-                || ($methodService->departureCountry === $fromCountry
+            if (($serviceId === 0 || $methodService->serviceId === $serviceId)
+                && ($methodService->departureCountry === $fromCountry
                     && $methodService->destinationCountry === $toCountry)
             ) {
                 $baseCost = self::getCostForShippingService(
@@ -524,7 +528,7 @@ class ShippingCostCalculator
      */
     private static function canPolicyBeApplied(ShippingPricePolicy $policy, $totalWeight, $totalPrice, $systemId)
     {
-        if ((string)$policy->systemId !== $systemId) {
+        if ((string)$policy->systemId != $systemId) {
             return false;
         }
 
