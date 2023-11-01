@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.3.18](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.17...v3.3.18) - 2023-11-01
+### Changed
+- Fixed issue with shipping polices
+
 ## [3.3.17](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.16...v3.3.17) - 2023-09-13
 ### Changed
 - Fixed issue with shipping polices
