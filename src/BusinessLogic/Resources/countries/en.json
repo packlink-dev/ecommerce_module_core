@@ -71,10 +71,14 @@
     "CZ": "Czech Republic",
     "SE": "Sweden",
     "GP": "Guadeloupe",
-    "GF": "Guiana",
+    "GF": "French Guiana",
     "MQ": "Martinique",
     "RE": "La Réunion",
-    "YT": "Mayotte"
+    "YT": "Mayotte",
+    "BG": "Bulgaria",
+    "GR": "Greece",
+    "AU": "Australia",
+    "FI": "Finland"
   },
   "register": {
     "logIn": "Log in",

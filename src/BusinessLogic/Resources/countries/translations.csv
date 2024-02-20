@@ -85,11 +85,15 @@ countries,MX,Mexico,México,Mexiko,Mexique,Messico
 countries,CL,Chile,Chile,Chile,Chili,Chile
 countries,CZ,Czech Republic,Republica checa,Tschechien,République Tchèque,Repubblica Ceca
 countries,SE,Sweden,Suecia,Schweden,Suède,Svezia
-countries,GP,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe
-countries,GF,Guiana,Guiana,Guiana,Guiana,Guiana
-countries,MQ,Martinique,Martinique,Martinique,Martinique,Martinique
-countries,RE,La Réunion,La Réunion,La Réunion,La Réunion,La Réunion
+countries,GP,Guadeloupe,Guadalupe,Guadeloupe,Guadeloupe,Guadalupa
+countries,GF,French Guiana,Guayana Francesa,Französisch-Guayana,Guyane française,Guyana francese
+countries,MQ,Martinique,Martinica,Martinique,Martinique,Martinica
+countries,RE,La Réunion,La Reunión,La Réunion,La Réunion,La Riunione
 countries,YT,Mayotte,Mayotte,Mayotte,Mayotte,Mayotte
+countries,BG,Bulgaria,Bulgaria,Bulgarien,Bulgarie,Bulgaria
+countries,GR,Greece,Grecia,Griechenland,Grèce,Grecia
+countries,AU,Australia,Australia,Australien,Australie,Australia
+countries,FI,Finland,Finlandia,Finnland,Finlande,Finlandia
 onboardingWelcome,header,Let's set up basic information so that<br>you can make shipments,Vamos a configurar tu información básica <br> para poder hacer envíos,"Richten Sie nun die grundlegenden Informationen ein, damit<br>Sie Versendungen vornehmen können",Configurez vos informations de base afin<br>d’effectuer des envois,È necessario impostare alcuni dati di base così che<br>potrai effettuare spedizioni
 onboardingWelcome,steps,It's just two steps that we need to go through to offer you the<br>carrier that best suits your needs,"Son solo dos pasos, los necesitamos para ofrecerte los servicios <br> de transporte que más se adaptan a tus necesidades.","In nur zwei Schritten können wir Ihnen den <br>Spediteur anbieten, der all Ihre Anforderungen erfüllt",Il ne vous reste que deux étapes pour savoir quel<br>transporteur répond le mieux à vos besoins,Si tratta di due semplici passaggi che dobbiamo completare per offrirti la<br>compagnia di trasporto che più si adatta alle tue esigenze
 onboardingWelcome,stepOne,Set parcel details,Configurar los detalles del paquete,Paketangaben einfügen,Configurez les informations sur le colis,Imposta i dettagli del pacco
