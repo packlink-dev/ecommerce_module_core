@@ -78,7 +78,8 @@
     "BG": "Bulgarie",
     "GR": "Grèce",
     "AU": "Australie",
-    "FI": "Finlande"
+    "FI": "Finlande",
+    "EE": "Estonie"
   },
   "register": {
     "logIn": "Se connecter",
