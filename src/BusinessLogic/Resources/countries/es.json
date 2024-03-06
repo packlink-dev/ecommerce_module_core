@@ -79,7 +79,9 @@
     "GR": "Grecia",
     "AU": "Australia",
     "FI": "Finlandia",
-    "EE": "Estonia"
+    "EE": "Estonia",
+    "RO": "Rumania",
+    "LV": "Letonia"
   },
   "register": {
     "logIn": "Iniciar sesión",
