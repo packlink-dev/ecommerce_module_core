@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.3.20](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.19...v3.3.20) - 2024-04-03
+### Changed
+– Add unsupported countries Estonia, Latvia and Romania
+
+## [3.3.19](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.18...v3.3.19) - 2024-24-02
+### Changed
+– Add unsupported countries (Bulgaria, Finland, Greece, Australia)
+– Add French overseas territories
+
 ## [3.3.18](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.17...v3.3.18) - 2023-11-01
 ### Changed
 - Fixed issue with shipping polices

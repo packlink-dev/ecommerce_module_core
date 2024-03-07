@@ -297,6 +297,9 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
                 new HttpResponse(200, array(), '[]'),
                 new HttpResponse(200, array(), '[]'),
                 new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
+                new HttpResponse(200, array(), '[]'),
             )
         );
 
@@ -372,7 +375,10 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
             new HttpResponse(200, array(), '[]'),
             new HttpResponse(200, array(), '[]'),
             new HttpResponse(200, array(), '[]'),
-            new HttpResponse(200, array(), '[]')
+            new HttpResponse(200, array(), '[]'),
+            new HttpResponse(200, array(), '[]'),
+            new HttpResponse(200, array(), '[]'),
+            new HttpResponse(200, array(), '[]'),
         );
     }
 
