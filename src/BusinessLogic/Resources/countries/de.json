@@ -69,7 +69,19 @@
     "MX": "Mexiko",
     "CL": "Chile",
     "CZ": "Tschechien",
-    "SE": "Schweden"
+    "SE": "Schweden",
+    "GP": "Guadeloupe",
+    "GF": "Französisch-Guayana",
+    "MQ": "Martinique",
+    "RE": "La Réunion",
+    "YT": "Mayotte",
+    "BG": "Bulgarien",
+    "GR": "Griechenland",
+    "AU": "Australien",
+    "FI": "Finnland",
+    "EE": "Estland",
+    "RO": "Rumänien",
+    "LV": "Lettland"
   },
   "register": {
     "logIn": "Einloggen",

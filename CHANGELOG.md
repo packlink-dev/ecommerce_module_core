@@ -3,7 +3,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased changes
+## [3.3.20](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.19...v3.3.20) - 2024-04-03
+### Changed
+– Add unsupported countries Estonia, Latvia and Romania
+
+## [3.3.19](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.18...v3.3.19) - 2024-24-02
+### Changed
+– Add unsupported countries (Bulgaria, Finland, Greece, Australia)
+– Add French overseas territories
+
+## [3.3.18](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.17...v3.3.18) - 2023-11-01
+### Changed
+- Fixed issue with shipping polices
+
+## [3.3.17](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.16...v3.3.17) - 2023-09-13
+### Changed
+- Fixed issue with shipping polices
+
+## [3.3.16](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.15...v3.3.16) - 2023-07-17
+### Changed
+- Modify regular expression pattern for phone validation to support invisible characters
+
+## [3.3.15](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.14...v3.3.15) - 2023-06-05
+### Changed
+- Update link to order draft on Packlink
+
+## [3.3.14](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.13...v3.3.14) - 2023-05-09
+### Changed
+- Fixed shipment url opened when 'View on Packlink' button is clicked on order
 
 ## [3.3.13](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.12...v3.3.13) - 2023-03-08
 ### Added
