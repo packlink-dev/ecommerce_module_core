@@ -81,7 +81,8 @@
     "FI": "Finlande",
     "EE": "Estonie",
     "RO": "Roumanie",
-    "LV": "Lettonie"
+    "LV": "Lettonie",
+    "DK": "Danemark"
   },
   "register": {
     "logIn": "Se connecter",

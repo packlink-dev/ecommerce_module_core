@@ -81,7 +81,8 @@
     "FI": "Finland",
     "EE": "Estonia",
     "RO": "Romania",
-    "LV": "Latvia"
+    "LV": "Latvia",
+    "DK": "Denmark"
   },
   "register": {
     "logIn": "Log in",
