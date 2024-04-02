@@ -18,6 +18,7 @@
     width: 100%;
     display: flex;
     background-color: white;
+    min-height: 350px;
 }
 
 .lp-locations {
