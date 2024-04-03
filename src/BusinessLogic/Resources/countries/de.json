@@ -82,7 +82,10 @@
     "EE": "Estland",
     "RO": "Rumänien",
     "LV": "Lettland",
-    "DK": "Dänemark"
+    "DK": "Dänemark",
+    "NO": "Norwegen",
+    "SA": "Saudi-Arabien",
+    "CA": "Kanada"
   },
   "register": {
     "logIn": "Einloggen",
