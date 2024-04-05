@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [3.3.21](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.20...v3.3.21) - 2024-02-04
 ### Changed
-- Add unsupported countries Denmark, Norway, Saudi Arabia and Canada
+- Add unsupported countries Denmark, Norway and Canada
 - Add min-height property to lp-content class
 
 ## [3.3.20](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.19...v3.3.20) - 2024-04-03
