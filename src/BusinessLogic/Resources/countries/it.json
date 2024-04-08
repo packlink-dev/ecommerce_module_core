@@ -84,7 +84,10 @@
     "LV": "Lettonia",
     "DK": "Danimarca",
     "NO": "Norvegia",
-    "CA": "Canada"
+    "CA": "Canada",
+    "CY": "Cipro",
+    "SI": "Slovenia",
+    "SK": "Slovacchia"
   },
   "register": {
     "logIn": "Accedi",
