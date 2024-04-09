@@ -145,6 +145,7 @@ echo $lang ?>">
 <script src="./resources/js/ConfigurationController.js"></script>
 <script src="./resources/js/SystemInfoController.js"></script>
 <script src="./resources/js/OrderStatusMappingController.js"></script>
+<script src="./resources/js/CustomsController.js"></script>
 
 <script src="./resources/js/MyShippingServicesController.js"></script>
 <script src="./resources/js/PickShippingServiceController.js"></script>
@@ -205,6 +206,12 @@ echo $lang ?>">
                 'order-status-mapping': {
                     getMappingAndStatusesUrl: "<?php getUrl('OrderStatusMapping', 'getMappingAndStatuses') ?>",
                     setUrl: "<?php getUrl('OrderStatusMapping', 'setMappings') ?>"
+                },
+                "customs": {
+                    getUrl: "<?php getUrl('Customs', 'getData') ?>",
+                    getSupportedCountriesUrl: "<?php getUrl('Customs', 'getAllCountries') ?>",
+                    getCustomData: "<?php getUrl('Customs', 'getCustomData') ?>",
+                    submitUrl: "<?php getUrl('Customs', 'save') ?>"
                 },
                 'my-shipping-services': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
@@ -282,6 +289,12 @@ echo $lang ?>">
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'templates/order-status-mapping.html')
                             ) ?>,
+                            'pl-header-section': ''
+                        },
+                        'pl-customs-page': {
+                            'pl-main-page-holder': <?php echo json_encode(
+                                file_get_contents($baseResourcesPath . 'templates/customs.html')
+                            )?>,
                             'pl-header-section': ''
                         },
                         'pl-system-info-modal': <?php echo json_encode(
