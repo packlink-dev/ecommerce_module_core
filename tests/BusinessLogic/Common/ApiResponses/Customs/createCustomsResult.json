@@ -1,0 +1,55 @@
+{
+  "invoice_number": "987654321",
+  "sender": {
+    "user_type": "PRIVATE_PERSON",
+    "full_name": "Juan Pedro Gomez Gomez",
+    "tax_id": "Y1234567N",
+    "company_name": "Dunder Mifflin",
+    "vat_number": "ATU99999999",
+    "eori_number": "GB123456789000",
+    "address": "San Cosme y San Damian, 20, 3ºD",
+    "postal_code": "28012",
+    "city": "Madrid",
+    "country": "Spain",
+    "phone_number": "+34 666 123456"
+  },
+  "receiver": {
+    "user_type": "PRIVATE_PERSON",
+    "full_name": "Juan Pedro Gomez Gomez",
+    "tax_id": "Y1234567N",
+    "company_name": "Dunder Mifflin",
+    "vat_number": "ATU99999999",
+    "eori_number": "GB123456789000",
+    "address": "San Cosme y San Damian, 20, 3ºD",
+    "postal_code": "28012",
+    "city": "Madrid",
+    "country": "Spain",
+    "phone_number": "+34 666 123456"
+  },
+  "inventory_of_contents": [
+    {
+      "tariff_number": "01012990",
+      "description": "Live horse, thoroughbred",
+      "country_of_origin": "ES",
+      "item_value": {
+        "currency": "EUR",
+        "value": 1000
+      },
+      "item_weight": 15.4,
+      "quantity": 1
+    }
+  ],
+  "reason_for_export": "PURCHASE_OR_SALE",
+  "shipment_details": {
+    "parcels_size": 1,
+    "parcels_weight": 0.01,
+    "cost": {
+      "currency": "EUR",
+      "value": 1000
+    }
+  },
+  "signature": {
+    "full_name": "Juan Pedro Gomez Gomez",
+    "city": "Madrid"
+  }
+}

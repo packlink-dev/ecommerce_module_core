@@ -9,12 +9,17 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Customs\MockCustomsMappingService;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Customs\CustomsMapping;
+use Packlink\BusinessLogic\Customs\CustomsMappingService;
+use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -114,9 +119,35 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
+        TestServiceRegister::registerService(
+            CustomsService::CLASS_NAME,
+            function () {
+                return new CustomsService();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            CustomsMappingService::CLASS_NAME,
+            function () {
+                return new MockCustomsMappingService();
+            }
+        );
+
+
+        TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
+
         $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
+        $mapping = new CustomsMapping();
+        $mapping->defaultReason = 'PURCHASE_OR_SALE';
+        $mapping->defaultSenderTaxId = '123';
+        $mapping->defaultReceiverUserType = 'PRIVATE_PERSON';
+        $mapping->defaultReceiverTaxId = '123';
+        $mapping->defaultTariffNumber = '';
+        $mapping->defaultCountry = 'FR';
+        $mapping->mappingReceiverTaxId = 'tax_1';
+        $this->shopConfig->setCustomsMappings($mapping);
     }
 
     /**
@@ -140,7 +171,36 @@ class SendDraftTaskTest extends BaseSyncTest
      */
     public function testExecute()
     {
-        $this->httpClient->setMockResponses($this->getMockResponses());
+        TestServiceRegister::registerService(
+            ShopOrderService::CLASS_NAME,
+            function () {
+                return new TestShopOrderService();
+            }
+        );
+
+        $responses = array_merge(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/searchResult.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+                ),
+            ),
+            $this->getMockResponses(),
+            array(
+                new HttpResponse(
+                    200, array(), '{}'
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/downloadUrl.json')
+                )
+            )
+        );
+        $this->httpClient->setMockResponses($responses);
         $this->syncTask->execute();
 
         /** @var OrderShipmentDetailsService $shopOrderService */
@@ -153,7 +213,9 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals('€', CurrencySymbolService::getCurrencySymbol($shipmentDetails->getCurrency()));
         $this->assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus($shipmentDetails->getStatus()));
         // there should be an info message that draft is created.
-        $this->assertCount(2, $this->shopLogger->loggedMessages);
+        $this->assertCount(1, $this->shopLogger->loggedMessages);
+        $this->assertEquals('string', $shipmentDetails->getCustomsInvoiceDownloadUrl());
+        $this->assertEquals('987654321', $shipmentDetails->getCustomsInvoiceId());
 
         /** @var OrderSendDraftTaskMapService $taskMapService */
         $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
@@ -162,12 +224,56 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertNotEmpty($taskMap->getOrderId(), 'Order ID should be set to the order task map.');
     }
 
+    public function testExecuteNotInternational()
+    {
+        TestServiceRegister::registerService(
+            ShopOrderService::CLASS_NAME,
+            function () {
+                return new TestShopOrderService();
+            }
+        );
+        $responses = array_merge(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/emptySearchResult.json')
+                )
+            ),
+            $this->getMockResponses(),
+            array(
+                new HttpResponse(
+                    200, array(), '{}'
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/downloadUrl.json')
+                )
+            )
+        );
+        $this->httpClient->setMockResponses($responses);
+        $this->syncTask->execute();
+
+        /** @var OrderShipmentDetailsService $shopOrderService */
+        $shopOrderService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+        $shipmentDetails = $shopOrderService->getDetailsByOrderId('test');
+        $this->assertEmpty($shipmentDetails->getCustomsInvoiceDownloadUrl());
+        $this->assertEmpty($shipmentDetails->getCustomsInvoiceId());
+    }
+
     /**
      * @expectedException \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      */
     public function testExecuteBadResponse()
     {
-        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '{}')));
+        $this->httpClient->setMockResponses(array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/searchResult.json')
+            ),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
+            ),
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+            ),
+            new HttpResponse(200, array(), '{}')));
         $this->syncTask->execute();
     }
 
@@ -176,7 +282,30 @@ class SendDraftTaskTest extends BaseSyncTest
      */
     public function testDraftAlreadyCreated()
     {
-        $this->httpClient->setMockResponses($this->getMockResponses());
+        $this->httpClient->setMockResponses(
+            array_merge(
+                array(
+                    new HttpResponse(
+                        200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/searchResult.json')
+                    ),
+                    new HttpResponse(
+                        200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
+                    ),
+                    new HttpResponse(
+                        200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+                    ),
+                ),
+                $this->getMockResponses(),
+                array(
+                    new HttpResponse(
+                        200, array(), '{}'
+                    ),
+                    new HttpResponse(
+                        200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/downloadUrl.json')
+                    )
+                )
+            )
+        );
         $this->syncTask->execute();
         // reset messages
         $this->shopLogger->loggedMessages = array();
