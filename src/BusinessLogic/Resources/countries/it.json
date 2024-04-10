@@ -81,7 +81,14 @@
     "FI": "Finlandia",
     "EE": "Estonia",
     "RO": "Romania",
-    "LV": "Lettonia"
+    "LV": "Lettonia",
+    "DK": "Danimarca",
+    "NO": "Norvegia",
+    "SA": "Arabia Saudita",
+    "CA": "Canada",
+    "CY": "Cipro",
+    "SI": "Slovenia",
+    "SK": "Slovacchia"
   },
   "register": {
     "logIn": "Accedi",
