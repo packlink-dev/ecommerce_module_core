@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Http;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
@@ -13,6 +14,8 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
+use Packlink\BusinessLogic\Http\DTO\Customs\CustomsInvoice;
+use Packlink\BusinessLogic\Http\DTO\Customs\CustomsUnionsSearchRequest;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\LocationInfo;
@@ -77,7 +80,7 @@ class Proxy
      * @return ParcelInfo[] Array of parcels information.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @noinspection PhpDocMissingThrowsInspection
      */
@@ -97,7 +100,7 @@ class Proxy
      * @return Warehouse[] Array of warehouses.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @noinspection PhpDocMissingThrowsInspection
      */
@@ -119,7 +122,7 @@ class Proxy
      * @return string Authorization token of the new account if it was created.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function register($data)
@@ -142,7 +145,7 @@ class Proxy
      * @return User User info.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getUserData()
@@ -158,7 +161,7 @@ class Proxy
      * @param string $webHookUrl Web-hook URL.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function registerWebHookHandler($webHookUrl)
@@ -176,7 +179,7 @@ class Proxy
      * @return DropOff[] List of all drop off locations near given postal code.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getLocations($serviceId, $countryCode, $postalCode)
@@ -196,7 +199,7 @@ class Proxy
      * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function searchLocations($platformCountry, $postalZone, $query)
@@ -225,7 +228,7 @@ class Proxy
      *
      * @return PostalCode[] PostalCode DTO.
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getPostalCodes($countryCode, $zipCode)
@@ -244,7 +247,7 @@ class Proxy
      * @return \Packlink\BusinessLogic\Http\DTO\PostalZone[]
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getPostalZones($countryCode, $lang = 'en')
@@ -282,7 +285,7 @@ class Proxy
      * @return ShippingServiceDetails[] Found services with details.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getShippingServicesDeliveryDetails(ShippingServiceSearch $params)
@@ -322,7 +325,7 @@ class Proxy
      * @return ShippingService Shipping service.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getShippingServiceDetails($id)
@@ -340,7 +343,7 @@ class Proxy
      * @return string Shipment reference for uploaded draft.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
      */
@@ -377,7 +380,7 @@ class Proxy
      * @return Shipment|null Shipment DTO if it exists for given reference number; otherwise, null.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getShipment($referenceId)
@@ -395,7 +398,7 @@ class Proxy
      * @return string[] Array of shipment labels.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getLabels($referenceId)
@@ -413,7 +416,7 @@ class Proxy
      * @return Tracking[] Tracking DTO.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     public function getTrackingInfo($referenceId)
@@ -442,6 +445,63 @@ class Proxy
         } catch (HttpBaseException $e) {
             Logger::logWarning('Could not send analytics data. Exception: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Search the known customs unions between two postal codes.
+     *
+     * @param CustomsUnionsSearchRequest $request
+     *
+     * @return array
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpRequestException
+     * @throws HttpCommunicationException
+     */
+    public function getCustomsByPostalCode(CustomsUnionsSearchRequest $request)
+    {
+        $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-unions/search-by-postal-code', $request->toArray())
+            ->decodeBodyToArray();
+
+        return isset($result['data']) ? $result['data'] : array();
+    }
+
+    /**
+     * Creates a new customs invoice.
+     *
+     * @param CustomsInvoice $customsInvoice
+     *
+     * @return string|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpRequestException
+     * @throws HttpCommunicationException
+     */
+    public function sendCustomsInvoice(CustomsInvoice $customsInvoice)
+    {
+        $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-invoices', $customsInvoice->toArray())
+            ->decodeBodyToArray();
+
+        return isset($result['invoice_number']) ? $result['invoice_number'] : null;
+    }
+
+    /**
+     * Retrieves customs invoice download url.
+     *
+     * @param $customsInvoiceId
+     *
+     * @return string
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function getCustomsInvoiceDownloadUrl($customsInvoiceId)
+    {
+        $result = $this->call(HttpClient::HTTP_METHOD_GET, "/customs-invoices/$customsInvoiceId/download")
+            ->decodeBodyToArray();
+
+        return isset($result['url']) ? $result['url'] : '';
     }
 
     /**
@@ -476,7 +536,7 @@ class Proxy
      * @return \Logeecom\Infrastructure\Http\HttpResponse|null Response if API returned it; NULL if 404.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     protected function getShipmentData($reference, $endpoint = '')
@@ -508,7 +568,7 @@ class Proxy
      * @return HttpResponse Response from request.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
     protected function call($method, $endpoint, array $body = array())

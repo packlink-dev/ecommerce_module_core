@@ -128,6 +128,18 @@ class Order
      * @var string
      */
     private $sellerUserId;
+    /**
+     * @var string
+     */
+    private $taxId = '';
+    /**
+     * @var string
+     */
+    private $vatNumber = '';
+    /**
+     * @var float
+     */
+    private $totalWeight = 0;
 
     /**
      * Returns order unique identifier.
@@ -527,5 +539,53 @@ class Order
     public function setSellerUserId($sellerUserId)
     {
         $this->sellerUserId = $sellerUserId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTaxId()
+    {
+        return $this->taxId;
+    }
+
+    /**
+     * @param string $taxId
+     */
+    public function setTaxId($taxId)
+    {
+        $this->taxId = $taxId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVatNumber()
+    {
+        return $this->vatNumber;
+    }
+
+    /**
+     * @param string $vatNumber
+     */
+    public function setVatNumber($vatNumber)
+    {
+        $this->vatNumber = $vatNumber;
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getTotalWeight()
+    {
+        return $this->totalWeight;
+    }
+
+    /**
+     * @param float|int $totalWeight
+     */
+    public function setTotalWeight($totalWeight)
+    {
+        $this->totalWeight = $totalWeight;
     }
 }

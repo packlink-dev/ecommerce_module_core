@@ -5,7 +5,7 @@ namespace Packlink\DemoUI\Controllers;
 use Packlink\BusinessLogic\Controllers\CustomsController as BaseCustomsController;
 use Packlink\BusinessLogic\Country\CountryCodes;
 use Packlink\DemoUI\Controllers\Models\Request;
-use Packlink\DemoUI\Services\BusinessLogic\CustomsService;
+use Packlink\DemoUI\Services\BusinessLogic\CustomsMappingService;
 
 class CustomsController extends BaseHttpController
 {
@@ -16,7 +16,7 @@ class CustomsController extends BaseHttpController
 
     public function __construct()
     {
-        $this->baseController = new BaseCustomsController(new CustomsService());
+        $this->baseController = new BaseCustomsController(new CustomsMappingService());
     }
 
     public function getData()

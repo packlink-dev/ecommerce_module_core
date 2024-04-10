@@ -3,71 +3,308 @@
 namespace Packlink\BusinessLogic\Customs;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
-use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
-use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\Http\DTO\Customs\Cost;
+use Packlink\BusinessLogic\Http\DTO\Customs\CustomsInvoice;
+use Packlink\BusinessLogic\Http\DTO\Customs\CustomsUnionsSearchRequest;
+use Packlink\BusinessLogic\Http\DTO\Customs\InventoryContent;
+use Packlink\BusinessLogic\Http\DTO\Customs\Money;
+use Packlink\BusinessLogic\Http\DTO\Customs\Receiver;
+use Packlink\BusinessLogic\Http\DTO\Customs\Sender;
+use Packlink\BusinessLogic\Http\DTO\Customs\ShipmentDetails;
+use Packlink\BusinessLogic\Http\DTO\Customs\Signature;
+use Packlink\BusinessLogic\Http\DTO\User;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
+use Packlink\BusinessLogic\Order\Objects\Order;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
  * Class CustomsService
  *
  * @package Packlink\BusinessLogic\Customs
  */
-abstract class CustomsService
+class CustomsService
 {
     /**
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+    const COMPANY = 'COMPANY';
+    const BUSINESS = 'BUSINESS';
+    const PRIVATE_PERSON = 'PRIVATE_PERSON';
 
     /**
-     * Updates customs mapping.
-     *
-     * @param array $data
-     *
-     * @return void
-     *
-     * @throws FrontDtoValidationException
-     * @throws FrontDtoNotRegisteredException
+     * @var Warehouse
      */
-    public function updateCustomsMapping(array $data)
+    private $warehouse;
+    /**
+     * @var CustomsMapping
+     */
+    private $mapping;
+    /**
+     * @var Proxy
+     */
+    private $proxy;
+
+    /**
+     * Checks if shipment is international.
+     *
+     * @param $countryCode
+     * @param $postalCode
+     *
+     * @return bool
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function isShipmentInternational($countryCode, $postalCode)
     {
-        $validationErrors = array();
+        $warehouse = $this->getWarehouse();
+        $searchRequest = new CustomsUnionsSearchRequest();
+        $searchRequest->fromCountryCode = $warehouse->country;
+        $searchRequest->fromPostalCode = $warehouse->postalCode;
+        $searchRequest->toCountryCode = $countryCode;
+        $searchRequest->toPostalCode = $postalCode;
 
-        try {
-            /** @var CustomsMapping $customsMapping */
-            $customsMapping = FrontDtoFactory::get(CustomsMapping::CLASS_KEY, $data);
-        } catch (FrontDtoValidationException $exception) {
-            $validationErrors = $exception->getValidationErrors();
+        $result = $this->getProxy()->getCustomsByPostalCode($searchRequest);
+
+        return !empty($result);
+    }
+
+    /**
+     * Sends customs invoice.
+     *
+     * @param $orderId
+     *
+     * @return string|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     * @throws OrderNotFound
+     */
+    public function sendCustomsInvoice($orderId)
+    {
+        $customsInvoice = $this->createCustomsInvoice($orderId);
+
+        return $this->getProxy()->sendCustomsInvoice($customsInvoice);
+    }
+
+    /**
+     * @param $orderId
+     *
+     * @return CustomsInvoice
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     * @throws OrderNotFound
+     */
+    protected function createCustomsInvoice($orderId)
+    {
+        $shopOrder = $this->getShopOrderService()->getOrderAndShippingData($orderId);
+        $warehouse = $this->getWarehouse();
+        $mapping = $this->getMapping();
+        $user = $this->getUser();
+
+        $customsInvoice = new CustomsInvoice();
+        $customsInvoice->invoiceNumber = $orderId;
+        $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
+        $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
+        $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder);
+        $customsInvoice->shipmentDetails = $this->getShipmentDetails($shopOrder);
+        $customsInvoice->reasonForExport = $mapping->defaultReason;
+        $customsInvoice->signature = $this->getSignature($warehouse);
+
+
+        return $customsInvoice;
+    }
+
+    /**
+     * @param Warehouse $warehouse
+     *
+     * @return Signature
+     */
+    protected function getSignature(Warehouse $warehouse)
+    {
+        $signature = new Signature();
+
+        $signature->fullName = $warehouse->name . ' ' . $warehouse->surname;
+        $signature->city = $warehouse->city;
+
+        return $signature;
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return ShipmentDetails
+     */
+    protected function getShipmentDetails(Order $order)
+    {
+        $shipmentDetails = new ShipmentDetails();
+        $shipmentDetails->parcelsSize = 1;
+        $shipmentDetails->parcelsWeight = $order->getTotalWeight();
+        $cost = new Cost();
+        $cost->currency = $order->getCurrency();
+        $cost->value = $order->getTotalWeight();
+        $shipmentDetails->cost = $cost;
+
+        return $shipmentDetails;
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return array
+     */
+    protected function getInventoryOfContents(Order $order)
+    {
+        $result = array();
+
+        foreach ($order->getItems() as $item) {
+            $inventory = new InventoryContent();
+            $inventory->tariffNumber = $item->getTariffNumber();
+            $inventory->description = $item->getTitle();
+            $inventory->countryOfOrigin = $item->getCountryOfOrigin();
+            $itemValue = new Money();
+            $itemValue->currency = $order->getCurrency();
+            $itemValue->value = $item->getPrice();
+            $inventory->itemValue = $itemValue;
+            $inventory->itemWeight = $item->getWeight();
+            $inventory->quantity = $item->getQuantity();
+
+            $result[] = $inventory;
         }
 
-        if (!empty($validationErrors)) {
-            throw new FrontDtoValidationException($validationErrors);
+        return $result;
+    }
+
+    /**
+     * @param Order $shopOrder
+     * @param CustomsMapping $mapping
+     *
+     * @return Receiver
+     */
+    protected function getReceiver(Order $shopOrder, CustomsMapping $mapping)
+    {
+        $receiver = new Receiver();
+        $receiver->userType = $mapping->defaultReceiverUserType;
+        $receiver->fullName = $shopOrder->getShippingAddress()->getName() . ' ' . $shopOrder->getShippingAddress()->getSurname();
+        $receiver->taxId = $mapping->defaultReceiverUserType === self::PRIVATE_PERSON ? $shopOrder->getTaxId() : '';
+        $receiver->companyName = $mapping->defaultReceiverUserType === self::COMPANY ?
+            $shopOrder->getShippingAddress()->getCompany() : '';
+        $receiver->vatNumber = $mapping->defaultReceiverUserType === self::COMPANY ? $shopOrder->getVatNumber(): '';
+        $receiver->address = $shopOrder->getShippingAddress()->getStreet1() . ' ' .
+            $shopOrder->getShippingAddress()->getStreet2();
+        $receiver->postalCode = $shopOrder->getShippingAddress()->getZipCode();
+        $receiver->city = $shopOrder->getShippingAddress()->getCity();
+        $receiver->country = $shopOrder->getShippingAddress()->getCountry();
+        $receiver->phoneNumber = $shopOrder->getShippingAddress()->getPhone();
+
+        return $receiver;
+    }
+
+    /**
+     * @param Warehouse $warehouse
+     * @param User $user
+     * @param CustomsMapping $mapping
+     *
+     * @return Sender
+     */
+    protected function getSender(Warehouse $warehouse, User $user, CustomsMapping $mapping)
+    {
+        $sender = new Sender();
+        $sender->userType = $user->customerType === self::BUSINESS ? self::COMPANY : self::PRIVATE_PERSON;
+        $sender->fullName = $warehouse->name . ' ' . $warehouse->surname;
+        $sender->taxId = $sender->userType === self::PRIVATE_PERSON ? $mapping->defaultSenderTaxId : '';
+        $sender->companyName = $sender->userType === self::COMPANY ? $warehouse->company : '';
+        $sender->vatNumber = $sender->userType === self::COMPANY ? $mapping->defaultSenderTaxId : '';
+        $sender->address = $warehouse->address;
+        $sender->postalCode = $warehouse->postalCode;
+        $sender->city = $warehouse->city;
+        $sender->country = $warehouse->country;
+        $sender->phoneNumber = $warehouse->phone;
+
+        return $sender;
+    }
+
+    /**
+     * @return User|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    protected function getUser()
+    {
+        $user = $this->getConfigService()->getUserInfo();
+
+        if (empty($user) || empty($user->customerType)) {
+            $user = $this->getProxy()->getUserData();
+            $this->getConfigService()->setUserInfo($user);
         }
 
-        $this->getConfigService()->setCustomsMappings($customsMapping);
+        return $user;
+    }
+
+    /**
+     * @return Warehouse|null
+     */
+    protected function getWarehouse()
+    {
+        if ($this->warehouse === null) {
+            $this->warehouse = $this->getConfigService()->getDefaultWarehouse();
+        }
+
+        return $this->warehouse;
     }
 
     /**
      * @return CustomsMapping|null
      */
-    public function getCustomsMappings()
+    protected function getMapping()
     {
-        return $this->getConfigService()->getCustomsMappings();
-    }
+        if ($this->mapping === null) {
+            $this->mapping = $this->getConfigService()->getCustomsMappings();
+        }
 
-    /**
-     * @return array
-     */
-    abstract public function getReceiverTaxIdOptions();
+        return $this->mapping;
+    }
 
     /**
      * @return \Packlink\BusinessLogic\Configuration
      */
-    private function getConfigService()
+    protected function getConfigService()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return ServiceRegister::getService(Configuration::CLASS_NAME);
+    }
+
+    /**
+     * @return Proxy
+     */
+    protected function getProxy()
+    {
+        if ($this->proxy === null) {
+            $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        }
+
+        return $this->proxy;
+    }
+
+    /**
+     * @return ShopOrderService
+     */
+    protected function getShopOrderService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(ShopOrderService::CLASS_NAME);
     }
 }

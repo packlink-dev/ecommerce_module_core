@@ -2,9 +2,9 @@
 
 namespace Packlink\DemoUI\Services\BusinessLogic;
 
-use Packlink\BusinessLogic\Customs\CustomsService as BaseCustomsService;
+use Packlink\BusinessLogic\Customs\CustomsMappingService as BaseCustomsService;
 
-class CustomsService extends BaseCustomsService
+class CustomsMappingService extends BaseCustomsService
 {
 
     /**

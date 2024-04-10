@@ -14,6 +14,7 @@ use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Customs\CustomsMapping;
+use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
@@ -197,6 +198,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             AutoTestService::CLASS_NAME,
             function () {
                 return new AutoTestService();
+            }
+        );
+
+        ServiceRegister::registerService(
+            CustomsService::CLASS_NAME,
+            function () {
+                return new CustomsService();
             }
         );
     }

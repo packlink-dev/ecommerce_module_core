@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Packlink\BusinessLogic\Country\CountryCodes;
 use Packlink\BusinessLogic\Customs\CustomsMapping;
-use Packlink\BusinessLogic\Customs\CustomsService;
+use Packlink\BusinessLogic\Customs\CustomsMappingService;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 
@@ -16,14 +16,14 @@ use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 class CustomsController
 {
     /**
-     * @var CustomsService
+     * @var CustomsMappingService
      */
     private $customService;
 
     /**
-     * @param CustomsService $customService
+     * @param CustomsMappingService $customService
      */
-    public function __construct(CustomsService $customService)
+    public function __construct(CustomsMappingService $customService)
     {
         $this->customService = $customService;
     }

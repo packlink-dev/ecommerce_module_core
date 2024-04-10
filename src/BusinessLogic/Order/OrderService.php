@@ -2,7 +2,10 @@
 
 namespace Packlink\BusinessLogic\Order;
 
+use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
@@ -101,11 +104,15 @@ class OrderService extends BaseService
     }
 
     /**
-     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipment
+     * @param Shipment $shipment
+     * @param string $customsId
      *
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     * @throws OrderShipmentDetailsNotFound
      */
-    public function updateShipmentData(Shipment $shipment)
+    public function updateShipmentData(Shipment $shipment, $customsId = '')
     {
         /** @var OrderShipmentDetailsService $shipmentDetailsService */
         $this->orderShipmentDetailsService->setShippingPrice(
@@ -118,6 +125,39 @@ class OrderService extends BaseService
         if ($this->isTrackingInfoUpdatable($shipment->status)) {
             $this->updateTrackingInfo($shipment);
         }
+
+        if ($customsId) {
+            $this->updateShipmentCustomsData($shipment->reference, $customsId);
+        }
+    }
+
+    /**
+     * Updates shipment details customs data
+     *
+     * @param string $reference
+     * @param string $customsInvoiceId
+     *
+     * @return void
+     * @throws OrderShipmentDetailsNotFound
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function updateShipmentCustomsData($reference, $customsInvoiceId)
+    {
+        $shipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($reference);
+
+        if (empty($shipmentDetails)) {
+            throw new OrderShipmentDetailsNotFound(
+                'Order details not found for reference "' . $reference . '".'
+            );
+        }
+
+        /** @var Proxy $proxy */
+        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $url = $proxy->getCustomsInvoiceDownloadUrl($customsInvoiceId);
+
+        $this->orderShipmentDetailsService->updateShipmentCustomsData($reference, $customsInvoiceId, $url);
     }
 
     /**
