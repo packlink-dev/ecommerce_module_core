@@ -21,9 +21,10 @@ class CustomsController extends BaseHttpController
 
     public function getData()
     {
+        $system = array('system' => 'Test System');
         $result = $this->baseController->getData();
 
-        return $this->output($result ? $result->toArray() : []);
+        return $this->output($result ? array_merge($result->toArray(), $system) : $system);
     }
 
     public function getAllCountries()
