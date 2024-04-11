@@ -57,7 +57,7 @@ abstract class CustomsMappingService
     }
 
     /**
-     * @return array
+     * @return TaxIdOption[]
      */
     abstract public function getReceiverTaxIdOptions();
 
