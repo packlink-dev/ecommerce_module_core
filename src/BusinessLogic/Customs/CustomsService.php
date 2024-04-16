@@ -18,7 +18,6 @@ use Packlink\BusinessLogic\Http\DTO\Customs\ShipmentDetails;
 use Packlink\BusinessLogic\Http\DTO\Customs\Signature;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
@@ -34,9 +33,9 @@ class CustomsService
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
-    const COMPANY = 'COMPANY';
+    const COMPANY = 'company';
     const BUSINESS = 'BUSINESS';
-    const PRIVATE_PERSON = 'PRIVATE_PERSON';
+    const PRIVATE_PERSON = 'private_person';
 
     /**
      * @var Warehouse
@@ -80,41 +79,38 @@ class CustomsService
     /**
      * Sends customs invoice.
      *
-     * @param $orderId
+     * @param Order $order
      *
      * @return string|null
      *
      * @throws HttpAuthenticationException
      * @throws HttpCommunicationException
      * @throws HttpRequestException
-     * @throws OrderNotFound
      */
-    public function sendCustomsInvoice($orderId)
+    public function sendCustomsInvoice($order)
     {
-        $customsInvoice = $this->createCustomsInvoice($orderId);
+        $customsInvoice = $this->createCustomsInvoice($order);
 
         return $this->getProxy()->sendCustomsInvoice($customsInvoice);
     }
 
     /**
-     * @param $orderId
+     * @param Order $shopOrder
      *
      * @return CustomsInvoice
      *
      * @throws HttpAuthenticationException
      * @throws HttpCommunicationException
      * @throws HttpRequestException
-     * @throws OrderNotFound
      */
-    protected function createCustomsInvoice($orderId)
+    protected function createCustomsInvoice($shopOrder)
     {
-        $shopOrder = $this->getShopOrderService()->getOrderAndShippingData($orderId);
         $warehouse = $this->getWarehouse();
         $mapping = $this->getMapping();
         $user = $this->getUser();
 
         $customsInvoice = new CustomsInvoice();
-        $customsInvoice->invoiceNumber = $orderId;
+        $customsInvoice->invoiceNumber = $shopOrder->getId();
         $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
         $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
         $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder);
@@ -153,7 +149,7 @@ class CustomsService
         $shipmentDetails->parcelsWeight = $order->getTotalWeight();
         $cost = new Cost();
         $cost->currency = $order->getCurrency();
-        $cost->value = $order->getTotalWeight();
+        $cost->value = $order->getTotalPrice();
         $shipmentDetails->cost = $cost;
 
         return $shipmentDetails;

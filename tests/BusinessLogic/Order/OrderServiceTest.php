@@ -13,6 +13,7 @@ use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
+use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -119,8 +120,8 @@ class OrderServiceTest extends BaseTestWithServices
     public function testPrepareDraft()
     {
         $method = $this->shippingMethodService->add($this->getShippingServiceDetails(123, 'PSP'));
-        $this->shopOrderService->getOrder('test', $method->getId(), 'IT');
-        $draft = $this->orderService->prepareDraft('test');
+        $order = $this->shopOrderService->getOrder('test', $method->getId(), 'IT');
+        $draft = $this->orderService->prepareDraft($order);
         $this->assertInstanceOf('Packlink\BusinessLogic\Http\DTO\Draft', $draft);
         self::assertNotEmpty($draft->content);
         self::assertNotEmpty($draft->packages);
@@ -133,7 +134,7 @@ class OrderServiceTest extends BaseTestWithServices
      */
     public function testPrepareDraftNoShippingMethod()
     {
-        $draft = $this->orderService->prepareDraft('test');
+        $draft = $this->orderService->prepareDraft($this->shopOrderService->getOrder('test', 'IT'));
         $this->assertInstanceOf('Packlink\BusinessLogic\Http\DTO\Draft', $draft);
         self::assertNotEmpty($draft->content);
         self::assertNotEmpty($draft->packages);
@@ -147,9 +148,9 @@ class OrderServiceTest extends BaseTestWithServices
     public function testPrepareDraftWrongDestinationCountry()
     {
         $method = $this->shippingMethodService->add($this->getShippingServiceDetails(123, 'PSP'));
-        $this->shopOrderService->getOrder('test', $method->getId(), 'DE');
+        $order = $this->shopOrderService->getOrder('test', $method->getId(), 'DE');
 
-        $this->orderService->prepareDraft('test');
+        $this->orderService->prepareDraft($order);
 
         $logMessages = $this->shopLogger->loggedMessages;
         self::assertCount(2, $logMessages);
@@ -167,7 +168,7 @@ class OrderServiceTest extends BaseTestWithServices
      */
     public function testPrepareDraftShippingReference()
     {
-        $draft = $this->orderService->prepareDraft('test');
+        $draft = $this->orderService->prepareDraft($this->shopOrderService->getOrder('test', 'IT'));
         self::assertEquals($draft->shipmentCustomReference, 'testOrderNumber');
     }
 
@@ -179,9 +180,9 @@ class OrderServiceTest extends BaseTestWithServices
         $this->shippingMethodService->add($this->getShippingServiceDetails(123, 'PSP', 3.14));
         $this->shippingMethodService->add($this->getShippingServiceDetails(234, 'PSP', 2.54));
         $method = $this->shippingMethodService->add($this->getShippingServiceDetails(456, 'PSP', 4.24));
-        $this->shopOrderService->getOrder('test', $method->getId(), 'IT');
+        $order = $this->shopOrderService->getOrder('test', $method->getId(), 'IT');
 
-        $draft = $this->orderService->prepareDraft('test');
+        $draft = $this->orderService->prepareDraft($order);
         self::assertEquals(234, $draft->serviceId);
     }
 
@@ -193,8 +194,9 @@ class OrderServiceTest extends BaseTestWithServices
         /** @var TestShopOrderService $orderRepository */
         $orderRepository = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $orderRepository->shouldThrowOrderNotFoundException(true);
+        $order = $this->shopOrderService->getOrder('test', 'IT');
 
-        $this->orderService->prepareDraft('123');
+        $this->orderService->prepareDraft($order);
     }
 
     /**

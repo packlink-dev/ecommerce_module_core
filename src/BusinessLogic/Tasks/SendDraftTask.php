@@ -19,6 +19,8 @@ use Packlink\BusinessLogic\Http\DTO\Draft\Customs;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
+use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -166,13 +168,14 @@ class SendDraftTask extends Task
         }
 
         try {
-            $draft = $this->getOrderService()->prepareDraft($this->orderId);
+            $order = $this->getShopOrderService()->getOrderAndShippingData($this->orderId);
+            $draft = $this->getOrderService()->prepareDraft($order);
         } catch (EmptyOrderException $e) {
             throw new AbortTaskExecutionException($e->getMessage());
         }
 
         try {
-            $this->createCustomsInvoice($draft);
+            $this->createCustomsInvoice($draft, $order);
         } catch (Exception $e) {
             Logger::logError('Failed to create customs invoice for order ' . $this->orderId
                 . 'because: ' . $e->getMessage());
@@ -208,13 +211,13 @@ class SendDraftTask extends Task
      * @throws HttpRequestException
      * @throws OrderNotFound
      */
-    private function createCustomsInvoice(Draft &$draft)
+    private function createCustomsInvoice(Draft &$draft, Order $order)
     {
         if (!$this->getCustomsService()->isShipmentInternational($draft->to->country, $draft->to->zipCode)) {
             return;
         }
 
-        $customsId = $this->getCustomsService()->sendCustomsInvoice($this->orderId);
+        $customsId = $this->getCustomsService()->sendCustomsInvoice($order);
 
         if (!$customsId) {
             return;
@@ -299,6 +302,15 @@ class SendDraftTask extends Task
         }
 
         return $this->customsService;
+    }
+
+    /**
+     * @return ShopOrderService
+     */
+    private function getShopOrderService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(ShopOrderService::CLASS_NAME);
     }
 
     /**

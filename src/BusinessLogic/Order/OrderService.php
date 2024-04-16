@@ -80,13 +80,11 @@ class OrderService extends BaseService
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      * @throws \Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException When order has no items.
      */
-    public function prepareDraft($orderId)
+    public function prepareDraft(Order $order)
     {
-        $order = $this->shopOrderService->getOrderAndShippingData($orderId);
-
         $items = $order->getItems();
         if (empty($items)) {
-            throw new EmptyOrderException("Order [$orderId] has no order items.");
+            throw new EmptyOrderException("Order [" . $order->getId() . "] has no order items.");
         }
 
         return $this->convertOrderToDraftDto($order);

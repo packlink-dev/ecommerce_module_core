@@ -28,7 +28,7 @@ class Cost extends DataTransferObject
         $result = new static();
 
         $result->currency = static::getDataValue($data, 'currency');
-        $result->value = static::getDataValue($data, 'total_price');
+        $result->value = static::getDataValue($data, 'value');
 
         return $result;
     }
@@ -40,7 +40,7 @@ class Cost extends DataTransferObject
     {
         return array(
             'currency' => $this->currency,
-            'total_price' => $this->value,
+            'value' => $this->value,
         );
     }
 }
