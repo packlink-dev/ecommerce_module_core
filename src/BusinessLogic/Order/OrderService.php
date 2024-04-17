@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Order;
 
+use Exception;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
@@ -153,7 +154,12 @@ class OrderService extends BaseService
 
         /** @var Proxy $proxy */
         $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        $url = $proxy->getCustomsInvoiceDownloadUrl($customsInvoiceId);
+        $url = '';
+        try {
+            $url = $proxy->getCustomsInvoiceDownloadUrl($customsInvoiceId);
+        } catch (Exception $e) {
+            Logger::logWarning('Failed to retrieve customs url because ' . $e->getMessage());
+        }
 
         $this->orderShipmentDetailsService->updateShipmentCustomsData($reference, $customsInvoiceId, $url);
     }
@@ -252,7 +258,7 @@ class OrderService extends BaseService
             foreach ($links as $link) {
                 $labels[] = new ShipmentLabel($link);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Logger::logError("Failed to retrieve labels for order [$reference] because: {$e->getMessage()}");
         }
 
