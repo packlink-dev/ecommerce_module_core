@@ -181,7 +181,7 @@ class SendDraftTaskTest extends BaseSyncTest
         $responses = array_merge(
             array(
                 new HttpResponse(
-                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/searchResult.json')
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/emptySearchResult.json')
                 ),
                 new HttpResponse(
                     200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
@@ -215,7 +215,7 @@ class SendDraftTaskTest extends BaseSyncTest
         // there should be an info message that draft is created.
         $this->assertCount(1, $this->shopLogger->loggedMessages);
         $this->assertEquals('string', $shipmentDetails->getCustomsInvoiceDownloadUrl());
-        $this->assertEquals('987654321', $shipmentDetails->getCustomsInvoiceId());
+        $this->assertEquals('70b7ac2a-7a71-11eb-9439-0242ac130002', $shipmentDetails->getCustomsInvoiceId());
 
         /** @var OrderSendDraftTaskMapService $taskMapService */
         $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
@@ -235,7 +235,7 @@ class SendDraftTaskTest extends BaseSyncTest
         $responses = array_merge(
             array(
                 new HttpResponse(
-                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/emptySearchResult.json')
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/searchResult.json')
                 )
             ),
             $this->getMockResponses(),
@@ -286,7 +286,7 @@ class SendDraftTaskTest extends BaseSyncTest
             array_merge(
                 array(
                     new HttpResponse(
-                        200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/searchResult.json')
+                        200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/emptySearchResult.json')
                     ),
                     new HttpResponse(
                         200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')

@@ -73,7 +73,7 @@ class CustomsService
 
         $result = $this->getProxy()->getCustomsByPostalCode($searchRequest);
 
-        return !empty($result);
+        return empty($result);
     }
 
     /**
@@ -113,7 +113,7 @@ class CustomsService
         $customsInvoice->invoiceNumber = $shopOrder->getId();
         $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
         $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
-        $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder);
+        $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder, $mapping);
         $customsInvoice->shipmentDetails = $this->getShipmentDetails($shopOrder);
         $customsInvoice->reasonForExport = $mapping->defaultReason;
         $customsInvoice->signature = $this->getSignature($warehouse);
@@ -157,18 +157,19 @@ class CustomsService
 
     /**
      * @param Order $order
+     * @param CustomsMapping $mapping
      *
      * @return array
      */
-    protected function getInventoryOfContents(Order $order)
+    protected function getInventoryOfContents(Order $order, CustomsMapping $mapping)
     {
         $result = array();
 
         foreach ($order->getItems() as $item) {
             $inventory = new InventoryContent();
-            $inventory->tariffNumber = $item->getTariffNumber();
+            $inventory->tariffNumber = $item->getTariffNumber() ?: $mapping->defaultTariffNumber;
             $inventory->description = $item->getTitle();
-            $inventory->countryOfOrigin = $item->getCountryOfOrigin();
+            $inventory->countryOfOrigin = $item->getCountryOfOrigin() ?: $mapping->defaultCountry;
             $itemValue = new Money();
             $itemValue->currency = $order->getCurrency();
             $itemValue->value = $item->getPrice();
@@ -193,10 +194,12 @@ class CustomsService
         $receiver = new Receiver();
         $receiver->userType = $mapping->defaultReceiverUserType;
         $receiver->fullName = $shopOrder->getShippingAddress()->getName() . ' ' . $shopOrder->getShippingAddress()->getSurname();
-        $receiver->taxId = $mapping->defaultReceiverUserType === self::PRIVATE_PERSON ? $shopOrder->getTaxId() : '';
+        $receiver->taxId = $mapping->defaultReceiverUserType === self::PRIVATE_PERSON ?
+            ($shopOrder->getTaxId() ?: $mapping->defaultReceiverTaxId) : '';
         $receiver->companyName = $mapping->defaultReceiverUserType === self::COMPANY ?
             $shopOrder->getShippingAddress()->getCompany() : '';
-        $receiver->vatNumber = $mapping->defaultReceiverUserType === self::COMPANY ? $shopOrder->getVatNumber(): '';
+        $receiver->vatNumber = $mapping->defaultReceiverUserType === self::COMPANY ?
+            ($shopOrder->getVatNumber() ?: $mapping->defaultReceiverTaxId) : '';
         $receiver->address = $shopOrder->getShippingAddress()->getStreet1() . ' ' .
             $shopOrder->getShippingAddress()->getStreet2();
         $receiver->postalCode = $shopOrder->getShippingAddress()->getZipCode();

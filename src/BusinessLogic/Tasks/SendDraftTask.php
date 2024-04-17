@@ -177,7 +177,7 @@ class SendDraftTask extends Task
         try {
             $this->createCustomsInvoice($draft, $order);
         } catch (Exception $e) {
-            Logger::logError('Failed to create customs invoice for order ' . $this->orderId
+            Logger::logInfo('Failed to create customs invoice for order ' . $this->orderId
                 . 'because: ' . $e->getMessage());
         }
 

@@ -482,7 +482,7 @@ class Proxy
         $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-invoices', $customsInvoice->toArray())
             ->decodeBodyToArray();
 
-        return isset($result['invoice_number']) ? $result['invoice_number'] : null;
+        return isset($result['id']) ? $result['id'] : null;
     }
 
     /**
