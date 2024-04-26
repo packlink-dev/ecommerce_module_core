@@ -114,6 +114,10 @@ class CustomsService
     {
         $customsInvoice = $this->createCustomsInvoice($order);
 
+        if (!$customsInvoice) {
+            return null;
+        }
+
         return $this->getProxy()->sendCustomsInvoice($customsInvoice);
     }
 
