@@ -213,7 +213,7 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals('€', CurrencySymbolService::getCurrencySymbol($shipmentDetails->getCurrency()));
         $this->assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus($shipmentDetails->getStatus()));
         // there should be an info message that draft is created.
-        $this->assertCount(1, $this->shopLogger->loggedMessages);
+        $this->assertCount(2, $this->shopLogger->loggedMessages);
         $this->assertEquals('string', $shipmentDetails->getCustomsInvoiceDownloadUrl());
         $this->assertEquals('70b7ac2a-7a71-11eb-9439-0242ac130002', $shipmentDetails->getCustomsInvoiceId());
 
@@ -312,10 +312,10 @@ class SendDraftTaskTest extends BaseSyncTest
 
         $this->syncTask->execute();
 
-        $this->assertCount(1, $this->shopLogger->loggedMessages);
+        $this->assertCount(2, $this->shopLogger->loggedMessages);
         $this->assertEquals(
             'Draft for order [test] has been already created. Task is terminating.',
-            $this->shopLogger->loggedMessages[0]->getMessage()
+            $this->shopLogger->loggedMessages[1]->getMessage()
         );
     }
 
