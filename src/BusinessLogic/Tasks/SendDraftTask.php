@@ -159,8 +159,6 @@ class SendDraftTask extends Task
     {
         $this->setExecution();
 
-        Logger::logInfo('Send draft task with customs started');
-
         $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
         if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
             Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
@@ -179,7 +177,7 @@ class SendDraftTask extends Task
         try {
             $this->createCustomsInvoice($draft, $order);
         } catch (Exception $e) {
-            Logger::logInfo('Failed to create customs invoice for order ' . $this->orderId
+            Logger::logWarning('Failed to create customs invoice for order ' . $this->orderId
                 . 'because: ' . $e->getMessage());
         }
 
