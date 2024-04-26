@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Customs;
 
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDto;
+use Packlink\BusinessLogic\Language\Translator;
 
 /**
  * Class CustomsMapping
@@ -114,5 +115,18 @@ class CustomsMapping extends FrontDto
             'default_country' => $this->defaultCountry,
             'mapping_receiver_tax_id' => $this->mappingReceiverTaxId,
         );
+    }
+
+    protected static function doValidate(array $payload, array &$validationErrors)
+    {
+        parent::doValidate($payload, $validationErrors);
+
+        if (!preg_match('/^[0-9]{6,8}$/', $payload['default_tariff_number'])) {
+            static::setInvalidFieldError(
+                'default_tariff_number',
+                $validationErrors,
+                Translator::translate('validation.invalidField')
+            );
+        }
     }
 }

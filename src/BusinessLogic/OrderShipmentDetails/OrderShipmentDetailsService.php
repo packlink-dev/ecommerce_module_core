@@ -175,11 +175,6 @@ class OrderShipmentDetailsService extends BaseService
         $this->repository->persist($orderDetails);
     }
 
-    public function setCustomsInvoiceData()
-    {
-
-    }
-
     /**
      * Sets shipping price.
      *
