@@ -215,7 +215,7 @@ class SendDraftTask extends Task
      */
     private function createCustomsInvoice(Draft &$draft, Order $order)
     {
-        if (!$this->getCustomsService()->isShipmentInternational($draft->to->country, $draft->to->zipCode)) {
+        if (!$this->getCustomsService()->shouldCreateCustoms($draft->to->country, $draft->to->zipCode)) {
             return;
         }
 

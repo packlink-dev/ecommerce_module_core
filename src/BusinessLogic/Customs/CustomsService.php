@@ -77,6 +77,29 @@ class CustomsService
     }
 
     /**
+     * @param $countryCode
+     * @param $postalCode
+     *
+     * @return bool
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function shouldCreateCustoms($countryCode, $postalCode)
+    {
+        $warehouse = $this->getWarehouse();
+
+        if (empty($warehouse->city) || empty($warehouse->address) || empty($warehouse->country)
+            || empty($warehouse->phone) || empty($warehouse->postalCode)
+            || (empty($warehouse->name) && empty($warehouse->surname))) {
+            return false;
+        }
+
+        return $this->isShipmentInternational($countryCode, $postalCode);
+    }
+
+    /**
      * Sends customs invoice.
      *
      * @param Order $order

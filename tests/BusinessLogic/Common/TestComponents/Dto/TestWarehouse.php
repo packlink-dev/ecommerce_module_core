@@ -22,6 +22,8 @@ class TestWarehouse extends Warehouse
         $this->name = 'default';
         $this->surname = 'test';
         $this->postalCode = '28001';
+        $this->city = 'Madrid';
+        $this->company = 'Test';
         $this->country = 'ES';
         $this->address = 'test';
         $this->phone = '123456789';
