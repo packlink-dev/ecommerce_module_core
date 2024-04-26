@@ -130,6 +130,11 @@ class CustomsService
     {
         $warehouse = $this->getWarehouse();
         $mapping = $this->getMapping();
+
+        if (!$mapping) {
+            return null;
+        }
+
         $user = $this->getUser();
 
         $customsInvoice = new CustomsInvoice();
