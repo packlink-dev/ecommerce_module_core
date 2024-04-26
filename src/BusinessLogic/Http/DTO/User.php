@@ -39,6 +39,10 @@ class User extends DataTransferObject
      * @var string
      */
     public $customerType;
+    /**
+     * @var string
+     */
+    public $taxId;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -53,6 +57,7 @@ class User extends DataTransferObject
             'email' => $this->email,
             'platform_country' => $this->country,
             'customer_type' => $this->customerType,
+            'tax_id' => $this->taxId
         );
     }
 
@@ -72,6 +77,7 @@ class User extends DataTransferObject
         $user->email = static::getDataValue($raw, 'email');
         $user->country = static::getDataValue($raw, 'platform_country');
         $user->customerType = static::getDataValue($raw, 'customer_type');
+        $user->taxId = static::getDataValue($raw, 'tax_id');
 
         return $user;
     }

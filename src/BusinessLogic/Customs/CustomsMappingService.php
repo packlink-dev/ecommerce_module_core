@@ -3,10 +3,15 @@
 namespace Packlink\BusinessLogic\Customs;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\Http\DTO\User;
+use Packlink\BusinessLogic\Http\Proxy;
 
 /**
  * Class CustomsService
@@ -53,13 +58,50 @@ abstract class CustomsMappingService
      */
     public function getCustomsMappings()
     {
-        return $this->getConfigService()->getCustomsMappings();
+        $mappings = $this->getConfigService()->getCustomsMappings();
+
+        if (!$mappings) {
+            $user = $this->getUser();
+
+            $mappings = new CustomsMapping();
+            $mappings->defaultSenderTaxId = $user->taxId;
+        }
+
+        return $mappings;
     }
 
     /**
      * @return TaxIdOption[]
      */
     abstract public function getReceiverTaxIdOptions();
+
+    /**
+     * @return User|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    protected function getUser()
+    {
+        $user = $this->getConfigService()->getUserInfo();
+
+        if (empty($user) || empty($user->taxId)) {
+            $user = $this->getPacklinkProxy()->getUserData();
+            $this->getConfigService()->setUserInfo($user);
+        }
+
+        return $user;
+    }
+
+    /**
+     * @return Proxy
+     */
+    protected function getPacklinkProxy()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(Proxy::CLASS_NAME);
+    }
 
     /**
      * @return \Packlink\BusinessLogic\Configuration
