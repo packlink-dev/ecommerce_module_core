@@ -159,6 +159,8 @@ class SendDraftTask extends Task
     {
         $this->setExecution();
 
+        Logger::logInfo('Send draft task with customs started');
+
         $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
         if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
             Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
