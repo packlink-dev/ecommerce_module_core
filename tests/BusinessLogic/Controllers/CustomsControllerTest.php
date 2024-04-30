@@ -109,7 +109,7 @@ class CustomsControllerTest extends BaseTestWithServices
             'default_sender_tax_id' => '123',
             'default_receiver_tax_id' => '123',
             'default_receiver_user_type' => 'PRIVATE_PERSON',
-            'default_tariff_number' => '',
+            'default_tariff_number' => '123456',
             'default_country' => 'FR',
             'mapping_receiver_tax_id' => 'tax_1',
         );
@@ -132,7 +132,7 @@ class CustomsControllerTest extends BaseTestWithServices
             'default_sender_tax_id' => '123',
             'default_receiver_tax_id' => '123',
             'default_receiver_user_type' => 'PRIVATE_PERSON',
-            'default_tariff_number' => '',
+            'default_tariff_number' => '12345678',
             'default_country' => 'FR',
             'mapping_receiver_tax_id' => 'tax_1',
         );
