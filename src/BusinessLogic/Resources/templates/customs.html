@@ -24,12 +24,12 @@
                         <option value="return">{$customs.return}</option>
                     </select>
                     <i class="material-icons">expand_more</i>
-                    <label for="pl-default-customs-reason">{$customs.reasonForExport}</label>
+                    <label class="pl-customs-label" for="pl-default-customs-reason" title="{$customs.reasonForExport}">{$customs.reasonForExport}</label>
                 </div>
                 <div class="pl-form-group">
                     <input type="text" id="pl-default-sender-tax-id" name="default_sender_tax_id"
                            data-required="true"/>
-                    <label for="pl-default-sender-tax-id">{$customs.senderTax}</label>
+                    <label class="pl-customs-label" for="pl-default-sender-tax-id" title="{$customs.senderTax}">{$customs.senderTax}</label>
                 </div>
                 <div class="pl-form-group">
                     <select id="pl-default-customs-user-type" name="default_receiver_user_type" data-required="true">
@@ -37,21 +37,21 @@
                         <option value="company">{$customs.company}</option>
                     </select>
                     <i class="material-icons">expand_more</i>
-                    <label for="pl-default-customs-user-type">{$customs.receiverUserType}</label>
+                    <label class="pl-customs-label" for="pl-default-customs-user-type" title="{$customs.receiverUserType}">{$customs.receiverUserType}</label>
                 </div>
                 <div class="pl-form-group">
                     <input type="text" id="pl-default-receiver-tax" name="default_receiver_tax_id"/>
-                    <label for="pl-default-receiver-tax">{$customs.receiverTaxId}</label>
+                    <label class="pl-customs-label" for="pl-default-receiver-tax" title="{$customs.receiverTaxId}">{$customs.receiverTaxId}</label>
                 </div>
                 <div class="pl-form-group">
                     <input type="text" id="pl-default-tariff" name="default_tariff_number"/>
-                    <label for="pl-default-tariff">{$customs.tariffNumber}</label>
+                    <label class="pl-customs-label" for="pl-default-tariff" title="{$customs.tariffNumber}">{$customs.tariffNumber}</label>
                 </div>
                 <div class="pl-form-group">
                     <select id="pl-default-country" name="default_country">
                     </select>
                     <i class="material-icons">expand_more</i>
-                    <label for="pl-default-country">{$customs.countryOrigin}</label>
+                    <label class="pl-customs-label" for="pl-default-country" title="{$customs.countryOrigin}">{$customs.countryOrigin}</label>
                 </div>
             </div>
             <h1 id="pl-data-mapping-title" class="pl-full-width pl-top-separate">
@@ -64,7 +64,7 @@
                     <select id="pl-mapping-receiver-tax" name="mapping_receiver_tax_id">
                     </select>
                     <i class="material-icons">expand_more</i>
-                    <label for="pl-mapping-receiver-tax">{$customs.receiverTaxId}</label>
+                    <label class="pl-customs-label" for="pl-mapping-receiver-tax" title="{$customs.receiverTaxId}">{$customs.receiverTaxId}</label>
                 </div>
             </div>
         </form>
