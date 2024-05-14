@@ -144,7 +144,7 @@ class SendDraftTaskTest extends BaseSyncTest
         $mapping->defaultSenderTaxId = '123';
         $mapping->defaultReceiverUserType = 'PRIVATE_PERSON';
         $mapping->defaultReceiverTaxId = '123';
-        $mapping->defaultTariffNumber = '';
+        $mapping->defaultTariffNumber = '0123456';
         $mapping->defaultCountry = 'FR';
         $mapping->mappingReceiverTaxId = 'tax_1';
         $this->shopConfig->setCustomsMappings($mapping);
