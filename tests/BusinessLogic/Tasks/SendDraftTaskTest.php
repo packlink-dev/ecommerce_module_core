@@ -214,7 +214,6 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals(ShipmentStatus::STATUS_PENDING, ShipmentStatus::getStatus($shipmentDetails->getStatus()));
         // there should be an info message that draft is created.
         $this->assertCount(1, $this->shopLogger->loggedMessages);
-        $this->assertEquals('string', $shipmentDetails->getCustomsInvoiceDownloadUrl());
         $this->assertEquals('70b7ac2a-7a71-11eb-9439-0242ac130002', $shipmentDetails->getCustomsInvoiceId());
 
         /** @var OrderSendDraftTaskMapService $taskMapService */
@@ -254,7 +253,6 @@ class SendDraftTaskTest extends BaseSyncTest
         /** @var OrderShipmentDetailsService $shopOrderService */
         $shopOrderService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $shipmentDetails = $shopOrderService->getDetailsByOrderId('test');
-        $this->assertEmpty($shipmentDetails->getCustomsInvoiceDownloadUrl());
         $this->assertEmpty($shipmentDetails->getCustomsInvoiceId());
     }
 

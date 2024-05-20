@@ -203,13 +203,13 @@ class SendDraftTask extends Task
 
     /**
      * @param Draft $draft
+     * @param Order $order
      *
      * @return void
      *
      * @throws HttpAuthenticationException
      * @throws HttpCommunicationException
      * @throws HttpRequestException
-     * @throws OrderNotFound
      */
     private function createCustomsInvoice(Draft &$draft, Order $order)
     {

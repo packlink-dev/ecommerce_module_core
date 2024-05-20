@@ -373,7 +373,7 @@
     "private": "Privato",
     "company": "Azienda",
     "receiverTaxId": "Numero di identificazione fiscale del destinatario/Numero di partita IVA",
-    "tariffNumber": "Numero di tariffa",
+    "tariffNumber": "HS Code",
     "countryOrigin": "Paese di origine",
     "dataMapping": "Mappatura dati",
     "mappingDescription": "Si prega di associare i dati di spedizione internazionale ai dati personalizzati di %s. I valori dei dati associati verranno poi utilizzati quando l'app invia dati di fattura doganale a Packlink."

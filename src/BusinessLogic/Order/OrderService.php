@@ -3,10 +3,7 @@
 namespace Packlink\BusinessLogic\Order;
 
 use Exception;
-use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
-use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
-use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
@@ -106,9 +103,6 @@ class OrderService extends BaseService
      * @param Shipment $shipment
      * @param string $customsId
      *
-     * @throws HttpAuthenticationException
-     * @throws HttpCommunicationException
-     * @throws HttpRequestException
      * @throws OrderShipmentDetailsNotFound
      */
     public function updateShipmentData(Shipment $shipment, $customsId = '')
@@ -138,9 +132,6 @@ class OrderService extends BaseService
      *
      * @return void
      * @throws OrderShipmentDetailsNotFound
-     * @throws HttpAuthenticationException
-     * @throws HttpCommunicationException
-     * @throws HttpRequestException
      */
     public function updateShipmentCustomsData($reference, $customsInvoiceId)
     {
@@ -152,16 +143,7 @@ class OrderService extends BaseService
             );
         }
 
-        /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
-        $url = '';
-        try {
-            $url = $proxy->getCustomsInvoiceDownloadUrl($customsInvoiceId);
-        } catch (Exception $e) {
-            Logger::logWarning('Failed to retrieve customs url because ' . $e->getMessage());
-        }
-
-        $this->orderShipmentDetailsService->updateShipmentCustomsData($reference, $customsInvoiceId, $url);
+        $this->orderShipmentDetailsService->updateShipmentCustomsData($reference, $customsInvoiceId);
     }
 
     /**

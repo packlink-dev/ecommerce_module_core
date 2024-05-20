@@ -373,7 +373,7 @@
     "private": "Particular",
     "company": "Empresa",
     "receiverTaxId": "Número de identificación fiscal del destinatario/Número de IVA",
-    "tariffNumber": "Código Arancelario",
+    "tariffNumber": "Código HS",
     "countryOrigin": "País de origen",
     "dataMapping": "Mapeo de datos",
     "mappingDescription": "Por favor, asigne los datos de los envíos internacionales a %s datos personalizados. Los valores de los datos asignados se utilizarán cuando la aplicación envíe los datos de la factura de aduanas a Packlink."

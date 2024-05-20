@@ -373,7 +373,7 @@
     "private": "Private person",
     "company": "Company",
     "receiverTaxId": "Receiver tax id/vat number",
-    "tariffNumber": "Tariff number",
+    "tariffNumber": "Harmonized System (HS) code",
     "countryOrigin": "Country of origin",
     "dataMapping": "Data mapping",
     "mappingDescription": "Please map international shipment data to %s custom data. Mapped data values will be used when the app sends customs invoice data to Packlink."

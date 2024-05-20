@@ -373,7 +373,7 @@
     "private": "Particulier",
     "company": "Entreprise",
     "receiverTaxId": "Numéro d'identification fiscale du destinataire/Numéro de TVA",
-    "tariffNumber": "Numéro de classification",
+    "tariffNumber": "Code HS",
     "countryOrigin": "Pays d'origine",
     "dataMapping": "Data mapping",
     "mappingDescription": "Veuillez associer les données relatives aux expéditions internationales aux données personnalisées de %s. Les valeurs des données mappées seront utilisées lorsque l'application enverra les données de facture douanière à Packlink."

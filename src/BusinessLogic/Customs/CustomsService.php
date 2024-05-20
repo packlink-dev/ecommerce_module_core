@@ -142,7 +142,7 @@ class CustomsService
         $user = $this->getUser();
 
         $customsInvoice = new CustomsInvoice();
-        $customsInvoice->invoiceNumber = $shopOrder->getId();
+        $customsInvoice->invoiceNumber = $shopOrder->getOrderNumber();
         $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
         $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
         $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder, $mapping);

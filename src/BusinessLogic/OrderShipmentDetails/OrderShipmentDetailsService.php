@@ -140,19 +140,17 @@ class OrderShipmentDetailsService extends BaseService
      *
      * @param string $reference
      * @param string $customsInvoiceId
-     * @param string $customsDownloadUrl
      *
      * @return void
      *
      * @throws OrderShipmentDetailsNotFound
      */
-    public function updateShipmentCustomsData($reference, $customsInvoiceId, $customsDownloadUrl)
+    public function updateShipmentCustomsData($reference, $customsInvoiceId)
     {
         /** @var OrderShipmentDetails $orderDetails */
         $orderDetails = $this->getDetailsByReferenceInternal($reference);
 
         $orderDetails->setCustomsInvoiceId($customsInvoiceId);
-        $orderDetails->setCustomsInvoiceDownloadUrl($customsDownloadUrl);
 
         $this->repository->persist($orderDetails);
     }

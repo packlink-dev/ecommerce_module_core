@@ -373,7 +373,7 @@
     "private": "Privatperson",
     "company": "Unternehmen",
     "receiverTaxId": "Empfänger Steuer-ID/USt-IdNr",
-    "tariffNumber": "Zolltarifnummer",
+    "tariffNumber": "HS Code",
     "countryOrigin": "Herkunftsland",
     "dataMapping": "Datenzuordnung",
     "mappingDescription": "Bitte weisen Sie internationale Versanddaten den benutzerdefinierten %s-Daten zu. Die zugeordneten Datenwerte werden verwendet, wenn die App Zollrechnungsdaten an Packlink sendet."
