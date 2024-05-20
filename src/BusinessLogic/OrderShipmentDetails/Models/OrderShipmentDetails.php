@@ -39,6 +39,7 @@ class OrderShipmentDetails extends Entity
         'shipmentUrl',
         'deleted',
         'currency',
+        'customsInvoiceId',
     );
     /**
      * Shop order ID.
@@ -112,6 +113,10 @@ class OrderShipmentDetails extends Entity
      * @var bool
      */
     private $deleted = false;
+    /**
+     * @var string
+     */
+    private $customsInvoiceId = '';
 
     /**
      * Returns entity configuration object.
@@ -233,7 +238,7 @@ class OrderShipmentDetails extends Entity
     /**
      * Sets order shipment labels from array of links to PDF.
      *
-     * @param ShipmentLabel[] Array of shipment labels.
+     * @param ShipmentLabel[] $labels Array of shipment labels.
      */
     public function setShipmentLabels(array $labels)
     {
@@ -435,5 +440,21 @@ class OrderShipmentDetails extends Entity
     public function setCurrency($currency)
     {
         $this->currency = $currency;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomsInvoiceId()
+    {
+        return $this->customsInvoiceId;
+    }
+
+    /**
+     * @param string $customsInvoiceId
+     */
+    public function setCustomsInvoiceId($customsInvoiceId)
+    {
+        $this->customsInvoiceId = $customsInvoiceId;
     }
 }

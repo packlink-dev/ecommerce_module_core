@@ -1,0 +1,77 @@
+<div class="pl-customs-page pl-full-width pl-page-config">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1 id="pl-page-title" class="pl-full-width">
+            {$configuration.customs}
+        </h1>
+    </header>
+    <div class="pl-page-content pl-page-padding">
+        <h1 id="pl-default-values-title" class="pl-full-width">
+            {$customs.defaultValues}
+        </h1>
+        <p id="pl-default-desc" class="pl-text-center pl-page-info pl-bottom-separate pl-top-separate">
+        </p>
+        <form method="POST" id="pl-customs-form">
+            <div class="pl-small-page">
+                <div class="pl-form-group">
+                    <select id="pl-default-customs-reason" name="default_reason" data-required="true">
+                        <option value="purchase_or_sale">{$customs.purchase}</option>
+                        <option value="personal_belongings">{$customs.personalBelongings}</option>
+                        <option value="sample">{$customs.sample}</option>
+                        <option value="documents">{$customs.documents}</option>
+                        <option value="return">{$customs.return}</option>
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label class="pl-customs-label" for="pl-default-customs-reason" title="{$customs.reasonForExport}">{$customs.reasonForExport}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-sender-tax-id" name="default_sender_tax_id"
+                           data-required="true"/>
+                    <label class="pl-customs-label" for="pl-default-sender-tax-id" title="{$customs.senderTax}">{$customs.senderTax}</label>
+                </div>
+                <div class="pl-form-group">
+                    <select id="pl-default-customs-user-type" name="default_receiver_user_type" data-required="true">
+                        <option value="private_person">{$customs.private}</option>
+                        <option value="company">{$customs.company}</option>
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label class="pl-customs-label" for="pl-default-customs-user-type" title="{$customs.receiverUserType}">{$customs.receiverUserType}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-receiver-tax" name="default_receiver_tax_id"/>
+                    <label class="pl-customs-label" for="pl-default-receiver-tax" title="{$customs.receiverTaxId}">{$customs.receiverTaxId}</label>
+                </div>
+                <div class="pl-form-group">
+                    <input type="text" id="pl-default-tariff" name="default_tariff_number"/>
+                    <label class="pl-customs-label" for="pl-default-tariff" title="{$customs.tariffNumber}">{$customs.tariffNumber}</label>
+                </div>
+                <div class="pl-form-group">
+                    <select id="pl-default-country" name="default_country">
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label class="pl-customs-label" for="pl-default-country" title="{$customs.countryOrigin}">{$customs.countryOrigin}</label>
+                </div>
+            </div>
+            <h1 id="pl-data-mapping-title" class="pl-full-width pl-top-separate">
+                {$customs.dataMapping}
+            </h1>
+            <p id="pl-mapping-desc" class="pl-text-center pl-page-info pl-bottom-separate pl-top-separate">
+            </p>
+            <div class="pl-small-page">
+                <div class="pl-form-group">
+                    <select id="pl-mapping-receiver-tax" name="mapping_receiver_tax_id">
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label class="pl-customs-label" for="pl-mapping-receiver-tax" title="{$customs.receiverTaxId}">{$customs.receiverTaxId}</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="pl-page-buttons">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+            {$general.saveChanges}
+        </button>
+    </div>
+</div>

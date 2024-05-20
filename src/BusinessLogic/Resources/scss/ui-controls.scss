@@ -203,6 +203,13 @@
       margin-top: 12px;
     }
 
+    .pl-customs-label {
+      width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     label {
       position: absolute;
       top: 8px;

@@ -87,6 +87,14 @@ class Item
      */
     private $length;
     /**
+     * @var string
+     */
+    private $countryOfOrigin = '';
+    /**
+     * @var string
+     */
+    private $tariffNumber = '';
+    /**
      * Other extra item properties in key => value format
      *
      * @var array
@@ -351,6 +359,38 @@ class Item
     public function setLength($length)
     {
         $this->length = $length;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountryOfOrigin()
+    {
+        return $this->countryOfOrigin;
+    }
+
+    /**
+     * @param string $countryOfOrigin
+     */
+    public function setCountryOfOrigin($countryOfOrigin)
+    {
+        $this->countryOfOrigin = $countryOfOrigin;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTariffNumber()
+    {
+        return $this->tariffNumber;
+    }
+
+    /**
+     * @param string $tariffNumber
+     */
+    public function setTariffNumber($tariffNumber)
+    {
+        $this->tariffNumber = $tariffNumber;
     }
 
     /**

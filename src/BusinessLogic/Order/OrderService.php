@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Order;
 
+use Exception;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
@@ -77,13 +78,11 @@ class OrderService extends BaseService
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
      * @throws \Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException When order has no items.
      */
-    public function prepareDraft($orderId)
+    public function prepareDraft(Order $order)
     {
-        $order = $this->shopOrderService->getOrderAndShippingData($orderId);
-
         $items = $order->getItems();
         if (empty($items)) {
-            throw new EmptyOrderException("Order [$orderId] has no order items.");
+            throw new EmptyOrderException("Order [" . $order->getId() . "] has no order items.");
         }
 
         return $this->convertOrderToDraftDto($order);
@@ -101,11 +100,12 @@ class OrderService extends BaseService
     }
 
     /**
-     * @param \Packlink\BusinessLogic\Http\DTO\Shipment $shipment
+     * @param Shipment $shipment
+     * @param string $customsId
      *
-     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     * @throws OrderShipmentDetailsNotFound
      */
-    public function updateShipmentData(Shipment $shipment)
+    public function updateShipmentData(Shipment $shipment, $customsId = '')
     {
         /** @var OrderShipmentDetailsService $shipmentDetailsService */
         $this->orderShipmentDetailsService->setShippingPrice(
@@ -118,6 +118,32 @@ class OrderService extends BaseService
         if ($this->isTrackingInfoUpdatable($shipment->status)) {
             $this->updateTrackingInfo($shipment);
         }
+
+        if ($customsId) {
+            $this->updateShipmentCustomsData($shipment->reference, $customsId);
+        }
+    }
+
+    /**
+     * Updates shipment details customs data
+     *
+     * @param string $reference
+     * @param string $customsInvoiceId
+     *
+     * @return void
+     * @throws OrderShipmentDetailsNotFound
+     */
+    public function updateShipmentCustomsData($reference, $customsInvoiceId)
+    {
+        $shipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($reference);
+
+        if (empty($shipmentDetails)) {
+            throw new OrderShipmentDetailsNotFound(
+                'Order details not found for reference "' . $reference . '".'
+            );
+        }
+
+        $this->orderShipmentDetailsService->updateShipmentCustomsData($reference, $customsInvoiceId);
     }
 
     /**
@@ -214,7 +240,7 @@ class OrderService extends BaseService
             foreach ($links as $link) {
                 $labels[] = new ShipmentLabel($link);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Logger::logError("Failed to retrieve labels for order [$reference] because: {$e->getMessage()}");
         }
 

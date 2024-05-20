@@ -136,6 +136,26 @@ class OrderShipmentDetailsService extends BaseService
     }
 
     /**
+     * Updates shipment customs data.
+     *
+     * @param string $reference
+     * @param string $customsInvoiceId
+     *
+     * @return void
+     *
+     * @throws OrderShipmentDetailsNotFound
+     */
+    public function updateShipmentCustomsData($reference, $customsInvoiceId)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($reference);
+
+        $orderDetails->setCustomsInvoiceId($customsInvoiceId);
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
      * Sets order packlink shipping status.
      *
      * @param string $shipmentReference Packlink shipment reference.

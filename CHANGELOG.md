@@ -3,7 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [3.3.21](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.20...v3.3.21) - 2024-02-04
+## [3.4.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.21...v3.4.0) - 2024-05-20
+### Added
+- Added creating customs invoice in Packlink PRO
+
+## [3.3.21](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.3.20...v3.3.21) - 2024-04-02
 ### Changed
 - Add unsupported countries Denmark, Norway, Saudi Arabia, Canada, Cyprus, Slovenia and Slovakia
 - Add min-height property to lp-content class

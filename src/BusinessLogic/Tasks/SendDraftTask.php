@@ -2,6 +2,10 @@
 
 namespace Packlink\BusinessLogic\Tasks;
 
+use Exception;
+use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
@@ -9,8 +13,14 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Packlink\BusinessLogic\Customs\CustomsService;
+use Packlink\BusinessLogic\Http\DTO\Draft;
+use Packlink\BusinessLogic\Http\DTO\Draft\Customs;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
+use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
+use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
+use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -46,6 +56,10 @@ class SendDraftTask extends Task
      * @var OrderShipmentDetailsService
      */
     private $orderShipmentDetailsService;
+    /**
+     * @var CustomsService
+     */
+    private $customsService;
 
     /**
      * UploadDraftTask constructor.
@@ -133,11 +147,11 @@ class SendDraftTask extends Task
     /**
      * Runs task logic.
      *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
      * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws OrderNotFound
      * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
@@ -154,9 +168,17 @@ class SendDraftTask extends Task
         }
 
         try {
-            $draft = $this->getOrderService()->prepareDraft($this->orderId);
+            $order = $this->getShopOrderService()->getOrderAndShippingData($this->orderId);
+            $draft = $this->getOrderService()->prepareDraft($order);
         } catch (EmptyOrderException $e) {
             throw new AbortTaskExecutionException($e->getMessage());
+        }
+
+        try {
+            $this->createCustomsInvoice($draft, $order);
+        } catch (Exception $e) {
+            Logger::logWarning('Failed to create customs invoice for order ' . $this->orderId
+                . 'because: ' . $e->getMessage());
         }
 
         $this->reportProgress(35);
@@ -173,10 +195,37 @@ class SendDraftTask extends Task
         $shipment = $this->getProxy()->getShipment($reference);
 
         if ($shipment) {
-            $this->getOrderService()->updateShipmentData($shipment);
+            $this->getOrderService()->updateShipmentData($shipment, isset($draft->customs) ? $draft->customs->customsInvoiceId : '');
         }
 
         $this->reportProgress(100);
+    }
+
+    /**
+     * @param Draft $draft
+     * @param Order $order
+     *
+     * @return void
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    private function createCustomsInvoice(Draft &$draft, Order $order)
+    {
+        if (!$this->getCustomsService()->shouldCreateCustoms($draft->to->country, $draft->to->zipCode)) {
+            return;
+        }
+
+        $customsId = $this->getCustomsService()->sendCustomsInvoice($order);
+
+        if (!$customsId) {
+            return;
+        }
+
+        $draft->hasCustoms = true;
+        $draft->customs = new Customs();
+        $draft->customs->customsInvoiceId = $customsId;
     }
 
     /**
@@ -239,6 +288,29 @@ class SendDraftTask extends Task
         }
 
         return $this->orderShipmentDetailsService;
+    }
+
+    /**
+     * Retrieves customs service.
+     *
+     * @return CustomsService
+     */
+    private function getCustomsService()
+    {
+        if ($this->customsService === null) {
+            $this->customsService = ServiceRegister::getService(CustomsService::CLASS_NAME);
+        }
+
+        return $this->customsService;
+    }
+
+    /**
+     * @return ShopOrderService
+     */
+    private function getShopOrderService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(ShopOrderService::CLASS_NAME);
     }
 
     /**

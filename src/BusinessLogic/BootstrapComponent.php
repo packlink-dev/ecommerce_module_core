@@ -13,6 +13,8 @@ use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
+use Packlink\BusinessLogic\Customs\CustomsMapping;
+use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
@@ -198,6 +200,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 return new AutoTestService();
             }
         );
+
+        ServiceRegister::registerService(
+            CustomsService::CLASS_NAME,
+            function () {
+                return new CustomsService();
+            }
+        );
     }
 
     /**
@@ -235,5 +244,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         FrontDtoFactory::register(RegistrationRequest::CLASS_KEY, RegistrationRequest::CLASS_NAME);
         FrontDtoFactory::register(RegistrationLegalPolicy::CLASS_KEY, RegistrationLegalPolicy::CLASS_NAME);
         FrontDtoFactory::register(ShippingPricePolicy::CLASS_KEY, ShippingPricePolicy::CLASS_NAME);
+        FrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
     }
 }

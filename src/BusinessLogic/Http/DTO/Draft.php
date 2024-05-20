@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Http\DTO\Draft\AdditionalData;
 use Packlink\BusinessLogic\Http\DTO\Draft\Address;
+use Packlink\BusinessLogic\Http\DTO\Draft\Customs;
 use Packlink\BusinessLogic\Http\DTO\Draft\DraftPrice;
 
 /**
@@ -149,6 +150,14 @@ class Draft extends DataTransferObject
      * @var DraftPrice
      */
     public $price;
+    /**
+     * @var bool
+     */
+    public $hasCustoms = false;
+    /**
+     * @var Customs
+     */
+    public $customs;
 
     /**
      * Draft constructor.
@@ -186,6 +195,7 @@ class Draft extends DataTransferObject
             'shipment_custom_reference' => $this->shipmentCustomReference,
             'priority' => $this->priority,
             'contentValue_currency' => $this->contentValueCurrency,
+            'has_customs' => $this->hasCustoms,
         );
 
         if ($this->from) {
@@ -205,6 +215,10 @@ class Draft extends DataTransferObject
             foreach ($this->packages as $package) {
                 $result['packages'][] = $package->toArray();
             }
+        }
+
+        if (!empty($this->customs)) {
+            $result['customs'] = $this->customs->toArray();
         }
 
         return $result;

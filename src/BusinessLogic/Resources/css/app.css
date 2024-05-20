@@ -473,6 +473,12 @@
 #pl-page .pl-form-group:not(:first-child) {
   margin-top: 12px;
 }
+#pl-page .pl-form-group .pl-customs-label {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 #pl-page .pl-form-group label {
   position: absolute;
   top: 8px;

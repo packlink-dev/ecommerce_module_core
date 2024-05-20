@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic;
 
+use Packlink\BusinessLogic\Customs\CustomsMapping;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
@@ -258,6 +259,31 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     public function getOrderStatusMappings()
     {
         return $this->getConfigValue('orderStatusMappings');
+    }
+
+    /**
+     * Sets customs mappings.
+     *
+     * @param CustomsMapping $mapping
+     *
+     * @return void
+     */
+    public function setCustomsMappings(CustomsMapping $mapping)
+    {
+        $this->saveConfigValue('customsMappings', $mapping->toArray());
+    }
+
+    /**
+     * @return CustomsMapping|null
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function getCustomsMappings()
+    {
+        $value = $this->getConfigValue('customsMappings');
+
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $value && is_array($value) ? FrontDtoFactory::get(CustomsMapping::CLASS_KEY, $value) : null;
     }
 
     /**

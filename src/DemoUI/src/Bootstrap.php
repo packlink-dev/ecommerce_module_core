@@ -35,6 +35,7 @@ use Packlink\DemoUI\Brands\Acme\AcmeConfigurationService;
 use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
+use Packlink\DemoUI\Services\BusinessLogic\CustomsMappingService;
 use Packlink\DemoUI\Services\BusinessLogic\ShopOrderService;
 use Packlink\BusinessLogic\SystemInformation\SystemInfoService as SystemInfoServiceInterface;
 use Packlink\DemoUI\Services\BusinessLogic\SystemInfoService;
@@ -89,6 +90,10 @@ class Bootstrap extends BootstrapComponent
      * @var SystemInfoService
      */
     private $systemInfoService;
+    /**
+     * @var CustomsMappingService
+     */
+    private $customsService;
 
     /**
      * Bootstrap constructor.
@@ -104,6 +109,7 @@ class Bootstrap extends BootstrapComponent
         $this->userAccountService = UserAccountService::getInstance();
         $this->registrationInfoService = new TestRegistrationInfoService();
         $this->systemInfoService = new SystemInfoService();
+        $this->customsService = new CustomsMappingService();
     }
 
     /**
@@ -215,6 +221,13 @@ class Bootstrap extends BootstrapComponent
             SystemInfoServiceInterface::CLASS_NAME,
             function () use ($instance) {
                 return $instance->systemInfoService;
+            }
+        );
+
+        ServiceRegister::registerService(
+            \Packlink\BusinessLogic\Customs\CustomsMappingService::CLASS_NAME,
+            function () use ($instance) {
+                return $instance->customsService;
             }
         );
     }
