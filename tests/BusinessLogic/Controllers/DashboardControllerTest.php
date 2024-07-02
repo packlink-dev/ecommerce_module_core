@@ -37,11 +37,12 @@ class DashboardControllerTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
@@ -69,10 +70,14 @@ class DashboardControllerTest extends BaseTestWithServices
         TestFrontDtoFactory::register(DashboardStatus::CLASS_KEY, DashboardStatus::CLASS_NAME);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
         ShippingMethodService::resetInstance();
-        parent::tearDown();
+        parent::after();
     }
 
     /**

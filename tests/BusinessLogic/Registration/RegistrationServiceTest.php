@@ -86,11 +86,12 @@ class RegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @throws \Exception
+     * @before
+     * @inheritDoc
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         TestServiceRegister::registerService(
             RegistrationService::CLASS_NAME,

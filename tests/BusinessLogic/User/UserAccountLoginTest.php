@@ -31,12 +31,15 @@ class UserAccountLoginTest extends BaseTestWithServices
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
+     *
+     * @before
+     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    protected function setUp()
+    protected function before()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        parent::setUp();
+        parent::before();
 
         TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
@@ -363,11 +366,16 @@ class UserAccountLoginTest extends BaseTestWithServices
         );
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     *
+     * @return void
+     */
+    protected function after()
     {
         UserAccountService::resetInstance();
         TestRepositoryRegistry::cleanUp();
 
-        parent::tearDown();
+        parent::after();
     }
 }

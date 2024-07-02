@@ -54,15 +54,17 @@ class ScheduleTickHandlerTest extends TestCase
     private $taskRunnerStarter;
 
     /**
+     * @before
+     *
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
 

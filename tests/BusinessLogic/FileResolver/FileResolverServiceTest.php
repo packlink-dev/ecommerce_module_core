@@ -30,9 +30,13 @@ class FileResolverServiceTest extends TestCase
      */
     private $fileResolverService;
 
-    public function setUp()
+    /**
+     * @before
+     * @return void
+     */
+    public function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         $this->fileResolverService = new FileResolverService(
             array(

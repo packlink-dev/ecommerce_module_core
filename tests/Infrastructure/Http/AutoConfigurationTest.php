@@ -18,11 +18,12 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
     protected $httpClient;
 
     /**
-     * @throws \Exception
+     * @before
+     * @inheritDoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->httpClient = new TestHttpClient();
         $me = $this;

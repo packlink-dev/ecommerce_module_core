@@ -57,9 +57,13 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
     public $serializer;
 
     /**
-     * @throws \Exception
+     * @before
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    protected function setUp()
+    protected function before()
     {
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 
@@ -96,7 +100,12 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
         );
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     *
+     * @return void
+     */
+    protected function after()
     {
         Logger::resetInstance();
         LoggerConfiguration::resetInstance();

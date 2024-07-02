@@ -21,12 +21,14 @@ class DailyScheduleTest extends TestCase
     public $dailySchedule;
 
     /**
+     * @before
+     *
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         // Always return 2018-03-21 13:42:05
         $this->dailySchedule = new DailySchedule();

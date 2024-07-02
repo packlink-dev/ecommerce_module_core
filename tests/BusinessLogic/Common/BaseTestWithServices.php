@@ -48,11 +48,17 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
     public $httpClient;
 
     /**
+     * @before
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
      * @throws \Exception
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $me = $this;
 
@@ -153,9 +159,14 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestFrontDtoFactory::register(Country::CLASS_KEY, Country::CLASS_NAME);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     *
+     * @return void
+     */
+    protected function after()
     {
-        parent::tearDown();
+        parent::after();
 
         TestFrontDtoFactory::reset();
     }

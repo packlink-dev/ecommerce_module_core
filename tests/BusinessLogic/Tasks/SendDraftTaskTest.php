@@ -45,11 +45,12 @@ use Packlink\BusinessLogic\Utility\CurrencySymbolService;
 class SendDraftTaskTest extends BaseSyncTest
 {
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         TestRepositoryRegistry::registerRepository(
             OrderShipmentDetails::getClassName(),
@@ -151,14 +152,15 @@ class SendDraftTaskTest extends BaseSyncTest
     }
 
     /**
+     * @after
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function after()
     {
         OrderService::resetInstance();
         ShippingMethodService::resetInstance();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

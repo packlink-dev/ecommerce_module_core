@@ -13,9 +13,13 @@ class RegistrationRegionsControllerTest extends  BaseTestWithServices
     public $service;
     public $controller;
 
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->service = MockCountryService::getInstance();
 
@@ -55,7 +59,11 @@ class RegistrationRegionsControllerTest extends  BaseTestWithServices
         $this->assertEquals(MockCountryService::$supportedCountries, $result);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
         MockCountryService::resetInstance();
     }

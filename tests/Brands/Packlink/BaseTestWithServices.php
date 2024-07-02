@@ -10,9 +10,17 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 
 class BaseTestWithServices extends \Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices
 {
-    protected function setUp()
+    /**
+     * @before
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         TestServiceRegister::registerService(
             BrandConfigurationService::CLASS_NAME,

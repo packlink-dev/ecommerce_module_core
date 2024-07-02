@@ -49,11 +49,12 @@ class OrderServiceTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $me = $this;
 
@@ -104,14 +105,15 @@ class OrderServiceTest extends BaseTestWithServices
     }
 
     /**
+     * @after
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function after()
     {
         OrderService::resetInstance();
         ShippingMethodService::resetInstance();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

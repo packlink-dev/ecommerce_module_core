@@ -16,9 +16,13 @@ use Packlink\BusinessLogic\Tasks\BatchTaskCleanupTask;
 
 class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
 {
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(
             QueueItem::getClassName(),

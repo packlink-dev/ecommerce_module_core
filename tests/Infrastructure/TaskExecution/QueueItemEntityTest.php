@@ -27,11 +27,12 @@ class QueueItemEntityTest extends TestCase
     protected $serializer;
 
     /**
-     * @throws \Exception
+     * @before
+     * @return void
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         $timeProvider = $this->timeProvider = new TestTimeProvider();
         $serializer = $this->serializer = new NativeSerializer();

@@ -22,9 +22,10 @@ class QueueItemTest extends TestCase
     private $timeProvider;
 
     /**
+     * @before
      * @throws \Exception
      */
-    protected function setUp()
+    protected function before()
     {
         $timeProvider = new TestTimeProvider();
 

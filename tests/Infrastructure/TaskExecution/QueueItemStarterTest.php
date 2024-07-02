@@ -51,9 +51,10 @@ class QueueItemStarterTest extends TestCase
     public $shopConfiguration;
 
     /**
+     * @before
      * @throws \Exception
      */
-    public function setUp()
+    public function before()
     {
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());

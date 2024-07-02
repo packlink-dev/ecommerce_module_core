@@ -39,11 +39,12 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     public $syncTask;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         MemoryStorage::reset();
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
@@ -69,12 +70,16 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         );
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
         ShippingMethodService::resetInstance();
         MemoryStorage::reset();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

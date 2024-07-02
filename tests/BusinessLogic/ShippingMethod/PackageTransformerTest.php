@@ -39,9 +39,18 @@ class PackageTransformerTest extends BaseTestWithServices
      */
     private $defaultParcel;
 
-    protected function setUp()
+    /**
+     * @before
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->transformer = PackageTransformer::getInstance();
 

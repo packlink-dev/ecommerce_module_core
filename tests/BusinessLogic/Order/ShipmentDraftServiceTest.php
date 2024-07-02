@@ -56,11 +56,14 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     public $orderSendDraftTaskMapService;
 
     /**
-     * @inheritdoc
+     * @before
+     * @return void
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Exception
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $me = $this;
         TestRepositoryRegistry::registerRepository(OrderShipmentDetails::CLASS_NAME, MemoryRepository::getClassName());
@@ -162,14 +165,16 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @inheritdoc
+     * @after
+     *
+     * @return void
      */
-    protected function tearDown()
+    protected function after()
     {
         OrderShipmentDetailsService::resetInstance();
         ShipmentDraftService::resetInstance();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

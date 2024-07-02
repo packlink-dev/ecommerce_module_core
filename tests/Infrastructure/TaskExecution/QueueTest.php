@@ -46,11 +46,14 @@ class QueueTest extends TestCase
     public $taskRunnerStarter;
 
     /**
-     * @throws \Exception
+     * @before
+     * @return void
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());

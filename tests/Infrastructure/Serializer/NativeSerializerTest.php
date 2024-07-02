@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
  */
 class NativeSerializerTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @before
+     */
+    public function before()
     {
         TestServiceRegister::registerService(
             Serializer::CLASS_NAME,

@@ -11,9 +11,13 @@ class AsyncSocketHttpClientTest extends BaseInfrastructureTestWithServices
 {
     public $client;
 
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->client = new TestAsyncSocketHttpClient();
     }

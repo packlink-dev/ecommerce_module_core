@@ -23,11 +23,12 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     public $orderShipmentDetailsService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         TestRepositoryRegistry::registerRepository(OrderShipmentDetails::CLASS_NAME, MemoryRepository::getClassName());
 
@@ -42,13 +43,14 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     }
 
     /**
+     * @after
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function after()
     {
         OrderShipmentDetailsService::resetInstance();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

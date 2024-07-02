@@ -32,9 +32,13 @@ class LocationServiceTest extends BaseTestWithServices
      */
     public $shippingMethodService;
 
-    public function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
@@ -73,11 +77,15 @@ class LocationServiceTest extends BaseTestWithServices
         $this->shippingMethodService = ShippingMethodService::getInstance();
     }
 
-    public function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    public function after()
     {
         LocationService::resetInstance();
         ShippingMethodService::resetInstance();
-        parent::tearDown();
+        parent::after();
     }
 
     public function testWarehouseNotSet()

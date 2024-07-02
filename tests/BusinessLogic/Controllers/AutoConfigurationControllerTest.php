@@ -33,11 +33,12 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
     public $httpClient;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
 
@@ -70,11 +71,12 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
     }
 
     /**
+     * @after
      * @inheritDoc
      */
-    public function tearDown()
+    public function after()
     {
-        parent::tearDown();
+        parent::after();
 
         TestRepositoryRegistry::cleanUp();
     }

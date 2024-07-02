@@ -265,19 +265,28 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
+     * @before
+     *
+     * @return void
+     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         RepositoryRegistry::registerRepository(QueueItem::getClassName(), $this->getQueueItemEntityRepositoryClass());
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     *
+     * @return void
+     */
+    protected function after()
     {
         $this->cleanUpStorage();
-        parent::tearDown();
+        $this->tearDown();
     }
 
     /**

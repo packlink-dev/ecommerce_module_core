@@ -31,11 +31,12 @@ class WebHookHandlerTest extends BaseTestWithServices
     public $orderShipmentDetailsService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         BootstrapComponent::init();
         $me = $this;
@@ -73,12 +74,16 @@ class WebHookHandlerTest extends BaseTestWithServices
         );
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
         WebHookEventHandler::resetInstance();
         OrderService::resetInstance();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

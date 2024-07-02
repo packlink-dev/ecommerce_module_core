@@ -24,11 +24,12 @@ class RegistrationControllerTest extends BaseTestWithServices
     public $registrationController;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 

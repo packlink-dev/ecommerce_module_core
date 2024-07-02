@@ -33,11 +33,12 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
     public $orderShipmentDetailsService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         $me = $this;
 
@@ -77,13 +78,14 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
     }
 
     /**
+     * @after
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function after()
     {
         OrderService::resetInstance();
 
-        parent::tearDown();
+        parent::after();
     }
 
     /**

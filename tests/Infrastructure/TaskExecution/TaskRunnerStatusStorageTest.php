@@ -25,10 +25,10 @@ class TaskRunnerStatusStorageTest extends TestCase
     private $configuration;
 
     /**
-     *
+     * @before
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    protected function setUp()
+    protected function before()
     {
         $configuration = new TestShopConfiguration();
 
