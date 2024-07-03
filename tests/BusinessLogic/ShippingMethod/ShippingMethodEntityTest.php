@@ -36,9 +36,13 @@ class ShippingMethodEntityTest extends BaseTestWithServices
      */
     public $httpClient;
 
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
 
@@ -75,9 +79,13 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         TestFrontDtoFactory::register(ShippingPricePolicy::CLASS_KEY, ShippingPricePolicy::CLASS_NAME);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
-        parent::tearDown();
+        parent::after();
 
         TestFrontDtoFactory::reset();
     }

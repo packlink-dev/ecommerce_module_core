@@ -77,9 +77,10 @@ class ScheduleCheckTaskTest extends TestCase
     private $oldTimeZone;
 
     /**
+     * @before
      * @throws \Exception
      */
-    public function setUp()
+    public function before()
     {
         $this->oldTimeZone = date_default_timezone_get();
         date_default_timezone_set('UTC');
@@ -137,14 +138,15 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
-     * @inheritdoc
+     * @after
+     * @return void
      */
-    public function tearDown()
+    public function after()
     {
         date_default_timezone_set($this->oldTimeZone);
         MemoryStorage::reset();
 
-        parent::tearDown();
+        $this->tearDown();
     }
 
     /**

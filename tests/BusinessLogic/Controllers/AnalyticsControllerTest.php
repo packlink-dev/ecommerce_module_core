@@ -33,11 +33,12 @@ class AnalyticsControllerTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         TestRepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
@@ -62,12 +63,16 @@ class AnalyticsControllerTest extends BaseTestWithServices
         );
     }
 
-    public function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    public function after()
     {
         ShippingMethodService::resetInstance();
         TestRepositoryRegistry::cleanUp();
 
-        parent::tearDown();
+        parent::after();
     }
 
     public function testSendSetupEvent()

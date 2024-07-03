@@ -17,9 +17,13 @@ class AutoTestControllerTest extends BaseTestWithServices
     public $service;
     public $controller;
 
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
         $this->service = new MockAutoTestService();
 
         $me = $this;

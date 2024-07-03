@@ -18,9 +18,14 @@ class IndexHelperTest extends TestCase
      */
     protected $entity;
 
-    protected function setUp()
+    /**
+     * @before
+     *
+     * @return void
+     */
+    protected function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         $this->entity = new FooEntity();
     }

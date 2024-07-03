@@ -28,9 +28,9 @@ abstract class BaseSyncTest extends BaseTestWithServices
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->syncTask = $this->createSyncTaskInstance();
         $this->attachProgressEventListener();

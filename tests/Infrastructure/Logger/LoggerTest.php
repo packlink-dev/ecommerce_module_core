@@ -16,9 +16,13 @@ class LoggerTest extends BaseInfrastructureTestWithServices
      */
     public $httpClient;
 
-    public function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->shopConfig->setIntegrationName('Shop1');
         $this->shopConfig->setDefaultLoggerEnabled(true);

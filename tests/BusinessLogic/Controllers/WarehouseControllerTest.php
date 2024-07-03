@@ -14,9 +14,13 @@ class WarehouseControllerTest extends BaseTestWithServices
     public $service;
     public $controller;
 
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->service = MockWarehouseService::getInstance();
 
@@ -85,9 +89,13 @@ class WarehouseControllerTest extends BaseTestWithServices
         $this->assertEquals($expected, $result);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
-        parent::tearDown();
+        parent::after();
 
         MockWarehouseService::resetInstance();
     }

@@ -41,11 +41,12 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     protected $serviceIds = array(20203, 20945, 20189);
 
     /**
+     * @before
      * @inheritdoc
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
@@ -93,12 +94,16 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
         }
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
         ShippingMethodService::resetInstance();
         MemoryStorage::reset();
 
-        parent::tearDown();
+        parent::after();
     }
 
     public function testActivationWrongService()

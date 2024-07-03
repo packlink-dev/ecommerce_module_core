@@ -17,9 +17,17 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
  */
 class ProxyTest extends BaseTestWithServices
 {
-    public function setUp()
+    /**
+     * @before
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     */
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());

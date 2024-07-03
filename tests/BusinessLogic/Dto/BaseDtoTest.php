@@ -15,18 +15,25 @@ use PHPUnit\Framework\TestCase;
 class BaseDtoTest extends TestCase
 {
     /**
+     * @before
+     *
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     *
+     * @return void
+     */
+    protected function after()
     {
-        parent::tearDown();
+        $this->tearDown();
 
         TestFrontDtoFactory::reset();
     }

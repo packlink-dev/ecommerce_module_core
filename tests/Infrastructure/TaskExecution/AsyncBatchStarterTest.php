@@ -15,7 +15,10 @@ class AsyncBatchStarterTest extends TestCase
 {
     private $asyncProcessStarter;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before()
     {
         $asyncProcessStarter = new TestAsyncProcessStarter(true);
 

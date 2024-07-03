@@ -33,11 +33,12 @@ class TaskCleanupTaskTest extends BaseTestWithServices
     public $queueService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         RepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());

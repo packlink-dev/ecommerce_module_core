@@ -171,13 +171,14 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
     }
 
     /**
+     * @before
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
      * @throws \Exception
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
 
@@ -236,12 +237,13 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
     }
 
     /**
+     * @after
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function after()
     {
         AsyncProcessStarterService::resetInstance();
         MemoryStorage::reset();
-        parent::tearDown();
+        parent::after();
     }
 }

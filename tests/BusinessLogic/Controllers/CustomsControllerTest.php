@@ -33,7 +33,11 @@ class CustomsControllerTest extends BaseTestWithServices
      */
     private $customsController;
 
-    public function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    public function before()
     {
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);

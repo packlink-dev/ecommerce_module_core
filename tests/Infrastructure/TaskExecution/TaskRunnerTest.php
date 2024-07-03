@@ -70,9 +70,10 @@ class TaskRunnerTest extends TestCase
     private $taskRunner;
 
     /**
-     * @throws \Exception
+     * @before
+     * @return void
      */
-    protected function setUp()
+    protected function before()
     {
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
@@ -147,11 +148,16 @@ class TaskRunnerTest extends TestCase
         $this->runnerStatusStorage->initializeStatus(new TaskRunnerStatus($guid, $currentTimestamp));
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     *
+     * @return void
+     */
+    protected function after()
     {
         MemoryStorage::reset();
         AsyncProcessStarterService::resetInstance();
-        parent::tearDown();
+        $this->tearDown();
     }
 
     /**

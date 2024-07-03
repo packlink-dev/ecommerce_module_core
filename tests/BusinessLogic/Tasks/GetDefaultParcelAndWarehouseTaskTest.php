@@ -16,11 +16,12 @@ use Packlink\BusinessLogic\User\UserAccountService;
 class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
 {
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         TestServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
@@ -31,12 +32,13 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
     }
 
     /**
+     * @after
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function after()
     {
         UserAccountService::resetInstance();
-        parent::tearDown();
+        parent::after();
     }
 
     /**

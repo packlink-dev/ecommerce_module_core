@@ -15,9 +15,12 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
  */
 class ShippingPricePolicyDtoTest extends BaseDtoTest
 {
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         TestFrontDtoFactory::register(ShippingPricePolicy::CLASS_KEY, ShippingPricePolicy::CLASS_NAME);
     }

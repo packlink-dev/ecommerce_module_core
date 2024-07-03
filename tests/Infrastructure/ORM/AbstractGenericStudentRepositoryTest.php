@@ -601,22 +601,27 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
+     * @before
+     *
+     * @return void
+     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    protected function setUp()
+    protected function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         RepositoryRegistry::registerRepository(StudentEntity::getClassName(), $this->getStudentEntityRepositoryClass());
     }
 
     /**
+     * @after
      * Clean up.
      */
-    protected function tearDown()
+    protected function after()
     {
         $this->cleanUpStorage();
-        parent::tearDown();
+        $this->tearDown();
     }
 
     /**

@@ -16,7 +16,11 @@ class HttpClientTest extends TestCase
      */
     protected $httpClient;
 
-    protected function setUp()
+    /**
+     * @before
+     * @return void
+     */
+    protected function before()
     {
         $this->httpClient = new TestHttpClient();
         $proxyInstance = $this;

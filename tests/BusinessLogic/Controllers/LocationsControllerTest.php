@@ -21,9 +21,13 @@ class LocationsControllerTest extends BaseTestWithServices
     public $testShopShippingMethodService;
     public $shippingMethodService;
 
-    protected function setUp()
+    /**
+     * @before
+     * @inheritDoc
+     */
+    protected function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
 
@@ -132,9 +136,13 @@ class LocationsControllerTest extends BaseTestWithServices
         $this->assertEquals($this->service->searchLocationsResult, $result);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    protected function after()
     {
-        parent::tearDown();
+        parent::after();
 
         MockLocationService::resetInstance();
     }

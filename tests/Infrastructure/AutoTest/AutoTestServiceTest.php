@@ -36,11 +36,13 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     protected $httpClient;
 
     /**
+     * @before
+     *
      * @throws \Exception
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
 
@@ -71,11 +73,12 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     }
 
     /**
+     * @after
      * @inheritDoc
      */
-    public function tearDown()
+    public function after()
     {
-        parent::tearDown();
+        parent::after();
 
         TestRepositoryRegistry::cleanUp();
         AutoTestLogger::resetInstance();

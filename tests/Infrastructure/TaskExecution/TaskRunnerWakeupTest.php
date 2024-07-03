@@ -55,9 +55,13 @@ class TaskRunnerWakeupTest extends TestCase
     private $logger;
 
     /**
-     * @throws \Exception
+     * @before
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
-    protected function setUp()
+    protected function before()
     {
         RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
 
@@ -109,11 +113,15 @@ class TaskRunnerWakeupTest extends TestCase
         $this->logger = $shopLogger;
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     * @return void
+     */
+    protected function after()
     {
         MemoryStorage::reset();
         AsyncProcessStarterService::resetInstance();
-        parent::tearDown();
+        $this->tearDown();
     }
 
     /**

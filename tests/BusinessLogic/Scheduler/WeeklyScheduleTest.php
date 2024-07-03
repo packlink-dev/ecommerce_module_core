@@ -30,12 +30,14 @@ class WeeklyScheduleTest extends TestCase
     private $oldTimeZone;
 
     /**
+     * @before
+     *
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        $this->setUp();
 
         $this->oldTimeZone = date_default_timezone_get();
         date_default_timezone_set('UTC');
@@ -56,12 +58,13 @@ class WeeklyScheduleTest extends TestCase
     }
 
     /**
-     * @inheritdoc
+     * @after
+     * @return void
      */
-    public function tearDown()
+    public function after()
     {
         date_default_timezone_set($this->oldTimeZone);
-        parent::tearDown();
+        $this->tearDown();
     }
 
     /**

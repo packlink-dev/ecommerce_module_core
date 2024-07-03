@@ -20,11 +20,12 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
     protected $httpClient;
 
     /**
+     * @before
      * @throws \Exception
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         $this->httpClient = new TestCurlHttpClient();
         $me = $this;

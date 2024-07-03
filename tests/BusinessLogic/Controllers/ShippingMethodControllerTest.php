@@ -42,11 +42,12 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     public $systemInfoService;
 
     /**
+     * @before
      * @inheritdoc
      */
-    public function setUp()
+    public function before()
     {
-        parent::setUp();
+        parent::before();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(ShippingMethod::CLASS_NAME, MemoryRepository::getClassName());
@@ -81,10 +82,14 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $this->controller = new ShippingMethodController();
     }
 
-    public function tearDown()
+    /**
+     * @after
+     * @inheritDoc
+     */
+    public function after()
     {
         ShippingMethodService::resetInstance();
-        parent::tearDown();
+        parent::after();
     }
 
     public function testGetAll()
@@ -519,10 +524,10 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     {
         $test = new UpdateShippingServicesTaskTest();
         /** @noinspection PhpUnhandledExceptionInspection */
-        $test->setUp();
+        $test->before();
         /** @noinspection PhpUnhandledExceptionInspection */
         $test->testExecuteAllNew();
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->setUp();
+        $this->before();
     }
 }
