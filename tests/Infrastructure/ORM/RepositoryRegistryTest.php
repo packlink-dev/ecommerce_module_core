@@ -39,19 +39,33 @@ class RepositoryRegistryTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @return void
      */
     public function testRegisterRepositoryWrongRepoClass()
     {
-        RepositoryRegistry::registerRepository('test', '\PHPUnit\Framework\TestCase');
+        $exThrown = null;
+        try {
+            RepositoryRegistry::registerRepository('test', '\PHPUnit\Framework\TestCase');
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @return void
      */
     public function testRegisterRepositoryNotRegistered()
     {
-        RepositoryRegistry::getRepository('test2');
+        $exThrown = null;
+        try {
+            RepositoryRegistry::getRepository('test2');
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
@@ -79,13 +93,21 @@ class RepositoryRegistryTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @return void
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function testGetQueueItemRepositoryException()
     {
         RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryRepository::getClassName());
 
-        RepositoryRegistry::getQueueItemRepository();
+        $exThrown = null;
+        try {
+            RepositoryRegistry::getQueueItemRepository();
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

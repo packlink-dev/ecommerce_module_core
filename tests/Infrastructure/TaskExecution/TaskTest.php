@@ -175,37 +175,55 @@ class TaskTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
      */
     public function testItShouldNotBePossibleToReportNegativeProgress()
     {
         $task = new FooTask();
 
-        $task->reportProgress(-1);
+        try {
+            $task->reportProgress(-1);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
 
         $this->fail('Task must refuse reporting negative progress with InvalidArgumentException.');
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
      */
     public function testItShouldNotBePossibleToReportMoreThan100ForProgress()
     {
         $task = new FooTask();
 
-        $task->reportProgress(100.01);
+        try {
+            $task->reportProgress(100.01);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
 
         $this->fail('Task must refuse reporting greater than 100% progress values with InvalidArgumentException.');
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
      */
     public function testItShouldNotBePossibleToReportNonIntegerValueForProgress()
     {
         $task = new FooTask();
 
-        $task->reportProgress('boo');
+        try {
+            $task->reportProgress('boo');
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
 
         $this->fail('Task must refuse reporting non float progress values with InvalidArgumentException.');
     }

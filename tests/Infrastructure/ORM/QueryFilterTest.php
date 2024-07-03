@@ -141,30 +141,51 @@ class QueryFilterTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @return void
      */
     public function testOrderByWrongColumn()
     {
         $queryFilter = new QueryFilter();
-        $queryFilter->orderBy(123);
+        $exThrown = null;
+        try {
+            $queryFilter->orderBy(123);
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @return void
      */
     public function testOrderByWrongDirection()
     {
         $queryFilter = new QueryFilter();
-        $queryFilter->orderBy('a', 123);
+        $exThrown = null;
+        try {
+            $queryFilter->orderBy('a', 123);
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @return void
      */
     public function testConditionWrongTypeValue()
     {
         $queryFilter = new QueryFilter();
-        $queryFilter->where('a', '=', new \stdClass());
+        $exThrown = null;
+        try {
+            $queryFilter->where('a', '=', new \stdClass());
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
@@ -173,19 +194,25 @@ class QueryFilterTest extends TestCase
      * @param $value
      *
      * @dataProvider wrongConditionProvider
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testWrongCondition($column, $operator, $value)
     {
         $queryFilter = new QueryFilter();
-        $queryFilter->where($column, $operator, $value);
+        $exThrown = null;
+        try {
+            $queryFilter->where($column, $operator, $value);
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
      * @return array
      * @throws \Exception
      */
-    public function wrongConditionProvider()
+    public static function wrongConditionProvider()
     {
         return array(
             array(

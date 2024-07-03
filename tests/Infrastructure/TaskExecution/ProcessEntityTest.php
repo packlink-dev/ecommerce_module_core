@@ -49,7 +49,7 @@ class ProcessEntityTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
      */
     public function testFromArrayInvalidGuid()
     {
@@ -59,11 +59,18 @@ class ProcessEntityTest extends BaseInfrastructureTestWithServices
             'runner' => Serializer::serialize($runner),
         );
 
-        Process::fromArray($data);
+        $exThrown = null;
+        try {
+            Process::fromArray($data);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
      */
     public function testFromArrayInvalidRunner()
     {
@@ -72,6 +79,13 @@ class ProcessEntityTest extends BaseInfrastructureTestWithServices
             'guid' => 'test',
         );
 
-        Process::fromArray($data);
+        $exThrown = null;
+        try {
+            Process::fromArray($data);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

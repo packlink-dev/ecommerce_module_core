@@ -20,10 +20,17 @@ class TestSingletonInstance extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @return void
      */
     public function testIncorrectInstance()
     {
-        TestAutoTestLogger::getInstance();
+        $exThrown = null;
+        try {
+            TestAutoTestLogger::getInstance();
+        } catch (\RuntimeException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

@@ -41,14 +41,19 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
 
     /**
      * Test auto-configure to throw exception if auto-configure URL is not set.
-     *
-     * @expectedException \Logeecom\Infrastructure\Exceptions\BaseException
      */
     public function testAutoConfigureNoUrlSet()
     {
         $this->shopConfig->setAutoConfigurationUrl(null);
         $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
-        $controller->start();
+        $exThrown = null;
+        try {
+            $controller->start();
+        } catch (\Logeecom\Infrastructure\Exceptions\BaseException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**

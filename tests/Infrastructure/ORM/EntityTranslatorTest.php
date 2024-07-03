@@ -46,26 +46,41 @@ class EntityTranslatorTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @return void
      */
     public function testTranslateWithoutInit()
     {
         $intermediate = new IntermediateObject();
         $translator = new EntityTranslator();
-        $translator->translate(array($intermediate));
+        $exThrown = null;
+        try {
+            $translator->translate(array($intermediate));
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\EntityClassException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @return void
      */
     public function testInitOnNonEntity()
     {
         $translator = new EntityTranslator();
-        $translator->init('\Logeecom\Infrastructure\ORM\IntermediateObject');
+        $exThrown = null;
+        try {
+            $translator->init('\Logeecom\Infrastructure\ORM\IntermediateObject');
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\EntityClassException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
+     * @return void
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\EntityClassException
      */
     public function testTranslateWrongEntity()
     {
@@ -76,6 +91,13 @@ class EntityTranslatorTest extends BaseInfrastructureTestWithServices
 
         $translator = new EntityTranslator();
         $translator->init(QueueItem::getClassName());
-        $translator->translate(array($intermediate));
+        $exThrown = null;
+        try {
+            $translator->translate(array($intermediate));
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\EntityClassException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

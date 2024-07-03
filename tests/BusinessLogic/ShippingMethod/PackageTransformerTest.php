@@ -95,7 +95,7 @@ class PackageTransformerTest extends BaseTestWithServices
     /**
      * @return array
      */
-    public function packagesProvider()
+    public static function packagesProvider()
     {
         return array(
             array(

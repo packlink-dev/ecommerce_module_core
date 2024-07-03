@@ -71,24 +71,35 @@ class ServiceRegisterTest extends TestCase
 
     /**
      * Test throwing exception when service is not registered.
-     * @expectedException \Logeecom\Infrastructure\Exceptions\ServiceNotRegisteredException
      */
     public function testGettingServiceWhenItIsNotRegistered()
     {
-        ServiceRegister::getService('SomeService');
+        $exThrown = null;
+        try {
+            ServiceRegister::getService('SomeService');
+        } catch (\Logeecom\Infrastructure\Exceptions\ServiceNotRegisteredException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
      * Test throwing exception when trying to register service with non callable delegate
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testRegisteringServiceWhenDelegateIsNotCallable()
     {
-        new TestServiceRegister(
-            array(
-                TestService::CLASS_NAME => 'Some non callable string',
-            )
-        );
+        $exThrown = null;
+        try {
+            new TestServiceRegister(
+                array(
+                    TestService::CLASS_NAME => 'Some non callable string',
+                )
+            );
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

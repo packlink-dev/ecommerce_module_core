@@ -38,19 +38,33 @@ class FrontDtoTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @return void
      */
     public function testFromArrayFieldsNotImplemented()
     {
-        EmptyFrontDto::fromArray(array('field'));
+        $exThrown = null;
+        try {
+            EmptyFrontDto::fromArray(array('field'));
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @return void
      */
     public function testFromArrayWrongFields()
     {
-        FooDto::fromArray(array('foo' => 'something', 'bad_field' => 'value'));
+        $exThrown = null;
+        try {
+            FooDto::fromArray(array('foo' => 'something', 'bad_field' => 'value'));
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     public function testValidation()

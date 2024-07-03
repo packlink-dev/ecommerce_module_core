@@ -189,16 +189,25 @@ class OrderServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @return void
+     * @throws EmptyOrderException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testPrepareDraftNoOrder()
     {
         /** @var TestShopOrderService $orderRepository */
         $orderRepository = TestServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $orderRepository->shouldThrowOrderNotFoundException(true);
-        $order = $this->shopOrderService->getOrder('test', 'IT');
 
-        $this->orderService->prepareDraft($order);
+        $exThrown = null;
+        try {
+            $order = $this->shopOrderService->getOrder('test', 'IT');
+            $this->orderService->prepareDraft($order);
+        } catch (\Packlink\BusinessLogic\Order\Exceptions\OrderNotFound $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**

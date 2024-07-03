@@ -73,8 +73,7 @@ class EventEmitterTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Handler exception
+     * @return void
      */
     public function testItShouldBePossibleToTriggerExceptionFromInsideHandlerMethod()
     {
@@ -86,7 +85,14 @@ class EventEmitterTest extends TestCase
             }
         );
 
-        $emitter->fire(new TestFooEvent());
+        try {
+            $emitter->fire(new TestFooEvent());
+        } catch (\Exception $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Handler exception', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('It should be possible to throw exception from event handler code.');
     }

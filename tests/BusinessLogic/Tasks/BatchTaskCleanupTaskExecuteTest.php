@@ -155,17 +155,21 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
         $this->assertEmpty($tasks);
     }
 
-    /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
-     */
     public function testRepositoryDoesNotImplementConditionallyDeletes()
     {
         // arrange
         RepositoryRegistry::registerRepository(QueueItem::getClassName(), MemoryQueueItemRepository::getClassName());
         $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS));
 
-        // act
-        $task->execute();
+        $exThrown = null;
+        try {
+            // act
+            $task->execute();
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     private function getTaskSet()

@@ -40,18 +40,26 @@ class PostalZoneEntityTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage 404 Not found.
+     * @return void
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      */
     public function testFailedPostalZonesRetrieval()
     {
         $this->httpClient->setMockResponses($this->getFailedResponses());
         /** @var Proxy $proxy */
         $proxy = TestServiceRegister::getService(Proxy::CLASS_NAME);
+        $exThrown = null;
+        try {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $proxy->getPostalZones('ES');
+        } catch (\Logeecom\Infrastructure\Http\Exceptions\HttpRequestException $ex) {
+            $exThrown = $ex;
+        }
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $proxy->getPostalZones('ES');
+        $this->assertNotNull($exThrown);
+        $this->assertEquals(404, $exThrown->getCode());
+        $this->assertEquals('404 Not found.', $exThrown->getMessage());
     }
 
     public function testCreatingPostalZoneFromArray()

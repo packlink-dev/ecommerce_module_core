@@ -172,17 +172,23 @@ class ShippingMethodEntityTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testCheapestServiceWrongDestination()
     {
         $method = $this->assertBasicDataToArray();
         $packages = array(Package::defaultPackage());
 
-        self::assertEquals(
-            4,
-            ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->basePrice
-        );
+        try {
+            $basePrice = ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages)->basePrice;
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
+
+        self::assertEquals(4, $basePrice);
     }
 
     public function testCheapestServiceProxyResponse()

@@ -165,13 +165,20 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     /**
      * Tests failure when storage is not available.
      *
-     * @expectedException \Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testStartAutoTestStorageFailure()
     {
         // repository is not registered
         $service = new AutoTestService();
-        $service->startAutoTest();
+
+        $exThrown = null;
+        try {
+            $service->startAutoTest();
+        } catch (\Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }
