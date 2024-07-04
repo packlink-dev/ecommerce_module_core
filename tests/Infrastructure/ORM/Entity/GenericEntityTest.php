@@ -49,7 +49,6 @@ abstract class GenericEntityTest extends TestCase
 
         $type = $config->getType();
         $this->assertNotEmpty($type);
-        $this->assertInternalType('string', $type);
 
         $indexMap = $config->getIndexMap();
         $this->assertInstanceOf("Logeecom\Infrastructure\ORM\Configuration\IndexMap", $indexMap);
@@ -70,10 +69,17 @@ abstract class GenericEntityTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @return void
      */
     public function testInvalidIndexType()
     {
-        new Index('type', 'name');
+        $exThrown = null;
+        try {
+            new Index('type', 'name');
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

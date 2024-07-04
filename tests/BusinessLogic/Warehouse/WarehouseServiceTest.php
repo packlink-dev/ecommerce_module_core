@@ -59,18 +59,29 @@ class WarehouseServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public function testSaveInvalid()
     {
         /** @var WarehouseService $service */
         $service = ServiceRegister::getService(WarehouseService::CLASS_NAME);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $service->updateWarehouseData(array('country' => 'ES', 'name' => 'test'));
+        $exThrown = null;
+        try {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $service->updateWarehouseData(array('country' => 'ES', 'name' => 'test'));
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public function testSaveInvalidPostalCode()
     {
@@ -80,12 +91,21 @@ class WarehouseServiceTest extends BaseTestWithServices
         $service = ServiceRegister::getService(WarehouseService::CLASS_NAME);
 
         $data = json_decode(file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json'), true);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $service->updateWarehouseData($data[0]);
+        $exThrown = null;
+        try {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $service->updateWarehouseData($data[0]);
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public function testSaveInvalidPostalCodeProxyResponse()
     {
@@ -94,8 +114,15 @@ class WarehouseServiceTest extends BaseTestWithServices
 
         $data = json_decode(file_get_contents(__DIR__ . '/../Common/ApiResponses/warehouses.json'), true);
         $data[0]['postal_code'] = '11111';
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $service->updateWarehouseData($data[0]);
+        $exThrown = null;
+        try {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $service->updateWarehouseData($data[0]);
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**

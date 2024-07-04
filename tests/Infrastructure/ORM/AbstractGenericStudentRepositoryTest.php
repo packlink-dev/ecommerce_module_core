@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\ORM;
 
+use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
@@ -405,7 +406,7 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
 
         $students = $repository->select($query);
         foreach ($students as $student) {
-            $this->assertAttributeNotEquals(6, 'localId', $student);
+            $this->assertNotEquals(6, $student->localId);
         }
     }
 
@@ -528,35 +529,45 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testQueryWithUnknownFieldSort()
     {
+        $exThrown = null;
         $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->orderBy('some_field', QueryFilter::ORDER_DESC);
 
-        $repository->select($queryFilter);
+        try {
+            $repository->select($queryFilter);
+        } catch (QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
     public function testQueryWithUnIndexedFieldSort()
     {
+        $exThrown = null;
         $this->testStudentMassInsert();
         $repository = RepositoryRegistry::getRepository(StudentEntity::getClassName());
         $queryFilter = new QueryFilter();
         $queryFilter->orderBy('contact', QueryFilter::ORDER_DESC);
 
-        $repository->select($queryFilter);
+        try {
+            $repository->select($queryFilter);
+        } catch (QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**

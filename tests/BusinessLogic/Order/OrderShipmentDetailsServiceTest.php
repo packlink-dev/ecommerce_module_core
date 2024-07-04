@@ -91,15 +91,22 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     * @return void
      */
     public function testSetLabelsUnknownReference()
     {
         $this->orderShipmentDetailsService->setReference('test', 'test_reference');
-        $this->orderShipmentDetailsService->setLabelsByReference(
-            'some reference',
-            array(new ShipmentLabel('label1'), new ShipmentLabel('label2'))
-        );
+        $exThrown = null;
+        try {
+            $this->orderShipmentDetailsService->setLabelsByReference(
+                'some reference',
+                array(new ShipmentLabel('label1'), new ShipmentLabel('label2'))
+            );
+        } catch (\Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
 
         $this->fail('Exception must be thrown if shipment reference is not found.');
     }

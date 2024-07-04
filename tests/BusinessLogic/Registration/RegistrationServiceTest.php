@@ -37,11 +37,9 @@ class RegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
+     * @return void
+     * @throws UnableToRegisterAccountException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
-     *
-     * @expectedException \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
-     * @expectedExceptionMessage Registration failed. Error: Client already exists
      */
     public function testRegisterSameEmailTwice()
     {
@@ -62,15 +60,20 @@ class RegistrationServiceTest extends BaseTestWithServices
         $this->assertNotEmpty($token, 'Token should not be an empty string');
         $this->assertEquals('ee0870a7dc61e4eda41fbae68395c672aeafe375cd90ce4adcf615c6ae86f28d', $token);
 
-        $service->register($this->getRequest());
+        $exThrown = null;
+        try {
+            $service->register($this->getRequest());
+        } catch (\Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
+        $this->assertEquals('Registration failed. Error: Client already exists', $exThrown->getMessage());
     }
 
     /**
+     * @return void
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
-     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
-     *
-     * @expectedException \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
-     * @expectedExceptionMessage Registration failed. Error: Bad Request
      */
     public function testBadRequest()
     {
@@ -82,7 +85,15 @@ class RegistrationServiceTest extends BaseTestWithServices
         $request = $this->getRequest();
         $request->platform = 'test';
 
-        $service->register($request);
+        $exThrown = null;
+        try {
+            $service->register($request);
+        } catch (\Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
+        $this->assertEquals('Registration failed. Error: Bad Request', $exThrown->getMessage());
     }
 
     /**

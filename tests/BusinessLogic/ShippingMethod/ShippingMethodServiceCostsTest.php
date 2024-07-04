@@ -1073,7 +1073,7 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
      *
      * @return array
      */
-    public function wrongParametersProvider()
+    public static function wrongParametersProvider()
     {
         return array(
             array('IT', '', 'IT', '00127', array(new Package())),

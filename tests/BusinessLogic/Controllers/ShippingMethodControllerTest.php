@@ -103,7 +103,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
                 '\Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse',
                 $item
             );
-            $this->assertInternalType('array', $item->toArray());
+            $this->assertTrue(is_array($item->toArray()));
         }
     }
 
@@ -522,7 +522,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
      */
     private function importShippingMethods()
     {
-        $test = new UpdateShippingServicesTaskTest();
+        $test = new UpdateShippingServicesTaskTest('before');
         /** @noinspection PhpUnhandledExceptionInspection */
         $test->before();
         /** @noinspection PhpUnhandledExceptionInspection */

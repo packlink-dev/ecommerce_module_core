@@ -312,9 +312,8 @@ class TaskRunnerTest extends TestCase
             $actualTestTask->getMethodCallCount('reconfigure'),
             'Run call should reconfigure failing expired tasks.'
         );
-        $this->assertContains((string)$expiredRunningItem->getId(), $actualFailureDescription);
-        $this->assertContains($expiredRunningItem->getTaskType(), $actualFailureDescription);
-        $this->assertContains('failed due to extended inactivity period', $actualFailureDescription);
+
+        $this->assertSame('Task '.$expiredRunningItem->getId() .'(' . $expiredRunningItem->getTaskType().') failed due to extended inactivity period.', $actualFailureDescription);
     }
 
     public function testRunnerShouldBeInactiveAtTheEndOfLifecycle()

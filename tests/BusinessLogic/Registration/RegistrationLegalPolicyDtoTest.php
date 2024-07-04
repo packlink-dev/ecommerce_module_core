@@ -58,7 +58,8 @@ class RegistrationLegalPolicyDtoTest extends BaseDtoTest
                 $errors
             );
 
-            self::assertArraySubset(array('data_processing', 'terms_and_conditions'), $errorCodes);
+            self::assertContains('data_processing', $errorCodes);
+            self::assertContains('terms_and_conditions', $errorCodes);
         }
 
         self::assertTrue($exceptionThrown);

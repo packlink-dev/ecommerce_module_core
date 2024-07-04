@@ -116,7 +116,7 @@ class QueueItemTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      */
     public function testQueueItemShouldThrowExceptionWhenSerializationFails()
     {
@@ -125,8 +125,15 @@ class QueueItemTest extends TestCase
 
         $queueItem->setSerializedTask('invalid serialized task content');
 
-        /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
-        $actualTask = $queueItem->getTask();
+        try {
+            /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask $actualTask */
+            $actualTask = $queueItem->getTask();
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
+
         $this->assertSame($task->getDependency1(), $actualTask->getDependency1());
         $this->assertSame($task->getDependency2(), $actualTask->getDependency2());
     }
@@ -152,41 +159,58 @@ class QueueItemTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid QueueItem status: "Not supported". Status must be one of "created", "queued",
-     *     "in_progress", "completed" or "failed" values.
+     * @return void
      */
     public function testItShouldNotBePossibleToSetNotSupportedStatus()
     {
         $queueItem = new QueueItem();
 
-        $queueItem->setStatus('Not supported');
+        try {
+            $queueItem->setStatus('Not supported');
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Invalid QueueItem status: "Not supported". Status must be one of "created", "queued", "in_progress", "completed", "failed" or "aborted" values.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Setting not supported status should fail.');
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Last execution progress percentage must be value between 0 and 100.
+     * @return void
      */
     public function testItShouldNotBePossibleToSetNegativeLastExecutionProgress()
     {
         $queueItem = new QueueItem();
 
-        $queueItem->setLastExecutionProgressBasePoints(-1);
+        try {
+            $queueItem->setLastExecutionProgressBasePoints(-1);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Last execution progress percentage must be value between 0 and 100.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('QueueItem must refuse setting negative last execution progress with InvalidArgumentException.');
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Last execution progress percentage must be value between 0 and 100.
+     * @return void
      */
     public function testItShouldNotBePossibleToSetMoreThan10000ForLastExecutionProgress()
     {
         $queueItem = new QueueItem();
 
-        $queueItem->setLastExecutionProgressBasePoints(10001);
+        try {
+            $queueItem->setLastExecutionProgressBasePoints(10001);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Last execution progress percentage must be value between 0 and 100.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'QueueItem must refuse setting greater than 100 last execution progress values with InvalidArgumentException.'
@@ -194,27 +218,39 @@ class QueueItemTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Progress percentage must be value between 0 and 100.
+     * @return void
      */
     public function testItShouldNotBePossibleToSetNegativeProgress()
     {
         $queueItem = new QueueItem();
 
-        $queueItem->setProgressBasePoints(-1);
+        try {
+            $queueItem->setProgressBasePoints(-1);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Progress percentage must be value between 0 and 100.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('QueueItem must refuse setting negative progress with InvalidArgumentException.');
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Progress percentage must be value between 0 and 100.
+     * @return void
      */
     public function testItShouldNotBePossibleToSetMoreThan100ForProgress()
     {
         $queueItem = new QueueItem();
 
-        $queueItem->setProgressBasePoints(10001);
+        try {
+            $queueItem->setProgressBasePoints(10001);
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Progress percentage must be value between 0 and 100.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('QueueItem must refuse setting greater than 100 progress values with InvalidArgumentException.');
     }
@@ -233,14 +269,20 @@ class QueueItemTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Progress percentage must be value between 0 and 100.
+     * @return void
      */
     public function testItShouldNotBePossibleToReportNonIntegerValueForProgress()
     {
         $queueItem = new QueueItem();
 
-        $queueItem->setProgressBasePoints('50%');
+        try {
+            $queueItem->setProgressBasePoints('50%');
+        } catch (\InvalidArgumentException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Progress percentage must be value between 0 and 100.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('QueueItem must refuse setting non integer progress values with InvalidArgumentException.');
     }

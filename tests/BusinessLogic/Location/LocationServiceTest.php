@@ -175,12 +175,9 @@ class LocationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
-     *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException
      */
     public function testLocationSearchWithUnsupportedCountry()
     {
@@ -188,7 +185,15 @@ class LocationServiceTest extends BaseTestWithServices
 
         /** @var LocationService $locationService */
         $locationService = TestServiceRegister::getService(LocationService::CLASS_NAME);
-        $locationService->searchLocations('RS', 'Test');
+
+        $exThrown = null;
+        try {
+            $locationService->searchLocations('RS', 'Test');
+        } catch (\Packlink\BusinessLogic\Location\Exceptions\PlatformCountryNotSupportedException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     public function testGetLocationsForInvalidPostalCode()

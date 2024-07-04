@@ -136,7 +136,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
                 $errors
             );
 
-            self::assertArraySubset(array($field), $errorCodes);
+            self::assertContains($field, $errorCodes);
         }
 
         self::assertTrue($exceptionThrown);

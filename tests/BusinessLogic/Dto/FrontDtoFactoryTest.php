@@ -42,35 +42,66 @@ class FrontDtoFactoryTest extends BaseDtoTest
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @return void
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function testNotRegistered()
     {
-        TestFrontDtoFactory::get(FooDto::CLASS_KEY, array());
+        $exThrown = null;
+        try {
+            TestFrontDtoFactory::get(FooDto::CLASS_KEY, array());
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
+     * @return void
      */
     public function testNotRegisteredBatch()
     {
-        TestFrontDtoFactory::getFromBatch(FooDto::CLASS_KEY, array());
+        $exThrown = null;
+        try {
+            TestFrontDtoFactory::getFromBatch(FooDto::CLASS_KEY, array());
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     * @return void
      */
     public function testBadClassRegistration()
     {
-        TestFrontDtoFactory::register(FooDto::CLASS_KEY, NonFrontDto::CLASS_NAME);
+        $exThrown = null;
+        try {
+            TestFrontDtoFactory::register(FooDto::CLASS_KEY, NonFrontDto::CLASS_NAME);
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @return void
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      */
     public function testGetWrongPayload()
     {
         TestFrontDtoFactory::register(FooDto::CLASS_KEY, FooDto::CLASS_NAME);
-        TestFrontDtoFactory::get(FooDto::CLASS_KEY, array('foo' => 'something', 'whatever' => 123));
+        $exThrown = null;
+        try {
+            TestFrontDtoFactory::get(FooDto::CLASS_KEY, array('foo' => 'something', 'whatever' => 123));
+        } catch (\Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

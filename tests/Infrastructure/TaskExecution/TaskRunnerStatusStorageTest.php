@@ -55,15 +55,22 @@ class TaskRunnerStatusStorageTest extends TestCase
     }
 
     /**
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
      */
     public function testSetTaskRunnerWhenItNotExist()
     {
         $taskRunnerStatusStorage = new RunnerStatusStorage();
         $taskStatus = new TaskRunnerStatus('guid', 123456789);
 
-        $taskRunnerStatusStorage->setStatus($taskStatus);
+        $exThrown = null;
+        try {
+            $taskRunnerStatusStorage->setStatus($taskStatus);
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
@@ -86,7 +93,7 @@ class TaskRunnerStatusStorageTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
      */
     public function testSetTaskRunnerWhenItExistButItIsNotTheSame()
@@ -95,6 +102,13 @@ class TaskRunnerStatusStorageTest extends TestCase
         $this->configuration->setTaskRunnerStatus('guid', 123456789);
         $taskStatus = new TaskRunnerStatus('guid2', 123456789);
 
-        $taskRunnerStatusStorage->setStatus($taskStatus);
+        $exThrown = null;
+        try {
+            $taskRunnerStatusStorage->setStatus($taskStatus);
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

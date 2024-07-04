@@ -259,7 +259,13 @@ class SendDraftTaskTest extends BaseSyncTest
     }
 
     /**
-     * @expectedException \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
+     * @return void
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
     public function testExecuteBadResponse()
     {
@@ -274,7 +280,15 @@ class SendDraftTaskTest extends BaseSyncTest
                 200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
             ),
             new HttpResponse(200, array(), '{}')));
-        $this->syncTask->execute();
+
+        $exThrown = null;
+        try {
+            $this->syncTask->execute();
+        } catch (\Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**

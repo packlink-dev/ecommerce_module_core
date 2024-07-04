@@ -245,8 +245,8 @@ class TaskRunnerWakeupTest extends TestCase
             $startCallHistory,
             'Wakeup call when new status setting fails must not start new runner instance.'
         );
-        $this->assertContains(
-            'Runner status storage failed to set new active state.',
+        $this->assertSame(
+            'Fail to wakeup task runner. Runner status storage failed to set new active state.',
             $this->logger->data->getMessage()
         );
     }
@@ -273,7 +273,7 @@ class TaskRunnerWakeupTest extends TestCase
             $startCallHistory,
             'Wakeup call when tasks status storage is unavailable must not start new runner instance.'
         );
-        $this->assertContains('Runner status storage unavailable.', $this->logger->data->getMessage());
+        $this->assertSame('Fail to wakeup task runner. Runner status storage unavailable.', $this->logger->data->getMessage());
     }
 
     /**
@@ -298,6 +298,6 @@ class TaskRunnerWakeupTest extends TestCase
             $startCallHistory,
             'Wakeup call when exception occurs must not start new runner instance.'
         );
-        $this->assertContains('Unexpected error occurred.', $this->logger->data->getMessage());
+        $this->assertSame('Fail to wakeup task runner. Unexpected error occurred.', $this->logger->data->getMessage());
     }
 }

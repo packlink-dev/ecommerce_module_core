@@ -578,11 +578,10 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Progress reported for not started queue item.
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testWhenNotInProgressReportedProgressShouldFailJob()
     {
@@ -592,8 +591,16 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queue->fail($queueItem, 'Test failure description');
 
-        // Act
-        $task->reportProgress(25.78);
+        try {
+            // Act
+            $task->reportProgress(25.78);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Progress reported for not started queue item.', $exThrown->getMessage());
+            return;
+        }
+
 
         // Assert
         $this->fail('Reporting progress on not started queue item should fail.');
@@ -958,8 +965,7 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -969,15 +975,19 @@ class QueueTest extends TestCase
         $queueItem = $this->queue->enqueue('testQueue', new FooTask());
         $this->queue->start($queueItem);
         $this->queue->abort($queueItem, 'Abort message.');
-        $this->queue->start($queueItem);
+        try {
+            $this->queue->start($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            return;
+        }
 
         $this->fail('Queue item should not be started after abortion.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "created" to "in_progress"
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -986,42 +996,60 @@ class QueueTest extends TestCase
     {
         $queueItem = new QueueItem(new FooTask());
 
-        $this->queue->start($queueItem);
+        try {
+            $this->queue->start($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "created" to "in_progress"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "created" to "in_progress" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "created" to "failed"
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromCreatedToFailedStatus()
     {
         $queueItem = new QueueItem(new FooTask());
 
-        $this->queue->fail($queueItem, 'Test failure description');
+        try {
+            $this->queue->fail($queueItem, 'Test failure description');
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "created" to "failed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "created" to "failed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "created" to "completed"
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromCreatedToCompletedStatus()
     {
         $queueItem = new QueueItem(new FooTask());
 
-        $this->queue->finish($queueItem);
+        try {
+            $this->queue->finish($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "created" to "completed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "created" to "completed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "queued" to "failed"
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromQueuedToFailedStatus()
@@ -1031,14 +1059,20 @@ class QueueTest extends TestCase
             new FooTask()
         );
 
-        $this->queue->fail($queueItem, 'Test failure description');
+        try {
+            $this->queue->fail($queueItem, 'Test failure description');
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "queued" to "failed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "queued" to "failed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "queued" to "completed"
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromQueuedToCompletedStatus()
@@ -1048,15 +1082,20 @@ class QueueTest extends TestCase
             new FooTask()
         );
 
-        $this->queue->finish($queueItem);
+        try {
+            $this->queue->finish($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "queued" to "completed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "queued" to "completed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "in_progress" to "in_progress"
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -1069,18 +1108,23 @@ class QueueTest extends TestCase
         );
         $this->queue->start($queueItem);
 
-        $this->queue->start($queueItem);
+        try {
+            $this->queue->start($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "in_progress" to "in_progress"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "in_progress" to "in_progress" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "failed" to "in_progress"
-     *
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedToInProgressStatus()
     {
@@ -1097,19 +1141,23 @@ class QueueTest extends TestCase
             }
         }
 
-        // Act
-        $this->queue->start($queueItem);
+        try {
+            $this->queue->start($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "failed" to "in_progress"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "failed" to "in_progress" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "failed" to "failed"
-     *
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedFailedStatus()
     {
@@ -1126,19 +1174,23 @@ class QueueTest extends TestCase
             }
         }
 
-        // Act
-        $this->queue->fail($queueItem, 'Test failure description');
+        try {
+            $this->queue->fail($queueItem, 'Test failure description');
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "failed" to "failed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "failed" to "failed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "failed" to "completed"
-     *
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromFailedCompletedStatus()
     {
@@ -1155,19 +1207,23 @@ class QueueTest extends TestCase
             }
         }
 
-        // Act
-        $this->queue->finish($queueItem);
+        try {
+            $this->queue->finish($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "failed" to "completed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "failed" to "completed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "completed" to "in_progress"
-     *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromCompletedToInProgressStatus()
     {
@@ -1179,19 +1235,23 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queue->finish($queueItem);
 
-        // Act
-        $this->queue->start($queueItem);
+        try {
+            $this->queue->start($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "completed" to "in_progress"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "completed" to "in_progress" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "completed" to "failed"
-     *
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromCompletedToFailedStatus()
     {
@@ -1203,19 +1263,23 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queue->finish($queueItem);
 
-        // Act
-        $this->queue->fail($queueItem, 'Test failure description');
+        try {
+            $this->queue->fail($queueItem, 'Test failure description');
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "completed" to "failed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "completed" to "failed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "completed" to "completed"
-     *
+     * @return void
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      */
     public function testItShouldBeForbiddenToTransitionFromCompletedToCompletedStatus()
     {
@@ -1227,31 +1291,40 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queue->finish($queueItem);
 
-        // Act
-        $this->queue->finish($queueItem);
+        try {
+            $this->queue->finish($queueItem);
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "completed" to "completed"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "completed" to "completed" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "queued" to "aborted"
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testItShouldBeForbiddenToTransitionFromQueuedToAbortedStatus()
     {
         $queueItem = $this->queue->enqueue('testQueue', new FooTask());
 
-        $this->queue->abort($queueItem, '');
+        try {
+            $this->queue->abort($queueItem, '');
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "queued" to "aborted"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "Created" to "Aborted" should not be allowed.');
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Illegal queue item state transition from "failed" to "aborted"
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -1267,25 +1340,37 @@ class QueueTest extends TestCase
                 $this->queue->start($queueItem);
             }
         }
-        $this->queue->abort($queueItem, '');
+        try {
+            $this->queue->abort($queueItem, '');
+        } catch (\BadMethodCallException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Illegal queue item state transition from "failed" to "aborted"', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail('Queue item status transition from "Failed" to "Aborted" should not be allowed.');
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
+     * @return void
      */
     public function testWhenStoringQueueItemFailsEnqueueMethodMustFail()
     {
         // Arrange
         $this->queueStorage->disabled = true;
 
-        // Act
-        $this->queue->enqueue(
-            'testQueue',
-            new FooTask()
-        );
+        try {
+            $this->queue->enqueue(
+                'testQueue',
+                new FooTask()
+            );
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Unable to update the task. Queue storage failed to save item.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'Enqueue queue item must fail with QueueStorageUnavailableException when queue storage save fails.'
@@ -1293,11 +1378,10 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     *
-     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testWhenStoringQueueItemFailsStartMethodMustFail()
     {
@@ -1308,8 +1392,14 @@ class QueueTest extends TestCase
         );
         $this->queueStorage->disabled = true;
 
-        // Act
-        $this->queue->start($queueItem);
+        try {
+            $this->queue->start($queueItem);
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Unable to update the task. Queue storage failed to save item.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'Starting queue item must fail with QueueStorageUnavailableException when queue storage save fails.'
@@ -1317,11 +1407,10 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     *
-     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testWhenStoringQueueItemFailsFailMethodMustFail()
     {
@@ -1333,8 +1422,14 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;
 
-        // Act
-        $this->queue->fail($queueItem, 'Test failure description.');
+        try {
+            $this->queue->fail($queueItem, 'Test failure description.');
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Unable to update the task. Queue storage failed to save item.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'Failing queue item must fail with QueueStorageUnavailableException when queue storage save fails.'
@@ -1342,11 +1437,10 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
-     *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testWhenStoringQueueItemProgressFailsProgressMethodMustFail()
     {
@@ -1358,8 +1452,14 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;
 
-        // Act
-        $this->queue->updateProgress($queueItem, 2095);
+        try {
+            $this->queue->updateProgress($queueItem, 2095);
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Unable to update the task. Queue storage failed to save item.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'Queue item progress update must fail with QueueStorageUnavailableException when queue storage save fails.'
@@ -1367,11 +1467,10 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
-     *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testWhenStoringQueueItemAliveFailsAliveMethodMustFail()
     {
@@ -1380,8 +1479,14 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;
 
-        // Act
-        $this->queue->keepAlive($queueItem);
+        try {
+            $this->queue->keepAlive($queueItem);
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Unable to update the task. Queue storage failed to save item.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'Queue item keep task alive signal must fail with QueueStorageUnavailableException when queue storage save fails.'
@@ -1389,11 +1494,10 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
-     * @expectedExceptionMessage Unable to update the task. Queue storage failed to save item.
-     *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @return void
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      */
     public function testWhenStoringQueueItemFailsFinishMethodMustFail()
     {
@@ -1405,8 +1509,14 @@ class QueueTest extends TestCase
         $this->queue->start($queueItem);
         $this->queueStorage->disabled = true;
 
-        // Act
-        $this->queue->finish($queueItem);
+        try {
+            $this->queue->finish($queueItem);
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException $ex) {
+            $exThrown = $ex;
+            $this->assertNotNull($exThrown);
+            $this->assertEquals('Unable to update the task. Queue storage failed to save item.', $exThrown->getMessage());
+            return;
+        }
 
         $this->fail(
             'Finishing queue item must fail with QueueStorageUnavailableException when queue storage save fails.'

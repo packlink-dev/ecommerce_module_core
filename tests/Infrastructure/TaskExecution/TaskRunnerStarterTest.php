@@ -77,12 +77,12 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
         // Assert
         $runCallHistory = $this->taskRunner->getMethodCallHistory('run');
         $this->assertCount(0, $runCallHistory, 'Run call must fail when runner is expired.');
-        $this->assertContains(
+        $this->assertStringStartsWith(
             'Failed to run task runner',
             $this->shopLogger->data->getMessage(),
             'Run call must throw TaskRunnerRunException when runner is expired'
         );
-        $this->assertContains(
+        $this->assertStringEndsWith(
             'Runner is expired.',
             $this->shopLogger->data->getMessage(),
             'Debug message must be logged when trying to run expired task runner.'
@@ -106,12 +106,12 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
         // Assert
         $runCallHistory = $this->taskRunner->getMethodCallHistory('run');
         $this->assertCount(0, $runCallHistory, 'Run call must fail when runner guid is not set as active runner guid.');
-        $this->assertContains(
+        $this->assertStringStartsWith(
             'Failed to run task runner.',
             $this->shopLogger->data->getMessage(),
             'Run call must throw TaskRunnerRunException when runner guid is not set as active runner guid.'
         );
-        $this->assertContains(
+        $this->assertStringEndsWith(
             'Runner guid is not set as active.',
             $this->shopLogger->data->getMessage(),
             'Debug message must be logged when trying to run task runner with guid that is not set as active runner guid.'
@@ -128,12 +128,12 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
         // Act
         $this->runnerStarter->run();
 
-        $this->assertContains(
+        $this->assertStringStartsWith(
             'Failed to run task runner.',
             $this->shopLogger->data->getMessage(),
             'Run call must throw TaskRunnerRunException when runner status storage is unavailable.'
         );
-        $this->assertContains('Runner status storage unavailable.', $this->shopLogger->data->getMessage());
+        $this->assertStringEndsWith('Runner status storage unavailable.', $this->shopLogger->data->getMessage());
     }
 
     public function testRunInCaseOfUnexpectedException()
@@ -145,12 +145,12 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
 
         // Act
         $this->runnerStarter->run();
-        $this->assertContains(
+        $this->assertStringStartsWith(
             'Failed to run task runner.',
             $this->shopLogger->data->getMessage(),
             'Run call must throw TaskRunnerRunException when unexpected exception occurs.'
         );
-        $this->assertContains('Unexpected error occurred.', $this->shopLogger->data->getMessage());
+        $this->assertStringEndsWith('Unexpected error occurred.', $this->shopLogger->data->getMessage());
     }
 
     public function testTaskStarterMustBeRunnableAfterDeserialization()

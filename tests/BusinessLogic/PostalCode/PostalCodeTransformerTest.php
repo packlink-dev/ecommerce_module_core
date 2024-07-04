@@ -21,11 +21,18 @@ class PostalCodeTransformerTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @return void
      */
     public function testTransformingInvalidPostalCode()
     {
-        PostalCodeTransformer::transform('PT', 'AB1234');
+        $exThrown = null;
+        try {
+            PostalCodeTransformer::transform('PT', 'AB1234');
+        } catch (InvalidArgumentException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     public function testTransformingFormattedPostalCode()
@@ -50,11 +57,18 @@ class PostalCodeTransformerTest extends BaseTestWithServices
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @return void
      */
     public function testTransformingPostalCodeWithSpecialCharacters()
     {
-        PostalCodeTransformer::transform('GB', 'SW1Ä1');
+        $exThrown = null;
+        try {
+            PostalCodeTransformer::transform('GB', 'SW1Ä1');
+        } catch (InvalidArgumentException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     public function testTransformingNonFormattedPostalCode()

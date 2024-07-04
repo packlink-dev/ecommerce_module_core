@@ -39,10 +39,17 @@ class BaseDtoTest extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @return void
      */
     public function testFromArrayNotImplemented()
     {
-        Address::fromArray(array());
+        $exThrown = null;
+        try {
+            Address::fromArray(array());
+        } catch (\RuntimeException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 }

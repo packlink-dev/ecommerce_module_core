@@ -185,8 +185,7 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
@@ -216,12 +215,18 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
         $this->assertNotNull($item);
 
         $item->setLastUpdateTimestamp(88888888);
-        $repository->saveWithCondition($item, array('lastUpdateTimestamp' => 1493851325));
+        $exThrown = null;
+        try {
+            $repository->saveWithCondition($item, array('lastUpdateTimestamp' => 1493851325));
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException
-     *
+     * @return void
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
@@ -246,11 +251,18 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
         $id = $repository->saveWithCondition($item, array('status' => 'created', 'lastUpdateTimestamp' => null));
         $this->assertEquals($item->getId(), $id);
 
-        $repository->saveWithCondition($item, array('status' => 'created', 'lastUpdateTimestamp' => 1518325751));
+        $exThrown = null;
+        try {
+            $repository->saveWithCondition($item, array('status' => 'created', 'lastUpdateTimestamp' => 1518325751));
+        } catch (\Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
-     * @expectedException \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @return void
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
@@ -261,7 +273,14 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
         $queryFilter = new QueryFilter();
         $queryFilter->where('progress', '=', 20);
 
-        $repository->select($queryFilter);
+        $exThrown = null;
+        try {
+            $repository->select($queryFilter);
+        } catch (\Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown);
     }
 
     /**
