@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.4.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.3...v3.4.4) - 2024-07-12
+### Changed
+- Fix front for integrations which still doesn't support customs
+
 ## [3.4.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.2...v3.4.3) - 2024-07-08
 ### Changed
 - Add unsupported country Algeria

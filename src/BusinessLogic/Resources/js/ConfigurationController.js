@@ -52,9 +52,12 @@ if (!window.Packlink) {
                 state.goToState('order-status-mapping');
             });
 
-            mainPage.querySelector('#pl-navigate-customs').addEventListener('click', () => {
-                state.goToState('customs')
-            })
+            let customs = mainPage.querySelector('#pl-navigate-customs')
+            if(customs) {
+                customs.addEventListener('click', () => {
+                    state.goToState('customs')
+                })
+            }
 
             mainPage.querySelector('#pl-navigate-warehouse').addEventListener('click', () => {
                 state.goToState('default-warehouse', {
