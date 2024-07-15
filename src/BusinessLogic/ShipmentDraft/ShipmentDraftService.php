@@ -121,20 +121,14 @@ class ShipmentDraftService extends BaseService
     /**
      * Checks if draft is expired.
      *
-     * @param $orderId
+     * @param string $reference
      *
      * @return bool
      */
-    public function isDraftExpired($orderId)
+    public function isDraftExpired($reference)
     {
-        $shipmentDetails = $this->getShipmentDetailsService()->getDetailsByOrderId($orderId);
-
-        if (!$shipmentDetails) {
-            return false;
-        }
-
         try {
-            $shipment = $this->getProxy()->getShipment($shipmentDetails->getReference());
+            $shipment = $this->getProxy()->getShipment($reference);
 
             if ($shipment) {
                 return false;
@@ -187,16 +181,6 @@ class ShipmentDraftService extends BaseService
     private function getConfigService()
     {
         return ServiceRegister::getService(Configuration::CLASS_NAME);
-    }
-
-    /**
-     * Retrieves order shipment details service.
-     *
-     * @return OrderShipmentDetailsService | object
-     */
-    private function getShipmentDetailsService()
-    {
-        return ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
     }
 
     /**
