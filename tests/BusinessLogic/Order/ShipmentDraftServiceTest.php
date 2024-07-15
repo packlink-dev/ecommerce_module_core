@@ -54,6 +54,10 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @var OrderSendDraftTaskMapService
      */
     public $orderSendDraftTaskMapService;
+    /**
+     * @var OrderShipmentDetailsService
+     */
+    public $orderShipmentDetailsService;
 
     /**
      * @before
@@ -162,6 +166,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
         $this->shopConfig->setDefaultParcel(ParcelInfo::defaultParcel());
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
         $this->shopConfig->setUserInfo(new User());
+        $this->orderShipmentDetailsService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
     }
 
     /**
@@ -304,6 +309,36 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
         $this->assertEquals(QueueItem::FAILED, $draftStatus->status);
         $this->assertEquals('Attempt 7: Error in task.', $draftStatus->message);
+    }
+
+    public function testDraftExpired()
+    {
+        // arrange
+        /** @var TestHttpClient $httpClient */
+        $httpClient = ServiceRegister::getService(HttpClient::CLASS_NAME);
+        $httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
+        $this->orderShipmentDetailsService->setReference('1', 'PRO202401234567');
+
+        // act
+        $result = $this->draftShipmentService->isDraftExpired('1');
+
+        // assert
+        $this->assertTrue($result);
+    }
+
+    public function testDraftNotExpired()
+    {
+        // arrange
+        /** @var TestHttpClient $httpClient */
+        $httpClient = ServiceRegister::getService(HttpClient::CLASS_NAME);
+        $httpClient->setMockResponses(array(new HttpResponse(200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json'))));
+        $this->orderShipmentDetailsService->setReference('1', 'PRO202401234567');
+
+        // act
+        $result = $this->draftShipmentService->isDraftExpired('1');
+
+        // assert
+        $this->assertFalse($result);
     }
 
     private function getScheduleRepository()
