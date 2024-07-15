@@ -40,6 +40,7 @@ class OrderShipmentDetails extends Entity
         'deleted',
         'currency',
         'customsInvoiceId',
+        'isExpired',
     );
     /**
      * Shop order ID.
