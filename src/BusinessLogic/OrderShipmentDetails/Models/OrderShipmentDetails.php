@@ -117,6 +117,10 @@ class OrderShipmentDetails extends Entity
      * @var string
      */
     private $customsInvoiceId = '';
+    /**
+     * @var bool
+     */
+    private $isExpired = false;
 
     /**
      * Returns entity configuration object.
@@ -456,5 +460,21 @@ class OrderShipmentDetails extends Entity
     public function setCustomsInvoiceId($customsInvoiceId)
     {
         $this->customsInvoiceId = $customsInvoiceId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExpired()
+    {
+        return $this->isExpired;
+    }
+
+    /**
+     * @param bool $isExpired
+     */
+    public function setIsExpired($isExpired)
+    {
+        $this->isExpired = $isExpired;
     }
 }
