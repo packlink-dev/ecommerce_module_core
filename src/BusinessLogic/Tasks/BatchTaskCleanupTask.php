@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\Exceptions\EntityClassException;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
@@ -24,6 +25,8 @@ use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
  */
 class BatchTaskCleanupTask extends Task
 {
+    const NUMBER_OF_TASKS = 5000;
+    const NUMBER_OF_ITERATIONS = 20;
     /**
      * @var array
      */
@@ -111,6 +114,7 @@ class BatchTaskCleanupTask extends Task
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws EntityClassException
      */
     public function execute()
     {
@@ -124,13 +128,39 @@ class BatchTaskCleanupTask extends Task
             );
         }
 
-        $query = $this->getDeleteQuery();
+        $query = $this->getQuery();
+        $numberOfTasks = $repository->count($query);
 
         $this->reportProgress(10);
 
-        $repository->deleteWhere($query);
+        $this->deleteInBatches($numberOfTasks, $query);
 
         $this->reportProgress(100);
+    }
+
+    /**
+     * @param $numberOfTasks
+     * @param QueryFilter $queryFilter
+     *
+     * @return void
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    protected function deleteInBatches($numberOfTasks, QueryFilter $queryFilter)
+    {
+        $repository = RepositoryRegistry::getQueueItemRepository();
+        $queryFilter->setLimit(self::NUMBER_OF_TASKS);
+        $i = 0;
+
+        while ($numberOfTasks > 0 || $i < self::NUMBER_OF_ITERATIONS) {
+            $repository->deleteWhere($queryFilter);
+
+            $numberOfTasks -= self::NUMBER_OF_TASKS;
+            $i++;
+
+            $this->reportProgress(10 + ($i + 1) * 3);
+        }
     }
 
     /**
@@ -139,7 +169,7 @@ class BatchTaskCleanupTask extends Task
      * @return \Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      */
-    private function getDeleteQuery()
+    private function getQuery()
     {
         $query = new QueryFilter();
         $query->where('queueTime', Operators::LESS_THAN, $this->getAgeCutOff());
