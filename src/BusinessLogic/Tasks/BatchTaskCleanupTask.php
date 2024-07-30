@@ -153,7 +153,7 @@ class BatchTaskCleanupTask extends Task
         $queryFilter->setLimit(self::NUMBER_OF_TASKS);
         $i = 0;
 
-        while ($numberOfTasks > 0 || $i < self::NUMBER_OF_ITERATIONS) {
+        while ($numberOfTasks > 0 && $i < self::NUMBER_OF_ITERATIONS) {
             $repository->deleteWhere($queryFilter);
 
             $numberOfTasks -= self::NUMBER_OF_TASKS;
