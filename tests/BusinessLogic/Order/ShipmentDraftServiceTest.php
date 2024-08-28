@@ -306,6 +306,34 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
         $this->assertEquals('Attempt 7: Error in task.', $draftStatus->message);
     }
 
+    public function testDraftExpired()
+    {
+        // arrange
+        /** @var TestHttpClient $httpClient */
+        $httpClient = ServiceRegister::getService(HttpClient::CLASS_NAME);
+        $httpClient->setMockResponses(array(new HttpResponse(404, array(), '')));
+
+        // act
+        $result = $this->draftShipmentService->isDraftExpired('PRO202401234567');
+
+        // assert
+        $this->assertTrue($result);
+    }
+
+    public function testDraftNotExpired()
+    {
+        // arrange
+        /** @var TestHttpClient $httpClient */
+        $httpClient = ServiceRegister::getService(HttpClient::CLASS_NAME);
+        $httpClient->setMockResponses(array(new HttpResponse(200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipment.json'))));
+
+        // act
+        $result = $this->draftShipmentService->isDraftExpired('PRO202401234567');
+
+        // assert
+        $this->assertFalse($result);
+    }
+
     private function getScheduleRepository()
     {
         return RepositoryRegistry::getRepository(Schedule::getClassName());

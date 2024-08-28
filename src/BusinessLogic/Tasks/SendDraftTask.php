@@ -37,7 +37,7 @@ class SendDraftTask extends Task
      *
      * @var string
      */
-    private $orderId;
+    protected $orderId;
     /**
      * Order service instance.
      *
@@ -55,7 +55,7 @@ class SendDraftTask extends Task
      *
      * @var OrderShipmentDetailsService
      */
-    private $orderShipmentDetailsService;
+    protected $orderShipmentDetailsService;
     /**
      * @var CustomsService
      */
@@ -159,8 +159,7 @@ class SendDraftTask extends Task
     {
         $this->setExecution();
 
-        $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
-        if ($isRepositoryRegistered && $this->isDraftCreated($this->orderId)) {
+        if ($this->shouldNotSynchronize()) {
             Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
             $this->reportProgress(100);
 
@@ -199,6 +198,16 @@ class SendDraftTask extends Task
         }
 
         $this->reportProgress(100);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldNotSynchronize()
+    {
+        $isRepositoryRegistered = RepositoryRegistry::isRegistered(OrderShipmentDetails::getClassName());
+
+        return $isRepositoryRegistered && $this->isDraftCreated($this->orderId);
     }
 
     /**
@@ -281,7 +290,7 @@ class SendDraftTask extends Task
      *
      * @return OrderShipmentDetailsService Service instance.
      */
-    private function getOrderShipmentDetailsService()
+    protected function getOrderShipmentDetailsService()
     {
         if ($this->orderShipmentDetailsService === null) {
             $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
