@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.4.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.5...v3.4.6) - 2024-08-28
+### Changed
+- Add detection of expired drafts
+
 ## [3.4.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.4...v3.4.5) - 2024-07-30
 ### Changed
 - Change BatchTaskCleanupTask to delete tasks in batches

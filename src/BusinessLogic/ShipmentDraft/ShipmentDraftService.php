@@ -4,12 +4,15 @@ namespace Packlink\BusinessLogic\ShipmentDraft;
 
 use DateInterval;
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\ShipmentDraft\Objects\ShipmentDraftStatus;
@@ -116,6 +119,30 @@ class ShipmentDraftService extends BaseService
     }
 
     /**
+     * Checks if draft is expired.
+     *
+     * @param string $reference
+     *
+     * @return bool
+     */
+    public function isDraftExpired($reference)
+    {
+        try {
+            $shipment = $this->getProxy()->getShipment($reference);
+
+            if ($shipment) {
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Logger::logError($e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
      * Enqueues delayed send draft task.
      *
      * @param SendDraftTask $task Task to be executed.
@@ -154,5 +181,15 @@ class ShipmentDraftService extends BaseService
     private function getConfigService()
     {
         return ServiceRegister::getService(Configuration::CLASS_NAME);
+    }
+
+    /**
+     * Retrieves proxy.
+     *
+     * @return Proxy | object
+     */
+    private function getProxy()
+    {
+        return ServiceRegister::getService(Proxy::CLASS_NAME);
     }
 }
