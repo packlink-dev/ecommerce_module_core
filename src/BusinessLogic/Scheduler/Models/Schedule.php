@@ -146,6 +146,7 @@ class Schedule extends Entity
     {
         $map = new IndexMap();
         $map->addDateTimeIndex('nextSchedule');
+        $map->addStringIndex('context');
 
         return new EntityConfiguration($map, 'Schedule');
     }
