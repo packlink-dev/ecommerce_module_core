@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.4.9](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.8...v3.4.9) - 2024-12-09
+### Changed
+- Add special handling for 429 - Too many retries exception
+
 ## [3.4.8](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.7...v3.4.8) - 2024-12-09
 ### Changed
 - Add unsupported country Japan
