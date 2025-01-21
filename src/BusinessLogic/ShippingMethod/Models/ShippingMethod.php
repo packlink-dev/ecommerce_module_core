@@ -43,6 +43,7 @@ class ShippingMethod extends Entity
         'currency',
         'fixedPrices',
         'systemDefaults',
+        'tags',
     );
     /**
      * Carrier name.
@@ -169,6 +170,11 @@ class ShippingMethod extends Entity
     public $systemDefaults;
 
     /**
+     * @var array
+     */
+    public $tags = array();
+
+    /**
      * Transforms raw array data to this entity instance.
      *
      * @param array $data Raw array data.
@@ -208,6 +214,12 @@ class ShippingMethod extends Entity
             foreach ($data['shippingServices'] as $service) {
                 $this->shippingServices[] = ShippingService::fromArray($service);
             }
+        }
+
+        if (isset($data['tags']) && is_array($data['tags'])) {
+            $this->shippingCountries = $data['tags'];
+        } else {
+            $this->shippingCountries = array();
         }
     }
 

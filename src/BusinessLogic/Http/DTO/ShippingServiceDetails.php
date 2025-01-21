@@ -143,6 +143,11 @@ class ShippingServiceDetails extends DataTransferObject
     public $availableDates;
 
     /**
+     * @var array
+     */
+    public $tags = array();
+
+    /**
      * @inheritdoc
      */
     public function toArray()
@@ -167,6 +172,7 @@ class ShippingServiceDetails extends DataTransferObject
             ),
             'service_info' => $this->serviceInfo,
             'available_dates' => $this->availableDates,
+            'tags' => $this->tags,
         );
     }
 
@@ -179,7 +185,7 @@ class ShippingServiceDetails extends DataTransferObject
 
         $instance->id = self::getDataValue($raw, 'id');
         $instance->carrierName = self::getDataValue($raw, 'carrier_name');
-        $instance->serviceName = self::getDataValue($raw, 'service_name');
+        $instance->serviceName = self::getDataValue($raw, 'name');
         $instance->currency = self::getDataValue($raw, 'currency');
         $instance->country = self::getDataValue($raw, 'country');
         $instance->departureDropOff = self::getDataValue($raw, 'dropoff', false);
@@ -204,6 +210,7 @@ class ShippingServiceDetails extends DataTransferObject
         $instance->serviceInfo = self::getDataValue($raw, 'service_info', array());
         $instance->availableDates = self::getDataValue($raw, 'available_dates', array());
         $instance->national = self::getDataValue($raw, 'national', null);
+        $instance->tags = self::getDataValue($raw, 'tags', array());
 
         return $instance;
     }

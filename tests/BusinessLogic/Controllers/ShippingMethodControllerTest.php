@@ -97,7 +97,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $this->importShippingMethods();
         $all = $this->controller->getAll();
         $this->assertNotEmpty($all);
-        $this->assertCount(18, $all);
+        $this->assertCount(19, $all);
         foreach ($all as $item) {
             $this->assertInstanceOf(
                 '\Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse',

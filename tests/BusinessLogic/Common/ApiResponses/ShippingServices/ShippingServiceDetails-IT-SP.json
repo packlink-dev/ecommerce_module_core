@@ -1,0 +1,87 @@
+[
+  {
+    "id": 23841,
+    "name": "Frio 13.30",
+    "carrier_name": "SEUR",
+    "country": "ES",
+    "base_price": "6.29",
+    "currency": "EUR",
+    "transit_time": "1 DAYS",
+    "labels_required": true,
+    "customs_required": false,
+    "dropoff": false,
+    "delivery_to_parcelshop": false,
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "5000.00",
+      "apply_percentage_aditional_insurance": "3.00"
+    },
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "available_dates": {
+      "2024/12/19": "[09:00 , 20:00]",
+      "2024/12/20": "[09:00 , 20:00]",
+      "2024/12/23": "[09:00 , 20:00]",
+      "2024/12/24": "[09:00 , 20:00]",
+      "2024/12/26": "[09:00 , 20:00]",
+      "2024/12/27": "[09:00 , 20:00]",
+      "2024/12/30": "[09:00 , 20:00]",
+      "2024/12/31": "[09:00 , 20:00]",
+      "2025/01/01": "[09:00 , 20:00]",
+      "2025/01/02": "[09:00 , 20:00]",
+      "2025/01/03": "[09:00 , 20:00]",
+      "2025/01/06": "[09:00 , 20:00]"
+    },
+    "category": "express",
+    "url_terms_and_conditions": null,
+    "url_forbidden_items": null,
+    "carrier_product_id": "ACI_SEUR_1330_FRIO",
+    "first_estimated_delivery_date": "2024/12/20",
+    "transit_hours": "24",
+    "translation_transit_key": null,
+    "time_left_first_available_date": {
+      "time_value": 7,
+      "time_unit": "HOURS"
+    },
+    "service_info": [
+      {
+        "text": "service-card.service-info.printer",
+        "icon": "printer"
+      }
+    ],
+    "price": {
+      "total_price": 7.61,
+      "base_price": 6.29,
+      "tax_price": 1.32,
+      "currency": "EUR",
+      "taxes": [
+        {
+          "identifier": "S4",
+          "name": "VAT",
+          "percentage": 21,
+          "amount": null,
+          "description": null
+        }
+      ]
+    },
+    "max_dimensions_message": null,
+    "has_proof_of_delivery": false,
+    "has_adult_signature": false,
+    "has_print_in_store": false,
+    "logo_id": "seur-frio",
+    "is_own_contract": false,
+    "has_paperless_customs": false,
+    "single_collection": null,
+    "tags": [
+      {
+        "id": "EXCLUSIVE_FOR_PLUS"
+      }
+    ],
+    "has_additional_handling": false
+  }
+]
