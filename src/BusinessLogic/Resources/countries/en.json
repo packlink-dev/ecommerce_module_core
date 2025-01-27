@@ -488,7 +488,9 @@
     "selectCountriesSubheader": "Select availability of at least one country and add <br> as many required",
     "discardChangesQuestion": "There are unsaved changes.<br>Are you sure you want to go back and discard them?",
     "atLeastOneCountry": "At least one country must be selected.",
-    "misconfiguration": "Due to store currency change, you must set a Fixed Price value by clicking \"edit\" on the shipping service."
+    "misconfiguration": "Due to store currency change, you must set a Fixed Price value by clicking \"edit\" on the shipping service.",
+    "refreshServiceList" : "Refresh service list",
+    "refreshError": "An error occurred while refreshing the service list"
   },
   "orderListAndDetails": {
     "printed": "Printed",

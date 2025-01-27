@@ -25,15 +25,23 @@ if (!window.Packlink) {
         /**
          * Enables loading spinner.
          */
-        this.showSpinner = () => {
-            this.showElement(document.getElementById('pl-spinner'));
+        this.showSpinner = (spinnerClass = null) => {
+            if (spinnerClass) {
+                this.showElement(document.getElementById(spinnerClass));
+            } else {
+                this.showElement(document.getElementById('pl-spinner'));
+            }
         };
 
         /**
          * Hides loading spinner.
          */
-        this.hideSpinner = () => {
-            this.hideElement(document.getElementById('pl-spinner'));
+        this.hideSpinner = (spinnerClass = null) => {
+            if (spinnerClass) {
+                this.hideElement(document.getElementById(spinnerClass));
+            } else {
+                this.hideElement(document.getElementById('pl-spinner'));
+            }
         };
 
         /**

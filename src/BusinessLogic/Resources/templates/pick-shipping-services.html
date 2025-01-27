@@ -67,6 +67,15 @@
             <div class="pl-filter pl-filter-selected">
                 <div class="pl-filter-options"></div>
             </div>
+            <div class="pl-filter" style="margin-left: auto">
+                <button id="refresh-service-list-btn" class="pl-button pl-button-primary pl-normal">
+                    <div class="pl-spinner pl-hidden" id="pl-refresh-spinner">
+                        <div></div>
+                    </div>{$shippingServices.refreshServiceList}</button>
+            </div>
+            <div id='pl-error' class="pl-error pl-hidden">
+                    <div class = 'pl-error-message' id="pl-error-message">{$shippingServices.refreshError}.</div>
+            </div>
         </div>
         <div id="pl-shipping-services-table" class="pl-full-width">
         </div>
