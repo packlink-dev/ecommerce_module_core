@@ -76,7 +76,7 @@ if (!window.Packlink) {
 
             mainPage.querySelector('#refresh-service-list-btn').addEventListener('click', () => {
                 const button = mainPage.querySelector('#refresh-service-list-btn');
-                const errorMessage = mainPage.querySelector('#pl-error');
+                const errorButton = mainPage.querySelector('#error-message-btn');
                 const errorMessageText = mainPage.querySelector('#pl-error-message');
 
                 ajaxService.get(configuration.enqueue, (response) => {
@@ -85,28 +85,40 @@ if (!window.Packlink) {
                         button.disabled = true;
                         utilityService.showSpinner('pl-refresh-spinner');
 
-                        checkTaskStatus(button, errorMessage, errorMessageText);
+                        checkTaskStatus(button, errorButton, errorMessageText);
                     } else {
-                        console.log(response.message);
-                        errorMessage.textContent = response.message;
-                        errorMessage.style.display = 'block';
-                        errorMessage.classList.remove('pl-hidden');
-
-                        setTimeout(() => {
-                            errorMessage.style.display = 'none';
-                            errorMessage.classList.add('pl-hidden');
-                        }, 5000);
+                        showError(errorButton,errorMessageText,response.message);
                     }
                 });
             });
+
+            const closeErrorButton = document.getElementById('close-error');
+
+            const errorButton = document.getElementById('error-message-btn');
+
+            closeErrorButton.addEventListener('click', () => {
+                errorButton.classList.add('pl-hidden');
+            });
         };
+
+        function showError(button, messageButton, message) {
+            button.classList.remove('pl-hidden');
+
+            if(message) {
+                messageButton.textContent = message;
+            }
+
+            setTimeout(() => {
+               button.classList.add('pl-hidden');
+            }, 5000);
+        }
 
         /**
          * @param button
+         * @param errorButton
          * @param errorMessage
-         * @param errorMessageText
          */
-        function checkTaskStatus(button, errorMessage, errorMessageText) {
+        function checkTaskStatus(button, errorButton, errorMessage) {
             ajaxService.get(configuration.getTaskStatus, (response) => {
                 const taskStatus = response.status;
                 const message = response.message;
@@ -121,29 +133,14 @@ if (!window.Packlink) {
                     button.disabled = false;
 
                     loadServices();
-
-                    console.log(taskStatus);
                 } else if (taskStatus === 'failed') {
-                    console.log(errorMessage);
+                    console.log(errorButton);
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
-                    errorMessageText.textContent = response.message;
-                    errorMessage.style.display = 'block';
-                    errorMessage.classList.remove('pl-hidden');
+                    showError(errorButton,errorMessage, message);
 
-                    setTimeout(() => {
-                        errorMessage.style.display = 'none';
-                        errorMessage.classList.add('pl-hidden');
-                    }, 5000);
                 } else {
-                    errorMessage.textContent = taskStatus;
-                    errorMessage.style.display = 'block';
-                    errorMessage.classList.remove('pl-hidden');
-
-                    setTimeout(() => {
-                        errorMessage.style.display = 'none';
-                        errorMessage.classList.add('pl-hidden');
-                    }, 5000);
+                    showError(errorButton,errorMessage, message);
                 }
             });
         }

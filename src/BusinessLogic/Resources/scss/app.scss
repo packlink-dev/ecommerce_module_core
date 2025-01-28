@@ -10,6 +10,34 @@
     height: 90px;
   }
 
+  #pl-error{
+
+    position: sticky;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 10px;
+
+    #error-message-btn {
+      padding-right: 30px;
+      color: #F5F5F5;
+    }
+
+    #pl-error-message {
+      color: #F5F5F5;
+    }
+
+    #close-error {
+      font-size: 18px;
+      color: #F5F5F5;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  }
+
   .pl-onboarding-list {
     width: 100%;
     justify-content: flex-start;

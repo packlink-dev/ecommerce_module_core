@@ -73,13 +73,16 @@
                         <div></div>
                     </div>{$shippingServices.refreshServiceList}</button>
             </div>
-            <div id='pl-error' class="pl-error pl-hidden">
-                    <div class = 'pl-error-message' id="pl-error-message">{$shippingServices.refreshError}.</div>
-            </div>
         </div>
         <div id="pl-shipping-services-table" class="pl-full-width">
         </div>
         <div id="pl-shipping-services-list" class="pl-full-width">
+        </div>
+        <div class="pl-error" id="pl-error">
+            <button id="error-message-btn" class="pl-button pl-button-danger pl-hidden">
+                <span id="pl-error-message">{$shippingServices.refreshError}.</span>
+                <span id="close-error" class="pl-error-close">&times;</span>
+            </button>
         </div>
     </div>
 </div>
