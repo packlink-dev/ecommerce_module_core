@@ -127,14 +127,12 @@ if (!window.Packlink) {
                     utilityService.showSpinner('pl-refresh-spinner');
                     button.disabled = true;
                     setTimeout(() => checkTaskStatus(button, errorMessage), 3000);
-                    console.log(taskStatus);
                 } else if (taskStatus === 'completed') {
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
 
                     loadServices();
                 } else if (taskStatus === 'failed') {
-                    console.log(errorButton);
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
                     showError(errorButton,errorMessage, message);
@@ -152,7 +150,6 @@ if (!window.Packlink) {
          * @param {{from: string, newService: boolean}} config
          */
         const checkServicesStatus = (response, config) => {
-            console.log(response);
             if (response.status === 'completed') {
                 ajaxService.get(configuration.getServicesUrl, (services) => {
                     bindServices(services, config);
@@ -207,7 +204,9 @@ if (!window.Packlink) {
          * Shows the block with the no services message.
          */
         const hideNoServicesModal = () => {
-            noServicesModal.close();
+            if (noServicesModal) {
+                noServicesModal.close();
+            }
         };
 
         /**
