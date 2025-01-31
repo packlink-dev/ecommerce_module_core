@@ -226,7 +226,9 @@ echo $lang ?>">
                     startAutoConfigureUrl: "<?php getUrl('AutoConfigure', 'start') ?>",
                     disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
                     getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
-                    systemId: null
+                    systemId: null,
+                    enqueue: "<?php getUrl('ManualRefreshService', 'enqueueUpdateTask'); ?>",
+                    getTaskStatus: "<?php getUrl('ManualRefreshService', 'getTaskStatus'); ?>"
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",

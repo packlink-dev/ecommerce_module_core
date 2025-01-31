@@ -49,12 +49,13 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             }
         );
 
-        $this->queueService = new TestQueueService();
+        $queueService = new TestQueueService();
+        $this->queueService = $queueService;
 
         TestServiceRegister::registerService(
             QueueService::CLASS_NAME,
-            function () {
-                return $this->queueService;
+            function () use ($queueService) {
+                return $queueService;
             }
         );
 
@@ -66,28 +67,24 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
     /**
      * @return void
      */
-    public function testEnqueueUpdateTaskSuccess(): void
+    public function testEnqueueUpdateTaskSuccess()
     {
         $response = $this->controller->enqueueUpdateTask();
 
-        $responseData = json_decode($response, true);
-
-        self::assertEquals($responseData['status'], 'success');
+        self::assertEquals($response['status'], 'success');
     }
 
     /**
      * @return void
      */
-    public function testEnqueueUpdateTaskFail(): void
+    public function testEnqueueUpdateTaskFail()
     {
         $exception = new \RuntimeException('Failed to enqueue task.');
         $this->queueService->setExceptionResponse('enqueue', $exception);
 
         $response = $this->controller->enqueueUpdateTask();
 
-        $responseData = json_decode($response, true);
-
-        self::assertEquals($responseData['status'], 'error');
+        self::assertEquals($response['status'], 'error');
     }
 
     /**
@@ -98,13 +95,13 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
-    public function testGetStatusQueued(): void
+    public function testGetStatusQueued()
     {
         $this->controller->enqueueUpdateTask();
 
-        $responseData = json_decode($this->controller->getTaskStatus(), true);
+        $response = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::QUEUED, $responseData['status']);
+        self::assertEquals(QueueItem::QUEUED, $response['status']);
     }
 
     /**
@@ -115,7 +112,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
-    public function testGetStatusFailed(): void
+    public function testGetStatusFailed()
     {
         $this->controller->enqueueUpdateTask();
 
@@ -127,14 +124,14 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
         $queueItem->setStatus(QueueItem::FAILED);
         $repo->update($queueItem);
 
-        $responseData = json_decode($this->controller->getTaskStatus(), true);
+        $response = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::FAILED, $responseData['status']);
+        self::assertEquals(QueueItem::FAILED, $response['status']);
     }
 
-    public function testGetStatusItemNotQueued(): void
+    public function testGetStatusItemNotQueued()
     {
-        $responseData = json_decode($this->controller->getTaskStatus(), true);
+        $responseData = $this->controller->getTaskStatus();
 
         self::assertEquals(QueueItem::CREATED, $responseData['status']);
         self::assertEquals('Queue item not found.', $responseData['message']);

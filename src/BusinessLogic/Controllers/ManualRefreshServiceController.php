@@ -25,11 +25,11 @@ class ManualRefreshServiceController
     /**
      * Enqueues the UpdateShippingServicesTask and returns a JSON response.
      *
-     * @return string
+     * @return array
      */
-    public function enqueueUpdateTask(): string
+    public function enqueueUpdateTask()
     {
-        $queueService = ServiceRegister::getService(QueueService::class);
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
 
         $configService = $this->getConfigService();
 
@@ -40,9 +40,9 @@ class ManualRefreshServiceController
                 $configService->getContext()
             );
 
-            return json_encode(['status' => 'success', 'message' => 'Task successfully enqueued.']);
+            return array('status' => 'success', 'message' => 'Task successfully enqueued.');
         } catch (\Exception $e) {
-            return json_encode(['status' => 'error', 'message' => 'Failed to enqueue task: ' . $e->getMessage()]);
+            return array('status' => 'error', 'message' => 'Failed to enqueue task: ' . $e->getMessage());
         }
     }
 
@@ -51,7 +51,7 @@ class ManualRefreshServiceController
      *
      * @param string $context
      *
-     * @return string <p>One of the following statuses:
+     * @return array <p>One of the following statuses:
      *  QueueItem::FAILED - when the task failed,
      *  QueueItem::COMPLETED - when the task completed successfully,
      *  QueueItem::IN_PROGRESS - when the task is in progress,
@@ -76,14 +76,14 @@ class ManualRefreshServiceController
 
             if ($status === QueueItem::FAILED || $status === QueueItem::COMPLETED) {
                 return $status === QueueItem::FAILED
-                    ? json_encode(['status' => $status, 'message' => $item->getFailureDescription()])
-                    : json_encode(['status' => $status, 'message' => 'Queue item completed']);
+                    ? array('status' => $status, 'message' => $item->getFailureDescription())
+                    : array('status' => $status, 'message' => 'Queue item completed');
             }
 
-            return json_encode(['status' => $status]);
+            return array('status' => $status);
         }
 
-        return json_encode(['status' => QueueItem::CREATED, 'message' => 'Queue item not found.']);
+        return array('status' => QueueItem::CREATED, 'message' => 'Queue item not found.');
     }
 
     /**
