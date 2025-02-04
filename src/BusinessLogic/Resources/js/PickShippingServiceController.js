@@ -131,7 +131,7 @@ if (!window.Packlink) {
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
 
-                    loadServices();
+                    ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
                 } else if (taskStatus === 'failed') {
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
