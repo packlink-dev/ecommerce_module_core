@@ -323,6 +323,14 @@ class ShippingMethod extends Entity
     }
 
     /**
+     * @return array
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    /**
      * Sets whether this shipping method is enabled for user.
      *
      * @param bool $enabled TRUE if enabled; otherwise, FALSE.
