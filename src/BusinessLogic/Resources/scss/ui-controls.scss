@@ -68,6 +68,10 @@
     &.pl-button-primary {
       background-color: $color-blue;
       color: $color-white;
+      &.pl-normal {
+        text-transform: none;
+        margin: 0;
+      }
     }
 
     &.pl-button-secondary {

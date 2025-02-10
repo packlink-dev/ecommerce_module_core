@@ -65,6 +65,12 @@ if (!window.Packlink) {
                 state.goToState('my-shipping-services');
             });
 
+            const button = mainPage.querySelector('#refresh-service-list-btn');
+            const errorButton = mainPage.querySelector('#error-message-btn');
+            const errorMessageText = mainPage.querySelector('#pl-error-message');
+
+            checkTaskStatus(button,errorButton,errorMessageText);
+
             mainPage.querySelectorAll('.pl-filter-option').forEach((optionBtn) => {
                 optionBtn.addEventListener('click', () => {
                     desktopMode = true;
@@ -75,10 +81,6 @@ if (!window.Packlink) {
             mainPage.querySelector('#pl-open-filter-button').addEventListener('click', showFilterModal);
 
             mainPage.querySelector('#refresh-service-list-btn').addEventListener('click', () => {
-                const button = mainPage.querySelector('#refresh-service-list-btn');
-                const errorButton = mainPage.querySelector('#error-message-btn');
-                const errorMessageText = mainPage.querySelector('#pl-error-message');
-
                 ajaxService.get(configuration.enqueue, (response) => {
                     if (response.status === 'success') {
 
@@ -93,8 +95,6 @@ if (!window.Packlink) {
             });
 
             const closeErrorButton = document.getElementById('close-error');
-
-            const errorButton = document.getElementById('error-message-btn');
 
             closeErrorButton.addEventListener('click', () => {
                 errorButton.classList.add('pl-hidden');
@@ -123,7 +123,7 @@ if (!window.Packlink) {
                 const taskStatus = response.status;
                 const message = response.message;
 
-                if (taskStatus === 'queued' || taskStatus === 'in_progress') {
+                if (taskStatus === 'queued' || taskStatus === 'in_progress' || taskStatus === 'created') {
                     utilityService.showSpinner('pl-refresh-spinner');
                     button.disabled = true;
                     setTimeout(() => checkTaskStatus(button, errorMessage), 3000);
