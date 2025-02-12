@@ -256,12 +256,12 @@ class UpdateShippingServicesTask extends Task
      *
      * @return array
      */
-    protected function getSpecialServices(array &$apiServices): array
+    protected function getSpecialServices(array &$apiServices)
     {
-        $specialServices = [];
+        $specialServices = array();
 
         foreach ($apiServices as $key => $service) {
-            if (in_array(['id' => self::SPECIAL_SERVICE_TAG], $service->tags, true)) {
+            if (in_array(array('id' => self::SPECIAL_SERVICE_TAG), $service->tags, true)) {
                 $specialServices[] = $service;
                 unset($apiServices[$key]);
             }

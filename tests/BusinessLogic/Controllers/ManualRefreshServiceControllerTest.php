@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -15,7 +16,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepos
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Controllers\ManualRefreshServiceController;
+use Packlink\BusinessLogic\Controllers\ManualRefreshController;
 
 class ManualRefreshServiceControllerTest extends BaseTestWithServices
 {
@@ -24,7 +25,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
     public $configuration;
 
     /**
-     * @var ManualRefreshServiceController
+     * @var ManualRefreshController
      */
     public $controller;
 
@@ -61,7 +62,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::THIS_CLASS_NAME);
 
-        $this->controller = new ManualRefreshServiceController();
+        $this->controller = new ManualRefreshController();
     }
 
     /**
@@ -71,7 +72,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
     {
         $response = $this->controller->enqueueUpdateTask();
 
-        self::assertEquals($response['status'], 'success');
+        self::assertEquals($response->status, 'success');
     }
 
     /**
@@ -79,12 +80,12 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
      */
     public function testEnqueueUpdateTaskFail()
     {
-        $exception = new \RuntimeException('Failed to enqueue task.');
+        $exception = new QueueStorageUnavailableException('Failed to enqueue task.');
         $this->queueService->setExceptionResponse('enqueue', $exception);
 
         $response = $this->controller->enqueueUpdateTask();
 
-        self::assertEquals($response['status'], 'error');
+        self::assertEquals($response->status, 'error');
     }
 
     /**
@@ -101,7 +102,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         $response = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::QUEUED, $response['status']);
+        self::assertEquals(QueueItem::QUEUED, $response->status);
     }
 
     /**
@@ -126,14 +127,14 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         $response = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::FAILED, $response['status']);
+        self::assertEquals(QueueItem::FAILED, $response->status);
     }
 
     public function testGetStatusItemNotQueued()
     {
         $responseData = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::CREATED, $responseData['status']);
-        self::assertEquals('Queue item not found.', $responseData['message']);
+        self::assertEquals(QueueItem::CREATED, $responseData->status);
+        self::assertEquals('Queue item not found.', $responseData->message);
     }
 }

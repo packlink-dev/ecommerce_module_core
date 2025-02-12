@@ -5,15 +5,14 @@ namespace Packlink\DemoUI\Controllers;
 use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
-use Packlink\BusinessLogic\Controllers\UpdateShippingServicesTaskStatusController;
 
-class ManualRefreshServiceController extends BaseHttpController
+class ManualRefreshController extends BaseHttpController
 {
     public function enqueueUpdateTask()
     {
-        $controller = new \Packlink\BusinessLogic\Controllers\ManualRefreshServiceController();
+        $controller = new \Packlink\BusinessLogic\Controllers\ManualRefreshController();
 
-        $this->output($controller->enqueueUpdateTask());
+        $this->output($controller->enqueueUpdateTask()->toArray());
     }
 
     public function getTaskStatus()
@@ -26,8 +25,8 @@ class ManualRefreshServiceController extends BaseHttpController
             return;
         }
 
-        $controller = new \Packlink\BusinessLogic\Controllers\ManualRefreshServiceController();
-        $this->output($controller->getTaskStatus());
+        $controller = new \Packlink\BusinessLogic\Controllers\ManualRefreshController();
+        $this->output($controller->getTaskStatus()->toArray());
 
         try {
             $status = $controller->getTaskStatus();

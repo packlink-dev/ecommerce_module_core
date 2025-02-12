@@ -121,7 +121,7 @@ class ShippingMethodService extends BaseService
      * @see update.
      *
      */
-    public function add(ShippingServiceDetails $serviceDetails, $isSpecialService = false)
+    public function add($serviceDetails, $isSpecialService = false)
     {
         return $this->update($serviceDetails, $isSpecialService);
     }
@@ -134,7 +134,7 @@ class ShippingMethodService extends BaseService
      *
      * @return ShippingMethod Created or updated shipping method.
      */
-    public function update(ShippingServiceDetails $serviceDetails, bool $isSpecialService = false)
+    public function update(ShippingServiceDetails $serviceDetails, $isSpecialService = false)
     {
         $method = $this->getShippingMethodForService($serviceDetails, $isSpecialService);
         if ($method === null) {
@@ -549,7 +549,7 @@ class ShippingMethodService extends BaseService
     protected function setShippingMethodDetails(
         ShippingMethod $shippingMethod,
         ShippingServiceDetails $serviceDetails,
-        bool $isSpecialService = false
+        $isSpecialService = false
     ) {
         if(!$isSpecialService) {
             $shippingMethod->setCarrierName($serviceDetails->carrierName);

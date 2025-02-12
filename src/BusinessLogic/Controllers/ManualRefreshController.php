@@ -6,15 +6,15 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Controllers\DTO\TaskStatus;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
-class ManualRefreshServiceController
+class ManualRefreshController
 {
-
     /**
      * Configuration service instance.
      *
@@ -25,7 +25,7 @@ class ManualRefreshServiceController
     /**
      * Enqueues the UpdateShippingServicesTask and returns a JSON response.
      *
-     * @return array
+     * @return TaskStatus
      */
     public function enqueueUpdateTask()
     {
@@ -40,9 +40,16 @@ class ManualRefreshServiceController
                 $configService->getContext()
             );
 
-            return array('status' => 'success', 'message' => 'Task successfully enqueued.');
-        } catch (\Exception $e) {
-            return array('status' => 'error', 'message' => 'Failed to enqueue task: ' . $e->getMessage());
+            $taskStatus = new TaskStatus();
+            $taskStatus->status = TaskStatus::SUCCESS;
+            $taskStatus->message = 'Task successfully enqueued.';
+            return $taskStatus;
+
+        } catch (QueueStorageUnavailableException $e) {
+            $taskStatus = new TaskStatus();
+            $taskStatus->status = TaskStatus::ERROR;
+            $taskStatus->message = 'Failed to enqueue task: ' . $e->getMessage();
+            return $taskStatus;
         }
     }
 
@@ -51,7 +58,7 @@ class ManualRefreshServiceController
      *
      * @param string $context
      *
-     * @return array <p>One of the following statuses:
+     * @return TaskStatus <p>One of the following statuses:
      *  QueueItem::FAILED - when the task failed,
      *  QueueItem::COMPLETED - when the task completed successfully,
      *  QueueItem::IN_PROGRESS - when the task is in progress,
@@ -65,44 +72,32 @@ class ManualRefreshServiceController
      */
     public function getTaskStatus($context = '')
     {
-        $repo = RepositoryRegistry::getQueueItemRepository();
+        /**@var QueueService $service */
+        $service = ServiceRegister::getService(QueueService::CLASS_NAME);
 
-        $filter = $this->buildCondition($context);
-        $filter->orderBy('queueTime', 'DESC');
+        $item = $service->findLatestByType('UpdateShippingServicesTask', $context);
 
-        $item = $repo->selectOne($filter);
+        $taskStatus = new TaskStatus();
+
         if ($item) {
             $status = $item->getStatus();
+            $taskStatus->status = $status;
 
-            if ($status === QueueItem::FAILED || $status === QueueItem::COMPLETED) {
-                return $status === QueueItem::FAILED
-                    ? array('status' => $status, 'message' => $item->getFailureDescription())
-                    : array('status' => $status, 'message' => 'Queue item completed');
+            if ($status === QueueItem::FAILED) {
+                $taskStatus->message = $item->getFailureDescription();
             }
 
-            return array('status' => $status);
+            if ($status === QueueItem::COMPLETED) {
+                $taskStatus->message = 'Queue item completed';
+            }
+
+            return $taskStatus;
         }
 
-        return array('status' => QueueItem::CREATED, 'message' => 'Queue item not found.');
-    }
+        $taskStatus->status = QueueItem::CREATED;
+        $taskStatus->message = 'Queue item not found.';
 
-    /**
-     * Builds query condition.
-     *
-     * @param string $context
-     *
-     * @return \Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     */
-    protected function buildCondition($context = '')
-    {
-        $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesTask');
-        if (!empty($context)) {
-            $filter->where('context', Operators::EQUALS, $context);
-        }
-
-        return $filter;
+        return $taskStatus;
     }
 
     /**
