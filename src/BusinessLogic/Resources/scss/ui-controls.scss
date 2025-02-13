@@ -68,9 +68,33 @@
     &.pl-button-primary {
       background-color: $color-blue;
       color: $color-white;
+
       &.pl-normal {
         text-transform: none;
         margin: 0;
+
+        .pl-spinner {
+          position: absolute;
+          z-index: 500;
+          background-color: unset;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          top: unset;
+          left: unset;
+          right: unset;
+          bottom: unset;
+
+          div {
+            width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
+            border-right-color: $color-blue;
+            border-left-color: $color-blue;
+            border-radius: 50%;
+            animation: pl-rotate 1s linear 0s infinite;
+          }
+        }
       }
     }
 
