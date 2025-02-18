@@ -227,8 +227,8 @@ echo $lang ?>">
                     disableCarriersUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
                     getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
                     systemId: null,
-                    enqueue: "<?php getUrl('ManualRefreshService', 'enqueueUpdateTask'); ?>",
-                    getTaskStatus: "<?php getUrl('ManualRefreshService', 'getTaskStatus'); ?>"
+                    enqueue: "<?php getUrl('ManualRefresh', 'enqueueUpdateTask'); ?>",
+                    getTaskStatus: "<?php getUrl('ManualRefresh', 'getTaskStatus'); ?>"
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",
