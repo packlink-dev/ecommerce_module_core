@@ -19,6 +19,8 @@ class ManualRefreshController extends BaseHttpController
     {
         $controller = new ShippingMethodController();
 
+        sleep(2);
+
         if (count($controller->getAll()) > 0) {
             $this->output(array('status' => QueueItem::COMPLETED, 'message' => 'Queue item completed'));
 
