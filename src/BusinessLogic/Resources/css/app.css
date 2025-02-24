@@ -967,24 +967,30 @@
   position: sticky;
   bottom: 20px;
   left: 50%;
-  transform: translateX(-50%);
   gap: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 #pl-page #pl-error #error-message-btn {
   padding-right: 30px;
   color: #f5f5f5;
+  background-color: #ca2929;
+  text-transform: none;
 }
 #pl-page #pl-error #pl-error-message {
   color: #f5f5f5;
 }
 #pl-page #pl-error #close-error {
-  font-size: 18px;
+  font-size: 22px;
   color: #f5f5f5;
   position: absolute;
-  top: 8px;
   right: 8px;
   cursor: pointer;
   margin-left: 10px;
+}
+#pl-page .pl-button-danger {
+  background-color: #ca2929;
 }
 #pl-page .pl-onboarding-list {
   width: 100%;

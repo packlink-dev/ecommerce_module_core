@@ -87,9 +87,9 @@ if (!window.Packlink) {
                         button.disabled = true;
                         utilityService.showSpinner('pl-refresh-spinner');
 
-                        checkTaskStatus(button, errorButton, errorMessageText);
+                        checkTaskStatus(button, errorButton, errorMessageText,false);
                     } else {
-                        showError(errorButton,errorMessageText,response.message);
+                        showError(errorButton,errorMessageText,response.message, false);
                     }
                 });
             });
@@ -117,8 +117,9 @@ if (!window.Packlink) {
          * @param button
          * @param errorButton
          * @param errorMessage
+         * @param initial
          */
-        function checkTaskStatus(button, errorButton, errorMessage) {
+        function checkTaskStatus(button, errorButton, errorMessage, initial = true) {
             ajaxService.get(configuration.getTaskStatus, (response) => {
                 const taskStatus = response.status;
                 const message = response.message;
@@ -126,18 +127,18 @@ if (!window.Packlink) {
                 if (taskStatus === 'queued' || taskStatus === 'in_progress' || taskStatus === 'created') {
                     utilityService.showSpinner('pl-refresh-spinner');
                     button.disabled = true;
-                    setTimeout(() => checkTaskStatus(button, errorMessage), 3000);
+                    setTimeout(() => checkTaskStatus(button, errorButton, errorMessage,initial), 3000);
                 } else if (taskStatus === 'completed') {
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
 
                     ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
-                } else if (taskStatus === 'failed') {
+                } else if (taskStatus === 'failed' && !initial) {
                     utilityService.hideSpinner('pl-refresh-spinner');
                     button.disabled = false;
                     showError(errorButton,errorMessage, message);
 
-                } else {
+                } else if (!initial) {
                     showError(errorButton,errorMessage, message);
                 }
             });
@@ -219,7 +220,7 @@ if (!window.Packlink) {
             const errorMessage = mainPage.querySelector('#pl-error');
             const errorMessageText = mainPage.querySelector('#pl-error-message');
 
-            checkTaskStatus(button, errorMessage,errorMessageText);
+            checkTaskStatus(button, errorMessage,errorMessageText, true);
 
             loadServices();
         };

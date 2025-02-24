@@ -11,16 +11,19 @@
   }
 
   #pl-error{
-
     position: sticky;
     bottom: 20px;
     left: 50%;
-    transform: translateX(-50%);
     gap: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
 
     #error-message-btn {
       padding-right: 30px;
       color: #F5F5F5;
+      background-color: #ca2929;
+      text-transform: none;
     }
 
     #pl-error-message {
@@ -28,14 +31,17 @@
     }
 
     #close-error {
-      font-size: 18px;
+      font-size: 22px;
       color: #F5F5F5;
       position: absolute;
-      top: 8px;
       right: 8px;
       cursor: pointer;
       margin-left: 10px;
     }
+  }
+
+  .pl-button-danger {
+    background-color: #ca2929;
   }
 
   .pl-onboarding-list {
