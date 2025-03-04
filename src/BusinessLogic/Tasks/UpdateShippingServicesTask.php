@@ -117,7 +117,10 @@ class UpdateShippingServicesTask extends Task
         }
 
         $supportedCountries = $this->getCountryService()->getSupportedCountries();
-        $sourceCountry = $supportedCountries[$sourceCountryCode];
+        $sourceCountry = array_key_exists($sourceCountryCode, $supportedCountries) ? $supportedCountries[$sourceCountryCode] : null;
+        if (!$sourceCountry) {
+            return array();
+        }
 
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $package = Package::fromArray($parcel->toArray());

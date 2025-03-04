@@ -325,7 +325,7 @@ class ShippingMethod extends Entity
     /**
      * @return array
      */
-    public function getTags(): array
+    public function getTags()
     {
         return $this->tags;
     }
