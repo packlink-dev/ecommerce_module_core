@@ -204,7 +204,7 @@ class UpdateShippingServicesTask extends Task
         $progressStep = count($currentMethods) > 0 ? (20 / count($currentMethods)) : 20;
 
         foreach ($currentMethods as $shippingMethod) {
-            $this->updateShippingMethod($shippingMethod, $apiServices);
+            $this->updateShippingMethod($shippingMethod, $apiServices, true);
 
             $progress += $progressStep;
             $this->reportProgress($progress);
@@ -228,11 +228,11 @@ class UpdateShippingServicesTask extends Task
      * @param ShippingMethod $shippingMethod Local shipping method.
      * @param ShippingServiceDetails[] $apiServices Shipping services returned from API.
      */
-    protected function updateShippingMethod(ShippingMethod $shippingMethod, array &$apiServices)
+    protected function updateShippingMethod(ShippingMethod $shippingMethod, array &$apiServices, $special = false)
     {
         $shippingServices = array();
         foreach ($apiServices as $service) {
-            if ($this->serviceBelongsToMethod($service, $shippingMethod)) {
+            if ($this->serviceBelongsToMethod($service, $shippingMethod, $special)) {
                 $shippingServices[] = ShippingService::fromServiceDetails($service);
             }
         }
@@ -330,9 +330,11 @@ class UpdateShippingServicesTask extends Task
      *
      * @return bool TRUE if given shipping service belongs to given shipping method; otherwise, FALSE.
      */
-    protected function serviceBelongsToMethod(ShippingServiceDetails $service, ShippingMethod $shippingMethod)
+    protected function serviceBelongsToMethod(ShippingServiceDetails $service, ShippingMethod $shippingMethod, $special = false)
     {
-        return $service->carrierName === $shippingMethod->getCarrierName()
+        $carrierName = $special ? $service->carrierName . ' ' . $service->serviceName : $service->carrierName;
+
+        return $carrierName === $shippingMethod->getCarrierName()
             && $service->national === $shippingMethod->isNational()
             && $service->expressDelivery === $shippingMethod->isExpressDelivery()
             && $service->departureDropOff === $shippingMethod->isDepartureDropOff()
