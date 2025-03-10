@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [3.4.11](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.10...v3.4.11) - 2025-03-10
 ### Changed
-- Add unsupported countries Morocco and United Arab Emirates
+- Add unsupported countries Morocco, United Arab Emirates and Monaco
 
 ## [3.4.10](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.9...v3.4.10) - 2025-01-30
 ### Changed
