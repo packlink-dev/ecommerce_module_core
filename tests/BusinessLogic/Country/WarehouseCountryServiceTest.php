@@ -23,7 +23,7 @@ class WarehouseCountryServiceTest extends BaseTestWithServices
         $countries = $service->getSupportedCountries();
 
         $this->assertNotEmpty($countries);
-        $this->assertCount(45, $countries);
+        $this->assertCount(47, $countries);
         $this->assertArrayHasKey('MX', $countries);
         $this->assertEquals('Mexico', $countries['MX']->name);
         $this->assertEquals('MX', $countries['MX']->code);
