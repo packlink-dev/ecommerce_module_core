@@ -125,7 +125,7 @@ class RegistrationServiceTest extends BaseTestWithServices
         return RegistrationRequest::fromArray(
             array(
                 'email' => 'john.doe@example.com',
-                'password' => 'test1234',
+                'password' => 'Test1234567#',
                 'phone' => '(024) 418 52 52',
                 'estimated_delivery_volume' => '1 - 10',
                 'platform' => $brand->platformCode,

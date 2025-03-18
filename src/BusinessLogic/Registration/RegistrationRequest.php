@@ -217,11 +217,11 @@ class RegistrationRequest extends FrontDto
             static::setInvalidFieldError('email', $validationErrors, Translator::translate('validation.invalidEmail'));
         }
 
-        if (!empty($payload['password']) && strlen($payload['password']) < 6) {
+        if (!empty($payload['password']) && !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/', $payload['password'])) {
             static::setInvalidFieldError(
                 'password',
                 $validationErrors,
-                Translator::translate('validation.shortPassword', array(6))
+                Translator::translate('validation.passwordRestriction', array(12))
             );
         }
 
