@@ -26,7 +26,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
         $brand = $brandConfigurationService->get();
 
         self::assertEquals('john.doe@example.com', $request->email);
-        self::assertEquals('test1234', $request->password);
+        self::assertEquals('Test1234567#', $request->password);
         self::assertEquals('(024) 418 52 52', $request->phone);
         self::assertEquals('1 - 10', $request->estimatedDeliveryVolume);
         self::assertEquals($brand->platformCode, $request->platform);
@@ -155,7 +155,7 @@ class RegistrationRequestDtoTest extends BaseDtoTest
 
         return array(
             'email' => 'john.doe@example.com',
-            'password' => 'test1234',
+            'password' => 'Test1234567#',
             'phone' => '(024) 418 52 52',
             'estimated_delivery_volume' => '1 - 10',
             'platform' => $brand->platformCode,
