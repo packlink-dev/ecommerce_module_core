@@ -95,4 +95,29 @@ class TestQueueService extends QueueService
 
         return $queueItem;
     }
+
+    /**
+     * Enqueues queue item to a given queue and stores changes.
+     *
+     * @param string $queueName Name of a queue where queue item should be queued.
+     * @param Task $task Task to enqueue.
+     * @param string $context Task execution context. If integration supports multiple accounts (middleware
+     *     integration) context based on account id should be provided. Failing to do this will result in global task
+     *     context and unpredictable task execution.
+     *
+     * @param int | null $priority Null priority falls back to Priority::NORMAL
+     *
+     * @return \Logeecom\Infrastructure\TaskExecution\QueueItem Created queue item.
+     *
+     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException When queue storage
+     *      fails to save the item.
+     */
+    public function enqueue($queueName, Task $task, $context = '', $priority = null)
+    {
+        if (!empty($this->exceptionResponses['enqueue'])) {
+            throw $this->exceptionResponses['enqueue'];
+        }
+
+        return parent::enqueue($queueName, $task, $context, $priority);
+    }
 }

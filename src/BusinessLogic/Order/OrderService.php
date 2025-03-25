@@ -53,11 +53,11 @@ class OrderService extends BaseService
     /**
      * @var ShopOrderService
      */
-    private $shopOrderService;
+    protected $shopOrderService;
     /**
      * @var OrderShipmentDetailsService
      */
-    private $orderShipmentDetailsService;
+    protected $orderShipmentDetailsService;
 
     /**
      * OrderService constructor.

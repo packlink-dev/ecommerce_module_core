@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.5.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.11...v3.5.0) - 2025-03-17
+**BREAKING CHANGES**
+### Added 
+- Add manual refresh button for updating shipping services
+- Add additional data to Shipment
+### Changed
+- `UpdateShippingServicesTask` - update to fetch special services
+
 ## [3.4.11](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.4.10...v3.4.11) - 2025-03-10
 ### Changed
 - Add unsupported countries Morocco, United Arab Emirates and Monaco

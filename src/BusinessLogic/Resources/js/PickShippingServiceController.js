@@ -13,6 +13,8 @@ if (!window.Packlink) {
      * @property {string} getCurrencyDetailsUrl
      * @property {string} systemId
      * @property {boolean} newService
+     * @property {string} enqueue
+     * @property {string} getTaskStatus
      */
 
     /**
@@ -63,6 +65,12 @@ if (!window.Packlink) {
                 state.goToState('my-shipping-services');
             });
 
+            const button = mainPage.querySelector('#refresh-service-list-btn');
+            const errorButton = mainPage.querySelector('#error-message-btn');
+            const errorMessageText = mainPage.querySelector('#pl-error-message');
+
+            checkTaskStatus(button,errorButton,errorMessageText);
+
             mainPage.querySelectorAll('.pl-filter-option').forEach((optionBtn) => {
                 optionBtn.addEventListener('click', () => {
                     desktopMode = true;
@@ -71,7 +79,70 @@ if (!window.Packlink) {
             });
 
             mainPage.querySelector('#pl-open-filter-button').addEventListener('click', showFilterModal);
+
+            mainPage.querySelector('#refresh-service-list-btn').addEventListener('click', () => {
+                ajaxService.get(configuration.enqueue, (response) => {
+                    if (response.status === 'success') {
+
+                        button.disabled = true;
+                        utilityService.showSpinner('pl-refresh-spinner');
+
+                        checkTaskStatus(button, errorButton, errorMessageText,false);
+                    } else {
+                        showError(errorButton,errorMessageText,response.message, false);
+                    }
+                });
+            });
+
+            const closeErrorButton = document.getElementById('close-error');
+
+            closeErrorButton.addEventListener('click', () => {
+                errorButton.classList.add('pl-hidden');
+            });
         };
+
+        function showError(button, messageButton, message) {
+            button.classList.remove('pl-hidden');
+
+            if(message) {
+                messageButton.textContent = message;
+            }
+
+            setTimeout(() => {
+               button.classList.add('pl-hidden');
+            }, 5000);
+        }
+
+        /**
+         * @param button
+         * @param errorButton
+         * @param errorMessage
+         * @param initial
+         */
+        function checkTaskStatus(button, errorButton, errorMessage, initial = true) {
+            ajaxService.get(configuration.getTaskStatus, (response) => {
+                const taskStatus = response.status;
+                const message = response.message;
+
+                if (taskStatus === 'queued' || taskStatus === 'in_progress' || taskStatus === 'created') {
+                    utilityService.showSpinner('pl-refresh-spinner');
+                    button.disabled = true;
+                    setTimeout(() => checkTaskStatus(button, errorButton, errorMessage,initial), 3000);
+                } else if (taskStatus === 'completed') {
+                    utilityService.hideSpinner('pl-refresh-spinner');
+                    button.disabled = false;
+
+                    ajaxService.get(configuration.getTaskStatusUrl, checkServicesStatus);
+                } else if (taskStatus === 'failed' && !initial) {
+                    utilityService.hideSpinner('pl-refresh-spinner');
+                    button.disabled = false;
+                    showError(errorButton,errorMessage, message);
+
+                } else if (!initial) {
+                    showError(errorButton,errorMessage, message);
+                }
+            });
+        }
 
         /**
          * Checks the status of the update shipping services task.
@@ -134,13 +205,27 @@ if (!window.Packlink) {
          * Shows the block with the no services message.
          */
         const hideNoServicesModal = () => {
-            noServicesModal.close();
+            if (noServicesModal) {
+                noServicesModal.close();
+            }
         };
 
         /**
          * Starts the auto-configure process.
          */
         const startAutoConfigure = () => {
+            const mainPage = templateService.getMainPage();
+
+            const button = mainPage.querySelector('#refresh-service-list-btn');
+            const errorMessage = mainPage.querySelector('#pl-error');
+            const errorMessageText = mainPage.querySelector('#pl-error-message');
+
+            checkTaskStatus(button, errorMessage,errorMessageText, true);
+
+            loadServices();
+        };
+
+        const loadServices = () => {
             hideNoServicesModal();
             utilityService.showSpinner();
             ajaxService.get(
@@ -155,7 +240,7 @@ if (!window.Packlink) {
                 },
                 showNoServicesModal
             );
-        };
+        }
 
         /**
          * Retrieves system info.

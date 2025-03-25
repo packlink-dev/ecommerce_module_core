@@ -22,6 +22,8 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
  */
 class UpdateShippingServicesTask extends Task
 {
+    const SPECIAL_SERVICE_TAG = 'EXCLUSIVE_FOR_PLUS';
+
     /**
      * @var WarehouseCountryService
      */
@@ -79,10 +81,14 @@ class UpdateShippingServicesTask extends Task
 
         if ($this->shouldExecute()) {
             $apiServices = $this->getRemoteServices();
+            $apiSpecialServices = $this->getSpecialServices($apiServices);
+
             $currentMethods = $this->getShippingMethodService()->getAllMethods();
+            $currentSpecialMethods = $this->getSpecialServices($currentMethods);
 
             $this->reportProgress(20);
             $this->syncServices($currentMethods, $apiServices);
+            $this->syncServicesSpecial($currentSpecialMethods, $apiSpecialServices);
         }
 
         $this->reportProgress(100);
@@ -111,7 +117,10 @@ class UpdateShippingServicesTask extends Task
         }
 
         $supportedCountries = $this->getCountryService()->getSupportedCountries();
-        $sourceCountry = $supportedCountries[$sourceCountryCode];
+        $sourceCountry = array_key_exists($sourceCountryCode, $supportedCountries) ? $supportedCountries[$sourceCountryCode] : null;
+        if (!$sourceCountry) {
+            return array();
+        }
 
         $parcel = $config->getDefaultParcel() ?: ParcelInfo::defaultParcel();
         $package = Package::fromArray($parcel->toArray());
@@ -162,7 +171,7 @@ class UpdateShippingServicesTask extends Task
     protected function syncServices(array $currentMethods, array $apiServices)
     {
         $progress = 20;
-        $progressStep = count($currentMethods) > 0 ? (60 / count($currentMethods)) : 60;
+        $progressStep = count($currentMethods) > 0 ? (40 / count($currentMethods)) : 40;
 
         foreach ($currentMethods as $shippingMethod) {
             $this->updateShippingMethod($shippingMethod, $apiServices);
@@ -171,7 +180,7 @@ class UpdateShippingServicesTask extends Task
             $this->reportProgress($progress);
         }
         
-        $this->reportProgress(80);
+        $this->reportProgress(60);
         $batch = 0;
         foreach ($apiServices as $service) {
             $batch++;
@@ -184,16 +193,46 @@ class UpdateShippingServicesTask extends Task
     }
 
     /**
+     * Creates, updates or deletes local shipping methods based on state on Packlink API.
+     *
+     * @param array $currentMethods Current shipping methods in shop.
+     * @param array $apiServices Services retrieved from API.
+     */
+    protected function syncServicesSpecial(array $currentMethods, array $apiServices)
+    {
+        $progress = 60;
+        $progressStep = count($currentMethods) > 0 ? (20 / count($currentMethods)) : 20;
+
+        foreach ($currentMethods as $shippingMethod) {
+            $this->updateShippingMethod($shippingMethod, $apiServices, true);
+
+            $progress += $progressStep;
+            $this->reportProgress($progress);
+        }
+
+        $this->reportProgress(80);
+        $batch = 0;
+        foreach ($apiServices as $service) {
+            $batch++;
+            if ($batch === 20) {
+                $this->reportAlive();
+                $batch = 0;
+            }
+            $this->getShippingMethodService()->add($service, true);
+        }
+    }
+
+    /**
      * Updates shipping method from data from Packlink API or deletes it if service does not exist.
      *
      * @param ShippingMethod $shippingMethod Local shipping method.
      * @param ShippingServiceDetails[] $apiServices Shipping services returned from API.
      */
-    protected function updateShippingMethod(ShippingMethod $shippingMethod, array &$apiServices)
+    protected function updateShippingMethod(ShippingMethod $shippingMethod, array &$apiServices, $special = false)
     {
         $shippingServices = array();
         foreach ($apiServices as $service) {
-            if ($this->serviceBelongsToMethod($service, $shippingMethod)) {
+            if ($this->serviceBelongsToMethod($service, $shippingMethod, $special)) {
                 $shippingServices[] = ShippingService::fromServiceDetails($service);
             }
         }
@@ -211,6 +250,27 @@ class UpdateShippingServicesTask extends Task
         }
 
         $this->getShippingMethodService()->delete($shippingMethod);
+    }
+
+    /**
+     * Returns all special services from an API, and removes it from an array
+     *
+     * @param array $apiServices
+     *
+     * @return array
+     */
+    protected function getSpecialServices(array &$apiServices)
+    {
+        $specialServices = array();
+
+        foreach ($apiServices as $key => $service) {
+            if (in_array(array('id' => self::SPECIAL_SERVICE_TAG), $service->tags, true)) {
+                $specialServices[] = $service;
+                unset($apiServices[$key]);
+            }
+        }
+
+        return $specialServices;
     }
 
     /**
@@ -270,9 +330,11 @@ class UpdateShippingServicesTask extends Task
      *
      * @return bool TRUE if given shipping service belongs to given shipping method; otherwise, FALSE.
      */
-    protected function serviceBelongsToMethod(ShippingServiceDetails $service, ShippingMethod $shippingMethod)
+    protected function serviceBelongsToMethod(ShippingServiceDetails $service, ShippingMethod $shippingMethod, $special = false)
     {
-        return $service->carrierName === $shippingMethod->getCarrierName()
+        $carrierName = $special ? $service->carrierName . ' ' . $service->serviceName : $service->carrierName;
+
+        return $carrierName === $shippingMethod->getCarrierName()
             && $service->national === $shippingMethod->isNational()
             && $service->expressDelivery === $shippingMethod->isExpressDelivery()
             && $service->departureDropOff === $shippingMethod->isDepartureDropOff()

@@ -111,7 +111,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     {
         $this->prepareAndExecuteValidTask();
 
-        self::assertCount(18, $this->shippingMethodService->getAllMethods());
+        self::assertCount(19, $this->shippingMethodService->getAllMethods());
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
 
         $this->validate100Progress();
@@ -123,7 +123,26 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
 
         $query = new QueryFilter();
         $query->where('national', Operators::EQUALS, false);
-        self::assertEquals(11, $repo->count($query));
+        self::assertEquals(12, $repo->count($query));
+    }
+
+    /**
+     *
+     * @return void
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function testExecuteNewSpecialServices()
+    {
+        $this->prepareAndExecuteValidTask();
+
+        $current = $this->shippingMethodService->getAllMethods();
+
+        $this->prepareAndExecuteValidTask();
     }
 
     /**
@@ -208,7 +227,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         $this->httpClient->setMockResponses($this->getValidMockResponses());
         $this->syncTask->execute();
 
-        self::assertCount(18, $this->shippingMethodService->getAllMethods());
+        self::assertCount(19, $this->shippingMethodService->getAllMethods());
         self::assertCount(1, $this->shippingMethodService->getActiveMethods());
 
         $method = $this->shippingMethodService->getShippingMethod($methodId);
@@ -238,7 +257,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         $this->prepareAndExecuteValidTask();
         $methods = $this->shippingMethodService->getAllMethods();
 
-        self::assertCount(18, $methods);
+        self::assertCount(19, $methods);
         foreach ($methods as $method) {
             self::assertEquals('EUR', $method->getCurrency());
         }
@@ -256,7 +275,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     {
         $this->prepareAndExecuteValidTask();
 
-        self::assertCount(18, $this->shippingMethodService->getAllMethods());
+        self::assertCount(19, $this->shippingMethodService->getAllMethods());
         self::assertCount(0, $this->shippingMethodService->getActiveMethods());
 
         $repo = RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME);
@@ -266,7 +285,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
 
         $query = new QueryFilter();
         $query->where('national', Operators::EQUALS, false);
-        self::assertEquals(11, $repo->count($query));
+        self::assertEquals(12, $repo->count($query));
 
         // only international from IT do ES
         $this->httpClient->setMockResponses(
@@ -364,6 +383,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     protected function getValidMockResponses()
     {
         return array(
+            new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-SP')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-IT')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-ES')),
             new HttpResponse(200, array(), $this->getDemoServiceDeliveryDetails('IT-DE')),

@@ -14,6 +14,8 @@ use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 
+use function Sodium\add;
+
 /**
  * Class ShippingMethodServiceTest.
  *
@@ -101,6 +103,29 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         );
     }
 
+    /**
+     * @return void
+     */
+    public function testAddNewSpecialMethod()
+    {
+        $shippingMethod = $this->shippingMethodService->add($this->getSpecialService(1), true);
+        $id = $shippingMethod->getId();
+
+        self::assertNotNull($shippingMethod, 'Failed to create shipping method!');
+        self::assertEquals('test special test service', $shippingMethod->getCarrierName());
+
+        $allServices = $shippingMethod->getShippingServices();
+        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $firstService */
+        $firstService = current($allServices);
+        self::assertEquals(1, $firstService->serviceId, 'Failed to set shipping method service ID!');
+        self::assertGreaterThan(0, $id, 'Failed to set shipping method ID!');
+
+        $shippingMethod = $this->shippingMethodService->getShippingMethod($id);
+        self::assertNotNull($shippingMethod, 'Failed to retrieve created shipping method!');
+
+        self::assertCount(1, $this->shippingMethodService->getAllMethods());
+    }
+
     public function testUpdateMethod()
     {
         $serviceDetails = $this->getShippingServiceDetails(1);
@@ -119,6 +144,31 @@ class ShippingMethodServiceTest extends BaseTestWithServices
         self::assertEquals('changed name', $firstService->serviceName);
 
         $serviceDetails->serviceName = 'changed name';
+        $this->shippingMethodService->update($serviceDetails);
+
+        self::assertCount(
+            0,
+            $this->testShopShippingMethodService->callHistory,
+            'Inactive service should not be updated in shop!'
+        );
+    }
+
+    public function testUpdateSpecialMethod()
+    {
+        $serviceDetails = $this->getSpecialService(1);
+        $defaultName = $serviceDetails->currency;
+        $shippingMethod = $this->shippingMethodService->add($this->getSpecialService(1), true);
+
+        $serviceDetails->serviceName = 'GB';
+        $this->shippingMethodService->update($serviceDetails, true);
+
+        $updatedShippingMethod = $this->shippingMethodService->getShippingMethod($shippingMethod->getId());
+        $allServices = $updatedShippingMethod->getShippingServices();
+        /** @var \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService $firstService */
+        $firstService = current($allServices);
+
+        self::assertNotEquals($defaultName, $firstService->serviceName);
+
         $this->shippingMethodService->update($serviceDetails);
 
         self::assertCount(
@@ -419,6 +469,46 @@ class ShippingMethodServiceTest extends BaseTestWithServices
                     'total_price' => 13.76,
                     'base_price' => 10.76,
                     'tax_price' => 3,
+                ),
+            )
+        );
+
+        $details->departureCountry = 'IT';
+        $details->destinationCountry = 'IT';
+        $details->national = true;
+
+        return $details;
+    }
+
+    /**
+     * @param int $id
+     * @param string $carrierName
+     *
+     * @return \Logeecom\Infrastructure\Data\DataTransferObject|\Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails
+     */
+    private function getSpecialService($id, $carrierName = 'test special', $serviceName = 'test service')
+    {
+        $details = ShippingServiceDetails::fromArray(
+            array(
+                'id' => $id,
+                'carrier_name' => $carrierName,
+                'name' => $serviceName,
+                'currency' => 'EUR',
+                'country' => 'IT',
+                'dropoff' => false,
+                'delivery_to_parcelshop' => false,
+                'category' => 'express',
+                'transit_time' => '3 DAYS',
+                'transit_hours' => 72,
+                'first_estimated_delivery_date' => '2019-01-05',
+                'national' => true,
+                'price' => array(
+                    'total_price' => 13.76,
+                    'base_price' => 10.76,
+                    'tax_price' => 3,
+                ),
+                'tags' => array(
+                    'id' => 'EXCLUSIVE_FOR_PLUS',
                 ),
             )
         );

@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
+use Packlink\BusinessLogic\Http\DTO\Shipment\AdditionalData;
 
 /**
  * Class Shipment.
@@ -83,6 +84,10 @@ class Shipment extends DataTransferObject
      * @var string
      */
     public $currency;
+    /**
+     * @var AdditionalData
+     */
+    public $additionalData;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -106,6 +111,7 @@ class Shipment extends DataTransferObject
             'tracking_url' => $this->carrierTrackingUrl,
             'service_id' => $this->serviceId,
             'currency' => $this->currency,
+            'additional_data' => $this->additionalData->toArray(),
         );
     }
 
@@ -141,6 +147,7 @@ class Shipment extends DataTransferObject
         }
 
         $shipment->carrierTrackingUrl = static::getDataValue($raw, 'tracking_url');
+        $shipment->additionalData = AdditionalData::fromArray(static::getDataValue($raw, 'additional_data', array()));
 
         return $shipment;
     }

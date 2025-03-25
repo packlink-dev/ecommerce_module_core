@@ -77,6 +77,7 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
                 'parcelDestination' => $this->parcelDestination,
                 'logoUrl' => $this->logoUrl,
                 'currency' => $this->currency,
+                'activated' => $this->activated,
             )
         );
     }

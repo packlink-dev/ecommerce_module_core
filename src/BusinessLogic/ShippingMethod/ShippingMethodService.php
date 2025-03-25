@@ -121,26 +121,27 @@ class ShippingMethodService extends BaseService
      * @see update.
      *
      */
-    public function add(ShippingServiceDetails $serviceDetails)
+    public function add($serviceDetails, $isSpecialService = false)
     {
-        return $this->update($serviceDetails);
+        return $this->update($serviceDetails, $isSpecialService);
     }
 
     /**
      * Creates or Updates shipping method from Packlink data.
      *
      * @param ShippingServiceDetails $serviceDetails
+     * @param bool $isSpecialService
      *
      * @return ShippingMethod Created or updated shipping method.
      */
-    public function update(ShippingServiceDetails $serviceDetails)
+    public function update(ShippingServiceDetails $serviceDetails, $isSpecialService = false)
     {
-        $method = $this->getShippingMethodForService($serviceDetails);
+        $method = $this->getShippingMethodForService($serviceDetails, $isSpecialService);
         if ($method === null) {
             $method = new ShippingMethod();
         }
 
-        $this->setShippingMethodDetails($method, $serviceDetails);
+        $this->setShippingMethodDetails($method, $serviceDetails, $isSpecialService);
 
         $this->save($method);
 
@@ -320,7 +321,7 @@ class ShippingMethodService extends BaseService
      *
      * @return ShippingMethod|null Shipping method if found; otherwise, NULL.
      */
-    public function getShippingMethodForService($service)
+    public function getShippingMethodForService($service, $isSpecialService = false)
     {
         $filter = new QueryFilter();
 
@@ -328,8 +329,15 @@ class ShippingMethodService extends BaseService
             $filter->where('departureDropOff', Operators::EQUALS, $service->departureDropOff)
                 ->where('destinationDropOff', Operators::EQUALS, $service->destinationDropOff)
                 ->where('national', Operators::EQUALS, $service->national)
-                ->where('expressDelivery', Operators::EQUALS, $service->expressDelivery)
-                ->where('carrierName', Operators::EQUALS, $service->carrierName);
+                ->where('expressDelivery', Operators::EQUALS, $service->expressDelivery);
+
+            if (!$isSpecialService) {
+                $filter->where('carrierName', Operators::EQUALS, $service->carrierName);
+            }
+
+            if($isSpecialService) {
+                $filter->where('carrierName', Operators::EQUALS, $service->carrierName . ' ' . $service->serviceName);
+            }
         } catch (QueryFilterInvalidParamException $e) {
             return null;
         }
@@ -540,9 +548,18 @@ class ShippingMethodService extends BaseService
      */
     protected function setShippingMethodDetails(
         ShippingMethod $shippingMethod,
-        ShippingServiceDetails $serviceDetails
+        ShippingServiceDetails $serviceDetails,
+        $isSpecialService = false
     ) {
-        $shippingMethod->setCarrierName($serviceDetails->carrierName);
+        if(!$isSpecialService) {
+            $shippingMethod->setCarrierName($serviceDetails->carrierName);
+        }
+
+        if($isSpecialService) {
+            $shippingMethod->setCarrierName($serviceDetails->carrierName . ' ' . $serviceDetails->serviceName);
+            $shippingMethod->tags = $serviceDetails->tags;
+        }
+
         $shippingMethod->setDepartureDropOff($serviceDetails->departureDropOff);
         $shippingMethod->setDestinationDropOff($serviceDetails->destinationDropOff);
         $shippingMethod->setDeliveryTime($serviceDetails->transitTime);
