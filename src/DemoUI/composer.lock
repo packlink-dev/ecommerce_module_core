@@ -18,5 +18,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "5.3.29"
-    }
+    },
+    "plugin-api-version": "2.2.0"
 }
