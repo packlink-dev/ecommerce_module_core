@@ -311,7 +311,7 @@
     "chooseYourCountry": "Choose your country",
     "searchCountry": "Search country",
     "invalidDeliveryVolume": "Field is not a valid delivery volume.",
-    "passwordRestriction": "Your password must be at least 12 characters long and include at least one lowercase letter, one uppercase letter, one number, and one symbol"
+    "passwordRestriction": "Your password must be at least %s characters long and include at least one lowercase letter, one uppercase letter, one number, and one symbol"
   },
   "onboardingWelcome": {
     "header": "Let's set up basic information so that you can make shipments",
