@@ -70,12 +70,14 @@ if (!window.Packlink) {
             const emailInput = templateService.getComponent('pl-register-email'),
                 phoneInput = templateService.getComponent('pl-register-phone'),
                 sourceInput = templateService.getComponent('pl-register-source'),
-                platformCountry = templateService.getComponent('pl-register-platform-country');
+                platformCountry = templateService.getComponent('pl-register-platform-country'),
+                registerPassword = templateService.getComponent('pl-register-password');
 
             emailInput.value = response.email;
             phoneInput.value = response.phone;
             sourceInput.value = response.source;
             platformCountry.value = response.platform_country;
+            registerPassword.title = translationService.translate('register.passwordRestriction', [12]);
 
             let termsAndConditionsLabel = templateService.getComponent('pl-register-terms-and-conditions-label'),
                 termsTranslation = translationService.translate(
