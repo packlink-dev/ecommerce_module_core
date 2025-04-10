@@ -203,12 +203,30 @@ if (!window.Packlink) {
          * @param {HTMLInputElement} input
          * @return {boolean}
          */
-        this.validatePasswordLength = (input) => validateField(
-            input,
-            input.value.length < input.dataset.minLength,
-            'validation.shortPassword',
-            [input.dataset.minLength]
-        );
+        this.validatePasswordLength = (input) => {
+            const password = input.value;
+            const minLength = 12;
+
+            const lowercase = /[a-z]/;
+            const uppercase = /[A-Z]/;
+            const number = /[0-9]/;
+            const symbol = /[!@#$%^&*(),.?":{}|<>]/;
+
+            const isValidLength = password.length >= minLength;
+            const hasLowercase = lowercase.test(password);
+            const hasUppercase = uppercase.test(password);
+            const hasNumber = number.test(password);
+            const hasSymbol = symbol.test(password);
+
+            const isPasswordInvalid = !(isValidLength && hasLowercase && hasUppercase && hasNumber && hasSymbol);
+
+            validateField(
+                    input,
+                    isPasswordInvalid,
+                    'validation.passwordRestriction',
+                    [minLength]
+            );
+        };
 
         /**
          * Validates if the input field is longer than a specified number of characters.
