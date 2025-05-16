@@ -217,9 +217,9 @@ class ShippingMethod extends Entity
         }
 
         if (isset($data['tags']) && is_array($data['tags'])) {
-            $this->shippingCountries = $data['tags'];
+            $this->tags = $data['tags'];
         } else {
-            $this->shippingCountries = array();
+            $this->tags = array();
         }
     }
 
