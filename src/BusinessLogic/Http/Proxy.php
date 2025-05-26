@@ -505,6 +505,27 @@ class Proxy
     }
 
     /**
+     * @param $accessToken
+     *
+     * @return string
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function getApiKeyWithToken($accessToken)
+    {
+        $response = $this->callWithToken(HttpClient::HTTP_METHOD_GET, 'users/api/keys', $accessToken);
+
+        $data = json_decode($response->getBody(), true);
+
+        if (isset($data['token'])) {
+            return $data['token'];
+        }
+
+        throw new HttpAuthenticationException('Could not retrieve API key.');
+    }
+
+    /**
      * @param $shippingDetails
      * @param $params
      * @return array
@@ -582,6 +603,48 @@ class Proxy
             $method,
             static::BASE_URL . static::API_VERSION . ltrim($endpoint, '/'),
             $this->getRequestHeaders(),
+            $bodyStringToSend
+        );
+
+        $this->validateResponse($response);
+
+        return $response;
+    }
+
+    /**
+     * Makes a HTTP call with Bearer token and returns response.
+     *
+     * @param string $method HTTP method (GET, POST, PUT, etc.).
+     * @param string $endpoint Endpoint resource on remote API.
+     * @param array $body Request payload body.
+     * @param string $accessToken Bearer token for authentication.
+     *
+     * @return HttpResponse Response from request.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    protected function callWithToken($method, $endpoint,  $accessToken, array $body = array())
+    {
+        $bodyStringToSend = '';
+        if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
+            $bodyStringToSend = json_encode($body);
+        }
+
+        $headers = array(
+            'accept' => 'Accept: application/json',
+            'content' => 'Content-Type: application/json',
+            'token' => 'Authorization: ' . 'Bearer ' . $accessToken,
+            'Module-Version' => 'X-Module-Version: ' . $this->configService->getModuleVersion(),
+            'Ecommerce-Name' => 'X-Ecommerce-Name: ' . $this->configService->getECommerceName(),
+            'Ecommerce-Version' => 'X-Ecommerce-Version: ' . $this->configService->getECommerceVersion(),
+        );
+
+        $response = $this->client->request(
+            $method,
+            static::BASE_URL . static::API_VERSION . ltrim($endpoint, '/'),
+            $headers,
             $bodyStringToSend
         );
 
