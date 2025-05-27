@@ -142,6 +142,8 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
 
         $current = $this->shippingMethodService->getAllMethods();
 
+        $this->assertNotEmpty($current);
+
         $this->prepareAndExecuteValidTask();
     }
 
