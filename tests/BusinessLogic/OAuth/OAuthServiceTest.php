@@ -53,11 +53,10 @@ class OAuthServiceTest extends BaseTestWithServices
      */
     public $stateService;
 
-    protected function setUp()
-    {
-        $this->before();
-    }
-
+    /**
+     * @before
+     * @inheritdoc
+     */
     protected function before()
     {
         parent::before();

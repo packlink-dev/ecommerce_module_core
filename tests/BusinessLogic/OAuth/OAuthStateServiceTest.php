@@ -3,8 +3,6 @@
 namespace Logeecom\Tests\BusinessLogic\OAuth;
 
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
-use Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException;
-use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -28,11 +26,13 @@ class OAuthStateServiceTest extends BaseTestWithServices
     public $repository;
 
     /**
-     * @throws RepositoryNotRegisteredException
-     * @throws RepositoryClassException
+     * @before
+     * @inheritdoc
      */
-    protected function setUp()
+    protected function before()
     {
+        parent::before();
+
         RepositoryRegistry::registerRepository(OAuthState::CLASS_NAME, MemoryRepository::getClassName());
 
         $this->repository = RepositoryRegistry::getRepository(OAuthState::CLASS_NAME);

@@ -14,13 +14,13 @@ use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
 
 class OAuthProxyTest extends BaseTestWithServices
 {
-    protected function setUp()
-    {
-        $this->before();
-    }
     /** @var OAuthProxy */
     private $proxy;
 
+    /**
+     * @before
+     * @inheritdoc
+     */
     protected function before()
     {
         parent::before();
