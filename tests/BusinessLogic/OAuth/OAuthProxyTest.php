@@ -155,7 +155,7 @@ class OAuthProxyTest extends BaseTestWithServices
         $headers = $method->invoke($this->proxy);
 
         $this->assertTrue(array_key_exists('Authorization', $headers));
-        $this->assertContains('Basic', $headers['Authorization']);
+        $this->assertTrue(strpos($headers['Authorization'], 'Basic') !== false);
         $this->assertTrue(array_key_exists('Content-Type', $headers));
         $this->assertEquals('Content-Type: application/x-www-form-urlencoded', $headers['Content-Type']);
     }
