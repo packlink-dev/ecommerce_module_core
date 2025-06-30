@@ -70,8 +70,10 @@ class ProxyTest extends BaseTestWithServices
 
         $this->assertNotNull($exThrown);
         $this->assertEquals(400, $exThrown->getCode());
-        $this->assertEquals('Error message 1
-Error message 2',  $exThrown->getMessage());
+        $expected = "Error message 1\nError message 2";
+        $actual = str_replace(["\r\n", "\r"], "\n", $exThrown->getMessage());
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**

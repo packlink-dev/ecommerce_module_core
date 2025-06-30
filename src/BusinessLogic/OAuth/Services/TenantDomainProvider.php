@@ -17,6 +17,7 @@ class TenantDomainProvider implements Services\Interfaces\TenantDomainProviderIn
         'FR' => 'pro.packlink.fr',
         'DE' => 'pro.packlink.de',
         'IT' => 'pro.packlink.it',
+        'WW' => 'pro.packlink.com'
     );
 
 
@@ -24,13 +25,13 @@ class TenantDomainProvider implements Services\Interfaces\TenantDomainProviderIn
      * @var string[]
      */
     private static $ALLOWED_COUNTRIES = array(
-        'ES', 'FR', 'DE', 'IT'
+        'ES', 'FR', 'DE', 'IT', 'WW'
     );
 
     /**
      * @var string
      */
-    private static $DEFAULT_DOMAIN = 'pro.packlink.fr';
+    private static $DEFAULT_DOMAIN = 'pro.packlink.com';
 
     /**
      * @param string $tenantCode
