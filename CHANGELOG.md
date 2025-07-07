@@ -3,10 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.6.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.1...v3.6.2) - 2025-07-07
+### Added
+- Add Other as option for OAuth 
+
 ## [3.6.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.0...v3.6.1) - 2025-05-27
 ### Added
 - Fix unit test for OAuth
-- 
+
 ## [3.6.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.5.2...v3.6.0) - 2025-05-26
 ### Added
 - Add OAuth
