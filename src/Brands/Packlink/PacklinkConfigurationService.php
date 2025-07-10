@@ -88,7 +88,7 @@ class PacklinkConfigurationService implements BrandConfigurationService
     protected static $additionalWarehouseCountries = array(
         'PL' => array(
             'code' => 'PL',
-            'postal_code' => '00-694',
+            'postal_code' => '00-693',
         ),
         'CH' => array(
             'code' => 'CH',
@@ -172,7 +172,7 @@ class PacklinkConfigurationService implements BrandConfigurationService
         ),
         'LV' => array(
             'code' => 'LV',
-            'postal_code' => 'LV–1073',
+            'postal_code' => '1073',
         ),
         'DK' => array(
             'code' => 'DK',

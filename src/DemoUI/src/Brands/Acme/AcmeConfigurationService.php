@@ -56,7 +56,7 @@ class AcmeConfigurationService implements BrandConfigurationService
     protected static $additionalWarehouseCountries = array(
         'PL' => array(
             'code' => 'PL',
-            'postal_code' => '00-694',
+            'postal_code' => '00-693',
         ),
         'CH' => array(
             'code' => 'CH',
