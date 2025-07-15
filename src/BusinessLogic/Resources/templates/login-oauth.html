@@ -1,0 +1,41 @@
+<div class="pl-login-page pl-flex-expand">
+    <div class="pl-flex-expand pl-page-padding pl-medium-page pl-center">
+        <div class="pl-bottom-separate">
+            <h1 class="pl-text-center">
+                {$login.welcome}
+            </h1>
+            <p class="pl-text-center">
+                {$login.connectDesc}
+            </p>
+        </div>
+        <div id="pl-oauth-form" class="pl-full-width">
+            <div class="pl-form-group">
+
+                <select id="pl-connect-select-country">
+                    <option value="ES" selected>{$countries.ES}</option>
+                    <option value="FR">{$countries.FR}</option>
+                    <option value="DE">{$countries.DE}</option>
+                    <option value="IT">{$countries.IT}</option>
+                    <option value="WW">{$countries.WW}</option>
+                </select>
+
+            </div>
+            <button id="pl-connect-button" class="pl-button pl-button-primary" disabled>
+                {$login.connect}
+            </button>
+        </div>
+    </div>
+    <div class="pl-full-width pl-login-footer pl-page-padding pl-text-center">
+        <div class="pl-medium-page">
+            <div>
+                <strong>{$login.dontHaveAccount}</strong>
+            </div>
+            <div class="pl-desktop-only">
+                {$login.chooseYourCountry}
+            </div>
+            <button type="submit" name="register" class="pl-button pl-button-inverted" id="pl-go-to-register">
+                {$login.registerMe}
+            </button>
+        </div>
+    </div>
+</div>

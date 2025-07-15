@@ -45,6 +45,8 @@
     "apiKeyIncorrect": "Falscher API-Schlüssel",
     "dontHaveAccount": "Sie haben noch keinen Account?",
     "validateApiKey": "API-Schlüssel bestätigen",
+    "connect": "Verbinden",
+    "connectDesc": "Integrieren Sie mühelos Ihren Shopify-Shop mit Packlink PRO, um Ihren Versandprozess zu optimieren. Klicken Sie einfach auf die Schaltfläche „Verbinden“, um zu starten und effizientes Auftragsmanagement sowie automatisierte Versandfunktionen freizuschalten.",
     "chooseYourCountry": "Wählen Sie Ihr Land aus, um mit der Registrierung beginnen zu können",
     "registerMe": "Registrieren"
   },

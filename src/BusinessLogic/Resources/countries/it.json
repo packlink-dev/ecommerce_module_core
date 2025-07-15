@@ -45,6 +45,8 @@
     "apiKeyIncorrect": "API Key non corretta",
     "dontHaveAccount": "Non hai un account?",
     "validateApiKey": "Convalida la chiave API",
+    "connect": "Connetti",
+    "connectDesc": "Integra facilmente il tuo negozio Shopify con Packlink PRO per semplificare il processo di spedizione. Clicca semplicemente sul pulsante Connetti qui sotto per iniziare e attivare una gestione efficiente degli ordini e funzionalità di spedizione automatizzate.",
     "chooseYourCountry": "Per iniziare la registrazione, scegli il tuo paese",
     "registerMe": "Iscriviti"
   },

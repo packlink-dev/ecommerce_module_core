@@ -33,14 +33,24 @@ class OAuthService implements OAuthServiceInterface
      * @var OAuthStateServiceInterface
      */
     protected $stateService;
+    /**
+     * @var OAuthConfiguration
+     */
+    protected $configuration;
 
 
-    public function __construct(OAuthProxyInterface $proxy, Proxy $packlinkProxy, RepositoryInterface $repository, OAuthStateServiceInterface $stateService)
-    {
+    public function __construct(
+        OAuthProxyInterface $proxy,
+        Proxy $packlinkProxy,
+        RepositoryInterface $repository,
+        OAuthStateServiceInterface $stateService,
+        OAuthConfiguration $configuration
+    ) {
         $this->proxy = $proxy;
         $this->packlinkProxy = $packlinkProxy;
         $this->repository = $repository;
         $this->stateService = $stateService;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -124,23 +134,23 @@ class OAuthService implements OAuthServiceInterface
     }
 
     /**
-     * @param OAuthUrlData $data
+     * @param string $domain
      *
      * @return string
      */
-    public function buildRedirectUrlAndSaveState(OAuthUrlData $data)
+    public function buildRedirectUrlAndSaveState($domain)
     {
         $queryParams = array(
             'response_type' => 'code',
-            'client_id'     => $data->getClientId(),
-            'redirect_uri'  => $data->getRedirectUri(),
-            'scope'         => implode(' ', $data->getScopes()),
-            'state'         => $this->saveState($data->getTenantId()),
+            'client_id'     => $this->configuration->getClientId(),
+            'redirect_uri'  => $this->configuration->getRedirectUri(),
+            'scope'         => implode(' ', $this->configuration->getScopes()),
+            'state'         => $this->saveState($this->configuration->getTenantId()),
         );
 
         $queryString = http_build_query($queryParams, '', '&', PHP_QUERY_RFC3986);
 
-        $domain = TenantDomainProvider::getDomain($data->getDomain());
+        $domain = TenantDomainProvider::getDomain($domain);
 
         return 'https://' . rtrim($domain, '/') . '/auth/oauth2/authorize?' . $queryString;
     }
