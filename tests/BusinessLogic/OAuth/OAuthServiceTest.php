@@ -15,7 +15,6 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationS
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Http\DTO\OAuthUrlData;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\OAuth\Models\OAuthInfo;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
@@ -97,7 +96,7 @@ class OAuthServiceTest extends BaseTestWithServices
 
         $this->stateService = new OAuthStateService($this->stateRepository);
 
-        $this->service = new OAuthService($authProxy, $proxy, $this->repository, $this->stateService);
+        $this->service = new OAuthService($authProxy, $proxy, $this->repository, $this->stateService, $oAuth);
     }
 
     /**
@@ -105,16 +104,7 @@ class OAuthServiceTest extends BaseTestWithServices
      */
     public function testBuildRedirectUrl()
     {
-        $data = new OAuthUrlData(
-            'tenant1',
-            'client',
-            'www.example.com',
-            array('write', 'read'),
-            'ES',
-            'client_secret'
-        );
-
-        $actualUrl = $this->service->buildRedirectUrlAndSaveState($data);
+        $actualUrl = $this->service->buildRedirectUrlAndSaveState('ES');
 
         $filter = new QueryFilter();
         $filter->where('tenantId', '=', 'tenant1');

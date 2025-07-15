@@ -4,7 +4,6 @@ namespace Packlink\BusinessLogic\OAuth\Services\Interfaces;
 
 use Packlink\BusinessLogic\Http\DTO\OAuthConnectData;
 use Packlink\BusinessLogic\Http\DTO\OAuthToken;
-use Packlink\BusinessLogic\Http\DTO\OAuthUrlData;
 
 interface OAuthServiceInterface
 {
@@ -37,11 +36,11 @@ interface OAuthServiceInterface
     public function refreshToken($refreshToken);
 
     /**
-     * @param OAuthUrlData $data
+     * @param string $domain
      *
      * @return string
      */
-    public function buildRedirectUrlAndSaveState(OAuthUrlData $data);
+    public function buildRedirectUrlAndSaveState($domain);
 
     /**
      * @param $state

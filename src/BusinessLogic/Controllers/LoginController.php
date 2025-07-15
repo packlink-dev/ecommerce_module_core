@@ -4,7 +4,11 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
+use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
+use Packlink\BusinessLogic\OAuth\Services\OAuthService;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
@@ -38,5 +42,16 @@ class LoginController
         }
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRedirectUrl($domain)
+    {
+        /** @var OAuthServiceInterface $authServiceConfig */
+        $authServiceConfig = ServiceRegister::getService(OAuthServiceInterface::CLASS_NAME);
+
+        return $authServiceConfig->buildRedirectUrlAndSaveState($domain);
     }
 }

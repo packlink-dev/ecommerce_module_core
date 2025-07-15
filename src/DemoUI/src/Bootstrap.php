@@ -16,6 +16,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
 use Packlink\Brands\Packlink\PacklinkConfigurationService;
 use Packlink\BusinessLogic\BootstrapComponent;
@@ -23,6 +24,15 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\OAuth\Models\OAuthInfo;
+use Packlink\BusinessLogic\OAuth\Models\OAuthState;
+use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
+use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
+use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthStateServiceInterface;
+use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
+use Packlink\BusinessLogic\OAuth\Services\OAuthService;
+use Packlink\BusinessLogic\OAuth\Services\OAuthStateService;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
@@ -36,6 +46,7 @@ use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\CustomsMappingService;
+use Packlink\DemoUI\Services\BusinessLogic\OAuthConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\ShopOrderService;
 use Packlink\BusinessLogic\SystemInformation\SystemInfoService as SystemInfoServiceInterface;
 use Packlink\DemoUI\Services\BusinessLogic\SystemInfoService;
@@ -96,20 +107,38 @@ class Bootstrap extends BootstrapComponent
     private $customsService;
 
     /**
+     * @var OAuthProxy
+     */
+    private $oauthProxy;
+    /**
+     * @var Proxy
+     */
+    private $proxy;
+    /**
+     * @var OAuthConfigurationService
+     */
+    private $oAuthConfiguration;
+
+    /**
      * Bootstrap constructor.
      */
     public function __construct()
     {
+        $client = new CurlHttpClient();
+        $configService = ConfigurationService::getInstance();
         $this->jsonSerializer = new JsonSerializer();
-        $this->httpClientService = new CurlHttpClient();
+        $this->httpClientService = $client;
         $this->loggerService = new LoggerService();
-        $this->configService = ConfigurationService::getInstance();
+        $this->configService = $configService;
         $this->shopOrderService = new ShopOrderService();
         $this->carrierService = new CarrierService();
         $this->userAccountService = UserAccountService::getInstance();
         $this->registrationInfoService = new TestRegistrationInfoService();
         $this->systemInfoService = new SystemInfoService();
         $this->customsService = new CustomsMappingService();
+        $this->oauthProxy = new OAuthProxy(OAuthConfigurationService::getInstance(), $client);
+        $this->proxy = new Proxy($configService, $client);
+        $this->oAuthConfiguration = OAuthConfigurationService::getInstance();
     }
 
     /**
@@ -152,6 +181,9 @@ class Bootstrap extends BootstrapComponent
         RepositoryRegistry::registerRepository(Entity::CLASS_NAME, SessionRepository::getClassName());
         RepositoryRegistry::registerRepository(LogData::CLASS_NAME, SessionRepository::getClassName());
         RepositoryRegistry::registerRepository(OrderSendDraftTaskMap::CLASS_NAME, SessionRepository::getClassName());
+        RepositoryRegistry::registerRepository(OAuthState::CLASS_NAME, SessionRepository::getClassName());
+        RepositoryRegistry::registerRepository(OAuthInfo::CLASS_NAME, SessionRepository::getClassName());
+
     }
 
     /**
@@ -228,6 +260,31 @@ class Bootstrap extends BootstrapComponent
             \Packlink\BusinessLogic\Customs\CustomsMappingService::CLASS_NAME,
             function () use ($instance) {
                 return $instance->customsService;
+            }
+        );
+
+        ServiceRegister::registerService(
+            OAuthStateServiceInterface::CLASS_NAME,
+            function () use ($instance) {
+                $repository = RepositoryRegistry::getRepository(OAuthState::CLASS_NAME);
+
+                return new OAuthStateService($repository);
+            }
+        );
+
+        ServiceRegister::registerService(
+            OAuthServiceInterface::CLASS_NAME,
+            function () use ($instance) {
+                $repository = RepositoryRegistry::getRepository(OAuthInfo::CLASS_NAME);
+                /** @var OAuthStateServiceInterface $stateService */
+                $stateService = ServiceRegister::getService(OAuthStateServiceInterface::CLASS_NAME);
+                return new OAuthService(
+                    $instance->oauthProxy,
+                    $instance->proxy,
+                    $repository,
+                    $stateService,
+                    $instance->oAuthConfiguration
+                );
             }
         );
     }

@@ -171,6 +171,7 @@ echo $lang ?>">
             const pageConfiguration = {
                 'login': {
                     submit: "<?php getUrl('Login', 'login') ?>",
+                    connect: "<?php getUrl('Login', 'getRedirectUrl') ?>",
                     listOfCountriesUrl: "<?php getUrl('Country', 'get') ?>",
                     logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>"
                 },
@@ -242,17 +243,27 @@ echo $lang ?>">
                 }
             };
 
+            const showOAuth = false;
+
+            const loginPageOauth = {
+                'pl-main-page-holder': <?php echo json_encode(
+                    file_get_contents($baseResourcesPath . 'templates/login-oauth.html')
+                ) ?>
+            }
+
+            const apiKeyPage = {
+                'pl-main-page-holder': <?php echo json_encode(
+                    file_get_contents($baseResourcesPath . 'templates/login.html')
+                ) ?>
+            }
+
             Packlink.state = new Packlink.StateController(
                 {
                     baseResourcesUrl: "<?php echo UrlService::getResourceUrl() ?>",
                     stateUrl: "<?php getUrl('ModuleState', 'getCurrentState') ?>",
                     pageConfiguration: pageConfiguration,
                     templates: {
-                        'pl-login-page': {
-                            'pl-main-page-holder': <?php echo json_encode(
-                                file_get_contents($baseResourcesPath . 'templates/login.html')
-                            ) ?>
-                        },
+                        'pl-login-page': showOAuth ? loginPageOauth : apiKeyPage,
                         'pl-register-page': {
                             'pl-main-page-holder': <?php echo json_encode(
                                 file_get_contents($baseResourcesPath . 'templates/register.html')
