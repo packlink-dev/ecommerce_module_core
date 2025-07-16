@@ -184,7 +184,7 @@ class PacklinkConfigurationService implements BrandConfigurationService
         ),
         'SA' => array(
             'code' => 'SA',
-            'postal_code' => 'Al-Riyadh',
+            'postal_code' => '12271',
         ),
         'CA' => array(
             'code' => 'CA',
