@@ -74,8 +74,8 @@ if (!window.Packlink) {
             url += 'domain=' + encodeURIComponent(selectedCountry);
 
             ajaxService.get(url, (response) => {
-                if (response && response.redirect_url) {
-                    window.location.href = response.redirect_url;
+                if (response && response.redirectUrl) {
+                    window.open(response.redirectUrl, '_blank');
                 } else {
                     failedLogin();
                 }
