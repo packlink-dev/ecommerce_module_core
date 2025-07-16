@@ -57,7 +57,7 @@ class LoginController extends BaseHttpController
         try {
             $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
 
-            $this->output(array('redirect_url' => $controller->getRedirectUrl($domain)));
+            $this->output(array('redirectUrl' => $controller->getRedirectUrl($domain)));
         } catch (\Throwable $e) {
             $this->output(array('redirect_url' => $e->getMessage(), 'stack_trace' => $e->getTraceAsString()));
 
