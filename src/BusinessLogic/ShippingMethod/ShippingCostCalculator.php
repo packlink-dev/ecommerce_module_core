@@ -267,7 +267,7 @@ class ShippingCostCalculator
                 $totalWeight,
                 $totalPrice,
                 $systemId,
-                0,
+                null,
                 0.0,
                 $fromCountry,
                 $toCountry
@@ -311,7 +311,7 @@ class ShippingCostCalculator
                     $totalWeight,
                     $totalPrice,
                     $systemId,
-                    $service->id,
+                    $service,
                     $service->basePrice,
                     $fromCountry,
                     $toCountry
@@ -336,7 +336,7 @@ class ShippingCostCalculator
      * @param ShippingMethod $shippingMethod
      * @param float $totalWeight
      * @param float $totalPrice
-     * @param int $serviceId
+     * @param ShippingServiceDetails|null $service
      * @param float $basePrice
      * @param string $fromCountry
      * @param string $toCountry
@@ -349,7 +349,7 @@ class ShippingCostCalculator
         $totalWeight,
         $totalPrice,
         $systemId,
-        $serviceId = 0,
+        $service = null,
         $basePrice = 0.0,
         $fromCountry = '',
         $toCountry = ''
@@ -363,9 +363,14 @@ class ShippingCostCalculator
         // porting to array_reduce would increase complexity of the code because inner function will need a lot of
         // parameters
         foreach ($shippingMethod->getShippingServices() as $methodService) {
-            if (($serviceId === 0 || $methodService->serviceId === $serviceId)
-                && ($methodService->departureCountry === $fromCountry
+            if (($methodService->departureCountry === $fromCountry
                     && $methodService->destinationCountry === $toCountry)
+                && self::isSameOrEquivalentService($methodService->serviceId,
+                    $methodService->category,
+                    $shippingMethod->getCarrierName(),
+                    $shippingMethod->isDepartureDropOff(),
+                    $shippingMethod->isDestinationDropOff(),
+                    $service)
             ) {
                 $baseCost = self::getCostForShippingService(
                     $shippingMethod,
@@ -380,6 +385,37 @@ class ShippingCostCalculator
         }
 
         return $cost !== PHP_INT_MAX ? $cost : false;
+    }
+
+    /**
+     * @param $serviceId
+     * @param $category
+     * @param $carrierName
+     * @param $departureDropOff
+     * @param $destinationDropOff
+     * @param ShippingServiceDetails|null $service
+     * @return bool
+     */
+    protected static function isSameOrEquivalentService(
+        $serviceId,
+        $category,
+        $carrierName,
+        $departureDropOff,
+        $destinationDropOff,
+        $service
+    )
+    {
+        if ($service === null) {
+            return true;
+        }
+
+        return $serviceId === $service->id ||
+            (
+                $category === $service->category &&
+                $carrierName === $service->carrierName &&
+                $departureDropOff === $service->departureDropOff &&
+                $destinationDropOff === $service->destinationDropOff
+            );
     }
 
     /**
