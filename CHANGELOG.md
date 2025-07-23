@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.6.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.3...v3.6.4) - 2025-07-23
+### Changed
+- Fix postal code for Saudi Arabia 
+
 ## [3.6.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.2...v3.6.3) - 2025-07-10
 ### Changed
 - Fixed unsupported postal codes for Poland and Latvia
