@@ -56,6 +56,11 @@ class ShippingService
     public $basePrice;
 
     /**
+     * @var string $category
+     */
+    public $category;
+
+    /**
      * ShippingService constructor.
      *
      * @param string $serviceId Packlink service id.
@@ -73,7 +78,8 @@ class ShippingService
         $destinationCountry = '',
         $totalPrice = 0.0,
         $basePrice = 0.0,
-        $taxPrice = 0.0
+        $taxPrice = 0.0,
+        $category = ''
     ) {
         $this->serviceId = $serviceId;
         $this->serviceName = $serviceName;
@@ -82,6 +88,7 @@ class ShippingService
         $this->totalPrice = $totalPrice;
         $this->basePrice = $basePrice;
         $this->taxPrice = $taxPrice;
+        $this->category = $category;
     }
 
     /**
@@ -100,7 +107,8 @@ class ShippingService
             $data['destination'],
             $data['totalPrice'],
             $data['basePrice'],
-            $data['taxPrice']
+            $data['taxPrice'],
+            isset($data['category']) ? $data['category'] : ''
         );
     }
 
@@ -120,7 +128,8 @@ class ShippingService
             $shippingServiceDetails->destinationCountry,
             $shippingServiceDetails->totalPrice,
             $shippingServiceDetails->basePrice,
-            $shippingServiceDetails->taxPrice
+            $shippingServiceDetails->taxPrice,
+            $shippingServiceDetails->category
         );
     }
 
@@ -139,6 +148,7 @@ class ShippingService
             'totalPrice' => $this->totalPrice,
             'basePrice' => $this->basePrice,
             'taxPrice' => $this->taxPrice,
+            'category' => $this->category
         );
     }
 }

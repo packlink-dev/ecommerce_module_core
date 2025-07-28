@@ -292,6 +292,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
                     'totalPrice' => 3,
                     'basePrice' => 2,
                     'taxPrice' => 1,
+                    'category' => 'standard',
                 ),
             ),
             'pricingPolicies' => array(

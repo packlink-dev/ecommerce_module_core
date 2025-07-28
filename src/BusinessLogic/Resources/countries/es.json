@@ -37,7 +37,8 @@
     "invalidPlatformCountry": "Field is not a valid platform country.",
     "invalidUrl": "Field must be a valid URL.",
     "invalidFieldValue": "Field must be set to \"%s\".",
-    "invalidMaxValue": "Maximal allowed value is %s."
+    "invalidMaxValue": "Maximal allowed value is %s.",
+    "passwordRestriction": "Tu contraseña debe tener al menos %s caracteres e incluir al menos una letra minúscula, una letra mayúscula, un número y un símbolo"
   },
   "login": {
     "apiKey": "Api key",
@@ -487,7 +488,9 @@
     "selectCountriesSubheader": "Selecciona la disponibilidad de al menos un país y <br> añade tantos como necesites",
     "discardChangesQuestion": "Algunos cambios no se han guardado.<br>¿Estás seguro de que quieres volver e ignorar los cambios?",
     "atLeastOneCountry": "",
-    "misconfiguration": "Debido al cambio de moneda de la tienda, debe establecer un valor de precio fijo haciendo clic en editar en el servicio de envío."
+    "misconfiguration": "Debido al cambio de moneda de la tienda, debe establecer un valor de precio fijo haciendo clic en editar en el servicio de envío.",
+    "refreshServiceList" : "Actualizar la lista de servicios",
+    "refreshError": "Ocurrió un error al actualizar la lista de servicios"
   },
   "orderListAndDetails": {
     "printed": "Impreso",
