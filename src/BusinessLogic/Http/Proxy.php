@@ -514,7 +514,11 @@ class Proxy
      */
     public function getApiKeyWithToken($accessToken)
     {
-        $response = $this->callWithToken(HttpClient::HTTP_METHOD_GET, 'users/api/keys', $accessToken);
+        try {
+            $response = $this->callWithToken(HttpClient::HTTP_METHOD_POST, 'users/api/keys', $accessToken);
+        }catch (HttpRequestException $e) {
+            $response = $this->callWithToken(HttpClient::HTTP_METHOD_GET, 'users/api/keys', $accessToken);
+        }
 
         $data = json_decode($response->getBody(), true);
 
