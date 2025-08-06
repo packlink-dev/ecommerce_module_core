@@ -97,7 +97,7 @@ class OAuthServiceTest extends BaseTestWithServices
 
         $this->stateService = new OAuthStateService($this->stateRepository);
 
-        $this->service = new OAuthService($authProxy, $proxy, $this->repository, $this->stateService);
+        $this->service = new OAuthService($authProxy, $this->repository, $this->stateService);
     }
 
     /**

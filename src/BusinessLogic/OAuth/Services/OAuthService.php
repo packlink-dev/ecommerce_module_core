@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
+use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\OAuthConnectData;
 use Packlink\BusinessLogic\Http\DTO\OAuthUrlData;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -21,11 +22,6 @@ class OAuthService implements OAuthServiceInterface
     protected $proxy;
 
     /**
-     * @var Proxy
-     */
-    protected $packlinkProxy;
-
-    /**
      * @var RepositoryInterface
      */
     protected $repository;
@@ -35,10 +31,9 @@ class OAuthService implements OAuthServiceInterface
     protected $stateService;
 
 
-    public function __construct(OAuthProxyInterface $proxy, Proxy $packlinkProxy, RepositoryInterface $repository, OAuthStateServiceInterface $stateService)
+    public function __construct(OAuthProxyInterface $proxy, RepositoryInterface $repository, OAuthStateServiceInterface $stateService)
     {
         $this->proxy = $proxy;
-        $this->packlinkProxy = $packlinkProxy;
         $this->repository = $repository;
         $this->stateService = $stateService;
     }
@@ -97,7 +92,7 @@ class OAuthService implements OAuthServiceInterface
      */
     public function getApiKey($accessToken)
     {
-        return $this->packlinkProxy->getApiKeyWithToken($accessToken);
+        return $this->getPacklinkProxy()->getApiKeyWithToken($accessToken);
     }
 
     /**
@@ -173,5 +168,14 @@ class OAuthService implements OAuthServiceInterface
     private function isTokenExpired(OAuthInfo $tokenEntity)
     {
         return (time() >= ($tokenEntity->getCreatedAt() + $tokenEntity->getExpiresIn()));
+    }
+
+    /**
+     * @return Proxy
+     */
+    private function getPacklinkProxy()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(Proxy::CLASS_NAME);
     }
 }
