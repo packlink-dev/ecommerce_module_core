@@ -25,11 +25,7 @@ use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServi
 use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
-use Packlink\BusinessLogic\OAuth\Proxy\Interfaces\OAuthProxyInterface;
-use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
-use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthStateServiceInterface;
-use Packlink\BusinessLogic\OAuth\Services\OAuthService;
 use Packlink\BusinessLogic\OAuth\Services\OAuthStateService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
