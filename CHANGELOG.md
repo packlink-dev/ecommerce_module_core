@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.6.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.5...v3.6.6) - 2025-08-06
+### Changed
+- Remove Packlink Proxy from OAuthService constructor
+
 ## [3.6.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.4...v3.6.5) - 2025-07-28
 ### Changed
 - Modify shipping services availability at checkout
