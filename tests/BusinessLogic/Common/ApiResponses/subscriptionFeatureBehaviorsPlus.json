@@ -1,0 +1,49 @@
+{
+  "subscription": {
+    "id": "cb013560-441e-46a5-b10d-3bff3b147b43",
+    "plan_name": "Plus",
+    "plan_code": "silver_fixed",
+    "current_period_ends_at": "2025-05-15T08:22:48Z",
+    "state": "active"
+  },
+  "client_feature_behaviours": [
+    {
+      "feature_name": "BRANDED_EMAILS",
+      "behaviour_properties": {
+        "available_emails": [
+          "BRANDED_SHIPMENT_CONFIRMATION"
+        ]
+      }
+    },
+    {
+      "feature_name": "CASH_ON_DELIVERY",
+      "behaviour_properties": {}
+    },
+    {
+      "feature_name": "OWN_CONTRACT",
+      "behaviour_properties": {}
+    },
+    {
+      "feature_name": "SUBSCRIBER_MARGINS",
+      "behaviour_properties": {
+        "subscription_plan": "silver_fixed"
+      }
+    },
+    {
+      "feature_name": "SUBSCRIBER_SERVICES",
+      "behaviour_properties": {
+        "service_ids": [
+          "23841"
+        ]
+      }
+    },
+    {
+      "feature_name": "USER_ANALYTICS",
+      "behaviour_properties": {}
+    },
+    {
+      "feature_name": "VIP_SUPPORT",
+      "behaviour_properties": {}
+    }
+  ]
+}

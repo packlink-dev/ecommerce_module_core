@@ -28,6 +28,8 @@ use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
+use Packlink\BusinessLogic\Http\Subscription\Services\SubscriptionService;
+use Packlink\BusinessLogic\Http\Subscription\SubscriptionProxy;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -78,6 +80,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             }
         );
 
+        TestServiceRegister::registerService(
+            SubscriptionService::CLASS_NAME,
+            function () {
+                return SubscriptionService::getInstance();
+            }
+        );
+
         $this->httpClient = new TestHttpClient();
         TestServiceRegister::registerService(
             HttpClient::CLASS_NAME,
@@ -90,6 +99,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             Proxy::CLASS_NAME,
             function () use ($me) {
                 return new Proxy($me->shopConfig, $me->httpClient);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            SubscriptionProxy::CLASS_NAME,
+            function () use ($me) {
+                return new SubscriptionProxy($me->shopConfig, $me->httpClient);
             }
         );
 

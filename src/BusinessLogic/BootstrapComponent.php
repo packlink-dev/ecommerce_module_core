@@ -23,6 +23,8 @@ use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
 use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
+use Packlink\BusinessLogic\Http\Subscription\Services\SubscriptionService;
+use Packlink\BusinessLogic\Http\Subscription\SubscriptionProxy;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
 use Packlink\BusinessLogic\OAuth\Proxy\Interfaces\OAuthProxyInterface;
@@ -79,6 +81,18 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
 
                 return new Proxy($config, $client);
+            }
+        );
+
+        ServiceRegister::registerService(
+            SubscriptionProxy::CLASS_NAME,
+            function () {
+                /** @var Configuration $config */
+                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+                /** @var HttpClient $client */
+                $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
+
+                return new SubscriptionProxy($config, $client);
             }
         );
 
@@ -177,6 +191,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             RegistrationService::CLASS_NAME,
             function () {
                 return RegistrationService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            SubscriptionService::CLASS_NAME,
+            function () {
+                return SubscriptionService::getInstance();
             }
         );
 
