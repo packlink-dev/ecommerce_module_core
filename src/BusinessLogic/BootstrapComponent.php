@@ -19,10 +19,13 @@ use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
+use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\Http\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
 use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
+use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
 use Packlink\BusinessLogic\Http\Subscription\Services\SubscriptionService;
 use Packlink\BusinessLogic\Http\Subscription\SubscriptionProxy;
 use Packlink\BusinessLogic\Location\LocationService;
@@ -195,9 +198,16 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         );
 
         ServiceRegister::registerService(
-            SubscriptionService::CLASS_NAME,
+            SubscriptionServiceInterface::CLASS_NAME,
             function () {
                 return SubscriptionService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            CashOnDeliveryServiceInterface::CLASS_NAME,
+            function () {
+                return new CashOnDeliveryService();
             }
         );
 

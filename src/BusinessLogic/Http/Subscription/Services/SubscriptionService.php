@@ -2,6 +2,9 @@
 
 namespace Packlink\BusinessLogic\Http\Subscription\Services;
 
+use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
+use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
@@ -9,10 +12,6 @@ use Packlink\BusinessLogic\Http\Subscription\SubscriptionProxy;
 
 class SubscriptionService extends BaseService implements SubscriptionServiceInterface
 {
-    /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
     /**
      * Singleton instance of this class.
      *
@@ -24,9 +23,9 @@ class SubscriptionService extends BaseService implements SubscriptionServiceInte
     /**
      * @return bool
      *
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
-     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
      */
     public function hasPlusSubscription()
     {

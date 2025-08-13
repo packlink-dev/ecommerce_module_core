@@ -7,6 +7,11 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Packlink\BusinessLogic\Http\Subscription\Services\SubscriptionService;
 
+/**
+ * Class SubscriptionServiceTest
+ *
+ * @package Logeecom\Tests\BusinessLogic\Subscription
+ */
 class SubscriptionServiceTest extends BaseTestWithServices
 {
     /**
