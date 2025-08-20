@@ -7,10 +7,12 @@ use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\Account;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
-
+use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
 class CashOnDeliveryService implements CashOnDeliveryServiceInterface
 {
@@ -19,6 +21,8 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
      */
     protected $repository;
 
+    /** @var Configuration $config */
+    protected $configurationService;
 
     /**
      * @throws RepositoryNotRegisteredException
@@ -26,20 +30,21 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
     public function __construct()
     {
         $this->repository = RepositoryRegistry::getRepository(CashOnDelivery::CLASS_NAME);
+
+        /** @var Configuration $config */
+        $this->configurationService = ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 
     /**
-     * @param $systemId
-     *
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
      */
-    public function getCashOnDeliveryConfig($systemId)
+    public function getCashOnDeliveryConfig()
     {
         $filter = new QueryFilter();
         /** @noinspection PhpUnhandledExceptionInspection */
-        $filter->where('systemId', '=', $systemId);
+        $filter->where('systemId', '=', $this->configurationService->getCurrentSystemId());
 
         /**@var CashOnDelivery|null $entity*/
         $entity = $this->repository->selectOne($filter);
@@ -48,35 +53,51 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
     }
 
     /**
-     * Create a new CacheOnDelivery object and save
-     *
-     * @param string $systemId
-     *
-     * @return CashOnDelivery|null
-     *
+     * @param CashOnDeliveryDTO $dto
+     * @return int
      * @throws QueryFilterInvalidParamException
      */
-    public function saveEmptyObject($systemId)
+    public function saveConfig(CashOnDeliveryDTO $dto)
     {
-        $entity = $this->createEmptyCashOnDelivery($systemId);
+        $entity = CashOnDelivery::fromArray($dto->toArray());
 
-        $this->repository->save($entity);
+        /** @var CashOnDelivery|null $existing */
+        $existing = $this->getCashOnDeliveryConfig();
 
-        return $this->getCashOnDeliveryConfig($systemId);
+        if ($existing) {
+            $entity->setId($existing->getId());
+            return $this->repository->update($entity);
+        }
+
+        return $this->repository->save($entity);
     }
 
     /**
      * Create a new CacheOnDelivery object and save
      *
-     * @param string $systemId
+     * @return CashOnDelivery|null
+     *
+     * @throws QueryFilterInvalidParamException
+     */
+    public function saveEmptyObject()
+    {
+        $entity = $this->createEmptyCashOnDelivery();
+
+        $this->repository->save($entity);
+
+        return $this->getCashOnDeliveryConfig();
+    }
+
+    /**
+     * Create a new CacheOnDelivery object and save
      *
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
      */
-    public function disable($systemId)
+    public function disable()
     {
-        $entity = $this->getCashOnDeliveryConfig($systemId);
+        $entity = $this->getCashOnDeliveryConfig();
         if (!$entity) {
             return null;
         }
@@ -85,21 +106,19 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
 
         $this->repository->update($entity);
 
-        return $this->getCashOnDeliveryConfig($systemId);
+        return $this->getCashOnDeliveryConfig();
     }
 
     /**
      * Disable COD and return freshly loaded entity.
      *
-     * @param string $systemId
-     *
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
      */
-    public function enable($systemId)
+    public function enable()
     {
-        $entity = $this->getCashOnDeliveryConfig($systemId);
+        $entity = $this->getCashOnDeliveryConfig();
         if (!$entity) {
             return null;
         }
@@ -108,7 +127,7 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
 
         $this->repository->update($entity);
 
-        return $this->getCashOnDeliveryConfig($systemId);
+        return $this->getCashOnDeliveryConfig();
     }
 
 
@@ -119,10 +138,10 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
      *
      * @return CashOnDelivery
      */
-    private function createEmptyCashOnDelivery($systemId)
+    private function createEmptyCashOnDelivery()
     {
         $cashOnDelivery = new CashOnDelivery();
-        $cashOnDelivery->setSystemId($systemId);
+        $cashOnDelivery->setSystemId($this->configurationService->getCurrentSystemId());
         $cashOnDelivery->setEnabled(false);
         $cashOnDelivery->setActive(false);
 

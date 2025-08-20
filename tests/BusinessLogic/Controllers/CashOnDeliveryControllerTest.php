@@ -12,8 +12,8 @@ use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Subscription\TestSubscriptionService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Packlink\BusinessLogic\Controllers\CashOnDeliveryController;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Exeption\CashOnDeliveryNotFoundException;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\Http\CashOnDelivery\Model\Account;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
 
@@ -71,52 +71,96 @@ class CashOnDeliveryControllerTest extends BaseTestWithServices
 
     /**
      * @throws QueryFilterInvalidParamException
-     * @throws CashOnDeliveryNotFoundException
      */
-    public function testCreatesEmptyConfigWhenNoneExists()
+    public function testGetCODNoneExists()
     {
-        $this->subscriptionService->setValue(false);
-        $this->cashOnDeliveryService->setEntity(null);
+        $dto = $this->controller->getCashOnDeliveryConfiguration();
 
-        $dto = $this->controller->getCashOnDeliveryConfiguration('sys-1');
-
-        $this->assertFalse($dto->enabled);
+        $this->assertNull($dto);
     }
 
-    /**
-     * @throws QueryFilterInvalidParamException
-     * @throws CashOnDeliveryNotFoundException
-     */
-    public function testDisablesWhenNoPlusSubscription()
+    public function testGetCashOnDelivery()
     {
         $entity = new CashOnDelivery();
-        $entity->setSystemId('sys-2');
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
         $entity->setEnabled(true);
 
         $this->cashOnDeliveryService->setEntity($entity);
-        $this->subscriptionService->setValue(false);
 
-        $dto = $this->controller->getCashOnDeliveryConfiguration('sys-2');
-
-        $this->assertFalse($dto->enabled);
-    }
-
-    /**
-     * @throws QueryFilterInvalidParamException
-     * @throws CashOnDeliveryNotFoundException
-     */
-    public function testEnablesWhenPlusSubscription()
-    {
-        $entity = new CashOnDelivery();
-        $entity->setSystemId('sys-3');
-        $entity->setEnabled(false);
-
-        $this->cashOnDeliveryService->setEntity($entity);
-        $this->subscriptionService->setValue(true);
-
-        $dto = $this->controller->getCashOnDeliveryConfiguration('sys-3');
+        $dto = $this->controller->getCashOnDeliveryConfiguration();
 
         $this->assertTrue($dto->enabled);
     }
 
+    public function testSaveConfigCreatesEntity()
+    {
+        $rawData = array(
+            'systemId' => $this->shopConfig->getCurrentSystemId(),
+            'enabled' => true,
+            'active' => true,
+            'account' => array('iban' => 'RS35123456789012345678'),
+        );
+
+        $id = $this->controller->saveConfig($rawData);
+
+        $this->assertNotNull($id);
+
+        $entity = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
+        $this->assertTrue($entity->isEnabled());
+        $this->assertTrue($entity->isActive());
+    }
+
+    /**
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testGetAndUpdateSubscriptionCreatesEntityIfNoneExistsAndPlusSubscription()
+    {
+        $this->subscriptionService->setValue(true);
+
+        $result = $this->controller->getAndUpdateSubscription();
+
+        $this->assertTrue($result);
+        $entity = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
+        $this->assertNotNull($entity);
+    }
+
+    /**
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testGetAndUpdateSubscriptionDisablesWhenNoSubscription()
+    {
+        $entity = new CashOnDelivery();
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
+        $entity->setEnabled(true);
+        $entity->setActive(true);
+        $entity->setAccount(new Account());
+
+        $this->cashOnDeliveryService->setEntity($entity);
+        $this->subscriptionService->setValue(false);
+
+        $result = $this->controller->getAndUpdateSubscription();
+
+        $this->assertFalse($result);
+        $this->assertFalse($this->cashOnDeliveryService->getCashOnDeliveryConfig()->isEnabled());
+    }
+
+    /**
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testGetAndUpdateSubscriptionEnablesWhenHasSubscription()
+    {
+        $entity = new CashOnDelivery();
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
+        $entity->setEnabled(false);
+        $entity->setActive(true);
+        $entity->setAccount(new Account());
+
+        $this->cashOnDeliveryService->setEntity($entity);
+        $this->subscriptionService->setValue(true);
+
+        $result = $this->controller->getAndUpdateSubscription();
+
+        $this->assertTrue($result);
+        $this->assertTrue($this->cashOnDeliveryService->getCashOnDeliveryConfig()->isEnabled());
+    }
 }

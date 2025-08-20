@@ -9,8 +9,10 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\Brands\Packlink\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\Account;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Services\CashOnDeliveryService;
+use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
+use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
+
 
 class CashOnDeliveryServiceTest extends BaseTestWithServices
 {
@@ -46,9 +48,7 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testGetCashOnDeliveryConfigNoEntity()
     {
-        $systemId = 'sys123';
-
-        $result = $this->service->getCashOnDeliveryConfig($systemId);
+        $result = $this->service->getCashOnDeliveryConfig();
 
         $this->assertNull($result);
     }
@@ -60,19 +60,16 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testGetCashOnDeliveryConfigReturnEntity()
     {
-        $systemId = 'sys123';
-
         $entity = new CashOnDelivery();
-        $entity->setSystemId($systemId);
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
         $entity->setEnabled(false);
         $entity->setActive(false);
         $entity->setAccount(new Account());
 
         $this->repository->save($entity);
 
-        $result = $this->service->getCashOnDeliveryConfig($systemId);
+        $result = $this->service->getCashOnDeliveryConfig();
 
-        $this->assertSame($systemId, $result->getSystemId());
         $this->assertFalse($result->isEnabled());
         $this->assertFalse($result->isActive());
         $this->assertNotNull($result->getAccount());
@@ -83,16 +80,13 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testSaveEmptyObjectCreatesAndReturnsEntity()
     {
-        $systemId = 'sys456';
-        $result = $this->service->saveEmptyObject($systemId);
+        $result = $this->service->saveEmptyObject();
 
-        $this->assertSame($systemId, $result->getSystemId());
         $this->assertFalse($result->isEnabled());
         $this->assertFalse($result->isActive());
         $this->assertNotNull($result->getAccount());
 
-        $stored = $this->service->getCashOnDeliveryConfig($systemId);
-        $this->assertSame($result->getSystemId(), $stored->getSystemId());
+        $stored = $this->service->getCashOnDeliveryConfig();
         $this->assertFalse($stored->isEnabled());
         $this->assertFalse($stored->isActive());
     }
@@ -104,15 +98,14 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testEnableSetsEnabledTrue()
     {
-        $systemId = 'sys789';
         $entity = new CashOnDelivery();
-        $entity->setSystemId($systemId);
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
         $entity->setEnabled(false);
         $entity->setActive(true);
         $entity->setAccount(new Account());
         $this->repository->save($entity);
 
-        $result = $this->service->enable($systemId);
+        $result = $this->service->enable();
 
         $this->assertTrue($result->isEnabled());
         $this->assertTrue($result->isActive());
@@ -125,18 +118,17 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testDisableSetsEnabledFalse()
     {
-        $systemId = 'sys987';
         $entity = new CashOnDelivery();
-        $entity->setSystemId($systemId);
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
         $entity->setEnabled(true);
         $entity->setActive(true);
         $entity->setAccount(new Account());
         $this->repository->save($entity);
 
-        $result = $this->service->disable($systemId);
+        $result = $this->service->disable();
 
         $this->assertFalse($result->isEnabled());
-        $this->assertTrue($result->isActive()); // active not changed in disable()
+        $this->assertTrue($result->isActive());
     }
 
     /**
@@ -146,8 +138,7 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testEnableReturnsNullIfEntityNotFound()
     {
-        $systemId = 'nonexistent';
-        $result = $this->service->enable($systemId);
+        $result = $this->service->enable();
 
         $this->assertNull($result);
     }
@@ -157,9 +148,52 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
      */
     public function testDisableReturnsNullIfEntityNotFound()
     {
-        $systemId = 'nonexistent';
-        $result = $this->service->disable($systemId);
+        $result = $this->service->disable();
 
         $this->assertNull($result);
+    }
+
+    /**
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testSaveConfigCreatesNewEntity()
+    {
+        /**@var CashOnDeliveryDTO $dto */
+        $dto = CashOnDeliveryDTO::fromArray(array(
+            'systemId' => $this->shopConfig->getCurrentSystemId(),
+            'enabled' => true,
+            'active' => true,
+            'account' => array('iban' => 'RS35123456789012345678')
+        ));
+
+        $id = $this->service->saveConfig($dto);
+
+        $this->assertNotNull($id);
+    }
+
+    /**
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testSaveConfigUpdatesExistingEntity()
+    {
+        $entity = new CashOnDelivery();
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
+        $entity->setEnabled(false);
+        $entity->setActive(false);
+        $entity->setAccount(new Account());
+
+        $this->repository->save($entity);
+
+        /**@var CashOnDeliveryDTO $dto */
+        $dto = CashOnDeliveryDTO::fromArray(array(
+            'systemId' => $this->shopConfig->getCurrentSystemId(),
+            'enabled' => true,
+            'active' => true,
+            'account' => array('iban' => 'RS35123456789012345678')
+        ));
+
+        $id = $this->service->saveConfig($dto);
+
+        $this->assertNotNull($id);
     }
 }

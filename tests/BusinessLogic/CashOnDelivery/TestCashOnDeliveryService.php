@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\CashOnDelivery;
 
 use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
 class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
 {
@@ -12,7 +13,7 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
      *
      * @var CashOnDelivery|null
      */
-    private $entity = null;
+    private $entity;
 
     /**
      * History of method calls for testing purposes.
@@ -20,6 +21,19 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
      * @var array
      */
     public $callHistory = array();
+
+    /**
+     * @var string $systemId
+     */
+    public $systemId;
+
+    /**
+     * @param string $systemId
+     */
+    public function setSystemId($systemId)
+    {
+        $this->systemId = $systemId;
+    }
 
     /**
      * Sets the entity to be returned by getCashOnDeliveryConfig.
@@ -33,19 +47,16 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
         $this->callHistory['setEntity'][] = $entity;
     }
 
-    public function getCashOnDeliveryConfig($systemId)
+    public function getCashOnDeliveryConfig()
     {
-        $this->callHistory['getCashOnDeliveryConfig'][] = $systemId;
-
         return $this->entity;
     }
 
-    public function saveEmptyObject($systemId)
+    public function saveEmptyObject()
     {
-        $this->callHistory['saveEmptyObject'][] = $systemId;
 
         $entity = new CashOnDelivery();
-        $entity->setSystemId($systemId);
+        $entity->setSystemId($this->systemId);
         $entity->setEnabled(false);
         $entity->setActive(false);
 
@@ -54,10 +65,8 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
         return $this->entity;
     }
 
-    public function disable($systemId)
+    public function disable()
     {
-        $this->callHistory['disable'][] = $systemId;
-
         if ($this->entity === null) {
             return null;
         }
@@ -67,10 +76,8 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
         return $this->entity;
     }
 
-    public function enable($systemId)
+    public function enable()
     {
-        $this->callHistory['enable'][] = $systemId;
-
         if ($this->entity === null) {
             return null;
         }
@@ -78,5 +85,14 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
         $this->entity->setEnabled(true);
 
         return $this->entity;
+    }
+
+    public function saveConfig(CashOnDeliveryDTO $dto)
+    {
+        $entity = CashOnDelivery::fromArray($dto->toArray());
+
+        $this->entity = $entity;
+
+        return 1;
     }
 }

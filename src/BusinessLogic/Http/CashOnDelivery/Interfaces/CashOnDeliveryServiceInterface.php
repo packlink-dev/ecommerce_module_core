@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces;
 
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
 interface CashOnDeliveryServiceInterface
 {
@@ -15,45 +16,44 @@ interface CashOnDeliveryServiceInterface
     /**
      * Retrieves the Cash on Delivery configuration for the given system ID.
      *
-     * @param string $systemId
-     *
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
      */
-    public function getCashOnDeliveryConfig($systemId);
+    public function getCashOnDeliveryConfig();
 
     /**
-     * Creates an empty CashOnDelivery entity and stores it in the database.
-     *
-     * @param string $systemId
-     *
-     * @return CashOnDelivery|null
-     *
+     * @param CashOnDeliveryDTO $dto
+     * @return int
      * @throws QueryFilterInvalidParamException
      */
-    public function saveEmptyObject($systemId);
+    public function saveConfig(CashOnDeliveryDTO $dto);
 
     /**
-     * Disables the CashOnDelivery for the given system ID.
-     *
-     * @param string $systemId
+     * Creates an empty CashOnDeliveryController entity and stores it in the database.
      *
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
      */
-    public function disable($systemId);
+    public function saveEmptyObject();
 
     /**
-     * Enables the CashOnDelivery for the given system ID.
-     *
-     * @param string $systemId
+     * Disables the CashOnDeliveryController for the given system ID.
      *
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
      */
-    public function enable($systemId);
+    public function disable();
+
+    /**
+     * Enables the CashOnDeliveryController for the given system ID.
+     *
+     * @return CashOnDelivery|null
+     *
+     * @throws QueryFilterInvalidParamException
+     */
+    public function enable();
 
 }

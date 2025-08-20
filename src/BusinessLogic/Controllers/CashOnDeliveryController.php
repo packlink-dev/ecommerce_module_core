@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Exeption\CashOnDeliveryNotFoundException;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
@@ -29,45 +29,69 @@ class CashOnDeliveryController
     }
 
     /**
-     * @throws QueryFilterInvalidParamException
+     * Saves COD configuration.
      *
-     * @throws CashOnDeliveryNotFoundException
+     * @param array $rawData
+     *
+     * @return int ID of saved entity
+     * @throws FrontDtoValidationException
      */
-    public function getCashOnDeliveryConfiguration($systemId)
+    public function saveConfig(array $rawData)
+    {
+        $dto = CashOnDeliveryDTO::fromArray($rawData);
+
+        return $this->cashOnDeliveryService->saveConfig($dto);
+    }
+
+    /**
+     * @return bool
+     *
+     * @throws QueryFilterInvalidParamException
+     */
+    public function getAndUpdateSubscription()
     {
         $plusSubscription = $this->subscriptionService->hasPlusSubscription();
+        $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
 
-        $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig($systemId);
+        if (!$cashOnDelivery && $plusSubscription) {
+            $cashOnDelivery = $this->cashOnDeliveryService->saveEmptyObject();
+        }
+
+        if (!$plusSubscription && $cashOnDelivery->isEnabled()) {
+            $this->cashOnDeliveryService->disable();
+        }
+
+        if ($plusSubscription && !$cashOnDelivery->isEnabled()) {
+            $this->cashOnDeliveryService->enable();
+        }
+
+        return $plusSubscription;
+    }
+    /**
+     * @return  CashOnDeliveryDTO|null $entity
+     *
+     * @throws QueryFilterInvalidParamException
+     */
+    public function getCashOnDeliveryConfiguration()
+    {
+        $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
 
 
         if(!$cashOnDelivery) {
-            $cashOnDelivery = $this->cashOnDeliveryService->saveEmptyObject($systemId);
+            return null;
         }
 
-        if(!$plusSubscription && $cashOnDelivery->isEnabled()) {
-            $cashOnDelivery = $this->cashOnDeliveryService->disable($systemId);
-        }
-
-        if($plusSubscription && !$cashOnDelivery->isEnabled()) {
-            $cashOnDelivery =  $this->cashOnDeliveryService->enable($systemId);
-        }
 
         return $this->mapEntityToDto($cashOnDelivery);
     }
 
     /**
-     * @param CashOnDelivery|null $entity
+     * @param CashOnDelivery $entity
      *
      * @return CashOnDeliveryDTO
-     *
-     * @throws CashOnDeliveryNotFoundException
      */
     private function mapEntityToDto($entity)
     {
-        if ($entity === null) {
-            throw new CashOnDeliveryNotFoundException('CashOnDelivery entity not found.');
-        }
-
         $dto = new CashOnDeliveryDTO();
         $dto->enabled = $entity->isEnabled();
         $dto->active = $entity->isActive();
