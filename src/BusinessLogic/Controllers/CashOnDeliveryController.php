@@ -34,7 +34,8 @@ class CashOnDeliveryController
      * @param array $rawData
      *
      * @return int ID of saved entity
-     * @throws FrontDtoValidationException
+     *
+     * @throws FrontDtoValidationException|QueryFilterInvalidParamException
      */
     public function saveConfig(array $rawData)
     {

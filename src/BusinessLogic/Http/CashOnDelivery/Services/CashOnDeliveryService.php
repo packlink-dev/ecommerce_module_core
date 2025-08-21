@@ -69,6 +69,8 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
             return $this->repository->update($entity);
         }
 
+        $entity->setSystemId($this->configurationService->getCurrentSystemId());
+
         return $this->repository->save($entity);
     }
 
