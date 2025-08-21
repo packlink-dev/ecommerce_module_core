@@ -61,6 +61,11 @@ class ShippingService
     public $category;
 
     /**
+     * @var CashOnDeliveryConfig|null $cashOnDeliveryConfig
+     */
+    private $cashOnDeliveryConfig;
+
+    /**
      * ShippingService constructor.
      *
      * @param string $serviceId Packlink service id.
@@ -70,6 +75,7 @@ class ShippingService
      * @param float $totalPrice Total price with tax.
      * @param float $basePrice Base price.
      * @param float $taxPrice Tax price.
+     * @param CashOnDeliveryConfig|null $cashOnDeliveryConfig
      */
     public function __construct(
         $serviceId = '',
@@ -79,7 +85,8 @@ class ShippingService
         $totalPrice = 0.0,
         $basePrice = 0.0,
         $taxPrice = 0.0,
-        $category = ''
+        $category = '',
+        $cashOnDeliveryConfig = null
     ) {
         $this->serviceId = $serviceId;
         $this->serviceName = $serviceName;
@@ -89,6 +96,7 @@ class ShippingService
         $this->basePrice = $basePrice;
         $this->taxPrice = $taxPrice;
         $this->category = $category;
+        $this->cashOnDeliveryConfig = $cashOnDeliveryConfig;
     }
 
     /**
@@ -108,7 +116,10 @@ class ShippingService
             $data['totalPrice'],
             $data['basePrice'],
             $data['taxPrice'],
-            isset($data['category']) ? $data['category'] : ''
+            isset($data['category']) ? $data['category'] : '',
+            isset($data['cash_on_delivery'])
+                ? CashOnDeliveryConfig::fromArray($data['cash_on_delivery'])
+                : null
         );
     }
 
@@ -129,7 +140,10 @@ class ShippingService
             $shippingServiceDetails->totalPrice,
             $shippingServiceDetails->basePrice,
             $shippingServiceDetails->taxPrice,
-            $shippingServiceDetails->category
+            $shippingServiceDetails->category,
+            !empty($shippingServiceDetails->cashOnDelivery)
+                ? CashOnDeliveryConfig::fromArray($shippingServiceDetails->cashOnDelivery)
+                : null
         );
     }
 
@@ -148,7 +162,10 @@ class ShippingService
             'totalPrice' => $this->totalPrice,
             'basePrice' => $this->basePrice,
             'taxPrice' => $this->taxPrice,
-            'category' => $this->category
+            'category' => $this->category,
+            'cash_on_delivery' => $this->cashOnDeliveryConfig
+                ? $this->cashOnDeliveryConfig->toArray()
+                : null
         );
     }
 }

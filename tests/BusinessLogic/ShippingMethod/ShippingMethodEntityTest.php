@@ -293,6 +293,12 @@ class ShippingMethodEntityTest extends BaseTestWithServices
                     'basePrice' => 2,
                     'taxPrice' => 1,
                     'category' => 'standard',
+                    'cash_on_delivery' => array(
+                        "apply_percentage_cash_on_delivery" => "2.75",
+                        "offered" => true,
+                        "max_cash_on_delivery" => "2.35",
+                        "min_cash_on_delivery" => "0.00",
+                    ),
                 ),
             ),
             'pricingPolicies' => array(
