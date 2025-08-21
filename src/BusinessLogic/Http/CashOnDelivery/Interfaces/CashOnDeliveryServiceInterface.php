@@ -30,15 +30,6 @@ interface CashOnDeliveryServiceInterface
     public function saveConfig(CashOnDeliveryDTO $dto);
 
     /**
-     * Creates an empty CashOnDeliveryController entity and stores it in the database.
-     *
-     * @return CashOnDelivery|null
-     *
-     * @throws QueryFilterInvalidParamException
-     */
-    public function saveEmptyObject();
-
-    /**
      * Disables the CashOnDeliveryController for the given system ID.
      *
      * @return CashOnDelivery|null

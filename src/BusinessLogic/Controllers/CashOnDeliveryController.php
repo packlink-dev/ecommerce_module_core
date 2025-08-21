@@ -22,8 +22,8 @@ class CashOnDeliveryController
      */
     protected $cashOnDeliveryService;
 
-    public function __construct(
-    ) {
+    public function __construct()
+    {
         $this->subscriptionService = ServiceRegister::getService(SubscriptionServiceInterface::CLASS_NAME);
         $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
     }
@@ -45,6 +45,8 @@ class CashOnDeliveryController
     }
 
     /**
+     * Get subscription status and update saved configuration if status changed
+     *
      * @return bool
      *
      * @throws QueryFilterInvalidParamException
@@ -54,20 +56,17 @@ class CashOnDeliveryController
         $plusSubscription = $this->subscriptionService->hasPlusSubscription();
         $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
 
-        if (!$cashOnDelivery && $plusSubscription) {
-            $cashOnDelivery = $this->cashOnDeliveryService->saveEmptyObject();
-        }
-
-        if (!$plusSubscription && $cashOnDelivery->isEnabled()) {
+        if (!$plusSubscription && $cashOnDelivery && $cashOnDelivery->isEnabled()) {
             $this->cashOnDeliveryService->disable();
         }
 
-        if ($plusSubscription && !$cashOnDelivery->isEnabled()) {
+        if ($plusSubscription && $cashOnDelivery && !$cashOnDelivery->isEnabled()) {
             $this->cashOnDeliveryService->enable();
         }
 
         return $plusSubscription;
     }
+
     /**
      * @return  CashOnDeliveryDTO|null $entity
      *
@@ -78,7 +77,7 @@ class CashOnDeliveryController
         $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
 
 
-        if(!$cashOnDelivery) {
+        if (!$cashOnDelivery) {
             return null;
         }
 

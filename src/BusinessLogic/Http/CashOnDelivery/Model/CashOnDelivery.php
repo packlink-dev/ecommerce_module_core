@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Http\CashOnDelivery\Model;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 
 class CashOnDelivery extends Entity
 {
@@ -124,6 +125,29 @@ class CashOnDelivery extends Entity
     public function setAccount(Account $account)
     {
         $this->account = $account;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function toArray()
+    {
+        $arr = parent::toArray();
+        $arr['account'] = $this->account ? $this->account->toArray() : null;
+
+        return $arr;
+    }
+
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function inflate(array $data)
+    {
+        parent::inflate($data);
+
+        if (isset($this->account) && is_array($this->account)) {
+            $this->account = Account::fromArray($this->account);
+        }
     }
 
     /**

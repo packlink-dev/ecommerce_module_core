@@ -76,22 +76,6 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @throws QueryFilterInvalidParamException
-     */
-    public function testSaveEmptyObjectCreatesAndReturnsEntity()
-    {
-        $result = $this->service->saveEmptyObject();
-
-        $this->assertFalse($result->isEnabled());
-        $this->assertFalse($result->isActive());
-        $this->assertNotNull($result->getAccount());
-
-        $stored = $this->service->getCashOnDeliveryConfig();
-        $this->assertFalse($stored->isEnabled());
-        $this->assertFalse($stored->isActive());
-    }
-
-    /**
      * @return void
      *
      * @throws QueryFilterInvalidParamException

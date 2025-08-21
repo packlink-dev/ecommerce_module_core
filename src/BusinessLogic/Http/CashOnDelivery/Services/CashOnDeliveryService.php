@@ -60,6 +60,8 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
     public function saveConfig(CashOnDeliveryDTO $dto)
     {
         $entity = CashOnDelivery::fromArray($dto->toArray());
+        $entity->setSystemId($this->configurationService->getCurrentSystemId());
+
 
         /** @var CashOnDelivery|null $existing */
         $existing = $this->getCashOnDeliveryConfig();
@@ -69,25 +71,7 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
             return $this->repository->update($entity);
         }
 
-        $entity->setSystemId($this->configurationService->getCurrentSystemId());
-
         return $this->repository->save($entity);
-    }
-
-    /**
-     * Create a new CacheOnDelivery object and save
-     *
-     * @return CashOnDelivery|null
-     *
-     * @throws QueryFilterInvalidParamException
-     */
-    public function saveEmptyObject()
-    {
-        $entity = $this->createEmptyCashOnDelivery();
-
-        $this->repository->save($entity);
-
-        return $this->getCashOnDeliveryConfig();
     }
 
     /**

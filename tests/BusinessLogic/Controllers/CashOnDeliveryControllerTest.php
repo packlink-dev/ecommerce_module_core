@@ -120,8 +120,6 @@ class CashOnDeliveryControllerTest extends BaseTestWithServices
         $result = $this->controller->getAndUpdateSubscription();
 
         $this->assertTrue($result);
-        $entity = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
-        $this->assertNotNull($entity);
     }
 
     /**

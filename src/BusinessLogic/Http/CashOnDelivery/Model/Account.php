@@ -29,4 +29,35 @@ class Account extends FrontDto
 
     /** @var string */
     protected $offlinePaymentMethod = '';
+    /**
+     * @return string
+     */
+    public function getOfflinePaymentMethod()
+    {
+        return $this->offlinePaymentMethod;
+    }
+
+    /**
+     * @return float
+     */
+    public function getCashOnDeliveryFee()
+    {
+        return $this->cashOnDeliveryFee;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountHolderName()
+    {
+        return $this->accountHolderName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIban()
+    {
+        return $this->iban;
+    }
 }
