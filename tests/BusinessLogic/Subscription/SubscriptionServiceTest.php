@@ -5,7 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\Subscription;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
-use Packlink\BusinessLogic\Http\Subscription\Services\SubscriptionService;
+use Packlink\BusinessLogic\Subscription\Services\SubscriptionService;
 
 /**
  * Class SubscriptionServiceTest

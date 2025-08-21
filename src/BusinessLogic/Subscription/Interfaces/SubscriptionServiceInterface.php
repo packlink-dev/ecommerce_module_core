@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\Subscription\Interfaces;
+namespace Packlink\BusinessLogic\Subscription\Interfaces;
 
 interface SubscriptionServiceInterface
 {

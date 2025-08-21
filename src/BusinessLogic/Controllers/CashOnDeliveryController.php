@@ -4,11 +4,11 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
-use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
 use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
+use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
 
 class CashOnDeliveryController
 {

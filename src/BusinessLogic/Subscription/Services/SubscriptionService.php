@@ -1,14 +1,14 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\Subscription\Services;
+namespace Packlink\BusinessLogic\Subscription\Services;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
-use Packlink\BusinessLogic\Http\Subscription\SubscriptionProxy;
+use Packlink\BusinessLogic\Subscription\Http\SubscriptionProxy;
+use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
 
 class SubscriptionService extends BaseService implements SubscriptionServiceInterface
 {

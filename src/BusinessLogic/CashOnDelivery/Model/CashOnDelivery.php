@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\CashOnDelivery\Model;
+namespace Packlink\BusinessLogic\CashOnDelivery\Model;
 
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;

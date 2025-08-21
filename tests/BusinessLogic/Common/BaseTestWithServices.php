@@ -23,13 +23,13 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Country\Country;
 use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
+use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
-use Packlink\BusinessLogic\Http\Subscription\Services\SubscriptionService;
-use Packlink\BusinessLogic\Http\Subscription\SubscriptionProxy;
+use Packlink\BusinessLogic\Subscription\Http\SubscriptionProxy;
+use Packlink\BusinessLogic\Subscription\Services\SubscriptionService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 

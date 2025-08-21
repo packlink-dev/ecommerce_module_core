@@ -1,9 +1,9 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces;
+namespace Packlink\BusinessLogic\CashOnDelivery\Interfaces;
 
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
 interface CashOnDeliveryServiceInterface

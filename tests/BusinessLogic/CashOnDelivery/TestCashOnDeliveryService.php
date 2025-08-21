@@ -2,8 +2,8 @@
 
 namespace Logeecom\Tests\BusinessLogic\CashOnDelivery;
 
-use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
 class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface

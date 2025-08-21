@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Subscription;
 
-use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
+use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
 
 class TestSubscriptionService implements SubscriptionServiceInterface
 {

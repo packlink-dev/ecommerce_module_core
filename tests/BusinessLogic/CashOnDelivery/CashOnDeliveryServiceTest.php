@@ -8,10 +8,10 @@ use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\Brands\Packlink\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\Account;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Services\CashOnDeliveryService;
+use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
 
 
 class CashOnDeliveryServiceTest extends BaseTestWithServices

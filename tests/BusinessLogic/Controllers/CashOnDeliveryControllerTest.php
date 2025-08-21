@@ -11,11 +11,11 @@ use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Subscription\TestSubscriptionService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Controllers\CashOnDeliveryController;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\Account;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\CashOnDelivery;
-use Packlink\BusinessLogic\Http\Subscription\Interfaces\SubscriptionServiceInterface;
+use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
 
 class CashOnDeliveryControllerTest extends BaseTestWithServices
 {

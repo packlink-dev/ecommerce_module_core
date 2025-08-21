@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\Subscription\DTO;
+namespace Packlink\BusinessLogic\Subscription\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
 

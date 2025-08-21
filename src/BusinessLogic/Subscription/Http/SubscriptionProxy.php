@@ -1,13 +1,13 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\Subscription;
+namespace Packlink\BusinessLogic\Subscription\Http;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Http\Subscription\DTO\SubscriptionFeatureBehaviours;
+use Packlink\BusinessLogic\Subscription\DTO\SubscriptionFeatureBehaviours;
 
 class SubscriptionProxy extends Proxy
 {

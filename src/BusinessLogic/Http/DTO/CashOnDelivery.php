@@ -3,8 +3,8 @@
 namespace Packlink\BusinessLogic\Http\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
+use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
-use Packlink\BusinessLogic\Http\CashOnDelivery\Model\Account;
 
 class CashOnDelivery extends DataTransferObject
 {

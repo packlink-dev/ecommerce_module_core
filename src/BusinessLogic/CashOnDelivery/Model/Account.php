@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Http\CashOnDelivery\Model;
+namespace Packlink\BusinessLogic\CashOnDelivery\Model;
 
 use Packlink\BusinessLogic\DTO\FrontDto;
 
