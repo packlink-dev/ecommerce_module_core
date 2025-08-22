@@ -1,0 +1,79 @@
+<div class="pl-cod-page pl-full-width">
+    <header class="pl-sub-header">
+        <button id="pl-back-button" class="pl-icon-button">
+            <i class="material-icons">keyboard_backspace</i>
+        </button>
+        <h1 id="pl-page-title" class="pl-text-center pl-full-width">
+            {$configuration.cashOnDelivery}
+        </h1>
+    </header>
+
+    <div class="pl-page-content pl-page-padding">
+        <form method="POST" id="pl-cod-form">
+
+            <p class="pl-text-center pl-page-info pl-bottom-separate">
+                {$cashOnDelivery.description}
+            </p>
+
+            <div class="pl-form-group">
+                <input type="checkbox" id="pl-cod-active" name="cod_active" value="1">
+                <label for="pl-cod-active">{$cashOnDelivery.activate}</label>
+            </div>
+
+            <div class="pl-config-section">
+
+                <h2 class="pl-text-center pl-full-width">
+                    {$cashOnDelivery.configurationTitle}
+                </h2>
+
+                <p class="pl-text-center pl-page-info pl-bottom-separate">
+                    {$cashOnDelivery.configurationDescription}
+                </p>
+
+                <div class="pl-small-page">
+                    <div class="pl-form-group">
+                        <input type="text"
+                               id="pl-cod-accountHolder"
+                               name="account_holder"
+                               placeholder="{$cashOnDelivery.accountHolder-placeholder}"
+                               data-required="true"/>
+                        <label for="pl-cod-accountHolder">{$cashOnDelivery.accountHolder}</label>
+                    </div>
+
+                    <div class="pl-form-group">
+                        <input type="text"
+                               id="pl-cod-iban"
+                               name="iban"
+                               placeholder="{$cashOnDelivery.iban-placeholder}"
+                               data-required="true"/>
+                        <label for="pl-cod-iban">{$cashOnDelivery.iban}</label>
+                    </div>
+
+                    <div class="pl-form-group">
+                        <input type="number"
+                               id="pl-cod-cashOnDeliveryFee"
+                               name="fee"
+                               step="0.01"
+                               min="0"
+                               placeholder="{$cashOnDelivery.fee-placeholder}"
+                               data-required="true"/>
+                        <label for="pl-cod-cashOnDeliveryFee">{$cashOnDelivery.fee}</label>
+                    </div>
+
+                    <div class="pl-form-group">
+                        <select id="pl-cod-offlinePaymentMethod" name="payment_method" data-required="true">
+                        </select>
+                        <i class="material-icons">expand_more</i>
+                        <label for="pl-cod-offlinePaymentMethod">{$cashOnDelivery.paymentMethod}</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="pl-page-buttons">
+        <button id="pl-page-submit-btn" class="pl-button pl-button-primary">
+            {$general.saveChanges}
+        </button>
+    </div>
+</div>
