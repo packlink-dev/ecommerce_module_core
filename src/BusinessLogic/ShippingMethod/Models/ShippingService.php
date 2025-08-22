@@ -63,7 +63,7 @@ class ShippingService
     /**
      * @var CashOnDeliveryConfig|null $cashOnDeliveryConfig
      */
-    private $cashOnDeliveryConfig;
+    public $cashOnDeliveryConfig;
 
     /**
      * ShippingService constructor.

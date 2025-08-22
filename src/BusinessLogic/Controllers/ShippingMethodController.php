@@ -10,6 +10,7 @@ use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
 use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\SystemInformation\SystemInfoService;
 
@@ -111,6 +112,25 @@ class ShippingMethodController
     public function getInactive()
     {
         return $this->getResponse($this->shippingMethodService->getInactiveMethods());
+    }
+
+    /**
+     * Returns shipping services with the given ID.
+     *
+     * @param int $id Shipping method ID.
+     *
+     * @return ShippingService[] Services.
+     */
+    public function getShippingServicesForMethod($id)
+    {
+        $model = $this->shippingMethodService->getShippingMethod($id);
+        $services = array();
+
+        if($model) {
+            $services =  $model->getShippingServices();
+        }
+
+        return $services;
     }
 
     /**
