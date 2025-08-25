@@ -36,6 +36,27 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
     }
 
     /**
+     * Calculate COD surcharge fee if it is not set in the configuration than use from api.
+     *
+     * @param float $orderTotal Total order amount
+     * @param float $percentage Percentage fee
+     * @param float $minFee Minimum fee
+     *
+     * @return float COD surcharge
+     * @throws QueryFilterInvalidParamException
+     */
+    public function calculateFee($orderTotal, $percentage, $minFee)
+    {
+        $calculated = round($orderTotal * ($percentage / 100), 2);
+
+        if ($calculated < $minFee) {
+            return $minFee;
+        }
+
+        return $calculated;
+    }
+
+    /**
      * @return CashOnDelivery|null
      *
      * @throws QueryFilterInvalidParamException
@@ -114,27 +135,5 @@ class CashOnDeliveryService implements CashOnDeliveryServiceInterface
         $this->repository->update($entity);
 
         return $this->getCashOnDeliveryConfig();
-    }
-
-
-    /**
-     * Create an empty CacheOnDelivery object
-     *
-     * @param string $systemId
-     *
-     * @return CashOnDelivery
-     */
-    private function createEmptyCashOnDelivery()
-    {
-        $cashOnDelivery = new CashOnDelivery();
-        $cashOnDelivery->setSystemId($this->configurationService->getCurrentSystemId());
-        $cashOnDelivery->setEnabled(false);
-        $cashOnDelivery->setActive(false);
-
-
-        $account = new Account();
-        $cashOnDelivery->setAccount($account);
-
-        return $cashOnDelivery;
     }
 }

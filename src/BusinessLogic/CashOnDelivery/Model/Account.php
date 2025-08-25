@@ -18,6 +18,38 @@ class Account extends FrontDto
         'offlinePaymentMethod',
     );
 
+    /**
+     * @param string $accountHolderName
+     */
+    public function setAccountHolderName($accountHolderName)
+    {
+        $this->accountHolderName = $accountHolderName;
+    }
+
+    /**
+     * @param string $iban
+     */
+    public function setIban($iban)
+    {
+        $this->iban = $iban;
+    }
+
+    /**
+     * @param float $cashOnDeliveryFee
+     */
+    public function setCashOnDeliveryFee($cashOnDeliveryFee)
+    {
+        $this->cashOnDeliveryFee = $cashOnDeliveryFee;
+    }
+
+    /**
+     * @param string $offlinePaymentMethod
+     */
+    public function setOfflinePaymentMethod($offlinePaymentMethod)
+    {
+        $this->offlinePaymentMethod = $offlinePaymentMethod;
+    }
+
     /** @var string */
     protected $accountHolderName = '';
 

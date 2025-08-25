@@ -14,6 +14,18 @@ interface CashOnDeliveryServiceInterface
     const CLASS_NAME = __CLASS__;
 
     /**
+     * Calculate COD surcharge fee if it is not set in the configuration than use from api.
+     *
+     * @param float $orderTotal Total order amount
+     * @param float $percentage Percentage fee
+     * @param float $minFee Minimum fee
+     *
+     * @return float COD surcharge
+     * @throws QueryFilterInvalidParamException
+     */
+    public function calculateFee($orderTotal, $percentage, $minFee);
+
+    /**
      * Retrieves the Cash on Delivery configuration for the given system ID.
      *
      * @return CashOnDelivery|null

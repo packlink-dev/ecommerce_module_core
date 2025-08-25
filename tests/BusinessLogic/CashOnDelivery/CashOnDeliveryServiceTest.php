@@ -180,4 +180,25 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
 
         $this->assertNotNull($id);
     }
+
+    /**
+     * @return void
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testCalculateFeeReturnsPercentageIfGreaterThanMin()
+    {
+        $fee = $this->service->calculateFee(100, 2.75, 2.35);
+
+        $this->assertEquals(2.75, $fee);
+    }
+
+    /**
+     * @return void
+     * @throws QueryFilterInvalidParamException
+     */
+    public function testCalculateFeeReturnsMinFeeIfPercentageLower()
+    {
+        $fee = $this->service->calculateFee(10, 2.75, 2.35);
+        $this->assertEquals(2.35, $fee);
+    }
 }

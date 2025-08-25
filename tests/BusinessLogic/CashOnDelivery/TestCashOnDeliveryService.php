@@ -95,4 +95,15 @@ class TestCashOnDeliveryService implements CashOnDeliveryServiceInterface
 
         return 1;
     }
+
+    public function calculateFee($orderTotal, $percentage, $minFee)
+    {
+        $calculated = round($orderTotal * ($percentage / 100), 2);
+
+        if ($calculated < $minFee) {
+            return $minFee;
+        }
+
+        return $calculated;
+    }
 }
