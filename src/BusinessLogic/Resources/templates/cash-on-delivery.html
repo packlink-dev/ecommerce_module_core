@@ -11,18 +11,22 @@
     <div class="pl-page-content pl-page-padding">
         <form method="POST" id="pl-cod-form">
 
-            <p class="pl-text-center pl-page-info pl-bottom-separate">
-                {$cashOnDelivery.description}
+            <p class="pl-text-center pl-page-info">
+                {$cashOnDelivery.descriptionFirst}
             </p>
 
-            <div class="pl-form-group">
+            <p class="pl-text-center pl-page-info">
+                {$cashOnDelivery.descriptionSecond}
+            </p>
+
+            <div class="pl-checkbox pl-country-checkbox-wrapper">
                 <input type="checkbox" id="pl-cod-active" name="cod_active" value="1">
                 <label for="pl-cod-active">{$cashOnDelivery.activate}</label>
             </div>
 
-            <div class="pl-config-section">
+            <div class="pl-form-group pl-config-section">
 
-                <h2 class="pl-text-center pl-full-width">
+                <h2 class="pl-full-width">
                     {$cashOnDelivery.configurationTitle}
                 </h2>
 
@@ -36,7 +40,9 @@
                                id="pl-cod-accountHolder"
                                name="account_holder"
                                placeholder="{$cashOnDelivery.accountHolder-placeholder}"
-                               data-required="true"/>
+                               data-required="true"
+                               data-type="text"
+                        />
                         <label for="pl-cod-accountHolder">{$cashOnDelivery.accountHolder}</label>
                     </div>
 
@@ -45,7 +51,9 @@
                                id="pl-cod-iban"
                                name="iban"
                                placeholder="{$cashOnDelivery.iban-placeholder}"
-                               data-required="true"/>
+                               data-required="true"
+                               data-type="iban"
+                        />
                         <label for="pl-cod-iban">{$cashOnDelivery.iban}</label>
                     </div>
 
@@ -56,7 +64,7 @@
                                step="0.01"
                                min="0"
                                placeholder="{$cashOnDelivery.fee-placeholder}"
-                               data-required="true"/>
+                        />
                         <label for="pl-cod-cashOnDeliveryFee">{$cashOnDelivery.fee}</label>
                     </div>
 

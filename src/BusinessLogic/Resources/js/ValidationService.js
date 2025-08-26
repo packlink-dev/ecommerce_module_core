@@ -15,7 +15,8 @@ if (!window.Packlink) {
         email: 'email',
         phone: 'phone',
         password: 'password',
-        text: 'text'
+        text: 'text',
+        iban: 'iban'
     };
 
     const validationRule = {
@@ -107,6 +108,8 @@ if (!window.Packlink) {
                     return this.validatePasswordLength(input);
                 case inputType.text:
                     return this.validateMaxLength(input);
+                case inputType.iban:
+                    return this.validateIBAN(input);
             }
 
             return true;
@@ -123,6 +126,18 @@ if (!window.Packlink) {
             input.value === '' || (input.type === 'checkbox' && !input.checked),
             'validation.requiredField'
         );
+
+        this.validateIBAN = (input) => {
+            const value = input.value.replace(/\s+/g, '');
+
+            const ibanRegex = /^[A-Z0-9]{1,24}$/;
+
+            return validateField(
+                input,
+                !ibanRegex.test(value),
+                'validation.invalidIBAN'
+            );
+        };
 
         /**
          * Validates a numeric input.

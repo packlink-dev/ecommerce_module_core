@@ -10,6 +10,7 @@ if (!window.Packlink) {
     function CashOnDeliveryController(configuration) {
         const templateService = Packlink.templateService,
             utilityService = Packlink.utilityService,
+            validationService = Packlink.validationService,
             ajaxService = Packlink.ajaxService,
             state = Packlink.state;
 
@@ -149,6 +150,14 @@ if (!window.Packlink) {
         }
 
         this.saveData = () => {
+
+            const form = templateService.getMainPage().querySelector('form');
+
+            if(!validationService.validateForm(form))
+            {
+                return false;
+            }
+
             const rawValues = this.getFormValues();
             const payload = {
                 enabled: true,
@@ -156,14 +165,28 @@ if (!window.Packlink) {
                 account: {
                     accountHolderName: rawValues.accountHolder || '',
                     iban: rawValues.iban || '',
-                    cashOnDeliveryFee: rawValues.cashOnDeliveryFee != null ? parseFloat(rawValues.cashOnDeliveryFee) : 0.0,
+                    cashOnDeliveryFee: null,
                     offlinePaymentMethod: rawValues.offlinePaymentMethod || ''
                 }
             };
+
+            if (rawValues.cashOnDeliveryFee != null && rawValues.cashOnDeliveryFee !== '') {
+                payload.account.cashOnDeliveryFee = parseFloat(rawValues.cashOnDeliveryFee);
+            }
+
             utilityService.showSpinner();
-            ajaxService.post(configuration.submitDataUrl, payload, (response) => {
-                utilityService.hideSpinner();
-                console.log('COD saved', response);
+            ajaxService.post(configuration.submitDataUrl, payload, goToNextPage,
+                Packlink.responseService.errorHandler);
+        };
+
+        /**
+         * Handles Save button navigation.
+         */
+        const goToNextPage = () => {
+            state.goToState(this.config.nextState, {
+                'code': this.config.code,
+                'prevState': this.config.prevState,
+                'nextState': 'onboarding-overview',
             });
         };
 

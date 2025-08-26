@@ -18,6 +18,19 @@ class Account extends FrontDto
         'offlinePaymentMethod',
     );
 
+    /** @var string */
+    protected $accountHolderName = '';
+
+    /** @var string */
+    protected $iban = '';
+
+
+    /** @var float|null */
+    protected $cashOnDeliveryFee;
+
+    /** @var string */
+    protected $offlinePaymentMethod = '';
+
     /**
      * @param string $accountHolderName
      */
@@ -35,7 +48,7 @@ class Account extends FrontDto
     }
 
     /**
-     * @param float $cashOnDeliveryFee
+     * @param float|null $cashOnDeliveryFee
      */
     public function setCashOnDeliveryFee($cashOnDeliveryFee)
     {
@@ -50,17 +63,6 @@ class Account extends FrontDto
         $this->offlinePaymentMethod = $offlinePaymentMethod;
     }
 
-    /** @var string */
-    protected $accountHolderName = '';
-
-    /** @var string */
-    protected $iban = '';
-
-    /** @var float */
-    protected $cashOnDeliveryFee = 0.0;
-
-    /** @var string */
-    protected $offlinePaymentMethod = '';
     /**
      * @return string
      */
@@ -70,7 +72,7 @@ class Account extends FrontDto
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     public function getCashOnDeliveryFee()
     {
