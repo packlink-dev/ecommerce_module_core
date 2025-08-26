@@ -3,17 +3,21 @@
 namespace Logeecom\Tests\BusinessLogic\Order;
 
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
-use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -29,6 +33,10 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
  */
 class OrderServiceTest extends BaseTestWithServices
 {
+    /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
+
+    private $cashOnDeliveryService;
+
     /**
      * Order service instance.
      *
@@ -96,6 +104,16 @@ class OrderServiceTest extends BaseTestWithServices
             ShippingMethodService::CLASS_NAME,
             function () use ($me) {
                 return $me->shippingMethodService;
+            }
+        );
+        /** @noinspection PhpUnhandledExceptionInspection */
+        RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
+
+        $this->cashOnDeliveryService = new TestCashOnDeliveryService();
+        ServiceRegister::registerService(
+            CashOnDeliveryServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->cashOnDeliveryService;
             }
         );
 
@@ -208,6 +226,39 @@ class OrderServiceTest extends BaseTestWithServices
         }
 
         $this->assertNotNull($exThrown);
+    }
+
+    /**
+     * @return void
+     * @throws EmptyOrderException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testPrepareDraftWithCashOnDelivery()
+    {
+        $shippingServiceDetails = $this->getShippingServiceDetails(123, 'PSP', 3.14);
+
+        $method = $this->shippingMethodService->add($shippingServiceDetails);
+
+        $order = $this->shopOrderService->getOrder('test', $method->getId(), 'IT');
+
+        $entity = new CashOnDelivery();
+        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
+        $entity->setEnabled(true);
+
+        $account = new Account();
+        $account->setCashOnDeliveryFee(2);
+        $account->setIban('E1');
+        $account->setAccountHolderName('Test Account');
+
+        $entity->setAccount($account);
+
+        $this->cashOnDeliveryService->setEntity($entity);
+
+        $draft = $this->orderService->prepareDraft($order);
+
+        $codArray = $draft->cashOnDelivery->toArray();
+
+        self::assertEquals('E1', $codArray['iban']);
     }
 
     /**

@@ -160,6 +160,13 @@ class Draft extends DataTransferObject
     public $customs;
 
     /**
+     * Cash on Delivery information.
+     *
+     * @var CashOnDeliveryDetails|null
+     */
+    public $cashOnDelivery = null;
+
+    /**
      * Draft constructor.
      */
     public function __construct()
@@ -219,6 +226,10 @@ class Draft extends DataTransferObject
 
         if (!empty($this->customs)) {
             $result['customs'] = $this->customs->toArray();
+        }
+
+        if (!empty($this->cashOnDelivery)) {
+            $result['cash_on_delivery'] = $this->cashOnDelivery->toArray();
         }
 
         return $result;

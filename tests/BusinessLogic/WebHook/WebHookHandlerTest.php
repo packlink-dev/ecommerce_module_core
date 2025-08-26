@@ -3,7 +3,9 @@
 namespace Logeecom\Tests\BusinessLogic\WebHook;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
@@ -11,6 +13,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
@@ -30,6 +34,10 @@ class WebHookHandlerTest extends BaseTestWithServices
      */
     public $orderShipmentDetailsService;
 
+    /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
+
+    private $cashOnDeliveryService;
+
     /**
      * @before
      * @inheritdoc
@@ -47,6 +55,17 @@ class WebHookHandlerTest extends BaseTestWithServices
         );
 
         $this->orderShipmentDetailsService = OrderShipmentDetailsService::getInstance();
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
+
+        $this->cashOnDeliveryService = new TestCashOnDeliveryService();
+        ServiceRegister::registerService(
+            CashOnDeliveryServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->cashOnDeliveryService;
+            }
+        );
 
         TestServiceRegister::registerService(
             OrderShipmentDetailsService::CLASS_NAME,

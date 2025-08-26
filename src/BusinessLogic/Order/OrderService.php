@@ -8,9 +8,12 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Http\DTO\CashOnDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
@@ -60,6 +63,11 @@ class OrderService extends BaseService
     protected $orderShipmentDetailsService;
 
     /**
+     * @var CashOnDeliveryServiceInterface
+     */
+    protected $cashOnDeliveryService;
+
+    /**
      * OrderService constructor.
      */
     protected function __construct()
@@ -69,6 +77,8 @@ class OrderService extends BaseService
         $this->shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
+
     }
 
     /**
@@ -335,8 +345,31 @@ class OrderService extends BaseService
         $this->addDepartureAddress($draft);
         $this->addDestinationAddress($order, $draft);
         $this->addAdditionalData($order, $draft);
+        $this->addCashOnDeliveryDetails($draft, $order->getTotalPrice(), $order->getPaymentId());
 
         return $draft;
+    }
+
+    /**
+     * @param Draft $draft
+     * @param float $totalAmount
+     * @param string $paymentMethod
+     */
+    private function addCashOnDeliveryDetails($draft, $totalAmount, $paymentMethod)
+    {
+        try {
+            $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
+        } catch (QueryFilterInvalidParamException $exception) {
+            return null;
+        }
+
+        if (!$cashOnDelivery || !$cashOnDelivery->getAccount() ||
+            $cashOnDelivery->getAccount()->getOfflinePaymentMethod() !== $paymentMethod) {
+            return;
+        }
+
+        $draft->cashOnDelivery = new CashOnDeliveryDetails($totalAmount,
+            $cashOnDelivery->getAccount()->getAccountHolderName(), $cashOnDelivery->getAccount()->getIban());
     }
 
     /**

@@ -142,6 +142,11 @@ class Order
     private $totalWeight = 0;
 
     /**
+     * @var string $paymentId
+     */
+    private $paymentId = '';
+
+    /**
      * Returns order unique identifier.
      *
      * @return string Unique identifier.
@@ -499,6 +504,22 @@ class Order
     public function setShippingDropOffId($shippingDropOffId)
     {
         $this->shippingDropOffId = $shippingDropOffId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentId()
+    {
+        return $this->paymentId;
+    }
+
+    /**
+     * @param string $paymentId
+     */
+    public function setPaymentId($paymentId)
+    {
+        $this->paymentId = $paymentId;
     }
 
     /**

@@ -4,11 +4,13 @@
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
+use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Customs\MockCustomsMappingService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
@@ -17,6 +19,8 @@ use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Customs\CustomsMapping;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
 use Packlink\BusinessLogic\Customs\CustomsService;
@@ -44,6 +48,10 @@ use Packlink\BusinessLogic\Utility\CurrencySymbolService;
  */
 class SendDraftTaskTest extends BaseSyncTest
 {
+    /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
+
+    private $cashOnDeliveryService;
+
     /**
      * @before
      * @inheritdoc
@@ -66,6 +74,18 @@ class SendDraftTaskTest extends BaseSyncTest
             OrderShipmentDetailsService::CLASS_NAME,
             function () {
                 return OrderShipmentDetailsService::getInstance();
+            }
+        );
+
+        $me = $this;
+        /** @noinspection PhpUnhandledExceptionInspection */
+        RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
+
+        $this->cashOnDeliveryService = new TestCashOnDeliveryService();
+        ServiceRegister::registerService(
+            CashOnDeliveryServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->cashOnDeliveryService;
             }
         );
 

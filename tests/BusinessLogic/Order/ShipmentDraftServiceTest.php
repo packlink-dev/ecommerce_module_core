@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
@@ -23,6 +24,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -54,6 +57,10 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @var OrderSendDraftTaskMapService
      */
     public $orderSendDraftTaskMapService;
+
+    /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
+
+    private $cashOnDeliveryService;
 
     /**
      * @before
@@ -105,6 +112,16 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             OrderSendDraftTaskMapService::CLASS_NAME,
             function () use ($me) {
                 return $me->orderSendDraftTaskMapService;
+            }
+        );
+
+        RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
+
+        $this->cashOnDeliveryService = new TestCashOnDeliveryService();
+        ServiceRegister::registerService(
+            CashOnDeliveryServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->cashOnDeliveryService;
             }
         );
 

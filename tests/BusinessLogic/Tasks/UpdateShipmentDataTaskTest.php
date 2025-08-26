@@ -3,13 +3,18 @@
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
+use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -32,6 +37,10 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      */
     public $orderShipmentDetailsService;
 
+    /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
+
+    private $cashOnDeliveryService;
+
     /**
      * @before
      * @inheritdoc
@@ -46,6 +55,18 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
             OrderShipmentDetails::getClassName(),
             MemoryRepository::getClassName()
         );
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
+
+        $this->cashOnDeliveryService = new TestCashOnDeliveryService();
+        ServiceRegister::registerService(
+            CashOnDeliveryServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->cashOnDeliveryService;
+            }
+        );
+
 
         TestServiceRegister::registerService(
             OrderService::CLASS_NAME,
