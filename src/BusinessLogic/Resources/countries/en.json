@@ -406,7 +406,8 @@
     "fee-placeholder": "Fee",
     "paymentMethod": "Shop offline payment method",
     "configurationTitle": "Cash on Delivery configuration",
-    "configurationDescription": "Please configure your account holder name and IBAN and map one of the available shop payment methods to the Cash on Delivery payment method. Mapped payment method will be treated as a Cash on Delivery payment option for shipping services that support it. For the rest of Packlink services, it will be hidden."
+    "configurationDescription": "Please configure your account holder name and IBAN and map one of the available shop payment methods to the Cash on Delivery payment method. Mapped payment method will be treated as a Cash on Delivery payment option for shipping services that support it. For the rest of Packlink services, it will be hidden.",
+    "surcharge": "Packlink Cash on Delivery Surcharge fee"
   },
   "systemInfo": {
     "title": "System information file <br>and debug mode",
