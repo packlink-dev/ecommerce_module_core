@@ -397,17 +397,18 @@
   "cashOnDelivery": {
     "descriptionFirst": "Cash on Delivery is a feature available to our merchants on the Packlink PRO Plus plans. COD is delivery service in which the recipient is responsible for paying the postage rather than the sender. COD postpones the payment for the delivery until the recipient receives the parcel instead of having to pay for it before the package is shipped.",
     "descriptionSecond" : "Packlink offers such a service as well for some of our shipping services and the process differs slightly. At Packlink, the sender is required to pay for the shipping when ordering the service but is reimbursed after the recipient pays the courier. \n For shipping methods that support Cash on Delivery, the integration will offer the payment method mapped as Cash on Delivery in your shop.",
-    "activate": "Active Cash on Delivery",
+    "activate": "Activate Cash on Delivery",
     "accountHolder": "Account holder",
     "accountHolder-placeholder": "First and last name",
     "iban": "Merchant IBAN",
     "iban-placeholder": "IBAN",
     "fee": "Cash on Delivery fee",
-    "fee-placeholder": "Fee",
+    "fee-placeholder": " ",
     "paymentMethod": "Shop offline payment method",
     "configurationTitle": "Cash on Delivery configuration",
     "configurationDescription": "Please configure your account holder name and IBAN and map one of the available shop payment methods to the Cash on Delivery payment method. Mapped payment method will be treated as a Cash on Delivery payment option for shipping services that support it. For the rest of Packlink services, it will be hidden.",
-    "surcharge": "Packlink Cash on Delivery Surcharge fee"
+    "surcharge": "Packlink Cash on Delivery Surcharge fee",
+    "infoMessage": "In case selected Cash On Delivery is the only active payment method, please ensure at least one other payment option is available to allow customers to complete orders when a Packlink shipping method that does not support COD is selected."
   },
   "systemInfo": {
     "title": "System information file <br>and debug mode",
