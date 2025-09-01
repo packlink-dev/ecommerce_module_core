@@ -82,12 +82,22 @@ if (!window.Packlink) {
 
             const activeCheckbox = templateService.getComponent('pl-cod-active');
             const configSection = mainPage.querySelector('.pl-config-section');
+            const infoBox = mainPage.querySelector('.pl-cod-info-box');
 
             if (activeCheckbox && configSection) {
                 configSection.style.display = activeCheckbox.checked ? 'block' : 'none';
 
+                if (infoBox) {
+                    infoBox.style.display = activeCheckbox.checked ? 'flex' : 'none';
+                }
+
                 activeCheckbox.addEventListener('change', () => {
                     configSection.style.display = activeCheckbox.checked ? 'block' : 'none';
+
+                    if (infoBox) {
+                        infoBox.style.display = activeCheckbox.checked ? 'flex' : 'none';
+                    }
+
                 });
             }
 
