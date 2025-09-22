@@ -408,7 +408,8 @@
     "configurationTitle": "Cash on Delivery configuration",
     "configurationDescription": "Please configure your account holder name and IBAN and map one of the available shop payment methods to the Cash on Delivery payment method. Mapped payment method will be treated as a Cash on Delivery payment option for shipping services that support it. For the rest of Packlink services, it will be hidden.",
     "surcharge": "Packlink Cash on Delivery Surcharge fee",
-    "infoMessage": "In case selected Cash On Delivery is the only active payment method, please ensure at least one other payment option is available to allow customers to complete orders when a Packlink shipping method that does not support COD is selected."
+    "infoMessage": "In case selected Cash On Delivery is the only active payment method, please ensure at least one other payment option is available to allow customers to complete orders when a Packlink shipping method that does not support COD is selected.",
+    "noOfflinePayments": "No offline payment methods are available in your shop. If you want to configure Cash on Delivery, please make sure that at least one offline payment method is activated."
   },
   "systemInfo": {
     "title": "System information file <br>and debug mode",

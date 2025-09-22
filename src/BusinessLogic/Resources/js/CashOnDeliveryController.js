@@ -12,7 +12,8 @@ if (!window.Packlink) {
             utilityService = Packlink.utilityService,
             validationService = Packlink.validationService,
             ajaxService = Packlink.ajaxService,
-            state = Packlink.state;
+            translationService = Packlink.translationService,
+        state = Packlink.state;
 
         this.config = {};
         this.pageId = 'pl-cod-page';
@@ -83,6 +84,31 @@ if (!window.Packlink) {
             const activeCheckbox = templateService.getComponent('pl-cod-active');
             const configSection = mainPage.querySelector('.pl-config-section');
             const infoBox = mainPage.querySelector('.pl-cod-info-box');
+            const infoText = infoBox ? infoBox.querySelector('.pl-cod-info-text') : null;
+            const form = mainPage.querySelector('#pl-cod-form');
+            const submitBtn = templateService.getComponent('pl-page-submit-btn');
+            const paymentMethodSelect = templateService.getComponent('pl-cod-offlinePaymentMethod');
+
+            const hasPaymentMethods = paymentMethodSelect && paymentMethodSelect.options.length > 0;
+
+            const noOfflinePaymentMethods = () => {
+                if (infoBox && activeCheckbox.checked && !hasPaymentMethods) {
+                    if (infoText) {
+                        infoText.innerText = translationService.translate('cashOnDelivery.noOfflinePayments');
+                    }
+                    if (form) {
+                        Array.from(form.elements).forEach(el => el.disabled = true);
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                    }
+
+                    if (activeCheckbox) {
+                        activeCheckbox.disabled = false;
+                    }
+                }
+            }
+
 
             if (activeCheckbox && configSection) {
                 configSection.style.display = activeCheckbox.checked ? 'block' : 'none';
@@ -91,6 +117,8 @@ if (!window.Packlink) {
                     infoBox.style.display = activeCheckbox.checked ? 'flex' : 'none';
                 }
 
+                noOfflinePaymentMethods();
+
                 activeCheckbox.addEventListener('change', () => {
                     configSection.style.display = activeCheckbox.checked ? 'block' : 'none';
 
@@ -98,6 +126,7 @@ if (!window.Packlink) {
                         infoBox.style.display = activeCheckbox.checked ? 'flex' : 'none';
                     }
 
+                    noOfflinePaymentMethods();
                 });
             }
 
