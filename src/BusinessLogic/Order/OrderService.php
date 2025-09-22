@@ -363,7 +363,7 @@ class OrderService extends BaseService
             return null;
         }
 
-        if (!$cashOnDelivery || !$cashOnDelivery->getAccount() ||
+        if (!$cashOnDelivery || !$cashOnDelivery->getAccount() || !$cashOnDelivery->isActive() ||
             $cashOnDelivery->getAccount()->getOfflinePaymentMethod() !== $paymentMethod) {
             return;
         }
