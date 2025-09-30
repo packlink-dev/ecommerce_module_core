@@ -53,7 +53,7 @@ class CashOnDeliveryController
     {
         $cod = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
 
-        if($cod && $cod->getAccount() && $cod->getAccount()->getCashOnDeliveryFee())
+        if($cod && $cod->getAccount() && $cod->getAccount()->getCashOnDeliveryFee() !== null)
         {
             return $cod->getAccount()->getCashOnDeliveryFee();
         }

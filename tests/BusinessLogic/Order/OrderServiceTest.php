@@ -244,6 +244,7 @@ class OrderServiceTest extends BaseTestWithServices
         $entity = new CashOnDelivery();
         $entity->setSystemId($this->shopConfig->getCurrentSystemId());
         $entity->setEnabled(true);
+        $entity->setActive(true);
 
         $account = new Account();
         $account->setCashOnDeliveryFee(2);
