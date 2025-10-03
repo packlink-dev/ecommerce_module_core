@@ -76,6 +76,7 @@ class LocationService extends BaseService
      */
     public function getLocations($shippingMethodId, $toCountry, $toPostCode, array $packages = array())
     {
+        Logger::logDebug('In Location service, fetching locations...');
         $context = $this->configuration->getContext();
         $warehouse = $this->configuration->getDefaultWarehouse();
         if ($warehouse === null) {
@@ -128,7 +129,10 @@ class LocationService extends BaseService
 
             $result = $this->transformCollectionToResponse($locations);
         } catch (InvalidArgumentException $e) {
+            Logger::logError('Unexpected error on fetching locations: ' . $e->getMessage());
         } catch (HttpBaseException $e) {
+            Logger::logError('Unexpected http error on fetching locations: ' . $e->getMessage());
+
         }
 
         return $result;

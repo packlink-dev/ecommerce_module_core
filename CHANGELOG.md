@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.6.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.6...v3.6.7) - 2025-10-03
+### Changed
+- Added logs to location service
+
 ## [3.6.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.6.4...v3.6.5) - 2025-07-28
 ### Changed
 - Modify shipping services availability at checkout
