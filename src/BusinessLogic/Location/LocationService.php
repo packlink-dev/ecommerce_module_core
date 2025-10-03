@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Location;
 
 use InvalidArgumentException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
@@ -75,9 +76,19 @@ class LocationService extends BaseService
      */
     public function getLocations($shippingMethodId, $toCountry, $toPostCode, array $packages = array())
     {
+        $context = $this->configuration->getContext();
         $warehouse = $this->configuration->getDefaultWarehouse();
+        if ($warehouse === null) {
+            Logger::logDebug('Warehouse not set in configuration for context ' . $context);
+        }
+
         $method = $this->shippingMethodService->getShippingMethod($shippingMethodId);
+        if ($method === null) {
+            Logger::logDebug("Method for id {$shippingMethodId} not found for context " . $context);
+        }
+
         if ($warehouse === null || $method === null || !$method->isDestinationDropOff()) {
+            Logger::logDebug("For context {$context}, locations are empty: Warehouse or method, is not found, or is not destination drop-off: " . $shippingMethodId);
             return array();
         }
 
@@ -98,14 +109,22 @@ class LocationService extends BaseService
             );
 
             if ($cheapestService === null) {
+                Logger::logDebug("For context {$context}, locations are empty: cheapestService is null: " . $shippingMethodId);
+
                 return array();
             }
+
+            Logger::logDebug('Calling proxy for context ' . $context);
 
             $locations = $this->proxy->getLocations(
                 $cheapestService->serviceId,
                 $toCountry,
                 PostalCodeTransformer::transform($toCountry, $toPostCode)
             );
+
+            if (empty($locations)) {
+                Logger::logDebug('Proxy returned empty drop off locations for context ' . $context);
+            }
 
             $result = $this->transformCollectionToResponse($locations);
         } catch (InvalidArgumentException $e) {
