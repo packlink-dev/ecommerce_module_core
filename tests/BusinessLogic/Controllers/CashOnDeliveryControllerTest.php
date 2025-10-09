@@ -11,7 +11,6 @@ use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
-use Logeecom\Tests\BusinessLogic\Subscription\TestSubscriptionService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
@@ -24,7 +23,6 @@ use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
-use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 class CashOnDeliveryControllerTest extends BaseTestWithServices
@@ -37,9 +35,6 @@ class CashOnDeliveryControllerTest extends BaseTestWithServices
 
     private $cashOnDeliveryService;
 
-
-    /** @var TestSubscriptionService $subscriptionService*/
-    private $subscriptionService;
 
     /** @var CashOnDeliveryController */
     private $controller;
@@ -72,14 +67,6 @@ class CashOnDeliveryControllerTest extends BaseTestWithServices
 
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
-
-        $this->subscriptionService = new TestSubscriptionService();
-        ServiceRegister::registerService(
-            SubscriptionServiceInterface::CLASS_NAME,
-            function () use ($me) {
-                return $me->subscriptionService;
-            }
-        );
 
         $this->cashOnDeliveryService = new TestCashOnDeliveryService();
         ServiceRegister::registerService(
@@ -166,58 +153,6 @@ class CashOnDeliveryControllerTest extends BaseTestWithServices
         $entity = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
         $this->assertTrue($entity->isEnabled());
         $this->assertTrue($entity->isActive());
-    }
-
-    /**
-     * @throws QueryFilterInvalidParamException
-     */
-    public function testGetAndUpdateSubscriptionCreatesEntityIfNoneExistsAndPlusSubscription()
-    {
-        $this->subscriptionService->setValue(true);
-
-        $result = $this->controller->getAndUpdateSubscription();
-
-        $this->assertTrue($result);
-    }
-
-    /**
-     * @throws QueryFilterInvalidParamException
-     */
-    public function testGetAndUpdateSubscriptionDisablesWhenNoSubscription()
-    {
-        $entity = new CashOnDelivery();
-        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
-        $entity->setEnabled(true);
-        $entity->setActive(true);
-        $entity->setAccount(new Account());
-
-        $this->cashOnDeliveryService->setEntity($entity);
-        $this->subscriptionService->setValue(false);
-
-        $result = $this->controller->getAndUpdateSubscription();
-
-        $this->assertFalse($result);
-        $this->assertFalse($this->cashOnDeliveryService->getCashOnDeliveryConfig()->isEnabled());
-    }
-
-    /**
-     * @throws QueryFilterInvalidParamException
-     */
-    public function testGetAndUpdateSubscriptionEnablesWhenHasSubscription()
-    {
-        $entity = new CashOnDelivery();
-        $entity->setSystemId($this->shopConfig->getCurrentSystemId());
-        $entity->setEnabled(false);
-        $entity->setActive(true);
-        $entity->setAccount(new Account());
-
-        $this->cashOnDeliveryService->setEntity($entity);
-        $this->subscriptionService->setValue(true);
-
-        $result = $this->controller->getAndUpdateSubscription();
-
-        $this->assertTrue($result);
-        $this->assertTrue($this->cashOnDeliveryService->getCashOnDeliveryConfig()->isEnabled());
     }
 
     /**

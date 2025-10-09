@@ -28,8 +28,6 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Subscription\Http\SubscriptionProxy;
-use Packlink\BusinessLogic\Subscription\Services\SubscriptionService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -80,13 +78,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             }
         );
 
-        TestServiceRegister::registerService(
-            SubscriptionService::CLASS_NAME,
-            function () {
-                return SubscriptionService::getInstance();
-            }
-        );
-
         $this->httpClient = new TestHttpClient();
         TestServiceRegister::registerService(
             HttpClient::CLASS_NAME,
@@ -99,13 +90,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             Proxy::CLASS_NAME,
             function () use ($me) {
                 return new Proxy($me->shopConfig, $me->httpClient);
-            }
-        );
-
-        TestServiceRegister::registerService(
-            SubscriptionProxy::CLASS_NAME,
-            function () use ($me) {
-                return new SubscriptionProxy($me->shopConfig, $me->httpClient);
             }
         );
 

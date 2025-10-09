@@ -15,15 +15,9 @@ use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
-use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
 
 class CashOnDeliveryController
 {
-    /**
-     * @var SubscriptionServiceInterface
-     */
-    protected $subscriptionService;
-
     /**
      * @var CashOnDeliveryServiceInterface
      */
@@ -36,7 +30,6 @@ class CashOnDeliveryController
 
     public function __construct(
     ) {
-        $this->subscriptionService = ServiceRegister::getService(SubscriptionServiceInterface::CLASS_NAME);
         $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
     }
@@ -82,27 +75,6 @@ class CashOnDeliveryController
         $dto = CashOnDeliveryDTO::fromArray($rawData);
 
         return $this->cashOnDeliveryService->saveConfig($dto);
-    }
-
-    /**
-     * @return bool
-     *
-     * @throws QueryFilterInvalidParamException
-     */
-    public function getAndUpdateSubscription()
-    {
-        $plusSubscription = $this->subscriptionService->hasPlusSubscription();
-        $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
-
-        if (!$plusSubscription && $cashOnDelivery && $cashOnDelivery->isEnabled()) {
-            $this->cashOnDeliveryService->disable();
-        }
-
-        if ($plusSubscription && $cashOnDelivery && !$cashOnDelivery->isEnabled()) {
-            $this->cashOnDeliveryService->enable();
-        }
-
-        return $plusSubscription;
     }
 
     /**

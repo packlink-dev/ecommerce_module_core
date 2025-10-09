@@ -40,9 +40,6 @@ use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
-use Packlink\BusinessLogic\Subscription\Http\SubscriptionProxy;
-use Packlink\BusinessLogic\Subscription\Interfaces\SubscriptionServiceInterface;
-use Packlink\BusinessLogic\Subscription\Services\SubscriptionService;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
@@ -80,18 +77,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
 
                 return new Proxy($config, $client);
-            }
-        );
-
-        ServiceRegister::registerService(
-            SubscriptionProxy::CLASS_NAME,
-            function () {
-                /** @var Configuration $config */
-                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
-                /** @var HttpClient $client */
-                $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
-
-                return new SubscriptionProxy($config, $client);
             }
         );
 
@@ -190,13 +175,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             RegistrationService::CLASS_NAME,
             function () {
                 return RegistrationService::getInstance();
-            }
-        );
-
-        ServiceRegister::registerService(
-            SubscriptionServiceInterface::CLASS_NAME,
-            function () {
-                return SubscriptionService::getInstance();
             }
         );
 
