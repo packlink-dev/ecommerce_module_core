@@ -29,11 +29,6 @@ if (!window.Packlink) {
             version.innerHTML = 'v' + response.version;
             helpLink.href = response.helpUrl;
 
-            let cod = templateService.getComponent('pl-navigate-cod');
-            if (cod) {
-                cod.style.display = 'none';
-            }
-
             templateService.getComponent('pl-open-system-info').addEventListener('click', () => {
                 state.goToState('system-info');
             });
