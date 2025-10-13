@@ -162,11 +162,11 @@ class ShippingCostCalculator
         $result = null;
         if (!empty($services)) {
             foreach ($services as $service) {
-                $result = self::getCheapestService($method->getShippingServices(), $result, $service->id);
+                $result = self::getCheapestService($method, $result, $service, '');
             }
         } else {
             // Fallback.
-            $result = self::getCheapestService($method->getShippingServices(), $result, '', $toCountry);
+            $result = self::getCheapestService($method, $result, null, $toCountry);
         }
 
         if ($result !== null) {
@@ -585,19 +585,25 @@ class ShippingCostCalculator
     /**
      * Gets the cheapest shipping services.
      *
-     * @param ShippingService[] $services Shipping services to check.
+     * @param ShippingMethod|null $method
+     *
      * @param ShippingService|null $result The service to compare to.
-     * @param int|string $serviceId The ID of service to take into consideration.
+     * @param ShippingServiceDetails|null $serviceProxy Current shipping service
      * @param string $toCountry The destination country for the service.
      *
-     * @return \Packlink\BusinessLogic\ShippingMethod\Models\ShippingService
+     * @return ShippingService
      */
-    private static function getCheapestService(array $services, $result, $serviceId = '', $toCountry = '')
+    private static function getCheapestService($method, $result, $serviceProxy = null, $toCountry = '')
     {
-        foreach ($services as $service) {
+        foreach ($method->getShippingServices() as $service) {
             if ((!$toCountry || $service->destinationCountry === $toCountry)
-                && (!$serviceId || $serviceId === $service->serviceId)
                 && ($result === null || $result->basePrice > $service->basePrice)
+                && (!$serviceProxy || self::isSameOrEquivalentService($service->serviceId,
+                    $service->category,
+                    $method->getCarrierName(),
+                    $method->isDepartureDropOff(),
+                    $method->isDestinationDropOff(),
+                    $serviceProxy))
             ) {
                 $result = $service;
             }
