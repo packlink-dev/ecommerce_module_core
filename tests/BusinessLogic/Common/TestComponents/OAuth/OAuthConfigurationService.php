@@ -27,6 +27,7 @@ class OAuthConfigurationService extends OAuthConfiguration
     protected $scopes;
     protected $tenantId;
     protected $domain;
+    protected $returnUrl;
 
     /**
      * @param mixed $clientSecret
@@ -76,6 +77,15 @@ class OAuthConfigurationService extends OAuthConfiguration
         $this->domain = $domain;
     }
 
+    /**
+     * @param $returnUrl
+     * @return void
+     */
+    public function setReturnUrl($returnUrl)
+    {
+        $this->returnUrl = $returnUrl;
+    }
+
 
     /**
      * @inheritDoc
@@ -113,6 +123,12 @@ class OAuthConfigurationService extends OAuthConfiguration
     {
         return $this->domain;
     }
+
+    public function getReturnUrl()
+    {
+        return $this->returnUrl;
+    }
+
 
     public function getTenantId()
     {

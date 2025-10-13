@@ -52,5 +52,10 @@ abstract class OAuthConfiguration extends Singleton
     /**
      * @return string
      */
+    abstract public function getReturnUrl();
+
+    /**
+     * @return string
+     */
     abstract public function getTenantId();
 }
