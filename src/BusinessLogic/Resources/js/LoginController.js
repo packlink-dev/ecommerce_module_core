@@ -67,7 +67,7 @@ if (!window.Packlink) {
              * @type {HTMLSelectElement|null}
              */
             const selectElem = templateService.getMainPage().querySelector('#pl-connect-select-country');
-            const selectedCountry = selectElem?.value || 'WW';
+            const selectedCountry = (selectElem && selectElem.value) ? selectElem.value : 'WW';
 
             let url = configuration.connect;
             url += url.includes('?') ? '&' : '?';
