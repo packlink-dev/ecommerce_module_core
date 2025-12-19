@@ -34,7 +34,7 @@ class Account extends FrontDto
     /**
      * @param string $accountHolderName
      */
-    public function setAccountHolderName($accountHolderName)
+    public function setAccountHolderName(string $accountHolderName)
     {
         $this->accountHolderName = $accountHolderName;
     }
@@ -42,7 +42,7 @@ class Account extends FrontDto
     /**
      * @param string $iban
      */
-    public function setIban($iban)
+    public function setIban(string $iban)
     {
         $this->iban = $iban;
     }
@@ -58,7 +58,7 @@ class Account extends FrontDto
     /**
      * @param string $offlinePaymentMethod
      */
-    public function setOfflinePaymentMethod($offlinePaymentMethod)
+    public function setOfflinePaymentMethod(string $offlinePaymentMethod)
     {
         $this->offlinePaymentMethod = $offlinePaymentMethod;
     }
@@ -66,7 +66,7 @@ class Account extends FrontDto
     /**
      * @return string
      */
-    public function getOfflinePaymentMethod()
+    public function getOfflinePaymentMethod(): string
     {
         return $this->offlinePaymentMethod;
     }
@@ -82,7 +82,7 @@ class Account extends FrontDto
     /**
      * @return string
      */
-    public function getAccountHolderName()
+    public function getAccountHolderName(): string
     {
         return $this->accountHolderName;
     }
@@ -90,7 +90,7 @@ class Account extends FrontDto
     /**
      * @return string
      */
-    public function getIban()
+    public function getIban(): string
     {
         return $this->iban;
     }

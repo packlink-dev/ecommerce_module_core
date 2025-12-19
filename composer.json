@@ -4,7 +4,7 @@
     "type": "library",
     "license": "proprietary",
     "require": {
-      "php": ">=5.3.29",
+      "php": ">=7.0",
       "ext-json": "*"
     },
     "autoload": {

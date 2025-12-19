@@ -37,12 +37,8 @@ use Packlink\BusinessLogic\Warehouse\Warehouse;
  *
  * @package Packlink\BusinessLogic
  */
-class Proxy
+class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
 {
-    /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
     /**
      * Packlink base API URL.
      */

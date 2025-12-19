@@ -7,6 +7,8 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
+use Packlink\BusinessLogic\Customs\Models\TaxIdOption;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
@@ -18,7 +20,7 @@ use Packlink\BusinessLogic\Http\Proxy;
  *
  * @package Packlink\BusinessLogic\Customs
  */
-abstract class CustomsMappingService
+abstract class CustomsMappingService implements \Packlink\BusinessLogic\Customs\Interfaces\CustomsMappingService
 {
     /**
      * Fully qualified name of this class.

@@ -8,7 +8,7 @@ namespace Packlink\BusinessLogic\FileResolver;
  *
  * @package Packlink\BusinessLogic\FileResolver
  */
-class FileResolverService
+class FileResolverService implements \Packlink\BusinessLogic\FileResolver\Interfaces\FileResolverService
 {
     /**
      * Class name.

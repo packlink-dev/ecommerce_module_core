@@ -33,7 +33,7 @@ class WarehouseControllerTest extends BaseTestWithServices
             }
         );
 
-        $this->controller = new WarehouseController();
+        $this->controller = new WarehouseController(TestServiceRegister::getService(WarehouseService::CLASS_NAME));;
     }
 
     public function testGetWarehouseMethodCalls()

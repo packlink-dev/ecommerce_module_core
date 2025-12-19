@@ -2,10 +2,8 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
-use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Country\Country;
-use Packlink\BusinessLogic\Country\WarehouseCountryService;
-use Packlink\BusinessLogic\Warehouse\WarehouseService;
+use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseService;
+use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
  * Class WarehouseController
@@ -17,22 +15,24 @@ class WarehouseController
     /**
      * Warehouse service.
      *
-     * @var \Packlink\BusinessLogic\Warehouse\WarehouseService
+     * @var WarehouseService
      */
     protected $service;
 
     /**
+     * @param WarehouseService $service
+     *
      * WarehouseController constructor.
      */
-    public function __construct()
+    public function __construct(WarehouseService $service)
     {
-        $this->service = ServiceRegister::getService(WarehouseService::CLASS_NAME);
+        $this->service = $service;
     }
 
     /**
      * Provides warehouse data.
      *
-     * @return \Packlink\BusinessLogic\Warehouse\Warehouse | null
+     * @return Warehouse | null
      */
     public function getWarehouse()
     {
@@ -53,18 +53,5 @@ class WarehouseController
     public function updateWarehouse(array $data)
     {
         return $this->service->updateWarehouseData($data);
-    }
-
-    /**
-     * Returns available countries for warehouse location.
-     *
-     * @return Country[]
-     */
-    public function getWarehouseCountries()
-    {
-        /** @var WarehouseCountryService $countryService */
-        $countryService = ServiceRegister::getService(WarehouseCountryService::CLASS_NAME);
-
-        return $countryService->getSupportedCountries(false);
     }
 }

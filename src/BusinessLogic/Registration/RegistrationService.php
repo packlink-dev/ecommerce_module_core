@@ -13,7 +13,7 @@ use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountExcept
  *
  * @package Packlink\BusinessLogic\Registration
  */
-class RegistrationService extends BaseService
+class RegistrationService extends BaseService implements \Packlink\BusinessLogic\Registration\Interfaces\RegistrationService
 {
     /**
      * Fully qualified name of this class.
@@ -29,11 +29,11 @@ class RegistrationService extends BaseService
     /**
      * Registers a new user on Packlink PRO.
      *
-     * @param \Packlink\BusinessLogic\Registration\RegistrationRequest $request
+     * @param RegistrationRequest $request
      *
      * @return string
      *
-     * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException
+     * @throws UnableToRegisterAccountException
      */
     public function register(RegistrationRequest $request)
     {

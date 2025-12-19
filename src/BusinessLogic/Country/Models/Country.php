@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Country;
+namespace Packlink\BusinessLogic\Country\Models;
 
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDto;
@@ -69,7 +69,7 @@ class Country extends FrontDto
      *
      * @throws FrontDtoValidationException
      */
-    public static function fromArray(array $raw)
+    public static function fromArray(array $raw): Country
     {
         /** @var static $instance */
         $instance = parent::fromArray($raw);
@@ -84,7 +84,7 @@ class Country extends FrontDto
      *
      * @return array DTO in array format.
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array_merge(
             parent::toArray(),

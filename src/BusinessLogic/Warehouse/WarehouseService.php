@@ -17,12 +17,8 @@ use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
  *
  * @package Packlink\BusinessLogic\Warehouse
  */
-class WarehouseService extends BaseService
+class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseService
 {
-    /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
     /**
      * Singleton instance of this class.
      *
@@ -63,7 +59,7 @@ class WarehouseService extends BaseService
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
-    public function updateWarehouseData(array $payload)
+    public function updateWarehouseData($payload)
     {
         $validationErrors = array();
         try {
@@ -109,7 +105,7 @@ class WarehouseService extends BaseService
      * @noinspection PhpUnhandledExceptionInspection
      * @noinspection PhpDocMissingThrowsInspection
      */
-    protected function validatePostalCode(array $payload)
+    protected function validatePostalCode(array $payload): array
     {
         $validationErrors = array();
 

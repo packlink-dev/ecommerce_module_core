@@ -51,7 +51,7 @@ class BrandConfiguration extends DataTransferObject
     /**
      * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array(
             'platform_code' => $this->platformCode,
@@ -69,7 +69,7 @@ class BrandConfiguration extends DataTransferObject
      *
      * @return BrandConfiguration
      */
-    public static function fromArray(array $data)
+    public static function fromArray(array $data): BrandConfiguration
     {
         $result = new static();
 

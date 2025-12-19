@@ -16,12 +16,13 @@ use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
  *
  * @package Packlink\BusinessLogic\OrderShipmentDetails
  */
-class OrderShipmentDetailsService extends BaseService
+class OrderShipmentDetailsService extends BaseService implements \Packlink\BusinessLogic\OrderShipmentDetails\Interfaces\OrderShipmentDetailsService
 {
     /**
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+
     /**
      * Singleton instance of this class.
      *

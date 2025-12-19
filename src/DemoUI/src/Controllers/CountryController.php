@@ -35,7 +35,7 @@ class CountryController extends BaseHttpController
 
         /**
          * @var string $code
-         * @var \Packlink\BusinessLogic\Country\Country $country
+         * @var \Packlink\BusinessLogic\Country\Models\Country $country
          */
         foreach ($countryService->getSupportedCountries() as $code => $country) {
             $result[] = array('value' => $code, 'label' => $country->name);

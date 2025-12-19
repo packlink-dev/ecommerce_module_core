@@ -13,7 +13,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\BootstrapComponent;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -61,7 +61,7 @@ class WebHookHandlerTest extends BaseTestWithServices
 
         $this->cashOnDeliveryService = new TestCashOnDeliveryService();
         ServiceRegister::registerService(
-            CashOnDeliveryServiceInterface::CLASS_NAME,
+            CashOnDeliveryService::CLASS_NAME,
             function () use ($me) {
                 return $me->cashOnDeliveryService;
             }

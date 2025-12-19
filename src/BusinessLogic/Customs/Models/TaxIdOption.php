@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Customs;
+namespace Packlink\BusinessLogic\Customs\Models;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
 

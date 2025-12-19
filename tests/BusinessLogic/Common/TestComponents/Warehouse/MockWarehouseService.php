@@ -19,7 +19,7 @@ class MockWarehouseService extends WarehouseService
         return $this->getWarehouseResult;
     }
 
-    public function updateWarehouseData(array $payload)
+    public function updateWarehouseData( $payload)
     {
         $this->callHistory[] = array('updateWarehouseData' => array($payload));
 

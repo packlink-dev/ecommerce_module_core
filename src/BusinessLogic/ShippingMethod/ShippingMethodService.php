@@ -23,7 +23,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
  *
  * @package Packlink\BusinessLogic\ShippingMethod
  */
-class ShippingMethodService extends BaseService
+class ShippingMethodService extends BaseService implements \Packlink\BusinessLogic\ShippingMethod\Interfaces\ShippingMethodService
 {
     /**
      * Fully qualified name of this class.
@@ -641,7 +641,6 @@ class ShippingMethodService extends BaseService
      * @param QueryFilter $filter Filter for query.
      *
      * @return ShippingMethod[] A list of found shipping methods.
-     * @noinspection PhpIncompatibleReturnTypeInspection
      */
     protected function select($filter = null)
     {

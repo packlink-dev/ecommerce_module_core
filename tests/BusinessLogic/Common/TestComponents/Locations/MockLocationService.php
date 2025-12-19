@@ -13,7 +13,7 @@ class MockLocationService extends LocationService
     public $callHistory = array();
     public $searchLocationsResult = array();
 
-    public function searchLocations($country, $query)
+    public function searchLocations($country, $query): array
     {
         $this->callHistory[] = array('searchLocations' => array($country, $query));
 

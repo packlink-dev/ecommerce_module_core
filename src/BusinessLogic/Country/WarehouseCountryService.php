@@ -2,8 +2,7 @@
 
 namespace Packlink\BusinessLogic\Country;
 
-use Packlink\BusinessLogic\DTO\FrontDtoFactory;
-use Packlink\BusinessLogic\Language\Translator;
+use Packlink\BusinessLogic\Country\Models\Country;
 
 /**
  * Class WarehouseCountryService
@@ -33,7 +32,7 @@ class WarehouseCountryService extends CountryService
      * @noinspection PhpUnhandledExceptionInspection
      * @noinspection PhpDocMissingThrowsInspection
      */
-    public function getSupportedCountries($associative = true)
+    public function getSupportedCountries( $associative = true)
     {
         $countries = $this->getBrandConfigurationService()->get()->warehouseCountries;
         $formattedCountries = $this->formatCountries($countries);
@@ -48,7 +47,7 @@ class WarehouseCountryService extends CountryService
      *
      * @return bool
      */
-    public function isCountrySupported($isoCode)
+    public function isCountrySupported( $isoCode )
     {
         $countries = $this->getBrandConfigurationService()->get()->warehouseCountries;
 

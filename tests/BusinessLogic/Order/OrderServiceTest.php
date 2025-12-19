@@ -11,7 +11,7 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderServic
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
 use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
@@ -111,7 +111,7 @@ class OrderServiceTest extends BaseTestWithServices
 
         $this->cashOnDeliveryService = new TestCashOnDeliveryService();
         ServiceRegister::registerService(
-            CashOnDeliveryServiceInterface::CLASS_NAME,
+            CashOnDeliveryService::CLASS_NAME,
             function () use ($me) {
                 return $me->cashOnDeliveryService;
             }

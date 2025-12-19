@@ -19,13 +19,14 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseService;
 
 /**
  * Class UserAccountService.
  *
  * @package Packlink\BusinessLogic\User
  */
-class UserAccountService extends BaseService
+class UserAccountService extends BaseService implements Interfaces\UserAccountService
 {
     /**
      * Fully qualified name of this interface.
@@ -37,12 +38,14 @@ class UserAccountService extends BaseService
      * @var static
      */
     protected static $instance;
+
     /**
      * Configuration service instance.
      *
      * @var Configuration
      */
     protected $configuration;
+
     /**
      * Proxy instance.
      *

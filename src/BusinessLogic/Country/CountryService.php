@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\Country;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
+use Packlink\BusinessLogic\Country\Models\Country;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
@@ -15,7 +16,7 @@ use Packlink\BusinessLogic\Language\Translator;
  *
  * @package Packlink\BusinessLogic\Country
  */
-class CountryService extends BaseService
+class CountryService extends BaseService implements \Packlink\BusinessLogic\Country\Interfaces\CountryService
 {
     /**
      * Fully qualified name of this class.

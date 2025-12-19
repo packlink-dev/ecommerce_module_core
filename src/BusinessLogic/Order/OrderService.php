@@ -11,7 +11,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\CashOnDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\Draft;
@@ -35,12 +35,13 @@ use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
  *
  * @package Packlink\BusinessLogic\Order
  */
-class OrderService extends BaseService
+class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\Interfaces\OrderService
 {
     /**
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
+
     /**
      * Singleton instance of this class.
      *
@@ -63,7 +64,7 @@ class OrderService extends BaseService
     protected $orderShipmentDetailsService;
 
     /**
-     * @var CashOnDeliveryServiceInterface
+     * @var CashOnDeliveryService
      */
     protected $cashOnDeliveryService;
 
@@ -77,19 +78,18 @@ class OrderService extends BaseService
         $this->shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
+        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryService::CLASS_NAME);
 
     }
 
     /**
      * Prepares shipment draft object for order with provided unique identifier.
      *
-     * @param string $orderId Unique order id.
+     * @param Order $order
      *
      * @return Draft Prepared shipment draft.
      *
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound When order with provided id is not found.
-     * @throws \Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException When order has no items.
+     * @throws EmptyOrderException When order has no items.
      */
     public function prepareDraft(Order $order)
     {
@@ -148,6 +148,7 @@ class OrderService extends BaseService
      * @param string $customsInvoiceId
      *
      * @return void
+     *
      * @throws OrderShipmentDetailsNotFound
      */
     public function updateShipmentCustomsData($reference, $customsInvoiceId)
@@ -360,7 +361,7 @@ class OrderService extends BaseService
         try {
             $cashOnDelivery = $this->cashOnDeliveryService->getCashOnDeliveryConfig();
         } catch (QueryFilterInvalidParamException $exception) {
-            return null;
+            return;
         }
 
         if (!$cashOnDelivery || !$cashOnDelivery->getAccount() || !$cashOnDelivery->isActive() ||

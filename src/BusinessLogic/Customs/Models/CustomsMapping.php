@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Customs;
+namespace Packlink\BusinessLogic\Customs\Models;
 
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDto;
@@ -83,7 +83,7 @@ class CustomsMapping extends FrontDto
      *
      * @throws FrontDtoValidationException
      */
-    public static function fromArray(array $raw)
+    public static function fromArray(array $raw): CustomsMapping
     {
         static::validate($raw);
 
@@ -104,7 +104,7 @@ class CustomsMapping extends FrontDto
      *
      * @return array DTO in array format.
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array(
             'default_reason' => $this->defaultReason,

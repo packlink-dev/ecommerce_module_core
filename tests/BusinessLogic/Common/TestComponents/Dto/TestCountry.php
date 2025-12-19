@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto;
 
-use Packlink\BusinessLogic\Country\Country;
+use Packlink\BusinessLogic\Country\Models\Country;
 
 /**
  * Class TestCountry

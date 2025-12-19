@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\Http\DTO\Customs\Cost;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsInvoice;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsUnionsSearchRequest;
@@ -27,7 +28,7 @@ use Packlink\BusinessLogic\Warehouse\Warehouse;
  *
  * @package Packlink\BusinessLogic\Customs
  */
-class CustomsService
+class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\CustomsService
 {
     /**
      * Fully qualified name of this class.
@@ -90,7 +91,7 @@ class CustomsService
     {
         $warehouse = $this->getWarehouse();
 
-        if (empty($warehouse->city) || empty($warehouse->address) || empty($warehouse->country)
+        if (!$warehouse || empty($warehouse->city) || empty($warehouse->address) || empty($warehouse->country)
             || empty($warehouse->phone) || empty($warehouse->postalCode)
             || (empty($warehouse->name) && empty($warehouse->surname))) {
             return false;

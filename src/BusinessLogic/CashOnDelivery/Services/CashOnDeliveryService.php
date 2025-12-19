@@ -8,13 +8,11 @@ use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
-use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
-class CashOnDeliveryService implements CashOnDeliveryServiceInterface
+class CashOnDeliveryService implements \Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService
 {
     /**
      * @var RepositoryInterface $repository

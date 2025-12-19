@@ -3,8 +3,8 @@
 namespace Packlink\BusinessLogic\Controllers;
 
 use Packlink\BusinessLogic\Country\CountryCodes;
-use Packlink\BusinessLogic\Customs\CustomsMapping;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
+use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 

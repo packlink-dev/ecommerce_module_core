@@ -5,7 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\Country;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestCountry;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Dto\BaseDtoTest;
-use Packlink\BusinessLogic\Country\Country;
+use Packlink\BusinessLogic\Country\Models\Country;
 
 /**
  * Class CountryDtoTest

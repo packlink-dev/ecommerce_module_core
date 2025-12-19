@@ -24,7 +24,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
@@ -119,7 +119,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
         $this->cashOnDeliveryService = new TestCashOnDeliveryService();
         ServiceRegister::registerService(
-            CashOnDeliveryServiceInterface::CLASS_NAME,
+            CashOnDeliveryService::CLASS_NAME,
             function () use ($me) {
                 return $me->cashOnDeliveryService;
             }

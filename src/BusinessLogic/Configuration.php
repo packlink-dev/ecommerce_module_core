@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic;
 
-use Packlink\BusinessLogic\Customs\CustomsMapping;
+use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;

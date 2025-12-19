@@ -22,8 +22,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\CustomsController;
-use Packlink\BusinessLogic\Customs\CustomsMapping;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
+use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DTO\ValidationError;
 
 class CustomsControllerTest extends BaseTestWithServices
