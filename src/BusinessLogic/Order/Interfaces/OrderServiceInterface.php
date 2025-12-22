@@ -14,7 +14,7 @@ use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 
-interface OrderService
+interface OrderServiceInterface
 {
     /**
      * Prepares shipment draft object for the given order.

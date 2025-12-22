@@ -7,7 +7,7 @@ use Packlink\BusinessLogic\Customs\Models\TaxIdOption;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 
-interface CustomsMappingService
+interface CustomsMappingServiceInterface
 {
 
     /**

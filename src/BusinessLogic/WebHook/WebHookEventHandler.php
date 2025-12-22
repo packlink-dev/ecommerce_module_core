@@ -16,7 +16,7 @@ use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsN
  *
  * @package Packlink\BusinessLogic\WebHook
  */
-class WebHookEventHandler extends BaseService implements Interfaces\WebHookEventHandler
+class WebHookEventHandler extends BaseService implements Interfaces\WebHookEventHandlerInterface
 {
     /**
      * Singleton instance of this class.

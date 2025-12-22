@@ -16,7 +16,7 @@ use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\Models\Country;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface as LabelServiceInterface;
 use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
@@ -40,8 +40,9 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseService;
+use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
+use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
 /**
  * Class BootstrapComponent.

@@ -6,7 +6,7 @@ use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 
-interface OrderShipmentDetailsService
+interface OrderShipmentDetailsServiceInterface
 {
     /**
      * Retrieves order shipment details by order ID.

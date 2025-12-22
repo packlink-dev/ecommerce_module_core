@@ -23,7 +23,7 @@ use Packlink\BusinessLogic\BootstrapComponent;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\OAuth\Models\OAuthInfo;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
@@ -336,7 +336,7 @@ class Bootstrap extends BootstrapComponent
         }
 
         ServiceRegister::registerService(
-            CountryService::CLASS_NAME,
+            CountryServiceInterface::CLASS_NAME,
             function () {
                 /** @var FileResolverService $fileResolverService */
                 $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);

@@ -11,7 +11,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\CashOnDeliveryDetails;
 use Packlink\BusinessLogic\Http\DTO\Draft;
@@ -35,7 +35,7 @@ use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
  *
  * @package Packlink\BusinessLogic\Order
  */
-class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\Interfaces\OrderService
+class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\Interfaces\OrderServiceInterface
 {
     /**
      * Fully qualified name of this class.
@@ -64,7 +64,7 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
     protected $orderShipmentDetailsService;
 
     /**
-     * @var CashOnDeliveryService
+     * @var CashOnDeliveryServiceInterface
      */
     protected $cashOnDeliveryService;
 
@@ -78,7 +78,7 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
         $this->shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
         $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryService::CLASS_NAME);
+        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
 
     }
 

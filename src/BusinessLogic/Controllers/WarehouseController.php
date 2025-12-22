@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
-use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseService;
+use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
@@ -15,16 +15,16 @@ class WarehouseController
     /**
      * Warehouse service.
      *
-     * @var WarehouseService
+     * @var WarehouseServiceInterface
      */
     protected $service;
 
     /**
-     * @param WarehouseService $service
+     * @param WarehouseServiceInterface $service
      *
      * WarehouseController constructor.
      */
-    public function __construct(WarehouseService $service)
+    public function __construct(WarehouseServiceInterface $service)
     {
         $this->service = $service;
     }

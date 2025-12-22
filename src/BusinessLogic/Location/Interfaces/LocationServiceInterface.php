@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\Location\Interfaces;
 
-interface LocationService
+interface LocationServiceInterface
 {
     /**
      * Returns array of locations for this shipping method.

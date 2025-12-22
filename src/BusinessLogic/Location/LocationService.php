@@ -21,7 +21,7 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
  *
  * @package Packlink\BusinessLogic\Location
  */
-class LocationService extends BaseService implements \Packlink\BusinessLogic\Location\Interfaces\LocationService
+class LocationService extends BaseService implements \Packlink\BusinessLogic\Location\Interfaces\LocationServiceInterface
 {
     /**
      * Fully qualified name of this class.

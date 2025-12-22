@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\FileResolver\Interfaces;
 
-interface FileResolverService
+interface FileResolverServiceInterface
 {
     /**
      * Returns merged content of the requested source file.

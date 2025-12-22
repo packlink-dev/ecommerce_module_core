@@ -7,10 +7,8 @@ use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
-interface WarehouseService
+interface WarehouseServiceInterface
 {
-    const CLASS_NAME = __CLASS__;
-
     /**
      * Gets a warehouse.
      *

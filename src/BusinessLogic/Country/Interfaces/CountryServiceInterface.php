@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic\Country\Interfaces;
 
 use Packlink\BusinessLogic\Country\Models\Country;
 
-interface CountryService
+interface CountryServiceInterface
 {
     /**
      * Returns a list of supported country DTOs.

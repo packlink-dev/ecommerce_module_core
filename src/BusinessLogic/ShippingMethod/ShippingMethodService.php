@@ -23,7 +23,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
  *
  * @package Packlink\BusinessLogic\ShippingMethod
  */
-class ShippingMethodService extends BaseService implements \Packlink\BusinessLogic\ShippingMethod\Interfaces\ShippingMethodService
+class ShippingMethodService extends BaseService implements \Packlink\BusinessLogic\ShippingMethod\Interfaces\ShippingMethodServiceInterface
 {
     /**
      * Fully qualified name of this class.

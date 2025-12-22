@@ -3,7 +3,7 @@
 namespace Packlink\BusinessLogic\Language;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface as LabelServiceInterface;
 
 /**
  * Class Translator.

@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
@@ -27,7 +27,7 @@ class RegistrationController
      */
     protected $brandConfigurationService;
     /**
-     * @var CountryService
+     * @var CountryServiceInterface
      */
     protected $countryService;
 
@@ -146,12 +146,12 @@ class RegistrationController
     /**
      * Returns an instance of country service.
      *
-     * @return CountryService
+     * @return CountryServiceInterface
      */
     protected function getCountryService()
     {
         if ($this->countryService === null) {
-            $this->countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+            $this->countryService = ServiceRegister::getService(CountryServiceInterface::CLASS_NAME);
         }
 
         return $this->countryService;

@@ -16,7 +16,7 @@ use Packlink\BusinessLogic\Language\Translator;
  *
  * @package Packlink\BusinessLogic\Country
  */
-class CountryService extends BaseService implements \Packlink\BusinessLogic\Country\Interfaces\CountryService
+class CountryService extends BaseService implements \Packlink\BusinessLogic\Country\Interfaces\CountryServiceInterface
 {
     /**
      * Fully qualified name of this class.

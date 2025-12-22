@@ -3,7 +3,7 @@
 namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface;
 use Packlink\BusinessLogic\Utility\UrlService;
 
 /**
@@ -20,8 +20,8 @@ class ConfigurationController
     {
         $lang = UrlService::getUrlLocaleKey();
 
-        /** @var CountryService $countryService */
-        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        /** @var CountryServiceInterface $countryService */
+        $countryService = ServiceRegister::getService(CountryServiceInterface::CLASS_NAME);
 
         return $countryService->getLabel(strtolower($lang), 'configuration.helpUrl');
     }

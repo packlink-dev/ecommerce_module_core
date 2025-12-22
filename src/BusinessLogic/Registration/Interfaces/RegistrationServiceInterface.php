@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\Registration\Interfaces;
 use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 
-interface RegistrationService
+interface RegistrationServiceInterface
 {
 
     /**

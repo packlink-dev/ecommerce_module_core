@@ -8,7 +8,7 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\SystemInfo;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
-interface ShippingMethodService
+interface ShippingMethodServiceInterface
 {
     /**
      * Returns all shipping methods for current user.

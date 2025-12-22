@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\User\Interfaces;
 
-interface UserAccountService
+interface UserAccountServiceInterface
 {
     /**
      * Validates provided API key and initializes user's data.

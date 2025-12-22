@@ -7,7 +7,7 @@ namespace Packlink\BusinessLogic\CountryLabels\Interfaces;
  *
  * @package Packlink\BusinessLogic\CountryLabels\Interfaces
  */
-interface CountryService
+interface CountryServiceInterface
 {
     /**
      * Class name.

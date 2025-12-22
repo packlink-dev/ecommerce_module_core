@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
@@ -16,7 +16,7 @@ use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
  *
  * @package Packlink\BusinessLogic\OrderShipmentDetails
  */
-class OrderShipmentDetailsService extends BaseService implements \Packlink\BusinessLogic\OrderShipmentDetails\Interfaces\OrderShipmentDetailsService
+class OrderShipmentDetailsService extends BaseService implements \Packlink\BusinessLogic\OrderShipmentDetails\Interfaces\OrderShipmentDetailsServiceInterface
 {
     /**
      * Fully qualified name of this class.
@@ -301,8 +301,8 @@ class OrderShipmentDetailsService extends BaseService implements \Packlink\Busin
             $countryCode = $userInfo->country;
         }
 
-        /** @var CountryService $countryService */
-        $countryService = ServiceRegister::getService(CountryService::CLASS_NAME);
+        /** @var CountryServiceInterface $countryService */
+        $countryService = ServiceRegister::getService(CountryServiceInterface::CLASS_NAME);
 
         return $countryService->getLabel(strtolower($countryCode), 'orderListAndDetails.shipmentUrl') . $reference . '/create/address';
     }

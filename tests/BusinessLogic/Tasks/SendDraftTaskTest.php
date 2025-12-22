@@ -19,7 +19,7 @@ use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
 use Packlink\BusinessLogic\Customs\CustomsService;
@@ -83,7 +83,7 @@ class SendDraftTaskTest extends BaseSyncTest
 
         $this->cashOnDeliveryService = new TestCashOnDeliveryService();
         ServiceRegister::registerService(
-            CashOnDeliveryService::CLASS_NAME,
+            CashOnDeliveryServiceInterface::CLASS_NAME,
             function () use ($me) {
                 return $me->cashOnDeliveryService;
             }

@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Http\DTO\CashOnDelivery as CashOnDeliveryDTO;
 
-interface CashOnDeliveryService
+interface CashOnDeliveryServiceInterface
 {
     /**
      * Fully qualified name of this class.

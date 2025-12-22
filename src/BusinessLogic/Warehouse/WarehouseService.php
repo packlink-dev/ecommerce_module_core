@@ -17,8 +17,10 @@ use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
  *
  * @package Packlink\BusinessLogic\Warehouse
  */
-class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseService
+class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface
 {
+    const CLASS_NAME = __CLASS__;
+
     /**
      * Singleton instance of this class.
      *

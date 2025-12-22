@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryService;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
@@ -19,7 +19,7 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 class CashOnDeliveryController
 {
     /**
-     * @var CashOnDeliveryService
+     * @var CashOnDeliveryServiceInterface
      */
     protected $cashOnDeliveryService;
 
@@ -30,7 +30,7 @@ class CashOnDeliveryController
 
     public function __construct(
     ) {
-        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryService::CLASS_NAME);
+        $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 

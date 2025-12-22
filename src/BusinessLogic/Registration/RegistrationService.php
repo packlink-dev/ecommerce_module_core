@@ -13,7 +13,7 @@ use Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountExcept
  *
  * @package Packlink\BusinessLogic\Registration
  */
-class RegistrationService extends BaseService implements \Packlink\BusinessLogic\Registration\Interfaces\RegistrationService
+class RegistrationService extends BaseService implements \Packlink\BusinessLogic\Registration\Interfaces\RegistrationServiceInterface
 {
     /**
      * Fully qualified name of this class.

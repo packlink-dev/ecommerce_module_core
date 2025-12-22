@@ -20,7 +20,7 @@ use Packlink\BusinessLogic\Http\Proxy;
  *
  * @package Packlink\BusinessLogic\Customs
  */
-abstract class CustomsMappingService implements \Packlink\BusinessLogic\Customs\Interfaces\CustomsMappingService
+abstract class CustomsMappingService implements \Packlink\BusinessLogic\Customs\Interfaces\CustomsMappingServiceInterface
 {
     /**
      * Fully qualified name of this class.

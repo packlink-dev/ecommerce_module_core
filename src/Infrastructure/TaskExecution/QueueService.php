@@ -13,6 +13,7 @@ use Logeecom\Infrastructure\TaskExecution\Events\QueueStatusChangedEvent;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -22,7 +23,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
  *
  * @package Logeecom\Infrastructure\TaskExecution
  */
-class QueueService
+class QueueService implements QueueServiceInterface
 {
     /**
      * Fully qualified name of this class.

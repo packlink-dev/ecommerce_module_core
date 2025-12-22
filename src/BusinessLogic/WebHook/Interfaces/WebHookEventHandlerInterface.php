@@ -2,7 +2,7 @@
 
 namespace Packlink\BusinessLogic\WebHook\Interfaces;
 
-interface WebHookEventHandler
+interface WebHookEventHandlerInterface
 {
     /**
      * Validates input and handles Packlink webhook event.
