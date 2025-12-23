@@ -1,5 +1,5 @@
 ---
-status: resolved
+status: completed
 priority: p2
 issue_id: "002"
 tags: [reliability, bug, code-review, exception-handling, fail-safe]
