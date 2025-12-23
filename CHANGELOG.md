@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.7.2] - 2025-12-23
+### Fixed
+- **Performance:** TaskRunner now stops wakeup loop when queue is empty (#57)
+  - Reduces CPU usage by 90-97% on idle systems
+  - Added `hasPendingTasks()` with LIMIT 1 optimization
+  - Implemented narrow fail-safe for query-specific exceptions
+  - 100% backward compatible - no breaking changes
+
 ## [3.7.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.0...v3.7.1) - 2025-10-20
 ### Changed
 - Add postal code for South Korea
