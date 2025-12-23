@@ -248,7 +248,7 @@ class TaskRunner
         $this->getRunnerStorage()->setStatus(TaskRunnerStatus::createNullStatus());
 
         // KILLSWITCH: Only wake up if there are pending tasks
-        if ($this->hasPendingTasks()) {
+        if ($this->getQueue()->hasPendingWork()) {
             $this->logDebug(array('Message' => 'Task runner: sending wakeup signal (tasks found).'));
             $this->getTaskWakeup()->wakeup();
         } else {
@@ -411,63 +411,6 @@ class TaskRunner
         $minimalSleepTime  = $configurationValue !== null ? $configurationValue : self::WAKEUP_DELAY;
 
         return $minimalSleepTime + ceil($this->batchSleepTime);
-    }
-
-    /**
-     * Checks if there are any pending tasks in the queue.
-     * Uses LIMIT 1 for optimal performance on large tables.
-     *
-     * @return bool TRUE if pending tasks exist; FALSE if idle.
-     */
-    private function hasPendingTasks()
-    {
-        try {
-            // Check for QUEUED tasks (most common state)
-            $queuedItems = $this->getQueue()->findOldestQueuedItems(1);
-            if (!empty($queuedItems)) {
-                $this->logDebug(array(
-                    'Message' => 'Killswitch: Found queued tasks',
-                    'Count' => count($queuedItems),
-                    'Decision' => 'WAKE'
-                ));
-                return true;
-            }
-
-            // CRITICAL FIX (Kieran): Add LIMIT to findRunningItems()
-            // Check for IN_PROGRESS tasks with limit
-            $runningItems = $this->getQueue()->findRunningItems(1);
-            if (!empty($runningItems)) {
-                $this->logDebug(array(
-                    'Message' => 'Killswitch: Found running tasks',
-                    'Count' => count($runningItems),
-                    'Decision' => 'WAKE'
-                ));
-                return true;
-            }
-
-            $this->logDebug(array(
-                'Message' => 'Killswitch: No pending tasks',
-                'Decision' => 'IDLE'
-            ));
-            return false;
-
-        } catch (\Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException $ex) {
-            // CRITICAL FIX (Kieran): Narrow exception handling
-            // Only catch query-specific exceptions, not all exceptions
-            $this->logWarning(array(
-                'Message' => 'Killswitch: Query failed, assuming tasks exist (fail-safe)',
-                'ExceptionType' => get_class($ex),
-                'ExceptionMessage' => $ex->getMessage()
-            ));
-            return true;
-        } catch (\Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException $ex) {
-            $this->logWarning(array(
-                'Message' => 'Killswitch: Repository error, assuming tasks exist (fail-safe)',
-                'ExceptionType' => get_class($ex),
-                'ExceptionMessage' => $ex->getMessage()
-            ));
-            return true;
-        }
     }
 
     /**
