@@ -148,15 +148,15 @@ private function wakeup()
 **Status:** ✅ **Verified working, CPU usage dropped 97%**
 
 **Before Fix:**
-![CPU Usage Before](screenshot-before.png)
+![CPU Usage Before](https://github.com/kamikaziii/ecommerce_module_core/raw/perf/taskrunner-killswitch-idle-detection-57/screenshot-before.png)
 *Constant ~120,000 CPU seconds/day after Packlink activation*
 
 **After Fix (Hourly Impact):**
-![CPU Usage Drop - Hourly](screenshot-afterByHour.png)
+![CPU Usage Drop - Hourly](https://github.com/kamikaziii/ecommerce_module_core/raw/perf/taskrunner-killswitch-idle-detection-57/screenshot-afterByHour.png)
 *Immediate drop to near-zero at 12:05 PM deployment*
 
 **After Fix (Daily Timeline):**
-![CPU Usage - Full Journey](screenshot-afterByDay.png)
+![CPU Usage - Full Journey](https://github.com/kamikaziii/ecommerce_module_core/raw/perf/taskrunner-killswitch-idle-detection-57/screenshot-afterByDay.png)
 *Complete optimization journey from 120,000/day to <1,000/day*
 
 ### Database Verification
@@ -484,17 +484,17 @@ wp db query "SELECT MAX(id), COUNT(*) FROM pzn_packlink_entity WHERE type='Proce
 
 ### Before Fix: Continuous CPU Drain
 
-![CPU Usage Before Killswitch](screenshot-before.png)
+![CPU Usage Before Killswitch](https://github.com/kamikaziii/ecommerce_module_core/raw/perf/taskrunner-killswitch-idle-detection-57/screenshot-before.png)
 _Dec 2-15, 2025: Packlink plugin activation caused immediate spike to 120,000+ CPU seconds/day, settling to constant ~40,000/day drain from infinite wakeup loop_
 
 ### After Fix: Immediate Impact (Hourly View)
 
-![CPU Usage Drop - Hourly](screenshot-afterByHour.png)
+![CPU Usage Drop - Hourly](https://github.com/kamikaziii/ecommerce_module_core/raw/perf/taskrunner-killswitch-idle-detection-57/screenshot-afterByHour.png)
 _Dec 23, 2025: Hourly breakdown showing dramatic drop from ~4,000 seconds/hour to near-zero after killswitch deployment at 12:05 PM UTC_
 
 ### After Fix: Complete Optimization Journey (Daily View)
 
-![CPU Usage After - Full Timeline](screenshot-afterByDay.png)
+![CPU Usage After - Full Timeline](https://github.com/kamikaziii/ecommerce_module_core/raw/perf/taskrunner-killswitch-idle-detection-57/screenshot-afterByDay.png)
 _Dec 2-24, 2025: Complete journey showing (1) Initial Packlink spike, (2) Partial reduction via WPGraphQL/Memcached optimizations, (3) Final drop to idle state after killswitch fix - from 120,000/day peak to <1,000/day_
 
 ---
