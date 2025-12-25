@@ -233,22 +233,22 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
     /**
      * Initializes events.
      */
-    protected static function initEvents()
-    {
-        parent::initEvents();
-
-        /** @var EventBus $eventBuss */
-        $eventBuss = ServiceRegister::getService(EventBus::CLASS_NAME);
-
-        // subscribe tick event listener
-        $eventBuss->when(
-            TickEvent::CLASS_NAME,
-            function () {
-                $handler = new ScheduleTickHandler();
-                $handler->handle();
-            }
-        );
-    }
+//    protected static function initEvents()
+//    {
+//        parent::initEvents();
+//
+//        /** @var EventBus $eventBuss */
+//        $eventBuss = ServiceRegister::getService(EventBus::CLASS_NAME);
+//
+//        // subscribe tick event listener
+//        $eventBuss->when(
+//            TickEvent::CLASS_NAME,
+//            function () {
+//                $handler = new ScheduleTickHandler();
+//                $handler->handle();
+//            }
+//        );
+//    }
 
     /**
      * Initializes the registry of DTO classes.
