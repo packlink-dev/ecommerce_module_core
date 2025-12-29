@@ -135,7 +135,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         );
 
         TestServiceRegister::registerService(
-            \Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface::CLASS_NAME,
+            \Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService::CLASS_NAME,
             function () {
                 $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
 

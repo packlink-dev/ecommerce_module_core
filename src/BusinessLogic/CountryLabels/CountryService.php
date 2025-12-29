@@ -4,7 +4,7 @@ namespace Packlink\BusinessLogic\CountryLabels;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
-use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryServiceInterface as BaseService;
+use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as BaseService;
 
 /**
  * Class CountryService

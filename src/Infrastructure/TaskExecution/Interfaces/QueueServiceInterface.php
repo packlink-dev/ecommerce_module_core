@@ -11,6 +11,11 @@ use Logeecom\Infrastructure\TaskExecution\Task;
 interface QueueServiceInterface
 {
     /**
+     * Fully qualified name of this class.
+     */
+    const CLASS_NAME = __CLASS__;
+
+    /**
      * Enqueues queue item to a given queue and stores changes.
      *
      * @param string $queueName Name of a queue where queue item should be queued.

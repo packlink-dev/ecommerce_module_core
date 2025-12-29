@@ -26,10 +26,6 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 class QueueService implements QueueServiceInterface
 {
     /**
-     * Fully qualified name of this class.
-     */
-    const CLASS_NAME = __CLASS__;
-    /**
      * Maximum failure retries count
      */
     const MAX_RETRIES = 5;
