@@ -39,9 +39,9 @@ class TaskExecutionConfig
      *
      * @param string $queueName Queue name.
      * @param int $priority Task priority (0-100).
-     * @param string $context Execution context.
+     * @param string|null $context Execution context.
      */
-    public function __construct(string $queueName, int $priority, string $context = '')
+    public function __construct(string $queueName, int $priority, $context = '')
     {
         $this->queueName = $queueName;
         $this->priority = $priority;
