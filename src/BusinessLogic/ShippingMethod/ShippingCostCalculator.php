@@ -97,6 +97,15 @@ class ShippingCostCalculator
             return array();
         }
 
+        // CRITICAL: Validate destination exists before calculating shipping
+        // Defense-in-depth for warehouse fallback bug. Prevents incorrect cost calculation
+        // when destination country is missing. Plugin should catch this first via is_available(),
+        // but this ensures core library never returns invalid costs.
+        if (empty($toCountry)) {
+            Logger::logWarning('ShippingCostCalculator: Destination country is required for cost calculation. Skipping.');
+            return array();
+        }
+
         $result = array();
         $package = self::preparePackages($packages);
         try {
