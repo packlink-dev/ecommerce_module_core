@@ -4,6 +4,7 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use BadMethodCallException;
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Interfaces\QueueItemRepository;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
@@ -354,13 +355,19 @@ class QueueService
      *
      * Finds queue items with status "in_progress".
      *
+     * @param int|null $limit Optional limit for number of items to return.
+     *
      * @return QueueItem[] Running queue items.
      */
-    public function findRunningItems()
+    public function findRunningItems($limit = null)
     {
         $filter = new QueryFilter();
         /** @noinspection PhpUnhandledExceptionInspection */
         $filter->where('status', '=', QueueItem::IN_PROGRESS);
+
+        if ($limit !== null) {
+            $filter->setLimit($limit);
+        }
 
         return $this->getStorage()->select($filter);
     }
@@ -391,6 +398,47 @@ class QueueService
         $result = !empty($result) ? call_user_func_array('array_merge', $result) : $result;
 
         return array_slice($result, 0, $limit);
+    }
+
+    /**
+     * Checks if there is any pending work in the queue.
+     * Used by TaskRunner killswitch to determine if wakeup is needed.
+     *
+     * Optimized with LIMIT 1 queries and fail-safe behavior.
+     *
+     * @return bool TRUE if work exists (queued or running); FALSE if idle.
+     */
+    public function hasPendingWork()
+    {
+        try {
+            // Check for QUEUED tasks
+            $queuedItems = $this->findOldestQueuedItems(1);
+            if (!empty($queuedItems)) {
+                return true;
+            }
+
+            // Check for IN_PROGRESS tasks
+            $runningItems = $this->findRunningItems(1);
+            if (!empty($runningItems)) {
+                return true;
+            }
+
+            return false;
+
+        } catch (\Exception $ex) {
+            // Fail-safe: assume work exists to prevent permanent idle
+            Logger::logWarning(
+                'Killswitch: Query failed, assuming tasks exist (fail-safe)',
+                'Core',
+                array(
+                    'Message' => 'Killswitch: Query failed, assuming tasks exist (fail-safe)',
+                    'ExceptionType' => get_class($ex),
+                    'ExceptionMessage' => $ex->getMessage()
+                )
+            );
+
+            return true;
+        }
     }
 
     /**

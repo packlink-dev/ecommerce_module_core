@@ -238,15 +238,23 @@ class TaskRunner
     {
         $this->logDebug(array('Message' => 'Task runner: starting self deactivation.'));
 
+        // Sleep with periodic keepalive signals
         for ($i = 0; $i < $this->getWakeupDelay(); $i++) {
             $this->getTimeProvider()->sleep(1);
             $this->keepAlive();
         }
 
+        // Deactivate this runner instance
         $this->getRunnerStorage()->setStatus(TaskRunnerStatus::createNullStatus());
 
-        $this->logDebug(array('Message' => 'Task runner: sending task runner wakeup signal.'));
-        $this->getTaskWakeup()->wakeup();
+        // KILLSWITCH: Only wake up if there are pending tasks
+        if ($this->getQueue()->hasPendingWork()) {
+            $this->logDebug(array('Message' => 'Task runner: sending wakeup signal (tasks found).'));
+            $this->getTaskWakeup()->wakeup();
+        } else {
+            $this->logDebug(array('Message' => 'Task runner: going idle (no tasks, killswitch active).'));
+            // No wakeup → TaskRunner stays idle until external trigger
+        }
     }
 
     /**

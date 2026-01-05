@@ -20,6 +20,11 @@ class TestTaskRunnerWakeupService extends TaskRunnerWakeupService
 
     public function wakeup()
     {
-        $this->callHistory['wakeup'][] = array();
+        // Track the wakeup attempt BEFORE calling parent
+        // This allows us to count ALL wakeup attempts (including those blocked by GUID)
+        $this->callHistory['wakeup'][] = array('timestamp' => time());
+
+        // Call parent to execute actual GUID locking logic
+        parent::wakeup();
     }
 }
