@@ -10,10 +10,10 @@ interface TaskStatusProviderInterface
     const CLASS_NAME = __CLASS__;
 
     /**
-     * @param string $businessTaskClass FQN business task-a (npr UpdateShippingServicesBusinessTask::class)
+     * @param string $type
      * @param string $context
      *
      * @return array{status:string, message:string|null}
      */
-    public function getLatestStatus(string $businessTaskClass, string $context = ''): array;
+    public function getLatestStatus(string $type, string $context = ''): array;
 }

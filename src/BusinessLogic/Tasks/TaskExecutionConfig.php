@@ -71,9 +71,10 @@ class TaskExecutionConfig
     /**
      * Get context.
      *
-     * @return string Context (shop ID, tenant ID, etc.).
+     * @return string|null
+     * Context (shop ID, tenant ID, etc.).
      */
-    public function getContext(): string
+    public function getContext()
     {
         return $this->context;
     }

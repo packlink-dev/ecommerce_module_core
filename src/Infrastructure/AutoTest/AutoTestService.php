@@ -13,6 +13,8 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\TaskAdapter;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\AutoTestBusinessTask;
 
 /**
  * Class AutoTestService.
@@ -52,7 +54,10 @@ class AutoTestService
 
         /** @var QueueService $queueService */
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-        $queueItem = $queueService->enqueue('Auto-test', new AutoTestTask('DUMMY TEST DATA'));
+        $queueItem = $queueService->enqueue(
+            'Auto-test',
+            new TaskAdapter(new AutoTestBusinessTask('DUMMY TEST DATA'))
+        );
 
         return $queueItem->getId();
     }
@@ -96,7 +101,7 @@ class AutoTestService
         if ($queueItemId) {
             $filter->where('id', Operators::EQUALS, $queueItemId);
         } else {
-            $filter->where('taskType', Operators::EQUALS, 'AutoTestTask');
+            $filter->where('queueName', Operators::EQUALS, 'Auto-test');
             $filter->orderBy('queueTime', 'DESC');
         }
 

@@ -107,4 +107,18 @@ class ManualRefreshController
 
         return $taskStatus;
     }
+
+    /**
+     * Configuration service instance.
+     *
+     * @return Configuration
+     */
+    protected function getConfigService(): Configuration
+    {
+        if ($this->configuration === null) {
+            $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+        }
+
+        return $this->configuration;
+    }
 }

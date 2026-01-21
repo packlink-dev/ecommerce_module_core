@@ -20,9 +20,9 @@ class QueueTaskStatusProvider implements Interfaces\TaskStatusProviderInterface
     /**
      * @inheritDoc
      */
-    public function getLatestStatus(string $businessTaskClass, string $context = ''): array
+    public function getLatestStatus(string $type, string $context = ''): array
     {
-        $item = $this->queueService->findLatestByType($businessTaskClass, $context);
+        $item = $this->queueService->findLatestByType($type, $context);
 
         if($item === null){
             return [];

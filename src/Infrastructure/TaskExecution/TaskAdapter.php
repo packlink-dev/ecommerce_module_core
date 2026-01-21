@@ -121,9 +121,9 @@ class TaskAdapter extends Task
      *
      * @return string Task class name.
      */
-    public static function getClassName()
+    public function getType()
     {
-        return 'TaskAdapter';
+        return $this->businessTaskClass ?: parent::getType();
     }
 
     public static function fromArray(array $array)
