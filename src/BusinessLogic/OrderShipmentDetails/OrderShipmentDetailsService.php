@@ -9,6 +9,8 @@ use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
+use Packlink\BusinessLogic\ShipmentDraft\Utility\DraftStatus;
+use Packlink\BusinessLogic\ShipmentDraft\Utility\DraftStatusMapper;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
 
 /**
@@ -260,6 +262,84 @@ class OrderShipmentDetailsService extends BaseService implements \Packlink\Busin
         return $orderDetails === null || $orderDetails->isDeleted();
     }
 
+    /**
+     * Returns draft status for order.
+     *
+     * @param string|int $orderId
+     *
+     * @return string
+     */
+    public function getDraftStatus($orderId)
+    {
+        $orderDetails = $this->getDetailsByOrderId($orderId);
+        if ($orderDetails === null) {
+            return DraftStatus::NOT_QUEUED;
+        }
+
+        $draftStatus = $orderDetails->getDraftStatus();
+        return !empty($draftStatus) ? $draftStatus : DraftStatus::NOT_QUEUED;
+    }
+
+    /**
+     * Returns draft error message for order, if any.
+     *
+     * @param string|int $orderId
+     *
+     * @return string|null
+     */
+    public function getDraftError($orderId)
+    {
+        $orderDetails = $this->getDetailsByOrderId($orderId);
+        if ($orderDetails === null) {
+            return null;
+        }
+
+        $draftError = $orderDetails->getDraftError();
+        return !empty($draftError) ? $draftError : null;
+    }
+
+    /**
+     * Returns draft reference for order, if any.
+     *
+     * @param string|int $orderId
+     *
+     * @return string|null
+     */
+    public function getDraftReference($orderId)
+    {
+        $orderDetails = $this->getDetailsByOrderId($orderId);
+
+        return $orderDetails ? $orderDetails->getReference() : null;
+    }
+
+    /**
+     * Set draft status for order.
+     *
+     *
+     * @param string $orderId Order ID.
+     * @param string $status Draft status: 'processing', 'completed', 'failed'.
+     * @param string|null $error Error message if failed.
+     */
+    public function setDraftStatus($orderId, $status, $error = null)
+    {
+        $orderDetails = $this->getDetailsByOrderId($orderId);
+
+        if ($orderDetails === null) {
+            $orderDetails = new OrderShipmentDetails();
+            $orderDetails->setOrderId($orderId);
+        }
+
+        $draftStatus = DraftStatus::isValid($status) ? $status : DraftStatus::NOT_QUEUED;
+        $orderDetails->setDraftStatus($draftStatus);
+        $orderDetails->setDraftError(null);
+        $orderDetails->setShippingStatus(DraftStatusMapper::toShipmentStatus($draftStatus));
+
+        if ($draftStatus === DraftStatus::FAILED && $error) {
+            $orderDetails->setDraftError($error);
+        }
+
+        $this->repository->persist($orderDetails);
+    }
     /**
      * Retrieves order shipment details.
      * Throws an exception if shipment details do not exist and throwing is requested.

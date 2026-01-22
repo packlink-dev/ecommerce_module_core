@@ -20,6 +20,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepos
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskExecutor;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
@@ -34,9 +35,9 @@ use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
-use Packlink\BusinessLogic\ShipmentDraft\Objects\ShipmentDraftStatus;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
+use Packlink\BusinessLogic\ShipmentDraft\Utility\DraftStatus;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
@@ -57,6 +58,10 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @var OrderSendDraftTaskMapService
      */
     public $orderSendDraftTaskMapService;
+    /**
+     * @var TestTaskExecutor
+     */
+    public $taskExecutor;
 
     /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
 
@@ -139,6 +144,15 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
+        $taskExecutor = new TestTaskExecutor();
+        $me->taskExecutor = $taskExecutor;
+        TestServiceRegister::registerService(
+            \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface::CLASS_NAME,
+            function () use ($taskExecutor) {
+                return $taskExecutor;
+            }
+        );
+
         TestServiceRegister::registerService(
             ShopOrderService::CLASS_NAME,
             function () {
@@ -209,8 +223,9 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
 
         $draftStatus = $this->draftShipmentService->getDraftStatus('test');
 
-        $this->assertEquals(QueueItem::QUEUED, $draftStatus->status);
+        $this->assertEquals(DraftStatus::PROCESSING, $draftStatus->status);
         $this->assertEmpty($draftStatus->message);
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
     }
 
     public function testSchedulesNotCreatedForCurrentUsers()
@@ -234,25 +249,17 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      */
     public function testCreateDelayedDraft()
     {
-        /** @var TimeProvider $timeProvider */
-        $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
-        $now = $timeProvider->getCurrentLocalTime();
         $delay = 8;
 
         $this->draftShipmentService->enqueueCreateShipmentDraftTask('test', true, $delay);
 
         $draftStatus = $this->draftShipmentService->getDraftStatus('test');
 
-        $this->assertEquals(ShipmentDraftStatus::DELAYED, $draftStatus->status);
+        $this->assertEquals(DraftStatus::DELAYED, $draftStatus->status);
         $this->assertEmpty($draftStatus->message);
 
-        $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
-        /** @var Schedule[] $schedules */
-        $schedules = $repository->select();
-
-        $this->assertCount(1, $schedules);
-        $this->assertInstanceOf('\\Packlink\\BusinessLogic\\Tasks\\SendDraftTask', $schedules[0]->getTask());
-        $this->assertEquals($delay * 60, $schedules[0]->getNextSchedule()->getTimestamp() - $now->getTimestamp());
+        $this->assertCount(1, $this->taskExecutor->scheduledTasks);
+        $this->assertEquals($delay * 60, $this->taskExecutor->scheduledTasks[0]['delaySeconds']);
     }
 
     /**
@@ -267,15 +274,11 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     public function testDoubleCreate()
     {
         $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
-
-        $map = $this->orderSendDraftTaskMapService->getOrderTaskMap('test');
-        $this->assertNotEmpty($map->getExecutionId());
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
 
         // draft task should not be created twice
         $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
-        $map2 = $this->orderSendDraftTaskMapService->getOrderTaskMap('test');
-
-        $this->assertEquals($map->getId(), $map2->getId());
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
     }
 
     /**
@@ -285,7 +288,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     {
         $draftStatus = $this->draftShipmentService->getDraftStatus('test');
 
-        $this->assertEquals(ShipmentDraftStatus::NOT_QUEUED, $draftStatus->status);
+        $this->assertEquals(DraftStatus::NOT_QUEUED, $draftStatus->status);
         $this->assertEmpty($draftStatus->message);
     }
 
@@ -302,25 +305,13 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      */
     public function testStatusFailed()
     {
-        /** @var TestHttpClient $httpClient */
-        $httpClient = ServiceRegister::getService(HttpClient::CLASS_NAME);
-        $httpClient->setMockResponses($this->getMockResponses());
-
-        $this->draftShipmentService->enqueueCreateShipmentDraftTask('test');
-
-        $map = $this->orderSendDraftTaskMapService->getOrderTaskMap('test');
-
-        /** @var QueueService $queueService */
-        $queueService = TestServiceRegister::getService(QueueService::CLASS_NAME);
-        $queueItem = $queueService->find($map->getExecutionId());
-        $queueService->start($queueItem);
-        $queueItem->setRetries(6);
-        $queueService->fail($queueItem, 'Error in task.');
+        $detailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+        $detailsService->setDraftStatus('test', DraftStatus::FAILED, 'Error in task.');
 
         $draftStatus = $this->draftShipmentService->getDraftStatus('test');
 
-        $this->assertEquals(QueueItem::FAILED, $draftStatus->status);
-        $this->assertEquals('Attempt 7: Error in task.', $draftStatus->message);
+        $this->assertEquals(DraftStatus::FAILED, $draftStatus->status);
+        $this->assertEquals('Error in task.', $draftStatus->message);
     }
 
     public function testDraftExpired()

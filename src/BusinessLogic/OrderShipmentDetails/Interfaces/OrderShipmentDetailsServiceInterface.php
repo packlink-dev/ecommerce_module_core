@@ -134,4 +134,31 @@ interface OrderShipmentDetailsServiceInterface
      * @return bool
      */
     public function isShipmentDeleted($shipmentReference);
+
+    /**
+     * Returns draft status for order.
+     *
+     * @param string|int $orderId
+     *
+     * @return string
+     */
+    public function getDraftStatus($orderId);
+
+    /**
+     * Returns draft error message for order, if any.
+     *
+     * @param string|int $orderId
+     *
+     * @return string|null
+     */
+    public function getDraftError($orderId);
+
+    /**
+     * Returns draft reference for order, if any.
+     *
+     * @param string|int $orderId
+     *
+     * @return string|null
+     */
+    public function getDraftReference($orderId);
 }

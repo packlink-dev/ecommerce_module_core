@@ -33,6 +33,8 @@ class OrderShipmentDetails extends Entity
         'shipmentLabels',
         'status',
         'lastStatusUpdateTime',
+        'draftStatus',
+        'draftError',
         'carrierTrackingNumbers',
         'carrierTrackingUrl',
         'shippingCost',
@@ -78,6 +80,18 @@ class OrderShipmentDetails extends Entity
      * @var \DateTime
      */
     private $lastStatusUpdateTime;
+    /**
+     * Draft status for shipment creation.
+     *
+     * @var string|null
+     */
+    private $draftStatus;
+    /**
+     * Draft error message, if any.
+     *
+     * @var string|null
+     */
+    private $draftError;
     /**
      * Array of carrier tracking numbers.
      *
@@ -299,6 +313,47 @@ class OrderShipmentDetails extends Entity
             $this->lastStatusUpdateTime = $timeProvider->getDateTime($updateTime);
         }
     }
+
+    /**
+     * Returns draft status.
+     *
+     * @return string|null
+     */
+    public function getDraftStatus()
+    {
+        return $this->draftStatus;
+    }
+
+    /**
+     * Sets draft status.
+     *
+     * @param string|null $status
+     */
+    public function setDraftStatus($status)
+    {
+        $this->draftStatus = $status;
+    }
+
+    /**
+     * Returns draft error message.
+     *
+     * @return string|null
+     */
+    public function getDraftError()
+    {
+        return $this->draftError;
+    }
+
+    /**
+     * Sets draft error message.
+     *
+     * @param string|null $error
+     */
+    public function setDraftError($error)
+    {
+        $this->draftError = $error;
+    }
+
 
     /**
      * Returns array of carrier tracking numbers.
