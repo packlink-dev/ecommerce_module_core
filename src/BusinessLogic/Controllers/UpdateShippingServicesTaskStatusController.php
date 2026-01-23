@@ -8,6 +8,7 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 
 /**
  * Class UpdateShippingServicesTaskStatusController.
@@ -69,7 +70,7 @@ class UpdateShippingServicesTaskStatusController
     protected function buildCondition($context = '')
     {
         $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesTask');
+        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
         if (!empty($context)) {
             $filter->where('context', Operators::EQUALS, $context);
         }

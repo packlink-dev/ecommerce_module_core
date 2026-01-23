@@ -88,14 +88,12 @@ class SendDraftBusinessTask implements BusinessTask
         yield 5;
 
         try {
-            $this->getOrderShipmentDetailsService()->setDraftStatus($this->orderId, DraftStatus::PROCESSING);
-
+            $this->markDraftStatus(DraftStatus::PROCESSING);
             yield 10;
 
             if ($this->shouldNotSynchronize()) {
-                Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
-
-                $this->getOrderShipmentDetailsService()->setDraftStatus($this->orderId, DraftStatus::COMPLETED);
+                $this->logDraftAlreadyCreated();
+                $this->markDraftStatus(DraftStatus::COMPLETED);
 
                 yield 100;
 
@@ -104,68 +102,40 @@ class SendDraftBusinessTask implements BusinessTask
 
             yield 20;
 
-            // Get order data and prepare draft
-            try {
-                $order = $this->getShopOrderService()->getOrderAndShippingData($this->orderId);
-                $draft = $this->getOrderService()->prepareDraft($order);
-            } catch (EmptyOrderException $e) {
-                // ✅ Empty order - abort (using OrderShipmentDetails for error tracking)
-                $this->getOrderShipmentDetailsService()->setDraftStatus(
-                    $this->orderId,
-                    DraftStatus::FAILED,
-                    'Empty order: ' . $e->getMessage()
-                );
-
-                throw $e;
-            }
+            $order = $this->getShopOrderService()->getOrderAndShippingData($this->orderId);
+            $draft = $this->getOrderService()->prepareDraft($order);
 
             yield 40;
 
-            try {
-                $this->createCustomsInvoice($draft, $order);
-            } catch (Exception $e) {
-                Logger::logWarning('Failed to create customs invoice for order ' . $this->orderId
-                    . ' because: ' . $e->getMessage());
-            }
+            $this->tryCreateCustomsInvoice($draft, $order);
 
             yield 50;
 
-            // Send draft to Packlink API
-            yield; // Keep-alive before API call
-            $reference = $this->getProxy()->sendDraft($draft);
-            Logger::logInfo(
-                'Sent draft shipment for order ' . $this->orderId
-                . '. Created reference: ' . $reference
-                . '. Draft details: ' . json_encode($draft->toArray())
-            );
+            $reference = $this->sendDraft($draft);
 
-            yield 70; // Draft sent to API
+            yield 70;
 
-            // ✅ Save reference to OrderShipmentDetails (unified entity)
             $this->getOrderService()->setReference($this->orderId, $reference);
 
-            yield 80; // Reference saved
+            yield 80;
 
-            // Get shipment data back from API
-            yield; // Keep-alive before API call
             $shipment = $this->getProxy()->getShipment($reference);
 
             if ($shipment) {
-                $this->getOrderService()->updateShipmentData($shipment, isset($draft->customs) ? $draft->customs->customsInvoiceId : '');
+                $customsId = isset($draft->customs) ? $draft->customs->customsInvoiceId : '';
+                $this->getOrderService()->updateShipmentData($shipment, $customsId);
             }
 
-            yield 90; // Shipment data retrieved
+            yield 90;
 
-            // ✅ Update: completed (using OrderShipmentDetails)
-            $this->getOrderShipmentDetailsService()->setDraftStatus($this->orderId, DraftStatus::COMPLETED);
+            $this->markDraftStatus(DraftStatus::COMPLETED);
 
-            yield 100; // Completed
-
+            yield 100;
+        } catch (EmptyOrderException $e) {
+            $this->markDraftStatus(DraftStatus::FAILED, 'Empty order: ' . $e->getMessage());
+            throw $e;
         } catch (Exception $e) {
-            // ✅ Update: failed (using OrderShipmentDetails for error tracking)
-            $this->getOrderShipmentDetailsService()->setDraftStatus($this->orderId, DraftStatus::FAILED, $e->getMessage());
-
-            // Re-throw for executor retry
+            $this->markDraftStatus(DraftStatus::FAILED, $e->getMessage());
             throw $e;
         }
     }
@@ -229,6 +199,62 @@ class SendDraftBusinessTask implements BusinessTask
         $reference = $shipmentDetails->getReference();
 
         return !empty($reference);
+    }
+
+    /**
+     * @param string $status
+     * @param string|null $error
+     *
+     * @return void
+     */
+    private function markDraftStatus($status, $error = null)
+    {
+        $this->getOrderShipmentDetailsService()->setDraftStatus($this->orderId, $status, $error);
+    }
+
+    /**
+     * @param Draft $draft
+     * @param Order $order
+     *
+     * @return void
+     */
+    private function tryCreateCustomsInvoice(Draft $draft, Order $order)
+    {
+        try {
+            $this->createCustomsInvoice($draft, $order);
+        } catch (Exception $e) {
+            Logger::logWarning(
+                'Failed to create customs invoice for order ' . $this->orderId . ' because: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @param Draft $draft
+     *
+     * @return string
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    private function sendDraft(Draft $draft)
+    {
+        $reference = $this->getProxy()->sendDraft($draft);
+        Logger::logInfo(
+            'Sent draft shipment for order ' . $this->orderId
+            . '. Created reference: ' . $reference
+            . '. Draft details: ' . json_encode($draft->toArray())
+        );
+
+        return $reference;
+    }
+
+    /**
+     * @return void
+     */
+    private function logDraftAlreadyCreated()
+    {
+        Logger::logInfo("Draft for order [{$this->orderId}] has been already created. Task is terminating.");
     }
 
     /**

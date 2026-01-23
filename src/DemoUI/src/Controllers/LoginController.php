@@ -2,7 +2,8 @@
 
 namespace Packlink\DemoUI\Controllers;
 
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\DemoUI\Controllers\Models\Request;
 use Packlink\DemoUI\Services\Integration\UrlService;
 
@@ -14,9 +15,18 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 class LoginController extends BaseHttpController
 {
     /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
+    /**
      * @var bool
      */
     protected $requiresAuthentication = false;
+
+    public function __construct(TaskExecutorInterface $taskExecutor)
+    {
+        $this->taskExecutor = $taskExecutor;
+    }
 
     /**
      * Handles login POST request.
@@ -38,9 +48,7 @@ class LoginController extends BaseHttpController
 
         $success = $controller->login($apiKey);
         if ($success) {
-            // this is only for the Demo app because there is no task runner
-            $task = new UpdateShippingServicesTask();
-            $task->execute();
+            $this->taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
         }
 
         $this->output(array('success' => $success));

@@ -3,14 +3,14 @@
 namespace Packlink\BusinessLogic\Warehouse;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 
 /**
  * Class WarehouseService.
@@ -27,6 +27,30 @@ class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Wa
      * @var static
      */
     protected static $instance;
+    /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
+
+    public static function getInstance()
+    {
+        if (static::$instance === null) {
+            $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+            static::$instance = new static($taskExecutor);
+        }
+
+        if (!(static::$instance instanceof static)) {
+            throw new \RuntimeException('Wrong static instance of a singleton class.');
+        }
+
+        return static::$instance;
+    }
+
+    public function __construct(TaskExecutorInterface $taskExecutor)
+    {
+        parent::__construct();
+        $this->taskExecutor = $taskExecutor;
+    }
 
     /**
      * Gets a warehouse.
@@ -78,8 +102,7 @@ class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Wa
 
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        /** @var \Logeecom\Infrastructure\TaskExecution\QueueService $queueService */
-        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+        $taskExecutor = $this->taskExecutor;
 
         $oldWarehouse = $configService->getDefaultWarehouse();
 
@@ -87,11 +110,7 @@ class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Wa
         if ($oldWarehouse === null
             || $oldWarehouse->country !== $warehouse->country
         ) {
-            $queueService->enqueue(
-                $configService->getDefaultQueueName(),
-                new UpdateShippingServicesTask(),
-                $configService->getContext()
-            );
+            $taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
         }
 
         return $warehouse;

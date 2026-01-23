@@ -6,12 +6,16 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestCurlHttpClient;
@@ -31,6 +35,10 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
      * @var TestHttpClient
      */
     public $httpClient;
+    /**
+     * @var TestQueueService
+     */
+    private $queueService;
 
     /**
      * @before
@@ -52,6 +60,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         );
 
         $queue = new TestQueueService();
+        $this->queueService = $queue;
         TestServiceRegister::registerService(
             QueueService::CLASS_NAME,
             function () use ($queue) {
@@ -89,7 +98,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController();
+        $controller = new AutoConfigurationController($this->createTaskExecutor());
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if default configuration request passed.');
@@ -108,7 +117,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController();
+        $controller = new AutoConfigurationController($this->createTaskExecutor());
         $controller->start(true);
 
         $taskController = new UpdateShippingServicesTaskStatusController();
@@ -129,7 +138,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController();
+        $controller = new AutoConfigurationController($this->createTaskExecutor());
         $controller->start(true);
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now +10 minutes'));
@@ -175,7 +184,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(400);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController();
+        $controller = new AutoConfigurationController($this->createTaskExecutor());
         $success = $controller->start();
 
         $this->assertFalse($success);
@@ -196,11 +205,11 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController();
+        $controller = new AutoConfigurationController($this->createTaskExecutor());
         $controller->start(true);
         $repo = RepositoryRegistry::getQueueItemRepository();
         $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesTask');
+        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
         $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
         $queueItem = $repo->selectOne($filter);
         $queueItem->setStatus($taskStatus);
@@ -228,6 +237,25 @@ Content-Length: 24860\r
 X-Custom-Header: Content: database\r
 \r
 {\"status\":\"success\"}",
+        );
+    }
+
+    /**
+     * @return HttpTaskExecutor
+     */
+    private function createTaskExecutor()
+    {
+        $taskConfig = new BusinessTestShopConfiguration();
+        $metadataProvider = new TaskMetadataProviderTest(
+            $taskConfig->getDefaultQueueName(),
+            $taskConfig->getContext()
+        );
+
+        return new HttpTaskExecutor(
+            $this->queueService,
+            $metadataProvider,
+            $taskConfig,
+            EventBus::getInstance()
         );
     }
 }

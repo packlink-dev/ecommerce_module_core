@@ -10,10 +10,10 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 
 /**
  * Class AutoConfigurationController.
@@ -22,6 +22,15 @@ use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
  */
 class AutoConfigurationController
 {
+    /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
+
+    public function __construct(TaskExecutorInterface $taskExecutor)
+    {
+        $this->taskExecutor = $taskExecutor;
+    }
     /**
      * Starts the auto-configuration process.
      *
@@ -68,7 +77,7 @@ class AutoConfigurationController
     {
         $repo = RepositoryRegistry::getQueueItemRepository();
         $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesTask');
+        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
         $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
         $item = $repo->selectOne($filter);
         if ($item) {
@@ -76,14 +85,6 @@ class AutoConfigurationController
         }
 
         // enqueue the task for updating shipping services
-        /** @var QueueService $queueService */
-        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-        $task = new UpdateShippingServicesTask();
-        $queueService->enqueue(
-            $configService->getDefaultQueueName(),
-            $task,
-            $configService->getContext(),
-            $task->getPriority()
-        );
+        $this->taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
     }
 }

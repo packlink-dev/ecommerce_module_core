@@ -5,9 +5,12 @@ namespace Logeecom\Tests\BusinessLogic\Common;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
@@ -28,6 +31,8 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
+use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -120,6 +125,28 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             TaskRunnerWakeup::CLASS_NAME,
             function () use ($wakeupService) {
                 return $wakeupService;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskMetadataProviderInterface::CLASS_NAME,
+            function () use ($me) {
+                return new DefaultTaskMetadataProvider($me->shopConfig);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskExecutorInterface::CLASS_NAME,
+            function () use ($queueService, $me) {
+                /** @var TaskMetadataProviderInterface $metadataProvider */
+                $metadataProvider = ServiceRegister::getService(TaskMetadataProviderInterface::CLASS_NAME);
+
+                return new HttpTaskExecutor(
+                    $queueService,
+                    $metadataProvider,
+                    $me->shopConfig,
+                    EventBus::getInstance()
+                );
             }
         );
 

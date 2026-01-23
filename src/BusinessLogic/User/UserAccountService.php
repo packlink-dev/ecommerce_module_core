@@ -7,7 +7,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Brand\Exceptions\PlatformCountryNotSupportedByBrandException;
@@ -18,6 +18,7 @@ use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 
@@ -38,6 +39,30 @@ class UserAccountService extends BaseService implements Interfaces\UserAccountSe
      * @var static
      */
     protected static $instance;
+    /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
+
+    public static function getInstance()
+    {
+        if (static::$instance === null) {
+            $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+            static::$instance = new static($taskExecutor);
+        }
+
+        if (!(static::$instance instanceof static)) {
+            throw new \RuntimeException('Wrong static instance of a singleton class.');
+        }
+
+        return static::$instance;
+    }
+
+    public function __construct(TaskExecutorInterface $taskExecutor)
+    {
+        parent::__construct();
+        $this->taskExecutor = $taskExecutor;
+    }
 
     /**
      * Configuration service instance.
@@ -184,18 +209,13 @@ class UserAccountService extends BaseService implements Interfaces\UserAccountSe
         $this->getConfigService()->setUserInfo($user);
         $defaultQueueName = $this->getConfigService()->getDefaultQueueName();
 
-        /** @var QueueService $queueService */
-        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+        $taskExecutor = $this->taskExecutor;
 
         $this->setDefaultParcel(true);
         $this->setWarehouseInfo(true);
 
         if ($this->getConfigService()->getDefaultWarehouse() !== null) {
-            $queueService->enqueue(
-                $defaultQueueName,
-                new UpdateShippingServicesTask(),
-                $this->getConfigService()->getContext()
-            );
+            $taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
         }
 
         $webHookUrl = $this->getConfigService()->getWebHookUrl();
@@ -273,6 +293,7 @@ class UserAccountService extends BaseService implements Interfaces\UserAccountSe
 
         return $this->proxy;
     }
+
 
     /**
      * Returns an instance of configuration service.

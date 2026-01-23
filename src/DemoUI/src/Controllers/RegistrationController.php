@@ -3,7 +3,8 @@
 namespace Packlink\DemoUI\Controllers;
 
 use Packlink\BusinessLogic\Controllers\RegistrationController as RegistrationControllerBase;
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\DemoUI\Controllers\Models\Request;
 
 /**
@@ -21,13 +22,18 @@ class RegistrationController extends BaseHttpController
      * @var RegistrationControllerBase
      */
     private $controller;
+    /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
 
     /**
      * RegistrationController constructor.
      */
-    public function __construct()
+    public function __construct(TaskExecutorInterface $taskExecutor)
     {
         $this->controller = new RegistrationControllerBase();
+        $this->taskExecutor = $taskExecutor;
     }
 
     /**
@@ -61,9 +67,7 @@ class RegistrationController extends BaseHttpController
 
         $success = $this->controller->register($payload);
         if ($success) {
-            // this is only for the Demo app because there is no task runner
-            $task = new UpdateShippingServicesTask();
-            $task->execute();
+            $this->taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
         }
 
         $this->output(array('success' => $success));

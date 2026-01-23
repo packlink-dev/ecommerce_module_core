@@ -138,7 +138,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         $repo = RepositoryRegistry::getQueueItemRepository();
         $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS,UpdateShippingServicesBusinessTask::class);
+        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
         $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
         $queueItem = $repo->selectOne($filter);
         $queueItem->setStatus(QueueItem::FAILED);

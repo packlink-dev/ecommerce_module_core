@@ -104,14 +104,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
-        $me->draftShipmentService = ShipmentDraftService::getInstance();
-        TestServiceRegister::registerService(
-            ShipmentDraftService::CLASS_NAME,
-            function () use ($me) {
-                return $me->draftShipmentService;
-            }
-        );
-
         $me->orderSendDraftTaskMapService = OrderSendDraftTaskMapService::getInstance();
         TestServiceRegister::registerService(
             OrderSendDraftTaskMapService::CLASS_NAME,
@@ -150,6 +142,15 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface::CLASS_NAME,
             function () use ($taskExecutor) {
                 return $taskExecutor;
+            }
+        );
+
+        ShipmentDraftService::resetInstance();
+        $me->draftShipmentService = new ShipmentDraftService($taskExecutor);
+        TestServiceRegister::registerService(
+            ShipmentDraftService::CLASS_NAME,
+            function () use ($me) {
+                return $me->draftShipmentService;
             }
         );
 

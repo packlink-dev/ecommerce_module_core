@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -28,6 +29,7 @@ use Packlink\BusinessLogic\Controllers\DefaultParcelController;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
@@ -104,7 +106,14 @@ class DefaultParcelControllerTest extends BaseTestWithServices
                 return $taskRunnerStarter;
             }
         );
-        $this->defaultParcelController = new DefaultParcelController();
+        $metadataProvider = new DefaultTaskMetadataProvider($configuration);
+        $taskExecutor = new HttpTaskExecutor(
+            $queue,
+            $metadataProvider,
+            $configuration,
+            EventBus::getInstance()
+        );
+        $this->defaultParcelController = new DefaultParcelController($taskExecutor);
     }
 
     /**

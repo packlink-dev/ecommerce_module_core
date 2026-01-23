@@ -7,11 +7,9 @@ use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableExce
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 class ManualRefreshController
 {
@@ -43,7 +41,7 @@ class ManualRefreshController
     protected $configuration;
 
     /**
-     * Enqueues the UpdateShippingServicesTask and returns a JSON response.
+     * Enqueues the UpdateShippingServicesBusinessTask and returns a JSON response.
      *
      * @return TaskStatus
      */
@@ -83,7 +81,7 @@ class ManualRefreshController
         $taskStatus = new TaskStatus();
 
         $result = $this->statusProvider->getLatestStatus(
-            UpdateShippingServicesBusinessTask::class,
+            'UpdateShippingServicesBusinessTask',
             $context
         );
 

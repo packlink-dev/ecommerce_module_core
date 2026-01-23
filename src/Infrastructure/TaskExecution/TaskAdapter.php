@@ -22,6 +22,12 @@ class TaskAdapter extends Task
      * @var string
      */
     private $businessTaskClass;
+    /**
+     * Business task fully qualified class name.
+     *
+     * @var string
+     */
+    private $businessTaskFullClass;
 
     /**
      * TaskAdapter constructor.
@@ -31,7 +37,9 @@ class TaskAdapter extends Task
     public function __construct(BusinessTask $businessTask)
     {
         $this->businessTask = $businessTask;
-        $this->businessTaskClass = get_class($businessTask);
+        $this->businessTaskFullClass = get_class($businessTask);
+        $parts = explode('\\', $this->businessTaskFullClass);
+        $this->businessTaskClass = end($parts);
     }
 
     /**
@@ -95,7 +103,7 @@ class TaskAdapter extends Task
     public function serialize()
     {
         return Serializer::serialize(array(
-            'class' => $this->businessTaskClass,
+            'class' => $this->businessTaskFullClass,
             'data' => $this->businessTask->toArray(),
         ));
     }
@@ -110,10 +118,12 @@ class TaskAdapter extends Task
     public function unserialize($serialized)
     {
         $data = Serializer::unserialize($serialized);
-        $this->businessTaskClass = $data['class'];
+        $this->businessTaskFullClass = $data['class'];
+        $parts = explode('\\', $this->businessTaskFullClass);
+        $this->businessTaskClass = end($parts);
 
         // Reconstruct business task using fromArray()
-        $this->businessTask = call_user_func(array($this->businessTaskClass, 'fromArray'), $data['data']);
+        $this->businessTask = call_user_func(array($this->businessTaskFullClass, 'fromArray'), $data['data']);
     }
 
     /**
@@ -153,7 +163,7 @@ class TaskAdapter extends Task
     public function toArray()
     {
         return array(
-            'class' => $this->businessTaskClass,
+            'class' => $this->businessTaskFullClass,
             'data' => $this->businessTask ? $this->businessTask->toArray() : array(),
         );
     }
@@ -174,20 +184,22 @@ class TaskAdapter extends Task
             throw new \InvalidArgumentException('TaskAdapter::__unserialize expects "class" key.');
         }
 
-        $this->businessTaskClass = $data['class'];
+        $this->businessTaskFullClass = $data['class'];
+        $parts = explode('\\', $this->businessTaskFullClass);
+        $this->businessTaskClass = end($parts);
 
-        if (!class_exists($this->businessTaskClass)) {
-            throw new \InvalidArgumentException('BusinessTask class does not exist: ' . $this->businessTaskClass);
+        if (!class_exists($this->businessTaskFullClass)) {
+            throw new \InvalidArgumentException('BusinessTask class does not exist: ' . $this->businessTaskFullClass);
         }
 
-        if (!is_callable(array($this->businessTaskClass, 'fromArray'))) {
+        if (!is_callable(array($this->businessTaskFullClass, 'fromArray'))) {
             throw new \InvalidArgumentException(
-                'BusinessTask class must implement static fromArray(): ' . $this->businessTaskClass
+                'BusinessTask class must implement static fromArray(): ' . $this->businessTaskFullClass
             );
         }
 
         $taskData = isset($data['data']) && is_array($data['data']) ? $data['data'] : array();
 
-        $this->businessTask = call_user_func(array($this->businessTaskClass, 'fromArray'), $taskData);
+        $this->businessTask = call_user_func(array($this->businessTaskFullClass, 'fromArray'), $taskData);
     }
 }

@@ -119,7 +119,7 @@ class UserAccountLoginTest extends BaseTestWithServices
         /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
         $queueItems = $queueStorage->select();
         $this->assertCount(1, $queueItems);
-        $this->assertEquals('UpdateShippingServicesTask', $queueItems[0]->getTaskType());
+        $this->assertEquals('UpdateShippingServicesBusinessTask', $queueItems[0]->getTaskType());
 
         /** @var MemoryRepository $scheduleRepository */
         $scheduleRepository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);

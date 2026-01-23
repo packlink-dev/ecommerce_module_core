@@ -38,6 +38,30 @@ class ShipmentDraftService extends BaseService
      * @var static
      */
     protected static $instance;
+    /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
+
+    public static function getInstance()
+    {
+        if (static::$instance === null) {
+            $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+            static::$instance = new static($taskExecutor);
+        }
+
+        if (!(static::$instance instanceof static)) {
+            throw new \RuntimeException('Wrong static instance of a singleton class.');
+        }
+
+        return static::$instance;
+    }
+
+    public function __construct(TaskExecutorInterface $taskExecutor)
+    {
+        parent::__construct();
+        $this->taskExecutor = $taskExecutor;
+    }
 
     /**
      * Enqueues the task for creating shipment draft for provided order id.
@@ -63,8 +87,7 @@ class ShipmentDraftService extends BaseService
         $businessTask = new SendDraftBusinessTask($orderId);
 
         // Enqueue via TaskExecutor interface (platform provides implementation)
-        /** @var TaskExecutorInterface $taskExecutor */
-        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+        $taskExecutor = $this->taskExecutor;
 
         if ($isDelayed) {
             $this->getOrderShipmentDetailsService()->setDraftStatus($orderId, DraftStatus::DELAYED);
@@ -132,6 +155,7 @@ class ShipmentDraftService extends BaseService
     {
         return ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
     }
+
 
     /**
      * Retrieves config service.
