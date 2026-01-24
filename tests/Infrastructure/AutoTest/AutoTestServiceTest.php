@@ -12,8 +12,11 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
+use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -22,6 +25,9 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueS
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
+use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
+use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 
 /**
  * Class AutoTestServiceTest.
@@ -57,15 +63,34 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
 
         $queue = new TestQueueService();
         TestServiceRegister::registerService(
-            QueueService::CLASS_NAME,
+            QueueServiceInterface::CLASS_NAME,
             function () use ($queue) {
                 return $queue;
             }
         );
 
+        $businessConfig = new BusinessTestShopConfiguration();
+        $metadataProvider = new DefaultTaskMetadataProvider($businessConfig);
+        TestServiceRegister::registerService(
+            TaskMetadataProviderInterface::CLASS_NAME,
+            function () use ($metadataProvider) {
+                return $metadataProvider;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskExecutorInterface::CLASS_NAME,
+            function () use ($queue, $metadataProvider, $businessConfig) {
+                /** @var EventBus $eventBus */
+                $eventBus = ServiceRegister::getService(EventBus::CLASS_NAME);
+
+                return new HttpTaskExecutor($queue, $metadataProvider, $businessConfig, $eventBus);
+            }
+        );
+
         $wakeupService = new TestTaskRunnerWakeupService();
         TestServiceRegister::registerService(
-            TaskRunnerWakeupService::CLASS_NAME,
+            TaskRunnerWakeup::CLASS_NAME,
             function () use ($wakeupService) {
                 return $wakeupService;
             }
@@ -93,7 +118,8 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     public function testSetAutoTestMode()
     {
         RepositoryRegistry::registerRepository(LogData::getClassName(), MemoryRepository::getClassName());
-        $service = new AutoTestService();
+        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+        $service = new AutoTestService($taskExecutor);
         $service->setAutoTestMode(true);
 
         $repo = RepositoryRegistry::getRepository(LogData::getClassName());
@@ -125,7 +151,8 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
         $domain = parse_url($this->shopConfig->getAsyncProcessUrl(''), PHP_URL_HOST);
         $this->shopConfig->setHttpConfigurationOptions($domain, array(new Options('test', 'value')));
 
-        $service = new AutoTestService();
+        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+        $service = new AutoTestService($taskExecutor);
         $queueItemId = $service->startAutoTest();
 
         self::assertNotNull($queueItemId, 'Test task should be enqueued.');
@@ -170,7 +197,8 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     public function testStartAutoTestStorageFailure()
     {
         // repository is not registered
-        $service = new AutoTestService();
+        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+        $service = new AutoTestService($taskExecutor);
 
         $exThrown = null;
         try {

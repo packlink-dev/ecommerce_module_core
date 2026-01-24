@@ -4,51 +4,28 @@ namespace Packlink\BusinessLogic\Warehouse;
 
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
-use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
+use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 
 /**
  * Class WarehouseService.
  *
  * @package Packlink\BusinessLogic\Warehouse
  */
-class WarehouseService extends BaseService implements \Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface
+class WarehouseService implements WarehouseServiceInterface
 {
-    const CLASS_NAME = __CLASS__;
-
-    /**
-     * Singleton instance of this class.
-     *
-     * @var static
-     */
-    protected static $instance;
     /**
      * @var TaskExecutorInterface
      */
     private $taskExecutor;
 
-    public static function getInstance()
-    {
-        if (static::$instance === null) {
-            $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-            static::$instance = new static($taskExecutor);
-        }
-
-        if (!(static::$instance instanceof static)) {
-            throw new \RuntimeException('Wrong static instance of a singleton class.');
-        }
-
-        return static::$instance;
-    }
-
     public function __construct(TaskExecutorInterface $taskExecutor)
     {
-        parent::__construct();
         $this->taskExecutor = $taskExecutor;
     }
 

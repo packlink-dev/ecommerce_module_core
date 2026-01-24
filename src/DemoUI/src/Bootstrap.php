@@ -15,6 +15,7 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
@@ -90,10 +91,6 @@ class Bootstrap extends BootstrapComponent
      */
     private $carrierService;
     /**
-     * @var UserAccountService
-     */
-    private $userAccountService;
-    /**
      * @var RegistrationInfoService
      */
     private $registrationInfoService;
@@ -132,7 +129,6 @@ class Bootstrap extends BootstrapComponent
         $this->configService = $configService;
         $this->shopOrderService = new ShopOrderService();
         $this->carrierService = new CarrierService();
-        $this->userAccountService = UserAccountService::getInstance();
         $this->registrationInfoService = new TestRegistrationInfoService();
         $this->systemInfoService = new SystemInfoService();
         $this->customsService = new CustomsMappingService();
@@ -238,7 +234,9 @@ class Bootstrap extends BootstrapComponent
         ServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
             function () use ($instance) {
-                return $instance->userAccountService;
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new UserAccountService($taskExecutor);
             }
         );
 

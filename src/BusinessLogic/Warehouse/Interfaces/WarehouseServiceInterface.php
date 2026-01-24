@@ -9,6 +9,7 @@ use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 interface WarehouseServiceInterface
 {
+    const CLASS_NAME = __CLASS__;
     /**
      * Gets a warehouse.
      *

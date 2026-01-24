@@ -11,9 +11,8 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Logeecom\Infrastructure\TaskExecution\TaskAdapter;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\AutoTestBusinessTask;
 
 /**
@@ -31,6 +30,15 @@ class AutoTestService
      * @var Configuration
      */
     private $configService;
+    /**
+     * @var TaskExecutorInterface
+     */
+    private $taskExecutor;
+
+    public function __construct(TaskExecutorInterface $taskExecutor)
+    {
+        $this->taskExecutor = $taskExecutor;
+    }
 
     /**
      * Starts the auto-test.
@@ -52,14 +60,11 @@ class AutoTestService
 
         $this->logHttpOptions();
 
-        /** @var QueueService $queueService */
-        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-        $queueItem = $queueService->enqueue(
-            'Auto-test',
-            new TaskAdapter(new AutoTestBusinessTask('DUMMY TEST DATA'))
-        );
+        $this->taskExecutor->enqueue(new AutoTestBusinessTask('DUMMY TEST DATA'));
 
-        return $queueItem->getId();
+        $queueItem = $this->findAutoTestQueueItem();
+
+        return $queueItem ? $queueItem->getId() : 0;
     }
 
     /**
@@ -97,16 +102,8 @@ class AutoTestService
     {
         $this->setAutoTestMode();
 
-        $filter = new QueryFilter();
-        if ($queueItemId) {
-            $filter->where('id', Operators::EQUALS, $queueItemId);
-        } else {
-            $filter->where('queueName', Operators::EQUALS, 'Auto-test');
-            $filter->orderBy('queueTime', 'DESC');
-        }
-
         $status = '';
-        $item = RepositoryRegistry::getQueueItemRepository()->selectOne($filter);
+        $item = $queueItemId ? $this->findQueueItemById($queueItemId) : $this->findAutoTestQueueItem();
         if ($item) {
             if ($item->getStatus() === QueueItem::QUEUED && $item->getQueueTimestamp() < time() - 30) {
                 // if item is queued and task runner did not start it within 30 seconds, task expired
@@ -180,5 +177,46 @@ class AutoTestService
         }
 
         return $this->configService;
+    }
+
+    /**
+     * Find queue item by ID.
+     *
+     * @param int $queueItemId
+     *
+     * @return QueueItem|null
+     */
+    private function findQueueItemById($queueItemId)
+    {
+        $filter = new QueryFilter();
+        $filter->where('id', Operators::EQUALS, $queueItemId);
+
+        return RepositoryRegistry::getQueueItemRepository()->selectOne($filter);
+    }
+
+    /**
+     * Find the latest auto-test queue item.
+     *
+     * @return QueueItem|null
+     */
+    private function findAutoTestQueueItem()
+    {
+        $filter = new QueryFilter();
+        $filter->where('queueName', Operators::EQUALS, $this->getConfigService()->getDefaultQueueName());
+        $filter->orderBy('queueTime', QueryFilter::ORDER_DESC);
+        $filter->setLimit(25);
+
+        $items = RepositoryRegistry::getQueueItemRepository()->select($filter);
+        foreach ($items as $item) {
+            try {
+                if ($item->getTaskType() === 'AutoTestBusinessTask') {
+                    return $item;
+                }
+            } catch (\Exception $e) {
+                // Ignore invalid task entries and continue searching.
+            }
+        }
+
+        return null;
     }
 }

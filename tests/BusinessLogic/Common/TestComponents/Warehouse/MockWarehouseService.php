@@ -6,8 +6,6 @@ use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
 class MockWarehouseService extends WarehouseService
 {
-    protected static $instance;
-
     public $callHistory = array();
     public $getWarehouseResult = null;
     public $updateWarehouseDataResult = null;

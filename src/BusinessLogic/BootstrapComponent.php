@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
@@ -32,6 +33,7 @@ use Packlink\BusinessLogic\Registration\RegistrationLegalPolicy;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
+use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
@@ -81,7 +83,10 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         ServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
             function () {
-                return UserAccountService::getInstance();
+                /**@var TaskExecutorInterface $taskExecutor */
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new UserAccountService($taskExecutor);
             }
         );
 
@@ -142,16 +147,22 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         );
 
         ServiceRegister::registerService(
-            ShipmentDraftService::CLASS_NAME,
+            ShipmentDraftServiceInterface::CLASS_NAME,
             function () {
-                return ShipmentDraftService::getInstance();
+                /**@var TaskExecutorInterface $taskExecutor */
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new ShipmentDraftService($taskExecutor);
             }
         );
 
         ServiceRegister::registerService(
-            WarehouseService::CLASS_NAME,
+            WarehouseServiceInterface::CLASS_NAME,
             function () {
-                return WarehouseService::getInstance();
+                /**@var TaskExecutorInterface $taskExecutor */
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new WarehouseService($taskExecutor);
             }
         );
 
@@ -208,7 +219,9 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         ServiceRegister::registerService(
             AutoTestService::CLASS_NAME,
             function () {
-                return new AutoTestService();
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new AutoTestService($taskExecutor);
             }
         );
 

@@ -5,6 +5,8 @@ namespace Logeecom\Tests\BusinessLogic\Controllers;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Warehouse\MockWarehouseService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Controllers\WarehouseController;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
@@ -22,7 +24,8 @@ class WarehouseControllerTest extends BaseTestWithServices
     {
         parent::before();
 
-        $this->service = MockWarehouseService::getInstance();
+        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+        $this->service = new MockWarehouseService($taskExecutor);
 
         $me = $this;
 
@@ -96,7 +99,5 @@ class WarehouseControllerTest extends BaseTestWithServices
     protected function after()
     {
         parent::after();
-
-        MockWarehouseService::resetInstance();
     }
 }

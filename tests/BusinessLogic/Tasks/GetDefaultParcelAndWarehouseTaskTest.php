@@ -26,7 +26,11 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
         TestServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
             function () {
-                return UserAccountService::getInstance();
+                $taskExecutor = \Logeecom\Infrastructure\ServiceRegister::getService(
+                    \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface::CLASS_NAME
+                );
+
+                return new UserAccountService($taskExecutor);
             }
         );
     }
@@ -37,7 +41,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
      */
     protected function after()
     {
-        UserAccountService::resetInstance();
         parent::after();
     }
 

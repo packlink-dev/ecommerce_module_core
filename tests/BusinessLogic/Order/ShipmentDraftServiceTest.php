@@ -145,7 +145,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
-        ShipmentDraftService::resetInstance();
         $me->draftShipmentService = new ShipmentDraftService($taskExecutor);
         TestServiceRegister::registerService(
             ShipmentDraftService::CLASS_NAME,
@@ -204,7 +203,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     protected function after()
     {
         OrderShipmentDetailsService::resetInstance();
-        ShipmentDraftService::resetInstance();
 
         parent::after();
     }

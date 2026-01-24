@@ -33,6 +33,7 @@ use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
+use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -79,7 +80,18 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,
             function () {
-                return WarehouseService::getInstance();
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new WarehouseService($taskExecutor);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            UserAccountService::CLASS_NAME,
+            function () {
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                return new UserAccountService($taskExecutor);
             }
         );
 

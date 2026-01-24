@@ -5,6 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\User;
 use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -61,7 +62,7 @@ class UserAccountLoginTest extends BaseTestWithServices
             }
         );
 
-        $this->userAccountService = UserAccountService::getInstance();
+        $this->userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
     }
 
     /**
@@ -373,7 +374,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      */
     protected function after()
     {
-        UserAccountService::resetInstance();
         TestRepositoryRegistry::cleanUp();
 
         parent::after();

@@ -85,7 +85,10 @@ class TaskAdapter extends Task
             }
 
             if (is_int($value) || is_float($value)) {
-                $this->reportProgress($value);
+                $progress = (int) round($value);
+                $progress = max(0, min(100, $progress));
+
+                $this->reportProgress($progress);
                 continue;
             }
 

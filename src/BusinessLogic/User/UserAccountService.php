@@ -8,7 +8,6 @@ use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
-use Packlink\BusinessLogic\BaseService;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Brand\Exceptions\PlatformCountryNotSupportedByBrandException;
 use Packlink\BusinessLogic\Configuration;
@@ -27,40 +26,19 @@ use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
  *
  * @package Packlink\BusinessLogic\User
  */
-class UserAccountService extends BaseService implements Interfaces\UserAccountServiceInterface
+class UserAccountService implements Interfaces\UserAccountServiceInterface
 {
     /**
      * Fully qualified name of this interface.
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * Singleton instance of this class.
-     *
-     * @var static
-     */
-    protected static $instance;
-    /**
      * @var TaskExecutorInterface
      */
     private $taskExecutor;
 
-    public static function getInstance()
-    {
-        if (static::$instance === null) {
-            $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-            static::$instance = new static($taskExecutor);
-        }
-
-        if (!(static::$instance instanceof static)) {
-            throw new \RuntimeException('Wrong static instance of a singleton class.');
-        }
-
-        return static::$instance;
-    }
-
     public function __construct(TaskExecutorInterface $taskExecutor)
     {
-        parent::__construct();
         $this->taskExecutor = $taskExecutor;
     }
 
