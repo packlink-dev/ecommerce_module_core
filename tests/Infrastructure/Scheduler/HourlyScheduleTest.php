@@ -1,24 +1,24 @@
 <?php
 
-namespace Logeecom\Tests\BusinessLogic\Scheduler;
+namespace Logeecom\Tests\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class DailyScheduleTest
- * @package Logeecom\Tests\BusinessLogic\Scheduler
+ * Class HourlyScheduleTest
+ * @package Logeecom\Tests\Infrastructure\Scheduler
  */
-class DailyScheduleTest extends TestCase
+class HourlyScheduleTest extends TestCase
 {
     /**
-     * Daily schedule instance
-     * @var \Packlink\BusinessLogic\Scheduler\Models\DailySchedule
+     * Hourly schedule instance
+     * @var \Logeecom\Infrastructure\Scheduler\Models\HourlySchedule
      */
-    public $dailySchedule;
+    public $hourlySchedule;
 
     /**
      * @before
@@ -31,9 +31,12 @@ class DailyScheduleTest extends TestCase
         $this->setUp();
 
         // Always return 2018-03-21 13:42:05
-        $this->dailySchedule = new DailySchedule();
-        $this->dailySchedule->setHour(15);
-        $this->dailySchedule->setMinute(0);
+        $this->hourlySchedule = new HourlySchedule();
+        $this->hourlySchedule->setStartHour(8);
+        $this->hourlySchedule->setStartMinute(15);
+        $this->hourlySchedule->setEndHour(23);
+        $this->hourlySchedule->setEndMinute(15);
+        $this->hourlySchedule->setInterval(2);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
@@ -56,69 +59,70 @@ class DailyScheduleTest extends TestCase
     /**
      * @throws \Exception Throws this exception when unable to create DateTime object
      */
-    public function testNextScheduleSameDay()
+    public function testNextHour()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 21);
-        $expected->setTime(15, 0);
+        $expected->setTime(14, 15);
 
-        $this->dailySchedule->setNextSchedule();
-        $nextSchedule = $this->dailySchedule->getNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
      * @throws \Exception Throws this exception when unable to create DateTime object
      */
-    public function testNextScheduleNextDay()
+    public function testBeyondInterval()
     {
-        $this->dailySchedule->setHour(11);
-        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->hourlySchedule->setEndHour(14);
+        $this->hourlySchedule->setEndMinute(0);
+
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
         $expected->setDate(2018, 3, 22);
-        $expected->setTime(11, 0);
+        $expected->setTime(8, 15);
 
-        $this->dailySchedule->setNextSchedule();
-        $nextSchedule = $this->dailySchedule->getNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
      * @throws \Exception Throws this exception when unable to create DateTime object
      */
-    public function testNextScheduleOnSpecificWeekDay()
+    public function testEdgeInterval()
     {
-        // Monday and Friday
-        $this->dailySchedule->setDaysOfWeek(array(1, 5));
-        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->hourlySchedule->setEndHour(14);
+        $this->hourlySchedule->setEndMinute(15);
+
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 3, 23);
-        $expected->setTime(15, 0);
+        $expected->setDate(2018, 3, 21);
+        $expected->setTime(14, 15);
 
-        $this->dailySchedule->setNextSchedule();
-        $nextSchedule = $this->dailySchedule->getNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
      * @throws \Exception Throws this exception when unable to create DateTime object
      */
-    public function testNextScheduleOnSpecificWeekDayNext()
+    public function testEveryHourAtSpecificMinute()
     {
-        // Monday
-        $this->dailySchedule->setDaysOfWeek(array(1));
-        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->hourlySchedule->setStartMinute(0);
+        $this->hourlySchedule->setMinute(27);
+
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 3, 26);
-        $expected->setTime(15, 0);
+        $expected->setDate(2018, 3, 21);
+        $expected->setTime(14, 27);
 
-        $this->dailySchedule->setNextSchedule();
-        $nextSchedule = $this->dailySchedule->getNextSchedule();
+        $this->hourlySchedule->setNextSchedule();
+        $nextSchedule = $this->hourlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

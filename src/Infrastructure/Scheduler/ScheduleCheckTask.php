@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Scheduler;
+namespace Logeecom\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -12,7 +12,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 
 /**
  * Class ScheduleCheckTask.

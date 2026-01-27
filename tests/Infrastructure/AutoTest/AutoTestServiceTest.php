@@ -17,6 +17,7 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -83,8 +84,10 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
             function () use ($queue, $metadataProvider, $businessConfig) {
                 /** @var EventBus $eventBus */
                 $eventBus = ServiceRegister::getService(EventBus::CLASS_NAME);
+                /** @var TimeProvider $timeProvider */
+                $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
 
-                return new HttpTaskExecutor($queue, $metadataProvider, $businessConfig, $eventBus);
+                return new HttpTaskExecutor($queue, $metadataProvider, $businessConfig, $eventBus, $timeProvider);
             }
         );
 

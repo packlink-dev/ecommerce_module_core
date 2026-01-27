@@ -33,7 +33,7 @@ use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
-use Packlink\BusinessLogic\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;

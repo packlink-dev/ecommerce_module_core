@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
@@ -31,11 +32,13 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
 
 /**
  * Class BaseTest.
@@ -52,6 +55,10 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
      * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
+    /**
+     * @var TestScheduler
+     */
+    public $scheduler;
 
     /**
      * @before
@@ -69,6 +76,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         $me = $this;
 
         $this->shopConfig = new TestShopConfiguration();
+        $this->scheduler = new TestScheduler();
 
         TestServiceRegister::registerService(
             Configuration::CLASS_NAME,
@@ -92,6 +100,13 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
 
                 return new UserAccountService($taskExecutor);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            SchedulerInterface::class,
+            function () use ($me) {
+                return $me->scheduler;
             }
         );
 
@@ -157,7 +172,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                     $queueService,
                     $metadataProvider,
                     $me->shopConfig,
-                    EventBus::getInstance()
+                    EventBus::getInstance(),
+                    ServiceRegister::getService(TimeProvider::CLASS_NAME)
                 );
             }
         );

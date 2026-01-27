@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Scheduler\SchedulerService;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
@@ -32,7 +33,7 @@ use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\Registration\RegistrationLegalPolicy;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
-use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
@@ -77,6 +78,16 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
 
                 return new Proxy($config, $client);
+            }
+        );
+
+        ServiceRegister::registerService(
+            SchedulerInterface::CLASS_NAME,
+            function () {
+                /** @var Configuration $config */
+                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+                return new SchedulerService($config);
             }
         );
 

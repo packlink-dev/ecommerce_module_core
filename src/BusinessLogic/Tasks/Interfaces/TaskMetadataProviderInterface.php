@@ -6,6 +6,9 @@ use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 interface TaskMetadataProviderInterface
 {
+    /**
+     * Name of the class
+     */
     const CLASS_NAME = __CLASS__;
 
     /**

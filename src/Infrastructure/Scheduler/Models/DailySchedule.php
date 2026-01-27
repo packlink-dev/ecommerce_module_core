@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Scheduler\Models;
+namespace Logeecom\Infrastructure\Scheduler\Models;
 
 /**
  * Class DailySchedule.

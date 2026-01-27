@@ -4,9 +4,10 @@ namespace Logeecom\Tests\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
@@ -49,7 +50,8 @@ class RegistrationControllerTest extends BaseTestWithServices
             TestServiceRegister::getService(\Logeecom\Infrastructure\TaskExecution\QueueService::CLASS_NAME),
             $metadataProvider,
             $this->shopConfig,
-            EventBus::getInstance()
+            EventBus::getInstance(),
+            ServiceRegister::getService(TimeProvider::CLASS_NAME)
         );
         $this->registrationController = new RegistrationController($taskExecutor);
     }

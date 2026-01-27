@@ -1,29 +1,29 @@
 <?php
 
-namespace Logeecom\Tests\BusinessLogic\Scheduler;
+namespace Logeecom\Tests\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\YearlySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class MonthlyScheduleTest
- * @package Logeecom\Tests\BusinessLogic\Scheduler
+ * Class YearlyScheduleTest
+ * @package Logeecom\Tests\Infrastructure\Scheduler
  */
-class MonthlyScheduleTest extends TestCase
+class YearlyScheduleTest extends TestCase
 {
     /**
-     * Monthly schedule instance
-     * @var \Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule
-     */
-    public $monthlySchedule;
-    /**
-     * Current Date time
+     * Current date time
      * @var \DateTime
      */
     public $nowTime;
+    /**
+     * Yearly schedule instance
+     * @var \Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule
+     */
+    public $yearlySchedule;
 
     /**
      * @before
@@ -36,13 +36,15 @@ class MonthlyScheduleTest extends TestCase
         $this->setUp();
 
         // Always return 2018-03-21 13:42:05
-        $this->monthlySchedule = new MonthlySchedule();
-        $this->monthlySchedule->setDay(15);
-        $this->monthlySchedule->setHour(3);
-        $this->monthlySchedule->setMinute(0);
+        $this->yearlySchedule = new YearlySchedule();
+        $this->yearlySchedule->setMonth(7);
+        $this->yearlySchedule->setDay(24);
+        $this->yearlySchedule->setHour(13);
+        $this->yearlySchedule->setMinute(45);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $nowDateTime = new \DateTime();
+        $nowDateTime->setTimezone(new \DateTimeZone('UTC'));
         $nowDateTime->setDate(2018, 3, 21);
         $nowDateTime->setTime(13, 42, 5);
 
@@ -63,49 +65,31 @@ class MonthlyScheduleTest extends TestCase
     /**
      * @throws \Exception Throws this exception when unable to create DateTime object
      */
-    public function testNextScheduleOnNextMonth()
+    public function testNextScheduleThisYear()
     {
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 4, 15);
-        $expected->setTime(3, 0);
+        $expected->setDate(2018, 7, 24);
+        $expected->setTime(13, 45);
 
-        $this->monthlySchedule->setNextSchedule();
-        $nextSchedule = $this->monthlySchedule->getNextSchedule();
+        $this->yearlySchedule->setNextSchedule();
+        $nextSchedule = $this->yearlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 
     /**
      * @throws \Exception Throws this exception when unable to create DateTime object
      */
-    public function testNextScheduleOnSameMonth()
+    public function testNextScheduleOnNexYear()
     {
-        $this->nowTime->setDate(2018, 2, 1);
+        $this->yearlySchedule->setMonth(1);
         $expected = new \DateTime();
         $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 2, 15);
-        $expected->setTime(3, 0);
+        $expected->setDate(2019, 1, 24);
+        $expected->setTime(13, 45);
 
-        $this->monthlySchedule->setNextSchedule();
-        $nextSchedule = $this->monthlySchedule->getNextSchedule();
-        $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
-    }
-
-    /**
-     * @throws \Exception Throws this exception when unable to create DateTime object
-     */
-    public function testLastDayInMonth()
-    {
-        $this->nowTime->setDate(2018, 2, 1);
-        $this->monthlySchedule->setDay(31);
-
-        $expected = new \DateTime();
-        $expected->setTimezone(new \DateTimeZone('UTC'));
-        $expected->setDate(2018, 2, 28);
-        $expected->setTime(3, 0);
-
-        $this->monthlySchedule->setNextSchedule();
-        $nextSchedule = $this->monthlySchedule->getNextSchedule();
+        $this->yearlySchedule->setNextSchedule();
+        $nextSchedule = $this->yearlySchedule->getNextSchedule();
         $this->assertEquals($expected->getTimestamp(), $nextSchedule->getTimestamp());
     }
 }

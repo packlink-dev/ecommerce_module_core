@@ -12,8 +12,8 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\Schedule;
-use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
+use Logeecom\Infrastructure\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
 
 /**

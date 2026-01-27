@@ -6,12 +6,14 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
@@ -77,7 +79,8 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             $queueService,
             $metadataProvider,
             $configuration,
-            EventBus::getInstance()
+            EventBus::getInstance(),
+            ServiceRegister::getService(TimeProvider::CLASS_NAME)
         );
         $statusProvider = new QueueTaskStatusProvider($queueService);
 

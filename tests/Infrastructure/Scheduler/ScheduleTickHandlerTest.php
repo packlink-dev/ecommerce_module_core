@@ -1,9 +1,8 @@
 <?php
 /** @noinspection PhpDuplicateArrayKeysInspection */
 
-namespace Logeecom\Tests\BusinessLogic\Scheduler;
+namespace Logeecom\Tests\Infrastructure\Scheduler;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
@@ -19,12 +18,13 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueS
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\ScheduleTickHandler;
+use Logeecom\Infrastructure\Scheduler\ScheduleTickHandler;
+use Packlink\BusinessLogic\Configuration;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class ScheduleCheckTaskTest
- * @package Logeecom\Tests\BusinessLogic\Scheduler
+ * @package Logeecom\Tests\Infrastructure\Scheduler
  */
 class ScheduleTickHandlerTest extends TestCase
 {

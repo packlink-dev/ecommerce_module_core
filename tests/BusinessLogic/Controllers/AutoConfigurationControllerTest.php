@@ -6,11 +6,13 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
@@ -255,7 +257,8 @@ X-Custom-Header: Content: database\r
             $this->queueService,
             $metadataProvider,
             $taskConfig,
-            EventBus::getInstance()
+            EventBus::getInstance(),
+            ServiceRegister::getService(TimeProvider::CLASS_NAME)
         );
     }
 }

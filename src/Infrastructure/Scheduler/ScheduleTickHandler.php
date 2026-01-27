@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Scheduler;
+namespace Logeecom\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;

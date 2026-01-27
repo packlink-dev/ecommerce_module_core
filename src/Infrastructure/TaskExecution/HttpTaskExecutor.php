@@ -2,15 +2,20 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
+use DateInterval;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Configuration;
-use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
+use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
@@ -36,6 +41,10 @@ class HttpTaskExecutor implements TaskExecutorInterface
      * @var Configuration
      */
     private $configService;
+    /**
+     * @var TimeProvider
+     */
+    private $timeProvider;
 
     /**
      * Registers TickEvent listener to handle schedule ticker.
@@ -44,12 +53,14 @@ class HttpTaskExecutor implements TaskExecutorInterface
         QueueServiceInterface $queueService,
         TaskMetadataProviderInterface $metadataProvider,
         Configuration $configuration,
-        EventBus $eventBus
+        EventBus $eventBus,
+        TimeProvider $timeProvider
     ) {
         $this->queueService = $queueService;
         $this->metadataProvider = $metadataProvider;
         $this->eventBus = $eventBus;
         $this->configService = $configuration;
+        $this->timeProvider = $timeProvider;
 
         $this->registerTickEventListener();
     }
@@ -97,37 +108,34 @@ class HttpTaskExecutor implements TaskExecutorInterface
      */
     public function scheduleDelayed(BusinessTask $businessTask, int $delaySeconds)
     {
-//        /** @var TimeProvider $timeProvider */
-//        $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
-//
-//        // Get execution configuration from metadata provider
-//        $executionConfig = $this->getExecutionConfig($businessTask);
-//
-//        // Wrap business task in adapter
-//        $taskAdapter = new TaskAdapter($businessTask);
-//
-//        // Calculate execution time
-//        $delayMinutes = ceil($delaySeconds / 60);
-//        /** @noinspection PhpUnhandledExceptionInspection */
-//        $timestamp = $timeProvider->getCurrentLocalTime()
-//            ->add(new DateInterval('PT' . $delayMinutes . 'M'))
-//            ->getTimestamp();
-//
-//        // Create delayed schedule
-//        $schedule = new HourlySchedule(
-//            $taskAdapter,
-//            $executionConfig->getQueueName(),
-//            $executionConfig->getContext()
-//        );
-//
-//        $schedule->setMonth((int)date('m', $timestamp));
-//        $schedule->setDay((int)date('d', $timestamp));
-//        $schedule->setHour((int)date('H', $timestamp));
-//        $schedule->setMinute((int)date('i', $timestamp));
-//        $schedule->setRecurring(false);
-//        $schedule->setNextSchedule();
-//
-//        RepositoryRegistry::getRepository(Schedule::CLASS_NAME)->save($schedule);
+        // Get execution configuration from metadata provider
+        $executionConfig = $this->metadataProvider->getExecutionConfig($businessTask);
+
+        // Wrap business task in adapter
+        $taskAdapter = new TaskAdapter($businessTask);
+
+        // Calculate execution time
+        $delayMinutes = ceil($delaySeconds / 60);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $timestamp = $this->timeProvider->getCurrentLocalTime()
+            ->add(new DateInterval('PT' . $delayMinutes . 'M'))
+            ->getTimestamp();
+
+        // Create delayed schedule
+        $schedule = new HourlySchedule(
+            $taskAdapter,
+            $executionConfig->getQueueName(),
+            $executionConfig->getContext()
+        );
+
+        $schedule->setMonth((int)date('m', $timestamp));
+        $schedule->setDay((int)date('d', $timestamp));
+        $schedule->setHour((int)date('H', $timestamp));
+        $schedule->setMinute((int)date('i', $timestamp));
+        $schedule->setRecurring(false);
+        $schedule->setNextSchedule();
+
+        RepositoryRegistry::getRepository(Schedule::CLASS_NAME)->save($schedule);
     }
 
     /**

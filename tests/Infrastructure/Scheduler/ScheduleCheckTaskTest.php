@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpDuplicateArrayKeysInspection */
 
-namespace Logeecom\Tests\BusinessLogic\Scheduler;
+namespace Logeecom\Tests\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
@@ -30,18 +30,18 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueS
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\DailySchedule;
-use Packlink\BusinessLogic\Scheduler\Models\HourlySchedule;
-use Packlink\BusinessLogic\Scheduler\Models\MonthlySchedule;
-use Packlink\BusinessLogic\Scheduler\Models\Schedule;
-use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
-use Packlink\BusinessLogic\Scheduler\ScheduleCheckTask;
+use Logeecom\Infrastructure\Scheduler\Models\DailySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\MonthlySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule;
+use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class ScheduleCheckTaskTest
  *
- * @package Logeecom\Tests\BusinessLogic\Scheduler
+ * @package Logeecom\Tests\Infrastructure\Scheduler
  */
 class ScheduleCheckTaskTest extends TestCase
 {

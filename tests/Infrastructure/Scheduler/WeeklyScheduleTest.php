@@ -1,16 +1,16 @@
 <?php
 
-namespace Logeecom\Tests\BusinessLogic\Scheduler;
+namespace Logeecom\Tests\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class WeeklyScheduleTest
- * @package Logeecom\Tests\BusinessLogic\Scheduler
+ * @package Logeecom\Tests\Infrastructure\Scheduler
  */
 class WeeklyScheduleTest extends TestCase
 {
