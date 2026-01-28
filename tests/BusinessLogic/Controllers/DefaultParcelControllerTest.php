@@ -15,6 +15,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
@@ -113,7 +114,8 @@ class DefaultParcelControllerTest extends BaseTestWithServices
             $metadataProvider,
             $configuration,
             EventBus::getInstance(),
-            ServiceRegister::getService(TimeProvider::CLASS_NAME)
+            ServiceRegister::getService(TimeProvider::CLASS_NAME),
+            ServiceRegister::getService(SchedulerInterface::class)
         );
         $this->defaultParcelController = new DefaultParcelController($taskExecutor);
     }

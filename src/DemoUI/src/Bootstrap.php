@@ -31,7 +31,6 @@ use Packlink\BusinessLogic\OAuth\Models\OAuthState;
 use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthStateServiceInterface;
-use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
 use Packlink\BusinessLogic\OAuth\Services\OAuthService;
 use Packlink\BusinessLogic\OAuth\Services\OAuthStateService;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService as ShopOrderServiceInterface;
@@ -235,8 +234,9 @@ class Bootstrap extends BootstrapComponent
             UserAccountService::CLASS_NAME,
             function () use ($instance) {
                 $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+                $scheduler = ServiceRegister::getService(\Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface::class);
 
-                return new UserAccountService($taskExecutor);
+                return new UserAccountService($taskExecutor, $scheduler);
             }
         );
 

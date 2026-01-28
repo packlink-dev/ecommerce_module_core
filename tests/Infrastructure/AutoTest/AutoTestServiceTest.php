@@ -18,6 +18,7 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -27,6 +28,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 
@@ -70,6 +72,14 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
             }
         );
 
+        $scheduler = new TestScheduler();
+        TestServiceRegister::registerService(
+            SchedulerInterface::class,
+            function () use ($scheduler) {
+                return $scheduler;
+            }
+        );
+
         $businessConfig = new BusinessTestShopConfiguration();
         $metadataProvider = new DefaultTaskMetadataProvider($businessConfig);
         TestServiceRegister::registerService(
@@ -87,7 +97,16 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
                 /** @var TimeProvider $timeProvider */
                 $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
 
-                return new HttpTaskExecutor($queue, $metadataProvider, $businessConfig, $eventBus, $timeProvider);
+                $scheduler = ServiceRegister::getService(SchedulerInterface::class);
+
+                return new HttpTaskExecutor(
+                    $queue,
+                    $metadataProvider,
+                    $businessConfig,
+                    $eventBus,
+                    $timeProvider,
+                    $scheduler
+                );
             }
         );
 

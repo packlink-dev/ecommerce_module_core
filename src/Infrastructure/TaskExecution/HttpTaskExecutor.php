@@ -4,7 +4,6 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use DateInterval;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
@@ -12,9 +11,9 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Configuration;
-use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
@@ -45,6 +44,10 @@ class HttpTaskExecutor implements TaskExecutorInterface
      * @var TimeProvider
      */
     private $timeProvider;
+    /**
+     * @var SchedulerInterface
+     */
+    private $scheduler;
 
     /**
      * Registers TickEvent listener to handle schedule ticker.
@@ -54,13 +57,15 @@ class HttpTaskExecutor implements TaskExecutorInterface
         TaskMetadataProviderInterface $metadataProvider,
         Configuration $configuration,
         EventBus $eventBus,
-        TimeProvider $timeProvider
+        TimeProvider $timeProvider,
+        SchedulerInterface $scheduler
     ) {
         $this->queueService = $queueService;
         $this->metadataProvider = $metadataProvider;
         $this->eventBus = $eventBus;
         $this->configService = $configuration;
         $this->timeProvider = $timeProvider;
+        $this->scheduler = $scheduler;
 
         $this->registerTickEventListener();
     }
@@ -108,10 +113,6 @@ class HttpTaskExecutor implements TaskExecutorInterface
      */
     public function scheduleDelayed(BusinessTask $businessTask, int $delaySeconds)
     {
-        // Get execution configuration from metadata provider
-        $executionConfig = $this->metadataProvider->getExecutionConfig($businessTask);
-
-        // Wrap business task in adapter
         $taskAdapter = new TaskAdapter($businessTask);
 
         // Calculate execution time
@@ -121,21 +122,17 @@ class HttpTaskExecutor implements TaskExecutorInterface
             ->add(new DateInterval('PT' . $delayMinutes . 'M'))
             ->getTimestamp();
 
-        // Create delayed schedule
-        $schedule = new HourlySchedule(
-            $taskAdapter,
-            $executionConfig->getQueueName(),
-            $executionConfig->getContext()
+        $this->scheduler->scheduleHourly(
+            function () use ($taskAdapter) {
+                return $taskAdapter;
+            },
+            new ScheduleConfig(
+                (int)date('N', $timestamp),
+                (int)date('H', $timestamp),
+                (int)date('i', $timestamp),
+                false
+            )
         );
-
-        $schedule->setMonth((int)date('m', $timestamp));
-        $schedule->setDay((int)date('d', $timestamp));
-        $schedule->setHour((int)date('H', $timestamp));
-        $schedule->setMinute((int)date('i', $timestamp));
-        $schedule->setRecurring(false);
-        $schedule->setNextSchedule();
-
-        RepositoryRegistry::getRepository(Schedule::CLASS_NAME)->save($schedule);
     }
 
     /**

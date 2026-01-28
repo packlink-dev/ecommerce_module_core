@@ -15,6 +15,7 @@ use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\RegistrationController;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 
 /**
  * Class RegistrationControllerTest.
@@ -51,7 +52,8 @@ class RegistrationControllerTest extends BaseTestWithServices
             $metadataProvider,
             $this->shopConfig,
             EventBus::getInstance(),
-            ServiceRegister::getService(TimeProvider::CLASS_NAME)
+            ServiceRegister::getService(TimeProvider::CLASS_NAME),
+            ServiceRegister::getService(SchedulerInterface::class)
         );
         $this->registrationController = new RegistrationController($taskExecutor);
     }

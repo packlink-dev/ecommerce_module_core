@@ -4,8 +4,6 @@ namespace Packlink\BusinessLogic\User;
 
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
-use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
@@ -15,11 +13,10 @@ use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Scheduler\Models\Schedule;
-use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
-use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 
 /**
  * Class UserAccountService.
@@ -36,10 +33,15 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
      * @var TaskExecutorInterface
      */
     private $taskExecutor;
+    /**
+     * @var SchedulerInterface
+     */
+    private $scheduler;
 
-    public function __construct(TaskExecutorInterface $taskExecutor)
+    public function __construct(TaskExecutorInterface $taskExecutor, SchedulerInterface $scheduler)
     {
         $this->taskExecutor = $taskExecutor;
+        $this->scheduler = $scheduler;
     }
 
     /**
@@ -233,29 +235,24 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
      */
     protected function createSchedules()
     {
-        $repository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
-
-        $this->scheduleUpdateShipmentServicesTask($repository);
+        $this->scheduleUpdateShipmentServicesTask();
     }
 
     /**
-     * @param \Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface $repository
-     *
+     * @return void
      */
-    protected function scheduleUpdateShipmentServicesTask(RepositoryInterface $repository)
+    protected function scheduleUpdateShipmentServicesTask()
     {
-        // Schedule weekly task for updating services
-        $schedule = new WeeklySchedule(
-            new UpdateShippingServicesTask(),
-            $this->getConfigService()->getDefaultQueueName(),
-            $this->getConfigService()->getContext()
+        $this->scheduler->scheduleWeekly(
+            function () {
+                return new UpdateShippingServicesTask();
+            },
+            new ScheduleConfig(
+                rand(1, 7),
+                rand(0, 5),
+                rand(0, 59)
+            )
         );
-
-        $schedule->setDay(rand(1, 7));
-        $schedule->setHour(rand(0, 5));
-        $schedule->setMinute(rand(0, 59));
-        $schedule->setNextSchedule();
-        $repository->save($schedule);
     }
 
     /**

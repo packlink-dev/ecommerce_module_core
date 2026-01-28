@@ -2,31 +2,27 @@
 
 namespace Packlink\BusinessLogic\Scheduler\Interfaces;
 
+use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
+
 interface SchedulerInterface
 {
     const CLASS_NAME = __CLASS__;
 
     /**
      * @param callable $callback
-     * @param int $dayOfWeek
-     * @param int $hour
-     * @param int $minute
+     * @param ScheduleConfig $config
      */
-    public function scheduleWeekly(callable $callback, int $dayOfWeek, int $hour, int $minute);
+    public function scheduleWeekly(callable $callback, ScheduleConfig $config);
 
     /**
      * @param callable $callback
-     * @param int $dayOfWeek
-     * @param int $hour
-     * @param int $minute
+     * @param ScheduleConfig $config
      */
-    public function scheduleDaily(callable $callback, int $dayOfWeek, int $hour, int $minute);
+    public function scheduleDaily(callable $callback, ScheduleConfig $config);
 
     /**
      * @param callable $callback
-     * @param int $dayOfWeek
-     * @param int $hour
-     * @param int $minute
+     * @param ScheduleConfig $config
      */
-    public function scheduleHourly(callable $callback, int $dayOfWeek, int $hour, int $minute);
+    public function scheduleHourly(callable $callback, ScheduleConfig $config);
 }

@@ -29,8 +29,11 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
                 $taskExecutor = \Logeecom\Infrastructure\ServiceRegister::getService(
                     \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface::CLASS_NAME
                 );
+                $scheduler = \Logeecom\Infrastructure\ServiceRegister::getService(
+                    \Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface::class
+                );
 
-                return new UserAccountService($taskExecutor);
+                return new UserAccountService($taskExecutor, $scheduler);
             }
         );
     }

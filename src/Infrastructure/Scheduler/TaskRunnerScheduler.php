@@ -6,13 +6,14 @@ use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Infrastructure\Scheduler\Models\DailySchedule;
 use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
 use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule;
 
-class SchedulerService implements SchedulerInterface
+class TaskRunnerScheduler implements SchedulerInterface
 {
     /**
      * @var Configuration
@@ -26,15 +27,13 @@ class SchedulerService implements SchedulerInterface
 
     /**
      * @param callable $callback
-     * @param int $dayOfWeek
-     * @param int $hour
-     * @param int $minute
+     * @param ScheduleConfig $config
      *
      * @return void
      *
      * @throws RepositoryNotRegisteredException
      */
-    public function scheduleWeekly(callable $callback, int $dayOfWeek, int $hour, int $minute)
+    public function scheduleWeekly(callable $callback, ScheduleConfig $config)
     {
         $task = $this->createTask($callback);
         $schedule = new WeeklySchedule(
@@ -43,9 +42,10 @@ class SchedulerService implements SchedulerInterface
             $this->configService->getContext()
         );
 
-        $schedule->setDay($dayOfWeek);
-        $schedule->setHour($hour);
-        $schedule->setMinute($minute);
+        $schedule->setDay($config->getDayOfWeek());
+        $schedule->setHour($config->getHour());
+        $schedule->setMinute($config->getMinute());
+        $schedule->setRecurring($config->isRecurring());
         $schedule->setNextSchedule();
 
         $this->saveSchedule($schedule);
@@ -53,15 +53,13 @@ class SchedulerService implements SchedulerInterface
 
     /**
      * @param callable $callback
-     * @param int $dayOfWeek
-     * @param int $hour
-     * @param int $minute
+     * @param ScheduleConfig $config
      *
      * @return void
      *
      * @throws RepositoryNotRegisteredException
      */
-    public function scheduleDaily(callable $callback, int $dayOfWeek, int $hour, int $minute)
+    public function scheduleDaily(callable $callback, ScheduleConfig $config)
     {
         $task = $this->createTask($callback);
         $schedule = new DailySchedule(
@@ -70,9 +68,18 @@ class SchedulerService implements SchedulerInterface
             $this->configService->getContext()
         );
 
-        $schedule->setDaysOfWeek(array($dayOfWeek));
-        $schedule->setHour($hour);
-        $schedule->setMinute($minute);
+        $daysOfWeek = $config->getDaysOfWeek();
+        if (empty($daysOfWeek) && $config->getDayOfWeek() !== null) {
+            $daysOfWeek = array($config->getDayOfWeek());
+        }
+
+        if (!empty($daysOfWeek)) {
+            $schedule->setDaysOfWeek($daysOfWeek);
+        }
+
+        $schedule->setHour($config->getHour());
+        $schedule->setMinute($config->getMinute());
+        $schedule->setRecurring($config->isRecurring());
         $schedule->setNextSchedule();
 
         $this->saveSchedule($schedule);
@@ -80,15 +87,13 @@ class SchedulerService implements SchedulerInterface
 
     /**
      * @param callable $callback
-     * @param int $dayOfWeek
-     * @param int $hour
-     * @param int $minute
+     * @param ScheduleConfig $config
      *
      * @return void
      *
      * @throws RepositoryNotRegisteredException
      */
-    public function scheduleHourly(callable $callback, int $dayOfWeek, int $hour, int $minute)
+    public function scheduleHourly(callable $callback, ScheduleConfig $config)
     {
         $task = $this->createTask($callback);
         $schedule = new HourlySchedule(
@@ -97,10 +102,29 @@ class SchedulerService implements SchedulerInterface
             $this->configService->getContext()
         );
 
-        $schedule->setDay($dayOfWeek);
-        $schedule->setMinute($minute);
-        $schedule->setStartHour($hour);
-        $schedule->setStartMinute($minute);
+        $schedule->setDay($config->getDayOfWeek());
+        if ($config->getMinute() !== null) {
+            $schedule->setMinute($config->getMinute());
+        }
+
+        $startHour = $config->getStartHour() !== null ? $config->getStartHour() : $config->getHour();
+        $startMinute = $config->getStartMinute() !== null ? $config->getStartMinute() : $config->getMinute();
+        if ($startHour !== null) {
+            $schedule->setStartHour($startHour);
+        }
+        if ($startMinute !== null) {
+            $schedule->setStartMinute($startMinute);
+        }
+        if ($config->getEndHour() !== null) {
+            $schedule->setEndHour($config->getEndHour());
+        }
+        if ($config->getEndMinute() !== null) {
+            $schedule->setEndMinute($config->getEndMinute());
+        }
+        if ($config->getInterval() !== null) {
+            $schedule->setInterval($config->getInterval());
+        }
+        $schedule->setRecurring($config->isRecurring());
         $schedule->setNextSchedule();
 
         $this->saveSchedule($schedule);
@@ -133,4 +157,5 @@ class SchedulerService implements SchedulerInterface
     {
         RepositoryRegistry::getRepository(Schedule::CLASS_NAME)->save($schedule);
     }
+
 }

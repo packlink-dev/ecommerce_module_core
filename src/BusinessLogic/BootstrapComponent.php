@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Infrastructure\Scheduler\SchedulerService;
+use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
@@ -87,7 +87,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 /** @var Configuration $config */
                 $config = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new SchedulerService($config);
+                return new TaskRunnerScheduler($config);
             }
         );
 
@@ -96,8 +96,10 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             function () {
                 /**@var TaskExecutorInterface $taskExecutor */
                 $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+                /** @var SchedulerInterface $scheduler */
+                $scheduler = ServiceRegister::getService(SchedulerInterface::class);
 
-                return new UserAccountService($taskExecutor);
+                return new UserAccountService($taskExecutor, $scheduler);
             }
         );
 

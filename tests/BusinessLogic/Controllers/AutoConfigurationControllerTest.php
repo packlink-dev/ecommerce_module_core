@@ -15,11 +15,13 @@ use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestCurlHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -67,6 +69,14 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
             QueueService::CLASS_NAME,
             function () use ($queue) {
                 return $queue;
+            }
+        );
+
+        $scheduler = new TestScheduler();
+        TestServiceRegister::registerService(
+            SchedulerInterface::class,
+            function () use ($scheduler) {
+                return $scheduler;
             }
         );
 
@@ -258,7 +268,8 @@ X-Custom-Header: Content: database\r
             $metadataProvider,
             $taskConfig,
             EventBus::getInstance(),
-            ServiceRegister::getService(TimeProvider::CLASS_NAME)
+            ServiceRegister::getService(TimeProvider::CLASS_NAME),
+            ServiceRegister::getService(SchedulerInterface::class)
         );
     }
 }

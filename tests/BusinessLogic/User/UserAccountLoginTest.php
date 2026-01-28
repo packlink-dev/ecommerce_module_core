@@ -12,13 +12,10 @@ use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Scheduler\Models\Schedule;
-use Packlink\BusinessLogic\Scheduler\Models\WeeklySchedule;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
@@ -43,7 +40,6 @@ class UserAccountLoginTest extends BaseTestWithServices
         parent::before();
 
         TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
-        TestRepositoryRegistry::registerRepository(Schedule::CLASS_NAME, MemoryRepository::getClassName());
 
         $queue = new TestQueueService();
         $taskRunnerStarter = new TestTaskRunnerWakeupService();
@@ -122,37 +118,12 @@ class UserAccountLoginTest extends BaseTestWithServices
         $this->assertCount(1, $queueItems);
         $this->assertEquals('UpdateShippingServicesBusinessTask', $queueItems[0]->getTaskType());
 
-        /** @var MemoryRepository $scheduleRepository */
-        $scheduleRepository = RepositoryRegistry::getRepository(Schedule::CLASS_NAME);
-        /** @var Schedule[] $allSchedules */
-        $allSchedules = $scheduleRepository->select();
-
-        $this->assertCount(1, $allSchedules);
-
-        $expectedSchedules = array(
-            WeeklySchedule::getClassName() => array(
-                UpdateShippingServicesTask::getClassName() => 1,
-            ),
-        );
-
-        foreach ($allSchedules as $schedule) {
-            $scheduleClass = get_class($schedule);
-            $taskClass = explode('\\', get_class($schedule->getTask()));
-            $taskClass = end($taskClass);
-            $this->assertArrayHasKey($scheduleClass, $expectedSchedules);
-            $this->assertArrayHasKey($taskClass, $expectedSchedules[$scheduleClass]);
-
-            $expectedSchedules[$scheduleClass][$taskClass]--;
-            if ($expectedSchedules[$scheduleClass][$taskClass] === 0) {
-                unset($expectedSchedules[$scheduleClass][$taskClass]);
-            }
-
-            if (empty($expectedSchedules[$scheduleClass])) {
-                unset($expectedSchedules[$scheduleClass]);
-            }
-        }
-
-        $this->assertEmpty($expectedSchedules);
+        $this->assertCount(1, $this->scheduler->weeklyCalls);
+        $scheduled = $this->scheduler->weeklyCalls[0];
+        $this->assertInstanceOf(UpdateShippingServicesTask::class, $scheduled['callback']());
+        $this->assertNotNull($scheduled['config']->getDayOfWeek());
+        $this->assertNotNull($scheduled['config']->getHour());
+        $this->assertNotNull($scheduled['config']->getMinute());
     }
 
     /**

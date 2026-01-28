@@ -98,8 +98,9 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             UserAccountService::CLASS_NAME,
             function () {
                 $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+                $scheduler = ServiceRegister::getService(SchedulerInterface::class);
 
-                return new UserAccountService($taskExecutor);
+                return new UserAccountService($taskExecutor, $scheduler);
             }
         );
 
@@ -173,7 +174,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                     $metadataProvider,
                     $me->shopConfig,
                     EventBus::getInstance(),
-                    ServiceRegister::getService(TimeProvider::CLASS_NAME)
+                    ServiceRegister::getService(TimeProvider::CLASS_NAME),
+                    ServiceRegister::getService(SchedulerInterface::class)
                 );
             }
         );

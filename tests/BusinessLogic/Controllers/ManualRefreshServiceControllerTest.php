@@ -20,6 +20,7 @@ use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\ManualRefreshController;
@@ -80,7 +81,8 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             $metadataProvider,
             $configuration,
             EventBus::getInstance(),
-            ServiceRegister::getService(TimeProvider::CLASS_NAME)
+            ServiceRegister::getService(TimeProvider::CLASS_NAME),
+            ServiceRegister::getService(SchedulerInterface::class)
         );
         $statusProvider = new QueueTaskStatusProvider($queueService);
 
