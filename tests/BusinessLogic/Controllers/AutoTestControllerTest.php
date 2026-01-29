@@ -7,6 +7,8 @@ use Logeecom\Infrastructure\Logger\LogData;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\AutoTest\MockAutoTestService;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
+use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -27,7 +29,9 @@ class AutoTestControllerTest extends BaseTestWithServices
     {
         parent::before();
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-        $this->service = new MockAutoTestService($taskExecutor);
+        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $this->service = new MockAutoTestService($taskExecutor, $statusProvider);
 
         $me = $this;
 

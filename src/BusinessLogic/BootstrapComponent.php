@@ -5,9 +5,13 @@ namespace Packlink\BusinessLogic;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\Scheduler\QueueSchedulerCheckPolicy;
 use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
@@ -88,6 +92,18 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $config = ServiceRegister::getService(Configuration::CLASS_NAME);
 
                 return new TaskRunnerScheduler($config);
+            }
+        );
+
+        ServiceRegister::registerService(
+            SchedulerCheckPolicyInterface::CLASS_NAME,
+            function () {
+                /** @var Configuration $config */
+                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+                /** @var QueueServiceInterface $queueService */
+                $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+
+                return new QueueSchedulerCheckPolicy($queueService, $config);
             }
         );
 
@@ -233,8 +249,9 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             AutoTestService::CLASS_NAME,
             function () {
                 $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+                $statusProvider = ServiceRegister::getService(TaskStatusProviderInterface::CLASS_NAME);
 
-                return new AutoTestService($taskExecutor);
+                return new AutoTestService($taskExecutor, $statusProvider);
             }
         );
 

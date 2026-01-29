@@ -16,6 +16,7 @@ use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
@@ -141,7 +142,9 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     {
         RepositoryRegistry::registerRepository(LogData::getClassName(), MemoryRepository::getClassName());
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-        $service = new AutoTestService($taskExecutor);
+        $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $service = new AutoTestService($taskExecutor, $statusProvider);
         $service->setAutoTestMode(true);
 
         $repo = RepositoryRegistry::getRepository(LogData::getClassName());
@@ -174,7 +177,9 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
         $this->shopConfig->setHttpConfigurationOptions($domain, array(new Options('test', 'value')));
 
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-        $service = new AutoTestService($taskExecutor);
+        $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $service = new AutoTestService($taskExecutor, $statusProvider);
         $queueItemId = $service->startAutoTest();
 
         self::assertNotNull($queueItemId, 'Test task should be enqueued.');
@@ -220,7 +225,9 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     {
         // repository is not registered
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-        $service = new AutoTestService($taskExecutor);
+        $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $service = new AutoTestService($taskExecutor, $statusProvider);
 
         $exThrown = null;
         try {

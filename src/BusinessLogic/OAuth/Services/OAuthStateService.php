@@ -47,7 +47,7 @@ class OAuthStateService implements OAuthStateServiceInterface
      */
     public function generate($tenantId)
     {
-        $random = hash('sha256', mt_rand() . uniqid('', true) . microtime(true));
+        $random = bin2hex(random_bytes(32));
 
         $data = array(
             'tenantId' => $tenantId,

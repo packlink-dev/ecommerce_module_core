@@ -6,9 +6,9 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Packlink\BusinessLogic\Configuration;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
 
 /**
  * Class ScheduleTickHandler.
@@ -18,39 +18,28 @@ use Packlink\BusinessLogic\Configuration;
 class ScheduleTickHandler
 {
     /**
-     * @var QueueService
+     * @var SchedulerCheckPolicyInterface
      */
-    private $queueService;
+    private $checkPolicy;
     /**
-     * @var Configuration
+     * @var TaskExecutorInterface
      */
-    private $configService;
+    private $taskExecutor;
 
     /**
      * Queues ScheduleCheckTask.
      */
-    public function handle()
-    {
-        $task = $this->getQueueService()->findLatestByType('ScheduleCheckTask');
-        $threshold = $this->getConfigService()->getSchedulerTimeThreshold();
-
-        $this->createCheckTask($task, $threshold);
+    public function __construct(
+        SchedulerCheckPolicyInterface $checkPolicy = null,
+        TaskExecutorInterface $taskExecutor = null
+    ) {
+        $this->checkPolicy = $checkPolicy ?: ServiceRegister::getService(SchedulerCheckPolicyInterface::CLASS_NAME);
+        $this->taskExecutor = $taskExecutor ?: ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
     }
 
-    /**
-     * Checks if ScheduleCheckTask should be enqueued and
-     * if it should, enqueues it.
-     *
-     * @param $task
-     * @param $threshold
-     */
-    protected function createCheckTask($task, $threshold)
+    public function handle()
     {
-        if ($task && in_array($task->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)) {
-            return;
-        }
-
-        if ($task === null || $task->getQueueTimestamp() + $threshold < time()) {
+        if ($this->checkPolicy->shouldEnqueue()) {
             $this->enqueueCheckTask();
         }
     }
@@ -62,12 +51,7 @@ class ScheduleTickHandler
     {
         $task = $this->getScheduleCheckTask();
         try {
-            $this->getQueueService()->enqueue(
-                $this->getConfigService()->getSchedulerQueueName(),
-                $task,
-                $this->getConfigService()->getContext(),
-                $task->getPriority()
-            );
+            $this->taskExecutor->enqueue(new LegacyTaskAdapter($task));
         } catch (QueueStorageUnavailableException $ex) {
             Logger::logDebug(
                 'Failed to enqueue task ' . $task->getType(),
@@ -89,29 +73,5 @@ class ScheduleTickHandler
     protected function getScheduleCheckTask()
     {
         return new ScheduleCheckTask();
-    }
-
-    /**
-     * @return QueueService
-     */
-    protected function getQueueService()
-    {
-        if ($this->queueService === null) {
-            $this->queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-        }
-
-        return $this->queueService;
-    }
-
-    /**
-     * @return Configuration
-     */
-    protected function getConfigService()
-    {
-        if ($this->configService === null) {
-            $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        }
-
-        return $this->configService;
     }
 }

@@ -7,12 +7,10 @@ use Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\LogData;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
-use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\AutoTestBusinessTask;
 
 /**
@@ -34,16 +32,19 @@ class AutoTestService
      * @var TaskExecutorInterface
      */
     private $taskExecutor;
+    /**
+     * @var TaskStatusProviderInterface
+     */
+    private $statusProvider;
 
-    public function __construct(TaskExecutorInterface $taskExecutor)
+    public function __construct(TaskExecutorInterface $taskExecutor, TaskStatusProviderInterface $statusProvider)
     {
         $this->taskExecutor = $taskExecutor;
+        $this->statusProvider = $statusProvider;
     }
 
     /**
      * Starts the auto-test.
-     *
-     * @return int The queue item ID.
      *
      * @throws \Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -62,9 +63,7 @@ class AutoTestService
 
         $this->taskExecutor->enqueue(new AutoTestBusinessTask('DUMMY TEST DATA'));
 
-        $queueItem = $this->findAutoTestQueueItem();
-
-        return $queueItem ? $queueItem->getId() : 0;
+        return (int)time();
     }
 
     /**
@@ -90,36 +89,32 @@ class AutoTestService
     /**
      * Gets the status of the auto-test task.
      *
-     * @param int $queueItemId The ID of the queue item that started the task.
+     * @param int $queueItemId The ID of the auto-test task (unused).
      *
      * @return AutoTestStatus The status of the auto-test task.
-     *
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
     public function getAutoTestTaskStatus($queueItemId = 0)
     {
         $this->setAutoTestMode();
 
-        $status = '';
-        $item = $queueItemId ? $this->findQueueItemById($queueItemId) : $this->findAutoTestQueueItem();
-        if ($item) {
-            if ($item->getStatus() === QueueItem::QUEUED && $item->getQueueTimestamp() < time() - 30) {
-                // if item is queued and task runner did not start it within 30 seconds, task expired
-                Logger::logError('Auto-test task did not finish within expected time frame.');
-
-                $status = 'timeout';
-            } else {
-                $status = $item->getStatus();
-            }
+        $context = $this->getConfigService()->getContext();
+        $result = $this->statusProvider->getLatestStatus(
+            'AutoTestBusinessTask',
+            $context ? $context : ''
+        );
+        $status = $result['status'] ?? 'not_started';
+        $logs = AutoTestLogger::getInstance()->getLogs();
+        if ($status === 'queued' && $this->isQueuedTimeout($logs)) {
+            Logger::logError('Auto-test task did not finish within expected time frame.');
+            $status = 'timeout';
         }
+        $error = $status === 'timeout' ? 'Task could not be started.' : ($result['message'] ?? '');
 
         return new AutoTestStatus(
             $status,
-            in_array($status, array('timeout', QueueItem::COMPLETED, QueueItem::FAILED), true),
-            $status === 'timeout' ? 'Task could not be started.' : '',
-            AutoTestLogger::getInstance()->getLogs()
+            in_array($status, array('timeout', 'completed', 'failed'), true),
+            $error,
+            $logs
         );
     }
 
@@ -180,43 +175,43 @@ class AutoTestService
     }
 
     /**
-     * Find queue item by ID.
+     * Determines if queued status exceeded the timeout window.
      *
-     * @param int $queueItemId
+     * @param LogData[] $logs
      *
-     * @return QueueItem|null
+     * @return bool
      */
-    private function findQueueItemById($queueItemId)
+    private function isQueuedTimeout(array $logs)
     {
-        $filter = new QueryFilter();
-        $filter->where('id', Operators::EQUALS, $queueItemId);
+        $autoTestStart = $this->findLatestLogByMessage($logs, 'Start auto-test');
+        if ($autoTestStart === null) {
+            return false;
+        }
 
-        return RepositoryRegistry::getQueueItemRepository()->selectOne($filter);
+        return $autoTestStart->getTimestamp() < time() - 30;
     }
 
     /**
-     * Find the latest auto-test queue item.
+     * Finds latest log by message.
      *
-     * @return QueueItem|null
+     * @param LogData[] $logs
+     * @param string $message
+     *
+     * @return LogData|null
      */
-    private function findAutoTestQueueItem()
+    private function findLatestLogByMessage(array $logs, $message)
     {
-        $filter = new QueryFilter();
-        $filter->where('queueName', Operators::EQUALS, $this->getConfigService()->getDefaultQueueName());
-        $filter->orderBy('queueTime', QueryFilter::ORDER_DESC);
-        $filter->setLimit(25);
+        $latest = null;
+        foreach ($logs as $log) {
+            if ($log->getMessage() !== $message) {
+                continue;
+            }
 
-        $items = RepositoryRegistry::getQueueItemRepository()->select($filter);
-        foreach ($items as $item) {
-            try {
-                if ($item->getTaskType() === 'AutoTestBusinessTask') {
-                    return $item;
-                }
-            } catch (\Exception $e) {
-                // Ignore invalid task entries and continue searching.
+            if ($latest === null || $log->getTimestamp() > $latest->getTimestamp()) {
+                $latest = $log;
             }
         }
 
-        return null;
+        return $latest;
     }
 }

@@ -5,8 +5,10 @@ namespace Logeecom\Infrastructure;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\RunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\TaskRunner;
@@ -65,6 +67,14 @@ class BootstrapComponent
             QueueServiceInterface::CLASS_NAME,
             function () {
                 return new QueueService();
+            }
+        );
+        ServiceRegister::registerService(
+            TaskStatusProviderInterface::CLASS_NAME,
+            function () {
+                $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+
+                return new QueueTaskStatusProvider($queueService);
             }
         );
         ServiceRegister::registerService(

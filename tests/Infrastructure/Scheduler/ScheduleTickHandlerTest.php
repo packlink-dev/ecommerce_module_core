@@ -7,6 +7,8 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
@@ -16,10 +18,14 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepos
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskExecutor;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Logeecom\Infrastructure\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\Configuration;
+use Logeecom\Infrastructure\Scheduler\QueueSchedulerCheckPolicy;
+use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -52,6 +58,19 @@ class ScheduleTickHandlerTest extends TestCase
      * @var TestTaskRunnerWakeupService
      */
     private $taskRunnerStarter;
+    /**
+     * @var TestTaskExecutor
+     */
+    private $taskExecutor;
+    /**
+     * @var QueueSchedulerCheckPolicy
+     */
+    private $checkPolicy;
+
+    /**
+     * @var TestShopConfiguration
+     */
+    private $config;
 
     /**
      * @before
@@ -72,6 +91,9 @@ class ScheduleTickHandlerTest extends TestCase
         $timeProvider = new TestTimeProvider();
         $taskRunnerStarter = new TestTaskRunnerWakeupService();
         $queue = new TestQueueService();
+        $config = new TestShopConfiguration();
+        $taskExecutor = new TestTaskExecutor();
+        $checkPolicy = new QueueSchedulerCheckPolicy($queue, $config);
 
         new TestServiceRegister(
             array(
@@ -81,10 +103,13 @@ class ScheduleTickHandlerTest extends TestCase
                 TaskRunnerWakeup::CLASS_NAME => function () use ($taskRunnerStarter) {
                     return $taskRunnerStarter;
                 },
-                Configuration::CLASS_NAME => function () {
-                    return new TestShopConfiguration();
+                Configuration::CLASS_NAME => function () use ($config) {
+                    return $config;
                 },
                 QueueService::CLASS_NAME => function () use ($queue) {
+                    return $queue;
+                },
+                QueueServiceInterface::CLASS_NAME => function () use ($queue) {
                     return $queue;
                 },
                 EventBus::CLASS_NAME => function () {
@@ -92,7 +117,13 @@ class ScheduleTickHandlerTest extends TestCase
                 },
                 Serializer::CLASS_NAME => function() {
                     return new NativeSerializer();
-                }
+                },
+                TaskExecutorInterface::CLASS_NAME => function () use ($taskExecutor) {
+                    return $taskExecutor;
+                },
+                SchedulerCheckPolicyInterface::CLASS_NAME => function () use ($checkPolicy) {
+                    return $checkPolicy;
+                },
             )
         );
 
@@ -100,6 +131,9 @@ class ScheduleTickHandlerTest extends TestCase
         $this->timeProvider = $timeProvider;
         $this->taskRunnerStarter = $taskRunnerStarter;
         $this->queue = $queue;
+        $this->config = $config;
+        $this->taskExecutor = $taskExecutor;
+        $this->checkPolicy = $checkPolicy;
         MemoryStorage::reset();
     }
 
@@ -112,14 +146,10 @@ class ScheduleTickHandlerTest extends TestCase
      */
     public function testFirstQueueOfHandler()
     {
-        $tickHandler = new ScheduleTickHandler();
+        $tickHandler = new ScheduleTickHandler($this->checkPolicy, $this->taskExecutor);
         $tickHandler->handle();
 
-        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->select();
-        $this->assertCount(1, $queueItems);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->assertEquals('ScheduleCheckTask', $queueItems[0]->getTaskType());
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
     }
 
     /**
@@ -131,22 +161,23 @@ class ScheduleTickHandlerTest extends TestCase
      */
     public function testSecondQueueOfHandler()
     {
-        $tickHandler = new ScheduleTickHandler();
+        $tickHandler = new ScheduleTickHandler($this->checkPolicy, $this->taskExecutor);
         $tickHandler->handle();
 
-        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->select();
-        $this->assertCount(1, $queueItems);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->assertEquals('ScheduleCheckTask', $queueItems[0]->getTaskType());
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
 
+        // simulate queued task so policy blocks second enqueue
+        $task = new ScheduleCheckTask();
+        $this->queue->enqueue(
+            $this->config->getSchedulerQueueName(),
+            $task,
+            $this->config->getContext(),
+            $task->getPriority()
+        );
 
         $tickHandler->handle();
 
-        $queueItems = $this->queueStorage->select();
-        $this->assertCount(1, $queueItems);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->assertEquals('ScheduleCheckTask', $queueItems[0]->getTaskType());
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
     }
 
     /**
@@ -158,21 +189,22 @@ class ScheduleTickHandlerTest extends TestCase
      */
     public function testSecondQueueOfHandlerAfterThreshold()
     {
-        $tickHandler = new ScheduleTickHandler();
+        $tickHandler = new ScheduleTickHandler($this->checkPolicy, $this->taskExecutor);
         $tickHandler->handle();
 
-        /** @var \Logeecom\Infrastructure\TaskExecution\QueueItem[] $queueItems */
-        $queueItems = $this->queueStorage->select();
-        $this->assertCount(1, $queueItems);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $queueItem = $queueItems[0];
-        $this->assertEquals('ScheduleCheckTask', $queueItem->getTaskType());
+        $this->assertCount(1, $this->taskExecutor->enqueuedTasks);
 
+        $task = new ScheduleCheckTask();
+        $queueItem = $this->queue->enqueue(
+            $this->config->getSchedulerQueueName(),
+            $task,
+            $this->config->getContext(),
+            $task->getPriority()
+        );
         $queueItem->setQueueTimestamp($queueItem->getQueueTimestamp() - 61);
-        $this->queueStorage->save($queueItem);
+        $this->queueStorage->update($queueItem);
         $tickHandler->handle();
 
-        $queueItems = $this->queueStorage->select();
-        $this->assertCount(2, $queueItems);
+        $this->assertCount(2, $this->taskExecutor->enqueuedTasks);
     }
 }

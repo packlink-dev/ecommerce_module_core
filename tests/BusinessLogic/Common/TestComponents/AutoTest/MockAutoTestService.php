@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\AutoTest;
 
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use RuntimeException;
 
 class MockAutoTestService extends AutoTestService
@@ -14,9 +15,9 @@ class MockAutoTestService extends AutoTestService
     public $shouldFail = false;
     public $failureMessage = 'Failure message.';
 
-    public function __construct(TaskExecutorInterface $taskExecutor)
+    public function __construct(TaskExecutorInterface $taskExecutor, TaskStatusProviderInterface $statusProvider)
     {
-        parent::__construct($taskExecutor);
+        parent::__construct($taskExecutor, $statusProvider);
     }
 
     public function startAutoTest()
