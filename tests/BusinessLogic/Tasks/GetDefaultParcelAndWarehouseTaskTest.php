@@ -3,10 +3,10 @@
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
-use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Tasks\GetDefaultParcelAndWarehouseTask;
+use Logeecom\Infrastructure\TaskExecution\TaskAdapter;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\GetDefaultParcelAndWarehouseBusinessTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
 /**
@@ -68,11 +68,13 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
     /**
      * Creates new instance of task that is being tested.
      *
-     * @return Task
+     * @return \Logeecom\Infrastructure\TaskExecution\Task
      */
     protected function createSyncTaskInstance()
     {
-        return new GetDefaultParcelAndWarehouseTask();
+        $businessTask = new GetDefaultParcelAndWarehouseBusinessTask();
+
+        return new TaskAdapter($businessTask);
     }
 
     /**
