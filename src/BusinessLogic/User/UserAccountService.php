@@ -187,8 +187,6 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
         }
 
         $this->getConfigService()->setUserInfo($user);
-        $defaultQueueName = $this->getConfigService()->getDefaultQueueName();
-
         $taskExecutor = $this->taskExecutor;
 
         $this->setDefaultParcel(true);

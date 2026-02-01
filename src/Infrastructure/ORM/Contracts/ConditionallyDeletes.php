@@ -1,13 +1,13 @@
 <?php
 
-namespace Packlink\BusinessLogic\ORM\Contracts;
+namespace Logeecom\Infrastructure\ORM\Contracts;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 
 /**
  * Interface ConditionallyDeletes
  *
- * @package Packlink\BusinessLogic\ORM\Contracts
+ * @package Logeecom\Infrastructure\ORM\Contracts
  */
 interface ConditionallyDeletes
 {

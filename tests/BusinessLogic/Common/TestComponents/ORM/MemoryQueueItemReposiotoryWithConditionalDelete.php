@@ -4,7 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
-use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
+use Logeecom\Infrastructure\ORM\Contracts\ConditionallyDeletes;
 
 /**
  * Class MemoryRepositoryWithConditionalDelete

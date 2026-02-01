@@ -7,7 +7,7 @@ use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Tasks\BatchTaskCleanupTask;
+use Logeecom\Infrastructure\TaskExecution\BatchTaskCleanupTask;
 
 /**
  * Class BatchTaskCleanupTaskSerializationTest

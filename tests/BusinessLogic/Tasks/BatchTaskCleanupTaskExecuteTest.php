@@ -12,7 +12,7 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM\MemoryQueueItemReposi
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
-use Packlink\BusinessLogic\Tasks\BatchTaskCleanupTask;
+use Logeecom\Infrastructure\TaskExecution\BatchTaskCleanupTask;
 
 class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
 {

@@ -1,18 +1,17 @@
 <?php
 
-namespace Packlink\BusinessLogic\Tasks;
+namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\Exceptions\EntityClassException;
+use Logeecom\Infrastructure\ORM\Contracts\ConditionallyDeletes;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
-use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
 
 /**
  * Class BatchTaskCleanupTask
@@ -21,7 +20,7 @@ use Packlink\BusinessLogic\ORM\Contracts\ConditionallyDeletes;
  *
  * It uses configurable value max task age to narrow down the list of deleted tasks.
  *
- * @package Packlink\BusinessLogic\Tasks
+ * @package Logeecom\Infrastructure\TaskExecution
  */
 class BatchTaskCleanupTask extends Task
 {

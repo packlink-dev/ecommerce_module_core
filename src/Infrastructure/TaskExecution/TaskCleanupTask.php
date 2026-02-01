@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\Tasks;
+namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -9,14 +9,13 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
  * Class TaskCleanupTask.
  * In charge for deleting from the database specific tasks in specific statuses older than specific age (in seconds).
  *
- * @package Packlink\BusinessLogic\Tasks
+ * @package Logeecom\Infrastructure\TaskExecution
  */
 class TaskCleanupTask extends Task
 {

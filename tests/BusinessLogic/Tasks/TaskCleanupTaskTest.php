@@ -14,7 +14,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
-use Packlink\BusinessLogic\Tasks\TaskCleanupTask;
+use Logeecom\Infrastructure\TaskExecution\TaskCleanupTask;
 
 /**
  * Class TaskCleanupTaskTest.
