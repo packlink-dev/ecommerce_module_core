@@ -38,8 +38,7 @@ class TaskAdapter extends Task
     {
         $this->businessTask = $businessTask;
         $this->businessTaskFullClass = get_class($businessTask);
-        $parts = explode('\\', $this->businessTaskFullClass);
-        $this->businessTaskClass = end($parts);
+        $this->businessTaskClass = $this->resolveTaskType($this->businessTaskFullClass);
     }
 
     /**
@@ -122,11 +121,10 @@ class TaskAdapter extends Task
     {
         $data = Serializer::unserialize($serialized);
         $this->businessTaskFullClass = $data['class'];
-        $parts = explode('\\', $this->businessTaskFullClass);
-        $this->businessTaskClass = end($parts);
 
         // Reconstruct business task using fromArray()
         $this->businessTask = call_user_func(array($this->businessTaskFullClass, 'fromArray'), $data['data']);
+        $this->businessTaskClass = $this->resolveTaskType($this->businessTaskFullClass);
     }
 
     /**
@@ -137,6 +135,29 @@ class TaskAdapter extends Task
     public function getType()
     {
         return $this->businessTaskClass ?: parent::getType();
+    }
+
+    /**
+     * Resolve the task type name used for QueueItem.
+     *
+     * Allows business tasks to provide a custom type (e.g., LegacyTaskAdapter).
+     *
+     * @param string $businessTaskFullClass
+     *
+     * @return string
+     */
+    private function resolveTaskType($businessTaskFullClass)
+    {
+        if (method_exists($this->businessTask, 'getTaskType')) {
+            $taskType = $this->businessTask->getTaskType();
+            if (is_string($taskType) && $taskType !== '') {
+                return $taskType;
+            }
+        }
+
+        $parts = explode('\\', $businessTaskFullClass);
+
+        return end($parts);
     }
 
     public static function fromArray(array $array)
@@ -188,8 +209,6 @@ class TaskAdapter extends Task
         }
 
         $this->businessTaskFullClass = $data['class'];
-        $parts = explode('\\', $this->businessTaskFullClass);
-        $this->businessTaskClass = end($parts);
 
         if (!class_exists($this->businessTaskFullClass)) {
             throw new \InvalidArgumentException('BusinessTask class does not exist: ' . $this->businessTaskFullClass);
@@ -204,5 +223,6 @@ class TaskAdapter extends Task
         $taskData = isset($data['data']) && is_array($data['data']) ? $data['data'] : array();
 
         $this->businessTask = call_user_func(array($this->businessTaskFullClass, 'fromArray'), $taskData);
+        $this->businessTaskClass = $this->resolveTaskType($this->businessTaskFullClass);
     }
 }

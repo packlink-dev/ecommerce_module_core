@@ -5,9 +5,9 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\Serializer\Concrete\JsonSerializer;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\TaskExecution\Tasks\BatchTaskCleanupTask;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\BatchTaskCleanupTask;
 
 /**
  * Class BatchTaskCleanupTaskSerializationTest

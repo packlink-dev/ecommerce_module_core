@@ -31,6 +31,13 @@ class DefaultTaskMetadataProvider implements TaskMetadataProviderInterface
      */
     public function getExecutionConfig(BusinessTask $task): TaskExecutionConfig
     {
+        if (method_exists($task, 'getExecutionConfig')) {
+            $executionConfig = $task->getExecutionConfig();
+            if ($executionConfig instanceof TaskExecutionConfig) {
+                return $executionConfig;
+            }
+        }
+
         $queueName = $this->config->getDefaultQueueName();
         $priority = $this->getTaskPriority($task);
         $context = $this->config->getContext();

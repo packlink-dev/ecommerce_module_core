@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus as CoreTaskStatus;
 
 class ManualRefreshController
 {
@@ -80,27 +81,28 @@ class ManualRefreshController
     {
         $taskStatus = new TaskStatus();
 
+        /** @var CoreTaskStatus $result */
         $result = $this->statusProvider->getLatestStatus(
             'UpdateShippingServicesBusinessTask',
             $context
         );
 
-        if (empty($result)) {
-            $taskStatus->status = QueueItem::CREATED;
-            $taskStatus->message = 'Queue item not found.';
+        if ($result->getStatus() === CoreTaskStatus::NOT_FOUND) {
+            $taskStatus->status = CoreTaskStatus::CREATED;
+            $taskStatus->message = 'Item not found in queue. Task was not enqueued yet.';
             return $taskStatus;
         }
 
-        $taskStatus->status = $result['status'];
-        $taskStatus->message = $result['message'] ?? null;
+        $taskStatus->status = $result->getStatus();
+        $taskStatus->message = $result->getMessage();
 
 
-        if ($result['status'] === QueueItem::FAILED) {
-            $taskStatus->message = $result['message'] ?: 'Task failed.';
+        if ($result->getStatus() === CoreTaskStatus::FAILED) {
+            $taskStatus->message = $result->getMessage() ?: 'Task failed.';
         }
 
-        if ($result['status'] === QueueItem::COMPLETED) {
-            $taskStatus->message = 'Queue item completed';
+        if ($result->getStatus() === CoreTaskStatus::COMPLETED) {
+            $taskStatus->message = 'Task completed successfully.';
         }
 
         return $taskStatus;

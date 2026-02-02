@@ -3,18 +3,18 @@
 namespace BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\Tasks\TaskCleanupTask;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
-use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
-use Logeecom\Infrastructure\TaskExecution\TaskCleanupTask;
 
 /**
  * Class TaskCleanupTaskTest.

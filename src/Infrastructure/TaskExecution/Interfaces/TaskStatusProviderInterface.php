@@ -2,6 +2,8 @@
 
 namespace Logeecom\Infrastructure\TaskExecution\Interfaces;
 
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
+
 interface TaskStatusProviderInterface
 {
     /**
@@ -13,7 +15,7 @@ interface TaskStatusProviderInterface
      * @param string $type
      * @param string $context
      *
-     * @return array{status:string, message:string|null}
+     * @return null|TaskStatus
      */
-    public function getLatestStatus(string $type, string $context = ''): array;
+    public function getLatestStatus(string $type, string $context = '');
 }

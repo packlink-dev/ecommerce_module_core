@@ -1,16 +1,17 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution;
+namespace Logeecom\Infrastructure\TaskExecution\Tasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\ORM\Exceptions\EntityClassException;
 use Logeecom\Infrastructure\ORM\Contracts\ConditionallyDeletes;
+use Logeecom\Infrastructure\ORM\Exceptions\EntityClassException;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
+use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**

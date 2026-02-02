@@ -22,16 +22,23 @@ class LegacyTaskAdapter implements BusinessTask
      * @var string
      */
     private $taskClass;
+    /**
+     * Optional execution config override.
+     *
+     * @var TaskExecutionConfig|null
+     */
+    private $executionConfig;
 
     /**
      * LegacyTaskAdapter constructor.
      *
      * @param Task $task Infrastructure task to wrap.
      */
-    public function __construct(Task $task)
+    public function __construct(Task $task, TaskExecutionConfig $executionConfig = null)
     {
         $this->task = $task;
         $this->taskClass = get_class($task);
+        $this->executionConfig = $executionConfig;
     }
 
     /**
@@ -53,10 +60,20 @@ class LegacyTaskAdapter implements BusinessTask
      */
     public function toArray(): array
     {
-        return [
+        $data = [
             'task_class' => $this->taskClass,
             'task_data' => $this->task->toArray(),
         ];
+
+        if ($this->executionConfig !== null) {
+            $data['execution_config'] = [
+                'queue_name' => $this->executionConfig->getQueueName(),
+                'priority' => $this->executionConfig->getPriority(),
+                'context' => $this->executionConfig->getContext(),
+            ];
+        }
+
+        return $data;
     }
 
     /**
@@ -74,7 +91,16 @@ class LegacyTaskAdapter implements BusinessTask
         /** @var Task $task */
         $task = $taskClass::fromArray($taskData);
 
-        return new static($task);
+        $executionConfig = null;
+        if (!empty($data['execution_config']) && is_array($data['execution_config'])) {
+            $queueName = $data['execution_config']['queue_name'] ?? '';
+            $priority = $data['execution_config']['priority'] ?? Priority::NORMAL;
+            $context = $data['execution_config']['context'] ?? '';
+
+            $executionConfig = new TaskExecutionConfig($queueName, (int)$priority, $context);
+        }
+
+        return new static($task, $executionConfig);
     }
 
     /**
@@ -99,5 +125,23 @@ class LegacyTaskAdapter implements BusinessTask
         }
 
         return Priority::NORMAL;
+    }
+
+    /**
+     * Returns wrapped task type for QueueItem.
+     *
+     * @return string
+     */
+    public function getTaskType(): string
+    {
+        return $this->task->getType();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExecutionConfig()
+    {
+        return $this->executionConfig;
     }
 }

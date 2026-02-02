@@ -185,7 +185,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
         self::assertNotNull($queueItemId, 'Test task should be enqueued.');
 
         $status = $service->getAutoTestTaskStatus($queueItemId);
-        self::assertEquals('queued', $status->taskStatus, 'AutoTest tasks should be enqueued.');
+        self::assertEquals('pending', $status->taskStatus, 'AutoTest tasks should be enqueued.');
         $logger = $this->shopLogger;
         $service->stopAutoTestMode(
             function () use ($logger) {

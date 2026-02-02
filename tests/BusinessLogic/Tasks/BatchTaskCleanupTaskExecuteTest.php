@@ -7,12 +7,12 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecution\Tasks\BatchTaskCleanupTask;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM\MemoryQueueItemReposiotoryWithConditionalDelete;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
-use Logeecom\Infrastructure\TaskExecution\BatchTaskCleanupTask;
 
 class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
 {

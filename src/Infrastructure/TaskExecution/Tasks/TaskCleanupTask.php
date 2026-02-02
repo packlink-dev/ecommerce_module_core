@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution;
+namespace Logeecom\Infrastructure\TaskExecution\Tasks;
 
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -9,6 +9,7 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**

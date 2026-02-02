@@ -83,7 +83,6 @@ class HttpTaskExecutor implements TaskExecutorInterface
      */
     public function enqueue(BusinessTask $businessTask)
     {
-        // Get execution configuration from metadata provider
         $executionConfig = $this->metadataProvider->getExecutionConfig($businessTask);
 
         $taskAdapter = new TaskAdapter($businessTask);

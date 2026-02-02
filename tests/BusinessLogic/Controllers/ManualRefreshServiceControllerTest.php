@@ -126,7 +126,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         $response = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::QUEUED, $response->status);
+        self::assertEquals('pending', $response->status);
     }
 
     /**
@@ -159,6 +159,6 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
         $responseData = $this->controller->getTaskStatus();
 
         self::assertEquals(QueueItem::CREATED, $responseData->status);
-        self::assertEquals('Queue item not found.', $responseData->message);
+        self::assertEquals('Item not found in queue. Task was not enqueued yet.', $responseData->message);
     }
 }

@@ -3,16 +3,21 @@
 namespace Logeecom\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Infrastructure\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus as CoreTaskStatus;
 
 /**
  * Class ScheduleCheckTask.
@@ -101,24 +106,39 @@ class ScheduleCheckTask extends Task
      */
     protected function enqueueScheduledTask($schedule)
     {
-        /** @var QueueService $queueService */
-        $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
-
         $task = $schedule->getTask();
         if (!$task) {
             return;
         }
 
-        $latestTask = $queueService->findLatestByType($task->getType(), $schedule->getContext());
-        if ($latestTask
-            && $schedule->isRecurring()
-            && in_array($latestTask->getStatus(), array(QueueItem::QUEUED, QueueItem::IN_PROGRESS), true)
-        ) {
-            // do not enqueue task if it is already scheduled for execution
+        /** @var TaskStatusProviderInterface $statusProvider */
+        $statusProvider = ServiceRegister::getService(TaskStatusProviderInterface::CLASS_NAME);
+
+        /** @var CoreTaskStatus $latestStatus */
+        $latestStatus = $statusProvider->getLatestStatus($task->getType(), $schedule->getContext());
+
+
+        // If schedule is recurring, do not enqueue if task is already waiting or running
+        // (canonical statuses, independent of backend)
+        if ($schedule->isRecurring() && $this->isAlreadyScheduledOrRunning($latestStatus)) {
             return;
         }
 
-        $queueService->enqueue($schedule->getQueueName(), $task, $schedule->getContext(), $task->getPriority());
+        /** @var TaskExecutorInterface $taskExecutor */
+        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+        /** @var Configuration $configuration */
+        $configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        $queueName = $schedule->getQueueName() ?: $configuration->getDefaultQueueName();
+        $context = $schedule->getContext() ?: $configuration->getContext();
+
+        $taskExecutor->enqueue(
+            new LegacyTaskAdapter(
+                $task,
+                new TaskExecutionConfig($queueName, $task->getPriority(), $context)
+            )
+        );
         $this->updateSchedule($schedule);
     }
 
@@ -152,6 +172,28 @@ class ScheduleCheckTask extends Task
         $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
 
         return $timeProvider->getCurrentLocalTime();
+    }
+
+    /**
+     * Determines whether a recurring task should be considered already scheduled for execution.
+     *
+     * We prevent duplicate enqueue if the latest status indicates the task is waiting/running.
+     * This logic is backend-agnostic (works for Queue, Action Scheduler, cron, etc.).
+     *
+     * @param CoreTaskStatus $latestStatus
+     *
+     * @return bool
+     */
+    private function isAlreadyScheduledOrRunning(CoreTaskStatus $latestStatus): bool
+    {
+        return in_array(
+            $latestStatus->getStatus(),
+            array(
+                CoreTaskStatus::PENDING,
+                CoreTaskStatus::RUNNING,
+            ),
+            true
+        );
     }
 
     /** @noinspection PhpDocMissingThrowsInspection */

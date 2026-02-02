@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\AutoTestBusinessTask;
 
 /**
@@ -98,17 +99,21 @@ class AutoTestService
         $this->setAutoTestMode();
 
         $context = $this->getConfigService()->getContext();
+
+        /** @var \Logeecom\Infrastructure\TaskExecution\Model\TaskStatus $result */
         $result = $this->statusProvider->getLatestStatus(
             'AutoTestBusinessTask',
             $context ? $context : ''
         );
-        $status = $result['status'] ?? 'not_started';
+
+        $status = $result->getStatus();
         $logs = AutoTestLogger::getInstance()->getLogs();
-        if ($status === 'queued' && $this->isQueuedTimeout($logs)) {
+
+        if ($status === TaskStatus::PENDING && $this->isQueuedTimeout($logs)) {
             Logger::logError('Auto-test task did not finish within expected time frame.');
             $status = 'timeout';
         }
-        $error = $status === 'timeout' ? 'Task could not be started.' : ($result['message'] ?? '');
+        $error = $status === 'timeout' ? 'Task could not be started.' : ($result->getMessage() ?? '');
 
         return new AutoTestStatus(
             $status,
