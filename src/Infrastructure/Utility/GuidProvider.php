@@ -49,6 +49,6 @@ class GuidProvider
      */
     public function generateGuid()
     {
-        return uniqid(getmypid() . '_', true);
+        throw new \RuntimeException('getmypid() is unavailable');
     }
 }
