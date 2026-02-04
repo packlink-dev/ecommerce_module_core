@@ -13,8 +13,11 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
@@ -32,7 +35,9 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -110,6 +115,17 @@ class ScheduleCheckTaskTest extends TestCase
                 Configuration::CLASS_NAME => function () use ($taskInstance) {
                     return $taskInstance->shopConfig;
                 },
+                AsyncProcessUrlProviderInterface::CLASS_NAME => function () {
+                    return new TestAsyncProcessUrlProvider();
+                },
+
+                TaskRunnerConfigInterface::CLASS_NAME => function () {
+                    $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+                    $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                    return new TestTaskRunnerConfig($config, $urlProvider);
+                },
+
                 TimeProvider::CLASS_NAME => function () use ($timeProvider) {
                     return $timeProvider;
                 },
@@ -129,7 +145,11 @@ class ScheduleCheckTaskTest extends TestCase
                     return new QueueTaskStatusProvider($queue);
                 },
                 TaskExecutorInterface::CLASS_NAME => function () use ($taskInstance, $queue, $timeProvider) {
-                    $metadataProvider = new DefaultTaskMetadataProvider($taskInstance->shopConfig);
+                    $taskRunnerConfig = ServiceRegister::getService(
+                        \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface::CLASS_NAME
+                    );
+
+                    $metadataProvider = new DefaultTaskMetadataProvider($taskInstance->shopConfig, $taskRunnerConfig);
 
                     return new HttpTaskExecutor(
                         $queue,
@@ -137,7 +157,8 @@ class ScheduleCheckTaskTest extends TestCase
                         $taskInstance->shopConfig,
                         EventBus::getInstance(),
                         $timeProvider,
-                        new TaskRunnerScheduler($taskInstance->shopConfig)
+                        new TaskRunnerScheduler($taskInstance->shopConfig, $taskRunnerConfig),
+                        $taskRunnerConfig
                     );
                 },
                 EventBus::CLASS_NAME => function () {

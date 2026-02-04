@@ -2,7 +2,13 @@
 
 namespace Logeecom\Tests\Infrastructure\logger;
 
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
 /**
  * Class ConfigurationTest.
@@ -11,6 +17,34 @@ use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
  */
 class ConfigurationTest extends BaseInfrastructureTestWithServices
 {
+    /**
+     * @before
+     *
+     * @throws \Exception
+     */
+    public function before()
+    {
+        parent::before();
+
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = ServiceRegister::getService(\Logeecom\Infrastructure\Configuration\Configuration::CLASS_NAME);
+                $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
+    }
     /**
      * Tests storing and retrieving value from config service
      */
@@ -30,11 +64,6 @@ class ConfigurationTest extends BaseInfrastructureTestWithServices
         $this->assertFalse($this->shopConfig->isDebugModeEnabled());
         $this->shopConfig->setDebugModeEnabled(true);
         $this->assertTrue($this->shopConfig->isDebugModeEnabled());
-
-        $this->shopConfig->setMaxStartedTasksLimit(45);
-        $this->assertEquals(45, $this->shopConfig->getMaxStartedTasksLimit());
-        $this->shopConfig->setMaxStartedTasksLimit(5);
-        $this->assertEquals(5, $this->shopConfig->getMaxStartedTasksLimit());
     }
 
     /**
@@ -42,8 +71,10 @@ class ConfigurationTest extends BaseInfrastructureTestWithServices
      */
     public function testSystemSpecific()
     {
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
         $this->shopConfig->setIntegrationName('new');
-        $this->shopConfig->setMaxStartedTasksLimit(45);
+        $taskRunnerConfig->setMaxStartedTasksLimit(45);
 
         $config1 = $this->shopConfig->getConfigEntity('integrationName');
         $config2 = $this->shopConfig->getConfigEntity('maxStartedTasksLimit');

@@ -7,8 +7,10 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -20,6 +22,8 @@ use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -71,8 +75,28 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         TestRepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::THIS_CLASS_NAME);
 
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+
+                return new TestTaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
         $metadataProvider = new TaskMetadataProviderTest(
-            $configuration->getDefaultQueueName(),
+            $taskRunnerConfig->getDefaultQueueName(),
             $configuration->getContext()
         );
 
@@ -82,7 +106,8 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             $configuration,
             EventBus::getInstance(),
             ServiceRegister::getService(TimeProvider::CLASS_NAME),
-            ServiceRegister::getService(SchedulerInterface::class)
+            ServiceRegister::getService(SchedulerInterface::class),
+            $taskRunnerConfig
         );
         $statusProvider = new QueueTaskStatusProvider($queueService);
 

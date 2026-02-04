@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\Task;
@@ -130,7 +131,7 @@ class ScheduleCheckTask extends Task
         /** @var Configuration $configuration */
         $configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-        $queueName = $schedule->getQueueName() ?: $configuration->getDefaultQueueName();
+        $queueName = $schedule->getQueueName() ?: $this->taskRunnerConfig()->getDefaultQueueName();
         $context = $schedule->getContext() ?: $configuration->getContext();
 
         $taskExecutor->enqueue(
@@ -226,5 +227,18 @@ class ScheduleCheckTask extends Task
         }
 
         return $this->repository;
+    }
+
+    /**
+     * Returns task runner config instance
+     *
+     * @return TaskRunnerConfigInterface
+     */
+    private function taskRunnerConfig()
+    {
+        /**@var \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface $taskRunnerConfig */
+        $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+        return $taskRunnerConfig;
     }
 }

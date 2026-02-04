@@ -4,6 +4,7 @@ namespace Logeecom\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Exceptions\BaseException;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 
 /**
  * Class AutoConfigurationController.
@@ -38,15 +39,20 @@ class AutoConfiguration
     private $httpClient;
 
     /**
+     * @var TaskRunnerConfig $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+    /**
      * AutoConfigurationController constructor.
      *
      * @param \Logeecom\Infrastructure\Configuration\Configuration $configService An instance of the configuration.
      * @param \Logeecom\Infrastructure\Http\HttpClient $httpClient An instance of the http client.
      */
-    public function __construct(Configuration $configService, HttpClient $httpClient)
+    public function __construct(Configuration $configService, HttpClient $httpClient, TaskRunnerConfig $taskRunnerConfig)
     {
         $this->configService = $configService;
         $this->httpClient = $httpClient;
+        $this->taskRunnerConfig = $taskRunnerConfig;
     }
 
     /**
@@ -60,18 +66,18 @@ class AutoConfiguration
     public function start()
     {
         $this->configService->setAutoConfigurationState(self::STATE_STARTED);
-        $url = $this->configService->getAutoConfigurationUrl();
+        $url = $this->taskRunnerConfig->getAutoConfigurationUrl();
         if (!$url) {
             throw new BaseException('Configuration service is not set to return auto-configuration URL');
         }
 
-        $this->configService->setAsyncProcessCallHttpMethod(HttpClient::HTTP_METHOD_POST);
+        $this->taskRunnerConfig->setAsyncProcessCallHttpMethod(HttpClient::HTTP_METHOD_POST);
         $result = $this->httpClient->autoConfigure(HttpClient::HTTP_METHOD_POST, $url);
 
         if (!$result) {
             $result = $this->httpClient->autoConfigure(HttpClient::HTTP_METHOD_GET, $url);
             if ($result) {
-                $this->configService->setAsyncProcessCallHttpMethod(HttpClient::HTTP_METHOD_GET);
+                $this->taskRunnerConfig->setAsyncProcessCallHttpMethod(HttpClient::HTTP_METHOD_GET);
             }
         }
 

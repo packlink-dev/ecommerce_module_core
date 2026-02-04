@@ -2,11 +2,16 @@
 
 namespace Logeecom\Tests\Infrastructure\Http;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\AutoConfiguration;
 use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
@@ -18,12 +23,37 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
     protected $httpClient;
 
     /**
+     * @var TaskRunnerConfigInterface
+     */
+    private $taskRunnerConfig;
+
+    /**
      * @before
      * @inheritDoc
      */
     public function before()
     {
         parent::before();
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+
+                return new TestTaskRunnerConfig($config, $urlProvider);
+            }
+        );
+        $this->taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
 
         $this->httpClient = new TestHttpClient();
         $me = $this;
@@ -42,8 +72,8 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
      */
     public function testAutoConfigureNoUrlSet()
     {
-        $this->shopConfig->setAutoConfigurationUrl(null);
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->setAutoConfigurationUrl(null);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
 
         $exThrown = null;
         try {
@@ -63,7 +93,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
         $response = new HttpResponse(200, array(), '{}');
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if default configuration request passed.');
@@ -88,7 +118,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
         $this->httpClient->setMockResponses($responses);
         $additionalOptionsCombination = array(new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4));
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if request passed with some combination.');
@@ -116,7 +146,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
         );
         $this->httpClient->setMockResponses($responses);
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
@@ -136,7 +166,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
      */
     public function testAutoConfigureFailedWhenThereAreNoResponses()
     {
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);;
         $success = $controller->start();
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
@@ -164,7 +194,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
         );
         $this->httpClient->setMockResponses($responses);
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);;
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must pass for GET request if POST failed.');
@@ -174,7 +204,7 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
         );
         $this->assertEquals(
             HttpClient::HTTP_METHOD_GET,
-            $this->shopConfig->getAsyncProcessCallHttpMethod(),
+            $this->taskRunnerConfig->getAsyncProcessCallHttpMethod(),
             'Second call should be GET.'
         );
     }

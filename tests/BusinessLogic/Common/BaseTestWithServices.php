@@ -5,8 +5,10 @@ namespace Logeecom\Tests\BusinessLogic\Common;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -18,7 +20,9 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -156,10 +160,30 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             }
         );
 
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+
+                return new TestTaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
         TestServiceRegister::registerService(
             TaskMetadataProviderInterface::CLASS_NAME,
             function () use ($me) {
-                return new DefaultTaskMetadataProvider($me->shopConfig);
+                $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+                return new DefaultTaskMetadataProvider($me->shopConfig, $taskRunnerConfig);
             }
         );
 
@@ -169,13 +193,16 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 /** @var TaskMetadataProviderInterface $metadataProvider */
                 $metadataProvider = ServiceRegister::getService(TaskMetadataProviderInterface::CLASS_NAME);
 
+                $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
                 return new HttpTaskExecutor(
                     $queueService,
                     $metadataProvider,
                     $me->shopConfig,
                     EventBus::getInstance(),
                     ServiceRegister::getService(TimeProvider::CLASS_NAME),
-                    ServiceRegister::getService(SchedulerInterface::class)
+                    ServiceRegister::getService(SchedulerInterface::class),
+                    $taskRunnerConfig
                 );
             }
         );

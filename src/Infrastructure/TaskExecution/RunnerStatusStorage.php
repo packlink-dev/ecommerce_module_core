@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 
 /**
@@ -23,6 +24,10 @@ class RunnerStatusStorage implements TaskRunnerStatusStorage
     private $configService;
 
     /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+    /**
      * Returns task runner status.
      *
      * @return TaskRunnerStatus Task runner status instance.
@@ -31,7 +36,7 @@ class RunnerStatusStorage implements TaskRunnerStatusStorage
      */
     public function getStatus()
     {
-        $result = $this->getConfigService()->getTaskRunnerStatus();
+        $result = $this->getTaskRunnerConfig()->getTaskRunnerStatus();
         if (empty($result)) {
             throw new TaskRunnerStatusStorageUnavailableException('Task runner status storage is not available');
         }
@@ -50,7 +55,7 @@ class RunnerStatusStorage implements TaskRunnerStatusStorage
     public function setStatus(TaskRunnerStatus $status)
     {
         $this->checkTaskRunnerStatusChangeAvailability($status);
-        $this->getConfigService()->setTaskRunnerStatus($status->getGuid(), $status->getAliveSinceTimestamp());
+        $this->taskRunnerConfig->setTaskRunnerStatus($status->getGuid(), $status->getAliveSinceTimestamp());
     }
 
     /**
@@ -71,6 +76,20 @@ class RunnerStatusStorage implements TaskRunnerStatusStorage
                 'Task runner with guid: ' . $guidForUpdate . ' can not change the status.'
             );
         }
+    }
+
+    /**
+     * Gets the configuration service.
+     *
+     * @return TaskRunnerConfigInterface Configuration service instance.
+     */
+    protected function getTaskRunnerConfig()
+    {
+        if (empty($this->taskRunnerConfig)) {
+            $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+        }
+
+        return $this->taskRunnerConfig;
     }
 
     /**

@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Controllers\DashboardController;
@@ -102,8 +103,12 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $config = ServiceRegister::getService(Configuration::CLASS_NAME);
                 /** @var QueueServiceInterface $queueService */
                 $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+                /**
+                 * @var TaskRunnerConfigInterface $taskRunnerConfig
+                 */
+                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
-                return new QueueSchedulerCheckPolicy($queueService, $config);
+                return new QueueSchedulerCheckPolicy($queueService, $config, $taskRunnerConfig);
             }
         );
 

@@ -3,6 +3,10 @@
 namespace Logeecom\Tests\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestAsyncSocketHttpClient;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -11,6 +15,8 @@ class AsyncSocketHttpClientTest extends BaseInfrastructureTestWithServices
 {
     public $client;
 
+    private $taskRunnerConfig;
+
     /**
      * @before
      * @inheritDoc
@@ -18,6 +24,27 @@ class AsyncSocketHttpClientTest extends BaseInfrastructureTestWithServices
     protected function before()
     {
         parent::before();
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+
+                return new TestTaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
+        $this->taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
 
         $this->client = new TestAsyncSocketHttpClient();
     }
@@ -112,7 +139,8 @@ class AsyncSocketHttpClientTest extends BaseInfrastructureTestWithServices
         $url = 'http://user:password@google.com/some/path?query=test#fragment';
         /** @var Configuration $configService */
         $configService = TestServiceRegister::getService(Configuration::CLASS_NAME);
-        $configService->setAsyncRequestTimeout(10);
+
+        $this->taskRunnerConfig->setAsyncRequestTimeout(10);
 
         // act
         $this->client->requestAsync('GET', $url);

@@ -122,7 +122,7 @@ class AsyncSocketHttpClient extends CurlHttpClient
      */
     protected function getRequestTimeOut()
     {
-        $timeout = $this->getConfigService()->getAsyncRequestTimeout();
+        $timeout = $this->getTaskRunnerConfig()->getAsyncRequestTimeout();
 
         return !empty($timeout) ? $timeout : static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
     }

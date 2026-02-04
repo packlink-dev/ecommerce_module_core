@@ -4,11 +4,17 @@
 
 namespace Logeecom\Tests\Infrastructure\Http;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\AutoConfiguration;
 use Logeecom\Infrastructure\Http\CurlHttpClient;
 use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestCurlHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
@@ -20,12 +26,37 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
     protected $httpClient;
 
     /**
+     * @var TaskRunnerConfigInterface
+     */
+    protected $taskRunnerConfig;
+
+    /**
      * @before
      * @throws \Exception
      */
     public function before()
     {
         parent::before();
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+
+                return new TestTaskRunnerConfig($config, $urlProvider);
+            }
+        );
+        $this->taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
 
         $this->httpClient = new TestCurlHttpClient();
         $me = $this;
@@ -44,8 +75,8 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
      */
     public function testAutoConfigureNoUrlSet()
     {
-        $this->shopConfig->setAutoConfigurationUrl(null);
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->setAutoConfigurationUrl(null);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $exThrown = null;
         try {
             $controller->start();
@@ -64,7 +95,9 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->resetAutoConfigurationUrl();
+
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if default configuration request passed.');
@@ -87,9 +120,10 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
             $this->getResponse(200),
         );
         $this->httpClient->setMockResponses($responses);
+        $this->taskRunnerConfig->setAutoConfigurationUrl('http://example.com');;
         $additionalOptionsCombination = array(new Options(CurlHttpClient::SWITCH_PROTOCOL, true));
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if request passed with some combination.');
@@ -129,7 +163,8 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
             new Options(CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6),
         );
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->setAutoConfigurationUrl('http://example.com');;
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if request passed with some combination.');
@@ -164,7 +199,8 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
         );
         $this->httpClient->setMockResponses($responses);
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->setAutoConfigurationUrl('http://example.com');;
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $success = $controller->start();
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
@@ -184,7 +220,8 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
      */
     public function testAutoConfigureFailedWhenThereAreNoResponses()
     {
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->setAutoConfigurationUrl('http://example.com');;
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);;
         $success = $controller->start();
 
         $this->assertFalse($success, 'Auto-configure must failed if no combination resulted with request passed.');
@@ -210,10 +247,11 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
         );
         $this->httpClient->setMockResponses($responses);
 
-        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient);
+        $this->taskRunnerConfig->setAutoConfigurationUrl('http://example.com');;
+        $controller = new AutoConfiguration($this->shopConfig, $this->httpClient, $this->taskRunnerConfig);
         $controller->start();
 
-        $this->shopConfig->setAutoConfigurationUrl('https://anotherdomain.com/test.php');
+        $this->taskRunnerConfig->setAutoConfigurationUrl('https://anotherdomain.com/test.php');
         $responses = array(
             $this->getResponse(400),
             $this->getResponse(400),
@@ -259,7 +297,7 @@ X-Custom-Header: Content: database\r
 
     private function getHttpConfigurationOptions()
     {
-        $domain = parse_url($this->shopConfig->getAutoConfigurationUrl(), PHP_URL_HOST);
+        $domain = parse_url($this->taskRunnerConfig->getAutoConfigurationUrl(), PHP_URL_HOST);
 
         return $this->shopConfig->getHttpConfigurationOptions($domain);
     }

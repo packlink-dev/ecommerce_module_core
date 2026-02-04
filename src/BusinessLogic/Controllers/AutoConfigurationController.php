@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
@@ -45,7 +46,8 @@ class AutoConfigurationController
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         /** @var \Logeecom\Infrastructure\Http\HttpClient $httpService */
         $httpService = ServiceRegister::getService(HttpClient::CLASS_NAME);
-        $service = new AutoConfiguration($configService, $httpService);
+        $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+        $service = new AutoConfiguration($configService, $httpService, $taskRunnerConfig);
 
         try {
             $success = $service->start();

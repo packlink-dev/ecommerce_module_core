@@ -26,7 +26,7 @@ class QueueTaskStatusProvider implements Interfaces\TaskStatusProviderInterface
      * @param string $type
      * @param string $context
      *
-     * @return TaskStatus|null
+     * @return TaskStatus
      */
     public function getLatestStatus(string $type, string $context = '')
     {

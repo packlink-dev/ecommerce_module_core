@@ -3,6 +3,7 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
@@ -12,11 +13,14 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Process;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
@@ -104,6 +108,23 @@ class TaskRunnerWakeupTest extends TestCase
         );
 
         Logger::resetInstance();
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
 
         $this->asyncProcessStarter = AsyncProcessStarterService::getInstance();
         $this->runnerStatusStorage = $runnerStatusStorage;

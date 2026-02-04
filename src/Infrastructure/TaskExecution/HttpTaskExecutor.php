@@ -8,6 +8,7 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -50,6 +51,11 @@ class HttpTaskExecutor implements TaskExecutorInterface
     private $scheduler;
 
     /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+
+    /**
      * Registers TickEvent listener to handle schedule ticker.
      */
     public function __construct(
@@ -58,7 +64,8 @@ class HttpTaskExecutor implements TaskExecutorInterface
         Configuration $configuration,
         EventBus $eventBus,
         TimeProvider $timeProvider,
-        SchedulerInterface $scheduler
+        SchedulerInterface $scheduler,
+        TaskRunnerConfigInterface $taskRunnerConfig
     ) {
         $this->queueService = $queueService;
         $this->metadataProvider = $metadataProvider;
@@ -66,6 +73,7 @@ class HttpTaskExecutor implements TaskExecutorInterface
         $this->configService = $configuration;
         $this->timeProvider = $timeProvider;
         $this->scheduler = $scheduler;
+        $this->taskRunnerConfig = $taskRunnerConfig;
 
         $this->registerTickEventListener();
     }
@@ -159,7 +167,7 @@ class HttpTaskExecutor implements TaskExecutorInterface
     public function handleTickEvent()
     {
         $task = $this->queueService->findLatestByType('ScheduleCheckTask');
-        $threshold = $this->configService->getSchedulerTimeThreshold();
+        $threshold = $this->taskRunnerConfig->getSchedulerTimeThreshold();
 
         $this->enqueueCheckTaskIfNeeded($task, $threshold);
     }

@@ -14,6 +14,7 @@ use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemSaveException;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -53,6 +54,11 @@ class QueueService implements QueueServiceInterface
      * @var Configuration
      */
     private $configService;
+
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
 
     /**
      * Enqueues queue item to a given queue and stores changes.
@@ -513,6 +519,20 @@ class QueueService implements QueueServiceInterface
     }
 
     /**
+     * Gets configuration service instance.
+     *
+     * @return TaskRunnerConfigInterface Configuration service instance.
+     */
+    private function getTaskRunnerConfig()
+    {
+        if ($this->taskRunnerConfig === null) {
+            $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+        }
+
+        return $this->taskRunnerConfig;
+    }
+
+    /**
      * Prepares exception message and throws exception.
      *
      * @param string $fromStatus A status form which status change is attempts.
@@ -538,7 +558,7 @@ class QueueService implements QueueServiceInterface
      */
     private function getMaxRetries()
     {
-        $configurationValue = $this->getConfigService()->getMaxTaskExecutionRetries();
+        $configurationValue = $this->getTaskRunnerConfig()->getMaxTaskExecutionRetries();
 
         return $configurationValue !== null ? $configurationValue : self::MAX_RETRIES;
     }

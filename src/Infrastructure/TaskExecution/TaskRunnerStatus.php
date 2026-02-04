@@ -4,6 +4,7 @@ namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
 /**
@@ -42,6 +43,11 @@ class TaskRunnerStatus
     private $configService;
 
     /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+
+    /**
      * TaskRunnerStatus constructor.
      *
      * @param string $guid Runner instance identifier.
@@ -53,6 +59,7 @@ class TaskRunnerStatus
         $this->aliveSinceTimestamp = $aliveSinceTimestamp;
         $this->timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
         $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
     }
 
     /**
@@ -105,7 +112,7 @@ class TaskRunnerStatus
      */
     private function getMaxAliveTimestamp()
     {
-        $configurationValue = $this->configService->getTaskRunnerMaxAliveTime();
+        $configurationValue = $this->taskRunnerConfig->getTaskRunnerMaxAliveTime();
 
         return $configurationValue !== null ? $configurationValue : self::MAX_ALIVE_TIME;
     }

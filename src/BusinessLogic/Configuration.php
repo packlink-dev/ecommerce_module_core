@@ -15,44 +15,13 @@ use Packlink\BusinessLogic\Warehouse\Warehouse;
  */
 abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Configuration
 {
-    /**
-     * Threshold between two runs of scheduler.
-     */
-    const SCHEDULER_TIME_THRESHOLD = 60;
-    /**
-     * Default scheduler queue name.
-     */
-    const DEFAULT_SCHEDULER_QUEUE_NAME = 'SchedulerCheckTaskQueue';
-    /**
-     * Default task retention time expressed in days. After this time tasks are not necesseary any more in the system.
-     */
-    const DEFAULT_MAX_TASK_AGE = 7;
+
     /**
      * Singleton instance of this class.
      *
      * @var static
      */
     protected static $instance;
-
-    /**
-     * Retrieves max task age in days. Tasks older than the given number of days are no longer needed in the system.
-     *
-     * @return int Max task age in days.
-     */
-    public function getMaxTaskAge()
-    {
-        return $this->getConfigValue('maxTaskAge', self::DEFAULT_MAX_TASK_AGE);
-    }
-
-    /**
-     * Sets max task age.
-     *
-     * @param int $maxAge Positive integer. Denotes max task age in days.
-     */
-    public function setMaxTaskAge($maxAge)
-    {
-        $this->saveConfigValue('maxTaskAge', $maxAge);
-    }
 
     /**
      * Determines whether the drop-off shipping services are system supported.
@@ -99,36 +68,6 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      * @return string The version number.
      */
     abstract public function getECommerceVersion();
-
-    /**
-     * Returns scheduler time threshold between checks.
-     *
-     * @return int Threshold in seconds.
-     */
-    public function getSchedulerTimeThreshold()
-    {
-        return $this->getConfigValue('schedulerTimeThreshold', static::SCHEDULER_TIME_THRESHOLD);
-    }
-
-    /**
-     * Sets scheduler time threshold between checks.
-     *
-     * @param int $schedulerTimeThreshold Threshold in seconds.
-     */
-    public function setSchedulerTimeThreshold($schedulerTimeThreshold)
-    {
-        $this->saveConfigValue('schedulerTimeThreshold', $schedulerTimeThreshold);
-    }
-
-    /**
-     * Returns scheduler queue name.
-     *
-     * @return string Queue name.
-     */
-    public function getSchedulerQueueName()
-    {
-        return $this->getConfigValue('schedulerQueueName', static::DEFAULT_SCHEDULER_QUEUE_NAME);
-    }
 
     /**
      * Returns authorization token.

@@ -2,23 +2,28 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\TaskRunner;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStarter;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestRunnerStatusStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunner;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
@@ -182,8 +187,43 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
 
         RepositoryRegistry::registerRepository(Process::CLASS_NAME, MemoryRepository::getClassName());
 
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
         $runnerStatusStorage = new TestRunnerStatusStorage();
-        $taskRunner = new TestTaskRunner();
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+        $taskRunner = new TestTaskRunner($taskRunnerConfig);
         $guidProvider = TestGuidProvider::getInstance();
 
         TestServiceRegister::registerService(

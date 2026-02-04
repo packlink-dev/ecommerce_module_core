@@ -190,7 +190,7 @@ class BatchTaskCleanupTask extends Task
     private function getAgeCutOff()
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $maxAge = $this->getConfigService()->getMaxTaskAge();
+        $maxAge = $this->getTaskRunnerConfig()->getMaxTaskAge();
         $currentDateTime = $this->getTimeProvider()->getDateTime(time());
 
         return $currentDateTime->modify("-$maxAge day");

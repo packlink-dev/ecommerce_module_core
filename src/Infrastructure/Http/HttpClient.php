@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 
 /**
  * Class HttpClient.
@@ -63,6 +64,11 @@ abstract class HttpClient
      * @var Configuration
      */
     private $configService;
+
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
     /**
      * An array of additional HTTP configuration options.
      *
@@ -280,6 +286,20 @@ abstract class HttpClient
         }
 
         return $response !== null && $response->isSuccessful();
+    }
+
+    /**
+     * Gets the configuration service.
+     *
+     * @return TaskRunnerConfigInterface Configuration service instance.
+     */
+    protected function getTaskRunnerConfig()
+    {
+        if (empty($this->taskRunnerConfig)) {
+            $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+        }
+
+        return $this->taskRunnerConfig;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Logeecom\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Configuration;
 
@@ -18,16 +19,23 @@ class QueueSchedulerCheckPolicy implements SchedulerCheckPolicyInterface
      */
     private $configService;
 
-    public function __construct(QueueServiceInterface $queueService, Configuration $configService)
+
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+    public function __construct(QueueServiceInterface $queueService, Configuration $configService,
+                                TaskRunnerConfigInterface $taskRunnerConfig)
     {
         $this->queueService = $queueService;
         $this->configService = $configService;
+        $this->taskRunnerConfig = $taskRunnerConfig;
     }
 
     public function shouldEnqueue()
     {
         $task = $this->queueService->findLatestByType('ScheduleCheckTask');
-        $threshold = $this->configService->getSchedulerTimeThreshold();
+        $threshold = $this->taskRunnerConfig->getSchedulerTimeThreshold();
 
         if ($task === null) {
             return true;

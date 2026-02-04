@@ -4,6 +4,7 @@ namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 
@@ -15,11 +16,17 @@ class DefaultTaskMetadataProvider implements TaskMetadataProviderInterface
     private $config;
 
     /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+
+    /**
      * @param Configuration $config
      */
-    public function __construct(Configuration $config)
+    public function __construct(Configuration $config, TaskRunnerConfigInterface $taskRunnerConfig)
     {
         $this->config = $config;
+        $this->taskRunnerConfig = $taskRunnerConfig;
     }
 
     /**
@@ -38,7 +45,7 @@ class DefaultTaskMetadataProvider implements TaskMetadataProviderInterface
             }
         }
 
-        $queueName = $this->config->getDefaultQueueName();
+        $queueName = $this->taskRunnerConfig->getDefaultQueueName();
         $priority = $this->getTaskPriority($task);
         $context = $this->config->getContext();
 

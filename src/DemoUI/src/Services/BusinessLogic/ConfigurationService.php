@@ -29,17 +29,6 @@ class ConfigurationService extends Configuration
     protected static $instance;
 
     /**
-     * Gets max inactivity period for a task in seconds.
-     * After inactivity period is passed, system will fail such task as expired.
-     *
-     * @return int Max task inactivity period in seconds if set; otherwise, self::MAX_TASK_INACTIVITY_PERIOD.
-     */
-    public function getMaxTaskInactivityPeriod()
-    {
-        return parent::getMaxTaskInactivityPeriod() ?: self::MAX_TASK_INACTIVITY_PERIOD;
-    }
-
-    /**
      * Retrieves integration name.
      *
      * @return string Integration name.
@@ -59,17 +48,6 @@ class ConfigurationService extends Configuration
         return '';
     }
 
-    /**
-     * Returns async process starter url, always in http.
-     *
-     * @param string $guid Process identifier.
-     *
-     * @return string Formatted URL of async process starter endpoint.
-     */
-    public function getAsyncProcessUrl($guid)
-    {
-        return '';
-    }
 
     /**
      * Returns web-hook callback URL for current system.

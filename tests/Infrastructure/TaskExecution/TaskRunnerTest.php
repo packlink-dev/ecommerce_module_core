@@ -3,6 +3,7 @@
 
 namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
@@ -13,7 +14,9 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\Process;
@@ -21,6 +24,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueItemStarter;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\TaskRunner;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
@@ -131,6 +135,23 @@ class TaskRunnerTest extends TestCase
 
         Logger::resetInstance();
 
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = TestServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
         $this->asyncProcessStarter = AsyncProcessStarterService::getInstance();
         $this->taskRunnerStarter = $taskRunnerStarter;
         $this->runnerStatusStorage = $runnerStatusStorage;
@@ -140,7 +161,10 @@ class TaskRunnerTest extends TestCase
         $this->configuration = $configuration;
         $this->logger = $shopLogger;
         $this->queue = $queue;
-        $this->taskRunner = new TaskRunner();
+
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+        $this->taskRunner = new TaskRunner($taskRunnerConfig);
 
         $guid = $this->guidProvider->generateGuid();
         $currentTimestamp = $this->timeProvider->getCurrentLocalTime()->getTimestamp();
@@ -199,8 +223,9 @@ class TaskRunnerTest extends TestCase
      */
     public function testMaximumConcurrentExecutionLimit()
     {
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
         // Arrange
-        $this->configuration->setMaxStartedTasksLimit(6);
+        $taskRunnerConfig->setMaxStartedTasksLimit(6);
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now -2 days'));
         $earliestQueue5Item = $this->queue->enqueue('queue5', new FooTask());

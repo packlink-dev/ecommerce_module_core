@@ -8,12 +8,17 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\RunnerStatusStorage;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerStatus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -23,6 +28,11 @@ class TaskRunnerStatusStorageTest extends TestCase
 {
     /** @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration */
     private $configuration;
+
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
 
     /**
      * @before
@@ -49,7 +59,26 @@ class TaskRunnerStatusStorageTest extends TestCase
             )
         );
 
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = ServiceRegister::getService(\Logeecom\Infrastructure\Configuration\Configuration::CLASS_NAME);
+                $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
         $this->configuration = $configuration;
+        $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
     }
@@ -79,7 +108,7 @@ class TaskRunnerStatusStorageTest extends TestCase
     public function testSetTaskRunnerWhenItExist()
     {
         $taskRunnerStatusStorage = new RunnerStatusStorage();
-        $this->configuration->setTaskRunnerStatus('guid', 123456789);
+        $this->taskRunnerConfig->setTaskRunnerStatus('guid', 123456789);
         $taskStatus = new TaskRunnerStatus('guid', 123456789);
         $ex = null;
 
@@ -99,7 +128,7 @@ class TaskRunnerStatusStorageTest extends TestCase
     public function testSetTaskRunnerWhenItExistButItIsNotTheSame()
     {
         $taskRunnerStatusStorage = new RunnerStatusStorage();
-        $this->configuration->setTaskRunnerStatus('guid', 123456789);
+        $this->taskRunnerConfig->setTaskRunnerStatus('guid', 123456789);
         $taskStatus = new TaskRunnerStatus('guid2', 123456789);
 
         $exThrown = null;

@@ -2,9 +2,12 @@
 
 namespace Logeecom\Infrastructure;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
@@ -12,6 +15,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\TaskExecution\RunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\TaskRunner;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\GuidProvider;
@@ -39,6 +43,16 @@ class BootstrapComponent
      */
     protected static function initServices()
     {
+        ServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+                $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
         ServiceRegister::registerService(
             TimeProvider::CLASS_NAME,
             function () {
@@ -86,7 +100,8 @@ class BootstrapComponent
         ServiceRegister::registerService(
             TaskRunner::CLASS_NAME,
             function () {
-                return new TaskRunner();
+                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+                return new TaskRunner($taskRunnerConfig);
             }
         );
         ServiceRegister::registerService(
@@ -95,6 +110,7 @@ class BootstrapComponent
                 return new RunnerStatusStorage();
             }
         );
+
     }
 
     /**

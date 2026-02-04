@@ -4,6 +4,9 @@ namespace BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\AutoTest\AutoTestStatus;
 use Logeecom\Infrastructure\Logger\LogData;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\AutoTest\MockAutoTestService;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\ServiceRegister;
@@ -13,6 +16,7 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\AutoTestController;
 
@@ -28,10 +32,30 @@ class AutoTestControllerTest extends BaseTestWithServices
     protected function before()
     {
         parent::before();
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () {
+                $config = ServiceRegister::getService(\Logeecom\Infrastructure\Configuration\Configuration::CLASS_NAME);
+                $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                return new TaskRunnerConfig($config, $urlProvider);
+            }
+        );
+
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
+        $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
         $statusProvider = new QueueTaskStatusProvider($queueService);
-        $this->service = new MockAutoTestService($taskExecutor, $statusProvider);
+        $this->service = new MockAutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
 
         $me = $this;
 

@@ -4,7 +4,9 @@ namespace Logeecom\Infrastructure\Scheduler;
 
 use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
@@ -20,9 +22,15 @@ class TaskRunnerScheduler implements SchedulerInterface
      */
     private $configService;
 
-    public function __construct(Configuration $configService)
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+
+    public function __construct(Configuration $configService, TaskRunnerConfigInterface $taskRunnerConfig)
     {
         $this->configService = $configService;
+        $this->taskRunnerConfig = $taskRunnerConfig;
     }
 
     /**
@@ -38,7 +46,7 @@ class TaskRunnerScheduler implements SchedulerInterface
         $task = $this->createTask($callback);
         $schedule = new WeeklySchedule(
             $task,
-            $this->configService->getDefaultQueueName(),
+            $this->taskRunnerConfig->getDefaultQueueName(),
             $this->configService->getContext()
         );
 
@@ -64,7 +72,7 @@ class TaskRunnerScheduler implements SchedulerInterface
         $task = $this->createTask($callback);
         $schedule = new DailySchedule(
             $task,
-            $this->configService->getDefaultQueueName(),
+            $this->taskRunnerConfig->getDefaultQueueName(),
             $this->configService->getContext()
         );
 
@@ -98,7 +106,7 @@ class TaskRunnerScheduler implements SchedulerInterface
         $task = $this->createTask($callback);
         $schedule = new HourlySchedule(
             $task,
-            $this->configService->getDefaultQueueName(),
+            $this->taskRunnerConfig->getDefaultQueueName(),
             $this->configService->getContext()
         );
 

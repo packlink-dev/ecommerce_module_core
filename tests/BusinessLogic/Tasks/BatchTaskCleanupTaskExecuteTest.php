@@ -5,17 +5,27 @@ namespace Logeecom\Tests\BusinessLogic\Tasks;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\Tasks\BatchTaskCleanupTask;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\ORM\MemoryQueueItemReposiotoryWithConditionalDelete;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 
 class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
 {
+
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
     /**
      * @before
      * @inheritDoc
@@ -23,6 +33,29 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     protected function before()
     {
         parent::before();
+
+        TestServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new TestAsyncProcessUrlProvider();
+            }
+        );
+
+        $test = $this;
+        TestServiceRegister::registerService(
+            TaskRunnerConfigInterface::CLASS_NAME,
+            function () use ($test) {
+                $config = ServiceRegister::getService(\Logeecom\Infrastructure\Configuration\Configuration::CLASS_NAME);
+                $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
+
+                $test->taskRunnerConfig = new TaskRunnerConfig($config, $urlProvider);
+
+                return $test->taskRunnerConfig;
+            }
+        );
+
+        $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
 
         RepositoryRegistry::registerRepository(
             QueueItem::getClassName(),
@@ -76,7 +109,7 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
             array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS),
             array('FooTask', 'BarTask')
         );
-        $this->getConfigService()->setMaxTaskAge(1);
+        $this->taskRunnerConfig->setMaxTaskAge(1);
 
         // act
         $task->execute();
@@ -93,7 +126,7 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
             array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS),
             array('FooTask', 'BarTask')
         );
-        $this->getConfigService()->setMaxTaskAge(20);
+        $this->taskRunnerConfig->setMaxTaskAge(20);
 
         // act
         $task->execute();
@@ -107,7 +140,7 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     {
         // arrange
         $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS), array('FooTask'));
-        $this->getConfigService()->setMaxTaskAge(1);
+        $this->taskRunnerConfig->setMaxTaskAge(1);
 
         // act
         $task->execute();
@@ -126,7 +159,7 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     {
         // arrange
         $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED), array('FooTask', 'BarTask'));
-        $this->getConfigService()->setMaxTaskAge(1);
+        $this->taskRunnerConfig->setMaxTaskAge(1);
 
         // act
         $task->execute();
@@ -145,7 +178,7 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
     {
         // arrange
         $task = new BatchTaskCleanupTask(array(QueueItem::COMPLETED, QueueItem::IN_PROGRESS));
-        $this->getConfigService()->setMaxTaskAge(1);
+        $this->taskRunnerConfig->setMaxTaskAge(1);
 
         // act
         $task->execute();

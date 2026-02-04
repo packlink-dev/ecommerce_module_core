@@ -243,7 +243,7 @@ class CurlHttpClient extends HttpClient
     protected function setCurlSessionOptionsForSynchronousRequest()
     {
         $this->curlOptions[CURLOPT_TIMEOUT_MS] =
-            $this->getConfigService()->getSyncRequestTimeout() ?: static::DEFAULT_REQUEST_TIMEOUT;
+            $this->getTaskRunnerConfig()->getSyncRequestTimeout() ?: static::DEFAULT_REQUEST_TIMEOUT;
     }
 
     /**
@@ -254,7 +254,7 @@ class CurlHttpClient extends HttpClient
         // Always ensure the connection is fresh.
         $this->curlOptions[CURLOPT_FRESH_CONNECT] = true;
         // Timeout super fast once connected, so it goes into async.
-        $asyncRequestTimeout = $this->getConfigService()->getAsyncRequestTimeout();
+        $asyncRequestTimeout = $this->getTaskRunnerConfig()->getAsyncRequestTimeout();
         $this->curlOptions[CURLOPT_TIMEOUT_MS] = $asyncRequestTimeout ?: static::DEFAULT_ASYNC_REQUEST_TIMEOUT;
     }
 

@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\AutoTestBusinessTask;
@@ -36,12 +37,23 @@ class AutoTestService
     /**
      * @var TaskStatusProviderInterface
      */
+
+    /**
+     * @var TaskRunnerConfigInterface
+     */
+    private $taskRunnerConfig;
+
     private $statusProvider;
 
-    public function __construct(TaskExecutorInterface $taskExecutor, TaskStatusProviderInterface $statusProvider)
+    public function __construct(
+        TaskExecutorInterface $taskExecutor,
+        TaskStatusProviderInterface $statusProvider,
+        TaskRunnerConfigInterface $taskRunnerConfig
+    )
     {
         $this->taskExecutor = $taskExecutor;
         $this->statusProvider = $statusProvider;
+        $this->taskRunnerConfig = $taskRunnerConfig;
     }
 
     /**
@@ -156,7 +168,8 @@ class AutoTestService
      */
     protected function logHttpOptions()
     {
-        $testDomain = parse_url($this->getConfigService()->getAsyncProcessUrl(''), PHP_URL_HOST);
+        $asyncUrl = $this->taskRunnerConfig->getAsyncProcessUrl('');
+        $testDomain = parse_url($asyncUrl, PHP_URL_HOST);
         $options = array();
         foreach ($this->getConfigService()->getHttpConfigurationOptions($testDomain) as $option) {
             $options[$option->getName()] = $option->getValue();

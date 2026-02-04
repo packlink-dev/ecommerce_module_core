@@ -6,6 +6,7 @@ use Exception;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -77,6 +78,17 @@ class TaskRunner
      * @var float
      */
     private $batchSleepTime = 0.0;
+
+    /**
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
+     */
+    private $taskRunnerConfig;
+
+    public function __construct(TaskRunnerConfigInterface $taskRunnerConfig)
+    {
+        $this->taskRunnerConfig = $taskRunnerConfig;
+    }
+
     /**
      * Sets task runner guid.
      *
@@ -176,7 +188,7 @@ class TaskRunner
         $this->logDebug(array('Message' => 'Task runner: available task detection started.'));
 
         // Calculate how many queue items can be started
-        $maxRunningTasks = $this->getConfigurationService()->getMaxStartedTasksLimit();
+        $maxRunningTasks = $this->taskRunnerConfig->getMaxStartedTasksLimit();
         $alreadyRunningItems = $this->getQueue()->findRunningItems();
         $numberOfAvailableSlots = $maxRunningTasks - count($alreadyRunningItems);
         if ($numberOfAvailableSlots <= 0) {
@@ -195,7 +207,7 @@ class TaskRunner
             return;
         }
 
-        $asyncStarterBatchSize = $this->getConfigurationService()->getAsyncStarterBatchSize();
+        $asyncStarterBatchSize = $this->taskRunnerConfig->getAsyncStarterBatchSize();
         $batchStarter = new AsyncBatchStarter($asyncStarterBatchSize);
         foreach ($items as $item) {
             $this->logMessageFor($item, 'Task runner: Adding task to a batch starter for async execution.');
@@ -262,7 +274,7 @@ class TaskRunner
             return;
         }
 
-        $this->getConfigurationService()->setTaskRunnerStatus($this->guid, $currentTime);
+        $this->taskRunnerConfig->setTaskRunnerStatus($this->guid, $currentTime);
         $this->aliveSinceUpdatedAt = $currentTime;
     }
 
@@ -398,7 +410,7 @@ class TaskRunner
      */
     private function getWakeupDelay()
     {
-        $configurationValue = $this->getConfigurationService()->getTaskRunnerWakeupDelay();
+        $configurationValue = $this->taskRunnerConfig->getTaskRunnerWakeupDelay();
 
         $minimalSleepTime  = $configurationValue !== null ? $configurationValue : self::WAKEUP_DELAY;
 

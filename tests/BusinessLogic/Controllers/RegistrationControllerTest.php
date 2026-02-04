@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -46,14 +47,17 @@ class RegistrationControllerTest extends BaseTestWithServices
             }
         );
 
-        $metadataProvider = new DefaultTaskMetadataProvider($this->shopConfig);
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+        $metadataProvider = new DefaultTaskMetadataProvider($this->shopConfig, $taskRunnerConfig);
         $taskExecutor = new HttpTaskExecutor(
             TestServiceRegister::getService(\Logeecom\Infrastructure\TaskExecution\QueueService::CLASS_NAME),
             $metadataProvider,
             $this->shopConfig,
             EventBus::getInstance(),
             ServiceRegister::getService(TimeProvider::CLASS_NAME),
-            ServiceRegister::getService(SchedulerInterface::class)
+            ServiceRegister::getService(SchedulerInterface::class),
+            $taskRunnerConfig
         );
         $this->registrationController = new RegistrationController($taskExecutor);
     }

@@ -14,6 +14,7 @@ use Logeecom\Infrastructure\Singleton;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\ProcessStarterSaveException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Runnable;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\Utility\GuidProvider;
 
 /**
@@ -55,6 +56,13 @@ class AsyncProcessStarterService extends Singleton implements AsyncProcessServic
     private $httpClient;
 
     /**
+     * Task runner infrastructure config.
+     *
+     * @var TaskRunnerConfigInterface
+     */
+    private $taskRunnerConfig;
+
+    /**
      * AsyncProcessStarterService constructor.
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
@@ -66,6 +74,8 @@ class AsyncProcessStarterService extends Singleton implements AsyncProcessServic
         $this->guidProvider = ServiceRegister::getService(GuidProvider::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
         $this->processRepository = RepositoryRegistry::getRepository(Process::CLASS_NAME);
+        $this->taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
     }
 
     /**
@@ -139,8 +149,8 @@ class AsyncProcessStarterService extends Singleton implements AsyncProcessServic
     {
         try {
             $this->httpClient->requestAsync(
-                $this->configuration->getAsyncProcessCallHttpMethod(),
-                $this->configuration->getAsyncProcessUrl($guid)
+                $this->taskRunnerConfig->getAsyncProcessCallHttpMethod(),
+                $this->taskRunnerConfig->getAsyncProcessUrl($guid)
             );
         } catch (\Exception $e) {
             Logger::logError($e->getMessage(), 'Integration');

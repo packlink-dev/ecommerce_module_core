@@ -9,6 +9,7 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
@@ -108,14 +109,18 @@ class DefaultParcelControllerTest extends BaseTestWithServices
                 return $taskRunnerStarter;
             }
         );
-        $metadataProvider = new DefaultTaskMetadataProvider($configuration);
+
+        $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+        $metadataProvider = new DefaultTaskMetadataProvider($configuration, $taskRunnerConfig);
         $taskExecutor = new HttpTaskExecutor(
             $queue,
             $metadataProvider,
             $configuration,
             EventBus::getInstance(),
             ServiceRegister::getService(TimeProvider::CLASS_NAME),
-            ServiceRegister::getService(SchedulerInterface::class)
+            ServiceRegister::getService(SchedulerInterface::class),
+            $taskRunnerConfig
         );
         $this->defaultParcelController = new DefaultParcelController($taskExecutor);
     }

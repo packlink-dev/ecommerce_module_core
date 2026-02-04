@@ -9,7 +9,6 @@ use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Singleton;
-use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException;
 
 /**
  * Class Configuration.
@@ -33,22 +32,6 @@ abstract class Configuration extends Singleton
      * Minimal log level
      */
     const MIN_LOG_LEVEL = 3;
-    /**
-     * Default maximum number of tasks that can run in the same time
-     */
-    const DEFAULT_MAX_STARTED_TASK_LIMIT = 8;
-    /**
-     * Default queue name.
-     */
-    const DEFAULT_QUEUE_NAME = 'default';
-    /**
-     * Default HTTP method to use for async call.
-     */
-    const ASYNC_CALL_METHOD = 'POST';
-    /**
-     * Default batch size for the asynchronous execution.
-     */
-    const DEFAULT_ASYNC_STARTER_BATCH_SIZE = 8;
     /**
      * System user context.
      *
@@ -95,15 +78,6 @@ abstract class Configuration extends Singleton
      * @return string Current system identifier.
      */
     abstract public function getCurrentSystemId();
-
-    /**
-     * Returns async process starter url, always in http.
-     *
-     * @param string $guid Process identifier.
-     *
-     * @return string Formatted URL of async process starter endpoint.
-     */
-    abstract public function getAsyncProcessUrl($guid);
 
     /**
      * Sets task execution context.
@@ -182,26 +156,6 @@ abstract class Configuration extends Singleton
     }
 
     /**
-     * Retrieves async starter batch size.
-     *
-     * @return int Async starter batch size.
-     */
-    public function getAsyncStarterBatchSize()
-    {
-        return $this->getConfigValue('asyncStarterBatchSize', static::DEFAULT_ASYNC_STARTER_BATCH_SIZE);
-    }
-
-    /**
-     * Sets async process batch size.
-     *
-     * @param int $size
-     */
-    public function setAsyncStarterBatchSize($size)
-    {
-        $this->saveConfigValue('asyncStarterBatchSize', $size);
-    }
-
-    /**
      * Returns debug mode status.
      *
      * @return bool TRUE if debug mode is enabled; otherwise, false.
@@ -209,151 +163,6 @@ abstract class Configuration extends Singleton
     public function isDebugModeEnabled()
     {
         return $this->getConfigValue('debugModeEnabled', false);
-    }
-
-    /**
-     * Gets the number of maximum allowed started task at the point in time. This number will determine how many tasks
-     * can be in "in_progress" status at the same time.
-     *
-     * @return int Max started tasks limit.
-     */
-    public function getMaxStartedTasksLimit()
-    {
-        return $this->getConfigValue('maxStartedTasksLimit', static::DEFAULT_MAX_STARTED_TASK_LIMIT);
-    }
-
-    /**
-     * Sets the number of maximum allowed started task at the point in time. This number will determine how many tasks
-     * can be in "in_progress" status at the same time.
-     *
-     * @param int $limit Max started tasks limit.
-     */
-    public function setMaxStartedTasksLimit($limit)
-    {
-        $this->saveConfigValue('maxStartedTasksLimit', $limit);
-    }
-
-    /**
-     * Automatic task runner wakeup delay in seconds. Task runner will sleep at the end of its lifecycle for this value
-     * seconds before it sends wakeup signal for a new lifecycle. Return null to use default system value (10).
-     *
-     * @return int|null Task runner wakeup delay in seconds if set; otherwise, null.
-     */
-    public function getTaskRunnerWakeupDelay()
-    {
-        return $this->getConfigValue('taskRunnerWakeupDelay');
-    }
-
-    /**
-     * Sets automatic task runner wakeup delay in seconds.
-     *
-     * @param int $delay
-     */
-    public function setTaskRunnerWakeupDelay($delay)
-    {
-        $this->saveConfigValue('taskRunnerWakeupDelay', $delay);
-    }
-
-    /**
-     * Gets maximal time in seconds allowed for runner instance to stay in alive (running) status. After this period
-     * system will automatically start new runner instance and shutdown old one. Return null to use default system
-     * value (60).
-     *
-     * @return int|null Task runner max alive time in seconds if set; otherwise, null;
-     */
-    public function getTaskRunnerMaxAliveTime()
-    {
-        return $this->getConfigValue('taskRunnerMaxAliveTime');
-    }
-
-    /**
-     * Sets the maximal time in seconds allowed for a runner instance to stay in alive (running) status.
-     *
-     * @param int $delay Task runner max alive time in seconds;
-     */
-    public function setTaskRunnerMaxAliveTime($delay)
-    {
-        $this->saveConfigValue('taskRunnerMaxAliveTime', $delay);
-    }
-
-    /**
-     * Gets maximum number of failed task execution retries. System will retry task execution in case of error until
-     * this number is reached. Return null to use default system value (5).
-     *
-     * @return int|null Number of max execution retries if set; otherwise, false.
-     */
-    public function getMaxTaskExecutionRetries()
-    {
-        return $this->getConfigValue('maxTaskExecutionRetries');
-    }
-
-    /**
-     * Sets the maximum number of failed task execution retries.
-     *
-     * @param int $retries Number of max execution retries.
-     */
-    public function setMaxTaskExecutionRetries($retries)
-    {
-        $this->saveConfigValue('maxTaskExecutionRetries', $retries);
-    }
-
-    /**
-     * Gets max inactivity period for a task in seconds. After inactivity period is passed, system will fail such tasks
-     * as expired. Return null to use default system value (30).
-     *
-     * @return int|null Max task inactivity period in seconds if set; otherwise, null.
-     */
-    public function getMaxTaskInactivityPeriod()
-    {
-        return $this->getConfigValue('maxTaskInactivityPeriod');
-    }
-
-    /**
-     * Sets the max inactivity period for a task in seconds.
-     *
-     * @param int $period Max task inactivity period in seconds.
-     */
-    public function setMaxTaskInactivityPeriod($period)
-    {
-        $this->saveConfigValue('maxTaskInactivityPeriod', $period);
-    }
-
-    /**
-     * Returns task runner status information
-     *
-     * @return array Guid and timestamp information
-     */
-    public function getTaskRunnerStatus()
-    {
-        return $this->getConfigValue('taskRunnerStatus', array());
-    }
-
-    /**
-     * Sets task runner status information as JSON encoded string.
-     *
-     * @param string $guid Global unique identifier.
-     * @param int $timestamp Timestamp.
-     *
-     * @throws TaskRunnerStatusStorageUnavailableException
-     */
-    public function setTaskRunnerStatus($guid, $timestamp)
-    {
-        $taskRunnerStatus = array('guid' => $guid, 'timestamp' => $timestamp);
-        $config = $this->saveConfigValue('taskRunnerStatus', $taskRunnerStatus);
-
-        if (!$config || !$config->getId()) {
-            throw new TaskRunnerStatusStorageUnavailableException('Task runner status storage is not available.');
-        }
-    }
-
-    /**
-     * Returns default queue name.
-     *
-     * @return string Default queue name.
-     */
-    public function getDefaultQueueName()
-    {
-        return $this->getConfigValue('defaultQueueName', static::DEFAULT_QUEUE_NAME);
     }
 
     /**
@@ -366,15 +175,6 @@ abstract class Configuration extends Singleton
         return $this->getConfigValue('autoConfigurationState', '');
     }
 
-    /**
-     * Gets auto-configuration controller URL.
-     *
-     * @return string Auto-configuration URL.
-     */
-    public function getAutoConfigurationUrl()
-    {
-        return $this->getAsyncProcessUrl('auto-configure');
-    }
 
     /**
      * Sets current auto-configuration state.
@@ -443,83 +243,29 @@ abstract class Configuration extends Singleton
     }
 
     /**
-     * Sets the HTTP method to be used for the async call.
+     * Generic configuration getter (domain-agnostic).
      *
-     * @param string $method Http method (GET or POST).
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
      */
-    public function setAsyncProcessCallHttpMethod($method)
+    public function get($key, $default = null)
     {
-        $this->saveConfigValue('asyncProcessCallHttpMethod', $method);
+        return $this->getConfigValue($key, $default);
     }
 
     /**
-     * Returns current HTTP method used for the async call.
+     * Generic configuration setter (domain-agnostic).
      *
-     * @return string The async call HTTP method (GET or POST).
-     */
-    public function getAsyncProcessCallHttpMethod()
-    {
-        return $this->getConfigValue('asyncProcessCallHttpMethod', static::ASYNC_CALL_METHOD);
-    }
-
-    /**
-     * Returns synchronous process timeout in milliseconds.
+     * @param string $key
+     * @param mixed $value
      *
-     * @return int|null
+     * @return \Logeecom\Infrastructure\Configuration\ConfigEntity
      */
-    public function getSyncRequestTimeout()
+    public function set($key, $value)
     {
-        return $this->getConfigValue('syncRequestTimeout');
-    }
-
-    /**
-     * Sets synchronous process timeout in milliseconds.
-     *
-     * @param int $timeout
-     */
-    public function setSyncRequestTimeout($timeout)
-    {
-        $this->saveConfigValue('syncRequestTimeout', $timeout);
-    }
-
-    /**
-     * Returns async process timeout in milliseconds.
-     *
-     * @return int|null
-     */
-    public function getAsyncRequestTimeout()
-    {
-        return $this->getConfigValue('asyncRequestTimeout');
-    }
-
-    /**
-     * Sets async process timeout in milliseconds.
-     *
-     * @param int $timeout
-     */
-    public function setAsyncRequestTimeout($timeout)
-    {
-        $this->saveConfigValue('asyncRequestTimeout', $timeout);
-    }
-
-    /**
-     * Returns whether the async requests are aborted with progress callback (used in CurlHttpClient).
-     *
-     * @return bool TRUE if the async requests are aborted with progress callback; otherwise, FALSE.
-     */
-    public function isAsyncRequestWithProgress()
-    {
-        return (bool)$this->getConfigValue('asyncRequestWithProgress', false);
-    }
-
-    /**
-     * Sets flag for usage of progress callback abort mechanism inside CurlHttpClient
-     *
-     * @param bool $withProgress
-     */
-    public function setAsyncRequestWithProgress($withProgress)
-    {
-        $this->saveConfigValue('asyncRequestWithProgress', $withProgress);
+        return $this->saveConfigValue($key, $value);
     }
 
     /**
