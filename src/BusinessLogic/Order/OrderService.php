@@ -489,8 +489,6 @@ class OrderService extends BaseService
      */
     private function addPackages(Order $order, Draft $draft)
     {
-        $storeUnit = \get_option('woocommerce_weight_unit', 'kg');
-
         $draft->content = array();
         $packages = array();
 
@@ -499,7 +497,7 @@ class OrderService extends BaseService
             $draft->content[] = $quantity . ' ' . $item->getTitle();
 
             for ($i = 0; $i < $quantity; $i++) {
-                $weight = $this->convertWeightUnits($storeUnit, $item->getWeight());
+                $weight = $this->convertWeightUnits($item->getWeight());
 
                 $packages[] = new Package(
                     $weight,
@@ -518,13 +516,14 @@ class OrderService extends BaseService
     /**
      * Converts weight units into kg
      *
-     * @param string $unit current unit set in woocommerce
      * @param float $weight weight to be converted to kg
      *
      * @return float
      */
-    private function convertWeightUnits($unit, $weight)
+    protected function convertWeightUnits($weight)
     {
+        $unit = $this->getStoreUnit();
+
         switch ($unit) {
             case 'g':
                 return $weight / 1000;
@@ -536,5 +535,13 @@ class OrderService extends BaseService
             default:
                 return $weight;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStoreUnit()
+    {
+        return 'kg';
     }
 }
