@@ -14,6 +14,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\Utility\Php\Php55;
 
 /**
  * Task to update available shipping services and their default costs.
@@ -252,6 +253,7 @@ class UpdateShippingServicesTask extends Task
         $this->getShippingMethodService()->delete($shippingMethod);
     }
 
+
     /**
      * Returns all special services from an API, and removes it from an array
      *
@@ -264,13 +266,29 @@ class UpdateShippingServicesTask extends Task
         $specialServices = array();
 
         foreach ($apiServices as $key => $service) {
-            if (in_array(array('id' => self::SPECIAL_SERVICE_TAG), $service->tags, true)) {
+            if ($this->hasSpecialTag($service)) {
                 $specialServices[] = $service;
                 unset($apiServices[$key]);
             }
         }
 
         return $specialServices;
+    }
+
+    /**
+     * Checks if a service has special_service_tag
+     *
+     * @param ShippingServiceDetails $service
+     *
+     * @return bool
+     */
+    protected function hasSpecialTag($service)
+    {
+        $tags = isset($service->tags) ? $service->tags : array();
+
+        $tagIds = array_values(Php55::arrayColumn($tags, 'id'));
+
+        return in_array(self::SPECIAL_SERVICE_TAG, $tagIds, true);
     }
 
     /**
