@@ -46,7 +46,14 @@ class BootstrapComponent
         ServiceRegister::registerService(
             TaskRunnerConfigInterface::CLASS_NAME,
             function () {
+                /**
+                 * @var Configuration $config
+                 */
                 $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+                /**
+                 * @var AsyncProcessUrlProviderInterface $urlProvider
+                 */
                 $urlProvider = ServiceRegister::getService(AsyncProcessUrlProviderInterface::CLASS_NAME);
 
                 return new TaskRunnerConfig($config, $urlProvider);
@@ -86,6 +93,9 @@ class BootstrapComponent
         ServiceRegister::registerService(
             TaskStatusProviderInterface::CLASS_NAME,
             function () {
+                /**
+                 * @var QueueServiceInterface $queueService
+                 */
                 $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
 
                 return new QueueTaskStatusProvider($queueService);
@@ -100,7 +110,11 @@ class BootstrapComponent
         ServiceRegister::registerService(
             TaskRunner::CLASS_NAME,
             function () {
+                /**
+                 * @var TaskRunnerConfigInterface $taskRunnerConfig
+                 */
                 $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
                 return new TaskRunner($taskRunnerConfig);
             }
         );

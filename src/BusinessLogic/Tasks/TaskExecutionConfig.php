@@ -79,4 +79,22 @@ class TaskExecutionConfig
         return $this->context;
     }
 
+
+    public function toArray(): array
+    {
+        return [
+            'queue_name' => $this->queueName,
+            'priority'   => $this->priority,
+            'context'    => $this->context,
+        ];
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            $data['queue_name'] ?? '',
+            (int) ($data['priority'] ?? 0),
+            $data['context'] ?? ''
+        );
+    }
 }

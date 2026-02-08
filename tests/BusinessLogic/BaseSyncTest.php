@@ -33,7 +33,6 @@ abstract class BaseSyncTest extends BaseTestWithServices
         parent::before();
 
         $this->syncTask = $this->createSyncTaskInstance();
-        $this->attachProgressEventListener();
     }
 
     /**
@@ -43,18 +42,32 @@ abstract class BaseSyncTest extends BaseTestWithServices
      */
     abstract protected function createSyncTaskInstance();
 
+
+    /**
+     * Pokrene business task i sakupi progress iz yield-ova.
+     */
+    protected function executeSyncTask()
+    {
+        foreach ($this->syncTask->execute() as $value) {
+            // keep-alive je yield; -> $value je null
+            if ($value !== null) {
+                $this->eventHistory[] = $value;
+            }
+        }
+    }
+
     /**
      * Validates whether tasks finished with 100%.
      * This method should be called after task executed.
      */
+
     protected function validate100Progress()
     {
-        /** @var TaskProgressEvent $lastReportProgress */
-        $lastReportProgress = end($this->eventHistory);
+        $last = end($this->eventHistory);
 
         $this->assertEquals(
             100,
-            $lastReportProgress->getProgressFormatted(),
+            (int) round((float) $last),
             'Task must be successfully finished with 100% report progress.'
         );
     }

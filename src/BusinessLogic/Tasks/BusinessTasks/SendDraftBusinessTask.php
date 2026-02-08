@@ -22,6 +22,7 @@ use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShipmentDraft\Utility\DraftStatus;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 class SendDraftBusinessTask implements BusinessTask
 {
@@ -61,13 +62,21 @@ class SendDraftBusinessTask implements BusinessTask
     private $customsService;
 
     /**
+     * Optional execution config override.
+     *
+     * @var TaskExecutionConfig|null
+     */
+    private $executionConfig;
+
+    /**
      * SendDraftBusinessTask constructor.
      *
      * @param string $orderId Order identifier.
      */
-    public function __construct(string $orderId)
+    public function __construct(string $orderId, TaskExecutionConfig $executionConfig = null)
     {
         $this->orderId = $orderId;
+        $this->executionConfig = $executionConfig;
     }
 
     /**
@@ -264,7 +273,13 @@ class SendDraftBusinessTask implements BusinessTask
      */
     public function toArray(): array
     {
-        return array('orderId' => $this->orderId);
+        $data = array('orderId' => $this->orderId);
+
+        if ($this->executionConfig !== null) {
+            $data['execution_config'] = $this->executionConfig->toArray();
+        }
+
+        return $data;
     }
 
     /**
@@ -276,7 +291,13 @@ class SendDraftBusinessTask implements BusinessTask
      */
     public static function fromArray(array $data): BusinessTask
     {
-        return new self($data['orderId']);
+        $executionConfig = null;
+
+        if (!empty($data['execution_config']) && is_array($data['execution_config'])) {
+            $executionConfig = TaskExecutionConfig::fromArray($data['execution_config']);
+        }
+
+        return new self($data['orderId'], $executionConfig);
     }
 
     /**
@@ -354,5 +375,13 @@ class SendDraftBusinessTask implements BusinessTask
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+    }
+
+    /**
+     * @return TaskExecutionConfig|null
+     */
+    public function getExecutionConfig()
+    {
+        return $this->executionConfig;
     }
 }

@@ -66,12 +66,9 @@ class LegacyTaskAdapter implements BusinessTask
         ];
 
         if ($this->executionConfig !== null) {
-            $data['execution_config'] = [
-                'queue_name' => $this->executionConfig->getQueueName(),
-                'priority' => $this->executionConfig->getPriority(),
-                'context' => $this->executionConfig->getContext(),
-            ];
+            $data['execution_config'] = $this->executionConfig->toArray();
         }
+
 
         return $data;
     }
@@ -92,12 +89,8 @@ class LegacyTaskAdapter implements BusinessTask
         $task = $taskClass::fromArray($taskData);
 
         $executionConfig = null;
-        if (!empty($data['execution_config']) && is_array($data['execution_config'])) {
-            $queueName = $data['execution_config']['queue_name'] ?? '';
-            $priority = $data['execution_config']['priority'] ?? Priority::NORMAL;
-            $context = $data['execution_config']['context'] ?? '';
-
-            $executionConfig = new TaskExecutionConfig($queueName, (int)$priority, $context);
+        if (!empty($data['execution_config'])) {
+            $executionConfig = TaskExecutionConfig::fromArray($data['execution_config']);
         }
 
         return new static($task, $executionConfig);

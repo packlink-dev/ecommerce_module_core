@@ -8,8 +8,6 @@ use Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnav
  * Interface TaskRunnerConfigInterface.
  *
  * Defines infrastructure configuration semantics for background execution (TaskRunner/Async starter).
- *
- * PHP 7.0 compatible: no void return types, no nullable type hints.
  */
 interface TaskRunnerConfigInterface
 {
@@ -210,4 +208,25 @@ interface TaskRunnerConfigInterface
      * @param bool $withProgress
      */
     public function setAsyncRequestWithProgress($withProgress);
+
+    /**
+     * Retrieves max task age in days.
+     *
+     * @return int
+     */
+    public function getMaxTaskAge();
+
+    /**
+     * Sets scheduler time threshold between checks.
+     *
+     * @param int $schedulerTimeThreshold
+     */
+    public function setSchedulerTimeThreshold($schedulerTimeThreshold);
+
+    /**
+     * Returns scheduler queue name.
+     *
+     * @return string
+     */
+    public function getSchedulerQueueName();
 }

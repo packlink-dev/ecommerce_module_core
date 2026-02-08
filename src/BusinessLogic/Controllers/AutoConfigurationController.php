@@ -12,7 +12,6 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 
@@ -55,10 +54,6 @@ class AutoConfigurationController
                 if ($enqueueTask) {
                     $this->enqueueUpdateServicesTask($configService);
                 }
-
-                /** @var TaskRunnerWakeup $wakeup */
-                $wakeup = ServiceRegister::getService(TaskRunnerWakeup::CLASS_NAME);
-                $wakeup->wakeup();
             }
         } catch (BaseException $e) {
             $success = false;

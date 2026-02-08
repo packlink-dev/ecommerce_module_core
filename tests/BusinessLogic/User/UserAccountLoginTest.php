@@ -16,6 +16,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegist
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
@@ -120,7 +121,7 @@ class UserAccountLoginTest extends BaseTestWithServices
 
         $this->assertCount(1, $this->scheduler->weeklyCalls);
         $scheduled = $this->scheduler->weeklyCalls[0];
-        $this->assertInstanceOf(UpdateShippingServicesTask::class, $scheduled['callback']());
+        $this->assertInstanceOf(UpdateShippingServicesBusinessTask::class, $scheduled['callback']());
         $this->assertNotNull($scheduled['config']->getDayOfWeek());
         $this->assertNotNull($scheduled['config']->getHour());
         $this->assertNotNull($scheduled['config']->getMinute());

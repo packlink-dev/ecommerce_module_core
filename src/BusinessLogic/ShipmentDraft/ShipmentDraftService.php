@@ -42,7 +42,6 @@ class ShipmentDraftService implements ShipmentDraftServiceInterface
      */
     public function enqueueCreateShipmentDraftTask($orderId, $isDelayed = false, $delayInterval = 5)
     {
-        // ✅ Get current status from OrderShipmentDetails (unified entity)
         $currentStatus = $this->getOrderShipmentDetailsService()->getDraftStatus($orderId);
 
         // Don't re-enqueue if already pending/processing/completed

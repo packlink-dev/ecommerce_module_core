@@ -174,13 +174,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         );
 
         ServiceRegister::registerService(
-            OrderSendDraftTaskMapService::CLASS_NAME,
-            function () {
-                return OrderSendDraftTaskMapService::getInstance();
-            }
-        );
-
-        ServiceRegister::registerService(
             ShipmentDraftServiceInterface::CLASS_NAME,
             function () {
                 /**@var TaskExecutorInterface $taskExecutor */

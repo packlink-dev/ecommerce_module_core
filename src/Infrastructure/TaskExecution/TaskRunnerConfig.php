@@ -26,6 +26,16 @@ class TaskRunnerConfig implements TaskRunnerConfigInterface
     const DEFAULT_ASYNC_STARTER_BATCH_SIZE = 8;
 
     /**
+     * Max inactivity period for a task in seconds
+     */
+    const MAX_TASK_INACTIVITY_PERIOD = 60;
+
+    /**
+     * Default scheduler queue name.
+     */
+    const DEFAULT_SCHEDULER_QUEUE_NAME = 'SchedulerCheckTaskQueue';
+
+    /**
      * Default task retention time expressed in days. After this time tasks are not necesseary any more in the system.
      */
     const DEFAULT_MAX_TASK_AGE = 7;
@@ -204,9 +214,7 @@ class TaskRunnerConfig implements TaskRunnerConfigInterface
      */
     public function getMaxTaskInactivityPeriod()
     {
-        $value = $this->getValue('maxTaskInactivityPeriod', null);
-
-        return $value === null ? null : (int)$value;
+         return $this->getValue('maxTaskInactivityPeriod', self::MAX_TASK_INACTIVITY_PERIOD);
     }
 
     /**
@@ -297,6 +305,7 @@ class TaskRunnerConfig implements TaskRunnerConfigInterface
         $this->setValue('asyncRequestWithProgress', (bool)$withProgress);
     }
 
+
     /**
      * Returns scheduler time threshold between checks.
      *
@@ -306,6 +315,28 @@ class TaskRunnerConfig implements TaskRunnerConfigInterface
     {
         return $this->getValue('schedulerTimeThreshold', static::SCHEDULER_TIME_THRESHOLD);
     }
+
+    /**
+     * Sets scheduler time threshold between checks.
+     *
+     * @param int $schedulerTimeThreshold Threshold in seconds.
+     */
+    public function setSchedulerTimeThreshold($schedulerTimeThreshold)
+    {
+        $this->setValue('schedulerTimeThreshold', $schedulerTimeThreshold);
+    }
+
+
+    /**
+     * Returns scheduler queue name.
+     *
+     * @return string Queue name.
+     */
+    public function getSchedulerQueueName()
+    {
+        return $this->getValue('schedulerQueueName', static::DEFAULT_SCHEDULER_QUEUE_NAME);
+    }
+
 
     /**
      * Reads a value from the underlying configuration storage.

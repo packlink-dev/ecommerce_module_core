@@ -3,7 +3,9 @@
 namespace Packlink\BusinessLogic\Tasks\BusinessTasks;
 
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 class AutoTestBusinessTask implements BusinessTask
 {
@@ -15,13 +17,22 @@ class AutoTestBusinessTask implements BusinessTask
     protected $data;
 
     /**
+     * Optional execution config override.
+     *
+     * @var TaskExecutionConfig|null
+     */
+    private $executionConfig;
+
+    /**
      * AutoTestBusinessTask constructor.
      *
      * @param string $data Dummy data.
+     * @param TaskRunnerConfigInterface|null $taskRunnerConfig
      */
-    public function __construct(string $data)
+    public function __construct(string $data, TaskExecutionConfig $executionConfig  = null)
     {
         $this->data = $data;
+        $this->executionConfig = $executionConfig ;
     }
 
     /**
@@ -48,7 +59,15 @@ class AutoTestBusinessTask implements BusinessTask
      */
     public function toArray(): array
     {
-        return array('data' => $this->data);
+        $data = [
+            'data' => $this->data,
+        ];
+
+        if ($this->executionConfig !== null) {
+            $data['execution_config'] = $this->executionConfig->toArray();
+        }
+
+        return $data;
     }
 
     /**
@@ -60,6 +79,20 @@ class AutoTestBusinessTask implements BusinessTask
      */
     public static function fromArray(array $data): BusinessTask
     {
-        return new static($data['data']);
+        $executionConfig = null;
+
+        if (!empty($data['execution_config'])) {
+            $executionConfig = TaskExecutionConfig::fromArray($data['execution_config']);
+        }
+
+        return new static($data['data'], $executionConfig);
+    }
+
+    /**
+     * @return TaskExecutionConfig|null
+     */
+    public function getExecutionConfig()
+    {
+        return $this->executionConfig;
     }
 }

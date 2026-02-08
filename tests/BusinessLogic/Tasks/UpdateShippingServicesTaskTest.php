@@ -18,6 +18,8 @@ use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
+use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
 
 /**
@@ -92,7 +94,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     public function testNoExecution()
     {
         // should not execute if user info or default parcel is not set.
-        $this->syncTask->execute();
+        $this->executeSyncTask();
 
         self::assertCount(0, $this->shippingMethodService->getAllMethods());
         self::assertEmpty($this->httpClient->getHistory());
@@ -227,7 +229,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
 
         // execute task once more. All services should be updated and invalid services should be deleted.
         $this->httpClient->setMockResponses($this->getValidMockResponses());
-        $this->syncTask->execute();
+        $this->executeSyncTask();
 
         self::assertCount(19, $this->shippingMethodService->getAllMethods());
         self::assertCount(1, $this->shippingMethodService->getActiveMethods());
@@ -344,7 +346,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
             )
         );
 
-        $this->syncTask->execute();
+        $this->executeSyncTask();
 
         self::assertCount(7, $this->shippingMethodService->getAllMethods());
 
@@ -359,11 +361,11 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     }
 
     /**
-     * @return Task
+     * @return BusinessTask
      */
     protected function createSyncTaskInstance()
     {
-        return new UpdateShippingServicesTask();
+        return new UpdateShippingServicesBusinessTask();
     }
 
     /**
@@ -451,7 +453,7 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
 
         $this->httpClient->setMockResponses($this->getValidMockResponses());
 
-        $this->syncTask->execute();
+        $this->executeSyncTask();
     }
 
     /**

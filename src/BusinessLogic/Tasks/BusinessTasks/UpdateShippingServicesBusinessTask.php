@@ -20,6 +20,7 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 class UpdateShippingServicesBusinessTask implements BusinessTask
 {
@@ -34,6 +35,18 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      * @var WarehouseCountryService
      */
     private $countryService;
+
+    /**
+     * Optional execution config override.
+     *
+     * @var TaskExecutionConfig|null
+     */
+    private $executionConfig;
+
+    public function __construct(TaskExecutionConfig $executionConfig = null)
+    {
+        $this->executionConfig = $executionConfig;
+    }
 
     /**
      * Gets all local methods and remote services and synchronizes data.
@@ -350,7 +363,13 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      */
     public function toArray(): array
     {
-        return [];
+        $data = [];
+
+        if ($this->executionConfig !== null) {
+            $data['execution_config'] = $this->executionConfig->toArray();
+        }
+
+        return $data;
     }
 
     /**
@@ -362,6 +381,20 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      */
     public static function fromArray(array $data): BusinessTask
     {
-        return new static();
+        $executionConfig = null;
+
+        if (!empty($data['execution_config']) && is_array($data['execution_config'])) {
+            $executionConfig = TaskExecutionConfig::fromArray($data['execution_config']);
+        }
+
+        return new static($executionConfig);
+    }
+
+    /**
+     * @return TaskExecutionConfig|null
+     */
+    public function getExecutionConfig()
+    {
+        return $this->executionConfig;
     }
 }

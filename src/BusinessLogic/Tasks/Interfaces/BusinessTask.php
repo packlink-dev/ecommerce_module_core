@@ -2,6 +2,9 @@
 
 namespace Packlink\BusinessLogic\Tasks\Interfaces;
 
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
+
 /**
  * Business Task interface.
  *
@@ -37,4 +40,11 @@ interface BusinessTask
      * @return static Task instance.
      */
     public static function fromArray(array $data): BusinessTask;
+
+    /**
+     * Return execution config for a task
+     *
+     * @return TaskExecutionConfig|null
+     */
+    public function getExecutionConfig();
 }

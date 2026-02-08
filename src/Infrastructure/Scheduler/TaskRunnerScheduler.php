@@ -46,7 +46,7 @@ class TaskRunnerScheduler implements SchedulerInterface
         $task = $this->createTask($callback);
         $schedule = new WeeklySchedule(
             $task,
-            $this->taskRunnerConfig->getDefaultQueueName(),
+            $this->taskRunnerConfig->getSchedulerQueueName(),
             $this->configService->getContext()
         );
 
@@ -72,7 +72,7 @@ class TaskRunnerScheduler implements SchedulerInterface
         $task = $this->createTask($callback);
         $schedule = new DailySchedule(
             $task,
-            $this->taskRunnerConfig->getDefaultQueueName(),
+            $this->taskRunnerConfig->getSchedulerQueueName(),
             $this->configService->getContext()
         );
 
@@ -106,7 +106,7 @@ class TaskRunnerScheduler implements SchedulerInterface
         $task = $this->createTask($callback);
         $schedule = new HourlySchedule(
             $task,
-            $this->taskRunnerConfig->getDefaultQueueName(),
+            $this->taskRunnerConfig->getSchedulerQueueName(),
             $this->configService->getContext()
         );
 

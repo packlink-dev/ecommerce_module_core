@@ -104,14 +104,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             }
         );
 
-        $me->orderSendDraftTaskMapService = OrderSendDraftTaskMapService::getInstance();
-        TestServiceRegister::registerService(
-            OrderSendDraftTaskMapService::CLASS_NAME,
-            function () use ($me) {
-                return $me->orderSendDraftTaskMapService;
-            }
-        );
-
         RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
 
         $this->cashOnDeliveryService = new TestCashOnDeliveryService();

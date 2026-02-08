@@ -43,6 +43,8 @@ class GuidProvider
     }
 
     /**
+     * Generates a cryptographically secure unique identifier.
+     *
      * @return string
      *
      * @throws \RuntimeException

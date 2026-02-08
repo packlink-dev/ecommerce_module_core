@@ -32,11 +32,14 @@ use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
+use Packlink\BusinessLogic\ShipmentDraft\Utility\DraftStatus;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
+use Packlink\BusinessLogic\Tasks\BusinessTasks\SendDraftBusinessTask;
+use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\SendDraftTask;
 use Packlink\BusinessLogic\Utility\CurrencySymbolService;
 
@@ -64,10 +67,7 @@ class SendDraftTaskTest extends BaseSyncTest
             OrderShipmentDetails::getClassName(),
             MemoryRepository::getClassName()
         );
-        TestRepositoryRegistry::registerRepository(
-            OrderSendDraftTaskMap::getClassName(),
-            MemoryRepository::getClassName()
-        );
+
         TestRepositoryRegistry::registerRepository(ShippingMethod::getClassName(), MemoryRepository::getClassName());
 
         TestServiceRegister::registerService(
@@ -119,12 +119,6 @@ class SendDraftTaskTest extends BaseSyncTest
             }
         );
 
-        TestServiceRegister::registerService(
-            OrderSendDraftTaskMapService::CLASS_NAME,
-            function () {
-                return OrderSendDraftTaskMapService::getInstance();
-            }
-        );
 
         TestServiceRegister::registerService(
             ShippingMethodService::CLASS_NAME,
@@ -223,7 +217,7 @@ class SendDraftTaskTest extends BaseSyncTest
             )
         );
         $this->httpClient->setMockResponses($responses);
-        $this->syncTask->execute();
+        $this->executeSyncTask();
 
         /** @var OrderShipmentDetailsService $shopOrderService */
         $shopOrderService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
@@ -238,11 +232,12 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertCount(1, $this->shopLogger->loggedMessages);
         $this->assertEquals('70b7ac2a-7a71-11eb-9439-0242ac130002', $shipmentDetails->getCustomsInvoiceId());
 
-        /** @var OrderSendDraftTaskMapService $taskMapService */
-        $taskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
-        $taskMap = $taskMapService->getOrderTaskMap('test');
-        $this->assertNotNull($taskMap, 'Order task map should be created');
-        $this->assertNotEmpty($taskMap->getOrderId(), 'Order ID should be set to the order task map.');
+        /** @var OrderShipmentDetailsService $detailsService */
+        $detailsService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+
+        $this->assertEquals('test', $shipmentDetails->getReference());
+        $this->assertEquals(DraftStatus::COMPLETED, $detailsService->getDraftStatus('test'));
+        $this->assertEmpty($detailsService->getDraftError('test'));
     }
 
     public function testExecuteNotInternational()
@@ -270,7 +265,7 @@ class SendDraftTaskTest extends BaseSyncTest
             )
         );
         $this->httpClient->setMockResponses($responses);
-        $this->syncTask->execute();
+        $this->executeSyncTask();
 
         /** @var OrderShipmentDetailsService $shopOrderService */
         $shopOrderService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
@@ -303,7 +298,7 @@ class SendDraftTaskTest extends BaseSyncTest
 
         $exThrown = null;
         try {
-            $this->syncTask->execute();
+            $this->executeSyncTask();
         } catch (\Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException $ex) {
             $exThrown = $ex;
         }
@@ -340,11 +335,11 @@ class SendDraftTaskTest extends BaseSyncTest
                 )
             )
         );
-        $this->syncTask->execute();
+        $this->executeSyncTask();
         // reset messages
         $this->shopLogger->loggedMessages = array();
 
-        $this->syncTask->execute();
+        $this->executeSyncTask();
 
         $this->assertCount(1, $this->shopLogger->loggedMessages);
         $this->assertEquals(
@@ -356,11 +351,11 @@ class SendDraftTaskTest extends BaseSyncTest
     /**
      * Creates new instance of task that is being tested.
      *
-     * @return Task
+     * @return BusinessTask
      */
     protected function createSyncTaskInstance()
     {
-        return new SendDraftTask('test');
+        return new SendDraftBusinessTask('test');
     }
 
     /**

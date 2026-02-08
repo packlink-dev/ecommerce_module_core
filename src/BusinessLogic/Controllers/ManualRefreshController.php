@@ -6,7 +6,6 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
