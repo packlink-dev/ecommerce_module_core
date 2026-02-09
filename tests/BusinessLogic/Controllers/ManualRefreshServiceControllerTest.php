@@ -109,7 +109,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             ServiceRegister::getService(SchedulerInterface::class),
             $taskRunnerConfig
         );
-        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $statusProvider = new QueueTaskStatusProvider($queueService, $this->timeProvider);
 
         $this->controller = new ManualRefreshController($taskExecutor, $statusProvider);
     }

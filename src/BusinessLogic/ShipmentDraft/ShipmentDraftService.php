@@ -67,7 +67,6 @@ class ShipmentDraftService implements ShipmentDraftServiceInterface
     /**
      * Returns the status of the CreateDraftTask.
      *
-     * ✅ REFACTORED: Gets status directly from OrderShipmentDetails (unified entity).
      *
      * @param string $orderId The Order ID.
      *
@@ -113,7 +112,7 @@ class ShipmentDraftService implements ShipmentDraftServiceInterface
 
 
     /**
-     * ✅ NEW: Get OrderShipmentDetailsService for unified state management.
+     * Get OrderShipmentDetailsService for unified state management.
      *
      * @return OrderShipmentDetailsService Service instance.
      */

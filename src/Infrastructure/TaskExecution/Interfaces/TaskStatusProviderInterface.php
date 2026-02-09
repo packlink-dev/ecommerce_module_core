@@ -13,9 +13,17 @@ interface TaskStatusProviderInterface
 
     /**
      * @param string $type
-     * @param string $context
+     * @param string|null $context
      *
      * @return TaskStatus
      */
-    public function getLatestStatus(string $type, string $context = '');
+    public function getLatestStatus(string $type, $context = '');
+
+    /**
+     * @param string $type
+     * @param string|null $context
+     *
+     * @return TaskStatus
+     */
+    public function getLatestStatusWithExpiration(string $type, $context = '');
 }

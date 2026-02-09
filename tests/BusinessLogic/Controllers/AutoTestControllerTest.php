@@ -54,7 +54,7 @@ class AutoTestControllerTest extends BaseTestWithServices
         $queueService = ServiceRegister::getService(QueueService::CLASS_NAME);
         $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
-        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $statusProvider = new QueueTaskStatusProvider($queueService, $this->timeProvider);
         $this->service = new MockAutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
 
         $me = $this;

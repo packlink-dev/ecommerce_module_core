@@ -6,6 +6,8 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
@@ -35,45 +37,15 @@ class UpdateShippingServicesTaskStatusController
      */
     public function getLastTaskStatus($context = '')
     {
-        $repo = RepositoryRegistry::getQueueItemRepository();
-        $filter = $this->buildCondition($context);
-        $filter->orderBy('queueTime', 'DESC');
+        /** @var TaskStatusProviderInterface $provider */
+        $provider = ServiceRegister::getService(TaskStatusProviderInterface::class);
 
-        $item = $repo->selectOne($filter);
-        if ($item) {
-            $status = $item->getStatus();
-            if ($status === QueueItem::FAILED || $status === QueueItem::COMPLETED) {
-                return $status;
-            }
+        $status = $provider->getLatestStatusWithExpiration('UpdateShippingServicesBusinessTask', (string)$context);
 
-            /** @var TimeProvider $timeProvider */
-            $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
-            $currentTimestamp = $timeProvider->getCurrentLocalTime()->getTimestamp();
-            $taskTimestamp = $item->getLastUpdateTimestamp() ?: $item->getQueueTimestamp();
-            $expired = $taskTimestamp + $item->getTask()->getMaxInactivityPeriod() < $currentTimestamp;
-
-            return $expired ? QueueItem::FAILED : $status;
+        if ($status->getStatus() === TaskStatus::EXPIRED) {
+            return TaskStatus::FAILED;
         }
 
-        return QueueItem::QUEUED;
-    }
-
-    /**
-     * Builds query condition.
-     *
-     * @param string $context
-     *
-     * @return \Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter
-     * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
-     */
-    protected function buildCondition($context = '')
-    {
-        $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
-        if (!empty($context)) {
-            $filter->where('context', Operators::EQUALS, $context);
-        }
-
-        return $filter;
+        return $status->getStatus();
     }
 }

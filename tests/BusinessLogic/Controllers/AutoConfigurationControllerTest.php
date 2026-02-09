@@ -9,9 +9,12 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerWakeupService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
@@ -74,6 +77,13 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
                 return new TaskRunnerConfig($config, $urlProvider);
             }
         );
+
+       TestServiceRegister::registerService(TaskStatusProviderInterface::CLASS_NAME, function ()
+       {
+           return new QueueTaskStatusProvider(ServiceRegister::getService(QueueServiceInterface::CLASS_NAME),
+               $this->timeProvider);
+       });
+
 
         $me = $this;
         $this->httpClient = new TestCurlHttpClient();

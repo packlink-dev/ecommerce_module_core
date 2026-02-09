@@ -47,6 +47,12 @@ class TaskStatus
     const CREATED = 'created';
 
     /**
+     * Task exceeded max inactivity period and is considered stuck.
+     */
+    const EXPIRED = 'expired';
+
+
+    /**
      * Current task status.
      *
      * @var string
@@ -105,6 +111,7 @@ class TaskStatus
             self::PENDING,
             self::RUNNING,
             self::COMPLETED,
+            self::EXPIRED,
             self::FAILED,
             self::CANCELED,
             self::RETRYING,

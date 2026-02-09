@@ -171,7 +171,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
         $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
         $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
-        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $statusProvider = new QueueTaskStatusProvider($queueService,$this->timeProvider);
 
         $service = new AutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
         $service->setAutoTestMode(true);
@@ -208,7 +208,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
 
         $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
         $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
-        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $statusProvider = new QueueTaskStatusProvider($queueService, $this->timeProvider);
 
         $service = new AutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
         $queueItemId = $service->startAutoTest();
@@ -259,7 +259,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
         $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
         $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
-        $statusProvider = new QueueTaskStatusProvider($queueService);
+        $statusProvider = new QueueTaskStatusProvider($queueService, $this->timeProvider);
         $service = new AutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
 
         $exThrown = null;

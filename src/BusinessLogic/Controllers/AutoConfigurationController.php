@@ -6,13 +6,11 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\Http\AutoConfiguration;
 use Logeecom\Infrastructure\Http\HttpClient;
-use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
-use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
-use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 
 /**
@@ -72,16 +70,15 @@ class AutoConfigurationController
      */
     protected function enqueueUpdateServicesTask(Configuration $configService)
     {
-        $repo = RepositoryRegistry::getQueueItemRepository();
-        $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
-        $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
-        $item = $repo->selectOne($filter);
-        if ($item) {
-            $repo->delete($item);
+        /** @var TaskStatusProviderInterface $statusProvider */
+        $statusProvider = ServiceRegister::getService(TaskStatusProviderInterface::class);
+
+        $latest = $statusProvider->getLatestStatus('UpdateShippingServicesBusinessTask', $configService->getContext());
+
+        if (in_array($latest->getStatus(), [TaskStatus::SCHEDULED, TaskStatus::PENDING, TaskStatus::RUNNING], true)) {
+            return;
         }
 
-        // enqueue the task for updating shipping services
         $this->taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
     }
 }

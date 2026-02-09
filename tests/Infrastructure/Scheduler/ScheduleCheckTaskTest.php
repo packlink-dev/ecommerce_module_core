@@ -142,7 +142,7 @@ class ScheduleCheckTaskTest extends TestCase
                     return $queue;
                 },
                 TaskStatusProviderInterface::CLASS_NAME => function () use ($queue) {
-                    return new QueueTaskStatusProvider($queue);
+                    return new QueueTaskStatusProvider($queue, $this->timeProvider);
                 },
                 TaskExecutorInterface::CLASS_NAME => function () use ($taskInstance, $queue, $timeProvider) {
                     $taskRunnerConfig = ServiceRegister::getService(
