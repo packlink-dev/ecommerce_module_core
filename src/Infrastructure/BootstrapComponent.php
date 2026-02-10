@@ -2,6 +2,7 @@
 
 namespace Logeecom\Infrastructure;
 
+use Cassandra\Time;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessStarterService;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
@@ -98,7 +99,12 @@ class BootstrapComponent
                  */
                 $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
 
-                return new QueueTaskStatusProvider($queueService);
+                /**
+                 * @var TimeProvider $timeProvider
+                 */
+                $timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
+
+                return new QueueTaskStatusProvider($queueService, $timeProvider);
             }
         );
         ServiceRegister::registerService(

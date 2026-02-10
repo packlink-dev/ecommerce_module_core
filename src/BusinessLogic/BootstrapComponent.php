@@ -7,12 +7,15 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
 use Logeecom\Infrastructure\Scheduler\QueueSchedulerCheckPolicy;
+use Logeecom\Infrastructure\Scheduler\ScheduleTickHandler;
 use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
+use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
@@ -40,7 +43,6 @@ use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
-use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
@@ -92,7 +94,10 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 /** @var Configuration $config */
                 $config = ServiceRegister::getService(Configuration::CLASS_NAME);
 
-                return new TaskRunnerScheduler($config);
+                /**@var TaskRunnerConfigInterface $taskRunnerConfig */
+                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+                return new TaskRunnerScheduler($config, $taskRunnerConfig);
             }
         );
 
@@ -246,10 +251,16 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         ServiceRegister::registerService(
             AutoTestService::CLASS_NAME,
             function () {
+                /**@var TaskExecutorInterface $taskExecutor */
                 $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+
+                /**@var TaskStatusProviderInterface $statusProvider */
                 $statusProvider = ServiceRegister::getService(TaskStatusProviderInterface::CLASS_NAME);
 
-                return new AutoTestService($taskExecutor, $statusProvider);
+                /**@var TaskRunnerConfigInterface $taskRunnerConfig */
+                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+                return new AutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
             }
         );
 
@@ -272,22 +283,22 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
     /**
      * Initializes events.
      */
-//    protected static function initEvents()
-//    {
-//        parent::initEvents();
-//
-//        /** @var EventBus $eventBuss */
-//        $eventBuss = ServiceRegister::getService(EventBus::CLASS_NAME);
-//
-//        // subscribe tick event listener
-//        $eventBuss->when(
-//            TickEvent::CLASS_NAME,
-//            function () {
-//                $handler = new ScheduleTickHandler();
-//                $handler->handle();
-//            }
-//        );
-//    }
+    protected static function initEvents()
+    {
+        parent::initEvents();
+
+        /** @var EventBus $eventBuss */
+        $eventBuss = ServiceRegister::getService(EventBus::CLASS_NAME);
+
+        // subscribe tick event listener
+        $eventBuss->when(
+            TickEvent::CLASS_NAME,
+            function () {
+                $handler = new ScheduleTickHandler();
+                $handler->handle();
+            }
+        );
+    }
 
     /**
      * Initializes the registry of DTO classes.
