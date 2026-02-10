@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecution\TaskAdapter;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
@@ -14,6 +15,7 @@ use Logeecom\Infrastructure\Scheduler\Models\DailySchedule;
 use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
 use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule;
+use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 
 class TaskRunnerScheduler implements SchedulerInterface
 {
@@ -41,11 +43,12 @@ class TaskRunnerScheduler implements SchedulerInterface
      *
      * @throws RepositoryNotRegisteredException
      */
-    public function scheduleWeekly(callable $callback, ScheduleConfig $config)
+    public function scheduleWeekly(BusinessTask $businessTask, ScheduleConfig $config)
     {
-        $task = $this->createTask($callback);
+        $taskAdapter = new TaskAdapter($businessTask);
+
         $schedule = new WeeklySchedule(
-            $task,
+            $taskAdapter,
             $this->taskRunnerConfig->getSchedulerQueueName(),
             $this->configService->getContext()
         );
@@ -67,11 +70,12 @@ class TaskRunnerScheduler implements SchedulerInterface
      *
      * @throws RepositoryNotRegisteredException
      */
-    public function scheduleDaily(callable $callback, ScheduleConfig $config)
+    public function scheduleDaily(BusinessTask $businessTask, ScheduleConfig $config)
     {
-        $task = $this->createTask($callback);
+        $taskAdapter = new TaskAdapter($businessTask);
+
         $schedule = new DailySchedule(
-            $task,
+            $taskAdapter,
             $this->taskRunnerConfig->getSchedulerQueueName(),
             $this->configService->getContext()
         );
@@ -101,11 +105,12 @@ class TaskRunnerScheduler implements SchedulerInterface
      *
      * @throws RepositoryNotRegisteredException
      */
-    public function scheduleHourly(callable $callback, ScheduleConfig $config)
+    public function scheduleHourly(BusinessTask $businessTask, ScheduleConfig $config)
     {
-        $task = $this->createTask($callback);
+        $taskAdapter = new TaskAdapter($businessTask);
+
         $schedule = new HourlySchedule(
-            $task,
+            $taskAdapter,
             $this->taskRunnerConfig->getSchedulerQueueName(),
             $this->configService->getContext()
         );

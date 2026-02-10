@@ -242,9 +242,7 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
     protected function scheduleUpdateShipmentServicesTask()
     {
         $this->scheduler->scheduleWeekly(
-            function () {
-                return new UpdateShippingServicesBusinessTask();
-            },
+            new UpdateShippingServicesBusinessTask(),
             new ScheduleConfig(
                 rand(1, 7),
                 rand(0, 5),

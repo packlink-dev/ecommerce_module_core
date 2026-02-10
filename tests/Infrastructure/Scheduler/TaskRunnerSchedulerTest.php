@@ -12,9 +12,9 @@ use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooBusinessTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
@@ -77,9 +77,7 @@ class TaskRunnerSchedulerTest extends TestCase
     {
         $cfg = new ScheduleConfig(3, 10, 15, true);
 
-        $this->scheduler->scheduleWeekly(function () {
-            return new FooTask();
-        }, $cfg);
+        $this->scheduler->scheduleWeekly(new FooBusinessTask(), $cfg);
 
         $saved = $this->getLastSavedSchedule();
         $this->assertInstanceOf(WeeklySchedule::class, $saved);
@@ -104,8 +102,7 @@ class TaskRunnerSchedulerTest extends TestCase
         $cfg->setMinute(30);
         $cfg->setRecurring(false);
 
-        $this->scheduler->scheduleDaily(function () {
-            return new FooTask();}, $cfg);
+        $this->scheduler->scheduleDaily(new FooBusinessTask(), $cfg);
 
         $saved = $this->getLastSavedSchedule();
         $this->assertInstanceOf(DailySchedule::class, $saved);
@@ -133,9 +130,7 @@ class TaskRunnerSchedulerTest extends TestCase
         $cfg->setInterval(2);
         $cfg->setRecurring(true);
 
-        $this->scheduler->scheduleHourly(function () {
-            return new FooTask();
-        }, $cfg);
+        $this->scheduler->scheduleHourly(new FooBusinessTask(), $cfg);
 
         $saved = $this->getLastSavedSchedule();
         $this->assertInstanceOf(HourlySchedule::class, $saved);

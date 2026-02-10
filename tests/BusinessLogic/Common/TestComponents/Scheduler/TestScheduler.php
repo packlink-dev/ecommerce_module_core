@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler;
 
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
+use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 
 class TestScheduler implements SchedulerInterface
 {
@@ -11,26 +12,26 @@ class TestScheduler implements SchedulerInterface
     public $dailyCalls = array();
     public $hourlyCalls = array();
 
-    public function scheduleWeekly(callable $callback, ScheduleConfig $config)
+    public function scheduleWeekly(BusinessTask $businessTask, ScheduleConfig $config)
     {
         $this->weeklyCalls[] = array(
-            'callback' => $callback,
+            'task' => $businessTask,
             'config' => $config,
         );
     }
 
-    public function scheduleDaily(callable $callback, ScheduleConfig $config)
+    public function scheduleDaily(BusinessTask $businessTask, ScheduleConfig $config)
     {
         $this->dailyCalls[] = array(
-            'callback' => $callback,
+            'task' => $businessTask,
             'config' => $config,
         );
     }
 
-    public function scheduleHourly(callable $callback, ScheduleConfig $config)
+    public function scheduleHourly(BusinessTask $businessTask, ScheduleConfig $config)
     {
         $this->hourlyCalls[] = array(
-            'callback' => $callback,
+            'task' => $businessTask,
             'config' => $config,
         );
     }
