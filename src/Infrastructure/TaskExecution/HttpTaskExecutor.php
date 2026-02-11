@@ -120,8 +120,6 @@ class HttpTaskExecutor implements TaskExecutorInterface
      */
     public function scheduleDelayed(BusinessTask $businessTask, int $delaySeconds)
     {
-        $taskAdapter = new TaskAdapter($businessTask);
-
         // Calculate execution time
         $delayMinutes = ceil($delaySeconds / 60);
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -130,9 +128,7 @@ class HttpTaskExecutor implements TaskExecutorInterface
             ->getTimestamp();
 
         $this->scheduler->scheduleHourly(
-            function () use ($taskAdapter) {
-                return $taskAdapter;
-            },
+            $businessTask,
             new ScheduleConfig(
                 (int)date('N', $timestamp),
                 (int)date('H', $timestamp),
