@@ -21,6 +21,9 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 
 /**
  * Class UpdateShippingServicesTaskTest.
@@ -68,6 +71,19 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
             ShippingMethodService::CLASS_NAME,
             function () use ($me) {
                 return $me->shippingMethodService;
+            }
+        );
+
+        RepositoryRegistry::registerRepository(
+            UpdateShippingServiceTaskStatus::CLASS_NAME,
+            MemoryRepository::getClassName()
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServiceTaskStatusServiceInterface::class,
+            function () {
+                $repo = RepositoryRegistry::getRepository(UpdateShippingServiceTaskStatus::CLASS_NAME);
+                return new UpdateShippingServiceTaskStatusService($repo);
             }
         );
     }
@@ -157,10 +173,13 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
      */
     public function testExecuteNew()
     {
+        MemoryStorage::reset();
         $this->prepareAndExecuteValidTask();
 
-        // in test repository in this test ids of services start from 4
-        $this->shippingMethodService->activate(4);
+        $method = $this->findMethodByServiceId(20339);
+        self::assertNotNull($method);
+
+        $this->shippingMethodService->activate($method->getId());
         $activeMethods = $this->shippingMethodService->getActiveMethods();
         self::assertCount(1, $activeMethods);
 
@@ -182,8 +201,11 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     {
         $this->prepareAndExecuteValidTask();
 
-        $this->shippingMethodService->activate(4);
-        $method = $this->shippingMethodService->getShippingMethod(4);
+        $method = $this->findMethodByServiceId(20339);
+        self::assertNotNull($method);
+
+        $this->shippingMethodService->activate($method->getId());
+        $method = $this->shippingMethodService->getShippingMethod($method->getId());
 
         $services = $method->getShippingServices();
         // previous price = 5.98
@@ -211,7 +233,9 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     {
         $this->prepareAndExecuteValidTask();
 
-        $methodId = 4;
+        $method = $this->findMethodByServiceId(20339);
+        self::assertNotNull($method);
+        $methodId = $method->getId();
         // update locally first
         $this->shippingMethodService->activate($methodId);
         $method = $this->shippingMethodService->getShippingMethod($methodId);
@@ -466,5 +490,25 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         return file_get_contents(
             __DIR__ . "/../Common/ApiResponses/ShippingServices/ShippingServiceDetails-$countries.json"
         );
+    }
+
+    /**
+     * @param int $serviceId
+     *
+     * @return ShippingMethod|null
+     */
+    private function findMethodByServiceId($serviceId)
+    {
+        $methods = $this->shippingMethodService->getAllMethods();
+
+        foreach ($methods as $method) {
+            foreach ($method->getShippingServices() as $service) {
+                if ($service->serviceId === $serviceId) {
+                    return $method;
+                }
+            }
+        }
+
+        return null;
     }
 }

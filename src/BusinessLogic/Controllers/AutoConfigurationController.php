@@ -7,11 +7,11 @@ use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\Http\AutoConfiguration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
-use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
 
 /**
  * Class AutoConfigurationController.
@@ -21,13 +21,22 @@ use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTas
 class AutoConfigurationController
 {
     /**
-     * @var TaskExecutorInterface
+     * @var UpdateShippingServicesOrchestratorInterface
      */
-    private $taskExecutor;
+    private $orchestrator;
 
-    public function __construct(TaskExecutorInterface $taskExecutor)
+    /**
+     * @var UpdateShippingServiceTaskStatusServiceInterface $service
+     */
+    private $service;
+
+    public function __construct(
+        UpdateShippingServicesOrchestratorInterface $orchestrator,
+        UpdateShippingServiceTaskStatusServiceInterface $service
+    )
     {
-        $this->taskExecutor = $taskExecutor;
+        $this->orchestrator = $orchestrator;
+        $this->service = $service;
     }
     /**
      * Starts the auto-configuration process.
@@ -43,7 +52,12 @@ class AutoConfigurationController
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         /** @var \Logeecom\Infrastructure\Http\HttpClient $httpService */
         $httpService = ServiceRegister::getService(HttpClient::CLASS_NAME);
+
+        /**
+         * @var TaskRunnerConfigInterface $taskRunnerConfig
+         */
         $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
         $service = new AutoConfiguration($configService, $httpService, $taskRunnerConfig);
 
         try {
@@ -70,15 +84,29 @@ class AutoConfigurationController
      */
     protected function enqueueUpdateServicesTask(Configuration $configService)
     {
-        /** @var TaskStatusProviderInterface $statusProvider */
-        $statusProvider = ServiceRegister::getService(TaskStatusProviderInterface::class);
+        $context = $configService->getContext();
 
-        $latest = $statusProvider->getLatestStatus('UpdateShippingServicesBusinessTask', $configService->getContext());
+        /** @var UpdateShippingServiceTaskStatus|null $entity */
+        $entity = $this->service->getLatestByContext($context);
 
-        if (in_array($latest->getStatus(), [TaskStatus::SCHEDULED, TaskStatus::PENDING, TaskStatus::RUNNING], true)) {
-            return;
+        if ($entity) {
+            $currentStatus = $entity->getStatus();
+
+            if (in_array($currentStatus, [TaskStatus::CREATED, TaskStatus::IN_PROGRESS, TaskStatus::PENDING,
+                TaskStatus::RUNNING], true)) {
+                $this->service->upsertStatus(
+                    $context,
+                    TaskStatus::FAILED,
+                    'Previous update attempt was reset.',
+                    true
+                );
+            }
         }
 
-        $this->taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
+        try {
+            $this->orchestrator->enqueue($context);
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }

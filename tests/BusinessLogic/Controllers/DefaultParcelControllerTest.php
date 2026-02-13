@@ -33,6 +33,10 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
@@ -122,7 +126,24 @@ class DefaultParcelControllerTest extends BaseTestWithServices
             ServiceRegister::getService(SchedulerInterface::class),
             $taskRunnerConfig
         );
-        $this->defaultParcelController = new DefaultParcelController($taskExecutor);
+
+        RepositoryRegistry::registerRepository(
+            UpdateShippingServiceTaskStatus::CLASS_NAME,
+            MemoryRepository::getClassName()
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServiceTaskStatusServiceInterface::class,
+            function () {
+                $repo = RepositoryRegistry::getRepository(UpdateShippingServiceTaskStatus::CLASS_NAME);
+                return new UpdateShippingServiceTaskStatusService($repo);
+            }
+        );
+
+        $statusService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+        $orchestrator = new UpdateShippingServicesOrchestrator($taskExecutor, $statusService);
+
+        $this->defaultParcelController = new DefaultParcelController($orchestrator);
     }
 
     /**

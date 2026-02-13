@@ -6,8 +6,10 @@ use Generator;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
+use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
@@ -21,6 +23,9 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 
 class UpdateShippingServicesBusinessTask implements BusinessTask
 {
@@ -43,6 +48,11 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      */
     private $executionConfig;
 
+    /**
+     * @var UpdateShippingServiceTaskStatusService
+     */
+    private $statusService;
+
     public function __construct(TaskExecutionConfig $executionConfig = null)
     {
         $this->executionConfig = $executionConfig;
@@ -58,25 +68,37 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      * @throws HttpAuthenticationException
      * @throws HttpCommunicationException
      * @throws HttpRequestException
-     * @throws FrontDtoValidationException
+     * @throws FrontDtoValidationException|QueryFilterInvalidParamException
      */
     public function execute(): \Generator
     {
         yield 1;
 
-        if ($this->shouldExecute()) {
-            $apiServices = $this->getRemoteServices();
-            $apiSpecialServices = $this->getSpecialServices($apiServices);
+        $context = $this->getContext();
 
-            $currentMethods = $this->getShippingMethodService()->getAllMethods();
-            $currentSpecialMethods = $this->getSpecialServices($currentMethods);
+        try {
+            $this->getStatusService()->upsertStatus($context, TaskStatus::IN_PROGRESS);
 
-            yield 20;
-            yield from $this->syncServices($currentMethods, $apiServices);
-            yield from $this->syncServicesSpecial($currentSpecialMethods, $apiSpecialServices);
+            if ($this->shouldExecute()) {
+                $apiServices = $this->getRemoteServices();
+                $apiSpecialServices = $this->getSpecialServices($apiServices);
+
+                $currentMethods = $this->getShippingMethodService()->getAllMethods();
+                $currentSpecialMethods = $this->getSpecialServices($currentMethods);
+
+                yield 20;
+                yield from $this->syncServices($currentMethods, $apiServices);
+                yield from $this->syncServicesSpecial($currentSpecialMethods, $apiSpecialServices);
+            }
+
+            $this->getStatusService()->upsertStatus($context, TaskStatus::COMPLETED, null, true);
+
+            yield 100;
+        } catch (\Exception $e) {
+            $this->getStatusService()->upsertStatus($context, TaskStatus::FAILED, $e->getMessage(), true);
+
+            throw $e;
         }
-
-        yield 100;
     }
 
     /**
@@ -396,5 +418,41 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
     public function getExecutionConfig()
     {
         return $this->executionConfig;
+    }
+    /**
+     * @return string
+     */
+    protected function getContext()
+    {
+        if ($this->executionConfig !== null && method_exists($this->executionConfig, 'getContext')) {
+            return (string)$this->executionConfig->getContext();
+        }
+
+        /** @var Configuration $config */
+        $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        if (method_exists($config, 'getContext')) {
+            return (string)$config->getContext();
+        }
+
+        return '';
+    }
+
+
+    /**
+     * @return UpdateShippingServiceTaskStatusServiceInterface
+     */
+    protected function getStatusService()
+    {
+        if ($this->statusService === null) {
+            /**
+             * @var UpdateShippingServiceTaskStatusServiceInterface $statusService
+             */
+            $statusService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+
+            $this->statusService = $statusService;
+        }
+
+        return $this->statusService;
     }
 }

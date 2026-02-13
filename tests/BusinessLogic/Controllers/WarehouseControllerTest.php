@@ -6,7 +6,7 @@ use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Warehouse\MockWarehouseService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\BusinessLogic\Controllers\WarehouseController;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
@@ -24,8 +24,8 @@ class WarehouseControllerTest extends BaseTestWithServices
     {
         parent::before();
 
-        $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
-        $this->service = new MockWarehouseService($taskExecutor);
+        $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+        $this->service = new MockWarehouseService($orchestrator);
 
         $me = $this;
 

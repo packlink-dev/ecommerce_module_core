@@ -15,7 +15,6 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
@@ -233,10 +232,13 @@ class Bootstrap extends BootstrapComponent
         ServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
             function () use ($instance) {
-                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
                 $scheduler = ServiceRegister::getService(\Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface::class);
 
-                return new UserAccountService($taskExecutor, $scheduler);
+                $orchestrator = ServiceRegister::getService(
+                    \Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface::class
+                );
+
+                return new UserAccountService($orchestrator, $scheduler);
             }
         );
 

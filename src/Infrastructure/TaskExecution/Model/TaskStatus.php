@@ -51,6 +51,11 @@ class TaskStatus
      */
     const EXPIRED = 'expired';
 
+    /**
+     * Task in progress
+     */
+    const IN_PROGRESS = 'in_progress';
+
 
     /**
      * Current task status.
@@ -112,9 +117,7 @@ class TaskStatus
             self::RUNNING,
             self::COMPLETED,
             self::EXPIRED,
-            self::FAILED,
-            self::CANCELED,
-            self::RETRYING,
+            self::FAILED
         );
     }
 }

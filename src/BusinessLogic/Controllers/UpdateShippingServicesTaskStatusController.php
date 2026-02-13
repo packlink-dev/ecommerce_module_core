@@ -10,6 +10,8 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface
 use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
 
 /**
  * Class UpdateShippingServicesTaskStatusController.
@@ -18,6 +20,20 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
  */
 class UpdateShippingServicesTaskStatusController
 {
+    /**
+     * @var UpdateShippingServiceTaskStatusServiceInterface
+     */
+    private $statusService;
+
+    /**
+     * @param UpdateShippingServiceTaskStatusServiceInterface $statusService
+     */
+    public function __construct(
+        UpdateShippingServiceTaskStatusServiceInterface $statusService
+    ) {
+        $this->statusService = $statusService;
+    }
+
     /**
      * Checks the status of the task responsible for getting services.
      *
@@ -37,15 +53,13 @@ class UpdateShippingServicesTaskStatusController
      */
     public function getLastTaskStatus($context = '')
     {
-        /** @var TaskStatusProviderInterface $provider */
-        $provider = ServiceRegister::getService(TaskStatusProviderInterface::class);
+        /** @var UpdateShippingServiceTaskStatus|null $entity */
+        $entity = $this->statusService->getLatestByContext((string)$context);
 
-        $status = $provider->getLatestStatusWithExpiration('UpdateShippingServicesBusinessTask', (string)$context);
-
-        if ($status->getStatus() === TaskStatus::EXPIRED) {
-            return TaskStatus::FAILED;
+        if (!$entity) {
+            return TaskStatus::NOT_FOUND;
         }
 
-        return $status->getStatus();
+        return $entity->getStatus();
     }
 }

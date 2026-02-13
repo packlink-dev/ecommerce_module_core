@@ -3,16 +3,15 @@
 namespace BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
-use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
@@ -21,6 +20,7 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
@@ -28,7 +28,11 @@ use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\ManualRefreshController;
-use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 
 class ManualRefreshServiceControllerTest extends BaseTestWithServices
 {
@@ -45,6 +49,12 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
      * @var TestQueueService
      */
     public $queueService;
+
+    /**@var UpdateShippingServiceTaskStatusServiceInterface $updateShippingServiceTaskStatusService */
+    private $updateShippingServiceTaskStatusService;
+
+    private $taskExecutor;
+
     /**
      * @before
      * @inheritdoc
@@ -100,6 +110,23 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             $configuration->getContext()
         );
 
+
+        RepositoryRegistry::registerRepository(
+            UpdateShippingServiceTaskStatus::CLASS_NAME,
+            MemoryRepository::getClassName()
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServiceTaskStatusServiceInterface::class,
+            function () {
+                $repo = RepositoryRegistry::getRepository(UpdateShippingServiceTaskStatus::CLASS_NAME);
+                return new UpdateShippingServiceTaskStatusService($repo);
+            }
+        );
+
+        $this->updateShippingServiceTaskStatusService = ServiceRegister::getService(
+            UpdateShippingServiceTaskStatusServiceInterface::class);
+
         $taskExecutor = new HttpTaskExecutor(
             $queueService,
             $metadataProvider,
@@ -109,9 +136,28 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
             ServiceRegister::getService(SchedulerInterface::class),
             $taskRunnerConfig
         );
-        $statusProvider = new QueueTaskStatusProvider($queueService, $this->timeProvider);
 
-        $this->controller = new ManualRefreshController($taskExecutor, $statusProvider);
+        TestServiceRegister::registerService(
+            TaskExecutorInterface::class,
+            function () use ($taskExecutor) {
+                return $taskExecutor;
+            }
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServicesOrchestratorInterface::class,
+            function () use ($taskExecutor) {
+                return new UpdateShippingServicesOrchestrator(
+                    $taskExecutor,
+                    ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class)
+                );
+            }
+        );
+
+        $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+
+
+        $this->controller = new ManualRefreshController($this->updateShippingServiceTaskStatusService, $orchestrator);
     }
 
     /**
@@ -151,7 +197,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         $response = $this->controller->getTaskStatus();
 
-        self::assertEquals('pending', $response->status);
+        self::assertEquals('created', $response->status);
     }
 
     /**
@@ -166,13 +212,13 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
     {
         $this->controller->enqueueUpdateTask();
 
-        $repo = RepositoryRegistry::getQueueItemRepository();
-        $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
-        $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
-        $queueItem = $repo->selectOne($filter);
-        $queueItem->setStatus(QueueItem::FAILED);
-        $repo->update($queueItem);
+        /**@var \Logeecom\Infrastructure\Configuration\Configuration $configuration */
+        $configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        $this->updateShippingServiceTaskStatusService->upsertStatus(
+            $configuration->getContext(),
+            TaskStatus::FAILED
+        );
 
         $response = $this->controller->getTaskStatus();
 
@@ -183,7 +229,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
     {
         $responseData = $this->controller->getTaskStatus();
 
-        self::assertEquals(QueueItem::CREATED, $responseData->status);
-        self::assertEquals('Item not found in queue. Task was not enqueued yet.', $responseData->message);
+        self::assertEquals(TaskStatus::NOT_FOUND, $responseData->status);
+        self::assertEquals('Status not found. Task was not enqueued yet.', $responseData->message);
     }
 }

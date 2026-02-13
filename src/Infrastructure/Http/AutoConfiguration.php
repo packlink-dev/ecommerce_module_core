@@ -4,6 +4,7 @@ namespace Logeecom\Infrastructure\Http;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Exceptions\BaseException;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 
 /**
@@ -39,7 +40,7 @@ class AutoConfiguration
     private $httpClient;
 
     /**
-     * @var TaskRunnerConfig $taskRunnerConfig
+     * @var TaskRunnerConfigInterface $taskRunnerConfig
      */
     private $taskRunnerConfig;
     /**
@@ -48,7 +49,7 @@ class AutoConfiguration
      * @param \Logeecom\Infrastructure\Configuration\Configuration $configService An instance of the configuration.
      * @param \Logeecom\Infrastructure\Http\HttpClient $httpClient An instance of the http client.
      */
-    public function __construct(Configuration $configService, HttpClient $httpClient, TaskRunnerConfig $taskRunnerConfig)
+    public function __construct(Configuration $configService, HttpClient $httpClient, TaskRunnerConfigInterface $taskRunnerConfig)
     {
         $this->configService = $configService;
         $this->httpClient = $httpClient;

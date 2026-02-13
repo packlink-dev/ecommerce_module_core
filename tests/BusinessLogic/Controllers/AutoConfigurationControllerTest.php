@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Controllers;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
@@ -23,6 +24,7 @@ use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
@@ -33,6 +35,10 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\AutoConfigurationController;
 use Packlink\BusinessLogic\Controllers\UpdateShippingServicesTaskStatusController;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
 
 /**
  * Class AutoConfigurationControllerTest.
@@ -49,6 +55,9 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
      * @var TestQueueService
      */
     private $queueService;
+
+    /**@var UpdateShippingServiceTaskStatusServiceInterface $updateShippingServiceTaskStatusService */
+    private $updateShippingServiceTaskStatusService;
 
     /**
      * @before
@@ -103,6 +112,23 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
             }
         );
 
+        RepositoryRegistry::registerRepository(
+            UpdateShippingServiceTaskStatus::CLASS_NAME,
+            MemoryRepository::getClassName()
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServiceTaskStatusServiceInterface::class,
+            function () {
+                $repo = RepositoryRegistry::getRepository(UpdateShippingServiceTaskStatus::CLASS_NAME);
+                return new UpdateShippingServiceTaskStatusService($repo);
+            }
+        );
+
+        $this->updateShippingServiceTaskStatusService = ServiceRegister::getService(
+            UpdateShippingServiceTaskStatusServiceInterface::class);
+
+
         $scheduler = new TestScheduler();
         TestServiceRegister::registerService(
             SchedulerInterface::class,
@@ -141,7 +167,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController($this->createTaskExecutor());
+        $controller = new AutoConfigurationController($this->createOrchestrator(), $this->updateShippingServiceTaskStatusService);
         $success = $controller->start();
 
         $this->assertTrue($success, 'Auto-configure must be successful if default configuration request passed.');
@@ -160,10 +186,12 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController($this->createTaskExecutor());
+        $controller = new AutoConfigurationController($this->createOrchestrator(), $this->updateShippingServiceTaskStatusService);
         $controller->start(true);
 
-        $taskController = new UpdateShippingServicesTaskStatusController();
+        $statusService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+
+        $taskController = new UpdateShippingServicesTaskStatusController($this->updateShippingServiceTaskStatusService);;
         $status = $taskController->getLastTaskStatus();
         $this->assertNotEquals(QueueItem::FAILED, $status);
     }
@@ -181,14 +209,14 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController($this->createTaskExecutor());
+        $controller = new AutoConfigurationController($this->createOrchestrator(), $this->updateShippingServiceTaskStatusService);
         $controller->start(true);
 
         $this->timeProvider->setCurrentLocalTime(new \DateTime('now +10 minutes'));
-        $taskController = new UpdateShippingServicesTaskStatusController();
+        $taskController = new UpdateShippingServicesTaskStatusController($this->updateShippingServiceTaskStatusService);
         $status = $taskController->getLastTaskStatus();
 
-        $this->assertEquals(QueueItem::FAILED, $status);
+        $this->assertEquals(QueueItem::CREATED, $status);
     }
 
     /**
@@ -227,7 +255,7 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(400);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController($this->createTaskExecutor());
+        $controller = new AutoConfigurationController($this->createOrchestrator(), $this->updateShippingServiceTaskStatusService);
         $success = $controller->start();
 
         $this->assertFalse($success);
@@ -248,17 +276,17 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
         $response = $this->getResponse(200);
         $this->httpClient->setMockResponses(array($response));
 
-        $controller = new AutoConfigurationController($this->createTaskExecutor());
+        $controller = new AutoConfigurationController($this->createOrchestrator(), $this->updateShippingServiceTaskStatusService);
         $controller->start(true);
-        $repo = RepositoryRegistry::getQueueItemRepository();
-        $filter = new QueryFilter();
-        $filter->where('taskType', Operators::EQUALS, 'UpdateShippingServicesBusinessTask');
-        $filter->where('status', Operators::EQUALS, QueueItem::QUEUED);
-        $queueItem = $repo->selectOne($filter);
-        $queueItem->setStatus($taskStatus);
-        $repo->update($queueItem);
+        /** @var Configuration $configuration */
+        $configuration = ServiceRegister::getService(\Logeecom\Infrastructure\Configuration\Configuration::CLASS_NAME);
 
-        $taskController = new UpdateShippingServicesTaskStatusController();
+        $this->updateShippingServiceTaskStatusService->upsertStatus(
+            $configuration->getContext(),
+            $taskStatus
+        );
+
+        $taskController = new UpdateShippingServicesTaskStatusController($this->updateShippingServiceTaskStatusService);
 
         return $taskController->getLastTaskStatus();
     }
@@ -304,6 +332,14 @@ X-Custom-Header: Content: database\r
             ServiceRegister::getService(TimeProvider::CLASS_NAME),
             ServiceRegister::getService(SchedulerInterface::class),
             $taskRunnerConfig
+        );
+    }
+
+    private function createOrchestrator()
+    {
+        return new UpdateShippingServicesOrchestrator(
+            $this->createTaskExecutor(),
+            $this->updateShippingServiceTaskStatusService
         );
     }
 }

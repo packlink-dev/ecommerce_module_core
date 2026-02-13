@@ -5,7 +5,6 @@ namespace Packlink\BusinessLogic\User;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Brand\Exceptions\PlatformCountryNotSupportedByBrandException;
 use Packlink\BusinessLogic\Configuration;
@@ -16,7 +15,7 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
-use Packlink\BusinessLogic\Tasks\UpdateShippingServicesTask;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 
 /**
  * Class UserAccountService.
@@ -30,17 +29,20 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
      */
     const CLASS_NAME = __CLASS__;
     /**
-     * @var TaskExecutorInterface
+     * @var UpdateShippingServicesOrchestratorInterface
      */
-    private $taskExecutor;
+    private $updateShippingServicesOrchestrator;
     /**
      * @var SchedulerInterface
      */
     private $scheduler;
 
-    public function __construct(TaskExecutorInterface $taskExecutor, SchedulerInterface $scheduler)
+    public function __construct(
+        UpdateShippingServicesOrchestratorInterface $updateShippingServicesOrchestrator,
+        SchedulerInterface $scheduler
+    )
     {
-        $this->taskExecutor = $taskExecutor;
+        $this->updateShippingServicesOrchestrator = $updateShippingServicesOrchestrator;
         $this->scheduler = $scheduler;
     }
 
@@ -187,13 +189,11 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
         }
 
         $this->getConfigService()->setUserInfo($user);
-        $taskExecutor = $this->taskExecutor;
-
         $this->setDefaultParcel(true);
         $this->setWarehouseInfo(true);
 
         if ($this->getConfigService()->getDefaultWarehouse() !== null) {
-            $taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
+            $this->updateShippingServicesOrchestrator->enqueue($this->getConfigService()->getContext());
         }
 
         $webHookUrl = $this->getConfigService()->getWebHookUrl();

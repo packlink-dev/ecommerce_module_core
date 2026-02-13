@@ -4,9 +4,8 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
-use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
 class DefaultParcelController
@@ -17,13 +16,13 @@ class DefaultParcelController
     private $configService;
 
     /**
-     * @var TaskExecutorInterface
+     * @var UpdateShippingServicesOrchestratorInterface
      */
-    private $taskExecutor;
+    private $orchestrator;
 
-    public function __construct(TaskExecutorInterface $taskExecutor)
+    public function __construct(UpdateShippingServicesOrchestratorInterface $orchestrator)
     {
-        $this->taskExecutor = $taskExecutor;
+        $this->orchestrator = $orchestrator;
     }
 
     /**
@@ -53,7 +52,7 @@ class DefaultParcelController
         $this->getConfigService()->setDefaultParcel($parcelInfo);
 
         if ($oldParcel === null || array_diff($oldParcel->toArray(), $parcelInfo->toArray())) {
-            $this->taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
+            $this->orchestrator->enqueue($this->getConfigService()->getContext());
         }
     }
 

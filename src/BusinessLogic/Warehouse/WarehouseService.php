@@ -3,13 +3,12 @@
 namespace Packlink\BusinessLogic\Warehouse;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 
 /**
@@ -20,13 +19,13 @@ use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 class WarehouseService implements WarehouseServiceInterface
 {
     /**
-     * @var TaskExecutorInterface
+     * @var UpdateShippingServicesOrchestratorInterface
      */
-    private $taskExecutor;
+    private $orchestrator;
 
-    public function __construct(TaskExecutorInterface $taskExecutor)
+    public function __construct(UpdateShippingServicesOrchestratorInterface $orchestrator)
     {
-        $this->taskExecutor = $taskExecutor;
+        $this->orchestrator = $orchestrator;
     }
 
     /**
@@ -79,7 +78,6 @@ class WarehouseService implements WarehouseServiceInterface
 
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $taskExecutor = $this->taskExecutor;
 
         $oldWarehouse = $configService->getDefaultWarehouse();
 
@@ -87,7 +85,7 @@ class WarehouseService implements WarehouseServiceInterface
         if ($oldWarehouse === null
             || $oldWarehouse->country !== $warehouse->country
         ) {
-            $taskExecutor->enqueue(new UpdateShippingServicesBusinessTask());
+            $this->orchestrator->enqueue($configService->getContext());
         }
 
         return $warehouse;

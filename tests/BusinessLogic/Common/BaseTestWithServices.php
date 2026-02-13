@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Common;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\HttpClient;
+use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
@@ -20,6 +21,7 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerConfig;
@@ -39,6 +41,11 @@ use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
@@ -92,19 +99,19 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,
             function () {
-                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+                $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
 
-                return new WarehouseService($taskExecutor);
+                return new WarehouseService($orchestrator);
             }
         );
 
         TestServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
             function () {
-                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
                 $scheduler = ServiceRegister::getService(SchedulerInterface::class);
+                $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
 
-                return new UserAccountService($taskExecutor, $scheduler);
+                return new UserAccountService($orchestrator, $scheduler);
             }
         );
 
@@ -127,6 +134,29 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
             Proxy::CLASS_NAME,
             function () use ($me) {
                 return new Proxy($me->shopConfig, $me->httpClient);
+            }
+        );
+
+        RepositoryRegistry::registerRepository(
+            UpdateShippingServiceTaskStatus::CLASS_NAME,
+            MemoryRepository::getClassName()
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServiceTaskStatusServiceInterface::class,
+            function () {
+                $repo = RepositoryRegistry::getRepository(UpdateShippingServiceTaskStatus::CLASS_NAME);
+                return new UpdateShippingServiceTaskStatusService($repo);
+            }
+        );
+
+        TestServiceRegister::registerService(
+            UpdateShippingServicesOrchestratorInterface::class,
+            function () {
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::CLASS_NAME);
+                $statusService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+
+                return new UpdateShippingServicesOrchestrator($taskExecutor, $statusService);
             }
         );
 
