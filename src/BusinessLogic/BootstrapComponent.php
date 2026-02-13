@@ -48,7 +48,10 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
 use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
@@ -100,6 +103,37 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
                 return new TaskRunnerScheduler($config, $taskRunnerConfig);
+            }
+        );
+
+        ServiceRegister::registerService(
+            UpdateShippingServiceTaskStatusServiceInterface::class,
+            function () {
+                $repo = RepositoryRegistry::getRepository(UpdateShippingServiceTaskStatus::CLASS_NAME);
+
+                return new UpdateShippingServiceTaskStatusService($repo);
+            }
+        );
+
+
+        ServiceRegister::registerService(
+            UpdateShippingServicesOrchestratorInterface::class,
+            function () {
+                /**
+                 * @var TaskExecutorInterface $taskExecutor
+                 */
+                $taskExecutor = ServiceRegister::getService(TaskExecutorInterface::class);
+
+                /**
+                 * @var UpdateShippingServiceTaskStatusServiceInterface $updateShippingService
+                 */
+                $updateShippingService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+
+
+                return new UpdateShippingServicesOrchestrator(
+                    $taskExecutor,
+                    $updateShippingService
+                );
             }
         );
 
@@ -281,17 +315,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 return new OAuthStateService($repository);
             }
         );
-
-        ServiceRegister::registerService(
-            UpdateShippingServicesOrchestratorInterface::class,
-            function () {
-                return new UpdateShippingServicesOrchestrator(
-                    ServiceRegister::getService(TaskExecutorInterface::class),
-                    ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class)
-                );
-            }
-        );
-
     }
 
     /**
