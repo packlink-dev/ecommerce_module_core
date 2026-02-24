@@ -243,7 +243,7 @@ class CurlHttpClient extends HttpClient
     protected function setCurlSessionOptionsForSynchronousRequest()
     {
         $this->curlOptions[CURLOPT_TIMEOUT_MS] =
-            $this->getTaskRunnerConfig()->getSyncRequestTimeout() ?: static::DEFAULT_REQUEST_TIMEOUT;
+            $this->getConfigService()->getSyncRequestTimeout() ?: static::DEFAULT_REQUEST_TIMEOUT;
     }
 
     /**

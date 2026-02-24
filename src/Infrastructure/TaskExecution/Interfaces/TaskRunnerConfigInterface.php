@@ -168,13 +168,6 @@ interface TaskRunnerConfigInterface
     public function setTaskRunnerStatus($guid, $timestamp);
 
     /**
-     * Returns sync request timeout in milliseconds.
-     *
-     * @return int|null
-     */
-    public function getSyncRequestTimeout();
-
-    /**
      * Sets sync request timeout in milliseconds.
      *
      * @param int $timeout

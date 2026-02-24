@@ -136,6 +136,16 @@ abstract class Configuration extends Singleton
     }
 
     /**
+     * Returns synchronous process timeout in milliseconds.
+     *
+     * @return int|null
+     */
+    public function getSyncRequestTimeout()
+    {
+        return $this->getConfigValue('syncRequestTimeout');
+    }
+
+    /**
      * Return whether default logger is enabled or not.
      *
      * @return bool TRUE if default logger is enabled; otherwise, false.

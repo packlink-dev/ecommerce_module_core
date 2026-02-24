@@ -255,16 +255,6 @@ class TaskRunnerConfig implements TaskRunnerConfigInterface
     }
 
     /**
-     * @return int|null
-     */
-    public function getSyncRequestTimeout()
-    {
-        $value = $this->getValue('syncRequestTimeout', null);
-
-        return $value === null ? null : (int)$value;
-    }
-
-    /**
      * @param int $timeout
      */
     public function setSyncRequestTimeout($timeout)
