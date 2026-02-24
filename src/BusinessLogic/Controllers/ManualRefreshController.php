@@ -3,9 +3,9 @@
 namespace Packlink\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus as CoreTaskStatus;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\TaskStatus;
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus as CoreTaskStatus;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
 use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;

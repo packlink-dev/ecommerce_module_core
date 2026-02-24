@@ -53,7 +53,6 @@ class RegistrationControllerTest extends BaseTestWithServices
         $taskExecutor = new HttpTaskExecutor(
             TestServiceRegister::getService(\Logeecom\Infrastructure\TaskExecution\QueueService::CLASS_NAME),
             $metadataProvider,
-            $this->shopConfig,
             EventBus::getInstance(),
             ServiceRegister::getService(TimeProvider::CLASS_NAME),
             ServiceRegister::getService(SchedulerInterface::class),

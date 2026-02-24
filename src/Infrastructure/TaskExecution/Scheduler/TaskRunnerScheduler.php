@@ -1,20 +1,19 @@
 <?php
 
-namespace Logeecom\Infrastructure\Scheduler;
+namespace Logeecom\Infrastructure\TaskExecution\Scheduler;
 
 use Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\DailySchedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\HourlySchedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\WeeklySchedule;
 use Logeecom\Infrastructure\TaskExecution\Task;
-use Logeecom\Infrastructure\TaskExecution\TaskAdapter;
-use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
+use Logeecom\Infrastructure\TaskExecutor\TaskAdapter;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
-use Logeecom\Infrastructure\Scheduler\Models\DailySchedule;
-use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
-use Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 
 class TaskRunnerScheduler implements SchedulerInterface

@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution;
 
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 
 class TestAsyncProcessUrlProvider implements AsyncProcessUrlProviderInterface
 {

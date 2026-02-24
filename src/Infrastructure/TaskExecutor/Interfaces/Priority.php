@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution\Interfaces;
+namespace Logeecom\Infrastructure\TaskExecutor\Interfaces;
 
 /**
  * Interface Priority

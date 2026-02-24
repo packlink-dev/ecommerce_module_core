@@ -3,30 +3,36 @@
 
 namespace Logeecom\Tests\Infrastructure\Scheduler;
 
+use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Interfaces\DefaultLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
-use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\DailySchedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\HourlySchedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\MonthlySchedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\WeeklySchedule;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\ScheduleCheckTask;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger as DefaultLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
@@ -42,12 +48,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
-use Logeecom\Infrastructure\Scheduler\Models\DailySchedule;
-use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
-use Logeecom\Infrastructure\Scheduler\Models\MonthlySchedule;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
-use Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule;
-use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -154,7 +154,6 @@ class ScheduleCheckTaskTest extends TestCase
                     return new HttpTaskExecutor(
                         $queue,
                         $metadataProvider,
-                        $taskInstance->shopConfig,
                         EventBus::getInstance(),
                         $timeProvider,
                         new TaskRunnerScheduler($taskInstance->shopConfig, $taskRunnerConfig),

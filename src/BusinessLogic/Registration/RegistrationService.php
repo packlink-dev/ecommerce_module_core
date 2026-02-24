@@ -39,7 +39,7 @@ class RegistrationService extends BaseService implements \Packlink\BusinessLogic
     {
         try {
             /** @var Proxy $proxy */
-            $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+            $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
 
             return $proxy->register($request->toArray());
         } catch (HttpBaseException $e) {

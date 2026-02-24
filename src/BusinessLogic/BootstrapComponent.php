@@ -5,17 +5,14 @@ namespace Packlink\BusinessLogic;
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
-use Logeecom\Infrastructure\Scheduler\QueueSchedulerCheckPolicy;
-use Logeecom\Infrastructure\Scheduler\ScheduleTickHandler;
-use Logeecom\Infrastructure\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
-use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
-use Logeecom\Infrastructure\Utility\Events\EventBus;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\QueueSchedulerCheckPolicy;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
+use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
@@ -90,19 +87,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
 
                 return new Proxy($config, $client);
-            }
-        );
-
-        ServiceRegister::registerService(
-            SchedulerInterface::CLASS_NAME,
-            function () {
-                /** @var Configuration $config */
-                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
-
-                /**@var TaskRunnerConfigInterface $taskRunnerConfig */
-                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
-
-                return new TaskRunnerScheduler($config, $taskRunnerConfig);
             }
         );
 
@@ -257,7 +241,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         );
 
         ServiceRegister::registerService(
-            CashOnDeliveryService::CLASS_NAME,
+           CashOnDeliveryServiceInterface::CLASS_NAME,
             function () {
                 return new CashOnDeliveryService();
             }
@@ -294,10 +278,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 /**@var TaskStatusProviderInterface $statusProvider */
                 $statusProvider = ServiceRegister::getService(TaskStatusProviderInterface::CLASS_NAME);
 
-                /**@var TaskRunnerConfigInterface $taskRunnerConfig */
-                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
-
-                return new AutoTestService($taskExecutor, $statusProvider, $taskRunnerConfig);
+                return new AutoTestService($taskExecutor, $statusProvider);
             }
         );
 
@@ -316,26 +297,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             }
         );
     }
-
-    /**
-     * Initializes events.
-     */
-//    protected static function initEvents()
-//    {
-//        parent::initEvents();
-//
-//        /** @var EventBus $eventBuss */
-//        $eventBuss = ServiceRegister::getService(EventBus::CLASS_NAME);
-//
-//        // subscribe tick event listener
-//        $eventBuss->when(
-//            TickEvent::CLASS_NAME,
-//            function () {
-//                $handler = new ScheduleTickHandler();
-//                $handler->handle();
-//            }
-//        );
-//    }
 
     /**
      * Initializes the registry of DTO classes.

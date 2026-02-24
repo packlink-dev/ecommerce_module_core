@@ -3,8 +3,8 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 
@@ -22,6 +22,7 @@ class DefaultTaskMetadataProvider implements TaskMetadataProviderInterface
 
     /**
      * @param Configuration $config
+     * @param TaskRunnerConfigInterface $taskRunnerConfig
      */
     public function __construct(Configuration $config, TaskRunnerConfigInterface $taskRunnerConfig)
     {

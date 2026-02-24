@@ -3,8 +3,8 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 
 class LegacyTaskAdapter implements BusinessTask

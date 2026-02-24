@@ -4,8 +4,8 @@ namespace Logeecom\Tests\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;

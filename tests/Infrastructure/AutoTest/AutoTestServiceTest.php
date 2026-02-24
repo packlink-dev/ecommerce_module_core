@@ -11,29 +11,29 @@ use Logeecom\Infrastructure\Logger\LogData;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueTaskStatusProvider;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
-use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration as BusinessTestShopConfiguration;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 
@@ -116,7 +116,7 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
 
         TestServiceRegister::registerService(
             TaskExecutorInterface::CLASS_NAME,
-            function () use ($queue, $metadataProvider, $businessConfig) {
+            function () use ($queue, $metadataProvider) {
                 /** @var EventBus $eventBus */
                 $eventBus = ServiceRegister::getService(EventBus::CLASS_NAME);
                 /** @var TimeProvider $timeProvider */
@@ -129,7 +129,6 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
                 return new HttpTaskExecutor(
                     $queue,
                     $metadataProvider,
-                    $businessConfig,
                     $eventBus,
                     $timeProvider,
                     $scheduler,

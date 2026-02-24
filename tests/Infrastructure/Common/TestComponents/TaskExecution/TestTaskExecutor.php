@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution;
 
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 
 class TestTaskExecutor implements TaskExecutorInterface

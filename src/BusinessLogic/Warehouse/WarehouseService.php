@@ -114,7 +114,7 @@ class WarehouseService implements WarehouseServiceInterface
 
             try {
                 /** @var Proxy $proxy */
-                $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+                $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
                 $postalCodes = $proxy->getPostalCodes($payload['country'], $payload['postal_code']);
                 if (empty($postalCodes)) {
                     $validationErrors[] = FrontDtoFactory::get(ValidationError::CLASS_KEY, $postalCodeError);

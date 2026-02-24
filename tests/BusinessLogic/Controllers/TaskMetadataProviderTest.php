@@ -2,7 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Controllers;
 
-use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;

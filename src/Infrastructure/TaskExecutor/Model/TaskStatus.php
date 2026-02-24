@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution\Model;
+namespace Logeecom\Infrastructure\TaskExecutor\Model;
 
 class TaskStatus
 {

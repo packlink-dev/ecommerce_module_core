@@ -210,7 +210,7 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
     public function updateTrackingInfo(Shipment $shipment)
     {
         /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         try {
             $orderShipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference($shipment->reference);
 
@@ -259,7 +259,7 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
     public function getShipmentLabels($reference)
     {
         /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         $labels = array();
 
         try {

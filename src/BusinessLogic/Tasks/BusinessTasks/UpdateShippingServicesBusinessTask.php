@@ -8,8 +8,8 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
@@ -24,7 +24,6 @@ use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
-use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
 use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 
 class UpdateShippingServicesBusinessTask implements BusinessTask
@@ -328,7 +327,7 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
     {
         /** @var Proxy $proxy */
         /** @noinspection OneTimeUseVariablesInspection */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
 
         return $proxy;
     }

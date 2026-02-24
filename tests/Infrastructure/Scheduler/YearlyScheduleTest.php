@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\Scheduler;
 
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\YearlySchedule;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\Scheduler\Models\YearlySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +21,7 @@ class YearlyScheduleTest extends TestCase
     public $nowTime;
     /**
      * Yearly schedule instance
-     * @var \Logeecom\Infrastructure\Scheduler\Models\WeeklySchedule
+     * @var \Logeecom\Infrastructure\TaskExecution\Scheduler\Models\WeeklySchedule
      */
     public $yearlySchedule;
 

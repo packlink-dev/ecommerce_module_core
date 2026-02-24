@@ -620,7 +620,7 @@ class ShippingCostCalculator
     private static function getProxy()
     {
         /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
 
         return $proxy;
     }

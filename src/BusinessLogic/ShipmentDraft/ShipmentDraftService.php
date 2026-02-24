@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\ShipmentDraft;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
 use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
@@ -139,6 +139,6 @@ class ShipmentDraftService implements ShipmentDraftServiceInterface
      */
     private function getProxy()
     {
-        return ServiceRegister::getService(Proxy::CLASS_NAME);
+        return ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
     }
 }

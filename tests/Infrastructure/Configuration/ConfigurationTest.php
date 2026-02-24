@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\logger;
 
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;

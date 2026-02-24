@@ -7,14 +7,18 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\QueueSchedulerCheckPolicy;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\ScheduleCheckTask;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\ScheduleTickHandler;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
@@ -22,15 +26,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepos
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessUrlProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestQueueService;
-use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskExecutor;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\Scheduler\ScheduleTickHandler;
 use Packlink\BusinessLogic\Configuration;
-use Logeecom\Infrastructure\Scheduler\QueueSchedulerCheckPolicy;
-use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
-use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use PHPUnit\Framework\TestCase;
 
 /**

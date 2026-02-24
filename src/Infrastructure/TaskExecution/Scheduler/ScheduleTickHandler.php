@@ -1,13 +1,13 @@
 <?php
 
-namespace Logeecom\Infrastructure\Scheduler;
+namespace Logeecom\Infrastructure\TaskExecution\Scheduler;
 
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
-use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
 
 /**

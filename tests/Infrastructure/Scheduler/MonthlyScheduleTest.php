@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\Scheduler;
 
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\MonthlySchedule;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\Scheduler\Models\MonthlySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,7 +16,7 @@ class MonthlyScheduleTest extends TestCase
 {
     /**
      * Monthly schedule instance
-     * @var \Logeecom\Infrastructure\Scheduler\Models\MonthlySchedule
+     * @var \Logeecom\Infrastructure\TaskExecution\Scheduler\Models\MonthlySchedule
      */
     public $monthlySchedule;
     /**

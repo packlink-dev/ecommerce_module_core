@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\Scheduler;
 
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\DailySchedule;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\Scheduler\Models\DailySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,7 +16,7 @@ class DailyScheduleTest extends TestCase
 {
     /**
      * Daily schedule instance
-     * @var \Logeecom\Infrastructure\Scheduler\Models\DailySchedule
+     * @var \Logeecom\Infrastructure\TaskExecution\Scheduler\Models\DailySchedule
      */
     public $dailySchedule;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Infrastructure\Scheduler\Models;
+namespace Logeecom\Infrastructure\TaskExecution\Scheduler\Models;
 
 /**
  * Class DailySchedule.

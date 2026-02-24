@@ -103,7 +103,7 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
     protected function handleEvent($eventData)
     {
         /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         try {
             /** @var \Packlink\BusinessLogic\Http\DTO\Shipment $shipment */
             $shipment = $proxy->getShipment($eventData->shipment_reference);

@@ -32,7 +32,7 @@ class AnalyticsController
 
             if (count($shippingService->getActiveMethods()) === 1) {
                 /** @var Proxy $proxy */
-                $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+                $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
                 $proxy->sendAnalytics(Analytics::EVENT_SETUP);
                 $configService->setSetupFinished();
             }
@@ -45,7 +45,7 @@ class AnalyticsController
     public static function sendOtherServicesDisabledEvent()
     {
         /** @var Proxy $proxy */
-        $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         $proxy->sendAnalytics(Analytics::EVENT_OTHER_SERVICES_DISABLED);
     }
 }

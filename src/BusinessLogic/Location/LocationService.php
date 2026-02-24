@@ -59,7 +59,7 @@ class LocationService extends BaseService implements \Packlink\BusinessLogic\Loc
     {
         parent::__construct();
 
-        $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+        $this->proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         $this->shippingMethodService = ServiceRegister::getService(ShippingMethodService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
     }

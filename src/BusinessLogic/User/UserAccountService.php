@@ -259,7 +259,7 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
     protected function getProxy()
     {
         if ($this->proxy === null) {
-            $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+            $this->proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         }
 
         return $this->proxy;

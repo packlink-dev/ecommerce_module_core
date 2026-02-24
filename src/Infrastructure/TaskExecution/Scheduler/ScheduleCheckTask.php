@@ -1,24 +1,23 @@
 <?php
 
-namespace Logeecom\Infrastructure\Scheduler;
+namespace Logeecom\Infrastructure\TaskExecution\Scheduler;
 
-use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Configuration\Configuration;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
-use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\TaskExecution\Task;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus as CoreTaskStatus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus as CoreTaskStatus;
 
 /**
  * Class ScheduleCheckTask.

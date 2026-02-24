@@ -2,10 +2,10 @@
 
 namespace Logeecom\Tests\Infrastructure\Scheduler;
 
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\HourlySchedule;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\Scheduler\Models\HourlySchedule;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,7 +16,7 @@ class HourlyScheduleTest extends TestCase
 {
     /**
      * Hourly schedule instance
-     * @var \Logeecom\Infrastructure\Scheduler\Models\HourlySchedule
+     * @var \Logeecom\Infrastructure\TaskExecution\Scheduler\Models\HourlySchedule
      */
     public $hourlySchedule;
 

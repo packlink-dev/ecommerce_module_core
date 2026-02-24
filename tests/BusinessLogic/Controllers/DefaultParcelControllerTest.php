@@ -6,17 +6,17 @@ use DateTime;
 use Exception;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
-use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
-use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
@@ -31,12 +31,12 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DefaultParcelController;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
+use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
 use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
-use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
+use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
@@ -120,7 +120,6 @@ class DefaultParcelControllerTest extends BaseTestWithServices
         $taskExecutor = new HttpTaskExecutor(
             $queue,
             $metadataProvider,
-            $configuration,
             EventBus::getInstance(),
             ServiceRegister::getService(TimeProvider::CLASS_NAME),
             ServiceRegister::getService(SchedulerInterface::class),

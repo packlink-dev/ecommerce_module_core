@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution;
+namespace Logeecom\Infrastructure\TaskExecution\Interfaces;
 
 interface AsyncProcessUrlProviderInterface
 {

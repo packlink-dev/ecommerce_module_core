@@ -2,14 +2,13 @@
 
 namespace Logeecom\Infrastructure\TaskExecution;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Serializer\Interfaces\Serializable;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\Priority;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\AliveAnnouncedTaskEvent;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TaskProgressEvent;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Logeecom\Infrastructure\Utility\Events\EventEmitter;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 

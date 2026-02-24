@@ -1,11 +1,11 @@
 <?php
 
-namespace Logeecom\Infrastructure\Scheduler;
+namespace Logeecom\Infrastructure\TaskExecution\Scheduler;
 
-use Logeecom\Infrastructure\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
 use Packlink\BusinessLogic\Configuration;
 
 class QueueSchedulerCheckPolicy implements SchedulerCheckPolicyInterface

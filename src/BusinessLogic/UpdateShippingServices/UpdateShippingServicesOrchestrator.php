@@ -2,8 +2,8 @@
 
 namespace Packlink\BusinessLogic\UpdateShippingServices;
 
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\UpdateShippingServicesBusinessTask;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
 use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;

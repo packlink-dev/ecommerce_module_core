@@ -3,7 +3,7 @@
 namespace Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
-use Logeecom\Infrastructure\TaskExecution\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 
 class TestTaskRunnerConfig extends TaskRunnerConfig

@@ -7,15 +7,15 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\ScheduleCheckTask;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\TaskAdapter;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
-use Packlink\BusinessLogic\Configuration;
-use Logeecom\Infrastructure\Scheduler\ScheduleCheckTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
@@ -38,10 +38,6 @@ class HttpTaskExecutor implements TaskExecutorInterface
     private $eventBus;
 
     /**
-     * @var Configuration
-     */
-    private $configService;
-    /**
      * @var TimeProvider
      */
     private $timeProvider;
@@ -61,7 +57,6 @@ class HttpTaskExecutor implements TaskExecutorInterface
     public function __construct(
         QueueServiceInterface $queueService,
         TaskMetadataProviderInterface $metadataProvider,
-        Configuration $configuration,
         EventBus $eventBus,
         TimeProvider $timeProvider,
         SchedulerInterface $scheduler,
@@ -70,7 +65,6 @@ class HttpTaskExecutor implements TaskExecutorInterface
         $this->queueService = $queueService;
         $this->metadataProvider = $metadataProvider;
         $this->eventBus = $eventBus;
-        $this->configService = $configuration;
         $this->timeProvider = $timeProvider;
         $this->scheduler = $scheduler;
         $this->taskRunnerConfig = $taskRunnerConfig;

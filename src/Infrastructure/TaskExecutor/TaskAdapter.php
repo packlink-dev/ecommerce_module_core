@@ -1,10 +1,11 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution;
+namespace Logeecom\Infrastructure\TaskExecutor;
 
 use Generator;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
+use Logeecom\Infrastructure\TaskExecution\Task;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 
 class TaskAdapter extends Task

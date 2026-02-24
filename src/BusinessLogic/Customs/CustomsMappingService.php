@@ -102,7 +102,7 @@ abstract class CustomsMappingService implements \Packlink\BusinessLogic\Customs\
     protected function getPacklinkProxy()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return ServiceRegister::getService(Proxy::CLASS_NAME);
+        return ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
     }
 
     /**

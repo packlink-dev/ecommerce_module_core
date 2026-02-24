@@ -9,10 +9,10 @@ use Logeecom\Infrastructure\Logger\LogData;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\AutoTestBusinessTask;
 
 /**
@@ -39,16 +39,19 @@ class AutoTestService
      */
 
     /**
-     * @var TaskRunnerConfigInterface
+     * @var TaskRunnerConfigInterface|null
      */
     private $taskRunnerConfig;
 
+    /**
+     * @var TaskStatusProviderInterface
+     */
     private $statusProvider;
 
     public function __construct(
         TaskExecutorInterface $taskExecutor,
         TaskStatusProviderInterface $statusProvider,
-        TaskRunnerConfigInterface $taskRunnerConfig
+        TaskRunnerConfigInterface $taskRunnerConfig = null
     )
     {
         $this->taskExecutor = $taskExecutor;
@@ -59,8 +62,7 @@ class AutoTestService
     /**
      * Starts the auto-test.
      *
-     * @throws \Logeecom\Infrastructure\Exceptions\StorageNotAccessibleException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
+     * @throws StorageNotAccessibleException
      */
     public function startAutoTest()
     {
@@ -112,7 +114,7 @@ class AutoTestService
 
         $context = $this->getConfigService()->getContext();
 
-        /** @var \Logeecom\Infrastructure\TaskExecution\Model\TaskStatus $result */
+        /** @var \Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus $result */
         $result = $this->statusProvider->getLatestStatus(
             'AutoTestBusinessTask',
             $context ? $context : ''
@@ -168,8 +170,13 @@ class AutoTestService
      */
     protected function logHttpOptions()
     {
-        $asyncUrl = $this->taskRunnerConfig->getAsyncProcessUrl('');
-        $testDomain = parse_url($asyncUrl, PHP_URL_HOST);
+        $testDomain = '';
+
+        if ($this->taskRunnerConfig) {
+            $asyncUrl = $this->taskRunnerConfig->getAsyncProcessUrl('');
+            $testDomain = parse_url($asyncUrl, PHP_URL_HOST);
+        }
+
         $options = array();
         foreach ($this->getConfigService()->getHttpConfigurationOptions($testDomain) as $option) {
             $options[$option->getName()] = $option->getValue();

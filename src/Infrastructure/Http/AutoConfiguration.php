@@ -5,7 +5,6 @@ namespace Logeecom\Infrastructure\Http;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\TaskRunnerConfig;
 
 /**
  * Class AutoConfigurationController.

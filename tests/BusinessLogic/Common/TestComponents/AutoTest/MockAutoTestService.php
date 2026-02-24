@@ -3,9 +3,9 @@
 namespace Logeecom\Tests\BusinessLogic\Common\TestComponents\AutoTest;
 
 use Logeecom\Infrastructure\AutoTest\AutoTestService;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
 use RuntimeException;
 
 class MockAutoTestService extends AutoTestService

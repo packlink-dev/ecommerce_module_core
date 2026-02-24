@@ -318,7 +318,7 @@ class SendDraftBusinessTask implements BusinessTask
     private function getProxy(): Proxy
     {
         if ($this->proxy === null) {
-            $this->proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+            $this->proxy = ServiceRegister::getService(\Packlink\BusinessLogic\Http\Interfaces\Proxy::CLASS_NAME);
         }
 
         return $this->proxy;

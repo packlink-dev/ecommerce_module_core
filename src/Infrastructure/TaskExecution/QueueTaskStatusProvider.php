@@ -3,10 +3,11 @@
 namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
+use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 
-class QueueTaskStatusProvider implements Interfaces\TaskStatusProviderInterface
+class QueueTaskStatusProvider implements TaskStatusProviderInterface
 {
     /**
      * @var QueueServiceInterface

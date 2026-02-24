@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -33,7 +34,6 @@ use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
-use Logeecom\Infrastructure\Scheduler\Models\Schedule;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShipmentDraft\OrderSendDraftTaskMapService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
@@ -131,7 +131,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
         $taskExecutor = new TestTaskExecutor();
         $me->taskExecutor = $taskExecutor;
         TestServiceRegister::registerService(
-            \Logeecom\Infrastructure\TaskExecution\Interfaces\TaskExecutorInterface::CLASS_NAME,
+            \Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface::CLASS_NAME,
             function () use ($taskExecutor) {
                 return $taskExecutor;
             }

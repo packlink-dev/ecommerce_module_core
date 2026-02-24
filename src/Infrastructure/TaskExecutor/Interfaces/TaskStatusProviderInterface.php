@@ -1,8 +1,8 @@
 <?php
 
-namespace Logeecom\Infrastructure\TaskExecution\Interfaces;
+namespace Logeecom\Infrastructure\TaskExecutor\Interfaces;
 
-use Logeecom\Infrastructure\TaskExecution\Model\TaskStatus;
+use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus;
 
 interface TaskStatusProviderInterface
 {

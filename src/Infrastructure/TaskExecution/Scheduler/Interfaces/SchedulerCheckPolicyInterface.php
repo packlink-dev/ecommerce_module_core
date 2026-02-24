@@ -1,6 +1,6 @@
 <?php
 
-namespace Logeecom\Infrastructure\Scheduler\Interfaces;
+namespace Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces;
 
 interface SchedulerCheckPolicyInterface
 {

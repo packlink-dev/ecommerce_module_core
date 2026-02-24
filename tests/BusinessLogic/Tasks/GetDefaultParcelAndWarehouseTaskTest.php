@@ -3,9 +3,9 @@
 namespace Logeecom\Tests\BusinessLogic\Tasks;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\TaskExecutor\TaskAdapter;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\TaskAdapter;
 use Packlink\BusinessLogic\Tasks\BusinessTasks\GetDefaultParcelAndWarehouseBusinessTask;
 use Packlink\BusinessLogic\User\UserAccountService;
 
