@@ -275,13 +275,29 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
         $specialServices = array();
 
         foreach ($apiServices as $key => $service) {
-            if (in_array(array('id' => self::SPECIAL_SERVICE_TAG), $service->tags, true)) {
+            if ($this->hasSpecialTag($service)) {
                 $specialServices[] = $service;
                 unset($apiServices[$key]);
             }
         }
 
         return $specialServices;
+    }
+
+    /**
+     * Checks if a service has special_service_tag
+     *
+     * @param ShippingServiceDetails $service
+     *
+     * @return bool
+     */
+    protected function hasSpecialTag($service)
+    {
+        $tags = isset($service->tags) ? $service->tags : array();
+
+        $tagIds = array_values(Php55::arrayColumn($tags, 'id'));
+
+        return in_array(self::SPECIAL_SERVICE_TAG, $tagIds, true);
     }
 
     /**

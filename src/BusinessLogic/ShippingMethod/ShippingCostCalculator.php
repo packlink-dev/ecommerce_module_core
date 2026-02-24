@@ -162,7 +162,7 @@ class ShippingCostCalculator
         $result = null;
         if (!empty($services)) {
             foreach ($services as $service) {
-                $result = self::getCheapestService($method, $result, $service, '');
+                $result = self::getCheapestService($method, $result, $service, $toCountry);
             }
         } else {
             // Fallback.

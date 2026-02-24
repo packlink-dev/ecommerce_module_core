@@ -492,12 +492,16 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
     {
         $draft->content = array();
         $packages = array();
+
         foreach ($order->getItems() as $item) {
             $quantity = $item->getQuantity() ?: 1;
             $draft->content[] = $quantity . ' ' . $item->getTitle();
+
             for ($i = 0; $i < $quantity; $i++) {
+                $weight = $this->convertWeightUnits($item->getWeight());
+
                 $packages[] = new Package(
-                    $item->getWeight(),
+                    $weight,
                     $item->getWidth(),
                     $item->getHeight(),
                     $item->getLength()
@@ -508,5 +512,37 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
         /** @var PackageTransformer $transformer */
         $transformer = ServiceRegister::getService(PackageTransformer::CLASS_NAME);
         $draft->packages = array($transformer->transform($packages));
+    }
+
+    /**
+     * Converts weight units into kg
+     *
+     * @param float $weight weight to be converted to kg
+     *
+     * @return float
+     */
+    protected function convertWeightUnits($weight)
+    {
+        $unit = $this->getStoreUnit();
+
+        switch ($unit) {
+            case 'g':
+                return $weight / 1000;
+            case 'oz':
+                return $weight * 0.02834952;
+            case 'lbs':
+                return $weight * 0.45359237;
+            case 'kg':
+            default:
+                return $weight;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStoreUnit()
+    {
+        return 'kg';
     }
 }
