@@ -295,7 +295,7 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
     {
         $tags = isset($service->tags) ? $service->tags : array();
 
-        $tagIds = array_values(Php55::arrayColumn($tags, 'id'));
+        $tagIds = array_values(array_column($tags, 'id'));
 
         return in_array(self::SPECIAL_SERVICE_TAG, $tagIds, true);
     }
