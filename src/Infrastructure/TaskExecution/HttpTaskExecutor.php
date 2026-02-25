@@ -18,7 +18,6 @@ use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
-use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
 
 class HttpTaskExecutor implements TaskExecutorInterface
 {

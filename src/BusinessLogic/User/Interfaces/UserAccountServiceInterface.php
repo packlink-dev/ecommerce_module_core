@@ -12,7 +12,6 @@ interface UserAccountServiceInterface
      * @return bool TRUE if login went successfully; otherwise, FALSE.
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\Brand\Exceptions\PlatformCountryNotSupportedByBrandException
      */
     public function login($apiKey);

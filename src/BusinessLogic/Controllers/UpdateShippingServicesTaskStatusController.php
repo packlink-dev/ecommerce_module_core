@@ -42,7 +42,6 @@ class UpdateShippingServicesTaskStatusController
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function getLastTaskStatus($context = '')
     {

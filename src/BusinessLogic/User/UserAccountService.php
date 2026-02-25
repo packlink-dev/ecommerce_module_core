@@ -74,7 +74,6 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
      * @return bool TRUE if login went successfully; otherwise, FALSE.
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws PlatformCountryNotSupportedByBrandException
      */
     public function login($apiKey)
@@ -177,7 +176,6 @@ class UserAccountService implements Interfaces\UserAccountServiceInterface
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpBaseException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws PlatformCountryNotSupportedByBrandException
      */
     protected function initializeUser(User $user)

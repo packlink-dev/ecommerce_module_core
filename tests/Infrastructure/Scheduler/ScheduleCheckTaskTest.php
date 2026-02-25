@@ -14,6 +14,7 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\DefaultTaskMetadataProvider;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
@@ -47,7 +48,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**

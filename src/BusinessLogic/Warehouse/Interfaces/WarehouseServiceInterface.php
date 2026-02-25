@@ -2,7 +2,6 @@
 
 namespace Packlink\BusinessLogic\Warehouse\Interfaces;
 
-use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
@@ -26,7 +25,6 @@ interface WarehouseServiceInterface
      *
      * @return Warehouse
      *
-     * @throws QueueStorageUnavailableException
      * @throws FrontDtoNotRegisteredException
      * @throws FrontDtoValidationException
      */

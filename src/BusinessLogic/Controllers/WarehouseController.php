@@ -46,7 +46,6 @@ class WarehouseController
      *
      * @return \Packlink\BusinessLogic\Warehouse\Warehouse
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */

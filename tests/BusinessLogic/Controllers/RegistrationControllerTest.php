@@ -5,6 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\DefaultTaskMetadataProvider;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
@@ -15,7 +16,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoServ
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\RegistrationController;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
-use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 
 /**

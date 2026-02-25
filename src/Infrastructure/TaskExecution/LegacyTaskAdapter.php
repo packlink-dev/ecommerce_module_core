@@ -1,11 +1,11 @@
 <?php
 
-namespace Packlink\BusinessLogic\Tasks;
+namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\TaskExecution\Exceptions\AbortTaskExecutionException;
-use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 class LegacyTaskAdapter implements BusinessTask
 {

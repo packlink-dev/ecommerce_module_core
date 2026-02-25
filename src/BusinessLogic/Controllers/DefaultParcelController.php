@@ -40,7 +40,6 @@ class DefaultParcelController
      *
      * @param array $rawData
      *
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      */
     public function setDefaultParcel(array $rawData)

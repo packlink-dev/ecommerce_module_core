@@ -68,7 +68,6 @@ class RegistrationController
      * @return bool A flag indicating whether the registration was successful.
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
-     * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
      * @throws \Packlink\BusinessLogic\Registration\Exceptions\UnableToRegisterAccountException

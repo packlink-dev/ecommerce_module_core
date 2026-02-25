@@ -6,9 +6,9 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
+use Logeecom\Infrastructure\TaskExecution\LegacyTaskAdapter;
 use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
-use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
 
 /**
  * Class ScheduleTickHandler.

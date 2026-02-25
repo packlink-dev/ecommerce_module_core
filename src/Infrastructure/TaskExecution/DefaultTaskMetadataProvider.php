@@ -1,12 +1,13 @@
 <?php
 
-namespace Packlink\BusinessLogic\Tasks;
+namespace Logeecom\Infrastructure\TaskExecution;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
+use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 class DefaultTaskMetadataProvider implements TaskMetadataProviderInterface
 {

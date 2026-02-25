@@ -11,6 +11,7 @@ use Logeecom\Infrastructure\Logger\LogData;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\DefaultTaskMetadataProvider;
 use Logeecom\Infrastructure\TaskExecution\HttpTaskExecutor;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
@@ -34,7 +35,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
-use Packlink\BusinessLogic\Tasks\DefaultTaskMetadataProvider;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 
 /**

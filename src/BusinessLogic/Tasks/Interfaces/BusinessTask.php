@@ -2,7 +2,6 @@
 
 namespace Packlink\BusinessLogic\Tasks\Interfaces;
 
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 /**

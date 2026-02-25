@@ -10,13 +10,13 @@ use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
+use Logeecom\Infrastructure\TaskExecution\LegacyTaskAdapter;
 use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
 use Logeecom\Infrastructure\TaskExecution\Task;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
 use Logeecom\Infrastructure\TaskExecutor\Model\TaskStatus as CoreTaskStatus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
-use Packlink\BusinessLogic\Tasks\LegacyTaskAdapter;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
 /**
