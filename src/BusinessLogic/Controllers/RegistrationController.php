@@ -7,10 +7,12 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\User\UserAccountService;
+use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
 class RegistrationController
 {
@@ -108,6 +110,8 @@ class RegistrationController
             /** @var UserAccountService $userAccountService */
             $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
             if ($userAccountService->login($token)) {
+                $this->registerIntegration();
+
                 return true;
             }
         }
@@ -180,5 +184,35 @@ class RegistrationController
         }
 
         return $language;
+    }
+
+    /**
+     * @return bool
+     */
+    private function registerIntegration() {
+
+        /** @var IntegrationRegistrationServiceInterface $integrationService */
+        $integrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
+
+        /** @var ConfigurationService $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        $integrationId = null;
+
+        try {
+            $integrationId = $integrationService->registerIntegration();
+        } catch (\Exception $e) {
+            $configService->setAuthorizationToken(null);
+
+            return false;
+        }
+
+        if (!$integrationId) {
+            $configService->setAuthorizationToken(null);
+
+            return false;
+        }
+
+        return true;
     }
 }

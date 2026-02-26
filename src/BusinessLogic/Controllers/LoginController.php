@@ -6,6 +6,7 @@ use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
 use Packlink\BusinessLogic\OAuth\Services\OAuthService;
@@ -25,23 +26,36 @@ class LoginController
      *
      * @return bool
      */
-    public function login($apiKey)
+    public function login($apiKey) //TODO: NOT TESTED YET!!!
     {
-        $result = false;
-
         try {
             /** @var UserAccountService $userAccountService */
             $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
             $result = $userAccountService->login($apiKey);
-        } catch (Exception $e) {
-            /** @var ConfigurationService $configService */
-            $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-            if ($configService->getAuthorizationToken() !== null) {
-                $configService->setAuthorizationToken(null);
-            }
-        }
 
-        return $result;
+            if (!$result) {
+                $this->removeAuthorizationToken();
+
+                return false;
+            }
+
+            /** @var IntegrationRegistrationServiceInterface $integrationService */
+            $integrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
+            $integrationId = $integrationService->registerIntegration();
+
+            if (!$integrationId) {
+                $this->removeAuthorizationToken();
+
+                return false;
+            }
+
+            return true;
+
+        } catch (Exception $e) {
+            $this->removeAuthorizationToken();
+
+            return false;
+        }
     }
 
     /**
@@ -53,5 +67,17 @@ class LoginController
         $authServiceConfig = ServiceRegister::getService(OAuthServiceInterface::CLASS_NAME);
 
         return $authServiceConfig->buildRedirectUrlAndSaveState($domain);
+    }
+
+    /**
+     * @return void
+     */
+    private function removeAuthorizationToken()
+    {
+        /** @var ConfigurationService $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        if ($configService->getAuthorizationToken() !== null) {
+            $configService->setAuthorizationToken(null);
+        }
     }
 }

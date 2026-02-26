@@ -29,6 +29,7 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
+use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 use Packlink\BusinessLogic\Utility\Php\Php55;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
@@ -112,6 +113,78 @@ class Proxy
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
         return FrontDtoFactory::getFromBatch(Warehouse::CLASS_KEY, $data);
+    }
+
+    /**
+     * Registers an integration (shop) in Packlink.
+     *
+     * Expected payload structure:
+     *  array(
+     *      'integration_type' => string, // e.g. 'prestashop_module'
+     *      'integration' => array(
+     *          'guid' => string,         // Unique integration GUID
+     *          'name' => string,         // Human-readable store name
+     *      ),
+     *      'webhooks' => array(
+     *          'http_header_name' => string,   // X-Packlink-Webhook-Secret
+     *          'http_header_value' => string,  // Generated secret value for request authentication
+     *          'status_update_url' => string,  // Where Packlink sends events
+     *      )
+     *  )
+     *
+     * @param array $data Integration registration payload
+     *
+     * @return string Integration ID (UUID)
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     * @throws IntegrationNotRegisteredException
+     */
+    public function registerIntegration($data) //TODO: NOT TESTED YET!!!
+    {
+        $response = $this->call(
+            HttpClient::HTTP_METHOD_POST,
+            'integrations',
+            $data
+        );
+
+        $result = $response->decodeBodyToArray();
+
+        if (empty($result['integration_id'])) {
+            Logger::logError(
+                'Integration ID not returned by Packlink API.',
+                'Core',
+                array(
+                    'Request data' => $data,
+                    'Response status' => $response->getStatus(),
+                    'Response body' => $response->getBody(),
+                )
+            );
+
+
+            throw new IntegrationNotRegisteredException('Integration ID not returned by Packlink API.' );
+        }
+
+        return $result['integration_id'];
+    }
+
+    /**
+     * Disconnects an integration from Packlink.
+     *
+     * @param $integrationId
+     *
+     * @return void
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function disconnectIntegration($integrationId) //TODO: NOT TESTED YET!!!
+    {
+        $this->call(
+            HttpClient::HTTP_METHOD_DELETE,
+            'integrations/' . urlencode($integrationId)
+        );
     }
 
     /**
