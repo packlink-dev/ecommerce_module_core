@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\Controllers;
 
+use Packlink\BusinessLogic\Country\Interfaces\CountryServiceInterface;
+use Packlink\BusinessLogic\Country\Models\Country;
 use Packlink\BusinessLogic\Warehouse\Interfaces\WarehouseServiceInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
@@ -17,16 +19,22 @@ class WarehouseController
      *
      * @var WarehouseServiceInterface
      */
-    protected $service;
+    protected $warehouseService;
+
+    /**
+     * @var CountryServiceInterface $countryService
+     */
+    protected $countryService;
 
     /**
      * @param WarehouseServiceInterface $service
      *
      * WarehouseController constructor.
      */
-    public function __construct(WarehouseServiceInterface $service)
+    public function __construct(WarehouseServiceInterface $service, CountryServiceInterface $countryService)
     {
-        $this->service = $service;
+        $this->warehouseService = $service;
+        $this->countryService = $countryService;
     }
 
     /**
@@ -36,7 +44,7 @@ class WarehouseController
      */
     public function getWarehouse()
     {
-        return $this->service->getWarehouse();
+        return $this->warehouseService->getWarehouse();
     }
 
     /**
@@ -51,6 +59,16 @@ class WarehouseController
      */
     public function updateWarehouse(array $data)
     {
-        return $this->service->updateWarehouseData($data);
+        return $this->warehouseService->updateWarehouseData($data);
+    }
+
+    /**
+     * Returns available countries for warehouse location.
+     *
+     * @return Country[]
+     */
+    public function getWarehouseCountries(): array
+    {
+        return $this->countryService->getSupportedCountries(false);
     }
 }

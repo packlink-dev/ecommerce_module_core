@@ -6,6 +6,7 @@ use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Warehouse\MockWarehouseService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\BusinessLogic\Controllers\WarehouseController;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
@@ -36,7 +37,10 @@ class WarehouseControllerTest extends BaseTestWithServices
             }
         );
 
-        $this->controller = new WarehouseController(TestServiceRegister::getService(WarehouseService::CLASS_NAME));;
+        $this->controller = new WarehouseController(
+            TestServiceRegister::getService(WarehouseService::CLASS_NAME),
+            TestServiceRegister::getService(CountryService::CLASS_NAME)
+        );
     }
 
     public function testGetWarehouseMethodCalls()
