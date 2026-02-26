@@ -191,6 +191,11 @@ if (!window.Packlink) {
             if (response.success) {
                 state.goToState('onboarding-state');
             } else {
+                if (response.error === 'integration_registration_failed'){
+                    alert(translationService.translate('register.integrationRegistrationFailed'));
+                    state.goToState('login');
+                }
+
                 responseService.errorHandler(response);
             }
         };

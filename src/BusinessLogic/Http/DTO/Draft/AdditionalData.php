@@ -80,6 +80,12 @@ class AdditionalData extends DataTransferObject
      * @var string
      */
     public $sellerUserId;
+    /**
+     * Integration identifier
+     *
+     * @var string
+     */
+    public $integrationId;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -99,6 +105,7 @@ class AdditionalData extends DataTransferObject
             'postal_zone_name_to' => $this->postalZoneNameTo,
             'order_id' => $this->orderId,
             'seller_user_id' => $this->sellerUserId,
+            'integration_id' => $this->integrationId,
         );
 
         if (!empty($this->items)) {

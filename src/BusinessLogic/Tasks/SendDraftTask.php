@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Tasks;
 
 use Exception;
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
@@ -157,6 +158,18 @@ class SendDraftTask extends Task
      */
     public function execute()
     {
+        $configService = $this->getConfigService();
+
+        if (!$configService->isIntegrationActive()) {
+            Logger::logInfo(
+                "Draft task for order [{$this->orderId}] aborted: integration is disabled.",
+                'Core'
+            );
+            $this->reportProgress(100);
+
+            return;
+        }
+
         $this->setExecution();
 
         if ($this->shouldNotSynchronize()) {
@@ -320,6 +333,16 @@ class SendDraftTask extends Task
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+    }
+
+    /**
+     * Retrieves config service.
+     *
+     * @return Configuration | object
+     */
+    protected function getConfigService()
+    {
+        return ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 
     /**

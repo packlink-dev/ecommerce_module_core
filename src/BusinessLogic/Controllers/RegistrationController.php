@@ -5,12 +5,14 @@ namespace Packlink\BusinessLogic\Controllers;
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Brand\BrandConfigurationService;
-use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
+use Packlink\BusinessLogic\DTO\FrontDtoFactory;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\User\UserAccountService;
+use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
 class RegistrationController
 {
@@ -65,7 +67,7 @@ class RegistrationController
      *
      * @param array $payload
      *
-     * @return bool A flag indicating whether the registration was successful.
+     * @return array 'success' bool, and 'errorCode'
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -108,11 +110,23 @@ class RegistrationController
             /** @var UserAccountService $userAccountService */
             $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
             if ($userAccountService->login($token)) {
-                return true;
+                $integrationRegistered = $this->registerIntegration();
+
+                if (!$integrationRegistered) {
+                    // User registered but integration registration failed
+                    /** @var ConfigurationService $configService */
+                    $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+                    $configService->resetAuthorizationCredentials();
+
+                    return array('success' => false, 'errorCode' => 'integration_registration_failed');
+                }
+
+                return array('success' => true, 'errorCode' => null);
             }
         }
 
-        return false;
+        return array('success' => false, 'errorCode' => null);
     }
 
     /**
@@ -180,5 +194,35 @@ class RegistrationController
         }
 
         return $language;
+    }
+
+    /**
+     * @return bool
+     */
+    private function registerIntegration() {
+
+        /** @var IntegrationRegistrationServiceInterface $integrationService */
+        $integrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
+
+        /** @var ConfigurationService $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        $integrationId = null;
+
+        try {
+            $integrationId = $integrationService->registerIntegration();
+        } catch (\Exception $e) {
+            $configService->setAuthorizationToken(null);
+
+            return false;
+        }
+
+        if (!$integrationId) {
+            $configService->setAuthorizationToken(null);
+
+            return false;
+        }
+
+        return true;
     }
 }

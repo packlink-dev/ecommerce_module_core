@@ -10,6 +10,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\QueueService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
@@ -28,6 +29,7 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -46,6 +48,10 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
      * @var \Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient
      */
     public $httpClient;
+    /**
+     * @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider
+     */
+    public $integrationRegistrationDataProvider;
 
     /**
      * @before
@@ -62,6 +68,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
 
         $me = $this;
 
+        $this->integrationRegistrationDataProvider = new MockIntegrationRegistrationDataProvider();
+        $this->integrationRegistrationDataProvider->setIntegrationId('mock-integration-id');
         $this->shopConfig = new TestShopConfiguration();
 
         TestServiceRegister::registerService(
@@ -89,7 +97,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
+                return new Proxy($me->shopConfig, $me->httpClient, $me->integrationRegistrationDataProvider);
             }
         );
 

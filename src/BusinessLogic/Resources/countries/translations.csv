@@ -35,9 +35,11 @@ validation,invalidPlatformCountry,"Field is not a valid platform country.","Fiel
 validation,invalidUrl,"Field must be a valid URL.","Field must be a valid URL.","Dieses Feld muss eine gültige URL enthalten.","Le champ doit contenir une URL valide.","Il campo deve contenere un URL valido."
 validation,invalidFieldValue,"Field must be set to ""%s"".","Field must be set to ""%s"".","Dieses Feld muss auf „%s“ gesetzt werden.","Le champ doit être défini sur « %s ».","Il campo deve essere impostato su ""%s""."
 validation,invalidMaxValue,"Maximal allowed value is %s.","Maximal allowed value is %s.","Der maximale Wert beträgt %s.","La valeur maximale autorisée est %s.","Il valore massimo consentito è %s."
-validation,passwordRestriction,"Your password must be at least %s characters long and include at least one lowercase letter, one uppercase letter, one number, and one symbol",,,,
+validation,invalidIBAN,"Merchant IBAN number must be up to 24 characters and contain only numbers and capital letters.",,,,
+validation,passwordRestriction,"Your password must be at least %s characters long and include at least one lowercase letter, one uppercase letter, one number, and one symbol","Tu contraseña debe tener al menos %s caracteres e incluir al menos una letra minúscula, una letra mayúscula, un número y un símbolo","Ihr Passwort muss mindestens %s Zeichen lang sein und mindestens einen Kleinbuchstaben, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten","Votre mot de passe doit contenir au moins %s caractères, dont au moins une lettre minuscule, une lettre majuscule, un chiffre et un symbole","La tua password deve contenere almeno %s caratteri e includere almeno una lettera minuscola, una lettera maiuscola, un numero e un simbolo"
 login,apiKey,"Api key","Api key",API-Schlüssel,"Clé API","API Key"
 login,apiKeyIncorrect,"API key was incorrect.","Clave de API incorrecta","Falscher API-Schlüssel","Clé API incorrecte","API Key non corretta"
+login,integrationRegistrationFailed,"Integration registration failed.","El registro de la integración falló.","Registrierung der Integration fehlgeschlagen.","Échec de l’enregistrement de l’intégration.","Registrazione dell’integrazione non riuscita."
 login,dontHaveAccount,"Don't have an account?","¿No tienes una cuenta?","Sie haben noch keinen Account?","Vous n’avez pas de compte ?","Non hai un account?"
 login,validateApiKey,"Validate API key","Validar API key","API-Schlüssel bestätigen","Valider clé API","Convalida la chiave API"
 login,connect,Connect,Conectar,Verbinden,Connecter,Connetti
@@ -298,6 +300,7 @@ register,email,Email,"Correo electrónico",E-Mail,"Adresse électronique",Email
 register,password,Password,Contraseña,Passwort,"Mot de passe",Password
 register,haveAccount,"Already have an account?","¿Ya tienes una cuenta?","Haben Sie bereits einen Account?","Vous avez déjà un compte ?","Hai già un account?"
 register,registerAccount,"Register your account",Registro,"Jetzt registrieren",Enregistrez-vous,Registrati
+register,integrationRegistrationFailed,"Your Packlink account was created successfully, but the store integration failed","Tu cuenta de Packlink se creó correctamente, pero la integración de la tienda falló","Ihr Packlink-Konto wurde erfolgreich erstellt, aber die Shop-Integration ist fehlgeschlagen","Votre compte Packlink a été créé avec succès, mais l’intégration de la boutique a échoué","Il tuo account Packlink è stato creato con successo, ma l’integrazione del negozio non è riuscita"
 register,getToKnowYou,"We would like to get to know you better in order to adapt to you and to send you an individual offer","Queremos conocerte mejor para adaptarnos a ti y hacerte una propuesta personalizada.","Wir möchten Sie besser kennenlernen, um uns an Sie anzupassen und Ihnen ein individuelles Angebot zukommen zu lassen","Nous souhaitons mieux vous connaître afin de nous adapter à vous et de vous faire une offre sur mesure","Vogliamo conoscerti meglio per adattarci a te e preparare una proposta personalizzata per te"
 register,monthlyShipmentVolume,"What is your monthly shipment volume?","¿Cuántos envíos sueles hacer al mes?","Wie hoch ist Ihr monatliches Sendungsaufkommen?","Combien d’envois faites-vous généralement par mois?","Quante spedizioni fai solitamente al mese?"
 register,phone,"Phone number",Teléfono,Telefonnummer,"Numéro de téléphone","Numero di telefono"
@@ -372,6 +375,23 @@ configuration,parcel,"Default parcel","Paquete predeterminado",Standardpaket,"Co
 configuration,help,Help,Ayuda,Hilfe,Aide,Aiuto
 configuration,contactUs,"Contact us at:",Contáctanos:,"Kontaktieren Sie uns:",Contactez-nous:,Contattaci:
 configuration,systemInfo,"System information","Información del sistema",Systeminformationen,"Informations du système","Informazioni del sistema"
+configuration,cashOnDelivery,"Cash on Delivery",,,,
+cashOnDelivery,descriptionFirst,"Cash on Delivery is a feature available to our merchants on the Packlink PRO Plus plans. COD is delivery service in which the recipient is responsible for paying the postage rather than the sender. COD postpones the payment for the delivery until the recipient receives the parcel instead of having to pay for it before the package is shipped.",,,,
+cashOnDelivery,descriptionSecond,"Packlink offers such a service as well for some of our shipping services and the process differs slightly. At Packlink, the sender is required to pay for the shipping when ordering the service but is reimbursed after the recipient pays the courier. 
+ For shipping methods that support Cash on Delivery, the integration will offer the payment method mapped as Cash on Delivery in your shop.",,,,
+cashOnDelivery,activate,"Activate Cash on Delivery",,,,
+cashOnDelivery,accountHolder,"Account holder",,,,
+cashOnDelivery,accountHolder-placeholder,"First and last name",,,,
+cashOnDelivery,iban,"Merchant IBAN",,,,
+cashOnDelivery,iban-placeholder,IBAN,,,,
+cashOnDelivery,fee,"Cash on Delivery fee",,,,
+cashOnDelivery,fee-placeholder," ",,,,
+cashOnDelivery,paymentMethod,"Shop offline payment method",,,,
+cashOnDelivery,configurationTitle,"Cash on Delivery configuration",,,,
+cashOnDelivery,configurationDescription,"Please configure your account holder name and IBAN and map one of the available shop payment methods to the Cash on Delivery payment method. Mapped payment method will be treated as a Cash on Delivery payment option for shipping services that support it. For the rest of Packlink services, it will be hidden.",,,,
+cashOnDelivery,surcharge,"Packlink Cash on Delivery Surcharge fee",,,,
+cashOnDelivery,infoMessage,"In case selected Cash On Delivery is the only active payment method, please ensure at least one other payment option is available to allow customers to complete orders when a Packlink shipping method that does not support COD is selected.",,,,
+cashOnDelivery,noOfflinePayments,"No offline payment methods are available in your shop. If you want to configure Cash on Delivery, please make sure that at least one offline payment method is activated.",,,,
 systemInfo,title,"System information file <br>and debug mode","System information file <br>and debug mode","Systeminfodatei <br>und debug mode","Fichier d’informations du système <br>et mode débogage","File di informazioni del sistema <br>e modalità debug"
 systemInfo,debugMode,"Debug mode","Debug mode","Debug mode","Debug mode","Debug mode"
 systemInfo,download,"Download system information","Download system information","Systeminfodatei herunterladen","Téléchargez le document d'information système","Scarica il file di informazioni del sistema"
@@ -467,8 +487,8 @@ shippingServices,selectCountriesSubheader,"Select availability of at least one c
 shippingServices,discardChangesQuestion,"There are unsaved changes.<br>Are you sure you want to go back and discard them?","Algunos cambios no se han guardado.<br>¿Estás seguro de que quieres volver e ignorar los cambios?","Es gibt nicht gespeicherte Änderungen.<br>Sind Sie sicher, dass Sie zurückgehen und sie verwerfen möchten?","Certaines modifications n’ont pas été enregistrées.<br>Êtes-vous sûr de vouloir revenir en arrière et de les ignorer ?","Alcune modifiche non sono state salvate.<br>Sei sicuro di voler tornare indietro e annullarle?"
 shippingServices,atLeastOneCountry,"At least one country must be selected.",,,,
 shippingServices,misconfiguration,"Due to store currency change, you must set a Fixed Price value by clicking ""edit"" on the shipping service.","Debido al cambio de moneda de la tienda, debe establecer un valor de precio fijo haciendo clic en editar en el servicio de envío.","Um Währungsänderungen zu speichern, müssen Sie einen Festpreiswert einstellen, indem Sie auf Versandservice ""Bearbeiten"" klicken.","En raison du changement de devise en magasin, vous devez établir une valeur monétaire fixe en cliquant sur « Modifier » dans le service d’expédition.","A causa del cambio di valuta del negozio, devi impostare un valore di prezzo fisso cliccando “Modifica” sul servizio di spedizione."
-shippingServices,refreshServiceList,"Refresh service list",,,,
-shippingServices,refreshError,"An error occurred while refreshing the service list",,,,
+shippingServices,refreshServiceList,"Refresh service list","Actualizar la lista de servicios","Serviceliste aktualisieren","Actualiser la liste des services","Aggiorna l'elenco dei servizi"
+shippingServices,refreshError,"An error occurred while refreshing the service list","Ocurrió un error al actualizar la lista de servicios","Beim Aktualisieren der Serviceliste ist ein Fehler aufgetreten","Une erreur s'est produite lors de l'actualisation de la liste des services","Si è verificato un errore durante l'aggiornamento dell'elenco dei servizi"
 orderListAndDetails,printed,Printed,Impreso,Ausgedruckt,Imprimé,Stampato
 orderListAndDetails,ready,Ready,Listo,Bereit,Prêt,"Pronto per la spedizione"
 orderListAndDetails,printLabel,"Print label","Imprimir etiquetas","Versandetikett drucken","Imprimer étiquette","Stampa etichette"
