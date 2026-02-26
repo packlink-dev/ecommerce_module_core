@@ -6,10 +6,6 @@ use Logeecom\Infrastructure\AutoTest\AutoTestService;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
-use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
-use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
-use Logeecom\Infrastructure\TaskExecution\Scheduler\QueueSchedulerCheckPolicy;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskStatusProviderInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
@@ -118,22 +114,6 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                     $taskExecutor,
                     $updateShippingService
                 );
-            }
-        );
-
-        ServiceRegister::registerService(
-            SchedulerCheckPolicyInterface::CLASS_NAME,
-            function () {
-                /** @var Configuration $config */
-                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
-                /** @var QueueServiceInterface $queueService */
-                $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
-                /**
-                 * @var TaskRunnerConfigInterface $taskRunnerConfig
-                 */
-                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
-
-                return new QueueSchedulerCheckPolicy($queueService, $config, $taskRunnerConfig);
             }
         );
 

@@ -10,6 +10,8 @@ use Logeecom\Infrastructure\TaskExecution\Interfaces\QueueServiceInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerStatusStorage;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerWakeup;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\Interfaces\SchedulerCheckPolicyInterface;
+use Logeecom\Infrastructure\TaskExecution\Scheduler\QueueSchedulerCheckPolicy;
 use Logeecom\Infrastructure\TaskExecution\Scheduler\ScheduleTickHandler;
 use Logeecom\Infrastructure\TaskExecution\Scheduler\TaskRunnerScheduler;
 use Logeecom\Infrastructure\TaskExecution\TaskEvents\TickEvent;
@@ -136,6 +138,19 @@ class TaskExecutionBootstrap
                 $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
                 return new TaskRunnerScheduler($config, $taskRunnerConfig);
+            }
+        );
+        ServiceRegister::registerService(
+            SchedulerCheckPolicyInterface::CLASS_NAME,
+            function () {
+                /** @var Configuration $config */
+                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+                /** @var QueueServiceInterface $queueService */
+                $queueService = ServiceRegister::getService(QueueServiceInterface::CLASS_NAME);
+                /** @var TaskRunnerConfigInterface $taskRunnerConfig */
+                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+                return new QueueSchedulerCheckPolicy($queueService, $config, $taskRunnerConfig);
             }
         );
 
