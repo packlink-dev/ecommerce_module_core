@@ -43,6 +43,7 @@
   "login": {
     "apiKey": "API-Schlüssel",
     "apiKeyIncorrect": "Falscher API-Schlüssel",
+    "integrationRegistrationFailed": "Registrierung der Integration fehlgeschlagen.",
     "dontHaveAccount": "Sie haben noch keinen Account?",
     "validateApiKey": "API-Schlüssel bestätigen",
     "connect": "Verbinden",

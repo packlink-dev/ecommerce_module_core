@@ -44,6 +44,7 @@
   "login": {
     "apiKey": "Api key",
     "apiKeyIncorrect": "API key was incorrect.",
+    "integrationRegistrationFailed": "Integration registration failed.",
     "dontHaveAccount": "Don't have an account?",
     "validateApiKey": "Validate API key",
     "connect": "Connect",

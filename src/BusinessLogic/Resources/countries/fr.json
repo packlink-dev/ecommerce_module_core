@@ -43,6 +43,7 @@
   "login": {
     "apiKey": "Clé API",
     "apiKeyIncorrect": "Clé API incorrecte",
+    "integrationRegistrationFailed": "Échec de l’enregistrement de l’intégration.",
     "dontHaveAccount": "Vous n’avez pas de compte ?",
     "validateApiKey": "Valider clé API",
     "connect": "Connecter",
