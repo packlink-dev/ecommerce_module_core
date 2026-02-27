@@ -36,17 +36,11 @@ class ConfigEntity extends Entity
      */
     protected $systemId;
     /**
-     * Integration identifier.
-     *
-     * @var string
-     */
-    protected $integrationId;
-    /**
      * Array of field names.
      *
      * @var array
      */
-    protected $fields = array('id', 'name', 'value', 'systemId', 'integrationId');
+    protected $fields = array('id', 'name', 'value', 'systemId');
 
     /**
      * Returns entity configuration object.
@@ -121,26 +115,4 @@ class ConfigEntity extends Entity
     {
         $this->systemId = (string)$systemId;
     }
-
-    /**
-     * Gets Integration identifier
-     *
-     * @return string
-     */
-    public function getIntegrationId()
-    {
-        return $this->integrationId;
-    }
-
-    /**
-     * Sets Integration identifier
-     *
-     * @param string $integrationId
-     */
-    public function setIntegrationId($integrationId)
-    {
-        $this->integrationId = $integrationId;
-    }
-
-
 }

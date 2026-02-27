@@ -32,6 +32,10 @@ class RegistrationController
      * @var CountryService
      */
     protected $countryService;
+    /**
+     * @var string|null
+     */
+    protected $lastErrorCode = null;
 
     /**
      * Gets the data needed for a registration page.
@@ -110,9 +114,20 @@ class RegistrationController
             /** @var UserAccountService $userAccountService */
             $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
             if ($userAccountService->login($token)) {
-                $this->registerIntegration();
+                $integrationRegistered = $this->registerIntegration(); //TODO start of not tested
 
-                return true;
+                if (!$integrationRegistered) { // User registered but integration registration failed
+                    /** @var ConfigurationService $configService */
+                    $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+                    $configService->resetAuthorizationCredentials();
+                    $this->lastErrorCode = 'integration_registration_failed';
+
+                    return false;
+                }
+                $this->lastErrorCode = null;
+
+                return true; //TODO end of not tested
             }
         }
 
@@ -214,5 +229,15 @@ class RegistrationController
         }
 
         return true;
+    }
+
+    /**
+     * Error code used for UI error message display
+     *
+     * @return string|null
+     */
+    public function getLastErrorCode()
+    {
+        return $this->lastErrorCode;
     }
 }

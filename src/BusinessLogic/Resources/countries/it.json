@@ -307,6 +307,7 @@
     "email": "Email",
     "password": "Password",
     "haveAccount": "Hai già un account?",
+    "integrationRegistrationFailed": "Il tuo account Packlink è stato creato con successo, ma l’integrazione del negozio non è riuscita",
     "registerAccount": "Registrati",
     "getToKnowYou": "Vogliamo conoscerti meglio per adattarci a te e preparare una proposta personalizzata per te",
     "monthlyShipmentVolume": "Quante spedizioni fai solitamente al mese?",

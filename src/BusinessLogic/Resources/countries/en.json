@@ -309,6 +309,7 @@
     "password": "Password",
     "haveAccount": "Already have an account?",
     "registerAccount": "Register your account",
+    "integrationRegistrationFailed": "Your Packlink account was created successfully, but the store integration failed",
     "getToKnowYou": "We would like to get to know you better in order to adapt to you and to send you an individual offer",
     "monthlyShipmentVolume": "What is your monthly shipment volume?",
     "phone": "Phone number",
