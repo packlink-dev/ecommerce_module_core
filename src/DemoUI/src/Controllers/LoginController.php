@@ -37,13 +37,21 @@ class LoginController extends BaseHttpController
         $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
 
         $success = $controller->login($apiKey);
+
+        $response = array(
+            'success' => $success,
+        );
+        if (!$success && method_exists($controller, 'getLastErrorCode')) {
+            $response['error'] = $controller->getLastErrorCode();
+        }
+
         if ($success) {
             // this is only for the Demo app because there is no task runner
             $task = new UpdateShippingServicesTask();
             $task->execute();
         }
 
-        $this->output(array('success' => $success));
+        $this->output($response);
     }
 
     public function getRedirectUrl(Request $request)

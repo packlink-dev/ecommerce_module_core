@@ -140,8 +140,13 @@ class Proxy
      * @throws HttpRequestException
      * @throws IntegrationNotRegisteredException
      */
-    public function registerIntegration($data) //TODO: NOT TESTED YET!!!
+    public function registerIntegration($data)
     {
+        Logger::logInfo(
+            'Sending registration request to Packlink... '
+            . '. Payload: ' . json_encode($data)
+        );
+
         $response = $this->call(
             HttpClient::HTTP_METHOD_POST,
             'integrations',
@@ -160,10 +165,13 @@ class Proxy
                     'Response body' => $response->getBody(),
                 )
             );
-
-
             throw new IntegrationNotRegisteredException('Integration ID not returned by Packlink API.' );
         }
+
+        Logger::logInfo(
+            'Integration registered. '
+            . 'Packlink response: ' . json_encode($result)
+        );
 
         return $result['integration_id'];
     }
@@ -173,18 +181,24 @@ class Proxy
      *
      * @param $integrationId
      *
-     * @return void
+     * @return bool
      *
      * @throws HttpAuthenticationException
      * @throws HttpCommunicationException
      * @throws HttpRequestException
      */
-    public function disconnectIntegration($integrationId) //TODO: NOT TESTED YET!!!
+    public function disconnectIntegration($integrationId)
     {
-        $this->call(
+        $result = $this->call(
             HttpClient::HTTP_METHOD_DELETE,
             'integrations/' . urlencode($integrationId)
         );
+
+        if ($result->getStatus() == 204) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

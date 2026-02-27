@@ -6,6 +6,7 @@ use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
@@ -20,13 +21,18 @@ use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 class LoginController
 {
     /**
+     * @var string|null
+     */
+    protected $lastErrorCode = null;
+
+    /**
      * Return flag indicating whether the user is logged in successfully.
      *
      * @param $apiKey
      *
      * @return bool
      */
-    public function login($apiKey) //TODO: NOT TESTED YET!!!
+    public function login($apiKey)
     {
         try {
             /** @var UserAccountService $userAccountService */
@@ -35,6 +41,7 @@ class LoginController
 
             if (!$result) {
                 $this->removeAuthorizationToken();
+                $this->lastErrorCode = 'invalid_api_key';
 
                 return false;
             }
@@ -44,15 +51,22 @@ class LoginController
             $integrationId = $integrationService->registerIntegration();
 
             if (!$integrationId) {
-                $this->removeAuthorizationToken();
+                $this->handleIntegrationRegistrationFailure();
 
                 return false;
             }
 
+            $this->lastErrorCode = null;
+
             return true;
 
+        } catch (IntegrationNotRegisteredException $e) {
+            $this->handleIntegrationRegistrationFailure();
+
+            return false;
         } catch (Exception $e) {
             $this->removeAuthorizationToken();
+            $this->lastErrorCode = 'invalid_api_key';
 
             return false;
         }
@@ -79,5 +93,24 @@ class LoginController
         if ($configService->getAuthorizationToken() !== null) {
             $configService->setAuthorizationToken(null);
         }
+    }
+
+    /**
+     * @return void
+     */
+    private function handleIntegrationRegistrationFailure()
+    {
+        $this->lastErrorCode = 'integration_registration_failed';
+        $this->removeAuthorizationToken();
+    }
+
+    /**
+     * Error code used for UI error message display
+     *
+     * @return string|null
+     */
+    public function getLastErrorCode()
+    {
+        return $this->lastErrorCode;
     }
 }

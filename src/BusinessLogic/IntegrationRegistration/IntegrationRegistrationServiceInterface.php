@@ -2,6 +2,8 @@
 
 namespace Packlink\BusinessLogic\IntegrationRegistration;
 
+use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
+
 /**
  * Interface IntegrationRegistrationServiceInterface. Must be implemented in integration.
  */
@@ -17,6 +19,8 @@ interface IntegrationRegistrationServiceInterface
      * integration ID from the response into ConfigEntity.
      *
      * @return string|null Integration identifier or null if request fails
+     *
+     * @throws IntegrationNotRegisteredException
      */
     public function registerIntegration();
 
