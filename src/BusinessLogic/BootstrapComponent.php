@@ -25,6 +25,9 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationDataProviderInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Location\LocationService;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthStateServiceInterface;
@@ -75,8 +78,11 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 $config = ServiceRegister::getService(Configuration::CLASS_NAME);
                 /** @var HttpClient $client */
                 $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
+                /** @var IntegrationRegistrationDataProviderInterface $dataProvider */
+                $dataProvider = ServiceRegister::getService(
+                    IntegrationRegistrationDataProviderInterface::CLASS_NAME);
 
-                return new Proxy($config, $client);
+                return new Proxy($config, $client, $dataProvider);
             }
         );
 
@@ -91,6 +97,16 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             ShippingMethodService::CLASS_NAME,
             function () {
                 return ShippingMethodService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            IntegrationRegistrationServiceInterface::CLASS_NAME,
+            function () {
+                return new IntegrationRegistrationService(
+                    ServiceRegister::getService(Proxy::CLASS_NAME),
+                    ServiceRegister::getService(IntegrationRegistrationDataProviderInterface::CLASS_NAME)
+                );
             }
         );
 

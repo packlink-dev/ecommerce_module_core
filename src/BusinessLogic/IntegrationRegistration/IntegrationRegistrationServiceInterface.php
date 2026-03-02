@@ -28,4 +28,12 @@ interface IntegrationRegistrationServiceInterface
      * Disconnects the integration from Packlink.
      */
     public function disconnectIntegration();
+
+    /**
+     * Returns the persisted integration ID if present as class variable,
+     * otherwise, if returns the ID from database if present.
+     *
+     * @return string|null Integration ID.
+     */
+    public function getIntegrationId();
 }

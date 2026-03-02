@@ -12,6 +12,8 @@ use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\OAuthToken;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationDataProviderInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Proxy\Interfaces\OAuthProxyInterface;
 use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
@@ -37,18 +39,24 @@ class OAuthProxy implements OAuthProxyInterface
      * @var string
      */
     private $baseUrl;
-
+    /**
+     * @var IntegrationRegistrationServiceInterface
+     */
+    private $registrationService;
 
     /**
      * OAuthProxy constructor.
      *
-     * @param \Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration
+     * @param OAuthConfiguration $config
      * @param HttpClient $client
      */
-    public function __construct(OAuthConfiguration $config, HttpClient $client)
-    {
+    public function __construct(
+        OAuthConfiguration $config,
+        HttpClient $client
+    ) {
         $this->config = $config;
         $this->client = $client;
+        $this->registrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
 
         $this->baseUrl = 'https://' . TenantDomainProvider::getDomain($config->getDomain()) . '/auth/oauth2/';
     }
@@ -103,7 +111,7 @@ class OAuthProxy implements OAuthProxyInterface
             return new OAuthToken(
                 isset($data['access_token']) ? $data['access_token'] : '',
                 isset($data['token_type']) ? $data['token_type'] : '',
-                isset($data['expires_in']) ? (int) $data['expires_in'] : 0,
+                isset($data['expires_in']) ? (int)$data['expires_in'] : 0,
                 isset($data['refresh_token']) ? $data['refresh_token'] : ''
             );
         } catch (Exception $e) {
@@ -214,28 +222,18 @@ class OAuthProxy implements OAuthProxyInterface
             return true;
         }
 
-        $integrationIntegrationService = $this->getIntegrationRegistrationService();
-        if ($integrationIntegrationService->getIntegrationId()) {
+        if ($this->registrationService->getIntegrationId()) {
             return true;
         }
 
         try {
-            if ($integrationIntegrationService->registerIntegration()) {
+            if ($this->registrationService->registerIntegration()) {
                 return true;
             }
-        } catch (IntegrationNotRegisteredException $e) {
+        } catch (Exception $e) {
             return false;
         }
 
         return false;
-    }
-
-    /**
-     * @return IntegrationRegistrationServiceInterface
-     */
-    private function getIntegrationRegistrationService()
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
     }
 }

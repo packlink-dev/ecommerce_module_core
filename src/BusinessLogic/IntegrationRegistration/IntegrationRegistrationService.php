@@ -76,4 +76,15 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
             );
         }
     }
+
+    /**
+     * Returns the persisted integration ID if present as class variable,
+     * otherwise, if returns the ID from database if present.
+     *
+     * @return string|null Integration ID.
+     */
+    public function getIntegrationId()
+    {
+        return $this->dataProvider->getIntegrationId();
+    }
 }
