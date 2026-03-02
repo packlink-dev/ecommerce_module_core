@@ -5,7 +5,7 @@ namespace Packlink\BusinessLogic\IntegrationRegistration;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 
 /**
- * Interface IntegrationRegistrationServiceInterface. Must be implemented in integration.
+ * Interface IntegrationRegistrationServiceInterface.
  */
 interface IntegrationRegistrationServiceInterface
 {
@@ -28,47 +28,4 @@ interface IntegrationRegistrationServiceInterface
      * Disconnects the integration from Packlink.
      */
     public function disconnectIntegration();
-
-    /**
-     * Returns the persisted integration GUID.
-     *
-     * @return string Integration GUID.
-     */
-    public function getIntegrationGuid();
-
-    /**
-     * Returns the persisted webhook secret.
-     *
-     * @return string Webhook secret used for authentication.
-     */
-    public function getWebhookSecret();
-
-    /**
-     * Returns the persisted integration ID if present as class variable,
-     * otherwise, if returns the ID from database if present.
-     *
-     * @return string|null Integration ID.
-     */
-    public function getIntegrationId();
-
-    /**
-     * Returns the integration type (e.g. Prestashop, WooCommerce...).
-     *
-     * @return string Integration type.
-     */
-    public function getIntegrationType();
-
-    /**
-     * Returns the name of the integration.
-     *
-     * @return string Integration name.
-     */
-    public function getIntegrationName();
-
-    /**
-     * Returns the WebhookStatusUpdateUrl.
-     *
-     * @return string Integration name.
-     */
-    public function getIntegrationWebhookStatusUpdateUrl();
 }

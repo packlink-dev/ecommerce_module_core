@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http;
 
+use Exception;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
@@ -30,12 +31,12 @@ use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
-use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationDataProviderInterface;
 use Packlink\BusinessLogic\Utility\Php\Php55;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
- * Class Proxy. In charge for communication with Packlink API.
+ * Class Proxy. In charge of communication with Packlink API.
  *
  * @package Packlink\BusinessLogic
  */
@@ -63,6 +64,10 @@ class Proxy
      * @var Configuration
      */
     private $configService;
+    /**
+     * @var IntegrationRegistrationDataProviderInterface
+     */
+    private $dataProvider;
 
     /**
      * Proxy constructor.
@@ -70,10 +75,15 @@ class Proxy
      * @param Configuration $configService Configuration service.
      * @param HttpClient $client System HTTP client.
      */
-    public function __construct(Configuration $configService, HttpClient $client)
-    {
+    public function __construct(
+        Configuration $configService,
+        HttpClient $client,
+        IntegrationRegistrationDataProviderInterface $dataProvider
+    ) {
         $this->client = $client;
         $this->configService = $configService;
+        $this->dataProvider = $dataProvider;
+
     }
 
     /**
@@ -166,7 +176,7 @@ class Proxy
                     'Response body' => $response->getBody(),
                 )
             );
-            throw new IntegrationNotRegisteredException('Integration ID not returned by Packlink API.' );
+            throw new IntegrationNotRegisteredException('Integration ID not returned by Packlink API.');
         }
 
         Logger::logInfo(
@@ -548,7 +558,8 @@ class Proxy
      */
     public function getCustomsByPostalCode(CustomsUnionsSearchRequest $request)
     {
-        $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-unions/search-by-postal-code', $request->toArray())
+        $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-unions/search-by-postal-code',
+            $request->toArray())
             ->decodeBodyToArray();
 
         return isset($result['data']) ? $result['data'] : array();
@@ -604,7 +615,7 @@ class Proxy
     {
         try {
             $response = $this->callWithToken(HttpClient::HTTP_METHOD_POST, 'users/api/keys', $accessToken);
-        }catch (HttpRequestException $e) {
+        } catch (HttpRequestException $e) {
             $response = $this->callWithToken(HttpClient::HTTP_METHOD_GET, 'users/api/keys', $accessToken);
         }
 
@@ -723,7 +734,7 @@ class Proxy
      * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
-    protected function callWithToken($method, $endpoint,  $accessToken, array $body = array())
+    protected function callWithToken($method, $endpoint, $accessToken, array $body = array())
     {
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
@@ -803,16 +814,16 @@ class Proxy
             return true;
         }
 
-        $integrationIntegrationService = $this->getIntegrationRegistrationService();
-        if ($integrationIntegrationService->getIntegrationId()) {
+        if ($this->dataProvider->getIntegrationId()) {
             return true;
         }
 
         try {
-            if ($integrationIntegrationService->registerIntegration()) {
+            $payload = $this->dataProvider->getRegistrationPayload();
+            if ($this->registerIntegration($payload)) {
                 return true;
             }
-        } catch (IntegrationNotRegisteredException $e) {
+        } catch (Exception $e) {
             return false;
         }
 
@@ -861,14 +872,5 @@ class Proxy
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
-    }
-
-    /**
-     * @return IntegrationRegistrationServiceInterface
-     */
-    private function getIntegrationRegistrationService()
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
     }
 }
