@@ -9,7 +9,10 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
+use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\OAuthToken;
+use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Proxy\Interfaces\OAuthProxyInterface;
 use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
 use Packlink\BusinessLogic\OAuth\Services\TenantDomainProvider;
@@ -124,6 +127,12 @@ class OAuthProxy implements OAuthProxyInterface
      */
     protected function call($method, $endpoint, array $body = array())
     {
+        if (!$this->isIntegrationRegistered($endpoint)) { //TODO not tested yet
+            throw new HttpAuthenticationException(
+                'Integration is not registered.'
+            );
+        }
+
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
             $bodyStringToSend = http_build_query($body);
@@ -190,5 +199,43 @@ class OAuthProxy implements OAuthProxyInterface
             'Authorization' => 'Authorization: Basic ' . $encodedCredentials,
             'Content-Type' => 'Content-Type: application/x-www-form-urlencoded',
         );
+    }
+
+    /**
+     * Checks whether integration is registered.
+     *
+     * @param string $endpoint skips check for endpoint 'token'
+     *
+     * @return bool
+     */
+    private function isIntegrationRegistered($endpoint) //TODO NOT TESTED
+    {
+        if ($endpoint == 'token') {
+            return true;
+        }
+
+        $integrationIntegrationService = $this->getIntegrationRegistrationService();
+        if ($integrationIntegrationService->getIntegrationId()) {
+            return true;
+        }
+
+        try {
+            if ($integrationIntegrationService->registerIntegration()) {
+                return true;
+            }
+        } catch (IntegrationNotRegisteredException $e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return IntegrationRegistrationServiceInterface
+     */
+    private function getIntegrationRegistrationService()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
     }
 }

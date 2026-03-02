@@ -114,9 +114,10 @@ class RegistrationController
             /** @var UserAccountService $userAccountService */
             $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
             if ($userAccountService->login($token)) {
-                $integrationRegistered = $this->registerIntegration(); //TODO start of not tested
+                $integrationRegistered = $this->registerIntegration();
 
-                if (!$integrationRegistered) { // User registered but integration registration failed
+                if (!$integrationRegistered) {
+                    // User registered but integration registration failed
                     /** @var ConfigurationService $configService */
                     $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
 
@@ -127,7 +128,7 @@ class RegistrationController
                 }
                 $this->lastErrorCode = null;
 
-                return true; //TODO end of not tested
+                return true;
             }
         }
 

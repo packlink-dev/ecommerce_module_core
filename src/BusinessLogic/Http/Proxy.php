@@ -30,6 +30,7 @@ use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Utility\Php\Php55;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
@@ -685,6 +686,12 @@ class Proxy
      */
     protected function call($method, $endpoint, array $body = array())
     {
+        if (!$this->isIntegrationRegistered($endpoint)) { //TODO not tested yet
+            throw new HttpAuthenticationException(
+                'Integration is not registered.'
+            );
+        }
+
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
             $bodyStringToSend = json_encode($body);
@@ -784,6 +791,52 @@ class Proxy
     }
 
     /**
+     * Checks whether integration is registered.
+     *
+     * @param string $endpoint endpoint of current call to the API
+     *
+     * @return bool
+     */
+    private function isIntegrationRegistered($endpoint) //TODO NOT TESTED
+    {
+        if ($this->isIntegrationCheckExcluded($endpoint)) {
+            return true;
+        }
+
+        $integrationIntegrationService = $this->getIntegrationRegistrationService();
+        if ($integrationIntegrationService->getIntegrationId()) {
+            return true;
+        }
+
+        try {
+            if ($integrationIntegrationService->registerIntegration()) {
+                return true;
+            }
+        } catch (IntegrationNotRegisteredException $e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if current request endpoint requires integration registration check.
+     *
+     * @param string $endpoint endpoint of current request
+     *
+     * @return bool
+     */
+    private function isIntegrationCheckExcluded($endpoint) //TODO NOT TESTED
+    {
+        $excluded = array(
+            'register',
+            'users/api/keys',
+        );
+
+        return in_array($endpoint, $excluded, true);
+    }
+
+    /**
      * Returns headers together with authorization entry.
      *
      * @return array Formatted request headers.
@@ -807,5 +860,14 @@ class Proxy
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return ServiceRegister::getService(BrandConfigurationService::CLASS_NAME);
+    }
+
+    /**
+     * @return IntegrationRegistrationServiceInterface
+     */
+    private function getIntegrationRegistrationService() //TODO Will this break?
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
     }
 }

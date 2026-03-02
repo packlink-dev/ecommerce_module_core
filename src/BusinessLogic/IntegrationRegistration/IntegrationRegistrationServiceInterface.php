@@ -47,7 +47,7 @@ interface IntegrationRegistrationServiceInterface
      * Returns the persisted integration ID if present as class variable,
      * otherwise, if returns the ID from database if present.
      *
-     * @return string Integration ID.
+     * @return string|null Integration ID.
      */
     public function getIntegrationId();
 
