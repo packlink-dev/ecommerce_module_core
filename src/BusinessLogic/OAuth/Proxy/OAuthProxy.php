@@ -127,7 +127,7 @@ class OAuthProxy implements OAuthProxyInterface
      */
     protected function call($method, $endpoint, array $body = array())
     {
-        if (!$this->isIntegrationRegistered($endpoint)) { //TODO not tested yet
+        if (!$this->isIntegrationRegistered($endpoint)) {
             throw new HttpAuthenticationException(
                 'Integration is not registered.'
             );
@@ -208,7 +208,7 @@ class OAuthProxy implements OAuthProxyInterface
      *
      * @return bool
      */
-    private function isIntegrationRegistered($endpoint) //TODO NOT TESTED
+    private function isIntegrationRegistered($endpoint)
     {
         if ($endpoint == 'token') {
             return true;

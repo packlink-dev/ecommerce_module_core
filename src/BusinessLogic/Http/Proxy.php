@@ -686,7 +686,7 @@ class Proxy
      */
     protected function call($method, $endpoint, array $body = array())
     {
-        if (!$this->isIntegrationRegistered($endpoint)) { //TODO not tested yet
+        if (!$this->isIntegrationRegistered($endpoint)) {
             throw new HttpAuthenticationException(
                 'Integration is not registered.'
             );
@@ -797,7 +797,7 @@ class Proxy
      *
      * @return bool
      */
-    private function isIntegrationRegistered($endpoint) //TODO NOT TESTED
+    private function isIntegrationRegistered($endpoint)
     {
         if ($this->isIntegrationCheckExcluded($endpoint)) {
             return true;
@@ -826,11 +826,12 @@ class Proxy
      *
      * @return bool
      */
-    private function isIntegrationCheckExcluded($endpoint) //TODO NOT TESTED
+    private function isIntegrationCheckExcluded($endpoint)
     {
         $excluded = array(
             'register',
             'users/api/keys',
+            'integrations',
         );
 
         return in_array($endpoint, $excluded, true);
@@ -865,7 +866,7 @@ class Proxy
     /**
      * @return IntegrationRegistrationServiceInterface
      */
-    private function getIntegrationRegistrationService() //TODO Will this break?
+    private function getIntegrationRegistrationService()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
