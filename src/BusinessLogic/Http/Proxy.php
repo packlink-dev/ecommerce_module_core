@@ -811,7 +811,7 @@ class Proxy
     private function isIntegrationRegistered($endpoint)
     {
         // If not logged in yet ignore all integration registration attempts
-        if (   $this->configService->getAuthorizationToken()) {
+        if (!$this->configService->getAuthorizationToken()) {
             return true;
         }
 
@@ -825,7 +825,10 @@ class Proxy
 
         try {
             $payload = $this->dataProvider->getRegistrationPayload();
-            if ($this->registerIntegration($payload)) {
+            $integrationId = $this->registerIntegration($payload);
+            if ($integrationId) {
+                $this->dataProvider->setIntegrationId($this->dataProvider->getIntegrationId());
+
                 return true;
             }
         } catch (Exception $e) {
