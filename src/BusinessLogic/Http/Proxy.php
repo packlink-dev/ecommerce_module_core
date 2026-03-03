@@ -843,6 +843,12 @@ class Proxy
             'register',
             'users/api/keys',
             'integrations',
+            'integrations/',
+            'clients', // Login workflow endpoints
+            'users/parcels',
+            'clients/warehouses',
+            'shipments/callback',
+            'analytics',
         );
 
         return in_array($endpoint, $excluded, true);
