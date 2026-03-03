@@ -56,7 +56,7 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
      */
     public function disconnectIntegration()
     {
-        $this->dataProvider->getIntegrationId();
+        $integrationId = $this->dataProvider->getIntegrationId();
 
         // Must have a check for legacy merchants that uninstall without ever registering
         if (empty($integrationId)) {

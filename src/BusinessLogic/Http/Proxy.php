@@ -810,6 +810,11 @@ class Proxy
      */
     private function isIntegrationRegistered($endpoint)
     {
+        // If not logged in yet ignore all integration registration attempts
+        if (   $this->configService->getAuthorizationToken()) {
+            return true;
+        }
+
         if ($this->isIntegrationCheckExcluded($endpoint)) {
             return true;
         }
@@ -848,7 +853,6 @@ class Proxy
             'users/parcels',
             'clients/warehouses',
             'shipments/callback',
-            'analytics',
         );
 
         return in_array($endpoint, $excluded, true);
