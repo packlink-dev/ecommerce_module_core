@@ -827,7 +827,7 @@ class Proxy
             $payload = $this->dataProvider->getRegistrationPayload();
             $integrationId = $this->registerIntegration($payload);
             if ($integrationId) {
-                $this->dataProvider->setIntegrationId($this->dataProvider->getIntegrationId());
+                $this->dataProvider->setIntegrationId($integrationId);
 
                 return true;
             }
