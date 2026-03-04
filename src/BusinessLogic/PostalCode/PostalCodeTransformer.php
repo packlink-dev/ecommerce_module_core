@@ -27,6 +27,9 @@ class PostalCodeTransformer
             '*** ***',
             '**** ***',
         ),
+        'GR' => array(
+            '*** **',
+        ),
         'IM' => array(
             '** ***',
             '*** ***',
