@@ -13,7 +13,7 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
     /**
      * Hardcoded header name Packlink uses to send the webhook secret.
      */
-    const WEBHOOK_SECRET_HEADER = 'X-Packlink-Webhook-Secret';
+    const WEBHOOK_SECRET_HEADER = 'HTTP_X_PACKLINK_WEBHOOK_SECRET';
 
     /**
      * Singleton instance of this class.
@@ -22,7 +22,7 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
      */
     protected static $instance;
 
-    public function handle($input)
+    public function handle($input) //TODO: yet to be tested when unblocked
     {
         Logger::logDebug(
             'Packlink registration webhook received.',
@@ -30,7 +30,7 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
             array('payload' => $input)
         );
 
-        $payload = json_decode($input, false); //TODO: check values of the payload when recieved
+        $payload = json_decode($input, false);
 
         if (!$this->validatePayload($payload)) {
             Logger::logWarning('Packlink registration webhook: invalid payload.');
@@ -95,7 +95,7 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
      *
      * @param string $integrationId The integration_id from the webhook payload.
      */
-    protected function handleDisconnection($integrationId)
+    protected function handleDisconnection($integrationId) //TODO MUST TEST THIS - never got here due to packlink disconnecting not working!
     {
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $storedIntegrationId = $configService->getIntegrationId();
