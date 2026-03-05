@@ -19,6 +19,8 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -61,11 +63,14 @@ class OrderService extends BaseService
      * @var OrderShipmentDetailsService
      */
     protected $orderShipmentDetailsService;
-
     /**
      * @var CashOnDeliveryServiceInterface
      */
     protected $cashOnDeliveryService;
+    /**
+     * @var IntegrationRegistrationServiceInterface
+     */
+    protected $integrationRegistrationService;
 
     /**
      * OrderService constructor.
@@ -78,6 +83,8 @@ class OrderService extends BaseService
         $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
         $this->configuration = ServiceRegister::getService(Configuration::CLASS_NAME);
         $this->cashOnDeliveryService = ServiceRegister::getService(CashOnDeliveryServiceInterface::CLASS_NAME);
+        $this->integrationRegistrationService =
+            ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
 
     }
 
@@ -465,6 +472,11 @@ class OrderService extends BaseService
         $additional->selectedWarehouseId = $this->configuration->getDefaultWarehouse()->id;
         $additional->orderId = $order->getId();
         $additional->sellerUserId = $order->getSellerUserId();
+
+        $integrationId = $this->configuration->getIntegrationId();
+        if ($integrationId !== null) { //If this is legacy merchant's first call to the API check
+            $additional->integrationId = $integrationId; //TODO TO TEST
+        }
 
         $additional->items = array();
         foreach ($order->getItems() as $item) {
