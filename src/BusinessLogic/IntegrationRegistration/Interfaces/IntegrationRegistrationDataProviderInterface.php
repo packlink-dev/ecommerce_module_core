@@ -1,8 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\IntegrationRegistration;
-
-use http\Encoding\Stream;
+namespace Packlink\BusinessLogic\IntegrationRegistration\Interfaces;
 
 /**
  * Interface IntegrationRegistrationDataProviderInterface. Must be implemented in integration.

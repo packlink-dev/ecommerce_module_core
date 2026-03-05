@@ -19,8 +19,7 @@ use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
-use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Exceptions\OrderNotFound;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
@@ -475,7 +474,7 @@ class OrderService extends BaseService
 
         $integrationId = $this->configuration->getIntegrationId();
         if ($integrationId !== null) { //If this is legacy merchant's first call to the API check
-            $additional->integrationId = $integrationId; //TODO TO TEST
+            $additional->integrationId = $integrationId;
         }
 
         $additional->items = array();

@@ -5,6 +5,8 @@ namespace Packlink\BusinessLogic\IntegrationRegistration;
 use Exception;
 use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 
 class IntegrationRegistrationService implements IntegrationRegistrationServiceInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Packlink\BusinessLogic\IntegrationRegistration;
+namespace Packlink\BusinessLogic\IntegrationRegistration\Interfaces;
 
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 

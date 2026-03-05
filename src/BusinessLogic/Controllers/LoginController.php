@@ -4,13 +4,10 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
-use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationServiceInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
-use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
-use Packlink\BusinessLogic\OAuth\Services\OAuthService;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
