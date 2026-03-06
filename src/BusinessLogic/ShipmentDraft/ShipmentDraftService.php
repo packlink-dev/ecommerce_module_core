@@ -52,6 +52,19 @@ class ShipmentDraftService extends BaseService
      */
     public function enqueueCreateShipmentDraftTask($orderId, $isDelayed = false, $delayInterval = 5)
     {
+
+        /** @var \Packlink\BusinessLogic\Configuration $configService */
+        $configService = $this->getConfigService();
+
+        if ($configService->isIntegrationActive()) {
+            Logger::logInfo(
+                "Skipping draft creation for order [{$orderId}]: integration is disabled.",
+                'Core'
+            );
+
+            return;
+        }
+
         /** @var OrderSendDraftTaskMapService $draftTaskMapService */
         $draftTaskMapService = ServiceRegister::getService(OrderSendDraftTaskMapService::CLASS_NAME);
         $orderTaskMap = $draftTaskMapService->getOrderTaskMap($orderId);
@@ -62,9 +75,6 @@ class ShipmentDraftService extends BaseService
         } else {
             $draftTaskMapService->createOrderTaskMap($orderId);
         }
-
-        /** @var \Packlink\BusinessLogic\Configuration $configService */
-        $configService = $this->getConfigService();
 
         $sendDraftTask = new SendDraftTask($orderId);
         if (!$isDelayed) {

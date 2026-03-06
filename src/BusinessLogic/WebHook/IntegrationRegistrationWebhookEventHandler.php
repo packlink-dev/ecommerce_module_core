@@ -46,6 +46,10 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
             $this->handleDisconnection($payload->integration_id);
         }
 
+        if ($payload->status === 'DISABLED') {
+            $this->handleDeactivation($payload->integration_id);
+        }
+
         return true;
     }
 
@@ -119,5 +123,38 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
         if (!$resetService->resetModule()) {
             Logger::logError('Packlink registration webhook: module reset failed.');
         }
+    }
+
+    /**
+     * Handles the DISABLED status by validating the integration ID
+     * and saving the disabled status flag to the database.
+     *
+     * @param string $integrationId The integration_id from the webhook payload.
+     */
+    protected function handleDeactivation($integrationId)
+    {
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $storedIntegrationId = $configService->getIntegrationId();
+
+        if ($integrationId !== $storedIntegrationId) {
+            Logger::logWarning(
+                'Packlink registration webhook: integration_id mismatch on deactivation.',
+                'Core',
+                array(
+                    'received' => $integrationId,
+                    'stored'   => $storedIntegrationId,
+                )
+            );
+
+            return;
+        }
+
+        $configService->setIntegrationStatus('DISABLED');
+
+        Logger::logInfo(
+            'Packlink integration has been disabled.',
+            'Core',
+            array('integrationId' => $integrationId, 'status' => $configService->getIntegrationStatus())
+        );
     }
 }

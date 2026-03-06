@@ -304,6 +304,40 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
         return $this->getConfigValue('setupFinished') ?: false;
     }
 
+
+    /**
+     * Retrieves integration status.
+     *
+     * @return string|null
+     */
+    public function getIntegrationStatus()
+    {
+        return $this->getConfigValue('integrationStatus');
+    }
+
+    /**
+     * Sets integration status.
+     *
+     * @param string $status
+     *
+     * @return \Logeecom\Infrastructure\Configuration\ConfigEntity
+     */
+    public function setIntegrationStatus($status)
+    {
+        return $this->saveConfigValue('integrationStatus', $status);
+    }
+
+    /**
+     * Returns whether the integration is currently active.
+     * Integration is considered active unless explicitly set to DISABLED.
+     *
+     * @return bool
+     */
+    public function isIntegrationActive()
+    {
+        return $this->getIntegrationStatus() !== 'DISABLED';
+    }
+
     /**
      * Determines whether the configuration entry is system specific.
      *
