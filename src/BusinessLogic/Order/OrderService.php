@@ -25,6 +25,7 @@ use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\Objects\Order;
 use Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
+use Packlink\BusinessLogic\PostalCode\PostalCodeTransformer;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 use Packlink\BusinessLogic\ShippingMethod\ShippingCostCalculator;
 use Packlink\BusinessLogic\ShippingMethod\ShippingMethodService;
@@ -421,7 +422,7 @@ class OrderService extends BaseService
         $to = $order->getShippingAddress();
         $draft->to = new Draft\Address();
         $draft->to->country = $to->getCountry();
-        $draft->to->zipCode = $to->getZipCode();
+        $draft->to->zipCode = PostalCodeTransformer::transform($to->getCountry(), $to->getZipCode());
         $draft->to->email = $to->getEmail();
         $draft->to->name = $to->getName();
         $draft->to->surname = $to->getSurname();
