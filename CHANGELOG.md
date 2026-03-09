@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.7.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.4...v3.7.5) - 2026-03-09
+### Changed
+- Transformations applied to GR and LV postal codes
+
 ## [3.7.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.3...v3.7.4) - 2026-02-06
 ### Changed
 - Fix shipping service special tag check
