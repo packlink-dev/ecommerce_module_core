@@ -56,7 +56,7 @@ class ShipmentDraftService extends BaseService
         /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = $this->getConfigService();
 
-        if ($configService->isIntegrationActive()) {
+        if (!$configService->isIntegrationActive()) {
             Logger::logInfo(
                 "Skipping draft creation for order [{$orderId}]: integration is disabled.",
                 'Core'
