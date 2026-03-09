@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic;
 
+use Logeecom\Infrastructure\Configuration\ConfigEntity;
 use Packlink\BusinessLogic\Customs\CustomsMapping;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
@@ -320,11 +321,77 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      *
      * @param string $status
      *
-     * @return \Logeecom\Infrastructure\Configuration\ConfigEntity
+     * @return ConfigEntity
      */
     public function setIntegrationStatus($status)
     {
         return $this->saveConfigValue('integrationStatus', $status);
+    }
+
+    /**
+     * Sets Integration identifier.
+     *
+     * @param string $integrationId ID of the integration.
+     *
+     * @return ConfigEntity
+     */
+    public function setIntegrationId($integrationId)
+    {
+        return $this->saveConfigValue('integrationId', $integrationId);
+    }
+
+    /**
+     * Retrieves Integration identifier.
+     *
+     * @return string | null  IntegrationId configuration.
+     */
+    public function getIntegrationId()
+    {
+        return $this->getConfigValue('integrationId');
+    }
+
+    /**
+     * Sets backup carrier ID.
+     *
+     * @param string $webhookSecret
+     *
+     * @return ConfigEntity
+     */
+    public function setWebhookSecret($webhookSecret)
+    {
+        return $this->saveConfigValue('webhookSecret', $webhookSecret);
+    }
+
+    /**
+     * Retrieves Webhook secret.
+     *
+     * @return string | null  Webhook Secret configuration.
+     */
+    public function getWebhookSecret()
+    {
+        return $this->getConfigValue('webhookSecret');
+    }
+
+    /**
+     * Sets Integration Guid.
+     *
+     * @param $integrationGuid
+     *
+     * @return ConfigEntity
+     */
+    public function setIntegrationGuid($integrationGuid)
+    {
+        return $this->saveConfigValue('integrationGuid', $integrationGuid);
+    }
+
+    /**
+     * Retrieves Integration Guid.
+     *
+     * @return string | null  Integration Guid configuration.
+     */
+    public function getIntegrationGuid()
+    {
+        return $this->getConfigValue('integrationGuid');
     }
 
     /**
