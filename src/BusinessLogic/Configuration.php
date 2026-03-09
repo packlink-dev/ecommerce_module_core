@@ -335,7 +335,15 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
      */
     public function isIntegrationActive()
     {
-        return $this->getIntegrationStatus() !== 'DISABLED';
+        $status = $this->getIntegrationStatus();
+        if($status == null) {
+            return true;
+        }
+        if($status !== 'DISABLED') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
