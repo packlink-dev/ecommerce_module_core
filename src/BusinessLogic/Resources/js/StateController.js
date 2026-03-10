@@ -98,8 +98,7 @@ if (!window.Packlink) {
          * Shown when Packlink has deactivated this store's integration,
          * e.g. due to subscription plan limits.
          */
-        const displayIntegrationDisabledPopup = () => { //TODO: TEST
-            // Remove any existing instance to avoid duplicates on re-display.
+        const displayIntegrationDisabledPopup = () => {
             const existing = document.getElementById('pl-integration-disabled-overlay');
             if (existing) {
                 existing.parentNode.removeChild(existing);
@@ -111,12 +110,12 @@ if (!window.Packlink) {
             const overlay = document.createElement('div');
             overlay.id = 'pl-integration-disabled-overlay';
             overlay.style.cssText = [
-                'position: fixed',
+                'position: absolute',
                 'top: 0',
                 'left: 0',
                 'width: 100%',
                 'height: 100%',
-                'background: rgba(0,0,0,0.5)',
+                'background: rgba(0,0,0,0.30)',
                 'z-index: 9999',
                 'display: flex',
                 'align-items: center',
@@ -124,36 +123,47 @@ if (!window.Packlink) {
             ].join(';');
 
             overlay.innerHTML = [
-                '<div style="background:#fff;max-width:560px;padding:40px;border-radius:4px;font-family:sans-serif;">',
-                '  <h2 style="margin-top:0;font-size:18px;">',
-                '    Your Packlink PRO integration has been disabled for this store',
+                '<div style="background:#fff;max-width:560px;width:100%;padding:70px 15px;',
+                '            border-radius:4px;font-family:sans-serif;',
+                '            box-shadow:0 2px 16px rgba(0,0,0,0.15);">',
+
+                '  <h2 style="margin:0 0 35px 0;font-size:20px;color:#184e87;font-weight:600;text-align:center;">',
+                '    Your module has been disabled',
                 '  </h2>',
-                '  <p style="color:#555;line-height:1.6;">',
-                '    Your Packlink PRO integration has been disabled for this store because you have',
-                '    exceeded the number of store connections included in your subscription plan.',
-                '  </p>',
-                '  <p style="color:#555;line-height:1.6;">',
-                '    While the integration is disabled, you will not be able to use Packlink shipping',
-                '    services, including dynamic rates and shipment creation and management.',
-                '  </p>',
-                '  <p style="color:#555;line-height:1.6;">',
-                '    To automatically reactivate the integration and regain access to all features,',
-                '    please resubscribe to the appropriate subscription plan',
-                '    <a href="' + resubscribeUrl + '" target="_blank">here</a>.',
-                '  </p>',
-                '  <button id="pl-integration-disabled-close"',
-                '    style="margin-top:16px;padding:8px 20px;cursor:pointer;background:#0076ff;',
-                '           color:#fff;border:none;border-radius:3px;font-size:14px;">',
-                '    Close',
-                '  </button>',
+
+                '  <div style="max-width:420px;margin:0 auto;text-align:left;color:#333;line-height:1.6;">',
+
+                '    <p style="margin-bottom:14px;">',
+                '      Your Packlink PRO integration has been disabled for this store',
+                '    </p>',
+
+                '    <p style="margin-bottom:14px;">',
+                '      Your Packlink PRO integration has been disabled for this store<br>',
+                '      because you have exceeded the number of store connections<br>',
+                '      included in your subscription plan.',
+                '    </p>',
+
+                '    <p style="margin-bottom:14px;">',
+                '      While the integration is disabled, you will not be able to use<br>',
+                '      Packlink shipping services, including dynamic rates and<br>',
+                '      shipment creation and management.',
+                '    </p>',
+
+                '    <p style="margin:0;">',
+                '      To automatically reactivate the integration and regain access to<br>',
+                '      all features, please resubscribe to the appropriate subscription<br>',
+                '      plan <a href="' + resubscribeUrl + '" target="_blank" style="color:#0076ff;">here</a>.',
+                '    </p>',
+
+                '  </div>',
                 '</div>',
+                '</div>'
             ].join('');
 
-            document.body.appendChild(overlay);
-
-            document.getElementById('pl-integration-disabled-close').addEventListener('click', () => {
-                overlay.parentNode.removeChild(overlay);
-            });
+            const plPage = document.getElementById('pl-page');
+            plPage.style.position = 'relative';
+            plPage.style.overflow = 'hidden';
+            plPage.appendChild(overlay);
         };
 
         /**
