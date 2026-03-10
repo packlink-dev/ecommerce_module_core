@@ -27,6 +27,9 @@ class PostalCodeTransformer
             '*** ***',
             '**** ***',
         ),
+        'GR' => array(
+            '*** **',
+        ),
         'IM' => array(
             '** ***',
             '*** ***',
@@ -70,6 +73,15 @@ class PostalCodeTransformer
      */
     public static function transform($countryCode, $postalCode)
     {
+        // Special case for LV postal codes.
+        if ($countryCode === 'LV') {
+            if (strpos($postalCode, 'LV-') === 0) {
+                return substr($postalCode, 3);
+            }
+
+            return $postalCode;
+        }
+
         if (!array_key_exists($countryCode, static::$map)) {
             return $postalCode;
         }
