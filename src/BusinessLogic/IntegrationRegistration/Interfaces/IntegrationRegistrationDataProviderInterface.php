@@ -68,4 +68,11 @@ interface IntegrationRegistrationDataProviderInterface
      * @return string Integration name.
      */
     public function getIntegrationWebhookStatusUpdateUrl();
+
+    /**
+     * Removes integration registration data from the database.
+     *
+     * @return void
+     */
+    public function deleteIntegrationData();
 }

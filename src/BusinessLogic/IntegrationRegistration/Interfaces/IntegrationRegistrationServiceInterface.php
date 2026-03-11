@@ -30,6 +30,14 @@ interface IntegrationRegistrationServiceInterface
     public function disconnectIntegration();
 
     /**
+     * Updates the integration URL. Packlink team will consider adding a dedicated endpoint
+     * for webhook URL update in the future. For now, re-registering integration will do.
+     *
+     * @return null|string
+     */
+    public function updateIntegrationUrl();
+
+    /**
      * Returns the persisted integration ID if present as class variable,
      * otherwise, if returns the ID from database if present.
      *

@@ -54,7 +54,7 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
     /**
      * Disconnects the integration from Packlink.
      *
-     * @return void
+     * @return bool|void
      */
     public function disconnectIntegration()
     {
@@ -69,14 +69,20 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
             $success = $this->proxy->disconnectIntegration($integrationId);
             if (!$success) {
                 Logger::logError(
-                    'Packlink integration disconnect failed during uninstall: API returned false'
+                    'Packlink integration disconnect failed: API returned false'
                 );
+
+                return false;
             }
         } catch (Exception $e) {
             Logger::logError(
-                'Packlink integration disconnect failed during uninstall: ' . $e->getMessage()
+                'Packlink integration disconnect failed: ' . $e->getMessage()
             );
+
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -88,5 +94,26 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
     public function getIntegrationId()
     {
         return $this->dataProvider->getIntegrationId();
+    }
+
+    /**
+     * Updates the integration URL. Packlink team will consider adding a dedicated endpoint
+     * for webhook URL update in the future. For now, re-registering integration will do.
+     *
+     * @return null|string Integration identifier or null if re-registration fails
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException
+     */
+    public function updateIntegrationUrl()
+    {
+        if (!$this->disconnectIntegration()) {
+            return null;
+        }
+        $this->dataProvider->deleteIntegrationData();
+
+        return $this->registerIntegration();
     }
 }
