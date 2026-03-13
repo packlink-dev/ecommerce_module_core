@@ -152,11 +152,6 @@ class Proxy
      */
     public function registerIntegration($data)
     {
-        Logger::logInfo(
-            'Sending registration request to Packlink... '
-            . '. Payload: ' . json_encode($data)
-        );
-
         $response = $this->call(
             HttpClient::HTTP_METHOD_POST,
             'integrations',
@@ -170,7 +165,6 @@ class Proxy
                 'Integration ID not returned by Packlink API.',
                 'Core',
                 array(
-                    'Request data' => $data,
                     'Response status' => $response->getStatus(),
                     'Response body' => $response->getBody(),
                 )

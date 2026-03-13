@@ -16,6 +16,13 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
     const WEBHOOK_SECRET_HEADER = 'HTTP_X_PACKLINK_WEBHOOK_SECRET';
 
     /**
+     * Integration statuses received from Packlink webhook.
+     */
+    const STATUS_ENABLED = 'ENABLED';
+    const STATUS_DISABLED = 'DISABLED';
+    const STATUS_DELETED = 'DELETED';
+
+    /**
      * Singleton instance of this class.
      *
      * @var static
@@ -42,15 +49,15 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
             return false;
         }
 
-        if ($payload->status === 'ENABLED') {
+        if ($payload->status === self::STATUS_ENABLED) {
             $this->handleActivation($payload->integration_id);
         }
 
-        if ($payload->status === 'DISABLED') {
+        if ($payload->status === self::STATUS_DISABLED) {
             $this->handleDeactivation($payload->integration_id);
         }
 
-        if ($payload->status === 'DELETED') {
+        if ($payload->status === self::STATUS_DELETED) {
             $this->handleDisconnection($payload->integration_id);
         }
 
@@ -105,19 +112,7 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
      */
     protected function handleDisconnection($integrationId)
     {
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $storedIntegrationId = $configService->getIntegrationId();
-
-        if ($integrationId !== $storedIntegrationId) {
-            Logger::logWarning(
-                'Packlink registration webhook: integration_id mismatch on disconnect.',
-                'Core',
-                array(
-                    'received' => $integrationId,
-                    'stored'   => $storedIntegrationId,
-                )
-            );
-
+        if (!$this->isIntegrationIdValid($integrationId, 'disconnect')) {
             return;
         }
 
@@ -137,23 +132,12 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
      */
     protected function handleActivation($integrationId)
     {
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $storedIntegrationId = $configService->getIntegrationId();
-
-        if ($integrationId !== $storedIntegrationId) {
-            Logger::logWarning(
-                'Packlink registration webhook: integration_id mismatch on activation.',
-                'Core',
-                array(
-                    'received' => $integrationId,
-                    'stored'   => $storedIntegrationId,
-                )
-            );
-
+        if (!$this->isIntegrationIdValid($integrationId, 'activation')) {
             return;
         }
 
-        $configService->setIntegrationStatus('ENABLED');
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $configService->setIntegrationStatus(self::STATUS_ENABLED);
 
         Logger::logInfo(
             'Packlink integration has been enabled.',
@@ -170,12 +154,36 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
      */
     protected function handleDeactivation($integrationId)
     {
+        if (!$this->isIntegrationIdValid($integrationId, 'deactivation')) {
+            return;
+        }
+
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        $configService->setIntegrationStatus(self::STATUS_DISABLED);
+
+        Logger::logInfo(
+            'Packlink integration has been disabled.',
+            'Core',
+            array('integrationId' => $integrationId, 'status' => $configService->getIntegrationStatus())
+        );
+    }
+
+    /**
+     * Validates the integration ID received in the webhook payload.
+     *
+     * @param string $integrationId
+     * @param string $action
+     *
+     * @return bool
+     */
+    protected function isIntegrationIdValid($integrationId, $action)
+    {
         $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
         $storedIntegrationId = $configService->getIntegrationId();
 
         if ($integrationId !== $storedIntegrationId) {
             Logger::logWarning(
-                'Packlink registration webhook: integration_id mismatch on deactivation.',
+                'Packlink registration webhook: integration_id mismatch on ' . $action . '.',
                 'Core',
                 array(
                     'received' => $integrationId,
@@ -183,15 +191,9 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
                 )
             );
 
-            return;
+            return false;
         }
 
-        $configService->setIntegrationStatus('DISABLED');
-
-        Logger::logInfo(
-            'Packlink integration has been disabled.',
-            'Core',
-            array('integrationId' => $integrationId, 'status' => $configService->getIntegrationStatus())
-        );
+        return true;
     }
 }

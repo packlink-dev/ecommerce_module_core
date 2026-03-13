@@ -32,10 +32,6 @@ class RegistrationController
      * @var CountryService
      */
     protected $countryService;
-    /**
-     * @var string|null
-     */
-    protected $lastErrorCode = null;
 
     /**
      * Gets the data needed for a registration page.
@@ -71,7 +67,7 @@ class RegistrationController
      *
      * @param array $payload
      *
-     * @return bool A flag indicating whether the registration was successful.
+     * @return array 'success' bool, and 'errorCode'
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueStorageUnavailableException
@@ -122,17 +118,15 @@ class RegistrationController
                     $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
 
                     $configService->resetAuthorizationCredentials();
-                    $this->lastErrorCode = 'integration_registration_failed';
 
-                    return false;
+                    return array('success' => false, 'errorCode' => 'integration_registration_failed');
                 }
-                $this->lastErrorCode = null;
 
-                return true;
+                return array('success' => true, 'errorCode' => null);
             }
         }
 
-        return false;
+        return array('success' => false, 'errorCode' => null);
     }
 
     /**
@@ -230,15 +224,5 @@ class RegistrationController
         }
 
         return true;
-    }
-
-    /**
-     * Error code used for UI error message display
-     *
-     * @return string|null
-     */
-    public function getLastErrorCode()
-    {
-        return $this->lastErrorCode;
     }
 }

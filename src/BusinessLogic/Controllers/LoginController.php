@@ -17,55 +17,62 @@ use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
  */
 class LoginController
 {
+    /** @var UserAccountService $userAccountService */
+    protected $userAccountService;
+    /** @var IntegrationRegistrationServiceInterface $integrationService */
+    protected $integrationService;
+    /** @var OAuthServiceInterface $authServiceConfig */
+    protected $authServiceConfig;
+    /** @var ConfigurationService $configService */
+    protected $configService;
+
     /**
-     * @var string|null
+     * LoginController constructor.
      */
-    protected $lastErrorCode = null;
+    public function __construct($userAccountService, $integrationService, $authServiceConfig, $configService)
+    {
+        $this->userAccountService = $userAccountService;
+        $this->integrationService = $integrationService;
+        $this->authServiceConfig = $authServiceConfig;
+        $this->configService = $configService;
+    }
 
     /**
      * Return flag indicating whether the user is logged in successfully.
      *
      * @param $apiKey
      *
-     * @return bool
+     * @return array 'success' bool, and 'errorCode'
      */
     public function login($apiKey)
     {
         try {
-            /** @var UserAccountService $userAccountService */
-            $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
-            $result = $userAccountService->login($apiKey);
+            $result = $this->userAccountService->login($apiKey);
 
             if (!$result) {
                 $this->removeAuthorizationToken();
-                $this->lastErrorCode = 'invalid_api_key';
 
-                return false;
+                return array('success' => false, 'errorCode' => 'invalid_api_key');
             }
 
-            /** @var IntegrationRegistrationServiceInterface $integrationService */
-            $integrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
-            $integrationId = $integrationService->registerIntegration();
+            $integrationId = $this->integrationService->registerIntegration();
 
             if (!$integrationId) {
                 $this->handleIntegrationRegistrationFailure();
 
-                return false;
+                return array('success' => false, 'errorCode' => 'integration_registration_failed');
             }
 
-            $this->lastErrorCode = null;
-
-            return true;
+            return array('success' => true, 'errorCode' => null);
 
         } catch (IntegrationNotRegisteredException $e) {
             $this->handleIntegrationRegistrationFailure();
 
-            return false;
+            return array('success' => false, 'errorCode' => 'integration_registration_failed');
         } catch (Exception $e) {
             $this->removeAuthorizationToken();
-            $this->lastErrorCode = 'invalid_api_key';
 
-            return false;
+            return array('success' => false, 'errorCode' => 'invalid_api_key');
         }
     }
 
@@ -74,10 +81,7 @@ class LoginController
      */
     public function getRedirectUrl($domain)
     {
-        /** @var OAuthServiceInterface $authServiceConfig */
-        $authServiceConfig = ServiceRegister::getService(OAuthServiceInterface::CLASS_NAME);
-
-        return $authServiceConfig->buildRedirectUrlAndSaveState($domain);
+        return $this->authServiceConfig->buildRedirectUrlAndSaveState($domain);
     }
 
     /**
@@ -85,10 +89,8 @@ class LoginController
      */
     private function removeAuthorizationToken()
     {
-        /** @var ConfigurationService $configService */
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        if ($configService->getAuthorizationToken() !== null) {
-            $configService->setAuthorizationToken(null);
+        if ($this->configService->getAuthorizationToken() !== null) {
+            $this->configService->setAuthorizationToken(null);
         }
     }
 
@@ -97,17 +99,6 @@ class LoginController
      */
     private function handleIntegrationRegistrationFailure()
     {
-        $this->lastErrorCode = 'integration_registration_failed';
         $this->removeAuthorizationToken();
-    }
-
-    /**
-     * Error code used for UI error message display
-     *
-     * @return string|null
-     */
-    public function getLastErrorCode()
-    {
-        return $this->lastErrorCode;
     }
 }
