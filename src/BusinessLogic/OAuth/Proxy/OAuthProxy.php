@@ -9,9 +9,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\Logger\Logger;
-use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\OAuthToken;
-use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Proxy\Interfaces\OAuthProxyInterface;
 use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
 use Packlink\BusinessLogic\OAuth\Services\TenantDomainProvider;
@@ -36,10 +34,6 @@ class OAuthProxy implements OAuthProxyInterface
      * @var string
      */
     private $baseUrl;
-    /**
-     * @var IntegrationRegistrationServiceInterface
-     */
-    private $registrationService;
 
     /**
      * OAuthProxy constructor.
@@ -53,7 +47,6 @@ class OAuthProxy implements OAuthProxyInterface
     ) {
         $this->config = $config;
         $this->client = $client;
-        $this->registrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
 
         $this->baseUrl = 'https://' . TenantDomainProvider::getDomain($config->getDomain()) . '/auth/oauth2/';
     }
@@ -132,12 +125,6 @@ class OAuthProxy implements OAuthProxyInterface
      */
     protected function call($method, $endpoint, array $body = array())
     {
-        if (!$this->isIntegrationRegistered($endpoint)) {
-            throw new HttpAuthenticationException(
-                'Integration is not registered.'
-            );
-        }
-
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
             $bodyStringToSend = http_build_query($body);
@@ -204,33 +191,5 @@ class OAuthProxy implements OAuthProxyInterface
             'Authorization' => 'Authorization: Basic ' . $encodedCredentials,
             'Content-Type' => 'Content-Type: application/x-www-form-urlencoded',
         );
-    }
-
-    /**
-     * Checks whether integration is registered.
-     *
-     * @param string $endpoint skips check for endpoint 'token'
-     *
-     * @return bool
-     */
-    private function isIntegrationRegistered($endpoint)
-    {
-        if ($endpoint == 'token') {
-            return true;
-        }
-
-        if ($this->registrationService->getIntegrationId()) {
-            return true;
-        }
-
-        try {
-            if ($this->registrationService->registerIntegration()) {
-                return true;
-            }
-        } catch (Exception $e) {
-            return false;
-        }
-
-        return false;
     }
 }

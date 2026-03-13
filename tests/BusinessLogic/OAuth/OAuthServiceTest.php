@@ -11,11 +11,14 @@ use Logeecom\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\OAuth\Models\OAuthInfo;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
 use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
@@ -79,7 +82,6 @@ class OAuthServiceTest extends BaseTestWithServices
         $oAuth->setRedirectUri('www.example.com');
         $oAuth->setTenantId('tenant1');
         $oAuth->setScopes(array('write','read'));
-
 
         $authProxy = new OAuthProxy($oAuth, $this->httpClientOauth);
 

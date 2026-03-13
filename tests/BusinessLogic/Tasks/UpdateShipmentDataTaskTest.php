@@ -9,14 +9,19 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\BaseSyncTest;
 use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -36,9 +41,12 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
      * @var \Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService
      */
     public $orderShipmentDetailsService;
+    /**
+     * @var IntegrationRegistrationServiceInterface
+     */
+    public $registrationService;
 
     /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
-
     private $cashOnDeliveryService;
 
     /**
@@ -72,6 +80,18 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
             OrderService::CLASS_NAME,
             function () {
                 return OrderService::getInstance();
+            }
+        );
+
+        /** @var \Packlink\BusinessLogic\Configuration $config */
+        $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        $integrationDataProvider = new MockIntegrationRegistrationDataProvider();
+        $proxy = new Proxy($config, $this->httpClient, $integrationDataProvider);
+        $this->registrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider);
+        ServiceRegister::registerService(
+            IntegrationRegistrationServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->registrationService;
             }
         );
 

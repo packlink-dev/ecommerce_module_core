@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -14,8 +15,12 @@ use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Model\Account;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Order\Exceptions\EmptyOrderException;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
@@ -55,6 +60,10 @@ class OrderServiceTest extends BaseTestWithServices
      * @var TestShopShippingMethodService
      */
     public $testShopShippingMethodService;
+    /**
+     * @var IntegrationRegistrationServiceInterface
+     */
+    public $registrationService;
 
     /**
      * @before
@@ -106,6 +115,19 @@ class OrderServiceTest extends BaseTestWithServices
                 return $me->shippingMethodService;
             }
         );
+
+        /** @var \Packlink\BusinessLogic\Configuration $config */
+        $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        $integrationDataProvider = new MockIntegrationRegistrationDataProvider();
+        $proxy = new Proxy($config, $this->httpClient, $integrationDataProvider);
+        $this->registrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider);
+        ServiceRegister::registerService(
+            IntegrationRegistrationServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->registrationService;
+            }
+        );
+
         /** @noinspection PhpUnhandledExceptionInspection */
         RepositoryRegistry::registerRepository(CashOnDelivery::CLASS_NAME, MemoryRepository::getClassName());
 

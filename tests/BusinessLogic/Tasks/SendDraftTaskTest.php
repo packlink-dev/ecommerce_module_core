@@ -14,6 +14,7 @@ use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Customs\MockCustomsMappingService;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -21,11 +22,15 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegist
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Customs\CustomsMapping;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
 use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -48,8 +53,11 @@ use Packlink\BusinessLogic\Utility\CurrencySymbolService;
  */
 class SendDraftTaskTest extends BaseSyncTest
 {
+    /**
+     * @var IntegrationRegistrationServiceInterface
+     */
+    public $registrationService;
     /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
-
     private $cashOnDeliveryService;
 
     /**
@@ -116,6 +124,18 @@ class SendDraftTaskTest extends BaseSyncTest
             Serializer::CLASS_NAME,
             function () {
                 return new NativeSerializer();
+            }
+        );
+
+        /** @var \Packlink\BusinessLogic\Configuration $config */
+        $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        $integrationDataProvider = new MockIntegrationRegistrationDataProvider();
+        $proxy = new Proxy($config, $this->httpClient, $integrationDataProvider);
+        $this->registrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider);
+        ServiceRegister::registerService(
+            IntegrationRegistrationServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->registrationService;
             }
         );
 

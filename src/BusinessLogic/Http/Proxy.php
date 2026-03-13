@@ -83,7 +83,6 @@ class Proxy
         $this->client = $client;
         $this->configService = $configService;
         $this->dataProvider = $dataProvider;
-
     }
 
     /**
