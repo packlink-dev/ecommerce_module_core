@@ -25,6 +25,7 @@ use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\BusinessLogic\User\UserAccountService;
 
 /**
@@ -89,7 +90,10 @@ class RegistrationControllerTest extends BaseTestWithServices
             }
         );
 
-        $this->userAccountService = UserAccountService::getInstance();
+        $scheduler = TestServiceRegister::getService(SchedulerInterface::CLASS_NAME);
+        $updateShippingServicesOrchestrator = TestServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+
+        $this->userAccountService = new UserAccountService($updateShippingServicesOrchestrator, $scheduler);
         TestServiceRegister::registerService(
             UserAccountService::CLASS_NAME,
             function () use ($me) {
@@ -118,8 +122,6 @@ class RegistrationControllerTest extends BaseTestWithServices
      */
     protected function after()
     {
-        UserAccountService::resetInstance();
-
         parent::after();
     }
 
