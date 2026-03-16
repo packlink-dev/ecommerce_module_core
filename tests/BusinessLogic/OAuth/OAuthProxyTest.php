@@ -7,9 +7,13 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
 
 class OAuthProxyTest extends BaseTestWithServices
@@ -42,7 +46,6 @@ class OAuthProxyTest extends BaseTestWithServices
         $oAuth->setRedirectUri('www.example.com');
         $oAuth->setTenantId('tenant1');
         $oAuth->setScopes(array('write','read'));
-
 
         $this->proxy = new OAuthProxy($oAuth, $this->httpClient);
     }

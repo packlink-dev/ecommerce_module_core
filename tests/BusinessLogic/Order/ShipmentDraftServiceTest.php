@@ -15,6 +15,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\CashOnDelivery\TestCashOnDeliveryService;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
@@ -28,8 +29,13 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterface;
 use Packlink\BusinessLogic\CashOnDelivery\Model\CashOnDelivery;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
+use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\Order\Interfaces\ShopOrderService;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
@@ -62,9 +68,16 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
      * @var TestTaskExecutor
      */
     public $taskExecutor;
+    /**
+     * @var IntegrationRegistrationDataProviderInterface
+     */
+    public $integrationRegistrationDataProvider;
+    /**
+     * @var IntegrationRegistrationServiceInterface
+     */
+    public $integrationRegistrationService;
 
     /** @var TestCashOnDeliveryService $cashOnDeliveryService*/
-
     private $cashOnDeliveryService;
 
     /**
@@ -118,6 +131,25 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
             QueueService::CLASS_NAME,
             function () {
                 return new TestQueueService();
+            }
+        );
+
+        $integrationDataProvider = new MockIntegrationRegistrationDataProvider();
+        TestServiceRegister::registerService(
+            IntegrationRegistrationDataProviderInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->integrationRegistrationDataProvider;
+            }
+        );
+
+        /** @var \Packlink\BusinessLogic\Configuration $config */
+        $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        $proxy = new Proxy($config, $this->httpClient, $integrationDataProvider);
+        $me->integrationRegistrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider);
+        TestServiceRegister::registerService(
+            IntegrationRegistrationServiceInterface::CLASS_NAME,
+            function () use ($me) {
+                return $me->integrationRegistrationService;
             }
         );
 

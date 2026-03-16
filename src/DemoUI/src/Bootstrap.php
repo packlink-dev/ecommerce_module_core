@@ -25,6 +25,8 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Models\OAuthInfo;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
 use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
@@ -130,7 +132,10 @@ class Bootstrap extends BootstrapComponent
         $this->systemInfoService = new SystemInfoService();
         $this->customsService = new CustomsMappingService();
         $this->oauthProxy = new OAuthProxy(OAuthConfigurationService::getInstance(), $client);
-        $this->proxy = new Proxy($configService, $client);
+        /** @var IntegrationRegistrationDataProviderInterface $integrationRegistrationDataProvider */
+        $integrationRegistrationDataProvider = ServiceRegister::getService(
+            IntegrationRegistrationDataProviderInterface::CLASS_NAME);
+        $this->proxy = new Proxy($configService, $client, $integrationRegistrationDataProvider);
         $this->oAuthConfiguration = OAuthConfigurationService::getInstance();
     }
 

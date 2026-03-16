@@ -43,6 +43,7 @@
   "login": {
     "apiKey": "API-Schlüssel",
     "apiKeyIncorrect": "Falscher API-Schlüssel",
+    "integrationRegistrationFailed": "Registrierung der Integration fehlgeschlagen.",
     "dontHaveAccount": "Sie haben noch keinen Account?",
     "validateApiKey": "API-Schlüssel bestätigen",
     "connect": "Verbinden",
@@ -306,6 +307,7 @@
     "email": "E-Mail",
     "password": "Passwort",
     "haveAccount": "Haben Sie bereits einen Account?",
+    "integrationRegistrationFailed": "Ihr Packlink-Konto wurde erfolgreich erstellt, aber die Shop-Integration ist fehlgeschlagen",
     "registerAccount": "Jetzt registrieren",
     "getToKnowYou": "Wir möchten Sie besser kennenlernen, um uns an Sie anzupassen und Ihnen ein individuelles Angebot zukommen zu lassen",
     "monthlyShipmentVolume": "Wie hoch ist Ihr monatliches Sendungsaufkommen?",
