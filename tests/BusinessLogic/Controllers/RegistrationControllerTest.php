@@ -7,7 +7,6 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestRegistrationInfoService;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -139,7 +138,7 @@ class RegistrationControllerTest extends BaseTestWithServices
 
         $result = $this->registrationController->register($this->getValidPayload());
 
-        $this->assertFalse($result);
+        $this->assertFalse($result['success']);
     }
 
     private function getValidPayload()

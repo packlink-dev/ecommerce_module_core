@@ -4,7 +4,6 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
-use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
@@ -21,19 +20,16 @@ class LoginController
     protected $userAccountService;
     /** @var IntegrationRegistrationServiceInterface $integrationService */
     protected $integrationService;
-    /** @var OAuthServiceInterface $authServiceConfig */
-    protected $authServiceConfig;
     /** @var ConfigurationService $configService */
     protected $configService;
 
     /**
      * LoginController constructor.
      */
-    public function __construct($userAccountService, $integrationService, $authServiceConfig, $configService)
+    public function __construct($userAccountService, $integrationService, $configService)
     {
         $this->userAccountService = $userAccountService;
         $this->integrationService = $integrationService;
-        $this->authServiceConfig = $authServiceConfig;
         $this->configService = $configService;
     }
 
@@ -81,7 +77,9 @@ class LoginController
      */
     public function getRedirectUrl($domain)
     {
-        return $this->authServiceConfig->buildRedirectUrlAndSaveState($domain);
+        /** @var OAuthServiceInterface $authServiceConfig */
+        $authServiceConfig = ServiceRegister::getService(OAuthServiceInterface::CLASS_NAME);
+        return $authServiceConfig->buildRedirectUrlAndSaveState($domain);
     }
 
     /**
