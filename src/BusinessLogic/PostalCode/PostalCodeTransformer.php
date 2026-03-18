@@ -73,6 +73,10 @@ class PostalCodeTransformer
      */
     public static function transform($countryCode, $postalCode)
     {
+        if ($countryCode === 'AE') {
+            return '1';
+        }
+
         // Special case for LV postal codes.
         if ($countryCode === 'LV') {
             if (strpos($postalCode, 'LV-') === 0) {
