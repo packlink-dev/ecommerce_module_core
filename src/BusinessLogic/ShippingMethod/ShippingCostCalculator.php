@@ -605,7 +605,11 @@ class ShippingCostCalculator
                     $method->isDestinationDropOff(),
                     $serviceProxy))
             ) {
-                $result = $service;
+                if ($serviceProxy) {
+                    $result = ShippingService::fromServiceDetails($serviceProxy);
+                } else {
+                    $result = $service;
+                }
             }
         }
 
