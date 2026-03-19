@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.0.0...v4.0.1) - 2026-03-18
+### Changed
+- Fixed an issue where an incorrect service ID was sent to the Packlink API
+
 ## [4.0.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.5...v4.0.0) - 2026-03-10
 **BREAKING CHANGES**
 Dropped support for PHP 5.6. Minimum supported PHP version is now PHP 7.0
