@@ -102,7 +102,7 @@ class SendDraftBusinessTask implements BusinessTask
                 "Draft task for order [{$this->orderId}] aborted: integration is disabled.",
                 'Core'
             );
-            $this->reportProgress(100);
+            yield 100;
 
             return;
         }
@@ -300,7 +300,7 @@ class SendDraftBusinessTask implements BusinessTask
      *
      * @param array $data Task data.
      *
-     * @return \Packlink\BusinessLogic\Tasks\SendDraftBusinessTask Task instance.
+     * @return SendDraftBusinessTask Task instance.
      */
     public static function fromArray(array $data): BusinessTask
     {

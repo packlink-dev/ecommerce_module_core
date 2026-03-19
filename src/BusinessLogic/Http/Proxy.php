@@ -193,7 +193,7 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
             'integrations/' . urlencode($integrationId)
         );
 
-        if ($result->getStatus() == 204) {
+        if ($result->getStatus() === 204) {
             return true;
         }
 
