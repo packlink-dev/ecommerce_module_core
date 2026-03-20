@@ -171,6 +171,9 @@ class UpdateShippingServicesTask extends Task
      */
     protected function syncServices(array $currentMethods, array $apiServices)
     {
+        $service = $this->getShippingMethodService();
+        $service->beginBatch();
+
         $progress = 20;
         $progressStep = count($currentMethods) > 0 ? (40 / count($currentMethods)) : 40;
 
@@ -180,17 +183,19 @@ class UpdateShippingServicesTask extends Task
             $progress += $progressStep;
             $this->reportProgress($progress);
         }
-        
+
         $this->reportProgress(60);
         $batch = 0;
-        foreach ($apiServices as $service) {
+        foreach ($apiServices as $apiService) {
             $batch++;
             if ($batch === 20) {
                 $this->reportAlive();
                 $batch = 0;
             }
-            $this->getShippingMethodService()->add($service);
+            $this->getShippingMethodService()->add($apiService);
         }
+
+        $this->getShippingMethodService()->endBatch();
     }
 
     /**
@@ -201,6 +206,9 @@ class UpdateShippingServicesTask extends Task
      */
     protected function syncServicesSpecial(array $currentMethods, array $apiServices)
     {
+        $service = $this->getShippingMethodService();
+        $service->beginBatch();
+
         $progress = 60;
         $progressStep = count($currentMethods) > 0 ? (20 / count($currentMethods)) : 20;
 
@@ -213,14 +221,16 @@ class UpdateShippingServicesTask extends Task
 
         $this->reportProgress(80);
         $batch = 0;
-        foreach ($apiServices as $service) {
+        foreach ($apiServices as $apiService) {
             $batch++;
             if ($batch === 20) {
                 $this->reportAlive();
                 $batch = 0;
             }
-            $this->getShippingMethodService()->add($service, true);
+            $this->getShippingMethodService()->add($apiService, true);
         }
+
+        $this->getShippingMethodService()->endBatch();
     }
 
     /**

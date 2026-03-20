@@ -419,6 +419,24 @@ class ShippingMethodService extends BaseService
     }
 
     /**
+     * Begins a batch operation. Subclasses may override to defer DB writes
+     * during bulk sync operations, accumulating changes in memory.
+     */
+    public function beginBatch()
+    {
+        // No-op in base implementation.
+    }
+
+    /**
+     * Ends a batch operation and flushes any pending changes to the database.
+     * Subclasses may override to write accumulated changes as a single DB write.
+     */
+    public function endBatch()
+    {
+        // No-op in base implementation.
+    }
+
+    /**
      * Validates currency configuration for a single pricing policy.
      *
      * @param ShippingPricePolicy $policy
