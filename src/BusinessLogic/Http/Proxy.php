@@ -152,11 +152,23 @@ class Proxy
      */
     public function registerIntegration($data)
     {
-        $response = $this->call(
-            HttpClient::HTTP_METHOD_POST,
-            'integrations',
-            $data
-        );
+        try {
+            $response = $this->call(
+                HttpClient::HTTP_METHOD_POST,
+                'integrations',
+                $data
+            );
+        } catch (Exception $e) {
+            Logger::logError(
+                'Error while trying to register the integration.',
+                'Core'
+            );
+            throw new IntegrationNotRegisteredException('Error while trying to register the integration.');
+        }
+
+        if (!$response) {
+            throw new IntegrationNotRegisteredException('Empty response from Packlink API.');
+        }
 
         $result = $response->decodeBodyToArray();
 
@@ -174,7 +186,9 @@ class Proxy
 
         Logger::logInfo(
             'Integration registered. '
-            . 'Packlink response: ' . json_encode($result)
+            . 'Packlink response: ' . json_encode($result),
+            'Core',
+            array('status_update_url' => $data['webhooks']['status_update_url'])
         );
 
         return $result['integration_id'];
