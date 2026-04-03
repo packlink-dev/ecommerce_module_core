@@ -1259,39 +1259,25 @@
 #pl-page #pl-countries-alert-wrapper.visible {
   display: flex;
 }
-.pl-integration-disabled-content {
-  max-width: 100%;
+.pl-integration-disabled-modal .pl-modal-title {
+  color: #2e4265;
+  font-size: 21px;
+}
+.pl-integration-disabled-modal .pl-modal-body {
+  padding-bottom: 30px;
+}
+.pl-integration-disabled-modal .pl-integration-disabled-content {
+  max-width: 420px;
+  margin: 0 auto;
   text-align: left;
   color: #333;
   line-height: 1.6;
-  font-size: 14px;
 }
-.pl-integration-disabled-content p {
+.pl-integration-disabled-modal .pl-integration-disabled-content p {
   margin-bottom: 16px;
 }
-.pl-integration-disabled-content p:last-child {
+.pl-integration-disabled-modal .pl-integration-disabled-content p:last-child {
   margin-bottom: 0;
-}
-.pl-integration-disabled-content a {
-  color: #2095f2;
-  text-decoration: none;
-}
-.pl-integration-disabled-content a:hover {
-  text-decoration: underline;
-}
-.pl-integration-disabled-content ~ .pl-modal-title {
-  color: #e63f3f;
-  font-size: 22px;
-  padding: 20px 40px 10px;
-}
-.pl-modal-mask:has(.pl-integration-disabled-content) .pl-modal {
-  border-radius: 8px;
-  max-width: 560px;
-  min-width: 460px;
-  padding: 10px 20px 30px;
-}
-.pl-modal-mask:has(.pl-integration-disabled-content) .pl-modal-body {
-  padding: 10px 40px 30px;
 }
 @media (max-width: 768px) {
   #pl-page .pl-main-logo {
