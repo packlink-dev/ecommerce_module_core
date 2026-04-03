@@ -384,7 +384,26 @@
     }
   }
 }
-
+.pl-integration-disabled-content {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: left;
+  color: #333;
+  line-height: 1.6;
+}
+.pl-integration-disabled-content p {
+  margin-bottom: 16px;
+}
+.pl-integration-disabled-content p:last-child {
+  margin-bottom: 0;
+}
+.pl-integration-disabled-content ~ .pl-modal-title,
+.pl-integration-disabled-content + .pl-modal-title {
+  color: $color-navy-dark;
+}
+.pl-integration-disabled-modal .pl-modal-body {
+  padding-bottom: 30px;
+}
 // mobile rules
 @media (max-width: 768px) {
   #pl-page {

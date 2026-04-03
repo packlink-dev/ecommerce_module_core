@@ -575,5 +575,13 @@
     "downloadTestLog": "Testprotokoll herunterladen",
     "autotestPassedSuccessfully": "Der automatische Test wurde erfolgreich abgeschlossen!",
     "testNotSuccessful": "Der Test wurde nicht erfolgreich abgeschlossen!"
+  },
+  "integrationDisabled": {
+    "title": "Ihr Modul wurde deaktiviert",
+    "storeDisabled": "Ihre Packlink PRO-Integration wurde für diesen Shop deaktiviert",
+    "exceededConnections": "Ihre Packlink PRO-Integration wurde für diesen Shop deaktiviert, da Sie die Anzahl der in Ihrem Abonnement enthaltenen Shop-Verbindungen überschritten haben.",
+    "whileDisabled": "Solange die Integration deaktiviert ist, können Sie die Versanddienste von Packlink, einschließlich dynamischer Tarife sowie Erstellung und Verwaltung von Sendungen, nicht nutzen.",
+    "resubscribe": "Um die Integration automatisch zu reaktivieren und wieder Zugriff auf alle Funktionen zu erhalten, abonnieren Sie bitte erneut den entsprechenden Tarif %s.",
+    "resubscribeLink": "hier"
   }
 }

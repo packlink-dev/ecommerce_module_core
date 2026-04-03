@@ -575,5 +575,13 @@
     "downloadTestLog": "Télécharger le registre de tests",
     "autotestPassedSuccessfully": "Test automatique réussi avec succès !",
     "testNotSuccessful": "Le test a échoué."
+  },
+  "integrationDisabled": {
+    "title": "Votre module a été désactivé",
+    "storeDisabled": "Votre intégration Packlink PRO a été désactivée pour cette boutique",
+    "exceededConnections": "Votre intégration Packlink PRO a été désactivée pour cette boutique car vous avez dépassé le nombre de connexions de boutiques incluses dans votre abonnement.",
+    "whileDisabled": "Pendant que l’intégration est désactivée, vous ne pourrez pas utiliser les services d’expédition Packlink, y compris les tarifs dynamiques ainsi que la création et la gestion des expéditions.",
+    "resubscribe": "Pour réactiver automatiquement l’intégration et retrouver l’accès à toutes les fonctionnalités, veuillez vous réabonner à l’offre appropriée %s.",
+    "resubscribeLink": "ici"
   }
 }
