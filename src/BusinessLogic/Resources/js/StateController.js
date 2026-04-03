@@ -121,7 +121,10 @@ if (!window.Packlink) {
                 title: Packlink.translationService.translate('integrationDisabled.title'),
                 content: content,
                 canClose: false,
-                footer: false
+                footer: false,
+                onOpen: (modalElement) => {
+                    modalElement.querySelector('.pl-modal').classList.add('pl-integration-disabled-modal');
+                }
             });
 
             modal.open();
