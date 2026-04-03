@@ -597,5 +597,13 @@
     "downloadTestLog": "Download test log",
     "autotestPassedSuccessfully": "Auto-test passed successfully!",
     "testNotSuccessful": "The test did not complete successfully."
+  },
+  "integrationDisabled": {
+    "title": "Your module has been disabled",
+    "storeDisabled": "Your Packlink PRO integration has been disabled for this store",
+    "exceededConnections": "Your Packlink PRO integration has been disabled for this store because you have exceeded the number of store connections included in your subscription plan.",
+    "whileDisabled": "While the integration is disabled, you will not be able to use Packlink shipping services, including dynamic rates and shipment creation and management.",
+    "resubscribe": "To automatically reactivate the integration and regain access to all features, please resubscribe to the appropriate subscription plan %s.",
+    "resubscribeLink": "here"
   }
 }
