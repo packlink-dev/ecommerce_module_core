@@ -9,6 +9,12 @@ class TestShopConfiguration extends Configuration
     private $callbackUrl = 'https://some-shop.test/callback?a=1&b=abc';
     private $servicePointEnabled = true;
     /**
+     * In-memory integration ID to avoid consuming MemoryStorage auto-increment IDs.
+     *
+     * @var string|null
+     */
+    private $integrationId;
+    /**
      * Singleton instance of this class.
      *
      * @var static
@@ -20,6 +26,24 @@ class TestShopConfiguration extends Configuration
         parent::__construct();
 
         static::$instance = $this;
+    }
+
+    /**
+     * @param string|null $integrationId
+     *
+     * @return \Logeecom\Infrastructure\Configuration\ConfigEntity|void
+     */
+    public function setIntegrationId($integrationId)
+    {
+        $this->integrationId = $integrationId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIntegrationId()
+    {
+        return $this->integrationId;
     }
 
     /**

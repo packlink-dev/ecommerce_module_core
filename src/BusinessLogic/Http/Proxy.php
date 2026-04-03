@@ -30,6 +30,7 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
+use Packlink\BusinessLogic\IntegrationRegistration\DTO\IntegrationRegistrationPayload;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
 use Packlink\BusinessLogic\Utility\Php\Php55;
@@ -142,7 +143,7 @@ class Proxy
      *      )
      *  )
      *
-     * @param array $data Integration registration payload
+     * @param IntegrationRegistrationPayload $payload Integration registration payload.
      *
      * @return string Integration ID (UUID)
      * @throws HttpAuthenticationException
@@ -150,12 +151,12 @@ class Proxy
      * @throws HttpRequestException
      * @throws IntegrationNotRegisteredException
      */
-    public function registerIntegration($data)
+    public function registerIntegration(IntegrationRegistrationPayload $payload)
     {
         $response = $this->call(
             HttpClient::HTTP_METHOD_POST,
             'integrations',
-            $data
+            $payload->toArray()
         );
 
         $result = $response->decodeBodyToArray();
@@ -690,7 +691,7 @@ class Proxy
      */
     protected function call($method, $endpoint, array $body = array())
     {
-        if (!$this->isIntegrationRegistered($endpoint)) {
+        if (!$this->ensureIntegrationIsRegistered($endpoint)) {
             throw new HttpAuthenticationException(
                 'Integration is not registered.'
             );
@@ -795,13 +796,14 @@ class Proxy
     }
 
     /**
-     * Checks whether integration is registered.
+     * Ensures the integration is registered before making an API call.
+     * For legacy merchants without a stored integration ID, attempts auto-registration.
      *
-     * @param string $endpoint endpoint of current call to the API
+     * @param string $endpoint Endpoint of current call to the API.
      *
      * @return bool
      */
-    private function isIntegrationRegistered($endpoint)
+    private function ensureIntegrationIsRegistered($endpoint)
     {
         // If not logged in yet ignore all integration registration attempts
         if (!$this->configService->getAuthorizationToken()) {
@@ -812,15 +814,22 @@ class Proxy
             return true;
         }
 
-        if ($this->dataProvider->getIntegrationId()) {
+        if ($this->configService->getIntegrationId()) {
             return true;
         }
 
         try {
-            $payload = $this->dataProvider->getRegistrationPayload();
+            $payload = new IntegrationRegistrationPayload(
+                $this->dataProvider->getIntegrationType(),
+                $this->dataProvider->getIntegrationGuid(),
+                $this->dataProvider->getIntegrationName(),
+                'X-Packlink-Webhook-Secret',
+                $this->dataProvider->getWebhookSecret(),
+                $this->dataProvider->getIntegrationWebhookStatusUpdateUrl()
+            );
             $integrationId = $this->registerIntegration($payload);
             if ($integrationId) {
-                $this->dataProvider->setIntegrationId($integrationId);
+                $this->configService->setIntegrationId($integrationId);
 
                 return true;
             }

@@ -69,7 +69,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         $me = $this;
 
         $this->integrationRegistrationDataProvider = new MockIntegrationRegistrationDataProvider();
-        $this->integrationRegistrationDataProvider->setIntegrationId('mock-integration-id');
         $this->shopConfig = new TestShopConfiguration();
 
         TestServiceRegister::registerService(
@@ -78,6 +77,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 return $me->shopConfig;
             }
         );
+
+        $this->shopConfig->setIntegrationId('mock-integration-id');
 
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,

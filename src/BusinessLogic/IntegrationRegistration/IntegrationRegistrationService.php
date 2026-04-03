@@ -4,10 +4,17 @@ namespace Packlink\BusinessLogic\IntegrationRegistration;
 
 use Exception;
 use Logeecom\Infrastructure\Logger\Logger;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\DTO\IntegrationRegistrationPayload;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 
+/**
+ * Class IntegrationRegistrationService.
+ *
+ * @package Packlink\BusinessLogic\IntegrationRegistration
+ */
 class IntegrationRegistrationService implements IntegrationRegistrationServiceInterface
 {
     /**
@@ -20,10 +27,23 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
      */
     private $dataProvider;
 
-    public function __construct($proxy, $dataProvider)
+    /**
+     * @var Configuration
+     */
+    private $configService;
+
+    /**
+     * IntegrationRegistrationService constructor.
+     *
+     * @param Proxy $proxy
+     * @param IntegrationRegistrationDataProviderInterface $dataProvider
+     * @param Configuration $configService
+     */
+    public function __construct($proxy, $dataProvider, $configService)
     {
         $this->proxy = $proxy;
         $this->dataProvider = $dataProvider;
+        $this->configService = $configService;
     }
 
     /**
@@ -38,15 +58,22 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
      */
     public function registerIntegration()
     {
-        $existingId = $this->dataProvider->getIntegrationId();
+        $existingId = $this->configService->getIntegrationId();
         if (!empty($existingId)) {
             return $existingId;
         }
 
-        $payload = $this->dataProvider->getRegistrationPayload();
+        $payload = new IntegrationRegistrationPayload(
+            $this->dataProvider->getIntegrationType(),
+            $this->dataProvider->getIntegrationGuid(),
+            $this->dataProvider->getIntegrationName(),
+            'X-Packlink-Webhook-Secret',
+            $this->dataProvider->getWebhookSecret(),
+            $this->dataProvider->getIntegrationWebhookStatusUpdateUrl()
+        );
 
         $integrationId = $this->proxy->registerIntegration($payload);
-        $this->dataProvider->setIntegrationId($integrationId);
+        $this->configService->setIntegrationId($integrationId);
 
         return $integrationId;
     }
@@ -58,7 +85,7 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
      */
     public function disconnectIntegration()
     {
-        $integrationId = $this->dataProvider->getIntegrationId();
+        $integrationId = $this->configService->getIntegrationId();
 
         // Must have a check for legacy merchants that uninstall without ever registering
         if (empty($integrationId)) {
@@ -86,14 +113,13 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
     }
 
     /**
-     * Returns the persisted integration ID if present as class variable,
-     * otherwise, if returns the ID from database if present.
+     * Returns the persisted integration ID.
      *
      * @return string|null Integration ID.
      */
     public function getIntegrationId()
     {
-        return $this->dataProvider->getIntegrationId();
+        return $this->configService->getIntegrationId();
     }
 
     /**
@@ -113,7 +139,9 @@ class IntegrationRegistrationService implements IntegrationRegistrationServiceIn
             return null;
         }
         $this->dataProvider->deleteIntegrationData();
+        $this->configService->setIntegrationId(null);
 
         return $this->registerIntegration();
     }
+
 }

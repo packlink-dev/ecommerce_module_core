@@ -8,6 +8,8 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\ModuleResetServiceInterface;
+use Packlink\BusinessLogic\WebHook\Exceptions\WebhookAuthorizationException;
+use Packlink\BusinessLogic\WebHook\Exceptions\WebhookPayloadValidationException;
 use Packlink\BusinessLogic\WebHook\IntegrationRegistrationWebhookEventHandler;
 
 class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
@@ -82,37 +84,37 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
     // -------------------------------------------------------------------------
 
     /**
-     * A completely empty payload should be rejected and return false.
+     * A completely empty payload should throw WebhookPayloadValidationException.
+     *
+     * @expectedException \Packlink\BusinessLogic\WebHook\Exceptions\WebhookPayloadValidationException
      */
-    public function testHandleReturnsFalseForEmptyPayload()
+    public function testHandleThrowsForEmptyPayload()
     {
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle('');
-
-        $this->assertFalse($result);
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle('');
     }
 
     /**
-     * A payload missing integration_id should be rejected.
+     * A payload missing integration_id should throw WebhookPayloadValidationException.
+     *
+     * @expectedException \Packlink\BusinessLogic\WebHook\Exceptions\WebhookPayloadValidationException
      */
-    public function testHandleReturnsFalseWhenIntegrationIdMissing()
+    public function testHandleThrowsWhenIntegrationIdMissing()
     {
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             json_encode(array('status' => 'ENABLED'))
         );
-
-        $this->assertFalse($result);
     }
 
     /**
-     * A payload missing status should be rejected.
+     * A payload missing status should throw WebhookPayloadValidationException.
+     *
+     * @expectedException \Packlink\BusinessLogic\WebHook\Exceptions\WebhookPayloadValidationException
      */
-    public function testHandleReturnsFalseWhenStatusMissing()
+    public function testHandleThrowsWhenStatusMissing()
     {
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             json_encode(array('integration_id' => self::STORED_INTEGRATION_ID))
         );
-
-        $this->assertFalse($result);
     }
 
     // -------------------------------------------------------------------------
@@ -120,31 +122,31 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
     // -------------------------------------------------------------------------
 
     /**
-     * A request with no webhook secret header should be rejected.
+     * A request with no webhook secret header should throw WebhookAuthorizationException.
+     *
+     * @expectedException \Packlink\BusinessLogic\WebHook\Exceptions\WebhookAuthorizationException
      */
-    public function testHandleReturnsFalseWhenSecretHeaderMissing()
+    public function testHandleThrowsWhenSecretHeaderMissing()
     {
         unset($_SERVER[IntegrationRegistrationWebhookEventHandler::WEBHOOK_SECRET_HEADER]);
 
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             $this->buildPayload('ENABLED', self::STORED_INTEGRATION_ID)
         );
-
-        $this->assertFalse($result);
     }
 
     /**
-     * A request with an incorrect webhook secret should be rejected.
+     * A request with an incorrect webhook secret should throw WebhookAuthorizationException.
+     *
+     * @expectedException \Packlink\BusinessLogic\WebHook\Exceptions\WebhookAuthorizationException
      */
-    public function testHandleReturnsFalseWhenSecretHeaderIsWrong()
+    public function testHandleThrowsWhenSecretHeaderIsWrong()
     {
         $_SERVER[IntegrationRegistrationWebhookEventHandler::WEBHOOK_SECRET_HEADER] = 'wrong-secret';
 
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             $this->buildPayload('ENABLED', self::STORED_INTEGRATION_ID)
         );
-
-        $this->assertFalse($result);
     }
 
     // -------------------------------------------------------------------------
@@ -153,15 +155,14 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
 
     /**
      * A valid ENABLED event with the correct integration ID should set status
-     * to ENABLED and return true.
+     * to ENABLED without throwing.
      */
     public function testHandleEnabledSetsIntegrationStatus()
     {
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             $this->buildPayload('ENABLED', self::STORED_INTEGRATION_ID)
         );
 
-        $this->assertTrue($result);
         $this->assertEquals('ENABLED', $this->configService->getIntegrationStatus());
     }
 
@@ -183,15 +184,14 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
 
     /**
      * A valid DISABLED event with the correct integration ID should set status
-     * to DISABLED and return true.
+     * to DISABLED without throwing.
      */
     public function testHandleDisabledSetsIntegrationStatus()
     {
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             $this->buildPayload('DISABLED', self::STORED_INTEGRATION_ID)
         );
 
-        $this->assertTrue($result);
         $this->assertEquals('DISABLED', $this->configService->getIntegrationStatus());
     }
 
@@ -213,15 +213,14 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
 
     /**
      * A valid DELETED event with the correct integration ID should trigger
-     * a module reset and return true.
+     * a module reset without throwing.
      */
     public function testHandleDeletedTriggersModuleReset()
     {
-        $result = IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
             $this->buildPayload('DELETED', self::STORED_INTEGRATION_ID)
         );
 
-        $this->assertTrue($result);
         $this->assertTrue($this->moduleResetService->wasResetCalled());
     }
 
@@ -238,8 +237,8 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
     }
 
     /**
-     * When module reset fails, handle() should still return true (event was
-     * handled) but log an error — verified via the shopLogger.
+     * When module reset fails, handle() should still complete without throwing
+     * but log an error — verified via the shopLogger.
      */
     public function testHandleDeletedLogsErrorWhenResetFails()
     {
@@ -252,6 +251,24 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $lastMessage = end($this->shopLogger->loggedMessages);
         $this->assertContains('module reset failed', strtolower($lastMessage->getMessage()));
+    }
+
+    // -------------------------------------------------------------------------
+    // Unknown status test
+    // -------------------------------------------------------------------------
+
+    /**
+     * An unknown status should not throw but should log a warning.
+     */
+    public function testHandleUnknownStatusLogsWarning()
+    {
+        IntegrationRegistrationWebhookEventHandler::getInstance()->handle(
+            $this->buildPayload('UNKNOWN_STATUS', self::STORED_INTEGRATION_ID)
+        );
+
+        $this->assertNotEmpty($this->shopLogger->loggedMessages);
+        $lastMessage = end($this->shopLogger->loggedMessages);
+        $this->assertContains('unknown status', strtolower($lastMessage->getMessage()));
     }
 
     /**

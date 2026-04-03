@@ -77,6 +77,7 @@ class WebHookHandlerTest extends BaseTestWithServices
         $orderRepository = new TestShopOrderService();
         $configService = new TestShopConfiguration();
         $configService->setAuthorizationToken('test');
+        $configService->setIntegrationId('mock-integration-id');
 
         TestServiceRegister::registerService(
             ShopOrderService::CLASS_NAME,

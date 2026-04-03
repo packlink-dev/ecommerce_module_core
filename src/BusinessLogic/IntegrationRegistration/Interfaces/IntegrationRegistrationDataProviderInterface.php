@@ -4,6 +4,9 @@ namespace Packlink\BusinessLogic\IntegrationRegistration\Interfaces;
 
 /**
  * Interface IntegrationRegistrationDataProviderInterface. Must be implemented in integration.
+ *
+ * Provides shop-specific data needed for integration registration with Packlink.
+ * Integration ID storage is handled by Configuration, not by this interface.
  */
 interface IntegrationRegistrationDataProviderInterface
 {
@@ -11,11 +14,6 @@ interface IntegrationRegistrationDataProviderInterface
      * Fully qualified name of this interface.
      */
     const CLASS_NAME = __CLASS__;
-
-    /**
-     * @return array Payload.
-     */
-    public function getRegistrationPayload();
 
     /**
      * Returns the persisted integration GUID.
@@ -30,23 +28,6 @@ interface IntegrationRegistrationDataProviderInterface
      * @return string Webhook secret used for authentication.
      */
     public function getWebhookSecret();
-
-    /**
-     * Returns the persisted integration ID if present as class variable,
-     * otherwise, if returns the ID from database if present.
-     *
-     * @return string|null Integration ID.
-     */
-    public function getIntegrationId();
-
-    /**
-     * Saves Integration Identifier to database
-     *
-     * @param string $integrationId
-     *
-     * @return void
-     */
-    public function setIntegrationId($integrationId);
 
     /**
      * Returns the integration type (e.g. Prestashop, WooCommerce...).
@@ -65,7 +46,7 @@ interface IntegrationRegistrationDataProviderInterface
     /**
      * Returns the WebhookStatusUpdateUrl.
      *
-     * @return string Integration name.
+     * @return string Webhook status update URL.
      */
     public function getIntegrationWebhookStatusUpdateUrl();
 
