@@ -120,7 +120,7 @@ if (!window.Packlink) {
             const modal = new Packlink.modalService({
                 title: Packlink.translationService.translate('integrationDisabled.title'),
                 content: content,
-                canClose: false,
+                canClose: true,
                 footer: false
             });
 
