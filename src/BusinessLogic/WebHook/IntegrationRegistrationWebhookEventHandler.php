@@ -2,12 +2,23 @@
 
 namespace Packlink\BusinessLogic\WebHook;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\BaseService;
-use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\ModuleResetServiceInterface;
+use Packlink\BusinessLogic\WebHook\DTO\WebhookStatusPayload;
+use Packlink\BusinessLogic\WebHook\Exceptions\WebhookAuthorizationException;
+use Packlink\BusinessLogic\WebHook\Exceptions\WebhookPayloadValidationException;
+use Packlink\BusinessLogic\WebHook\WebhookHandler\IntegrationEventHandlerFactory;
 
+/**
+ * Class IntegrationRegistrationWebhookEventHandler.
+ *
+ * Entry point for incoming integration status webhooks.
+ * Validates payload and auth, then delegates to the appropriate status handler
+ * resolved via IntegrationEventHandlerFactory.
+ *
+ * @package Packlink\BusinessLogic\WebHook
+ */
 class IntegrationRegistrationWebhookEventHandler extends BaseService
 {
     /**
@@ -16,73 +27,87 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
     const WEBHOOK_SECRET_HEADER = 'HTTP_X_PACKLINK_WEBHOOK_SECRET';
 
     /**
-     * Integration statuses received from Packlink webhook.
-     */
-    const STATUS_ENABLED = 'ENABLED';
-    const STATUS_DISABLED = 'DISABLED';
-    const STATUS_DELETED = 'DELETED';
-
-    /**
      * Singleton instance of this class.
      *
      * @var static
      */
     protected static $instance;
 
+    /**
+     * Validates and dispatches an incoming webhook payload.
+     *
+     * @param string $input Raw JSON input from the webhook request.
+     *
+     * @return void
+     *
+     * @throws WebhookPayloadValidationException When the payload is invalid.
+     * @throws WebhookAuthorizationException When the webhook secret header is missing or invalid.
+     */
     public function handle($input)
     {
         Logger::logDebug(
             'Packlink registration webhook received.',
             'Core',
-            array('payload' => $input)
+            array(
+                new \Logeecom\Infrastructure\Logger\LogContextData('payload', $input)
+            )
         );
 
-        $payload = json_decode($input, false);
+        $payload = $this->parseAndValidatePayload($input);
+        $this->validateAuthHeader();
 
-        if (!$this->validatePayload($payload)) {
-            Logger::logWarning('Packlink registration webhook: invalid payload.');
-            return false;
+        $handler = IntegrationEventHandlerFactory::create($payload->getStatus());
+
+        if ($handler === null) {
+            Logger::logWarning(
+                'Packlink registration webhook: unknown status.',
+                'Core',
+                array('status' => $payload->getStatus())
+            );
+
+            return;
         }
 
-        if (!$this->validateAuthHeader()) {
-            Logger::logWarning('Packlink registration webhook: unauthorized request.');
-            return false;
-        }
-
-        if ($payload->status === self::STATUS_ENABLED) {
-            $this->handleActivation($payload->integration_id);
-        }
-
-        if ($payload->status === self::STATUS_DISABLED) {
-            $this->handleDeactivation($payload->integration_id);
-        }
-
-        if ($payload->status === self::STATUS_DELETED) {
-            $this->handleDisconnection($payload->integration_id);
-        }
-
-        return true;
+        $handler->handle($payload->getIntegrationId());
     }
 
     /**
-     * Validates the incoming JSON payload structure.
+     * Parses raw JSON input and validates the resulting payload.
      *
-     * @param \stdClass|null $payload
+     * @param string $input Raw JSON string.
      *
-     * @return bool
+     * @return WebhookStatusPayload
+     *
+     * @throws WebhookPayloadValidationException
      */
-    protected function validatePayload($payload)
+    protected function parseAndValidatePayload($input)
     {
-        return $payload !== null
-            && !empty($payload->integration_id)
-            && !empty($payload->status);
+        $decoded = json_decode($input, true);
+
+        if (!is_array($decoded)) {
+            Logger::logWarning('Packlink registration webhook: invalid payload.');
+            throw new WebhookPayloadValidationException('Webhook payload is not valid JSON.');
+        }
+
+        $payload = WebhookStatusPayload::fromArray($decoded);
+
+        if (!$payload->isValid()) {
+            Logger::logWarning('Packlink registration webhook: invalid payload.');
+            throw new WebhookPayloadValidationException(
+                'Webhook payload is missing required fields (integration_id, status).'
+            );
+        }
+
+        return $payload;
     }
 
     /**
      * Validates the X-Packlink-Webhook-Secret header against
      * the stored webhook secret in config.
      *
-     * @return bool
+     * @return void
+     *
+     * @throws WebhookAuthorizationException
      */
     protected function validateAuthHeader()
     {
@@ -91,109 +116,17 @@ class IntegrationRegistrationWebhookEventHandler extends BaseService
             : null;
 
         if (empty($incomingSecret)) {
-            return false;
+            Logger::logWarning('Packlink registration webhook: unauthorized request.');
+            throw new WebhookAuthorizationException('Webhook secret header is missing.');
         }
 
+        /** @var \Packlink\BusinessLogic\Configuration $configService */
         $configService = ServiceRegister::getService(\Packlink\BusinessLogic\Configuration::CLASS_NAME);
         $storedSecret = $configService->getWebhookSecret();
 
-        if (!empty($storedSecret) && $incomingSecret === $storedSecret) {
-            return true;
+        if (empty($storedSecret) || $incomingSecret !== $storedSecret) {
+            Logger::logWarning('Packlink registration webhook: unauthorized request.');
+            throw new WebhookAuthorizationException('Webhook secret does not match.');
         }
-
-        return false;
-    }
-
-    /**
-     * Handles the DELETED status by validating the integration ID
-     * and triggering a full module reset.
-     *
-     * @param string $integrationId The integration_id from the webhook payload.
-     */
-    protected function handleDisconnection($integrationId)
-    {
-        if (!$this->isIntegrationIdValid($integrationId, 'disconnect')) {
-            return;
-        }
-
-        /** @var ModuleResetServiceInterface $resetService */
-        $resetService = ServiceRegister::getService(ModuleResetServiceInterface::CLASS_NAME);
-
-        if (!$resetService->resetModule()) {
-            Logger::logError('Packlink registration webhook: module reset failed.');
-        }
-    }
-
-    /**
-     * Handles the ENABLED status by validating the integration ID
-     * and saving the enabled status flag to the database.
-     *
-     * @param string $integrationId The integration_id from the webhook payload.
-     */
-    protected function handleActivation($integrationId)
-    {
-        if (!$this->isIntegrationIdValid($integrationId, 'activation')) {
-            return;
-        }
-
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $configService->setIntegrationStatus(self::STATUS_ENABLED);
-
-        Logger::logInfo(
-            'Packlink integration has been enabled.',
-            'Core',
-            array('integrationId' => $integrationId, 'status' => $configService->getIntegrationStatus())
-        );
-    }
-
-    /**
-     * Handles the DISABLED status by validating the integration ID
-     * and saving the disabled status flag to the database.
-     *
-     * @param string $integrationId The integration_id from the webhook payload.
-     */
-    protected function handleDeactivation($integrationId)
-    {
-        if (!$this->isIntegrationIdValid($integrationId, 'deactivation')) {
-            return;
-        }
-
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $configService->setIntegrationStatus(self::STATUS_DISABLED);
-
-        Logger::logInfo(
-            'Packlink integration has been disabled.',
-            'Core',
-            array('integrationId' => $integrationId, 'status' => $configService->getIntegrationStatus())
-        );
-    }
-
-    /**
-     * Validates the integration ID received in the webhook payload.
-     *
-     * @param string $integrationId
-     * @param string $action
-     *
-     * @return bool
-     */
-    protected function isIntegrationIdValid($integrationId, $action)
-    {
-        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-        $storedIntegrationId = $configService->getIntegrationId();
-
-        if ($integrationId !== $storedIntegrationId) {
-            Logger::logWarning(
-                'Packlink registration webhook: integration_id mismatch on ' . $action . '.',
-                'Core',
-                array(
-                    'received' => $integrationId,
-                    'stored'   => $storedIntegrationId,
-                )
-            );
-
-            return false;
-        }
-
-        return true;
     }
 }

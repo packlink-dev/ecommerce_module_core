@@ -334,6 +334,20 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     }
 
     /**
+     * Removes integration registration data from the database
+     * by annulling all integration-related configuration values.
+     *
+     * @return void
+     */
+    public function deleteIntegrationData()
+    {
+        $this->saveConfigValue('integrationId', null);
+        $this->saveConfigValue('integrationGuid', null);
+        $this->saveConfigValue('webhookSecret', null);
+        $this->saveConfigValue('integrationStatus', null);
+    }
+
+    /**
      * Returns whether the integration is currently active.
      * Integration is considered active unless explicitly set to DISABLED.
      *

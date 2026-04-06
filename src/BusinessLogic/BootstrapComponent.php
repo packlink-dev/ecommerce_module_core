@@ -148,7 +148,8 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             function () {
                 return new IntegrationRegistrationService(
                     ServiceRegister::getService(Proxy::CLASS_NAME),
-                    ServiceRegister::getService(IntegrationRegistrationDataProviderInterface::CLASS_NAME)
+                    ServiceRegister::getService(IntegrationRegistrationDataProviderInterface::CLASS_NAME),
+                    ServiceRegister::getService(Configuration::CLASS_NAME)
                 );
             }
         );
