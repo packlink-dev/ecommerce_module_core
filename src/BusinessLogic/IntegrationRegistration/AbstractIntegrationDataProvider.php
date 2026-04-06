@@ -13,12 +13,12 @@ abstract class AbstractIntegrationDataProvider implements IntegrationRegistratio
     /**
      * @var string|null integration identifier
      */
-    private $integrationId = null;
+    protected $integrationId = null;
 
     /**
      * @var Configuration $configService
      */
-    private $configService;
+    protected $configService;
 
     public function __construct($configService)
     {
@@ -108,6 +108,14 @@ abstract class AbstractIntegrationDataProvider implements IntegrationRegistratio
     {
         $this->integrationId = null;
         $this->configService->deleteIntegrationData();
+    }
+
+    /**
+     * @return Configuration
+     */
+    protected function getConfigService()
+    {
+        return $this->configService;
     }
 
 }
