@@ -120,7 +120,7 @@ if (!window.Packlink) {
             const modal = new Packlink.modalService({
                 title: Packlink.translationService.translate('integrationDisabled.title'),
                 content: content,
-                canClose: false,
+                canClose: true,
                 footer: false,
                 onOpen: (modalElement) => {
                     modalElement.querySelector('.pl-modal').classList.add('pl-integration-disabled-modal');
