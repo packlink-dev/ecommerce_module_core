@@ -13,11 +13,6 @@ interface IntegrationRegistrationDataProviderInterface
     const CLASS_NAME = __CLASS__;
 
     /**
-     * @return array Payload.
-     */
-    public function getRegistrationPayload();
-
-    /**
      * Returns the persisted integration GUID.
      *
      * @return string Integration GUID.
@@ -65,7 +60,7 @@ interface IntegrationRegistrationDataProviderInterface
     /**
      * Returns the WebhookStatusUpdateUrl.
      *
-     * @return string Integration name.
+     * @return string Webhook status update URL.
      */
     public function getIntegrationWebhookStatusUpdateUrl();
 

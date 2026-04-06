@@ -5,7 +5,8 @@
     "license": "proprietary",
     "require": {
       "php": ">=5.3.29",
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-openssl": "*"
     },
     "autoload": {
         "psr-4": {
