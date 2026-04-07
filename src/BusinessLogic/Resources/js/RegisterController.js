@@ -191,12 +191,16 @@ if (!window.Packlink) {
             if (response.success) {
                 state.goToState('onboarding-state');
             } else {
-                if (response.error === 'integration_registration_failed'){
-                    alert(translationService.translate('register.integrationRegistrationFailed'));
+                if (response.error === 'integration_registration_failed') {
+                    utilityService.showFlashMessage(
+                        translationService.translate('register.integrationRegistrationFailed'),
+                        'danger',
+                        7000
+                    );
                     state.goToState('login');
+                } else {
+                    responseService.errorHandler(response);
                 }
-
-                responseService.errorHandler(response);
             }
         };
     }
