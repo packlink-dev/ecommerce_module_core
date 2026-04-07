@@ -23,6 +23,10 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      * @var MockIntegrationRegistrationDataProvider
      */
     protected $dataProvider;
+    /**
+     * @var Configuration
+     */
+    protected $configService;
 
     /**
      * @before
@@ -36,13 +40,17 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
 
         $this->dataProvider = new MockIntegrationRegistrationDataProvider();
 
-        /** @var \Packlink\BusinessLogic\Configuration $config */
-        $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
-        $me->proxy = new Proxy($config, $this->httpClient, $this->dataProvider);
+        /** @var Configuration $config */
+        $this->configService = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        // Clear the integration ID set by the base class so tests start clean
+        $this->configService->setIntegrationId(null);
+
+        $me->proxy = new Proxy($this->configService, $this->httpClient, $this->dataProvider);
 
         $me->integrationRegistrationService = new IntegrationRegistrationService(
             $me->proxy,
-            $me->dataProvider
+            $me->dataProvider,
+            $this->configService
         );
     }
 
@@ -68,7 +76,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testRegisterIntegrationReturnsExistingId()
     {
-        $this->dataProvider->setStoredIntegrationId('existing-id-123');
+        $this->configService->setIntegrationId('existing-id-123');
 
         $result = $this->integrationRegistrationService->registerIntegration();
 
@@ -89,7 +97,6 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testRegisterIntegrationCallsProxyWhenNoIdStored()
     {
-        $this->dataProvider->setStoredIntegrationId(null);
         $this->httpClient->setMockResponses(array(
             $this->getMockRegisterIntegrationResponse('new-integration-id'),
         ));
@@ -100,7 +107,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * After a successful registration the ID must be persisted in the data provider.
+     * After a successful registration the ID must be persisted in configuration.
      *
      * @return void
      *
@@ -111,14 +118,13 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testRegisterIntegrationPersistsId()
     {
-        $this->dataProvider->setStoredIntegrationId(null);
         $this->httpClient->setMockResponses(array(
             $this->getMockRegisterIntegrationResponse('persisted-id'),
         ));
 
         $this->integrationRegistrationService->registerIntegration();
 
-        $this->assertEquals('persisted-id', $this->dataProvider->getIntegrationId());
+        $this->assertEquals('persisted-id', $this->configService->getIntegrationId());
     }
 
     /**
@@ -129,11 +135,9 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testDisconnectIntegrationSkipsWhenNoId()
     {
-        $this->dataProvider->setStoredIntegrationId(null);
-
         $result = $this->integrationRegistrationService->disconnectIntegration();
 
-        $this->assertNull($result);
+        $this->assertTrue($result);
         $this->assertEmpty($this->httpClient->getHistory());
     }
 
@@ -144,7 +148,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testDisconnectIntegrationReturnsTrueOnSuccess()
     {
-        $this->dataProvider->setStoredIntegrationId('some-id');
+        $this->configService->setIntegrationId('some-id');
         $this->httpClient->setMockResponses(array(
             $this->getMockDisconnectIntegrationResponse(true),
         ));
@@ -160,7 +164,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testDisconnectIntegrationReturnsFalseWhenApiFails()
     {
-        $this->dataProvider->setStoredIntegrationId('some-id');
+        $this->configService->setIntegrationId('some-id');
         $this->httpClient->setMockResponses(array(
             $this->getMockDisconnectIntegrationResponse(false),
         ));
@@ -176,7 +180,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testDisconnectIntegrationReturnsFalseOnException()
     {
-        $this->dataProvider->setStoredIntegrationId('some-id');
+        $this->configService->setIntegrationId('some-id');
         $this->httpClient->setMockResponses(array(
             $this->getMockErrorResponse(),
         ));
@@ -187,12 +191,12 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * getIntegrationId() should delegate to the data provider and return whatever
+     * getIntegrationId() should delegate to configuration and return whatever
      * ID is currently stored.
      */
     public function testGetIntegrationIdReturnsStoredId()
     {
-        $this->dataProvider->setStoredIntegrationId('delegate-id');
+        $this->configService->setIntegrationId('delegate-id');
 
         $result = $this->integrationRegistrationService->getIntegrationId();
 
@@ -204,8 +208,6 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testGetIntegrationIdReturnsNullWhenNotSet()
     {
-        $this->dataProvider->setStoredIntegrationId(null);
-
         $result = $this->integrationRegistrationService->getIntegrationId();
 
         $this->assertNull($result);
@@ -224,7 +226,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testUpdateIntegrationUrlReturnsNewId()
     {
-        $this->dataProvider->setStoredIntegrationId('old-id');
+        $this->configService->setIntegrationId('old-id');
         $this->httpClient->setMockResponses(array(
             $this->getMockDisconnectIntegrationResponse(true),
             $this->getMockRegisterIntegrationResponse('new-id-after-update'),
@@ -248,7 +250,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testUpdateIntegrationUrlReturnsNullWhenDisconnectFails()
     {
-        $this->dataProvider->setStoredIntegrationId('old-id');
+        $this->configService->setIntegrationId('old-id');
         $this->httpClient->setMockResponses(array(
             $this->getMockDisconnectIntegrationResponse(false),
         ));
@@ -259,7 +261,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * After a successful updateIntegrationUrl() call the data provider must hold
+     * After a successful updateIntegrationUrl() call the configuration must hold
      *  the new ID, not the old one.
      *
      * @return void
@@ -271,7 +273,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
      */
     public function testUpdateIntegrationUrlPersistsNewId()
     {
-        $this->dataProvider->setStoredIntegrationId('old-id');
+        $this->configService->setIntegrationId('old-id');
         $this->httpClient->setMockResponses(array(
             $this->getMockDisconnectIntegrationResponse(true),
             $this->getMockRegisterIntegrationResponse('brand-new-id'),
@@ -279,7 +281,7 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
 
         $this->integrationRegistrationService->updateIntegrationUrl();
 
-        $this->assertEquals('brand-new-id', $this->dataProvider->getIntegrationId());
+        $this->assertEquals('brand-new-id', $this->configService->getIntegrationId());
     }
 
     /**

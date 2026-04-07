@@ -74,7 +74,7 @@ class RegistrationControllerTest extends BaseTestWithServices
         $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
         $proxy = new Proxy($config, $this->httpClient, $me->integrationRegistrationDataProvider);
         $me->integrationRegistrationService = new IntegrationRegistrationService(
-            $proxy, $me->integrationRegistrationDataProvider);
+            $proxy, $me->integrationRegistrationDataProvider, $config);
 
         TestServiceRegister::registerService(
             IntegrationRegistrationServiceInterface::CLASS_NAME,
@@ -150,7 +150,7 @@ class RegistrationControllerTest extends BaseTestWithServices
      */
     public function testRegisterIntegrationFailsWhenProxyFails()
     {
-        $this->integrationRegistrationDataProvider->setStoredIntegrationId(null);
+        $this->shopConfig->setIntegrationId(null);
 
         $this->httpClient->setMockResponses(array(
             new HttpResponse(200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/registrationSuccessful.json')),

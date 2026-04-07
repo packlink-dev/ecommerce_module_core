@@ -49,7 +49,6 @@ use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTa
 use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServicesOrchestrator;
 use Packlink\BusinessLogic\UpdateShippingServices\UpdateShippingServiceTaskStatusService;
 use Packlink\BusinessLogic\User\UserAccountService;
-use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -93,7 +92,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         $me = $this;
 
         $this->integrationRegistrationDataProvider = new MockIntegrationRegistrationDataProvider();
-        $this->integrationRegistrationDataProvider->setIntegrationId('mock-integration-id');
         $this->shopConfig = new TestShopConfiguration();
         $this->scheduler = new TestScheduler();
 
@@ -103,6 +101,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 return $me->shopConfig;
             }
         );
+
+        $this->shopConfig->setIntegrationId('mock-integration-id');
 
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,

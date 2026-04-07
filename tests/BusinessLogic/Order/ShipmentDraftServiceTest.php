@@ -145,7 +145,7 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
         /** @var \Packlink\BusinessLogic\Configuration $config */
         $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
         $proxy = new Proxy($config, $this->httpClient, $integrationDataProvider);
-        $me->integrationRegistrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider);
+        $me->integrationRegistrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider, $config);
         TestServiceRegister::registerService(
             IntegrationRegistrationServiceInterface::CLASS_NAME,
             function () use ($me) {
