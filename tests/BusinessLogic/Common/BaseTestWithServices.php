@@ -29,7 +29,6 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
-use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 use Packlink\BusinessLogic\Warehouse\WarehouseService;
 
@@ -69,7 +68,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         $me = $this;
 
         $this->integrationRegistrationDataProvider = new MockIntegrationRegistrationDataProvider();
-        $this->integrationRegistrationDataProvider->setIntegrationId('mock-integration-id');
         $this->shopConfig = new TestShopConfiguration();
 
         TestServiceRegister::registerService(
@@ -78,6 +76,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 return $me->shopConfig;
             }
         );
+
+        $this->shopConfig->setIntegrationId('mock-integration-id');
 
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,

@@ -87,7 +87,7 @@ class UpdateShipmentDataTaskTest extends BaseSyncTest
         $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
         $integrationDataProvider = new MockIntegrationRegistrationDataProvider();
         $proxy = new Proxy($config, $this->httpClient, $integrationDataProvider);
-        $this->registrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider);
+        $this->registrationService = new IntegrationRegistrationService($proxy, $integrationDataProvider, $config);
         ServiceRegister::registerService(
             IntegrationRegistrationServiceInterface::CLASS_NAME,
             function () use ($me) {
