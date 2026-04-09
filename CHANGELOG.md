@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
+## [3.7.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.6...v3.7.7) - 2026-04-07
+### Changed
+- Add batch saving shipping methods
+
+## [3.7.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.5...v3.7.6) - 2026-03-24
+### Changed
+- Fixed an issue where an incorrect service ID was sent to the Packlink API
+- Fix postal code for AE
 
 ## [3.7.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.7.4...v3.7.5) - 2026-03-09
 ### Changed
