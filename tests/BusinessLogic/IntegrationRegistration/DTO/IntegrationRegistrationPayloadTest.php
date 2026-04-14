@@ -3,14 +3,14 @@
 namespace Logeecom\Tests\BusinessLogic\IntegrationRegistration\DTO;
 
 use Packlink\BusinessLogic\IntegrationRegistration\DTO\IntegrationRegistrationPayload;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class IntegrationRegistrationPayloadTest.
  *
  * @package Logeecom\Tests\BusinessLogic\IntegrationRegistration\DTO
  */
-class IntegrationRegistrationPayloadTest extends PHPUnit_Framework_TestCase
+class IntegrationRegistrationPayloadTest extends TestCase
 {
     public function testConstructorAndGetters()
     {
