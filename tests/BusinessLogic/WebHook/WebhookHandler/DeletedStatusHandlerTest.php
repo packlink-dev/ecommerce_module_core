@@ -96,6 +96,8 @@ class DeletedStatusHandlerTest extends BaseTestWithServices
 
         $this->assertNotEmpty($this->shopLogger->loggedMessages);
         $lastMessage = end($this->shopLogger->loggedMessages);
-        $this->assertContains('module reset failed', strtolower($lastMessage->getMessage()));
+        $this->assertTrue(
+            strpos(strtolower($lastMessage->getMessage()), 'module reset failed') !== false
+        );
     }
 }
