@@ -37,7 +37,16 @@ if (!window.Packlink) {
 
             templateService.setTemplates(configuration.templates);
 
-            ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
+            //ajaxService.get(configuration.stateUrl, displayPageBasedOnState);
+            ajaxService.get(configuration.stateUrl, (response) => {
+                displayPageBasedOnState(response);
+
+                ajaxService.get(configuration.integrationStatusUrl, (statusResponse) => {
+                    if (statusResponse.status === 'DISABLED') {
+                        displayIntegrationDisabledPopup();
+                    }
+                });
+            });
         };
 
         /**
@@ -82,6 +91,40 @@ if (!window.Packlink) {
                     this.goToState('my-shipping-services');
                     break;
             }
+        };
+
+        /**
+         * Displays the integration disabled popup overlay.
+         * Shown when Packlink has deactivated this store's integration,
+         * e.g. due to subscription plan limits.
+         */
+        const displayIntegrationDisabledPopup = () => {
+            const resubscribeUrl = 'https://pro.packlink.' + configuration.platformDomain
+                + '/private/subscriptions';
+
+            const resubscribeLinkText = Packlink.translationService.translate('integrationDisabled.resubscribeLink');
+            const resubscribeText = Packlink.translationService.translate(
+                'integrationDisabled.resubscribe',
+                ['<a href="' + resubscribeUrl + '" target="_blank" class="pl-modal-link">' + resubscribeLinkText + '</a>']
+            );
+
+            const content = [
+                '<div class="pl-integration-disabled-content">',
+                '  <p>' + Packlink.translationService.translate('integrationDisabled.storeDisabled') + '</p>',
+                '  <p>' + Packlink.translationService.translate('integrationDisabled.exceededConnections') + '</p>',
+                '  <p>' + Packlink.translationService.translate('integrationDisabled.whileDisabled') + '</p>',
+                '  <p>' + resubscribeText + '</p>',
+                '</div>'
+            ].join('');
+
+            const modal = new Packlink.modalService({
+                title: Packlink.translationService.translate('integrationDisabled.title'),
+                content: content,
+                canClose: true,
+                footer: false
+            });
+
+            modal.open();
         };
 
         /**

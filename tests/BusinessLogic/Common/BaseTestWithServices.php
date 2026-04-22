@@ -19,6 +19,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Scheduler\TestScheduler;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\BaseInfrastructureTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
@@ -70,6 +71,10 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
      * @var TestScheduler
      */
     public $scheduler;
+    /**
+     * @var \Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider
+     */
+    public $integrationRegistrationDataProvider;
 
     /**
      * @before
@@ -86,6 +91,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
 
         $me = $this;
 
+        $this->integrationRegistrationDataProvider = new MockIntegrationRegistrationDataProvider();
         $this->shopConfig = new TestShopConfiguration();
         $this->scheduler = new TestScheduler();
 
@@ -95,6 +101,8 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
                 return $me->shopConfig;
             }
         );
+
+        $this->shopConfig->setIntegrationId('mock-integration-id');
 
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,
@@ -133,7 +141,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         TestServiceRegister::registerService(
             Proxy::CLASS_NAME,
             function () use ($me) {
-                return new Proxy($me->shopConfig, $me->httpClient);
+                return new Proxy($me->shopConfig, $me->httpClient, $me->integrationRegistrationDataProvider);
             }
         );
 

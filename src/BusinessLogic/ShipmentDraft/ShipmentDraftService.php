@@ -42,6 +42,18 @@ class ShipmentDraftService implements ShipmentDraftServiceInterface
      */
     public function enqueueCreateShipmentDraftTask($orderId, $isDelayed = false, $delayInterval = 5)
     {
+        /** @var \Packlink\BusinessLogic\Configuration $configService */
+        $configService = $this->getConfigService();
+
+        if (!$configService->isIntegrationActive()) {
+            Logger::logInfo(
+                "Skipping draft creation for order [{$orderId}]: integration is disabled.",
+                'Core'
+            );
+
+            return;
+        }
+
         $currentStatus = $this->getOrderShipmentDetailsService()->getDraftStatus($orderId);
 
         // Don't re-enqueue if already pending/processing/completed

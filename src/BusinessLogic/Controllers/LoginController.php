@@ -4,11 +4,9 @@ namespace Packlink\BusinessLogic\Controllers;
 
 use Exception;
 use Logeecom\Infrastructure\ServiceRegister;
-use Logeecom\Tests\BusinessLogic\Common\TestComponents\OAuth\OAuthConfigurationService;
-use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthServiceInterface;
-use Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration;
-use Packlink\BusinessLogic\OAuth\Services\OAuthService;
 use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 
@@ -18,30 +16,60 @@ use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
  */
 class LoginController
 {
+    /** @var UserAccountService $userAccountService */
+    protected $userAccountService;
+    /** @var IntegrationRegistrationServiceInterface $integrationService */
+    protected $integrationService;
+    /** @var ConfigurationService $configService */
+    protected $configService;
+
+    /**
+     * LoginController constructor.
+     */
+    public function __construct($userAccountService, $integrationService, $configService)
+    {
+        $this->userAccountService = $userAccountService;
+        $this->integrationService = $integrationService;
+        $this->configService = $configService;
+    }
+
     /**
      * Return flag indicating whether the user is logged in successfully.
      *
      * @param $apiKey
      *
-     * @return bool
+     * @return array 'success' bool, and 'errorCode'
      */
     public function login($apiKey)
     {
-        $result = false;
-
         try {
-            /** @var UserAccountService $userAccountService */
-            $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
-            $result = $userAccountService->login($apiKey);
-        } catch (Exception $e) {
-            /** @var ConfigurationService $configService */
-            $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-            if ($configService->getAuthorizationToken() !== null) {
-                $configService->setAuthorizationToken(null);
-            }
-        }
+            $result = $this->userAccountService->login($apiKey);
 
-        return $result;
+            if (!$result) {
+                $this->removeAuthorizationToken();
+
+                return array('success' => false, 'errorCode' => 'invalid_api_key');
+            }
+
+            $integrationId = $this->integrationService->registerIntegration();
+
+            if (!$integrationId) {
+                $this->handleIntegrationRegistrationFailure();
+
+                return array('success' => false, 'errorCode' => 'integration_registration_failed');
+            }
+
+            return array('success' => true, 'errorCode' => null);
+
+        } catch (IntegrationNotRegisteredException $e) {
+            $this->handleIntegrationRegistrationFailure();
+
+            return array('success' => false, 'errorCode' => 'integration_registration_failed');
+        } catch (Exception $e) {
+            $this->removeAuthorizationToken();
+
+            return array('success' => false, 'errorCode' => 'invalid_api_key');
+        }
     }
 
     /**
@@ -51,7 +79,24 @@ class LoginController
     {
         /** @var OAuthServiceInterface $authServiceConfig */
         $authServiceConfig = ServiceRegister::getService(OAuthServiceInterface::CLASS_NAME);
-
         return $authServiceConfig->buildRedirectUrlAndSaveState($domain);
+    }
+
+    /**
+     * @return void
+     */
+    private function removeAuthorizationToken()
+    {
+        if ($this->configService->getAuthorizationToken() !== null) {
+            $this->configService->setAuthorizationToken(null);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function handleIntegrationRegistrationFailure()
+    {
+        $this->removeAuthorizationToken();
     }
 }

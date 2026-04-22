@@ -109,14 +109,23 @@ if (!window.Packlink) {
             if (response.success) {
                 state.goToState('onboarding-state');
             } else {
-                failedLogin();
+                failedLogin(response.error);
             }
         };
 
-        const failedLogin = () => {
-            if (inputElem) {
-                Packlink.validationService.setError(inputElem, errorMessage);
+        const failedLogin = (errorCode) => {
+            if (!inputElem) {
+                Packlink.utilityService.hideSpinner();
+                return;
             }
+
+            let messageKey = 'login.apiKeyIncorrect';
+
+            if (errorCode === 'integration_registration_failed') {
+                messageKey = 'login.integrationRegistrationFailed';
+            }
+
+            Packlink.validationService.setError( inputElem, Packlink.translationService.translate(messageKey));
             Packlink.utilityService.hideSpinner();
         };
     }

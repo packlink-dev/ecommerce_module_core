@@ -9,6 +9,7 @@ use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
@@ -17,6 +18,7 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\Proxy;
+use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
@@ -61,8 +63,9 @@ class ShippingMethodEntityTest extends BaseTestWithServices
             function () use ($self) {
                 /** @var \Packlink\BusinessLogic\Configuration $config */
                 $config = TestServiceRegister::getService(Configuration::CLASS_NAME);
+                $integrationDataProvider = new MockIntegrationRegistrationDataProvider();
 
-                return new Proxy($config, $self->httpClient);
+                return new Proxy($config, $self->httpClient, $integrationDataProvider);
             }
         );
 

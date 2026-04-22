@@ -15,6 +15,7 @@ use Logeecom\Infrastructure\Serializer\Concrete\NativeSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\IntegrationRegistration\MockIntegrationRegistrationDataProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestDefaultLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Logger\TestShopLogger;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -22,6 +23,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -55,6 +57,10 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
      * @var \Logeecom\Infrastructure\Serializer\Serializer
      */
     public $serializer;
+    /**
+     * @var IntegrationRegistrationDataProviderInterface
+     */
+    public $integrationRegistrationDataProvider;
 
     /**
      * @before
@@ -75,6 +81,7 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
         $this->shopLogger = new TestShopLogger();
         $this->defaultLogger = new TestDefaultLogger();
         $this->serializer = new NativeSerializer();
+        $this->integrationRegistrationDataProvider = new MockIntegrationRegistrationDataProvider();
 
         new TestServiceRegister(
             array(
@@ -95,6 +102,9 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
                 },
                 Serializer::CLASS_NAME => function () use ($me) {
                     return $me->serializer;
+                },
+                IntegrationRegistrationDataProviderInterface::CLASS_NAME => function () use ($me) {
+                    return $me->integrationRegistrationDataProvider;
                 },
             )
         );

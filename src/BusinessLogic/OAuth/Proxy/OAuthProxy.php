@@ -35,15 +35,16 @@ class OAuthProxy implements OAuthProxyInterface
      */
     private $baseUrl;
 
-
     /**
      * OAuthProxy constructor.
      *
-     * @param \Packlink\BusinessLogic\OAuth\Services\OAuthConfiguration
+     * @param OAuthConfiguration $config
      * @param HttpClient $client
      */
-    public function __construct(OAuthConfiguration $config, HttpClient $client)
-    {
+    public function __construct(
+        OAuthConfiguration $config,
+        HttpClient $client
+    ) {
         $this->config = $config;
         $this->client = $client;
 
@@ -100,7 +101,7 @@ class OAuthProxy implements OAuthProxyInterface
             return new OAuthToken(
                 isset($data['access_token']) ? $data['access_token'] : '',
                 isset($data['token_type']) ? $data['token_type'] : '',
-                isset($data['expires_in']) ? (int) $data['expires_in'] : 0,
+                isset($data['expires_in']) ? (int)$data['expires_in'] : 0,
                 isset($data['refresh_token']) ? $data['refresh_token'] : ''
             );
         } catch (Exception $e) {

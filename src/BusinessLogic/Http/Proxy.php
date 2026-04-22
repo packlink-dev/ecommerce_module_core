@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\Http;
 
+use Exception;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpBaseException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
@@ -29,10 +30,13 @@ use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
+use Packlink\BusinessLogic\IntegrationRegistration\DTO\IntegrationRegistrationPayload;
+use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
 use Packlink\BusinessLogic\Warehouse\Warehouse;
 
 /**
- * Class Proxy. In charge for communication with Packlink API.
+ * Class Proxy. In charge of communication with Packlink API.
  *
  * @package Packlink\BusinessLogic
  */
@@ -56,6 +60,10 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      * @var Configuration
      */
     private $configService;
+    /**
+     * @var IntegrationRegistrationDataProviderInterface
+     */
+    private $dataProvider;
 
     /**
      * Proxy constructor.
@@ -63,10 +71,14 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      * @param Configuration $configService Configuration service.
      * @param HttpClient $client System HTTP client.
      */
-    public function __construct(Configuration $configService, HttpClient $client)
-    {
+    public function __construct(
+        Configuration $configService,
+        HttpClient $client,
+        IntegrationRegistrationDataProviderInterface $dataProvider
+    ) {
         $this->client = $client;
         $this->configService = $configService;
+        $this->dataProvider = $dataProvider;
     }
 
     /**
@@ -107,6 +119,97 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
         return FrontDtoFactory::getFromBatch(Warehouse::CLASS_KEY, $data);
+    }
+
+    /**
+     * Registers an integration (shop) in Packlink.
+     *
+     * Expected payload structure:
+     *  array(
+     *      'integration_type' => string, // e.g. 'prestashop_module'
+     *      'integration' => array(
+     *          'guid' => string,         // Unique integration GUID
+     *          'name' => string,         // Human-readable store name
+     *      ),
+     *      'webhooks' => array(
+     *          'http_header_name' => string,   // X-Packlink-Webhook-Secret
+     *          'http_header_value' => string,  // Generated secret value for request authentication
+     *          'status_update_url' => string,  // Where Packlink sends events
+     *      )
+     *  )
+     *
+     * @param IntegrationRegistrationPayload $payload Integration registration payload.
+     *
+     * @return string Integration ID (UUID)
+     * @throws IntegrationNotRegisteredException
+     */
+    public function registerIntegration(IntegrationRegistrationPayload $payload)
+    {
+        try {
+            $response = $this->call(
+                HttpClient::HTTP_METHOD_POST,
+                'integrations',
+                $payload->toArray()
+            );
+        } catch (Exception $e) {
+            Logger::logError(
+                'Error while trying to register the integration.',
+                'Core'
+            );
+            throw new IntegrationNotRegisteredException('Error while trying to register the integration.');
+        }
+
+        if (!$response) {
+            throw new IntegrationNotRegisteredException('Empty response from Packlink API.');
+        }
+
+        $result = $response->decodeBodyToArray();
+
+        if (empty($result['integration_id'])) {
+            Logger::logError(
+                'Integration ID not returned by Packlink API.',
+                'Core',
+                array(
+                    'Response status' => $response->getStatus(),
+                    'Response body' => $response->getBody(),
+                )
+            );
+            throw new IntegrationNotRegisteredException('Integration ID not returned by Packlink API.');
+        }
+
+        Logger::logInfo(
+            'Integration registered. '
+            . 'Packlink response: ' . json_encode($result),
+            'Core',
+            array('status_update_url' => $payload->getStatusUpdateUrl())
+        );
+
+        return $result['integration_id'];
+    }
+
+    /**
+     * Disconnects an integration from Packlink.
+     *
+     * @param $integrationId
+     *
+     * @return bool
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function disconnectIntegration($integrationId)
+    {
+        $result = $this->call(
+            HttpClient::HTTP_METHOD_DELETE,
+            'integrations/' . urlencode($integrationId)
+        );
+
+        if ($result->getStatus() === 204) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -455,7 +558,8 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      */
     public function getCustomsByPostalCode(CustomsUnionsSearchRequest $request)
     {
-        $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-unions/search-by-postal-code', $request->toArray())
+        $result = $this->call(HttpClient::HTTP_METHOD_POST, '/customs-unions/search-by-postal-code',
+            $request->toArray())
             ->decodeBodyToArray();
 
         return isset($result['data']) ? $result['data'] : array();
@@ -511,7 +615,7 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
     {
         try {
             $response = $this->callWithToken(HttpClient::HTTP_METHOD_POST, 'users/api/keys', $accessToken);
-        }catch (HttpRequestException $e) {
+        } catch (HttpRequestException $e) {
             $response = $this->callWithToken(HttpClient::HTTP_METHOD_GET, 'users/api/keys', $accessToken);
         }
 
@@ -593,6 +697,12 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      */
     protected function call($method, $endpoint, array $body = array())
     {
+        if (!$this->ensureIntegrationIsRegistered($endpoint)) {
+            throw new HttpAuthenticationException(
+                'Integration is not registered.'
+            );
+        }
+
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
             $bodyStringToSend = json_encode($body);
@@ -624,7 +734,7 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      * @throws HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      */
-    protected function callWithToken($method, $endpoint,  $accessToken, array $body = array())
+    protected function callWithToken($method, $endpoint, $accessToken, array $body = array())
     {
         $bodyStringToSend = '';
         if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
@@ -689,6 +799,74 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
 
             throw new HttpRequestException($message, $httpCode);
         }
+    }
+
+    /**
+     * Ensures the integration is registered before making an API call.
+     * For legacy merchants without a stored integration ID, attempts auto-registration.
+     *
+     * @param string $endpoint Endpoint of current call to the API.
+     *
+     * @return bool
+     */
+    private function ensureIntegrationIsRegistered($endpoint)
+    {
+        // If not logged in yet ignore all integration registration attempts
+        if (!$this->configService->getAuthorizationToken()) {
+            return true;
+        }
+
+        if ($this->isIntegrationCheckExcluded($endpoint)) {
+            return true;
+        }
+
+        if ($this->configService->getIntegrationId()) {
+            return true;
+        }
+
+        try {
+            $payload = new IntegrationRegistrationPayload(
+                $this->dataProvider->getIntegrationType(),
+                $this->dataProvider->getIntegrationGuid(),
+                $this->dataProvider->getIntegrationName(),
+                'X-Packlink-Webhook-Secret',
+                $this->dataProvider->getWebhookSecret(),
+                $this->dataProvider->getIntegrationWebhookStatusUpdateUrl()
+            );
+            $integrationId = $this->registerIntegration($payload);
+            if ($integrationId) {
+                $this->configService->setIntegrationId($integrationId);
+
+                return true;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if current request endpoint requires integration registration check.
+     *
+     * @param string $endpoint endpoint of current request
+     *
+     * @return bool
+     */
+    private function isIntegrationCheckExcluded($endpoint)
+    {
+        $excluded = array(
+            'register',
+            'users/api/keys',
+            'integrations',
+            'integrations/',
+            'clients', // Login workflow endpoints
+            'users/parcels',
+            'clients/warehouses',
+            'shipments/callback',
+        );
+
+        return in_array($endpoint, $excluded, true);
     }
 
     /**

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.1.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.0.1...v4.1.0) - 2026-04-21
+### Added
+- Store registration on Packlink
+
 ## [4.0.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.0.0...v4.0.1) - 2026-03-18
 ### Changed
 - Fixed an issue where an incorrect service ID was sent to the Packlink API
