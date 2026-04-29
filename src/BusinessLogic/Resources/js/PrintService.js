@@ -19,7 +19,7 @@ if (!window.Packlink) {
          * the browser's native print dialog.
          *
          * @param {string} url Same-origin URL to the PDF.
-         * @param {function} [onComplete] Called after the print dialog has been triggered.
+         * @param {function} [onComplete] Called after the print dialog is dismissed.
          */
         this.printPdf = function (url, onComplete) {
             const iframe = document.createElement('iframe');
@@ -31,23 +31,38 @@ if (!window.Packlink) {
             iframe.style.border = 'none';
             iframe.src = url;
 
+            let teardownCalled = false;
+            const teardown = function () {
+                if (teardownCalled) {
+                    return;
+                }
+                teardownCalled = true;
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+                if (typeof onComplete === 'function') {
+                    onComplete();
+                }
+            };
+
             iframe.onload = function () {
+                const contentWindow = iframe.contentWindow;
                 try {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print();
+                    contentWindow.addEventListener('afterprint', teardown);
+                } catch (e) {
+                    // Some PDF-viewer iframes block addEventListener;
+                    // the safety timeout below will still reclaim the iframe.
+                }
+                try {
+                    contentWindow.focus();
+                    contentWindow.print();
                 } catch (e) {
                     window.open(url, '_blank');
+                    teardown();
+                    return;
                 }
 
-                setTimeout(function () {
-                    if (iframe.parentNode) {
-                        iframe.parentNode.removeChild(iframe);
-                    }
-
-                    if (typeof onComplete === 'function') {
-                        onComplete();
-                    }
-                }, 1000);
+                setTimeout(teardown, 60000);
             };
 
             document.body.appendChild(iframe);
