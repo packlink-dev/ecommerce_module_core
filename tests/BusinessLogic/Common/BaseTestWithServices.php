@@ -103,6 +103,7 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
         );
 
         $this->shopConfig->setIntegrationId('mock-integration-id');
+        $this->shopConfig->setAuthorizationToken('mock-auth-token');
 
         TestServiceRegister::registerService(
             WarehouseService::CLASS_NAME,
