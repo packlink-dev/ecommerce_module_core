@@ -816,9 +816,16 @@ class Proxy
      */
     private function ensureIntegrationIsRegistered($endpoint)
     {
-        // If not logged in yet ignore all integration registration attempts
-        if (!$this->configService->getAuthorizationToken()) {
+        // Pre-auth endpoints proceed regardless of token state (e.g. POST /register).
+        if (!$this->isAuthRequired($endpoint)) {
             return true;
+        }
+
+        // No token => block. Was previously `return true`, which let unauthenticated
+        // requests reach Packlink and is the root cause of the empty-Authorization
+        // POST /integrations errors.
+        if (!$this->configService->getAuthorizationToken()) {
+            return false;
         }
 
         if ($this->isIntegrationCheckExcluded($endpoint)) {
@@ -872,6 +879,19 @@ class Proxy
         );
 
         return in_array($endpoint, $excluded, true);
+    }
+
+    /**
+     * Whether the endpoint requires an Authorization token. Returns false only for pre-login
+     * endpoints (e.g. POST /register, /users/api/keys); every other endpoint requires a token.
+     *
+     * @param string $endpoint
+     *
+     * @return bool
+     */
+    private function isAuthRequired($endpoint)
+    {
+        return !in_array($endpoint, array('register', 'users/api/keys'), true);
     }
 
     /**

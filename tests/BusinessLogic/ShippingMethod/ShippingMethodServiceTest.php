@@ -185,7 +185,8 @@ class ShippingMethodServiceTest extends BaseTestWithServices
 
         $updatedMethod = $this->shippingMethodService->update($serviceDetails);
 
-        self::assertNotEquals($serviceDetails->id, $updatedMethod->getId());
+        self::assertNotNull($updatedMethod->getId());
+        self::assertCount(1, $this->shippingMethodService->getAllMethods());
     }
 
     public function testDeleteMethod()
