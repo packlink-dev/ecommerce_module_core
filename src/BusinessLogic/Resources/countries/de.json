@@ -603,5 +603,9 @@
     "phoneEmailInfoBody": "Eine Mobiltelefonnummer und eine E-Mail-Adresse helfen Carriern, den Empfänger zu kontaktieren, Lieferaktualisierungen zu teilen und eine erfolgreiche Zustellung sicherzustellen. Werden beide angegeben, erhöht sich die Erfolgsquote der Zustellung um bis zu 95 %.",
     "phoneEmailInfoWarning": "Fehlen diese Informationen, kann es zu Lieferproblemen oder Verzögerungen kommen.",
     "genericBanner": "Schalten Sie exklusive Versandvorteile frei mit Zugang zu den besten Carrier-Tarifen, Premium-Kühlversandservices und der Freiheit, mit Ihren eigenen ausgehandelten Carrier-Tarifen zu versenden."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Versandetikett",
+    "customsInvoice": "Zollrechnung"
   }
 }

@@ -603,5 +603,9 @@
     "phoneEmailInfoBody": "Un número de teléfono móvil y una dirección de correo electrónico ayudan a los transportistas a contactar con el destinatario, compartir actualizaciones de entrega y garantizar una entrega exitosa. Proporcionar ambos aumenta el porcentaje de entregas exitosas hasta en un 95%.",
     "phoneEmailInfoWarning": "Si falta esta información, pueden producirse problemas o retrasos en la entrega.",
     "genericBanner": "Desbloquea ventajas de envío exclusivas con acceso a las mejores tarifas de transportistas, servicios premium de entrega refrigerada y la libertad de enviar usando las tarifas negociadas de tu propio transportista."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Etiqueta de envío",
+    "customsInvoice": "Factura aduanera"
   }
 }

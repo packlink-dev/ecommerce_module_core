@@ -603,5 +603,9 @@
     "phoneEmailInfoBody": "Un numéro de téléphone portable et une adresse e-mail aident les transporteurs à contacter le destinataire, à partager les mises à jour de livraison et à assurer une livraison réussie. Fournir les deux augmente le taux de livraisons réussies jusqu'à 95 %.",
     "phoneEmailInfoWarning": "L'absence de ces informations peut entraîner des problèmes ou des retards de livraison.",
     "genericBanner": "Profitez d'avantages d'expédition exclusifs avec l'accès aux meilleurs tarifs de transporteurs, des services de livraison réfrigérée premium et la liberté d'expédier en utilisant les tarifs négociés de votre propre transporteur."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Étiquette d'expédition",
+    "customsInvoice": "Facture douanière"
   }
 }

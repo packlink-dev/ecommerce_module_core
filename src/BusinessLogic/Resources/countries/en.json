@@ -625,5 +625,9 @@
     "phoneEmailInfoBody": "A mobile phone number and email address help carriers contact the recipient, share delivery updates, and ensure a successful delivery. Providing both increases successful delivery rates by up to 95%.",
     "phoneEmailInfoWarning": "Missing this information may lead to delivery issues or delays.",
     "genericBanner": "Unlock exclusive shipping benefits with access to the best carrier rates, premium refrigerated delivery services, and the freedom to ship using your own negotiated carrier rates."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Shipping label",
+    "customsInvoice": "Customs invoice"
   }
 }

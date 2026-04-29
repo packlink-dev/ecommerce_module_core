@@ -603,5 +603,9 @@
     "phoneEmailInfoBody": "Un numero di telefono cellulare e un indirizzo e-mail aiutano i corrieri a contattare il destinatario, condividere gli aggiornamenti sulla consegna e garantire una consegna riuscita. Fornendo entrambi, il tasso di consegne riuscite aumenta fino al 95%.",
     "phoneEmailInfoWarning": "La mancanza di queste informazioni può causare problemi o ritardi nella consegna.",
     "genericBanner": "Sblocca vantaggi di spedizione esclusivi con accesso alle migliori tariffe dei corrieri, servizi premium di consegna refrigerata e la libertà di spedire utilizzando le tariffe negoziate del tuo corriere."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Etichetta di spedizione",
+    "customsInvoice": "Fattura doganale"
   }
 }
