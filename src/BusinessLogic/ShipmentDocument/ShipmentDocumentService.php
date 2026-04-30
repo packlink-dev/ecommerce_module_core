@@ -2,8 +2,9 @@
 
 namespace Packlink\BusinessLogic\ShipmentDocument;
 
-use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\Logger\Logger;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
+use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -29,14 +30,23 @@ class ShipmentDocumentService implements ShipmentDocumentServiceInterface
      * @var OrderService
      */
     protected $orderService;
+    /**
+     * @var Proxy
+     */
+    protected $proxy;
 
     /**
-     * ShipmentDocumentService constructor.
+     * ShipmentDocumentService constructor
+     *
+     * @param OrderShipmentDetailsService $orderShipmentDetailsService
+     * @param OrderService $orderService
+     * @param Proxy $proxy
      */
-    public function __construct()
+    public function __construct($orderShipmentDetailsService, $orderService, $proxy)
     {
-        $this->orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
-        $this->orderService = ServiceRegister::getService(OrderService::CLASS_NAME);
+        $this->orderShipmentDetailsService = $orderShipmentDetailsService;
+        $this->orderService = $orderService;
+        $this->proxy = $proxy;
     }
 
     /**
@@ -53,7 +63,10 @@ class ShipmentDocumentService implements ShipmentDocumentServiceInterface
             return array();
         }
 
-        return $this->collectShippingLabels($details);
+        return array_merge(
+            $this->collectShippingLabels($details),
+            $this->collectCustomsInvoice($details)
+        );
     }
 
     /**
@@ -92,6 +105,48 @@ class ShipmentDocumentService implements ShipmentDocumentServiceInterface
         }
 
         return $documents;
+    }
+
+    /**
+     * Collects the customs invoice (if any) for the given order shipment
+     * details and wraps it as a document. Returns an empty array when the
+     * order has no `customsInvoiceId` or the API download URL cannot be
+     * resolved.
+     *
+     * @param OrderShipmentDetails $details Order shipment details.
+     *
+     * @return ShipmentDocument[]
+     */
+    protected function collectCustomsInvoice(OrderShipmentDetails $details)
+    {
+        $customsInvoiceId = $details->getCustomsInvoiceId();
+        if (empty($customsInvoiceId)) {
+            return array();
+        }
+
+        try {
+            $downloadUrl = $this->proxy->getCustomsInvoiceDownloadUrl($customsInvoiceId);
+        } catch (\Exception $e) {
+            Logger::logWarning(
+                'Failed to fetch customs invoice download URL for invoice ' . $customsInvoiceId
+                . '. Error: ' . $e->getMessage(),
+                'Core'
+            );
+            return array();
+        }
+
+        if (empty($downloadUrl)) {
+            return array();
+        }
+
+        return array(
+            new ShipmentDocument(
+                ShipmentDocumentType::CUSTOMS_INVOICE,
+                $downloadUrl,
+                false,
+                ShipmentDocumentType::getLabel(ShipmentDocumentType::CUSTOMS_INVOICE)
+            )
+        );
     }
 
     /**

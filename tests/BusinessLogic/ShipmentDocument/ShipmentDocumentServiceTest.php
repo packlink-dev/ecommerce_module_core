@@ -2,12 +2,14 @@
 
 namespace Logeecom\Tests\BusinessLogic\ShipmentDocument;
 
+use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
+use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\Order\OrderService;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\OrderShipmentDetails\OrderShipmentDetailsService;
@@ -69,8 +71,14 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
 
         TestServiceRegister::registerService(
             ShipmentDocumentServiceInterface::CLASS_NAME,
-            function () {
-                return new ShipmentDocumentService();
+            function () use ($me) {
+                /** @var Proxy $proxy */
+                $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+                return new ShipmentDocumentService(
+                    $me->orderShipmentDetailsService,
+                    $me->orderService,
+                    $proxy
+                );
             }
         );
 
@@ -123,7 +131,10 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
         $this->assertEquals(ShipmentDocumentType::SHIPPING_LABEL, $documents[0]->getType());
         $this->assertEquals('https://example.com/a.pdf', $documents[0]->getLink());
         $this->assertFalse($documents[0]->isPrinted());
-        $this->assertEquals('Shipping label', $documents[0]->getName());
+        $this->assertEquals(
+            ShipmentDocumentType::getLabel(ShipmentDocumentType::SHIPPING_LABEL),
+            $documents[0]->getName()
+        );
 
         $this->assertEquals('https://example.com/b.pdf', $documents[1]->getLink());
         $this->assertTrue($documents[1]->isPrinted());
@@ -246,5 +257,81 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
     public function testMarkDocumentPrintedThrowsWhenReferenceUnknown()
     {
         $this->service->markDocumentPrinted('missing', ShipmentDocumentType::SHIPPING_LABEL, 'a');
+    }
+
+    /**
+     * Tests that an order without a customsInvoiceId produces no customs
+     * invoice document and does not call the Proxy.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testGetDocumentsForOrderOmitsCustomsInvoiceWhenIdMissing()
+    {
+        $this->orderShipmentDetailsService->setReference('order-1', 'ref-1');
+        $this->orderShipmentDetailsService->setLabelsByReference(
+            'ref-1',
+            array(new ShipmentLabel('https://example.com/a.pdf'))
+        );
+
+        $documents = $this->service->getDocumentsForOrder('order-1');
+
+        $this->assertCount(1, $documents);
+        $this->assertEquals(ShipmentDocumentType::SHIPPING_LABEL, $documents[0]->getType());
+        $this->assertEmpty($this->httpClient->getHistory());
+    }
+
+    /**
+     * Tests that a customs invoice id triggers a Proxy lookup and the
+     * resulting download URL is wrapped as a CUSTOMS_INVOICE document.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testGetDocumentsForOrderIncludesCustomsInvoiceWhenIdSet()
+    {
+        $this->orderShipmentDetailsService->setReference('order-1', 'ref-1');
+        $this->orderShipmentDetailsService->updateShipmentCustomsData('ref-1', 'inv-42');
+
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(
+                    200,
+                    array(),
+                    '{"url":"https://example.com/invoice.pdf"}'
+                ),
+            )
+        );
+
+        $documents = $this->service->getDocumentsForOrder('order-1');
+
+        $this->assertCount(1, $documents);
+        $this->assertEquals(ShipmentDocumentType::CUSTOMS_INVOICE, $documents[0]->getType());
+        $this->assertEquals('https://example.com/invoice.pdf', $documents[0]->getLink());
+        $this->assertFalse($documents[0]->isPrinted());
+        $this->assertEquals(
+            ShipmentDocumentType::getLabel(ShipmentDocumentType::CUSTOMS_INVOICE),
+            $documents[0]->getName()
+        );
+    }
+
+    /**
+     * Tests that a customs invoice document is omitted when the API returns
+     * a payload without a `url` (treated as "no download available").
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testGetDocumentsForOrderOmitsCustomsInvoiceWhenProxyReturnsNoUrl()
+    {
+        $this->orderShipmentDetailsService->setReference('order-1', 'ref-1');
+        $this->orderShipmentDetailsService->updateShipmentCustomsData('ref-1', 'inv-42');
+
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(200, array(), '{}'),
+            )
+        );
+
+        $documents = $this->service->getDocumentsForOrder('order-1');
+
+        $this->assertSame(array(), $documents);
     }
 }

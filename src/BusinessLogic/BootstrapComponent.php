@@ -317,7 +317,14 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         ServiceRegister::registerService(
             ShipmentDocumentServiceInterface::CLASS_NAME,
             function () {
-                return new ShipmentDocumentService();
+                /** @var OrderShipmentDetailsService $orderShipmentDetailsService */
+                $orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+                /** @var OrderService $orderService */
+                $orderService = ServiceRegister::getService(OrderService::CLASS_NAME);
+                /** @var Proxy $proxy */
+                $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+
+                return new ShipmentDocumentService($orderShipmentDetailsService, $orderService, $proxy);
             }
         );
     }
