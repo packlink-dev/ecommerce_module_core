@@ -27,6 +27,7 @@ use Packlink\BusinessLogic\Http\DTO\Shipment;
 use Packlink\BusinessLogic\Http\DTO\ShippingService;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
+use Packlink\BusinessLogic\Http\DTO\Subscription\Subscription;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
@@ -718,6 +719,61 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
         $this->validateResponse($response);
 
         return $response;
+    }
+
+    /**
+     * Makes a HTTP call to Packlink API without the API version prefix.
+     * Used for endpoints outside the /v1/ namespace (e.g. /pro/subscriptions/).
+     *
+     * @param string $method HTTP method (GET, POST, PUT, DELETE).
+     * @param string $endpoint API endpoint path (without base URL or version).
+     * @param array $body Request body (for POST/PUT).
+     *
+     * @return HttpResponse HTTP response.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    protected function callBase($method, $endpoint, array $body = array())
+    {
+        if (!$this->ensureIntegrationIsRegistered($endpoint)) {
+            throw new HttpAuthenticationException(
+                'Integration is not registered.'
+            );
+        }
+
+        $bodyStringToSend = '';
+        if (in_array(strtoupper($method), array(HttpClient::HTTP_METHOD_POST, HttpClient::HTTP_METHOD_PUT), true)) {
+            $bodyStringToSend = json_encode($body);
+        }
+
+        $response = $this->client->request(
+            $method,
+            static::BASE_URL . ltrim($endpoint, '/'),
+            $this->getRequestHeaders(),
+            $bodyStringToSend
+        );
+
+        $this->validateResponse($response);
+
+        return $response;
+    }
+
+    /**
+     * Returns the merchant's active Packlink subscription.
+     *
+     * @return Subscription Active subscription DTO.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getActiveSubscription()
+    {
+        $response = $this->callBase(HttpClient::HTTP_METHOD_GET, 'pro/subscriptions/client/active');
+
+        return Subscription::fromArray($response->decodeBodyToArray());
     }
 
     /**
