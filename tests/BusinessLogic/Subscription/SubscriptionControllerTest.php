@@ -2,6 +2,7 @@
 
 namespace Logeecom\Tests\BusinessLogic\Subscription;
 
+use Logeecom\Infrastructure\Configuration\Configuration as InfrastructureConfiguration;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
@@ -57,6 +58,7 @@ class SubscriptionControllerTest extends BaseTestWithServices
     public function after()
     {
         SubscriptionService::resetInstance();
+        InfrastructureConfiguration::setUICountryCode(null);
         parent::after();
     }
 
@@ -95,6 +97,7 @@ class SubscriptionControllerTest extends BaseTestWithServices
     public function testGetPromotionalBannerFreeES()
     {
         $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('es');
         $servicesResponse = $this->servicesPayload(array(
             array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
             array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
@@ -151,9 +154,47 @@ class SubscriptionControllerTest extends BaseTestWithServices
         self::assertSame('https://pro.packlink.com/private/subscriptions', $response->upgradeUrl);
     }
 
+    public function testGetPromotionalBannerLanguageDrivesTemplateCarriersDriveContent()
+    {
+        // ES platform, German UI: template comes from system language (DE),
+        // highlighted carriers come from platform (ES → Correos & SEUR).
+        $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('de');
+
+        $servicesResponse = $this->servicesPayload(array(
+            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
+            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
+        ));
+        $this->mockSubscriptionResponses(array(
+            $this->subscriptionPayload('Free'),
+            $servicesResponse,
+        ));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertContains('Correos', $response->bannerLabel);
+        self::assertContains('SEUR', $response->bannerLabel);
+        // German template phrase
+        self::assertContains('Wechseln Sie zu Plus', $response->bannerLabel);
+    }
+
+    public function testGetPromotionalBannerLanguageWithoutTemplateFallsBackToGeneric()
+    {
+        // ES platform, English UI: no template for 'en' → generic English label.
+        $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('en');
+
+        $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertSame(SubscriptionController::GENERIC_BANNER_LABEL, $response->bannerLabel);
+    }
+
     public function testGetPromotionalBannerUpgradeUrl()
     {
         $this->setMerchantCountry('FR');
+        InfrastructureConfiguration::setUICountryCode('fr');
         $servicesResponse = $this->servicesPayload(array(
             array('carrier_name' => 'Colissimo', 'total_price' => 6.10),
             array('carrier_name' => 'Mondial Relay', 'total_price' => 4.20),

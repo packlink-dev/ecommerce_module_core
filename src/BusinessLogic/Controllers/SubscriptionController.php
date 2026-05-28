@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Controllers;
 
 use Exception;
+use Logeecom\Infrastructure\Configuration\Configuration as InfrastructureConfiguration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Configuration;
@@ -59,16 +60,16 @@ class SubscriptionController
     );
 
     /**
-     * Country-specific banner templates. Placeholders in order:
+     * Language-keyed banner templates. Placeholders in order:
      * %1$s = target plan name (Plus / Premium),
      * %2$s = first price (formatted), %3$s = first carrier,
      * %4$s = second price (formatted), %5$s = second carrier.
      */
     private static $bannerTemplates = array(
-        'ES' => 'Pasate a %1$s y empieza a enviar desde %2$s EUR con %3$s y desde %4$s EUR con %5$s para paquetes de hasta 1 kg.',
-        'FR' => 'Passez a %1$s et commencez a expedier des %2$s EUR avec %3$s et des %4$s EUR avec %5$s pour des colis jusqu\'a 1 kg.',
-        'IT' => 'Passa a %1$s e inizia a spedire a partire da %2$s EUR con %3$s e da %4$s EUR con %5$s per pacchi fino a 1 kg!',
-        'DE' => 'Wechseln Sie zu %1$s und versenden Sie schon ab %2$s EUR mit %3$s und ab %4$s EUR mit %5$s fur Pakete bis zu 1 kg.',
+        'es' => 'Pasate a %1$s y empieza a enviar desde %2$s EUR con %3$s y desde %4$s EUR con %5$s para paquetes de hasta 1 kg.',
+        'fr' => 'Passez a %1$s et commencez a expedier des %2$s EUR avec %3$s et des %4$s EUR avec %5$s pour des colis jusqu\'a 1 kg.',
+        'it' => 'Passa a %1$s e inizia a spedire a partire da %2$s EUR con %3$s e da %4$s EUR con %5$s per pacchi fino a 1 kg!',
+        'de' => 'Wechseln Sie zu %1$s und versenden Sie schon ab %2$s EUR mit %3$s und ab %4$s EUR mit %5$s fur Pakete bis zu 1 kg.',
     );
 
     /**
@@ -175,8 +176,13 @@ class SubscriptionController
     }
 
     /**
+     * Highlighted carriers come from the merchant's platform country (ES/FR/IT/DE);
+     * the template language follows the system UI language. When the merchant's
+     * platform has no highlighted carriers, OR the system language has no localized
+     * template, the generic English label is returned.
+     *
      * @param string $planTier 'FREE' or 'PLUS'.
-     * @param string $country Two-letter uppercase country code.
+     * @param string $country Two-letter uppercase platform country code.
      *
      * @return string
      */
@@ -186,18 +192,34 @@ class SubscriptionController
             return self::GENERIC_BANNER_LABEL;
         }
 
+        $language = $this->getSystemLanguage();
+
+        if (!isset(self::$bannerTemplates[$language])) {
+            return self::GENERIC_BANNER_LABEL;
+        }
+
         $carriers = self::$highlightedCarriers[$country];
         $prices = $this->fetchCarrierPrices($country, $carriers);
         $upgradeTo = $planTier === 'FREE' ? 'Plus' : 'Premium';
 
         return sprintf(
-            self::$bannerTemplates[$country],
+            self::$bannerTemplates[$language],
             $upgradeTo,
             number_format($prices[0], 2, ',', ''),
             $carriers[0],
             number_format($prices[1], 2, ',', ''),
             $carriers[1]
         );
+    }
+
+    /**
+     * @return string Lowercase two-letter language code from the UI configuration.
+     */
+    private function getSystemLanguage()
+    {
+        $language = InfrastructureConfiguration::getUICountryCode();
+
+        return strtolower((string)$language);
     }
 
     /**
