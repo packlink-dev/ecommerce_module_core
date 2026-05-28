@@ -66,6 +66,7 @@ class SubscriptionController
      * %4$s = second price (formatted), %5$s = second carrier.
      */
     private static $bannerTemplates = array(
+        'en' => 'Upgrade to %1$s and start shipping from %2$s EUR with %3$s and from %4$s EUR with %5$s for parcels up to 1 kg.',
         'es' => 'Pasate a %1$s y empieza a enviar desde %2$s EUR con %3$s y desde %4$s EUR con %5$s para paquetes de hasta 1 kg.',
         'fr' => 'Passez a %1$s et commencez a expedier des %2$s EUR avec %3$s et des %4$s EUR avec %5$s pour des colis jusqu\'a 1 kg.',
         'it' => 'Passa a %1$s e inizia a spedire a partire da %2$s EUR con %3$s e da %4$s EUR con %5$s per pacchi fino a 1 kg!',

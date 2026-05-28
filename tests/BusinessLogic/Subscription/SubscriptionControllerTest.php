@@ -180,15 +180,37 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
     public function testGetPromotionalBannerLanguageWithoutTemplateFallsBackToGeneric()
     {
-        // ES platform, English UI: no template for 'en' → generic English label.
+        // ES platform, Dutch UI: no template for 'nl' → generic English label.
         $this->setMerchantCountry('ES');
-        InfrastructureConfiguration::setUICountryCode('en');
+        InfrastructureConfiguration::setUICountryCode('nl');
 
         $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
 
         $response = $this->getController()->getPromotionalBanner();
 
         self::assertSame(SubscriptionController::GENERIC_BANNER_LABEL, $response->bannerLabel);
+    }
+
+    public function testGetPromotionalBannerEnglishLanguageUsesEnglishTemplate()
+    {
+        // ES platform, English UI: now uses the EN template with ES carriers.
+        $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('en');
+
+        $servicesResponse = $this->servicesPayload(array(
+            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
+            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
+        ));
+        $this->mockSubscriptionResponses(array(
+            $this->subscriptionPayload('Free'),
+            $servicesResponse,
+        ));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertContains('Upgrade to Plus', $response->bannerLabel);
+        self::assertContains('Correos', $response->bannerLabel);
+        self::assertContains('SEUR', $response->bannerLabel);
     }
 
     public function testGetPromotionalBannerUpgradeUrl()
