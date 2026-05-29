@@ -583,5 +583,25 @@
     "whileDisabled": "Pendant que l’intégration est désactivée, vous ne pourrez pas utiliser les services d’expédition Packlink, y compris les tarifs dynamiques ainsi que la création et la gestion des expéditions.",
     "resubscribe": "Pour réactiver automatiquement l’intégration et retrouver l’accès à toutes les fonctionnalités, veuillez vous réabonner à l’offre appropriée %s.",
     "resubscribeLink": "ici"
+  },
+  "subscription": {
+    "upgrade": "Mettre à niveau",
+    "upgradeNow": "Mettre à niveau maintenant",
+    "tooltipBenefit1": "Toutes les fonctionnalités du plan Free incluses",
+    "tooltipBenefit2": "Accès exclusif à des tarifs d'expédition réduits",
+    "tooltipBenefit3": "Intégrations de boutiques supplémentaires",
+    "tooltipBenefit4": "Personnalisation des communications",
+    "tooltipBenefit5": "Connexions de contrats de transporteurs pour expédier avec vos propres tarifs",
+    "tooltipBenefit6": "Support premium",
+    "yourPricingPlan": "Votre offre tarifaire :",
+    "ordersPageBanner": "Accédez aux meilleurs tarifs d'expédition ou expédiez avec les tarifs de votre propre transporteur.",
+    "supportPageBannerFree": "Passez à un plan supérieur et gérez les problèmes d'expédition plus rapidement par chat ou téléphone",
+    "supportPageBannerPlus": "Passez à un plan supérieur et gérez les problèmes d'expédition plus rapidement par téléphone",
+    "measureAccuratelyTitle": "Mesurez avec précision !",
+    "measureAccuratelyBody": "Évitez les frais supplémentaires : les transporteurs vérifient la taille des colis, alors pesez et mesurez à l'aide d'une balance et d'un mètre ruban.",
+    "phoneEmailInfoTitle": "Pourquoi le téléphone portable et l'e-mail sont-ils requis ?",
+    "phoneEmailInfoBody": "Un numéro de téléphone portable et une adresse e-mail aident les transporteurs à contacter le destinataire, à partager les mises à jour de livraison et à assurer une livraison réussie. Fournir les deux augmente le taux de livraisons réussies jusqu'à 95 %.",
+    "phoneEmailInfoWarning": "L'absence de ces informations peut entraîner des problèmes ou des retards de livraison.",
+    "genericBanner": "Profitez d'avantages d'expédition exclusifs avec l'accès aux meilleurs tarifs de transporteurs, des services de livraison réfrigérée premium et la liberté d'expédier en utilisant les tarifs négociés de votre propre transporteur."
   }
 }

@@ -605,5 +605,25 @@
     "whileDisabled": "While the integration is disabled, you will not be able to use Packlink shipping services, including dynamic rates and shipment creation and management.",
     "resubscribe": "To automatically reactivate the integration and regain access to all features, please resubscribe to the appropriate subscription plan %s.",
     "resubscribeLink": "here"
+  },
+  "subscription": {
+    "upgrade": "Upgrade",
+    "upgradeNow": "Upgrade now",
+    "tooltipBenefit1": "All features from the Free plan included",
+    "tooltipBenefit2": "Exclusive access to discounted shipping rates",
+    "tooltipBenefit3": "Additional store integrations",
+    "tooltipBenefit4": "Communication branding",
+    "tooltipBenefit5": "Carrier contract connections to ship with your own rates",
+    "tooltipBenefit6": "Premium support",
+    "yourPricingPlan": "Your pricing plan:",
+    "ordersPageBanner": "Unlock exclusive access to best shipping rates or ship with your own carrier rates.",
+    "supportPageBannerFree": "Upgrade and handle shipping issues faster via chat or phone",
+    "supportPageBannerPlus": "Upgrade and handle shipping issues faster via phone",
+    "measureAccuratelyTitle": "Measure Accurately!",
+    "measureAccuratelyBody": "Avoid extra charges: carriers audit parcel sizes, so weigh and measure using a scale and tape measure.",
+    "phoneEmailInfoTitle": "Why are mobile phone and email required?",
+    "phoneEmailInfoBody": "A mobile phone number and email address help carriers contact the recipient, share delivery updates, and ensure a successful delivery. Providing both increases successful delivery rates by up to 95%.",
+    "phoneEmailInfoWarning": "Missing this information may lead to delivery issues or delays.",
+    "genericBanner": "Unlock exclusive shipping benefits with access to the best carrier rates, premium refrigerated delivery services, and the freedom to ship using your own negotiated carrier rates."
   }
 }

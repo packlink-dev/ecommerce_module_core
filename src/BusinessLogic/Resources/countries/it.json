@@ -583,5 +583,25 @@
     "whileDisabled": "Finché l’integrazione è disattivata, non potrai utilizzare i servizi di spedizione Packlink, inclusi i prezzi dinamici e la creazione e gestione delle spedizioni.",
     "resubscribe": "Per riattivare automaticamente l’integrazione e riottenere l’accesso a tutte le funzionalità, effettua nuovamente l’iscrizione al piano di abbonamento appropriato %s.",
     "resubscribeLink": "qui"
+  },
+  "subscription": {
+    "upgrade": "Aggiorna",
+    "upgradeNow": "Aggiorna ora",
+    "tooltipBenefit1": "Tutte le funzionalità del piano Free incluse",
+    "tooltipBenefit2": "Accesso esclusivo a tariffe di spedizione scontate",
+    "tooltipBenefit3": "Integrazioni aggiuntive con negozi",
+    "tooltipBenefit4": "Personalizzazione delle comunicazioni",
+    "tooltipBenefit5": "Connessioni a contratti con corrieri per spedire con le tue tariffe",
+    "tooltipBenefit6": "Supporto premium",
+    "yourPricingPlan": "Il tuo piano tariffario:",
+    "ordersPageBanner": "Accedi alle migliori tariffe di spedizione o spedisci con le tariffe del tuo corriere.",
+    "supportPageBannerFree": "Aggiorna e gestisci i problemi di spedizione più velocemente via chat o telefono",
+    "supportPageBannerPlus": "Aggiorna e gestisci i problemi di spedizione più velocemente via telefono",
+    "measureAccuratelyTitle": "Misura con precisione!",
+    "measureAccuratelyBody": "Evita costi aggiuntivi: i corrieri verificano le dimensioni dei pacchi, quindi pesa e misura con una bilancia e un metro a nastro.",
+    "phoneEmailInfoTitle": "Perché sono richiesti telefono cellulare ed e-mail?",
+    "phoneEmailInfoBody": "Un numero di telefono cellulare e un indirizzo e-mail aiutano i corrieri a contattare il destinatario, condividere gli aggiornamenti sulla consegna e garantire una consegna riuscita. Fornendo entrambi, il tasso di consegne riuscite aumenta fino al 95%.",
+    "phoneEmailInfoWarning": "La mancanza di queste informazioni può causare problemi o ritardi nella consegna.",
+    "genericBanner": "Sblocca vantaggi di spedizione esclusivi con accesso alle migliori tariffe dei corrieri, servizi premium di consegna refrigerata e la libertà di spedire utilizzando le tariffe negoziate del tuo corriere."
   }
 }
