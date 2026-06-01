@@ -41,6 +41,8 @@ use Packlink\BusinessLogic\Registration\RegistrationLegalPolicy;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
+use Packlink\BusinessLogic\ShipmentDocument\Interfaces\ShipmentDocumentServiceInterface;
+use Packlink\BusinessLogic\ShipmentDocument\ShipmentDocumentService;
 use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
 use Packlink\BusinessLogic\Subscription\SubscriptionService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
@@ -309,6 +311,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             function () {
                 $repository = RepositoryRegistry::getRepository(OAuthState::CLASS_NAME);
                 return new OAuthStateService($repository);
+            }
+        );
+
+        ServiceRegister::registerService(
+            ShipmentDocumentServiceInterface::CLASS_NAME,
+            function () {
+                return new ShipmentDocumentService();
             }
         );
     }
