@@ -13,6 +13,9 @@ use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\Serializer\Concrete\JsonSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Infrastructure\ServiceRegister;
+use Logeecom\Infrastructure\TaskExecution\DefaultTaskMetadataProvider;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessUrlProviderInterface;
+use Logeecom\Infrastructure\TaskExecution\Interfaces\TaskRunnerConfigInterface;
 use Logeecom\Infrastructure\TaskExecution\Process;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\Schedule;
@@ -27,6 +30,7 @@ use Packlink\BusinessLogic\FileResolver\FileResolverService;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
+use Packlink\DemoUI\Services\BusinessLogic\IntegrationRegistrationService;
 use Packlink\BusinessLogic\OAuth\Models\OAuthInfo;
 use Packlink\BusinessLogic\OAuth\Models\OAuthState;
 use Packlink\BusinessLogic\OAuth\Proxy\OAuthProxy;
@@ -40,13 +44,17 @@ use Packlink\BusinessLogic\Registration\RegistrationInfoService;
 use Packlink\BusinessLogic\ShipmentDraft\Models\OrderSendDraftTaskMap;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
+use Packlink\BusinessLogic\UpdateShippingServices\Models\UpdateShippingServiceTaskStatus;
 use Packlink\BusinessLogic\SystemInformation\SystemInfoService as SystemInfoServiceInterface;
+use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\User\UserAccountService;
+use Packlink\DemoUI\Services\BusinessLogic\AsyncProcessUrlProvider;
 use Packlink\DemoUI\Brands\Acme\AcmeConfigurationService;
 use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\CustomsMappingService;
+use Packlink\DemoUI\Services\BusinessLogic\IntegrationRegistrationDataProvider;
 use Packlink\DemoUI\Services\BusinessLogic\OAuthConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\ShopOrderService;
 use Packlink\DemoUI\Services\BusinessLogic\SystemInfoService;
@@ -90,6 +98,10 @@ class Bootstrap extends BootstrapComponent
      */
     private $carrierService;
     /**
+     * @var IntegrationRegistrationDataProvider
+     */
+    private $integrationRegistrationDataProvider;
+    /**
      * @var RegistrationInfoService
      */
     private $registrationInfoService;
@@ -132,10 +144,8 @@ class Bootstrap extends BootstrapComponent
         $this->systemInfoService = new SystemInfoService();
         $this->customsService = new CustomsMappingService();
         $this->oauthProxy = new OAuthProxy(OAuthConfigurationService::getInstance(), $client);
-        /** @var IntegrationRegistrationDataProviderInterface $integrationRegistrationDataProvider */
-        $integrationRegistrationDataProvider = ServiceRegister::getService(
-            IntegrationRegistrationDataProviderInterface::CLASS_NAME);
-        $this->proxy = new Proxy($configService, $client, $integrationRegistrationDataProvider);
+        $this->integrationRegistrationDataProvider = new IntegrationRegistrationDataProvider($configService);
+        $this->proxy = new Proxy($configService, $client, $this->integrationRegistrationDataProvider);
         $this->oAuthConfiguration = OAuthConfigurationService::getInstance();
     }
 
@@ -147,6 +157,20 @@ class Bootstrap extends BootstrapComponent
         static::$instance = new static();
 
         parent::init();
+
+        // Register the task-execution / scheduler service stack (queue, task runner,
+        // scheduler). UserAccountService and others depend on these at login time.
+        \Logeecom\Infrastructure\TaskExecution\TaskExecutionBootstrap::init();
+
+        // Override the core HttpTaskExecutor (which only queues) with a synchronous executor:
+        // the demo has no async process / queue runner, so tasks must run in-process,
+        // otherwise the carrier-fetch task never executes and no services are retrieved.
+        ServiceRegister::registerService(
+            \Logeecom\Infrastructure\TaskExecutor\Interfaces\TaskExecutorInterface::CLASS_NAME,
+            function () {
+                return new \Packlink\DemoUI\Services\BusinessLogic\SynchronousTaskExecutor();
+            }
+        );
     }
 
     /**
@@ -181,6 +205,7 @@ class Bootstrap extends BootstrapComponent
         RepositoryRegistry::registerRepository(OrderSendDraftTaskMap::CLASS_NAME, SessionRepository::getClassName());
         RepositoryRegistry::registerRepository(OAuthState::CLASS_NAME, SessionRepository::getClassName());
         RepositoryRegistry::registerRepository(OAuthInfo::CLASS_NAME, SessionRepository::getClassName());
+        RepositoryRegistry::registerRepository(UpdateShippingServiceTaskStatus::CLASS_NAME, SessionRepository::getClassName());
 
     }
 
@@ -230,6 +255,41 @@ class Bootstrap extends BootstrapComponent
             ShopShippingMethodService::CLASS_NAME,
             function () use ($instance) {
                 return $instance->carrierService;
+            }
+        );
+
+        ServiceRegister::registerService(
+            IntegrationRegistrationDataProviderInterface::CLASS_NAME,
+            function () use ($instance) {
+                return $instance->integrationRegistrationDataProvider;
+            }
+        );
+
+        ServiceRegister::registerService(
+            AsyncProcessUrlProviderInterface::CLASS_NAME,
+            function () {
+                return new AsyncProcessUrlProvider();
+            }
+        );
+
+        // Override core integration registration with a demo stub: a localhost demo can't
+        // complete real Packlink integration registration (needs a public HTTPS webhook URL).
+        ServiceRegister::registerService(
+            IntegrationRegistrationServiceInterface::CLASS_NAME,
+            function () {
+                return new IntegrationRegistrationService();
+            }
+        );
+
+        ServiceRegister::registerService(
+            TaskMetadataProviderInterface::CLASS_NAME,
+            function () {
+                /** @var Configuration $config */
+                $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+                /** @var TaskRunnerConfigInterface $taskRunnerConfig */
+                $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
+
+                return new DefaultTaskMetadataProvider($config, $taskRunnerConfig);
             }
         );
 

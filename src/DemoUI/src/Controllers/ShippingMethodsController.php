@@ -2,6 +2,7 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Exceptions\BaseException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Infrastructure\TaskExecution\QueueItem;
@@ -10,6 +11,8 @@ use Packlink\BusinessLogic\Controllers\ShippingMethodController;
 use Packlink\BusinessLogic\Controllers\UpdateShippingServicesTaskStatusController;
 use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
 use Packlink\BusinessLogic\Tax\TaxClass;
 use Packlink\DemoUI\Controllers\Models\Request;
 
@@ -60,14 +63,52 @@ class ShippingMethodsController extends BaseHttpController
             return;
         }
 
-        try {
-            $controller = new UpdateShippingServicesTaskStatusController();
-            $status = $controller->getLastTaskStatus();
-        } catch (BaseException $e) {
-            $status = QueueItem::FAILED;
+        // No services yet. In the demo there is no async runner, so run the update task
+        // synchronously here (self-heal): this resolves the otherwise-permanent polling loop
+        // by actually fetching and saving the carriers, then reporting the real outcome.
+        $this->runUpdateTaskNow();
+
+        if (count($this->controller->getAll()) > 0) {
+            $this->output(array('status' => QueueItem::COMPLETED));
+
+            return;
         }
 
-        $this->output(array('status' => $status));
+        // Task ran but produced no services: report failed so the frontend stops polling.
+        $this->output(array('status' => QueueItem::FAILED));
+    }
+
+    /**
+     * Clears any leftover task status and runs the update-shipping-services task synchronously.
+     * Used to self-heal the demo when no services are present yet.
+     */
+    private function runUpdateTaskNow()
+    {
+        /** @var Configuration $config */
+        $config = ServiceRegister::getService(Configuration::CLASS_NAME);
+        /** @var UpdateShippingServiceTaskStatusServiceInterface $statusService */
+        $statusService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+        /** @var UpdateShippingServicesOrchestratorInterface $orchestrator */
+        $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+
+        $context = (string)$config->getContext();
+
+        // Clear stuck/non-terminal status so the orchestrator does not skip the run.
+        for ($i = 0; $i < 50; $i++) {
+            $entity = $statusService->getLatestByContext($context);
+            if (!$entity) {
+                break;
+            }
+
+            $statusService->delete($entity);
+        }
+
+        try {
+            // Synchronous executor runs the task in-process and saves the carriers.
+            $orchestrator->enqueue($context);
+        } catch (\Throwable $e) {
+            error_log('Demo: update shipping services task failed: ' . $e->getMessage());
+        }
     }
 
     /**

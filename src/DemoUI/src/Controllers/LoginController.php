@@ -4,7 +4,9 @@ namespace Packlink\DemoUI\Controllers;
 
 use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationServiceInterface;
 use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\User\UserAccountService;
 use Packlink\DemoUI\Controllers\Models\Request;
 use Packlink\DemoUI\Services\Integration\UrlService;
 
@@ -16,18 +18,9 @@ use Packlink\DemoUI\Services\Integration\UrlService;
 class LoginController extends BaseHttpController
 {
     /**
-     * @var UpdateShippingServicesOrchestratorInterface
-     */
-    private $updateShippingServicesOrchestrator;
-    /**
      * @var bool
      */
     protected $requiresAuthentication = false;
-
-    public function __construct(UpdateShippingServicesOrchestratorInterface $updateShippingServicesOrchestrator)
-    {
-        $this->updateShippingServicesOrchestrator = $updateShippingServicesOrchestrator;
-    }
 
     /**
      * Handles login POST request.
@@ -45,16 +38,18 @@ class LoginController extends BaseHttpController
     {
         $payload = $request->getPayload();
         $apiKey = !empty($payload['apiKey']) ? $payload['apiKey'] : null;
-        $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
 
-        $success = $controller->login($apiKey);
-        if ($success) {
+        $result = $this->getCoreController()->login($apiKey);
+
+        if (!empty($result['success'])) {
             /** @var Configuration $configService */
             $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
-            $this->updateShippingServicesOrchestrator->enqueue($configService->getContext());
+            /** @var UpdateShippingServicesOrchestratorInterface $orchestrator */
+            $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+            $orchestrator->enqueue($configService->getContext());
         }
 
-        $this->output(array('success' => $success));
+        $this->output($result);
     }
 
     public function getRedirectUrl(Request $request)
@@ -66,14 +61,31 @@ class LoginController extends BaseHttpController
         }
 
         try {
-            $controller = new \Packlink\BusinessLogic\Controllers\LoginController();
-
-            $this->output(array('redirectUrl' => $controller->getRedirectUrl($domain)));
+            $this->output(array('redirectUrl' => $this->getCoreController()->getRedirectUrl($domain)));
         } catch (\Throwable $e) {
             $this->output(array('redirect_url' => $e->getMessage(), 'stack_trace' => $e->getTraceAsString()));
-
         }
+    }
 
+    /**
+     * Builds the core LoginController with its required dependencies.
+     *
+     * @return \Packlink\BusinessLogic\Controllers\LoginController
+     */
+    private function getCoreController()
+    {
+        /** @var UserAccountService $userAccountService */
+        $userAccountService = ServiceRegister::getService(UserAccountService::CLASS_NAME);
+        /** @var IntegrationRegistrationServiceInterface $integrationService */
+        $integrationService = ServiceRegister::getService(IntegrationRegistrationServiceInterface::CLASS_NAME);
+        /** @var Configuration $configService */
+        $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+
+        return new \Packlink\BusinessLogic\Controllers\LoginController(
+            $userAccountService,
+            $integrationService,
+            $configService
+        );
     }
 
     /**

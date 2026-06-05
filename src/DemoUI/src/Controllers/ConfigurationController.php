@@ -15,10 +15,12 @@ class ConfigurationController extends BaseHttpController
     public function getData()
     {
         $ctrl = new \Packlink\BusinessLogic\Controllers\ConfigurationController();
+        $userInfo = $this->getConfigService()->getUserInfo();
         echo json_encode(
             array(
                 'helpUrl' => $ctrl->getHelpLink(),
                 'version' => $this->getConfigService()->getModuleVersion(),
+                'email' => $userInfo !== null ? $userInfo->email : '',
             )
         );
     }
