@@ -393,7 +393,8 @@
     "parcel": "Paquete predeterminado",
     "help": "Ayuda",
     "contactUs": "Contáctanos:",
-    "systemInfo": "Información del sistema"
+    "systemInfo": "Información del sistema",
+    "email": "Correo electrónico:"
   },
   "systemInfo": {
     "title": "System information file <br>and debug mode",

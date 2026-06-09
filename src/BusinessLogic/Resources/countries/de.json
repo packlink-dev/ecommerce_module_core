@@ -393,7 +393,8 @@
     "parcel": "Standardpaket",
     "help": "Hilfe",
     "contactUs": "Kontaktieren Sie uns:",
-    "systemInfo": "Systeminformationen"
+    "systemInfo": "Systeminformationen",
+    "email": "E-Mail:"
   },
   "systemInfo": {
     "title": "Systeminfodatei <br>und debug mode",

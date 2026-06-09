@@ -376,6 +376,7 @@ configuration,help,Help,Ayuda,Hilfe,Aide,Aiuto
 configuration,contactUs,"Contact us at:",Contáctanos:,"Kontaktieren Sie uns:",Contactez-nous:,Contattaci:
 configuration,systemInfo,"System information","Información del sistema",Systeminformationen,"Informations du système","Informazioni del sistema"
 configuration,cashOnDelivery,"Cash on Delivery",,,,
+configuration,email,E-mail:,"Correo electrónico:",E-Mail:,E-mail:,E-mail:
 cashOnDelivery,descriptionFirst,"Cash on Delivery is a feature available to our merchants on the Packlink PRO Plus plans. COD is delivery service in which the recipient is responsible for paying the postage rather than the sender. COD postpones the payment for the delivery until the recipient receives the parcel instead of having to pay for it before the package is shipped.",,,,
 cashOnDelivery,descriptionSecond,"Packlink offers such a service as well for some of our shipping services and the process differs slightly. At Packlink, the sender is required to pay for the shipping when ordering the service but is reimbursed after the recipient pays the courier. 
  For shipping methods that support Cash on Delivery, the integration will offer the payment method mapped as Cash on Delivery in your shop.",,,,

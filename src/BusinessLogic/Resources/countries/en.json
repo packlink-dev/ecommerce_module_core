@@ -396,7 +396,8 @@
     "help": "Help",
     "contactUs": "Contact us at:",
     "systemInfo": "System information",
-    "cashOnDelivery": "Cash on Delivery"
+    "cashOnDelivery": "Cash on Delivery",
+    "email": "E-mail:"
   },
   "cashOnDelivery": {
     "descriptionFirst": "Cash on Delivery is a feature available to our merchants on the Packlink PRO Plus plans. COD is delivery service in which the recipient is responsible for paying the postage rather than the sender. COD postpones the payment for the delivery until the recipient receives the parcel instead of having to pay for it before the package is shipped.",

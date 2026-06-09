@@ -393,7 +393,8 @@
     "parcel": "Colis par défaut",
     "help": "Aide",
     "contactUs": "Contactez-nous:",
-    "systemInfo": "Informations du système"
+    "systemInfo": "Informations du système",
+    "email": "E-mail:"
   },
   "systemInfo": {
     "title": "Fichier d’informations du système <br>et mode débogage",
