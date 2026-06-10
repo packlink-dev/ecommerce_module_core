@@ -229,4 +229,38 @@ interface Proxy
      */
     public function getApiKeyWithToken($accessToken);
 
+    /**
+     * @param string $reference
+     *
+     * @return string|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function getOrderReference($reference);
+
+    /**
+     * @param string $reference
+     * @param string $locale
+     *
+     * @return string|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function getPublicTrackingUrl($reference, $locale = 'en-GB');
+
+    /**
+     * @param string $publicTrackingUrl
+     *
+     * @return string|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpCommunicationException
+     * @throws HttpRequestException
+     */
+    public function getEstimatedDeliveryDate($publicTrackingUrl);
+
 }

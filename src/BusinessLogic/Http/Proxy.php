@@ -15,6 +15,9 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\Http\DTO\Analytics;
+use Packlink\BusinessLogic\Http\DTO\BFF\BffPostsaleResponse;
+use Packlink\BusinessLogic\Http\DTO\BFF\BffSessionResponse;
+use Packlink\BusinessLogic\Http\DTO\BFF\BffTrackingResponse;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsInvoice;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsUnionsSearchRequest;
 use Packlink\BusinessLogic\Http\DTO\Draft;
@@ -65,6 +68,12 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      * @var IntegrationRegistrationDataProviderInterface
      */
     private $dataProvider;
+    /**
+     * BFF session id, cached per request lifecycle.
+     *
+     * @var string|null
+     */
+    private $bffSessionId = null;
 
     /**
      * Proxy constructor.
@@ -777,6 +786,76 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
     }
 
     /**
+     * Gets the order_reference for a shipment via the v1 API.
+     *
+     * @param string $reference Shipment reference.
+     *
+     * @return string|null Order reference, or null if not found.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getOrderReference($reference)
+    {
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, 'shipments/' . $reference);
+        $data = $response->decodeBodyToArray();
+
+        return isset($data['order_reference']) ? $data['order_reference'] : null;
+    }
+
+    /**
+     * Gets the public (shareable) tracking page URL for a shipment via the BFF postsale endpoint.
+     *
+     * Flow: v1 API (order_reference) -> BFF init (session) -> BFF postsale (tracking URL).
+     *
+     * @param string $reference Shipment reference.
+     * @param string $locale    Locale for the tracking page, e.g. 'en-GB'.
+     *
+     * @return string|null Public tracking URL, or null if unavailable.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getPublicTrackingUrl($reference, $locale = 'en-GB')
+    {
+        $orderReference = $this->getOrderReference($reference);
+        if (!$orderReference) {
+            return null;
+        }
+
+        $response = $this->callBff("postsale/{$orderReference}/{$reference}?locale={$locale}");
+        $postsale = BffPostsaleResponse::fromArray($response->decodeBodyToArray());
+
+        return $postsale->publicTrackingUrl ?: null;
+    }
+
+    /**
+     * Gets the estimated delivery date from the BFF public tracking endpoint.
+     *
+     * @param string $publicTrackingUrl Full public tracking URL containing the tracking ref.
+     *
+     * @return string|null Estimated delivery date, or null if unavailable.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getEstimatedDeliveryDate($publicTrackingUrl)
+    {
+        $trackingRef = basename(parse_url($publicTrackingUrl, PHP_URL_PATH));
+        if (!$trackingRef) {
+            return null;
+        }
+
+        $response = $this->callBff("tracking/public/{$trackingRef}");
+        $tracking = BffTrackingResponse::fromArray($response->decodeBodyToArray());
+
+        return $tracking->estimatedDeliveryDate ?: null;
+    }
+
+    /**
      * Makes a HTTP call with Bearer token and returns response.
      *
      * @param string $method HTTP method (GET, POST, PUT, etc.).
@@ -943,6 +1022,74 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
     private function isAuthRequired($endpoint): bool
     {
         return !in_array($endpoint, array('register', 'users/api/keys'), true);
+    }
+
+    /**
+     * Initializes a BFF session (GET /bff/init). Cached per request lifecycle.
+     *
+     * @return string Session id.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    private function initBffSession()
+    {
+        if ($this->bffSessionId !== null) {
+            return $this->bffSessionId;
+        }
+
+        $response = $this->client->request(
+            HttpClient::HTTP_METHOD_GET,
+            static::BASE_URL . 'bff/init',
+            $this->getBffHeaders()
+        );
+        $this->validateResponse($response);
+
+        $session = BffSessionResponse::fromArray($response->decodeBodyToArray());
+        $this->bffSessionId = $session->sessionId;
+
+        return $this->bffSessionId;
+    }
+
+    /**
+     * Calls a BFF endpoint (no API version prefix) with the session id header.
+     *
+     * @param string $endpoint BFF endpoint path, e.g. 'tracking/public/{ref}'.
+     *
+     * @return HttpResponse HTTP response.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    private function callBff($endpoint)
+    {
+        $headers = $this->getBffHeaders();
+        $headers['session'] = 'X-Packlink-Session-Id: ' . $this->initBffSession();
+
+        $response = $this->client->request(
+            HttpClient::HTTP_METHOD_GET,
+            static::BASE_URL . 'bff/' . ltrim($endpoint, '/'),
+            $headers
+        );
+        $this->validateResponse($response);
+
+        return $response;
+    }
+
+    /**
+     * Returns base headers for BFF API calls.
+     *
+     * @return array
+     */
+    private function getBffHeaders()
+    {
+        return array(
+            'token' => 'Authorization: ' . $this->configService->getAuthorizationToken(),
+            'accept' => 'Accept: application/json',
+            'content-type' => 'Content-Type: application/json',
+        );
     }
 
     /**

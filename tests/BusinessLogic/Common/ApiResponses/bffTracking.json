@@ -1,0 +1,12 @@
+{
+    "parcels": [
+        {
+            "estimatedDeliveryDate": "2026-06-15",
+            "currentStatus": {
+                "label": {
+                    "key": "IN_TRANSIT"
+                }
+            }
+        }
+    ]
+}
