@@ -10,7 +10,7 @@ use Packlink\BusinessLogic\ShipmentDocument\ShipmentDocumentType;
  *
  * @package Logeecom\Tests\BusinessLogic\ShipmentDocument\DTO
  */
-class ShipmentDocumentTest extends \PHPUnit_Framework_TestCase
+class ShipmentDocumentTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Tests that toArray returns all four fields in their provided form.
