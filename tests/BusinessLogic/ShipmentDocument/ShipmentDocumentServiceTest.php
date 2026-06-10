@@ -251,12 +251,18 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
      * Tests that marking a document for an unregistered shipment reference
      * propagates the OrderShipmentDetailsNotFound exception from the
      * underlying service.
-     *
-     * @expectedException \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
      */
     public function testMarkDocumentPrintedThrowsWhenReferenceUnknown()
     {
-        $this->service->markDocumentPrinted('missing', ShipmentDocumentType::SHIPPING_LABEL, 'a');
+        try {
+            $this->service->markDocumentPrinted('missing', ShipmentDocumentType::SHIPPING_LABEL, 'a');
+        } catch (\Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound $ex) {
+            $this->assertNotNull($ex);
+
+            return;
+        }
+
+        $this->fail('Exception must be thrown if shipment reference is not found.');
     }
 
     /**

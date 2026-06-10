@@ -109,8 +109,14 @@ class BffProxyTest extends BaseTestWithServices
 
         // Third call is the postsale endpoint with order reference, shipment reference and locale.
         $postsaleRequest = $history[2];
-        self::assertContains('bff/postsale/ORD-987654/DE0123456789', $postsaleRequest['url']);
-        self::assertContains('locale=es-ES', $postsaleRequest['url']);
+        self::assertNotFalse(
+            strpos($postsaleRequest['url'], 'bff/postsale/ORD-987654/DE0123456789'),
+            'Postsale URL "' . $postsaleRequest['url'] . '" must contain the order and shipment references.'
+        );
+        self::assertNotFalse(
+            strpos($postsaleRequest['url'], 'locale=es-ES'),
+            'Postsale URL "' . $postsaleRequest['url'] . '" must contain the locale parameter.'
+        );
 
         // The BFF call must carry the session header obtained from bff/init.
         self::assertArrayHasKey('session', $postsaleRequest['headers']);

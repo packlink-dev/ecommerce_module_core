@@ -114,9 +114,9 @@ class SubscriptionControllerTest extends BaseTestWithServices
         self::assertInstanceOf(PromotionalBannerResponse::class, $response);
         self::assertSame('FREE', $response->planTier);
         self::assertNotNull($response->bannerLabel);
-        self::assertContains('Correos', $response->bannerLabel);
-        self::assertContains('SEUR', $response->bannerLabel);
-        self::assertContains('Plus', $response->bannerLabel);
+        self::assertLabelContains('Correos', $response->bannerLabel);
+        self::assertLabelContains('SEUR', $response->bannerLabel);
+        self::assertLabelContains('Plus', $response->bannerLabel);
     }
 
     public function testGetPromotionalBannerPremiumReturnsEmpty()
@@ -172,10 +172,10 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         $response = $this->getController()->getPromotionalBanner();
 
-        self::assertContains('Correos', $response->bannerLabel);
-        self::assertContains('SEUR', $response->bannerLabel);
+        self::assertLabelContains('Correos', $response->bannerLabel);
+        self::assertLabelContains('SEUR', $response->bannerLabel);
         // German template phrase
-        self::assertContains('Wechseln Sie zu Plus', $response->bannerLabel);
+        self::assertLabelContains('Wechseln Sie zu Plus', $response->bannerLabel);
     }
 
     public function testGetPromotionalBannerLanguageWithoutTemplateFallsBackToGeneric()
@@ -208,9 +208,9 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         $response = $this->getController()->getPromotionalBanner();
 
-        self::assertContains('Upgrade to Plus', $response->bannerLabel);
-        self::assertContains('Correos', $response->bannerLabel);
-        self::assertContains('SEUR', $response->bannerLabel);
+        self::assertLabelContains('Upgrade to Plus', $response->bannerLabel);
+        self::assertLabelContains('Correos', $response->bannerLabel);
+        self::assertLabelContains('SEUR', $response->bannerLabel);
     }
 
     public function testGetPromotionalBannerUpgradeUrl()
@@ -230,7 +230,23 @@ class SubscriptionControllerTest extends BaseTestWithServices
         $response = $this->getController()->getPromotionalBanner();
 
         self::assertSame('https://pro.packlink.fr/private/subscriptions', $response->upgradeUrl);
-        self::assertContains('Premium', $response->bannerLabel);
+        self::assertLabelContains('Premium', $response->bannerLabel);
+    }
+
+    /**
+     * Asserts that the banner label contains the given substring. Compatible with
+     * all supported PHPUnit versions (assertContains no longer accepts strings and
+     * assertStringContainsString does not exist before PHPUnit 7.5).
+     *
+     * @param string $needle
+     * @param string $label
+     */
+    private static function assertLabelContains($needle, $label)
+    {
+        self::assertNotFalse(
+            strpos($label, $needle),
+            'Banner label "' . $label . '" must contain "' . $needle . '".'
+        );
     }
 
     /**

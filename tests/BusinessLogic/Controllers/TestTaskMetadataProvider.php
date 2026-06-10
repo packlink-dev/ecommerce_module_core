@@ -7,7 +7,7 @@ use Packlink\BusinessLogic\Tasks\Interfaces\BusinessTask;
 use Packlink\BusinessLogic\Tasks\Interfaces\TaskMetadataProviderInterface;
 use Packlink\BusinessLogic\Tasks\TaskExecutionConfig;
 
-class TaskMetadataProviderTest implements TaskMetadataProviderInterface
+class TestTaskMetadataProvider implements TaskMetadataProviderInterface
 {
     /**
      * @var string
