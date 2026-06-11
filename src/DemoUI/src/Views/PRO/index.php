@@ -147,6 +147,7 @@ echo $lang ?>">
 <script src="./resources/js/OrderStatusMappingController.js"></script>
 <script src="./resources/js/CustomsController.js"></script>
 
+<script src="./resources/js/SubscriptionBannerController.js"></script>
 <script src="./resources/js/MyShippingServicesController.js"></script>
 <script src="./resources/js/PickShippingServiceController.js"></script>
 <script src="./resources/js/ShippingServicesRenderer.js"></script>
@@ -198,7 +199,8 @@ echo $lang ?>">
                     searchPostalCodesUrl: "<?php getUrl('DefaultWarehouse', 'searchPostalCodes') ?>"
                 },
                 'configuration': {
-                    getDataUrl: "<?php getUrl('Configuration', 'getData')?>"
+                    getDataUrl: "<?php getUrl('Configuration', 'getData')?>",
+                    getPromotionalBannerUrl: "<?php getUrl('Subscription', 'getPromotionalBanner') ?>"
                 },
                 'system-info': {
                     getStatusUrl: "<?php getUrl('Debug', 'getStatus') ?>",
@@ -218,7 +220,9 @@ echo $lang ?>">
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getActive') ?>",
                     deleteServiceUrl: "<?php getUrl('ShippingMethods', 'deactivate') ?>",
                     getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
-                    systemId: null
+                    systemId: null,
+                    getSubscriptionPlanUrl: "<?php getUrl('Subscription', 'getPlan') ?>",
+                    getPromotionalBannerUrl: "<?php getUrl('Subscription', 'getPromotionalBanner') ?>"
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>",
@@ -229,7 +233,9 @@ echo $lang ?>">
                     getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
                     systemId: null,
                     enqueue: "<?php getUrl('ManualRefresh', 'enqueueUpdateTask'); ?>",
-                    getTaskStatus: "<?php getUrl('ManualRefresh', 'getTaskStatus'); ?>"
+                    getTaskStatus: "<?php getUrl('ManualRefresh', 'getTaskStatus'); ?>",
+                    getSubscriptionPlanUrl: "<?php getUrl('Subscription', 'getPlan') ?>",
+                    getPromotionalBannerUrl: "<?php getUrl('Subscription', 'getPromotionalBanner') ?>"
                 },
                 'edit-service': {
                     getServiceUrl: "<?php getUrl('ShippingMethods', 'getService') ?>",

@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.8.1...master)
+### Added
+- Shipment document service for printing/downloading shipping labels and customs invoices (`ShipmentDocument` namespace, `PrintService.js`)
+- Shared tracking page support: BFF proxy methods (`getPublicTrackingUrl`, `getEstimatedDeliveryDate`, `getOrderReference`) and BFF response DTOs
+- Subscription service, controller and DTOs with promotional banner for plan upgrades (new line-up UI)
+- Subscription banner frontend assets, templates and country translations
+
 ## [3.8.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.8.0...v3.8.1) - 2026-04-29
 ### Added
 - Fix integration registration when missing token

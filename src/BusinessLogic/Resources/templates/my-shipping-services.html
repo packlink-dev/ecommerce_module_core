@@ -3,6 +3,13 @@
         {$shippingServices.myServices}
     </header>
     <div class="pl-page-content pl-flex-expand">
+        <div id="pl-promotional-banner" class="pl-promotional-banner pl-hidden">
+            <span class="pl-promotional-banner-text" id="pl-promotional-banner-text"></span>
+            <button class="pl-promotional-banner-button" id="pl-promotional-banner-button">
+                <i class="material-icons pl-promotional-banner-icon">bolt</i>
+                {$subscription.upgradeNow}
+            </button>
+        </div>
         <article id="pl-no-shipping-services"
                  class="pl-no-services pl-flex-expand pl-center pl-page-padding pl-page-content pl-hidden pl-no-margin">
             <img src="{$BASE_URL$}/images/service_truck.png" alt="">
