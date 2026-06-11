@@ -1,0 +1,16 @@
+{
+    "shipmentData": {
+        "shipmentDetails": {
+            "publicTrackingUrl": "https://pro.packlink.com/tracking/ABC123XYZ",
+            "orderReference": "ORD-987654",
+            "isDropOff": true
+        },
+        "service": {
+            "carrierIcon": "https://cdn.packlink.com/carriers/dhl.png",
+            "name": "DHL Express"
+        },
+        "shipmentStatus": {
+            "label": "In transit"
+        }
+    }
+}
