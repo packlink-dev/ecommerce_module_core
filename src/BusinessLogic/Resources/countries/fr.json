@@ -590,9 +590,9 @@
     "upgradeNow": "Mettre à niveau maintenant",
     "tooltipBenefit1": "Toutes les fonctionnalités du plan Free incluses",
     "tooltipBenefit2": "Accès exclusif à des tarifs d'expédition réduits",
-    "tooltipBenefit3": "Intégrations de boutiques supplémentaires",
-    "tooltipBenefit4": "Personnalisation des communications",
-    "tooltipBenefit5": "Connexions de contrats de transporteurs pour expédier avec vos propres tarifs",
+    "tooltipBenefit3": "Connexions ecommerce/marketplace illimitées",
+    "tooltipBenefit4": "Personnalisation des emails avec votre image de marque",
+    "tooltipBenefit5": "Connectez vos contrats de transporteurs pour expédier avec vos propres tarifs",
     "tooltipBenefit6": "Support premium",
     "yourPricingPlan": "Votre offre tarifaire :",
     "ordersPageBanner": "Accédez aux meilleurs tarifs d'expédition ou expédiez avec les tarifs de votre propre transporteur.",
@@ -600,11 +600,11 @@
     "supportPageBannerPlus": "Passez à un plan supérieur et gérez les problèmes d'expédition plus rapidement par téléphone",
     "measureAccuratelyTitle": "Mesurez avec précision !",
     "measureAccuratelyHighlight": "Évitez les frais supplémentaires :",
-    "measureAccuratelyBody": "les transporteurs vérifient la taille des colis, alors pesez et mesurez à l'aide d'une balance et d'un mètre ruban.",
+    "measureAccuratelyBody": "les transporteurs contrôlent les dimensions de vos colis. Pensez à les peser et les mesurer à l'aide d'une balance et d'un mètre.",
     "phoneEmailInfoTitle": "Pourquoi le téléphone portable et l'e-mail sont-ils requis ?",
     "phoneEmailInfoBody": "Un numéro de téléphone portable et une adresse e-mail aident les transporteurs à contacter le destinataire, à partager les mises à jour de livraison et à assurer une livraison réussie. Fournir les deux augmente le taux de livraisons réussies jusqu'à 95 %.",
     "phoneEmailInfoWarning": "L'absence de ces informations peut entraîner des problèmes ou des retards de livraison.",
-    "genericBanner": "Profitez d'avantages d'expédition exclusifs avec l'accès aux meilleurs tarifs de transporteurs, des services de livraison réfrigérée premium et la liberté d'expédier en utilisant les tarifs négociés de votre propre transporteur."
+    "genericBanner": "Débloquez des avantages exclusifs avec l'accès aux meilleurs tarifs d'expédition, à des services de livraison réfrigérée et à la liberté d'expédier en utilisant vos propres tarifs de transporteurs négociés."
   },
   "shipmentDocumentType": {
     "shippingLabel": "Étiquette d'expédition",
