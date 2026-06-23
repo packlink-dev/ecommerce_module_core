@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.2.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.1.1...v4.2.0) - 2026-06-23
+### Changed
+- Added shared tracking page
+- Added bulk print labels
+- Added new line up banners
+
 ## [4.1.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.1.0...v4.1.1) - 2026-04-29
 ### Changed
 - Fixed integration registration when missing token
