@@ -2,7 +2,9 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\DefaultParcelController as DefaultParcelControllerBase;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
 use Packlink\DemoUI\Controllers\Models\Request;
 
 /**
@@ -22,7 +24,10 @@ class DefaultParcelController extends BaseHttpController
      */
     public function __construct()
     {
-        $this->controller = new DefaultParcelControllerBase();
+        /** @var UpdateShippingServicesOrchestratorInterface $orchestrator */
+        $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+
+        $this->controller = new DefaultParcelControllerBase($orchestrator);
     }
 
     /**

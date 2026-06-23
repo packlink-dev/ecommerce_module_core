@@ -12,7 +12,10 @@ use Packlink\BusinessLogic\CashOnDelivery\Interfaces\CashOnDeliveryServiceInterf
 use Packlink\BusinessLogic\CashOnDelivery\Services\CashOnDeliveryService;
 use Packlink\BusinessLogic\Controllers\DashboardController;
 use Packlink\BusinessLogic\Controllers\DTO\DashboardStatus;
+use Packlink\BusinessLogic\Controllers\DTO\PromotionalBannerResponse;
+use Packlink\BusinessLogic\Controllers\DTO\SubscriptionPlanResponse;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\Controllers\SubscriptionController;
 use Packlink\BusinessLogic\Country\CountryService;
 use Packlink\BusinessLogic\Country\Models\Country;
 use Packlink\BusinessLogic\Country\WarehouseCountryService;
@@ -38,7 +41,10 @@ use Packlink\BusinessLogic\Registration\RegistrationLegalPolicy;
 use Packlink\BusinessLogic\Registration\RegistrationRequest;
 use Packlink\BusinessLogic\Registration\RegistrationService;
 use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
+use Packlink\BusinessLogic\ShipmentDocument\Interfaces\ShipmentDocumentServiceInterface;
+use Packlink\BusinessLogic\ShipmentDocument\ShipmentDocumentService;
 use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
+use Packlink\BusinessLogic\Subscription\SubscriptionService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
@@ -169,6 +175,20 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         );
 
         ServiceRegister::registerService(
+            SubscriptionService::CLASS_NAME,
+            function () {
+                return SubscriptionService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            SubscriptionController::CLASS_NAME,
+            function () {
+                return new SubscriptionController();
+            }
+        );
+
+        ServiceRegister::registerService(
             ShippingMethodController::CLASS_NAME,
             function () {
                 return new ShippingMethodController();
@@ -293,6 +313,20 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
                 return new OAuthStateService($repository);
             }
         );
+
+        ServiceRegister::registerService(
+            ShipmentDocumentServiceInterface::CLASS_NAME,
+            function () {
+                /** @var OrderShipmentDetailsService $orderShipmentDetailsService */
+                $orderShipmentDetailsService = ServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+                /** @var OrderService $orderService */
+                $orderService = ServiceRegister::getService(OrderService::CLASS_NAME);
+                /** @var Proxy $proxy */
+                $proxy = ServiceRegister::getService(Proxy::CLASS_NAME);
+
+                return new ShipmentDocumentService($orderShipmentDetailsService, $orderService, $proxy);
+            }
+        );
     }
 
     /**
@@ -311,5 +345,7 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
         FrontDtoFactory::register(RegistrationLegalPolicy::CLASS_KEY, RegistrationLegalPolicy::CLASS_NAME);
         FrontDtoFactory::register(ShippingPricePolicy::CLASS_KEY, ShippingPricePolicy::CLASS_NAME);
         FrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
+        FrontDtoFactory::register(SubscriptionPlanResponse::CLASS_KEY, SubscriptionPlanResponse::CLASS_NAME);
+        FrontDtoFactory::register(PromotionalBannerResponse::CLASS_KEY, PromotionalBannerResponse::CLASS_NAME);
     }
 }

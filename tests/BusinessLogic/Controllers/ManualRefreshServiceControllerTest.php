@@ -17,7 +17,7 @@ use Logeecom\Infrastructure\Utility\Events\EventBus;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\TestShopConfiguration;
-use Logeecom\Tests\BusinessLogic\Controllers\TaskMetadataProviderTest;
+use Logeecom\Tests\BusinessLogic\Controllers\TestTaskMetadataProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryQueueItemRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegistry;
@@ -104,7 +104,7 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
 
         $taskRunnerConfig = TestServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
 
-        $metadataProvider = new TaskMetadataProviderTest(
+        $metadataProvider = new TestTaskMetadataProvider(
             $taskRunnerConfig->getDefaultQueueName(),
             $configuration->getContext()
         );

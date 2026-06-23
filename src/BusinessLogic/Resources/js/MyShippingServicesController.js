@@ -4,7 +4,8 @@ if (!window.Packlink) {
 
 (function () {
     /**
-     * @param {{getServicesUrl: string, deleteServiceUrl: string, getCurrencyDetailsUrl: string, systemId: string}} configuration
+     * @param {{getServicesUrl: string, deleteServiceUrl: string, getCurrencyDetailsUrl: string, systemId: string,
+     *     getSubscriptionPlanUrl?: string, getPromotionalBannerUrl?: string}} configuration
      * @constructor
      */
     function MyShippingServicesController(configuration) {
@@ -43,6 +44,14 @@ if (!window.Packlink) {
             });
 
             settingsButtonService.displaySettings(settingsMenu, state);
+
+            if (configuration.getSubscriptionPlanUrl) {
+                const bannerController = new Packlink.SubscriptionBannerController();
+                bannerController.init({
+                    getSubscriptionPlanUrl: configuration.getSubscriptionPlanUrl,
+                    getPromotionalBannerUrl: configuration.getPromotionalBannerUrl
+                });
+            }
         };
 
         /**

@@ -31,6 +31,11 @@ class OAuthConfigurationService extends OAuthConfiguration
         return 'demo-ui';
     }
 
+    public function getReturnUrl()
+    {
+        return 'demo-ui-return-url';
+    }
+
     public function getTenantId()
     {
         return 'demo-ui-tenant-id';

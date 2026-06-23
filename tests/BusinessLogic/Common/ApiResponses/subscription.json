@@ -1,0 +1,12 @@
+{
+  "id": "sub_abc123",
+  "client_id": "client_xyz789",
+  "activated_at": "2025-01-15T10:30:00Z",
+  "current_billing_currency": "EUR",
+  "current_billing_amount": 29.99,
+  "plan": {
+    "id": "plan_plus",
+    "code": "plus_legacy_es",
+    "name": "Plus"
+  }
+}

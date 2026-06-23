@@ -1378,3 +1378,181 @@
 }
 @media (min-width: 769px) and (max-width: 1280px) {
 }
+
+/* CR-65: Subscription line-up */
+#pl-page .pl-promotional-banner {
+  background-color: #efedfc;
+  color: #5b4dc7;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-text {
+  flex: 1;
+  color: #5b4dc7;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: #efedfc;
+  color: #5b4dc7;
+  border: 1px solid #5b4dc7;
+  border-radius: 0;
+  margin: 0;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-button .pl-promotional-banner-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-button:hover {
+  background-color: #e6e2fb;
+}
+#pl-page .pl-info-box {
+  background-color: #EBF5FF;
+  border-left: 4px solid #2095f2;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+}
+#pl-page .pl-info-box .pl-info-box-info-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #2095f2;
+}
+#pl-page .pl-info-box .pl-info-box-content {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3a3d46;
+}
+#pl-page .pl-info-box .pl-info-box-content strong {
+  font-weight: 700;
+}
+#pl-page .pl-account-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 300px;
+  padding: 5px 26px;
+  background-color: #f5f5f5;
+}
+#pl-page .pl-account-section .pl-account-email {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #3a3d46;
+}
+#pl-page .pl-account-section .pl-account-email .pl-account-icon {
+  font-size: 20px;
+  line-height: 1;
+  color: #2095f2;
+}
+#pl-page .pl-account-section .pl-account-email .pl-account-email-label {
+  font-weight: 700;
+  margin-right: 2px;
+}
+#pl-page .pl-account-section .pl-account-email-value {
+  margin-top: -2px;
+  margin-left: 26px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a3d46;
+  word-break: break-all;
+}
+#pl-page .pl-upgrade-wrapper {
+  position: relative;
+  display: inline-flex;
+  margin-left: 26px;
+}
+#pl-page .pl-upgrade-wrapper:hover .pl-upgrade-tooltip {
+  display: block;
+}
+#pl-page .pl-upgrade-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  background-color: #ffffff;
+  color: #5b4dc7;
+  border: 1px solid #5b4dc7;
+  border-radius: 0;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#pl-page .pl-upgrade-button .pl-upgrade-button-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+#pl-page .pl-upgrade-button:hover {
+  background-color: #efedfc;
+}
+#pl-page .pl-upgrade-tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background-color: #ffffff;
+  color: #3a3d46;
+  border: 1px solid #d7d7d7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  width: max-content;
+  max-width: 280px;
+  z-index: 1000;
+  display: none;
+}
+#pl-page .pl-upgrade-tooltip.pl-visible {
+  display: block;
+}
+#pl-page .pl-upgrade-tooltip ul {
+  list-style: disc;
+  padding-left: 16px;
+  margin: 0;
+}
+#pl-page .pl-plan-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+#pl-page .pl-plan-display .pl-plan-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+#pl-page .pl-plan-display .pl-plan-tier {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}

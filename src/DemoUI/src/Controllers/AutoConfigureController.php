@@ -2,7 +2,10 @@
 
 namespace Packlink\DemoUI\Controllers;
 
+use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Controllers\AutoConfigurationController;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServicesOrchestratorInterface;
+use Packlink\BusinessLogic\UpdateShippingServices\Interfaces\UpdateShippingServiceTaskStatusServiceInterface;
 
 /**
  * Class AutoConfigureController.
@@ -16,7 +19,12 @@ class AutoConfigureController extends BaseHttpController
      */
     public function start()
     {
-        $controller = new AutoConfigurationController();
+        /** @var UpdateShippingServicesOrchestratorInterface $orchestrator */
+        $orchestrator = ServiceRegister::getService(UpdateShippingServicesOrchestratorInterface::class);
+        /** @var UpdateShippingServiceTaskStatusServiceInterface $statusService */
+        $statusService = ServiceRegister::getService(UpdateShippingServiceTaskStatusServiceInterface::class);
+
+        $controller = new AutoConfigurationController($orchestrator, $statusService);
 
         $this->output(array('success' => $controller->start(true)));
     }

@@ -179,25 +179,32 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      */
     protected function syncServices(array $currentMethods, array $apiServices): Generator
     {
-        $progress = 20;
-        $progressStep = count($currentMethods) > 0 ? (40 / count($currentMethods)) : 40;
+        $service = $this->getShippingMethodService();
+        $service->beginBatch();
 
-        foreach ($currentMethods as $shippingMethod) {
-            $this->updateShippingMethod($shippingMethod, $apiServices);
+        try {
+            $progress = 20;
+            $progressStep = count($currentMethods) > 0 ? (40 / count($currentMethods)) : 40;
 
-            $progress += $progressStep;
-            yield $progress;
-        }
+            foreach ($currentMethods as $shippingMethod) {
+                $this->updateShippingMethod($shippingMethod, $apiServices);
 
-        yield 60;
-        $batch = 0;
-        foreach ($apiServices as $service) {
-            $batch++;
-            if ($batch === 20) {
-                yield; // Keep-alive
-                $batch = 0;
+                $progress += $progressStep;
+                yield $progress;
             }
-            $this->getShippingMethodService()->add($service);
+
+            yield 60;
+            $batch = 0;
+            foreach ($apiServices as $apiService) {
+                $batch++;
+                if ($batch === 20) {
+                    yield; // Keep-alive
+                    $batch = 0;
+                }
+                $this->getShippingMethodService()->add($apiService);
+            }
+        } finally {
+            $this->getShippingMethodService()->endBatch();
         }
     }
 
@@ -211,25 +218,32 @@ class UpdateShippingServicesBusinessTask implements BusinessTask
      */
     protected function syncServicesSpecial(array $currentMethods, array $apiServices): Generator
     {
-        $progress = 60;
-        $progressStep = count($currentMethods) > 0 ? (20 / count($currentMethods)) : 20;
+        $service = $this->getShippingMethodService();
+        $service->beginBatch();
 
-        foreach ($currentMethods as $shippingMethod) {
-            $this->updateShippingMethod($shippingMethod, $apiServices, true);
+        try {
+            $progress = 60;
+            $progressStep = count($currentMethods) > 0 ? (20 / count($currentMethods)) : 20;
 
-            $progress += $progressStep;
-            yield $progress;
-        }
+            foreach ($currentMethods as $shippingMethod) {
+                $this->updateShippingMethod($shippingMethod, $apiServices, true);
 
-        yield 80;
-        $batch = 0;
-        foreach ($apiServices as $service) {
-            $batch++;
-            if ($batch === 20) {
-                yield; // Keep-alive
-                $batch = 0;
+                $progress += $progressStep;
+                yield $progress;
             }
-            $this->getShippingMethodService()->add($service, true);
+
+            yield 80;
+            $batch = 0;
+            foreach ($apiServices as $apiService) {
+                $batch++;
+                if ($batch === 20) {
+                    yield; // Keep-alive
+                    $batch = 0;
+                }
+                $this->getShippingMethodService()->add($apiService, true);
+            }
+        } finally {
+            $this->getShippingMethodService()->endBatch();
         }
     }
 

@@ -15,6 +15,8 @@ if (!window.Packlink) {
      * @property {boolean} newService
      * @property {string} enqueue
      * @property {string} getTaskStatus
+     * @property {string} [getSubscriptionPlanUrl]
+     * @property {string} [getPromotionalBannerUrl]
      */
 
     /**
@@ -99,6 +101,14 @@ if (!window.Packlink) {
             closeErrorButton.addEventListener('click', () => {
                 errorButton.classList.add('pl-hidden');
             });
+
+            if (configuration.getSubscriptionPlanUrl) {
+                const bannerController = new Packlink.SubscriptionBannerController();
+                bannerController.init({
+                    getSubscriptionPlanUrl: configuration.getSubscriptionPlanUrl,
+                    getPromotionalBannerUrl: configuration.getPromotionalBannerUrl
+                });
+            }
         };
 
         function showError(button, messageButton, message) {

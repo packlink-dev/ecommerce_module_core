@@ -317,7 +317,7 @@ X-Custom-Header: Content: database\r
         $taskConfig = new BusinessTestShopConfiguration();
 
         $taskRunnerConfig = ServiceRegister::getService(TaskRunnerConfigInterface::CLASS_NAME);
-        $metadataProvider = new TaskMetadataProviderTest(
+        $metadataProvider = new TestTaskMetadataProvider(
             $taskRunnerConfig->getDefaultQueueName(),
             $taskConfig->getContext()
         );

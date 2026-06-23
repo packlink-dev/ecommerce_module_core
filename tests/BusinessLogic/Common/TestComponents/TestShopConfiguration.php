@@ -15,6 +15,12 @@ class TestShopConfiguration extends Configuration
      */
     private $integrationId;
     /**
+     * In-memory authorization token to avoid consuming MemoryStorage auto-increment IDs.
+     *
+     * @var string|null
+     */
+    private $authorizationToken;
+    /**
      * Singleton instance of this class.
      *
      * @var static
@@ -44,6 +50,16 @@ class TestShopConfiguration extends Configuration
     public function getIntegrationId()
     {
         return $this->integrationId;
+    }
+
+    public function setAuthorizationToken($token)
+    {
+        $this->authorizationToken = $token;
+    }
+
+    public function getAuthorizationToken()
+    {
+        return $this->authorizationToken;
     }
 
     /**

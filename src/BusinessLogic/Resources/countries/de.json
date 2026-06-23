@@ -393,7 +393,8 @@
     "parcel": "Standardpaket",
     "help": "Hilfe",
     "contactUs": "Kontaktieren Sie uns:",
-    "systemInfo": "Systeminformationen"
+    "systemInfo": "Systeminformationen",
+    "email": "E-Mail:"
   },
   "systemInfo": {
     "title": "Systeminfodatei <br>und debug mode",
@@ -583,5 +584,30 @@
     "whileDisabled": "Solange die Integration deaktiviert ist, können Sie die Versanddienste von Packlink, einschließlich dynamischer Tarife sowie Erstellung und Verwaltung von Sendungen, nicht nutzen.",
     "resubscribe": "Um die Integration automatisch zu reaktivieren und wieder Zugriff auf alle Funktionen zu erhalten, abonnieren Sie bitte erneut den entsprechenden Tarif %s.",
     "resubscribeLink": "hier"
+  },
+  "subscription": {
+    "upgrade": "Upgrade",
+    "upgradeNow": "Jetzt upgraden",
+    "tooltipBenefit1": "Alle Funktionen des Free-Tarifs enthalten",
+    "tooltipBenefit2": "Exklusiver Zugang zu vergünstigten Versandtarifen",
+    "tooltipBenefit3": "Zusätzliche Shop-Integrationen",
+    "tooltipBenefit4": "Branding der Kommunikation",
+    "tooltipBenefit5": "Anbindungen an Carrier-Verträge, um mit eigenen Tarifen zu versenden",
+    "tooltipBenefit6": "Premium-Support",
+    "yourPricingPlan": "Ihr Preisplan:",
+    "ordersPageBanner": "Profitieren Sie von den besten Versandtarifen oder versenden Sie mit Ihren eigenen Carrier-Tarifen.",
+    "supportPageBannerFree": "Upgraden Sie und lösen Sie Versandprobleme schneller per Chat oder Telefon",
+    "supportPageBannerPlus": "Upgraden Sie und lösen Sie Versandprobleme schneller per Telefon",
+    "measureAccuratelyTitle": "Genau messen!",
+    "measureAccuratelyHighlight": "Vermeiden Sie Zusatzkosten:",
+    "measureAccuratelyBody": "Carrier prüfen die Paketgrößen, wiegen und messen Sie daher mit einer Waage und einem Maßband.",
+    "phoneEmailInfoTitle": "Warum sind Mobiltelefon und E-Mail erforderlich?",
+    "phoneEmailInfoBody": "Eine Mobiltelefonnummer und eine E-Mail-Adresse helfen Carriern, den Empfänger zu kontaktieren, Lieferaktualisierungen zu teilen und eine erfolgreiche Zustellung sicherzustellen. Werden beide angegeben, erhöht sich die Erfolgsquote der Zustellung um bis zu 95 %.",
+    "phoneEmailInfoWarning": "Fehlen diese Informationen, kann es zu Lieferproblemen oder Verzögerungen kommen.",
+    "genericBanner": "Schalten Sie exklusive Versandvorteile frei mit Zugang zu den besten Carrier-Tarifen, Premium-Kühlversandservices und der Freiheit, mit Ihren eigenen ausgehandelten Carrier-Tarifen zu versenden."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Versandetikett",
+    "customsInvoice": "Zollrechnung"
   }
 }
