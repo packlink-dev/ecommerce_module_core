@@ -45,7 +45,7 @@ class SubscriptionController
     private static $representativePostalCodes = array(
         'ES' => '28001',
         'FR' => '75001',
-        'IT' => '00100',
+        'IT' => '00118',
         'DE' => '10115',
     );
 
