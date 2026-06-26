@@ -6,6 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is `packlink/integration-core`, a PHP library that provides the shared core for Packlink shipping integrations across e-commerce platforms (PrestaShop, WooCommerce, Magento, Shopify, etc.). Platform-specific modules consume this library and implement its abstract classes/interfaces. It is **not** a standalone application.
 
+## AI Docs & Change Requests
+
+All change requests, contribution guidelines, and coding standards live under `.ai-docs/`. Read the relevant docs before starting work:
+
+- **`.ai-docs/coding-standards.md`** — authoritative coding conventions (PHP 7.0 idioms, naming, docblocks, DTO/Singleton/test patterns, frontend resources). Read this before writing code.
+- **`.ai-docs/guidelines.md`** — the change-request / contribution workflow.
+- **`.ai-docs/design.md`** — system-wide architecture reference (layers, ORM, task queue, Packlink API proxy, services, key flows, entity catalog, platform integration contract).
+
+**Change-request pattern.** Each change request gets its own folder, `.ai-docs/change_requests/<CR-ID>/`, named with the ticket ID plus a short slug (e.g. `CR-SET-62b-labels`). It contains two documents:
+
+- `spec.md` — *what & why*: overview, the concrete classes/DTOs/interfaces to add or change (with namespaces, fields, method signatures), New/Modified file tables, and rationale notes.
+- `design.md` — *how*: ordered implementation tasks with effort and dependencies, a task-dependency graph, and a files-changed-per-task table.
+
+See `.ai-docs/change_requests/CR-SET-62b-labels/` as the reference example.
+
 ## Build & Test Commands
 
 ```bash
@@ -88,6 +103,8 @@ Controllers in `BusinessLogic/Controllers/` are thin wrappers that resolve servi
 - PHPUnit 4.8 — no `void` return types on test methods, uses older assertion style.
 
 ## Key Constraints
+
+> Full conventions are in `.ai-docs/coding-standards.md` — the authoritative style source. The most load-bearing constraints:
 
 - **PHP 7.0 minimum** — no nullable types (`?Type`), no `void` return types, no typed properties. Use PHPDoc for type hints. `array()` syntax instead of `[]` is used throughout.
 - **Platform agnostic** — this library must never depend on a specific e-commerce platform. Platform-specific behavior goes through abstract classes/interfaces (e.g., `Configuration`, `HttpClient`, `RepositoryInterface`).
