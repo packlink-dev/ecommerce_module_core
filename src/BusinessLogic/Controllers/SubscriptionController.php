@@ -81,6 +81,44 @@ class SubscriptionController
         . 'premium refrigerated delivery services, and the freedom to ship using your own negotiated carrier rates.';
 
     /**
+     * Base URL of the Packlink CDN translation files that carry the localized
+     * promotional banner copy. The frontend fetches the language-specific file and
+     * reads {@see self::CDN_BANNER_LABEL_KEY} from it.
+     */
+    const CDN_TRANSLATIONS_BASE_URL = 'https://cdn.packlink.com/translations/pro';
+
+    /**
+     * Flat key in the CDN translation file holding the promotional banner text.
+     */
+    const CDN_BANNER_LABEL_KEY = 'subscriptions.upgrade-notification.more-features';
+
+    /**
+     * Module UI language to CDN display-locale folder. The folder selects the
+     * language the banner copy is rendered in. Only languages with a published CDN
+     * folder are listed; any other UI language yields a null CDN URL.
+     */
+    private static $cdnDisplayLocales = array(
+        'es' => 'es-ES',
+        'fr' => 'fr-FR',
+        'de' => 'de-DE',
+        'it' => 'it-IT',
+        'en' => 'en-GB',
+    );
+
+    /**
+     * Packlink account platform-country to CDN market language code, used as the
+     * "packlink_pro_<market>" filename suffix. The suffix selects which market's
+     * subscription banner content is loaded. Only countries with a published CDN
+     * file are listed; any other account country yields a null CDN URL.
+     */
+    private static $cdnMarketLanguages = array(
+        'ES' => 'es',
+        'FR' => 'fr',
+        'DE' => 'de',
+        'IT' => 'it',
+    );
+
+    /**
      * @var SubscriptionService
      */
     private $subscriptionService;
@@ -150,8 +188,32 @@ class SubscriptionController
 
         $response->upgradeUrl = $this->buildUpgradeUrl($country);
         $response->bannerLabel = $this->buildBannerLabel($response->planTier, $country);
+        $response->bannerCdnUrl = $this->buildBannerCdnUrl($this->getSystemLanguage(), $country);
 
         return $response;
+    }
+
+    /**
+     * Builds the CDN URL for the promotional banner content, or null when no CDN file
+     * applies. The display-locale folder follows the module UI language and the market
+     * language suffix follows the merchant's Packlink account platform country, e.g.
+     * UI "es" + account "FR" => .../pro/es-ES/packlink_pro_fr.json. Returns null when
+     * either the UI language or the account country is unsupported, leaving the banner
+     * server-driven.
+     *
+     * @param string $language Lowercase two-letter module UI language code.
+     * @param string $country Two-letter uppercase Packlink account platform country.
+     *
+     * @return string|null
+     */
+    private function buildBannerCdnUrl($language, $country)
+    {
+        if (!isset(self::$cdnDisplayLocales[$language]) || !isset(self::$cdnMarketLanguages[$country])) {
+            return null;
+        }
+
+        return self::CDN_TRANSLATIONS_BASE_URL . '/' . self::$cdnDisplayLocales[$language]
+            . '/packlink_pro_' . self::$cdnMarketLanguages[$country] . '.json';
     }
 
     /**

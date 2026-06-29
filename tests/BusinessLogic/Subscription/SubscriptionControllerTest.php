@@ -213,6 +213,90 @@ class SubscriptionControllerTest extends BaseTestWithServices
         self::assertLabelContains('SEUR', $response->bannerLabel);
     }
 
+    public function testGetPromotionalBannerCdnUrlMatchingMarketAndUi()
+    {
+        // Spanish UI + ES account: folder from UI locale (es-ES), suffix from account market (es).
+        $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('es');
+
+        $servicesResponse = $this->servicesPayload(array(
+            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
+            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
+        ));
+        $this->mockSubscriptionResponses(array(
+            $this->subscriptionPayload('Free'),
+            $servicesResponse,
+        ));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertSame(
+            'https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_es.json',
+            $response->bannerCdnUrl
+        );
+    }
+
+    public function testGetPromotionalBannerCdnUrlCombinesUiLocaleAndAccountMarket()
+    {
+        // Spanish UI + FR account: display-locale folder follows the UI (es-ES),
+        // market suffix follows the Packlink account platform country (fr).
+        $this->setMerchantCountry('FR');
+        InfrastructureConfiguration::setUICountryCode('es');
+
+        $servicesResponse = $this->servicesPayload(array(
+            array('carrier_name' => 'Colissimo', 'total_price' => 6.10),
+            array('carrier_name' => 'Mondial Relay', 'total_price' => 4.20),
+        ));
+        $this->mockSubscriptionResponses(array(
+            $this->subscriptionPayload('Free'),
+            $servicesResponse,
+        ));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertSame(
+            'https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_fr.json',
+            $response->bannerCdnUrl
+        );
+    }
+
+    public function testGetPromotionalBannerCdnUrlEnglishUiIsSupported()
+    {
+        // English UI + ES account: English display locale (en-GB) with the ES market suffix.
+        $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('en');
+
+        $servicesResponse = $this->servicesPayload(array(
+            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
+            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
+        ));
+        $this->mockSubscriptionResponses(array(
+            $this->subscriptionPayload('Free'),
+            $servicesResponse,
+        ));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertSame(
+            'https://cdn.packlink.com/translations/pro/en-GB/packlink_pro_es.json',
+            $response->bannerCdnUrl
+        );
+    }
+
+    public function testGetPromotionalBannerNoCdnUrlForUnknownAccountCountry()
+    {
+        // Unknown account country: no market suffix → null, banner stays server-driven.
+        $this->setMerchantCountry('NL');
+        InfrastructureConfiguration::setUICountryCode('es');
+
+        $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertNull($response->bannerCdnUrl);
+        self::assertSame(SubscriptionController::GENERIC_BANNER_LABEL, $response->bannerLabel);
+    }
+
     public function testGetPromotionalBannerUpgradeUrl()
     {
         $this->setMerchantCountry('FR');

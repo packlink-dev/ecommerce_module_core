@@ -39,6 +39,14 @@ class PromotionalBannerResponse extends FrontDto
      */
     public $upgradeUrl;
     /**
+     * URL of the Packlink CDN translation file that holds the localized promotional
+     * banner text, or null when no CDN file exists for the current language. The
+     * frontend fetches this and falls back to {@see $bannerLabel} on any failure.
+     *
+     * @var string|null
+     */
+    public $bannerCdnUrl;
+    /**
      * Fields for this DTO. Needed for validation and transformation from/to array.
      *
      * @var array
@@ -47,5 +55,6 @@ class PromotionalBannerResponse extends FrontDto
         'planTier',
         'bannerLabel',
         'upgradeUrl',
+        'bannerCdnUrl',
     );
 }

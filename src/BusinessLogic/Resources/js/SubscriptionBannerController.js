@@ -16,6 +16,9 @@ if (!window.Packlink) {
     function SubscriptionBannerController() {
         const ajaxService = Packlink.ajaxService;
 
+        // Flat key in the CDN translation file holding the promotional banner text.
+        const CDN_BANNER_LABEL_KEY = 'subscriptions.upgrade-notification.more-features';
+
         let planTier = null;
         let upgradeUrl = null;
 
@@ -48,7 +51,7 @@ if (!window.Packlink) {
                         }
 
                         upgradeUrl = bannerResponse.upgradeUrl;
-                        renderBanner(bannerResponse.bannerLabel);
+                        resolveBannerText(bannerResponse, renderBanner);
                     });
                 } else if (config.bannerTextOverride) {
                     upgradeUrl = config.upgradeUrl;
@@ -63,6 +66,33 @@ if (!window.Packlink) {
          * @return {string|null}
          */
         this.getPlanTier = () => planTier;
+
+        /**
+         * Resolves the banner text, preferring the localized copy from the Packlink CDN
+         * (bannerResponse.bannerCdnUrl) and falling back to the server-built
+         * bannerResponse.bannerLabel on any failure: no URL, unsupported browser,
+         * network error, non-OK response, or a missing banner key.
+         *
+         * @param {{bannerCdnUrl?: string, bannerLabel?: string}} bannerResponse
+         * @param {function(string)} callback
+         */
+        const resolveBannerText = (bannerResponse, callback) => {
+            const fallback = bannerResponse.bannerLabel;
+            const cdnUrl = bannerResponse.bannerCdnUrl;
+
+            if (!cdnUrl || typeof window.fetch !== 'function') {
+                callback(fallback);
+                return;
+            }
+
+            window.fetch(cdnUrl)
+                .then((response) => (response.ok ? response.json() : Promise.reject()))
+                .then((data) => {
+                    const text = data && data[CDN_BANNER_LABEL_KEY];
+                    callback(text || fallback);
+                })
+                .catch(() => callback(fallback));
+        };
 
         /**
          * Populates the banner DOM and reveals it.
