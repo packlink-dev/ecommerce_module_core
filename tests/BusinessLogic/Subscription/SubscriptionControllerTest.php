@@ -98,25 +98,16 @@ class SubscriptionControllerTest extends BaseTestWithServices
     {
         $this->setMerchantCountry('ES');
         InfrastructureConfiguration::setUICountryCode('es');
-        $servicesResponse = $this->servicesPayload(array(
-            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
-            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
-            array('carrier_name' => 'Other Carrier', 'total_price' => 9.99),
-        ));
 
-        $this->mockSubscriptionResponses(array(
-            $this->subscriptionPayload('Free'),
-            $servicesResponse,
-        ));
+        $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
 
         $response = $this->getController()->getPromotionalBanner();
 
         self::assertInstanceOf(PromotionalBannerResponse::class, $response);
         self::assertSame('FREE', $response->planTier);
-        self::assertNotNull($response->bannerLabel);
-        self::assertLabelContains('Correos', $response->bannerLabel);
-        self::assertLabelContains('SEUR', $response->bannerLabel);
-        self::assertLabelContains('Plus', $response->bannerLabel);
+        // Banner text is resolved on the frontend (CDN -> baked-in); the server only
+        // provides the generic fallback label.
+        self::assertSame(SubscriptionController::GENERIC_BANNER_LABEL, $response->bannerLabel);
     }
 
     public function testGetPromotionalBannerPremiumReturnsEmpty()
@@ -154,35 +145,12 @@ class SubscriptionControllerTest extends BaseTestWithServices
         self::assertSame('https://pro.packlink.com/private/subscriptions', $response->upgradeUrl);
     }
 
-    public function testGetPromotionalBannerLanguageDrivesTemplateCarriersDriveContent()
+    public function testGetPromotionalBannerLabelIsAlwaysGenericFallback()
     {
-        // ES platform, German UI: template comes from system language (DE),
-        // highlighted carriers come from platform (ES → Correos & SEUR).
+        // The server no longer builds a per-carrier/price label; it always returns the
+        // generic fallback regardless of country/language.
         $this->setMerchantCountry('ES');
         InfrastructureConfiguration::setUICountryCode('de');
-
-        $servicesResponse = $this->servicesPayload(array(
-            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
-            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
-        ));
-        $this->mockSubscriptionResponses(array(
-            $this->subscriptionPayload('Free'),
-            $servicesResponse,
-        ));
-
-        $response = $this->getController()->getPromotionalBanner();
-
-        self::assertLabelContains('Correos', $response->bannerLabel);
-        self::assertLabelContains('SEUR', $response->bannerLabel);
-        // German template phrase
-        self::assertLabelContains('Wechseln Sie zu Plus', $response->bannerLabel);
-    }
-
-    public function testGetPromotionalBannerLanguageWithoutTemplateFallsBackToGeneric()
-    {
-        // ES platform, Dutch UI: no template for 'nl' → generic English label.
-        $this->setMerchantCountry('ES');
-        InfrastructureConfiguration::setUICountryCode('nl');
 
         $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
 
@@ -191,31 +159,9 @@ class SubscriptionControllerTest extends BaseTestWithServices
         self::assertSame(SubscriptionController::GENERIC_BANNER_LABEL, $response->bannerLabel);
     }
 
-    public function testGetPromotionalBannerEnglishLanguageUsesEnglishTemplate()
+    public function testGetPromotionalBannerExposesLanguageAndPlatform()
     {
-        // ES platform, English UI: now uses the EN template with ES carriers.
-        $this->setMerchantCountry('ES');
-        InfrastructureConfiguration::setUICountryCode('en');
-
-        $servicesResponse = $this->servicesPayload(array(
-            array('carrier_name' => 'Correos Standard', 'total_price' => 4.50),
-            array('carrier_name' => 'SEUR Express', 'total_price' => 5.75),
-        ));
-        $this->mockSubscriptionResponses(array(
-            $this->subscriptionPayload('Free'),
-            $servicesResponse,
-        ));
-
-        $response = $this->getController()->getPromotionalBanner();
-
-        self::assertLabelContains('Upgrade to Plus', $response->bannerLabel);
-        self::assertLabelContains('Correos', $response->bannerLabel);
-        self::assertLabelContains('SEUR', $response->bannerLabel);
-    }
-
-    public function testGetPromotionalBannerCdnUrlMatchingMarketAndUi()
-    {
-        // Spanish UI + ES account: folder from UI locale (es-ES), suffix from account market (es).
+        // language (=> CDN locale folder) from the UI, platform (=> market suffix) from the account.
         $this->setMerchantCountry('ES');
         InfrastructureConfiguration::setUICountryCode('es');
 
@@ -230,16 +176,14 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         $response = $this->getController()->getPromotionalBanner();
 
-        self::assertSame(
-            'https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_es.json',
-            $response->bannerCdnUrl
-        );
+        self::assertSame('es', $response->language);
+        self::assertSame('es', $response->platform);
     }
 
-    public function testGetPromotionalBannerCdnUrlCombinesUiLocaleAndAccountMarket()
+    public function testGetPromotionalBannerLanguageFromUiPlatformFromAccount()
     {
-        // Spanish UI + FR account: display-locale folder follows the UI (es-ES),
-        // market suffix follows the Packlink account platform country (fr).
+        // FR account browsing in Spanish: language=es (locale es-ES), platform=fr
+        // => the frontend composes .../pro/es-ES/packlink_pro_fr.json.
         $this->setMerchantCountry('FR');
         InfrastructureConfiguration::setUICountryCode('es');
 
@@ -254,15 +198,12 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         $response = $this->getController()->getPromotionalBanner();
 
-        self::assertSame(
-            'https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_fr.json',
-            $response->bannerCdnUrl
-        );
+        self::assertSame('es', $response->language);
+        self::assertSame('fr', $response->platform);
     }
 
-    public function testGetPromotionalBannerCdnUrlEnglishUiIsSupported()
+    public function testGetPromotionalBannerEnglishUiKeepsAccountPlatform()
     {
-        // English UI + ES account: English display locale (en-GB) with the ES market suffix.
         $this->setMerchantCountry('ES');
         InfrastructureConfiguration::setUICountryCode('en');
 
@@ -277,60 +218,20 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         $response = $this->getController()->getPromotionalBanner();
 
-        self::assertSame(
-            'https://cdn.packlink.com/translations/pro/en-GB/packlink_pro_es.json',
-            $response->bannerCdnUrl
-        );
-    }
-
-    public function testGetPromotionalBannerNoCdnUrlForUnknownAccountCountry()
-    {
-        // Unknown account country: no market suffix → null, banner stays server-driven.
-        $this->setMerchantCountry('NL');
-        InfrastructureConfiguration::setUICountryCode('es');
-
-        $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
-
-        $response = $this->getController()->getPromotionalBanner();
-
-        self::assertNull($response->bannerCdnUrl);
-        self::assertSame(SubscriptionController::GENERIC_BANNER_LABEL, $response->bannerLabel);
+        self::assertSame('en', $response->language);
+        self::assertSame('es', $response->platform);
     }
 
     public function testGetPromotionalBannerUpgradeUrl()
     {
         $this->setMerchantCountry('FR');
         InfrastructureConfiguration::setUICountryCode('fr');
-        $servicesResponse = $this->servicesPayload(array(
-            array('carrier_name' => 'Colissimo', 'total_price' => 6.10),
-            array('carrier_name' => 'Mondial Relay', 'total_price' => 4.20),
-        ));
 
-        $this->mockSubscriptionResponses(array(
-            $this->subscriptionPayload('Plus'),
-            $servicesResponse,
-        ));
+        $this->mockSubscriptionResponses(array($this->subscriptionPayload('Plus')));
 
         $response = $this->getController()->getPromotionalBanner();
 
         self::assertSame('https://pro.packlink.fr/private/subscriptions', $response->upgradeUrl);
-        self::assertLabelContains('Premium', $response->bannerLabel);
-    }
-
-    /**
-     * Asserts that the banner label contains the given substring. Compatible with
-     * all supported PHPUnit versions (assertContains no longer accepts strings and
-     * assertStringContainsString does not exist before PHPUnit 7.5).
-     *
-     * @param string $needle
-     * @param string $label
-     */
-    private static function assertLabelContains($needle, $label)
-    {
-        self::assertNotFalse(
-            strpos($label, $needle),
-            'Banner label "' . $label . '" must contain "' . $needle . '".'
-        );
     }
 
     /**
