@@ -22,6 +22,9 @@ class PostalCodeTransformer
      * @var array
      */
     protected static $map = array(
+        'AR' => array(
+            '***** ***',
+        ),
         'GB' => array(
             '** ***',
             '*** ***',
