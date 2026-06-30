@@ -54,6 +54,9 @@ class PostalCodeTransformerTest extends BaseTestWithServices
 
         $transformedPostalCode = PostalCodeTransformer::transform('PT', '1000-260');
         self::assertEquals('1000-260', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('AR', 'C1258 AAA');
+        self::assertEquals('C1258 AAA', $transformedPostalCode);
     }
 
     /**
@@ -105,6 +108,9 @@ class PostalCodeTransformerTest extends BaseTestWithServices
 
         $transformedPostalCode = PostalCodeTransformer::transform('PT', '1000');
         self::assertEquals('1000', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('AR', 'C1258AAA');
+        self::assertEquals('C1258 AAA', $transformedPostalCode);
     }
 
     public function testTransformingImproperlyFormattedPostalCode()
