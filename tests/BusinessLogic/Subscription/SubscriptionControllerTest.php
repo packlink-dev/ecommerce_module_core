@@ -178,6 +178,10 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         self::assertSame('es', $response->language);
         self::assertSame('es', $response->platform);
+        self::assertSame(
+            'https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_es.json',
+            $response->bannerCdnUrl
+        );
     }
 
     public function testGetPromotionalBannerLanguageFromUiPlatformFromAccount()
@@ -200,6 +204,10 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         self::assertSame('es', $response->language);
         self::assertSame('fr', $response->platform);
+        self::assertSame(
+            'https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_fr.json',
+            $response->bannerCdnUrl
+        );
     }
 
     public function testGetPromotionalBannerEnglishUiKeepsAccountPlatform()
@@ -220,6 +228,25 @@ class SubscriptionControllerTest extends BaseTestWithServices
 
         self::assertSame('en', $response->language);
         self::assertSame('es', $response->platform);
+        self::assertSame(
+            'https://cdn.packlink.com/translations/pro/en-GB/packlink_pro_es.json',
+            $response->bannerCdnUrl
+        );
+    }
+
+    public function testGetPromotionalBannerCdnUrlNullForUnsupportedLanguage()
+    {
+        // An unsupported UI language has no display-locale folder, so no CDN URL can be built.
+        $this->setMerchantCountry('ES');
+        InfrastructureConfiguration::setUICountryCode('pt');
+
+        $this->mockSubscriptionResponses(array($this->subscriptionPayload('Free')));
+
+        $response = $this->getController()->getPromotionalBanner();
+
+        self::assertSame('pt', $response->language);
+        self::assertSame('es', $response->platform);
+        self::assertNull($response->bannerCdnUrl);
     }
 
     public function testGetPromotionalBannerUpgradeUrl()

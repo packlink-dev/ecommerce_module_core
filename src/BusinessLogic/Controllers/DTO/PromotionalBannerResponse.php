@@ -53,6 +53,16 @@ class PromotionalBannerResponse extends FrontDto
      */
     public $platform;
     /**
+     * Fully built CDN URL for the promotional banner translation file, composed from the
+     * display-locale folder (derived from {@see $language}) and the "packlink_pro_<market>"
+     * filename (derived from {@see $platform}), e.g. language "es" + platform "fr" =>
+     * "https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_fr.json".
+     * Null when the language or platform country is unknown/unsupported.
+     *
+     * @var string|null
+     */
+    public $bannerCdnUrl;
+    /**
      * Fields for this DTO. Needed for validation and transformation from/to array.
      *
      * @var array
@@ -63,5 +73,6 @@ class PromotionalBannerResponse extends FrontDto
         'upgradeUrl',
         'language',
         'platform',
+        'bannerCdnUrl',
     );
 }

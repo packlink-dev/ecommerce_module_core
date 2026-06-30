@@ -33,6 +33,23 @@ class SubscriptionController
     );
 
     /**
+     * UI language => CDN display-locale folder. Selects the locale subfolder of the
+     * promotional banner translation file on the CDN.
+     */
+    private static $displayLocales = array(
+        'es' => 'es-ES',
+        'en' => 'en-GB',
+        'fr' => 'fr-FR',
+        'it' => 'it-IT',
+        'de' => 'de-DE',
+    );
+
+    /**
+     * Base URL of the CDN folder holding the promotional banner translation files.
+     */
+    const CDN_BASE_URL = 'https://cdn.packlink.com/translations/pro';
+
+    /**
      * Generic English label sent as the banner text. The frontend prefers the live
      * CDN copy (and a baked-in per-locale fallback); this is the final fallback used
      * when neither is availavbble.
@@ -112,8 +129,30 @@ class SubscriptionController
         $response->bannerLabel = self::GENERIC_BANNER_LABEL;
         $response->language = $this->getSystemLanguage();
         $response->platform = $country !== '' ? strtolower($country) : null;
+        $response->bannerCdnUrl = $this->buildBannerCdnUrl($response->language, $response->platform);
 
         return $response;
+    }
+
+    /**
+     * Builds the CDN URL of the promotional banner translation file from the UI language
+     * (mapped to a display-locale folder) and the platform country (used as the
+     * "packlink_pro_<market>" filename suffix).
+     *
+     * @param string|null $language Lowercase two-letter UI language code.
+     * @param string|null $platform Lowercase platform country code.
+     *
+     * @return string|null Full CDN URL, or null when the language or platform is unknown/unsupported.
+     */
+    private function buildBannerCdnUrl($language, $platform)
+    {
+        if (empty($language) || empty($platform) || !isset(self::$displayLocales[$language])) {
+            return null;
+        }
+
+        $locale = self::$displayLocales[$language];
+
+        return self::CDN_BASE_URL . '/' . $locale . '/packlink_pro_' . $platform . '.json';
     }
 
     /**
