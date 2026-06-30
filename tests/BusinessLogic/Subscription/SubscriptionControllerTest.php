@@ -187,7 +187,7 @@ class SubscriptionControllerTest extends BaseTestWithServices
     public function testGetPromotionalBannerLanguageFromUiPlatformFromAccount()
     {
         // FR account browsing in Spanish: language=es (locale es-ES), platform=fr
-        // => the frontend composes .../pro/es-ES/packlink_pro_fr.json.
+        // => the server builds .../pro/es-ES/packlink_pro_fr.json.
         $this->setMerchantCountry('FR');
         InfrastructureConfiguration::setUICountryCode('es');
 
