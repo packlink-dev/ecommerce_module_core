@@ -609,5 +609,41 @@
   "shipmentDocumentType": {
     "shippingLabel": "Etiqueta de envío",
     "customsInvoice": "Factura aduanera"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integración de contratos con transportistas (Correos, Seur y Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con Correos, Correos Express, Seur, UPS, InPost y más.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Conecta 1 contrato con transportista (Correos, Seur y Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 2,47€ con Correos y desde 4,44€ con Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratos con transportistas ilimitados (Correos, Seur y Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 2,38€ con Correos y desde 4,35€ con Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 2,47 € con Correos y desde 4,44 € con Correos Express para paquetes de hasta 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integración de contratos con transportistas (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con Chronopost, Mondial Relay, Colissimo y más.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Conecta 1 contrato con transportista (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 2,84€ con Chronopost y desde 2,89€ con Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratos con transportistas ilimitados (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 2,84€ con Chronopost y desde 2,89€ con Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 2,84 € con Chronopost y desde 2,89 € con Mondial Relay para paquetes de hasta 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con DPD, UPS, DHL Express, TNT y más.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 3,97€ con DPD XS y desde 4,65€ con UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 3,97€ con DPD XS y desde 4,65€ con UPS.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 3,97 € con DPD XS y desde 4,65 € con UPS para paquetes de hasta 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Descuentos Plus, tarifas de envío desde 3,82€ para Poste Italiane y 4,50€ para BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Integración de contratos con transportistas (BRT y Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con Poste Italiane, BRT, InPost y más.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Conecta 1 contrato con transportista (BRT y Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 3,82€ para Poste Italiane y 4,50€ para BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratos con transportistas ilimitados (BRT y Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 3,70€ para Poste Italiane y 4,35€ para BRT.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 3,82 € con Poste Italiane y desde 4,50 € con BRT para paquetes de hasta 2 kg 💎!"
+    }
   }
 }
