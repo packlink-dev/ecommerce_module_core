@@ -13,8 +13,8 @@ if (!window.Packlink) {
      *
      * The banner element (#pl-promotional-banner) is expected to already be present in the
      * current page template, starting hidden via the pl-hidden class. This controller fetches
-     * the plan tier, hides the banner for PREMIUM merchants (or when the plan is unavailable),
-     * and otherwise fills in the label text and wires the upgrade button.
+     * the plan tier, shows the banner only for FREE merchants (PLUS/PREMIUM or an unavailable
+     * plan see nothing), and otherwise fills in the label text and wires the upgrade button.
      *
      * @constructor
      */
@@ -42,7 +42,9 @@ if (!window.Packlink) {
             ajaxService.get(config.getSubscriptionPlanUrl, (response) => {
                 planTier = response ? response.planTier : null;
 
-                if (!planTier || planTier === 'PREMIUM') {
+                // The promotional banner is only shown to FREE merchants. PLUS and PREMIUM
+                // merchants (or when the plan is unavailable) do not see it.
+                if (!planTier || planTier !== 'FREE') {
                     return;
                 }
 
