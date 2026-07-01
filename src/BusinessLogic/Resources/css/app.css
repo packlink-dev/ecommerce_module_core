@@ -1368,7 +1368,7 @@
   color: #5b4dc7;
   border-radius: 6px;
   padding: 10px 16px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -1474,6 +1474,28 @@
 #pl-page .pl-upgrade-wrapper:hover .pl-upgrade-tooltip {
   display: block;
 }
+#pl-page .pl-upgrade-wrapper:hover::before,
+#pl-page .pl-upgrade-wrapper:hover::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: transparent;
+  z-index: 1001;
+}
+#pl-page .pl-upgrade-wrapper:hover::before {
+  bottom: -6px;
+  border-width: 0 9px 9px 9px;
+  border-bottom-color: #d7d7d7;
+}
+#pl-page .pl-upgrade-wrapper:hover::after {
+  bottom: -7px;
+  border-width: 0 8px 8px 8px;
+  border-bottom-color: #ffffff;
+}
 #pl-page .pl-upgrade-button {
   display: inline-flex;
   align-items: center;
@@ -1497,7 +1519,8 @@
   line-height: 1;
 }
 #pl-page .pl-upgrade-button:hover {
-  background-color: #efedfc;
+  background-color: #ffffff;
+  color: #5b4dc7;
 }
 #pl-page .pl-upgrade-tooltip {
   position: absolute;
@@ -1512,17 +1535,21 @@
   font-size: 12px;
   line-height: 1.6;
   width: max-content;
-  max-width: 280px;
+  max-width: none;
+  white-space: nowrap;
   z-index: 1000;
   display: none;
 }
 #pl-page .pl-upgrade-tooltip.pl-visible {
   display: block;
 }
-#pl-page .pl-upgrade-tooltip ul {
+#pl-page .pl-upgrade-tooltip .pl-upgrade-benefits {
+  margin: 0;
+}
+#pl-page .pl-upgrade-tooltip .pl-upgrade-benefits ul {
   list-style: disc;
   padding-left: 16px;
-  margin: 0;
+  margin: 4px 0;
 }
 #pl-page .pl-plan-display {
   display: flex;
