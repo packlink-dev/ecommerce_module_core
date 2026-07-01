@@ -12,7 +12,7 @@ $pl-info-border: #B3D7FF;
     color: $pl-purple;
     border-radius: 6px;
     padding: 10px 16px;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -132,6 +132,36 @@ $pl-info-border: #B3D7FF;
     &:hover .pl-upgrade-tooltip {
       display: block;
     }
+
+    // Caret pointing up at the centre of the Upgrade button, shown with the tooltip.
+    // Anchored to this wrapper (which is exactly button-sized) so left: 50% lands on the
+    // button centre. Two stacked triangles: the outer one in the border colour, the inner
+    // white fill sits 1px lower so it overlaps into the bubble and the caret opens into it
+    // (no border line closing off its base). The `-6px` matches the tooltip's 6px top gap.
+    &:hover::before,
+    &:hover::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-color: transparent;
+      z-index: 1001;
+    }
+
+    &:hover::before {
+      bottom: -6px;
+      border-width: 0 9px 9px 9px;
+      border-bottom-color: $border-color;
+    }
+
+    &:hover::after {
+      bottom: -7px;
+      border-width: 0 8px 8px 8px;
+      border-bottom-color: $color-white;
+    }
   }
 
   .pl-upgrade-button {
@@ -157,8 +187,10 @@ $pl-info-border: #B3D7FF;
       line-height: 1;
     }
 
+    // Keep the button visually unchanged on hover (override the global button:hover highlight).
     &:hover {
-      background-color: $pl-purple-bg;
+      background-color: $color-white;
+      color: $pl-purple;
     }
   }
 
@@ -175,7 +207,8 @@ $pl-info-border: #B3D7FF;
     font-size: 12px;
     line-height: 1.6;
     width: max-content;
-    max-width: 280px;
+    max-width: none;
+    white-space: nowrap;
     z-index: 1000;
     display: none;
 
@@ -183,10 +216,14 @@ $pl-info-border: #B3D7FF;
       display: block;
     }
 
-    ul {
-      list-style: disc;
-      padding-left: 16px;
+    .pl-upgrade-benefits {
       margin: 0;
+
+      ul {
+        list-style: disc;
+        padding-left: 16px;
+        margin: 4px 0;
+      }
     }
   }
 

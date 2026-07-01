@@ -73,16 +73,34 @@ if (!window.Packlink) {
                     button.addEventListener('mouseleave', () => tooltip.classList.remove('pl-visible'));
                 }
 
-                // Benefit keys contain digits, which translateHtml's placeholder regex cannot
-                // resolve, so populate the tooltip list here via the translation service.
+                // Render the consolidated upgrade benefits: intro/closing lines as plain text
+                // and the "- " prefixed lines as a bulleted list, keeping the styled tooltip look.
                 const benefits = templateService.getComponent('pl-dashboard-upgrade-benefits');
                 if (benefits) {
                     benefits.innerHTML = '';
-                    for (let i = 1; i <= 6; i++) {
-                        const li = document.createElement('li');
-                        li.textContent = translationService.translate('subscription.tooltipBenefit' + i);
-                        benefits.appendChild(li);
-                    }
+                    const lines = translationService.translate('subscription.tooltipBenefits').split('\n');
+                    let list = null;
+                    lines.forEach((line) => {
+                        const text = line.trim();
+                        if (text === '') {
+                            return;
+                        }
+
+                        if (text.indexOf('-') === 0) {
+                            if (!list) {
+                                list = document.createElement('ul');
+                                benefits.appendChild(list);
+                            }
+                            const li = document.createElement('li');
+                            li.textContent = text.replace(/^-\s*/, '');
+                            list.appendChild(li);
+                        } else {
+                            list = null;
+                            const paragraph = document.createElement('div');
+                            paragraph.textContent = text;
+                            benefits.appendChild(paragraph);
+                        }
+                    });
                 }
 
                 wrapper.classList.remove('pl-hidden');
