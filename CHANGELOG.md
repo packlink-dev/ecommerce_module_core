@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.1...v4.2.2) - 2026-06-30
+### Changed
+- Fix translation logic for the banners
+
 ## [4.2.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.0...v4.2.1) - 2026-06-25
 ### Changed
 - Fix IT postal code for retrieving prices for promotional banner
