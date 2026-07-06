@@ -22,8 +22,10 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\CustomsController;
+use Packlink\BusinessLogic\Country\CountryCodes;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
+use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\ValidationError;
 
 class CustomsControllerTest extends BaseTestWithServices
@@ -39,6 +41,8 @@ class CustomsControllerTest extends BaseTestWithServices
      */
     public function before()
     {
+        parent::before();
+
         RepositoryRegistry::registerRepository(ConfigEntity::CLASS_NAME, MemoryRepository::getClassName());
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
         TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
@@ -116,6 +120,8 @@ class CustomsControllerTest extends BaseTestWithServices
             'default_tariff_number' => '123456',
             'default_country' => 'FR',
             'mapping_receiver_tax_id' => 'tax_1',
+            'mapping_tariff_number' => 'hs_code_1',
+            'mapping_company_vat' => 'vat_1',
         );
         /** @var CustomsMappingService $service */
         $service = TestServiceRegister::getService(CustomsMappingService::CLASS_NAME);
@@ -139,6 +145,8 @@ class CustomsControllerTest extends BaseTestWithServices
             'default_tariff_number' => '12345678',
             'default_country' => 'FR',
             'mapping_receiver_tax_id' => 'tax_1',
+            'mapping_tariff_number' => 'hs_code_1',
+            'mapping_company_vat' => 'vat_1',
         );
 
         // act
@@ -149,5 +157,66 @@ class CustomsControllerTest extends BaseTestWithServices
         $service = TestServiceRegister::getService(CustomsMappingService::CLASS_NAME);
         $result = $service->getCustomsMappings();
         self::assertEquals($mapping, $result->toArray());
+    }
+
+    public function testGetAllCountries()
+    {
+        // act
+        $result = $this->customsController->getAllCountries();
+
+        // assert
+        self::assertEquals(CountryCodes::$countryCodes, $result);
+    }
+
+    public function testGetMappingFieldsOptions()
+    {
+        // act
+        $result = $this->customsController->getMappingFieldsOptions();
+
+        // assert
+        self::assertCount(1, $result);
+        self::assertEquals('mapping_receiver_tax_id', $result[0]->field);
+        self::assertEquals(
+            array(
+                array('value' => 'tax_1', 'name' => 'Tax 1'),
+                array('value' => 'tax_2', 'name' => 'Tax 2'),
+                array('value' => 'tax_3', 'name' => 'Tax 3'),
+            ),
+            array_map(
+                function ($option) {
+                    return $option->toArray();
+                },
+                $result[0]->options
+            )
+        );
+    }
+
+    public function testSaveInvalidMappingThrows()
+    {
+        // arrange
+        $mapping = array(
+            'default_reason' => 'PURCHASE_OR_SALE',
+            'default_sender_tax_id' => '123',
+            'default_receiver_tax_id' => '123',
+            'default_receiver_user_type' => 'PRIVATE_PERSON',
+            'default_tariff_number' => '123', // invalid: fewer than 6 digits
+            'default_country' => 'FR',
+            'mapping_receiver_tax_id' => 'tax_1',
+        );
+
+        // act
+        $exceptionThrown = null;
+        try {
+            $this->customsController->save($mapping);
+        } catch (FrontDtoValidationException $e) {
+            $exceptionThrown = $e;
+        }
+
+        // assert
+        self::assertNotNull($exceptionThrown, 'Invalid mapping must raise a validation exception.');
+
+        /** @var Configuration $configuration */
+        $configuration = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        self::assertNull($configuration->getCustomsMappings(), 'Invalid mapping must not be persisted.');
     }
 }

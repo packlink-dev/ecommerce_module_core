@@ -340,4 +340,29 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
 
         $this->assertSame(array(), $documents);
     }
+
+    /**
+     * Tests that a Proxy failure while fetching the customs invoice download
+     * URL is swallowed: no document is returned and the failure is logged,
+     * matching the collectCustomsInvoice() swallow-and-log behaviour.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testGetDocumentsForOrderOmitsCustomsInvoiceAndLogsOnApiFailure()
+    {
+        $this->orderShipmentDetailsService->setReference('order-1', 'ref-1');
+        $this->orderShipmentDetailsService->updateShipmentCustomsData('ref-1', 'inv-42');
+
+        // no mock responses queued: the Proxy call fails with HttpCommunicationException.
+
+        $documents = $this->service->getDocumentsForOrder('order-1');
+
+        $this->assertSame(array(), $documents);
+        $this->assertTrue(
+            $this->shopLogger->isMessageContainedInLog(
+                'Failed to fetch customs invoice download URL for invoice inv-42'
+            ),
+            'API failure while resolving the customs invoice download URL must be logged.'
+        );
+    }
 }

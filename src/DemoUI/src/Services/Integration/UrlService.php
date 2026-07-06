@@ -17,9 +17,7 @@ class UrlService
      */
     public static function getEndpointUrl($controllerName, $action)
     {
-        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
-
-        return "{$schema}://{$_SERVER['HTTP_HOST']}/Controllers/Index.php?controller={$controllerName}&action={$action}";
+        return static::getSchema() . "://{$_SERVER['HTTP_HOST']}/Controllers/Index.php?controller={$controllerName}&action={$action}";
     }
 
     /**
@@ -29,10 +27,9 @@ class UrlService
      */
     public static function getResourceUrl($filePath = '')
     {
-        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
         $brandPlatformCode = getenv('PL_PLATFORM');
 
-        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/$brandPlatformCode/resources" . ($filePath ? '/' . $filePath : '');
+        return static::getSchema() . "://{$_SERVER['HTTP_HOST']}/Views/$brandPlatformCode/resources" . ($filePath ? '/' . $filePath : '');
     }
 
     /**
@@ -42,9 +39,25 @@ class UrlService
      */
     public static function getHomepage()
     {
-        $schema = empty($_SERVER['HTTPS']) ? 'http' : 'https';
         $brandPlatformCode = getenv('PL_PLATFORM');
 
-        return "{$schema}://{$_SERVER['HTTP_HOST']}/Views/$brandPlatformCode/index.php";
+        return static::getSchema() . "://{$_SERVER['HTTP_HOST']}/Views/$brandPlatformCode/index.php";
+    }
+
+    /**
+     * Resolves the request schema, honoring the X-Forwarded-Proto header set by
+     * reverse proxies (e.g. ngrok) that terminate TLS in front of this dev server -
+     * $_SERVER['HTTPS'] alone is never set in that case, which would otherwise
+     * generate http:// URLs for a page actually served over https://.
+     *
+     * @return string 'http' or 'https'
+     */
+    private static function getSchema()
+    {
+        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            return strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https' ? 'https' : 'http';
+        }
+
+        return empty($_SERVER['HTTPS']) ? 'http' : 'https';
     }
 }

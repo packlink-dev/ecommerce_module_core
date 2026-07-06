@@ -50,6 +50,14 @@ class CustomsMapping extends FrontDto
      */
     public $mappingReceiverTaxId;
     /**
+     * @var string
+     */
+    public $mappingTariffNumber;
+    /**
+     * @var string
+     */
+    public $mappingCompanyVat;
+    /**
      * Fields for this DTO.
      *
      * @var array
@@ -62,6 +70,8 @@ class CustomsMapping extends FrontDto
         'default_tariff_number',
         'default_country',
         'mapping_receiver_tax_id',
+        'mapping_tariff_number',
+        'mapping_company_vat',
     );
     /**
      * Required fields for DTO to be valid.
@@ -95,6 +105,8 @@ class CustomsMapping extends FrontDto
         $mapping->defaultTariffNumber = static::getDataValue($raw,'default_tariff_number');
         $mapping->defaultCountry = static::getDataValue($raw,'default_country');
         $mapping->mappingReceiverTaxId = static::getDataValue($raw,'mapping_receiver_tax_id');
+        $mapping->mappingTariffNumber = static::getDataValue($raw,'mapping_tariff_number');
+        $mapping->mappingCompanyVat = static::getDataValue($raw,'mapping_company_vat');
 
         return $mapping;
     }
@@ -114,6 +126,8 @@ class CustomsMapping extends FrontDto
             'default_tariff_number' => $this->defaultTariffNumber,
             'default_country' => $this->defaultCountry,
             'mapping_receiver_tax_id' => $this->mappingReceiverTaxId,
+            'mapping_tariff_number' => $this->mappingTariffNumber,
+            'mapping_company_vat' => $this->mappingCompanyVat,
         );
     }
 
