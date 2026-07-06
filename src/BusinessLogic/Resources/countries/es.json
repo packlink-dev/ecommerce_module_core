@@ -393,7 +393,8 @@
     "parcel": "Paquete predeterminado",
     "help": "Ayuda",
     "contactUs": "Contáctanos:",
-    "systemInfo": "Información del sistema"
+    "systemInfo": "Información del sistema",
+    "email": "Correo electrónico:"
   },
   "systemInfo": {
     "title": "System information file <br>and debug mode",
@@ -583,5 +584,61 @@
     "whileDisabled": "Mientras la integración esté deshabilitada, no podrás utilizar los servicios de envío de Packlink, incluidas las tarifas dinámicas y la creación y gestión de envíos.",
     "resubscribe": "Para reactivar automáticamente la integración y recuperar el acceso a todas las funciones, vuelve a suscribirte al plan de suscripción adecuado %s.",
     "resubscribeLink": "aquí"
+  },
+  "subscription": {
+    "upgrade": "Actualizar",
+    "upgradeNow": "Actualizar ahora",
+    "tooltipBenefits": "Todo lo de Free, y además:\n- Ahorra más: Accede a nuestras tarifas de envío más bajas.\n- Simplifica tu facturación: Recibe una única factura mensual.\n- Resuelve dudas antes: Accede a soporte en vivo prémium.\n¡Y mucho más!",
+    "yourPricingPlan": "Tu plan de precios:",
+    "ordersPageBanner": "Actualiza y obtén tarifas con descuento, factura mensual única y soporte en vivo.",
+    "supportPageBannerFree": "Actualiza y resuelve incidencias de envío más rápido por chat o teléfono",
+    "supportPageBannerPlus": "Actualiza y resuelve incidencias de envío más rápido por teléfono",
+    "measureAccuratelyTitle": "¡Mide con precisión!",
+    "measureAccuratelyHighlight": "Evita cargos adicionales:",
+    "measureAccuratelyBody": "los transportistas auditan el tamaño de los paquetes, así que pesa y mide usando una báscula y una cinta métrica.",
+    "phoneEmailInfoTitle": "¿Por qué son obligatorios el teléfono móvil y el correo electrónico?",
+    "phoneEmailInfoBody": "Un número de teléfono móvil y una dirección de correo electrónico ayudan a los transportistas a contactar con el destinatario, compartir actualizaciones de entrega y garantizar una entrega exitosa. Proporcionar ambos aumenta el porcentaje de entregas exitosas hasta en un 95%.",
+    "phoneEmailInfoWarning": "Si falta esta información, pueden producirse problemas o retrasos en la entrega.",
+    "genericBanner": "Desbloquea ventajas de envío exclusivas con acceso a las mejores tarifas de transportistas, servicios premium de entrega refrigerada y la libertad de enviar usando las tarifas negociadas de tu propio transportista."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Etiqueta de envío",
+    "customsInvoice": "Factura aduanera"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integración de contratos con transportistas (Correos, Seur y Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con Correos, Correos Express, Seur, UPS, InPost y más.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Conecta 1 contrato con transportista (Correos, Seur y Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 2,47€ con Correos y desde 4,44€ con Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratos con transportistas ilimitados (Correos, Seur y Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 2,38€ con Correos y desde 4,35€ con Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 2,47 € con Correos y desde 4,44 € con Correos Express para paquetes de hasta 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integración de contratos con transportistas (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con Chronopost, Mondial Relay, Colissimo y más.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Conecta 1 contrato con transportista (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 2,84€ con Chronopost y desde 2,89€ con Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratos con transportistas ilimitados (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 2,84€ con Chronopost y desde 2,89€ con Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 2,84 € con Chronopost y desde 2,89 € con Mondial Relay para paquetes de hasta 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con DPD, UPS, DHL Express, TNT y más.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 3,97€ con DPD XS y desde 4,65€ con UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 3,97€ con DPD XS y desde 4,65€ con UPS.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 3,97 € con DPD XS y desde 4,65 € con UPS para paquetes de hasta 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Descuentos Plus, tarifas de envío desde 3,82€ para Poste Italiane y 4,50€ para BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Integración de contratos con transportistas (BRT y Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Descuentos en todas las tarifas de envío con Poste Italiane, BRT, InPost y más.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Conecta 1 contrato con transportista (BRT y Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Descuentos Plus, tarifas de envío desde 3,82€ para Poste Italiane y 4,50€ para BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratos con transportistas ilimitados (BRT y Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 3,70€ para Poste Italiane y 4,35€ para BRT.",
+      "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 3,82 € con Poste Italiane y desde 4,50 € con BRT para paquetes de hasta 2 kg 💎!"
+    }
   }
 }

@@ -1,0 +1,247 @@
+// --- CR-65: Subscription line-up (promotional banner, info box, tooltip, plan display) ---
+
+$pl-purple: #5b4dc7;
+$pl-purple-bg: #efedfc;
+$pl-purple-hover: #e6e2fb;
+$pl-info-bg: #EBF5FF;
+$pl-info-border: #B3D7FF;
+
+#pl-page {
+  .pl-promotional-banner {
+    background-color: $pl-purple-bg;
+    color: $pl-purple;
+    border-radius: 6px;
+    padding: 10px 16px;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    .pl-promotional-banner-text {
+      flex: 1;
+      color: $pl-purple;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .pl-promotional-banner-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: $pl-purple-bg;
+      color: $pl-purple;
+      border: 1px solid $pl-purple;
+      border-radius: 0;
+      margin: 0;
+      padding: 3px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+
+      .pl-promotional-banner-icon {
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      &:hover {
+        background-color: $pl-purple-hover;
+      }
+    }
+  }
+
+  .pl-info-box {
+    background-color: $pl-info-bg;
+    border-left: 4px solid $color-blue;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+
+    .pl-info-box-info-icon {
+      flex-shrink: 0;
+      font-size: 18px;
+      line-height: 1.5;
+      color: $color-blue;
+    }
+
+    .pl-info-box-content {
+      flex: 1;
+      font-size: 13px;
+      line-height: 1.5;
+      color: $text-color;
+
+      strong {
+        font-weight: 700;
+      }
+    }
+  }
+
+  .pl-account-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 300px;
+    padding: 5px 26px;
+    background-color: #f5f5f5;
+
+    .pl-account-email {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: $text-color;
+
+      .pl-account-icon {
+        font-size: 20px;
+        line-height: 1;
+        color: $color-blue;
+      }
+
+      .pl-account-email-label {
+        font-weight: 700;
+        margin-right: 2px;
+      }
+    }
+
+    .pl-account-email-value {
+      margin-top: -2px;
+      margin-left: 26px;
+      font-size: 13px;
+      font-weight: 600;
+      color: $text-color;
+      word-break: break-all;
+    }
+  }
+
+  .pl-upgrade-wrapper {
+    position: relative;
+    display: inline-flex;
+    margin-left: 26px;
+
+    &:hover .pl-upgrade-tooltip {
+      display: block;
+    }
+
+    // Caret pointing up at the centre of the Upgrade button, shown with the tooltip.
+    // Anchored to this wrapper (which is exactly button-sized) so left: 50% lands on the
+    // button centre. Two stacked triangles: the outer one in the border colour, the inner
+    // white fill sits 1px lower so it overlaps into the bubble and the caret opens into it
+    // (no border line closing off its base). The `-6px` matches the tooltip's 6px top gap.
+    &:hover::before,
+    &:hover::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-color: transparent;
+      z-index: 1001;
+    }
+
+    &:hover::before {
+      bottom: -6px;
+      border-width: 0 9px 9px 9px;
+      border-bottom-color: $border-color;
+    }
+
+    &:hover::after {
+      bottom: -7px;
+      border-width: 0 8px 8px 8px;
+      border-bottom-color: $color-white;
+    }
+  }
+
+  .pl-upgrade-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    margin: 0;
+    background-color: $color-white;
+    color: $pl-purple;
+    border: 1px solid $pl-purple;
+    border-radius: 0;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    .pl-upgrade-button-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    // Keep the button visually unchanged on hover (override the global button:hover highlight).
+    &:hover {
+      background-color: $color-white;
+      color: $pl-purple;
+    }
+  }
+
+  .pl-upgrade-tooltip {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background-color: $color-white;
+    color: $text-color;
+    border: 1px solid $border-color;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    width: max-content;
+    max-width: none;
+    white-space: nowrap;
+    z-index: 1000;
+    display: none;
+
+    &.pl-visible {
+      display: block;
+    }
+
+    .pl-upgrade-benefits {
+      margin: 0;
+
+      ul {
+        list-style: disc;
+        padding-left: 16px;
+        margin: 4px 0;
+      }
+    }
+  }
+
+  .pl-plan-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+
+    .pl-plan-label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .pl-plan-tier {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  }
+}

@@ -393,7 +393,8 @@
     "parcel": "Colis par défaut",
     "help": "Aide",
     "contactUs": "Contactez-nous:",
-    "systemInfo": "Informations du système"
+    "systemInfo": "Informations du système",
+    "email": "E-mail:"
   },
   "systemInfo": {
     "title": "Fichier d’informations du système <br>et mode débogage",
@@ -583,5 +584,61 @@
     "whileDisabled": "Pendant que l’intégration est désactivée, vous ne pourrez pas utiliser les services d’expédition Packlink, y compris les tarifs dynamiques ainsi que la création et la gestion des expéditions.",
     "resubscribe": "Pour réactiver automatiquement l’intégration et retrouver l’accès à toutes les fonctionnalités, veuillez vous réabonner à l’offre appropriée %s.",
     "resubscribeLink": "ici"
+  },
+  "subscription": {
+    "upgrade": "Mettre à niveau",
+    "upgradeNow": "Mettre à niveau maintenant",
+    "tooltipBenefits": "Tout le plan Free, et plus encore :\n- Économisez grâce à nos meilleurs tarifs d'expédition.\n- Recevez une facture mensuelle unique.\n- Accédez à une assistance premium.\nEt bien plus encore !",
+    "yourPricingPlan": "Votre offre tarifaire :",
+    "ordersPageBanner": "Passez à l'offre supérieure : expédition à tarif réduit, facture unique et assistance en direct.",
+    "supportPageBannerFree": "Passez à un plan supérieur et gérez les problèmes d'expédition plus rapidement par chat ou téléphone",
+    "supportPageBannerPlus": "Passez à un plan supérieur et gérez les problèmes d'expédition plus rapidement par téléphone",
+    "measureAccuratelyTitle": "Mesurez avec précision !",
+    "measureAccuratelyHighlight": "Évitez les frais supplémentaires :",
+    "measureAccuratelyBody": "les transporteurs contrôlent les dimensions de vos colis. Pensez à les peser et les mesurer à l'aide d'une balance et d'un mètre.",
+    "phoneEmailInfoTitle": "Pourquoi le téléphone portable et l'e-mail sont-ils requis ?",
+    "phoneEmailInfoBody": "Un numéro de téléphone portable et une adresse e-mail aident les transporteurs à contacter le destinataire, à partager les mises à jour de livraison et à assurer une livraison réussie. Fournir les deux augmente le taux de livraisons réussies jusqu'à 95 %.",
+    "phoneEmailInfoWarning": "L'absence de ces informations peut entraîner des problèmes ou des retards de livraison.",
+    "genericBanner": "Débloquez des avantages exclusifs avec l'accès aux meilleurs tarifs d'expédition, à des services de livraison réfrigérée et à la liberté d'expédier en utilisant vos propres tarifs de transporteurs négociés."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Étiquette d'expédition",
+    "customsInvoice": "Facture douanière"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Intégration de contrats transporteur (Correos, Seur et Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Réductions sur tous les tarifs d'expédition avec Correos, Correos Express, Seur, UPS, InPost et plus encore.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Connectez 1 contrat transporteur (Correos, Seur et Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Remises Plus, tarifs d'expédition à partir de 2,47€ avec Correos et à partir de 4,44€ avec Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contrats transporteur illimités (Correos, Seur et Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Remises Premium, tarifs d'expédition à partir de 2,38€ avec Correos et à partir de 4,35€ avec Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Passez à Plus et commencez à expédier dès 2,47 € avec Correos et dès 4,44 € avec Correos Express pour des colis jusqu'à 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Intégration de contrats transporteur (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Réductions sur tous les tarifs d'expédition avec Chronopost, Mondial Relay, Colissimo et plus encore.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Connectez 1 contrat transporteur (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Remises Plus, tarifs d'expédition à partir de 2,84€ avec Chronopost et à partir de 2,89€ avec Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contrats transporteur illimités (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Remises Premium, tarifs d'expédition à partir de 2,84€ avec Chronopost et à partir de 2,89€ avec Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Passez à Plus et commencez à expédier dès 2,84 € avec Chronopost et dès 2,89 € avec Mondial Relay pour des colis jusqu'à 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Réductions sur tous les tarifs d'expédition avec DPD, UPS, DHL Express, TNT et plus encore.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Remises Plus, tarifs d'expédition à partir de 3,97€ avec DPD XS et à partir de 4,65€ avec UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Remises Premium, tarifs d'expédition à partir de 3,97€ avec DPD XS et à partir de 4,65€ avec UPS.",
+      "subscriptions.upgrade-notification.more-features": "Passez à Plus et commencez à expédier dès 3,97 € avec DPD XS et dès 4,65 € avec UPS pour des colis jusqu'à 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Remises Plus, tarifs d'expédition à partir de 3,82€ pour Poste Italiane et 4,50€ pour BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Intégration de contrats transporteur (BRT et Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Réductions sur tous les tarifs d'expédition avec Poste Italiane, BRT, InPost et plus encore.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Connectez 1 contrat transporteur (BRT et Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Remises Plus, tarifs d'expédition à partir de 3,82€ pour Poste Italiane et 4,50€ pour BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contrats transporteur illimités (BRT et Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Remises Premium, tarifs d'expédition à partir de 3,70€ pour Poste Italiane et 4,35€ pour BRT.",
+      "subscriptions.upgrade-notification.more-features": "Passez à Plus et commencez à expédier dès 3,82 € avec Poste Italiane et dès 4,50 € avec BRT pour des colis jusqu'à 2 kg 💎!"
+    }
   }
 }

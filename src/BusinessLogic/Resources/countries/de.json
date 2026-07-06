@@ -393,7 +393,8 @@
     "parcel": "Standardpaket",
     "help": "Hilfe",
     "contactUs": "Kontaktieren Sie uns:",
-    "systemInfo": "Systeminformationen"
+    "systemInfo": "Systeminformationen",
+    "email": "E-Mail:"
   },
   "systemInfo": {
     "title": "Systeminfodatei <br>und debug mode",
@@ -583,5 +584,61 @@
     "whileDisabled": "Solange die Integration deaktiviert ist, können Sie die Versanddienste von Packlink, einschließlich dynamischer Tarife sowie Erstellung und Verwaltung von Sendungen, nicht nutzen.",
     "resubscribe": "Um die Integration automatisch zu reaktivieren und wieder Zugriff auf alle Funktionen zu erhalten, abonnieren Sie bitte erneut den entsprechenden Tarif %s.",
     "resubscribeLink": "hier"
+  },
+  "subscription": {
+    "upgrade": "Upgrade",
+    "upgradeNow": "Jetzt upgraden",
+    "tooltipBenefits": "Alles aus Free, plus:\n- Mehr sparen: Schalten Sie unsere günstigsten Versandtarife frei.\n- Abrechnung vereinfachen: Erhalten Sie eine einzige monatliche Rechnung.\n- Schneller Hilfe erhalten: Nutzen Sie den Premium-Live-Support.\nUnd vieles mehr!",
+    "yourPricingPlan": "Ihr Preisplan:",
+    "ordersPageBanner": "Upgraden Sie für ermäßigte Versandtarife, eine monatliche Rechnung und Live-Support.",
+    "supportPageBannerFree": "Upgraden Sie und lösen Sie Versandprobleme schneller per Chat oder Telefon",
+    "supportPageBannerPlus": "Upgraden Sie und lösen Sie Versandprobleme schneller per Telefon",
+    "measureAccuratelyTitle": "Genau messen!",
+    "measureAccuratelyHighlight": "Vermeiden Sie Zusatzkosten:",
+    "measureAccuratelyBody": "Carrier prüfen die Paketgrößen, wiegen und messen Sie daher mit einer Waage und einem Maßband.",
+    "phoneEmailInfoTitle": "Warum sind Mobiltelefon und E-Mail erforderlich?",
+    "phoneEmailInfoBody": "Eine Mobiltelefonnummer und eine E-Mail-Adresse helfen Carriern, den Empfänger zu kontaktieren, Lieferaktualisierungen zu teilen und eine erfolgreiche Zustellung sicherzustellen. Werden beide angegeben, erhöht sich die Erfolgsquote der Zustellung um bis zu 95 %.",
+    "phoneEmailInfoWarning": "Fehlen diese Informationen, kann es zu Lieferproblemen oder Verzögerungen kommen.",
+    "genericBanner": "Schalten Sie exklusive Versandvorteile frei mit Zugang zu den besten Carrier-Tarifen, Premium-Kühlversandservices und der Freiheit, mit Ihren eigenen ausgehandelten Carrier-Tarifen zu versenden."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Versandetikett",
+    "customsInvoice": "Zollrechnung"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integration von Versandverträgen (Correos, Seur und Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit Correos, Correos Express, Seur, UPS, InPost und mehr.",
+      "subscriptions.plus-plan-features.carrier-contracts": "1 Versandvertrag verbinden (Correos, Seur und Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 2,47€ mit Correos und ab 4,44€ mit Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unbegrenzte Versandverträge (Correos, Seur und Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 2,38€ mit Correos und ab 4,35€ mit Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 2,47 € mit Correos und ab 4,44 € mit Correos Express für Pakete bis 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integration von Versandverträgen (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit Chronopost, Mondial Relay, Colissimo und mehr.",
+      "subscriptions.plus-plan-features.carrier-contracts": "1 Versandvertrag verbinden (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 2,84€ mit Chronopost und ab 2,89€ mit Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unbegrenzte Versandverträge (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 2,84€ mit Chronopost und ab 2,89€ mit Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 2,84 € mit Chronopost und ab 2,89 € mit Mondial Relay für Pakete bis 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit DPD, UPS, DHL Express, TNT und mehr.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 3,97€ mit DPD XS und ab 4,65€ mit UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 3,97€ mit DPD XS und ab 4,65€ mit UPS.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 3,97 € mit DPD XS und ab 4,65 € mit UPS für Pakete bis 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Plus-Rabatte, Versandkosten ab 3,82€ für Poste Italiane und 4,50€ für BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Integration von Versandverträgen (BRT und Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit Poste Italiane, BRT, InPost und mehr.",
+      "subscriptions.plus-plan-features.carrier-contracts": "1 Versandvertrag verbinden (BRT und Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 3,82€ für Poste Italiane und 4,50€ für BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unbegrenzte Versandverträge (BRT und Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 3,70€ für Poste Italiane und 4,35€ für BRT.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 3,82 € mit Poste Italiane und ab 4,50 € mit BRT für Pakete bis 2 kg 💎!"
+    }
   }
 }

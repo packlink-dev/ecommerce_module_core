@@ -48,6 +48,7 @@ use Packlink\DemoUI\Repository\SessionRepository;
 use Packlink\DemoUI\Services\BusinessLogic\CarrierService;
 use Packlink\DemoUI\Services\BusinessLogic\ConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\CustomsMappingService;
+use Packlink\DemoUI\Services\BusinessLogic\IntegrationRegistrationDataProvider;
 use Packlink\DemoUI\Services\BusinessLogic\OAuthConfigurationService;
 use Packlink\DemoUI\Services\BusinessLogic\ShopOrderService;
 use Packlink\BusinessLogic\SystemInformation\SystemInfoService as SystemInfoServiceInterface;
@@ -91,6 +92,10 @@ class Bootstrap extends BootstrapComponent
      * @var CarrierService
      */
     private $carrierService;
+    /**
+     * @var IntegrationRegistrationDataProvider
+     */
+    private $integrationRegistrationDataProvider;
     /**
      * @var UserAccountService
      */
@@ -139,10 +144,8 @@ class Bootstrap extends BootstrapComponent
         $this->systemInfoService = new SystemInfoService();
         $this->customsService = new CustomsMappingService();
         $this->oauthProxy = new OAuthProxy(OAuthConfigurationService::getInstance(), $client);
-        /** @var IntegrationRegistrationDataProviderInterface $integrationRegistrationDataProvider */
-        $integrationRegistrationDataProvider = ServiceRegister::getService(
-            IntegrationRegistrationDataProviderInterface::CLASS_NAME);
-        $this->proxy = new Proxy($configService, $client, $integrationRegistrationDataProvider);
+        $this->integrationRegistrationDataProvider = new IntegrationRegistrationDataProvider($configService);
+        $this->proxy = new Proxy($configService, $client, $this->integrationRegistrationDataProvider);
         $this->oAuthConfiguration = OAuthConfigurationService::getInstance();
     }
 
@@ -265,6 +268,13 @@ class Bootstrap extends BootstrapComponent
             \Packlink\BusinessLogic\Customs\CustomsMappingService::CLASS_NAME,
             function () use ($instance) {
                 return $instance->customsService;
+            }
+        );
+
+        ServiceRegister::registerService(
+            IntegrationRegistrationDataProviderInterface::CLASS_NAME,
+            function () use ($instance) {
+                return $instance->integrationRegistrationDataProvider;
             }
         );
 

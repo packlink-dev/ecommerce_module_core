@@ -393,7 +393,8 @@
     "parcel": "Pacco predefinito",
     "help": "Aiuto",
     "contactUs": "Contattaci:",
-    "systemInfo": "Informazioni del sistema"
+    "systemInfo": "Informazioni del sistema",
+    "email": "E-mail:"
   },
   "systemInfo": {
     "title": "File di informazioni del sistema <br>e modalità debug",
@@ -583,5 +584,61 @@
     "whileDisabled": "Finché l’integrazione è disattivata, non potrai utilizzare i servizi di spedizione Packlink, inclusi i prezzi dinamici e la creazione e gestione delle spedizioni.",
     "resubscribe": "Per riattivare automaticamente l’integrazione e riottenere l’accesso a tutte le funzionalità, effettua nuovamente l’iscrizione al piano di abbonamento appropriato %s.",
     "resubscribeLink": "qui"
+  },
+  "subscription": {
+    "upgrade": "Aggiorna",
+    "upgradeNow": "Aggiorna ora",
+    "tooltipBenefits": "Tutto ciò che include Free, più:\n- Risparmia di più: Sblocca le nostre tariffe di spedizione più basse.\n- Semplifica la fatturazione: Ricevi un'unica fattura mensile.\n- Ottieni assistenza rapida: Accedi al supporto live premium.\nE molto altro ancora!",
+    "yourPricingPlan": "Il tuo piano tariffario:",
+    "ordersPageBanner": "Aggiorna per tariffe scontate, un'unica fattura mensile e supporto live.",
+    "supportPageBannerFree": "Aggiorna e gestisci i problemi di spedizione più velocemente via chat o telefono",
+    "supportPageBannerPlus": "Aggiorna e gestisci i problemi di spedizione più velocemente via telefono",
+    "measureAccuratelyTitle": "Misura con precisione!",
+    "measureAccuratelyHighlight": "Evita costi aggiuntivi:",
+    "measureAccuratelyBody": "i corrieri verificano le dimensioni dei pacchi, quindi pesa e misura con una bilancia e un metro a nastro.",
+    "phoneEmailInfoTitle": "Perché sono richiesti telefono cellulare ed e-mail?",
+    "phoneEmailInfoBody": "Un numero di telefono cellulare e un indirizzo e-mail aiutano i corrieri a contattare il destinatario, condividere gli aggiornamenti sulla consegna e garantire una consegna riuscita. Fornendo entrambi, il tasso di consegne riuscite aumenta fino al 95%.",
+    "phoneEmailInfoWarning": "La mancanza di queste informazioni può causare problemi o ritardi nella consegna.",
+    "genericBanner": "Sblocca vantaggi di spedizione esclusivi con accesso alle migliori tariffe dei corrieri, servizi premium di consegna refrigerata e la libertà di spedire utilizzando le tariffe negoziate del tuo corriere."
+  },
+  "shipmentDocumentType": {
+    "shippingLabel": "Etichetta di spedizione",
+    "customsInvoice": "Fattura doganale"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integrazione contratti corriere (Correos, Seur e Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con Correos, Correos Express, Seur, UPS, InPost e altri.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Collega 1 contratto corriere (Correos, Seur e Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 2,47€ con Correos e da 4,44€ con Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratti corriere illimitati (Correos, Seur e Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 2,38€ con Correos e da 4,35€ con Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 2,47 € con Correos e da 4,44 € con Correos Express per pacchi fino a 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integrazione contratti corriere (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con Chronopost, Mondial Relay, Colissimo e altri.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Collega 1 contratto corriere (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 2,84€ con Chronopost e da 2,89€ con Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratti corriere illimitati (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 2,84€ con Chronopost e da 2,89€ con Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 2,84 € con Chronopost e da 2,89 € con Mondial Relay per pacchi fino a 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con DPD, UPS, DHL Express, TNT e altri.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 3,97€ con DPD XS e da 4,65€ con UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 3,97€ con DPD XS e da 4,65€ con UPS.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 3,97 € con DPD XS e da 4,65 € con UPS per pacchi fino a 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Sconti Plus, tariffe di spedizione a partire da 3,82€ per Poste Italiane e 4,50€ per BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Integrazione contratti corriere (BRT e Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con Poste Italiane, BRT, InPost e altri.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Collega 1 contratto corriere (BRT e Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 3,82€ per Poste Italiane e 4,50€ per BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratti corriere illimitati (BRT e Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 3,70€ per Poste Italiane e 4,35€ per BRT.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 3,82 € con Poste Italiane e da 4,50 € con BRT per pacchi fino a 2 kg 💎!"
+    }
   }
 }
