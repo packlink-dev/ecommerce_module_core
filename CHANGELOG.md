@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.2.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.2...v4.2.3) - 2026-07-06
+### Changed
+- Hide banner when it is plus plan
+
 ## [4.2.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.1...v4.2.2) - 2026-06-30
 ### Changed
 - Fix translation logic for the banners
