@@ -10,7 +10,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class QueueItemEntityTest.
@@ -27,12 +27,10 @@ class QueueItemEntityTest extends TestCase
     protected $serializer;
 
     /**
-     * @before
      * @return void
      */
     protected function before()
     {
-        $this->setUp();
 
         $timeProvider = $this->timeProvider = new TestTimeProvider();
         $serializer = $this->serializer = new NativeSerializer();
@@ -50,7 +48,6 @@ class QueueItemEntityTest extends TestCase
     }
 
     /**
-     *
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\QueueItemDeserializationException
      */
     public function testToArray()

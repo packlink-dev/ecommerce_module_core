@@ -39,7 +39,6 @@ class WebHookHandlerTest extends BaseTestWithServices
     private $cashOnDeliveryService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -95,7 +94,6 @@ class WebHookHandlerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

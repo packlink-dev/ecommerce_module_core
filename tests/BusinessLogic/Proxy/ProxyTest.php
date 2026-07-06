@@ -18,8 +18,6 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 class ProxyTest extends BaseTestWithServices
 {
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException

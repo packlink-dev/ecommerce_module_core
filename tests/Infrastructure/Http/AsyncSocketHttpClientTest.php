@@ -18,7 +18,6 @@ class AsyncSocketHttpClientTest extends BaseInfrastructureTestWithServices
     private $taskRunnerConfig;
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()

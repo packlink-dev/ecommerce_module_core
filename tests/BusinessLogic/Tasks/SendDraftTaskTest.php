@@ -64,7 +64,6 @@ class SendDraftTaskTest extends BaseSyncTest
     private $cashOnDeliveryService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -185,7 +184,6 @@ class SendDraftTaskTest extends BaseSyncTest
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

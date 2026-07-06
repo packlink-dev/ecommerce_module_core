@@ -746,43 +746,6 @@
   font-size: 16px;
   line-height: 19px;
 }
-
-#pl-cod-form .pl-config-section h2{
-  padding-bottom: 20px;
-  padding-top: 20px;
-}
-
-#pl-cod-form #pl-desc-second {
-  padding-top: 20px;
-}
-
-#pl-cod-form .pl-cod-info-box {
-  display: flex;
-  background-color: #f0f8ff;
-  border-left: 4px solid #2196F3;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 4px;
-  flex-direction: row;
-  gap: 8px;
-}
-
-#pl-cod-form .pl-cod-info-icon {
-  font-size: 20px;
-  color: #2196F3;
-  margin-right: 8px;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-#pl-cod-form .pl-cod-info-text {
-  font-size: 13px;
-  margin-right: 30px;
-  color: #333;
-  align-content: center;
-  flex: 1;
-}
-
 #pl-page .pl-modal-mask .pl-modal .pl-modal-body {
   padding: 20px 40px;
   align-items: flex-start;
@@ -996,6 +959,208 @@
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+}
+#pl-page .pl-promotional-banner {
+  background-color: #efedfc;
+  color: #5b4dc7;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-text {
+  flex: 1;
+  color: #5b4dc7;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: #efedfc;
+  color: #5b4dc7;
+  border: 1px solid #5b4dc7;
+  border-radius: 0;
+  margin: 0;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-button .pl-promotional-banner-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+#pl-page .pl-promotional-banner .pl-promotional-banner-button:hover {
+  background-color: #e6e2fb;
+}
+#pl-page .pl-info-box {
+  background-color: #ebf5ff;
+  border-left: 4px solid #2095f2;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+}
+#pl-page .pl-info-box .pl-info-box-info-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #2095f2;
+}
+#pl-page .pl-info-box .pl-info-box-content {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3a3d46;
+}
+#pl-page .pl-info-box .pl-info-box-content strong {
+  font-weight: 700;
+}
+#pl-page .pl-account-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 300px;
+  padding: 5px 26px;
+  background-color: #f5f5f5;
+}
+#pl-page .pl-account-section .pl-account-email {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #3a3d46;
+}
+#pl-page .pl-account-section .pl-account-email .pl-account-icon {
+  font-size: 20px;
+  line-height: 1;
+  color: #2095f2;
+}
+#pl-page .pl-account-section .pl-account-email .pl-account-email-label {
+  font-weight: 700;
+  margin-right: 2px;
+}
+#pl-page .pl-account-section .pl-account-email-value {
+  margin-top: -2px;
+  margin-left: 26px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a3d46;
+  word-break: break-all;
+}
+#pl-page .pl-upgrade-wrapper {
+  position: relative;
+  display: inline-flex;
+  margin-left: 26px;
+}
+#pl-page .pl-upgrade-wrapper:hover .pl-upgrade-tooltip {
+  display: block;
+}
+#pl-page .pl-upgrade-wrapper:hover::before, #pl-page .pl-upgrade-wrapper:hover::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: transparent;
+  z-index: 1001;
+}
+#pl-page .pl-upgrade-wrapper:hover::before {
+  bottom: -6px;
+  border-width: 0 9px 9px 9px;
+  border-bottom-color: #d7d7d7;
+}
+#pl-page .pl-upgrade-wrapper:hover::after {
+  bottom: -7px;
+  border-width: 0 8px 8px 8px;
+  border-bottom-color: #fff;
+}
+#pl-page .pl-upgrade-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  background-color: #fff;
+  color: #5b4dc7;
+  border: 1px solid #5b4dc7;
+  border-radius: 0;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#pl-page .pl-upgrade-button .pl-upgrade-button-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+#pl-page .pl-upgrade-button:hover {
+  background-color: #fff;
+  color: #5b4dc7;
+}
+#pl-page .pl-upgrade-tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background-color: #fff;
+  color: #3a3d46;
+  border: 1px solid #d7d7d7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  width: max-content;
+  max-width: none;
+  white-space: nowrap;
+  z-index: 1000;
+  display: none;
+}
+#pl-page .pl-upgrade-tooltip.pl-visible {
+  display: block;
+}
+#pl-page .pl-upgrade-tooltip .pl-upgrade-benefits {
+  margin: 0;
+}
+#pl-page .pl-upgrade-tooltip .pl-upgrade-benefits ul {
+  list-style: disc;
+  padding-left: 16px;
+  margin: 4px 0;
+}
+#pl-page .pl-plan-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+#pl-page .pl-plan-display .pl-plan-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+#pl-page .pl-plan-display .pl-plan-tier {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 #pl-page #pl-main-header {
   height: 90px;
@@ -1296,6 +1461,25 @@
 #pl-page #pl-countries-alert-wrapper.visible {
   display: flex;
 }
+.pl-integration-disabled-content {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: left;
+  color: #333;
+  line-height: 1.6;
+}
+.pl-integration-disabled-content p {
+  margin-bottom: 16px;
+}
+.pl-integration-disabled-content p:last-child {
+  margin-bottom: 0;
+}
+.pl-integration-disabled-content ~ .pl-modal-title, .pl-integration-disabled-content + .pl-modal-title {
+  color: #2e4265;
+}
+.pl-integration-disabled-modal .pl-modal-body {
+  padding-bottom: 30px;
+}
 @media (max-width: 768px) {
   #pl-page .pl-main-logo {
     width: 100%;
@@ -1377,209 +1561,4 @@
   }
 }
 @media (min-width: 769px) and (max-width: 1280px) {
-}
-
-/* CR-65: Subscription line-up */
-#pl-page .pl-promotional-banner {
-  background-color: #efedfc;
-  color: #5b4dc7;
-  border-radius: 6px;
-  padding: 10px 16px;
-  margin-bottom: 0;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-#pl-page .pl-promotional-banner .pl-promotional-banner-text {
-  flex: 1;
-  color: #5b4dc7;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-#pl-page .pl-promotional-banner .pl-promotional-banner-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background-color: #efedfc;
-  color: #5b4dc7;
-  border: 1px solid #5b4dc7;
-  border-radius: 0;
-  margin: 0;
-  padding: 3px 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-#pl-page .pl-promotional-banner .pl-promotional-banner-button .pl-promotional-banner-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-#pl-page .pl-promotional-banner .pl-promotional-banner-button:hover {
-  background-color: #e6e2fb;
-}
-#pl-page .pl-info-box {
-  background-color: #EBF5FF;
-  border-left: 4px solid #2095f2;
-  border-radius: 4px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 10px;
-}
-#pl-page .pl-info-box .pl-info-box-info-icon {
-  flex-shrink: 0;
-  font-size: 18px;
-  line-height: 1.5;
-  color: #2095f2;
-}
-#pl-page .pl-info-box .pl-info-box-content {
-  flex: 1;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #3a3d46;
-}
-#pl-page .pl-info-box .pl-info-box-content strong {
-  font-weight: 700;
-}
-#pl-page .pl-account-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  width: 300px;
-  padding: 5px 26px;
-  background-color: #f5f5f5;
-}
-#pl-page .pl-account-section .pl-account-email {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #3a3d46;
-}
-#pl-page .pl-account-section .pl-account-email .pl-account-icon {
-  font-size: 20px;
-  line-height: 1;
-  color: #2095f2;
-}
-#pl-page .pl-account-section .pl-account-email .pl-account-email-label {
-  font-weight: 700;
-  margin-right: 2px;
-}
-#pl-page .pl-account-section .pl-account-email-value {
-  margin-top: -2px;
-  margin-left: 26px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #3a3d46;
-  word-break: break-all;
-}
-#pl-page .pl-upgrade-wrapper {
-  position: relative;
-  display: inline-flex;
-  margin-left: 26px;
-}
-#pl-page .pl-upgrade-wrapper:hover .pl-upgrade-tooltip {
-  display: block;
-}
-#pl-page .pl-upgrade-wrapper:hover::before,
-#pl-page .pl-upgrade-wrapper:hover::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-color: transparent;
-  z-index: 1001;
-}
-#pl-page .pl-upgrade-wrapper:hover::before {
-  bottom: -6px;
-  border-width: 0 9px 9px 9px;
-  border-bottom-color: #d7d7d7;
-}
-#pl-page .pl-upgrade-wrapper:hover::after {
-  bottom: -7px;
-  border-width: 0 8px 8px 8px;
-  border-bottom-color: #ffffff;
-}
-#pl-page .pl-upgrade-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  min-width: 0;
-  margin: 0;
-  background-color: #ffffff;
-  color: #5b4dc7;
-  border: 1px solid #5b4dc7;
-  border-radius: 0;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: none;
-  cursor: pointer;
-  white-space: nowrap;
-}
-#pl-page .pl-upgrade-button .pl-upgrade-button-icon {
-  font-size: 14px;
-  line-height: 1;
-}
-#pl-page .pl-upgrade-button:hover {
-  background-color: #ffffff;
-  color: #5b4dc7;
-}
-#pl-page .pl-upgrade-tooltip {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  background-color: #ffffff;
-  color: #3a3d46;
-  border: 1px solid #d7d7d7;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.6;
-  width: max-content;
-  max-width: none;
-  white-space: nowrap;
-  z-index: 1000;
-  display: none;
-}
-#pl-page .pl-upgrade-tooltip.pl-visible {
-  display: block;
-}
-#pl-page .pl-upgrade-tooltip .pl-upgrade-benefits {
-  margin: 0;
-}
-#pl-page .pl-upgrade-tooltip .pl-upgrade-benefits ul {
-  list-style: disc;
-  padding-left: 16px;
-  margin: 4px 0;
-}
-#pl-page .pl-plan-display {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-#pl-page .pl-plan-display .pl-plan-label {
-  font-size: 14px;
-  font-weight: 600;
-}
-#pl-page .pl-plan-display .pl-plan-tier {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
 }

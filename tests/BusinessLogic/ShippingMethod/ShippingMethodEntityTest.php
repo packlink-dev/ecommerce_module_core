@@ -39,7 +39,6 @@ class ShippingMethodEntityTest extends BaseTestWithServices
     public $httpClient;
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()
@@ -83,7 +82,6 @@ class ShippingMethodEntityTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

@@ -29,7 +29,6 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
     protected $configService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -55,7 +54,6 @@ class IntegrationRegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

@@ -35,7 +35,6 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
     private $moduleResetService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -68,7 +67,6 @@ class IntegrationRegistrationWebhookHandlerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

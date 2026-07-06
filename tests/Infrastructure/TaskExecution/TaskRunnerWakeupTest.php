@@ -36,7 +36,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class TaskRunnerWakeupTest
@@ -59,8 +59,6 @@ class TaskRunnerWakeupTest extends TestCase
     private $logger;
 
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
@@ -135,18 +133,15 @@ class TaskRunnerWakeupTest extends TestCase
     }
 
     /**
-     * @after
      * @return void
      */
     protected function after()
     {
         MemoryStorage::reset();
         AsyncProcessStarterService::resetInstance();
-        $this->tearDown();
     }
 
     /**
-     *
      * @throws \Exception
      */
     public function testWakeupWhenThereIsNoLiveRunner()

@@ -50,8 +50,6 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     protected $httpClient;
 
     /**
-     * @before
-     *
      * @throws \Exception
      */
     public function before()
@@ -147,7 +145,6 @@ class AutoTestServiceTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     public function after()

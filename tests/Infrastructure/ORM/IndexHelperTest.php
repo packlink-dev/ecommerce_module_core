@@ -4,7 +4,7 @@ namespace Logeecom\Tests\Infrastructure\ORM;
 
 use Logeecom\Infrastructure\ORM\Utility\IndexHelper;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\FooEntity;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class IndexHelperTest.
@@ -19,13 +19,10 @@ class IndexHelperTest extends TestCase
     protected $entity;
 
     /**
-     * @before
-     *
      * @return void
      */
     protected function before()
     {
-        $this->setUp();
 
         $this->entity = new FooEntity();
     }

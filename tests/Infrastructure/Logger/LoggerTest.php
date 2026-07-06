@@ -17,7 +17,6 @@ class LoggerTest extends BaseInfrastructureTestWithServices
     public $httpClient;
 
     /**
-     * @before
      * @inheritDoc
      */
     public function before()

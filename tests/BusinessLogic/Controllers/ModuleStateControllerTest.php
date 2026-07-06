@@ -29,7 +29,6 @@ class ModuleStateControllerTest extends BaseTestWithServices
     private $moduleStateController;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()

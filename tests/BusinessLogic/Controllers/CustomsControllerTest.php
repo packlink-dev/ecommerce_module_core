@@ -36,7 +36,6 @@ class CustomsControllerTest extends BaseTestWithServices
     private $customsController;
 
     /**
-     * @before
      * @inheritDoc
      */
     public function before()

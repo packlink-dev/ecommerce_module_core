@@ -14,7 +14,6 @@ class RegistrationRegionsControllerTest extends  BaseTestWithServices
     public $controller;
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()
@@ -60,7 +59,6 @@ class RegistrationRegionsControllerTest extends  BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

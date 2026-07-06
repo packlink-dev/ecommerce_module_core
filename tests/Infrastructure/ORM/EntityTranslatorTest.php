@@ -24,8 +24,6 @@ use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 class EntityTranslatorTest extends BaseInfrastructureTestWithServices
 {
     /**
-     * @before
-     *
      * @throws \Exception
      */
     public function before()

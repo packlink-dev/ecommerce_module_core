@@ -33,7 +33,6 @@ class AnalyticsControllerTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -64,7 +63,6 @@ class AnalyticsControllerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     public function after()

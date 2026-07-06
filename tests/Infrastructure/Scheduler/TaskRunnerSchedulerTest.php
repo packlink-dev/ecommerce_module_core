@@ -20,7 +20,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\Scheduler\DTO\ScheduleConfig;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 class TaskRunnerSchedulerTest extends TestCase
 {
@@ -34,14 +34,11 @@ class TaskRunnerSchedulerTest extends TestCase
     private $scheduler;
 
     /**
-     * @before
-     *
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
     public function before()
     {
-        $this->setUp();
 
         RepositoryRegistry::registerRepository(OrderShipmentDetails::CLASS_NAME, MemoryRepository::getClassName());
 

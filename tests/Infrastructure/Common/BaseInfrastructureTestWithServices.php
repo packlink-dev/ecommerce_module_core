@@ -24,14 +24,13 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\TestRepositoryRegist
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Class BaseTest.
  *
  * @package Logeecom\Tests\Infrastructure\Common
  */
-abstract class BaseInfrastructureTestWithServices extends TestCase
+abstract class BaseInfrastructureTestWithServices extends CompatTestCase
 {
     /**
      * @var TestShopConfiguration
@@ -63,10 +62,6 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
     public $integrationRegistrationDataProvider;
 
     /**
-     * @before
-     *
-     * @return void
-     *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
     protected function before()
@@ -110,18 +105,11 @@ abstract class BaseInfrastructureTestWithServices extends TestCase
         );
     }
 
-    /**
-     * @after
-     *
-     * @return void
-     */
     protected function after()
     {
         Logger::resetInstance();
         LoggerConfiguration::resetInstance();
         MemoryStorage::reset();
         TestRepositoryRegistry::cleanUp();
-
-        parent::tearDown();
     }
 }

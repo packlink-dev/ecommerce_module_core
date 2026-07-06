@@ -30,7 +30,6 @@ class AutoConfigurationCurlTest extends BaseInfrastructureTestWithServices
     protected $taskRunnerConfig;
 
     /**
-     * @before
      * @throws \Exception
      */
     public function before()

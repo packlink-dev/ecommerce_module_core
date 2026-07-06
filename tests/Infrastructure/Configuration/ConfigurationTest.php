@@ -18,8 +18,6 @@ use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 class ConfigurationTest extends BaseInfrastructureTestWithServices
 {
     /**
-     * @before
-     *
      * @throws \Exception
      */
     public function before()

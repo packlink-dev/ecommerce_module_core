@@ -21,8 +21,6 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 class SubscriptionProxyTest extends BaseTestWithServices
 {
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException

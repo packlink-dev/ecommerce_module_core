@@ -43,7 +43,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestGuidProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class TaskRunnerTest
@@ -74,7 +74,6 @@ class TaskRunnerTest extends TestCase
     private $taskRunner;
 
     /**
-     * @before
      * @return void
      */
     protected function before()
@@ -173,15 +172,12 @@ class TaskRunnerTest extends TestCase
     }
 
     /**
-     * @after
-     *
      * @return void
      */
     protected function after()
     {
         MemoryStorage::reset();
         AsyncProcessStarterService::resetInstance();
-        $this->tearDown();
     }
 
     /**

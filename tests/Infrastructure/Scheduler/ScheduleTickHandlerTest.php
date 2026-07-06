@@ -31,7 +31,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class ScheduleCheckTaskTest
@@ -78,8 +78,6 @@ class ScheduleTickHandlerTest extends TestCase
     private $config;
 
     /**
-     * @before
-     *
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      *
@@ -88,7 +86,6 @@ class ScheduleTickHandlerTest extends TestCase
      */
     protected function before()
     {
-        $this->setUp();
 
         RepositoryRegistry::registerRepository(QueueItem::CLASS_NAME, MemoryQueueItemRepository::getClassName());
 

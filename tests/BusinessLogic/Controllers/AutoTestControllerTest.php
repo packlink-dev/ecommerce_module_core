@@ -26,7 +26,6 @@ class AutoTestControllerTest extends BaseTestWithServices
     public $controller;
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()

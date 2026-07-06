@@ -30,7 +30,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class QueueItemStarterTest
@@ -51,7 +51,6 @@ class QueueItemStarterTest extends TestCase
     public $shopConfiguration;
 
     /**
-     * @before
      * @throws \Exception
      */
     public function before()

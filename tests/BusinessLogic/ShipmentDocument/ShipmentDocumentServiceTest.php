@@ -39,7 +39,6 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
     public $service;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -86,7 +85,6 @@ class ShipmentDocumentServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

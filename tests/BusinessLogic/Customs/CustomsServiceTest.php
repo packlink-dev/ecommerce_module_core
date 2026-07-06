@@ -27,7 +27,6 @@ class CustomsServiceTest extends BaseTestWithServices
     private $customsService;
 
     /**
-     * @before
      * @inheritdoc
      *
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException

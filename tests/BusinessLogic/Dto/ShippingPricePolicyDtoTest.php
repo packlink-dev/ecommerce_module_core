@@ -16,7 +16,6 @@ use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 class ShippingPricePolicyDtoTest extends BaseDtoTest
 {
     /**
-     * @before
      */
     protected function before()
     {

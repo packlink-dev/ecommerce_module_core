@@ -28,7 +28,6 @@ class AutoConfigurationTest extends BaseInfrastructureTestWithServices
     private $taskRunnerConfig;
 
     /**
-     * @before
      * @inheritDoc
      */
     public function before()

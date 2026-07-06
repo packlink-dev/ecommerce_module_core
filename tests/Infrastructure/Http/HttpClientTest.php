@@ -7,7 +7,7 @@ use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Http\HttpResponse;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 class HttpClientTest extends TestCase
 {
@@ -17,7 +17,6 @@ class HttpClientTest extends TestCase
     protected $httpClient;
 
     /**
-     * @before
      * @return void
      */
     protected function before()

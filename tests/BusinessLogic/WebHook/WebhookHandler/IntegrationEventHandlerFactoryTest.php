@@ -14,7 +14,6 @@ use Packlink\BusinessLogic\WebHook\WebhookHandler\IntegrationEventStatuses;
 class IntegrationEventHandlerFactoryTest extends BaseTestWithServices
 {
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -23,7 +22,6 @@ class IntegrationEventHandlerFactoryTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

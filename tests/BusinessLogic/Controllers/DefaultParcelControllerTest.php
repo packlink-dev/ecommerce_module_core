@@ -52,7 +52,6 @@ class DefaultParcelControllerTest extends BaseTestWithServices
     private $defaultParcelController;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()

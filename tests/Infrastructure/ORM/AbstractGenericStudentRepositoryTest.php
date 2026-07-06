@@ -7,7 +7,7 @@ use Logeecom\Infrastructure\ORM\QueryFilter\Operators;
 use Logeecom\Infrastructure\ORM\QueryFilter\QueryFilter;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\Entity\StudentEntity;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class AbstractGenericTest.
@@ -612,27 +612,22 @@ abstract class AbstractGenericStudentRepositoryTest extends TestCase
     }
 
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
     protected function before()
     {
-        $this->setUp();
 
         RepositoryRegistry::registerRepository(StudentEntity::getClassName(), $this->getStudentEntityRepositoryClass());
     }
 
     /**
-     * @after
      * Clean up.
      */
     protected function after()
     {
         $this->cleanUpStorage();
-        $this->tearDown();
     }
 
     /**

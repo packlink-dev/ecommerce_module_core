@@ -16,8 +16,6 @@ use Packlink\BusinessLogic\DTO\ValidationError;
 class CustomsMappingTest extends BaseDtoTest
 {
     /**
-     * @before
-     *
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
      */
     public function registerCustomsMapping()
