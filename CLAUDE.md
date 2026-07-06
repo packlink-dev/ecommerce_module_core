@@ -12,14 +12,16 @@ All change requests, contribution guidelines, and coding standards live under `.
 
 - **`.ai-docs/coding-standards.md`** — authoritative coding conventions (PHP 7.0 idioms, naming, docblocks, DTO/Singleton/test patterns, frontend resources). Read this before writing code.
 - **`.ai-docs/guidelines.md`** — the change-request / contribution workflow.
-- **`.ai-docs/design.md`** — system-wide architecture reference (layers, ORM, task queue, Packlink API proxy, services, key flows, entity catalog, platform integration contract).
+- **`.ai-docs/architecture.md`** — system-wide architecture reference (layers, ORM, task queue, Packlink API proxy, services, key flows, entity catalog, platform integration contract).
 
-**Change-request pattern.** Each change request gets its own folder, `.ai-docs/change_requests/<CR-ID>/`, named with the ticket ID plus a short slug (e.g. `CR-SET-62b-labels`). It contains two documents:
+**Change-request pattern.** Each change request gets its own folder, `.ai-docs/change_requests/<CR-ID>/`, named with the ticket ID plus a short slug (e.g. `CR-SET-62b-labels`). It contains three documents plus an optional folder:
 
 - `spec.md` — *what & why*: overview, the concrete classes/DTOs/interfaces to add or change (with namespaces, fields, method signatures), New/Modified file tables, and rationale notes.
-- `design.md` — *how*: ordered implementation tasks with effort and dependencies, a task-dependency graph, and a files-changed-per-task table.
+- `design.md` — *how it fits*: narrative design — architecture recap, components & responsibilities, deltas & rationale for non-obvious decisions.
+- `tasks.md` — *ordered work*: implementation tasks with effort and dependencies, a task-dependency graph, and a files-changed-per-task table.
+- `requirements/` *(optional)* — raw source material the CR was derived from (ticket PDFs, mockup images, extracted requirements notes), kept separate from the derived spec/design/tasks docs.
 
-See `.ai-docs/change_requests/CR-SET-62b-labels/` as the reference example.
+See `.ai-docs/change_requests/CR-SET-66-Customs-support/` as the reference example (`CR-SET-62b-labels` predates the `design.md`/`tasks.md` split and has a thinner `design.md`).
 
 ## Build & Test Commands
 

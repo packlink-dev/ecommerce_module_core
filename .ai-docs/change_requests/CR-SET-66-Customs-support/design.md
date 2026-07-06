@@ -48,8 +48,9 @@ documents the flow so the (mostly test-coverage) deltas in §3 are clear.
 |-----------|------|--------|
 | `CustomsController` (CRUD) | `src/BusinessLogic/Controllers/CustomsController.php` | ✅ |
 | `CustomsMappingService` (+ interface) | `src/BusinessLogic/Customs/CustomsMappingService.php`, `Customs/Interfaces/CustomsMappingServiceInterface.php` | ✅ |
-| `CustomsMapping` (FrontDto) | `src/BusinessLogic/Customs/Models/CustomsMapping.php` | ✅ |
+| `CustomsMapping` (FrontDto) | `src/BusinessLogic/Customs/Models/CustomsMapping.php` | ✅ (extended: `mapping_tariff_number`, `mapping_company_vat`) |
 | `TaxIdOption` | `src/BusinessLogic/Customs/Models/TaxIdOption.php` | ✅ |
+| `MappingFieldOptions` (new) | `src/BusinessLogic/Customs/Models/MappingFieldOptions.php` | ✅ new |
 | `CustomsService` (+ interface) | `src/BusinessLogic/Customs/CustomsService.php`, `Customs/Interfaces/CustomsService.php` | ✅ |
 | Customs invoice DTOs | `src/BusinessLogic/Http/DTO/Customs/*` (`CustomsInvoice`, `Sender`, `Receiver`, `InventoryContent`, `ShipmentDetails`, `Signature`, `Cost`, `Money`, `CustomsUnionsSearchRequest`) | ✅ |
 | Draft customs | `src/BusinessLogic/Http/DTO/Draft.php` (`hasCustoms`), `Http/DTO/Draft/Customs.php` | ✅ |
@@ -81,30 +82,65 @@ building blocks (`ShipmentDocumentService`, `Proxy::getCustomsInvoiceDownloadUrl
 `PrintService.js`, `ShipmentDocument(CUSTOMS_INVOICE)`) already exist; each platform renders the
 buttons on its own order-details page.
 
-### 3.1 Common-UI design (customs settings page)
+### 3.1 Common-UI design (customs settings page) — as implemented
 
-Today `Resources/templates/customs.html` renders a fixed **Data mapping** section with a single
-`mapping_receiver_tax_id` select. The mockups require more mapping fields, and the set differs
-per platform (WooCommerce shows **Company VAT**, PrestaShop does not). To stay platform-agnostic
-the common UI renders the mapping section **generically** from platform-supplied option lists
-rather than hardcoding fields:
+`Resources/templates/customs.html` previously rendered a fixed **Data mapping** section with a
+single `mapping_receiver_tax_id` select. The mockups require more mapping fields, and the set
+differs per platform (WooCommerce shows **Company VAT**, PrestaShop does not). To stay
+platform-agnostic the common UI now renders the mapping section **generically** from a
+platform-supplied field list, fully replacing the old single-field wiring:
 
-- **`CustomsMapping` model** (`Customs/Models/CustomsMapping.php`) — add the new mapping fields
-  to `$fields`, `fromArray()`, `toArray()` (e.g. `mapping_tariff_number` for the product HS code
-  field; reuse `mapping_receiver_tax_id` for the customer tax id; add a field for company VAT
-  where supplied). Keep them **optional** (not in `$requiredFields`).
-- **`customs.html` + `CustomsController.js`** — render a mapping `<select>` per platform-supplied
-  field definition (label + options), following the existing receiver-tax-id pattern
-  (`configuration.getCustomData` populates options; `modelFields` is extended accordingly).
-- **Core/platform boundary** — core defines the mapping fields it understands and renders the
-  selects; the **options** (available product/customer attributes) and which optional fields are
-  present come from the platform (e.g. an extended `getReceiverTaxIdOptions()`-style contract or
-  the existing custom-data endpoint). Core must not reference PrestaShop/WooCommerce field names.
-- **Consumption** — `Customs/CustomsService.php` already falls back to mapping/defaults when
-  building the invoice; extend it to read any new mapping fields when assembling inventory
-  (HS code) and receiver (tax id / company VAT) data.
-- **Styles** — reuse existing `.pl-form-group` / `.pl-customs-label`; recompile SCSS only if new
-  styles are added (`php cssCompile.php`). Add the new translation keys to `Resources/countries/*.json`.
+- **`CustomsMapping` model** (`Customs/Models/CustomsMapping.php`) — added `mapping_tariff_number`
+  (product HS code field) and `mapping_company_vat` (platform-variant company VAT field) to
+  `$fields`, `fromArray()`, `toArray()`. Both are **optional** (not in `$requiredFields`), same as
+  the pre-existing `mapping_receiver_tax_id`.
+- **New DTO `Customs/Models/MappingFieldOptions.php`** — `{field, label, options: TaxIdOption[]}`.
+  One instance describes one renderable mapping select: which `CustomsMapping` field it targets,
+  its display label, and its selectable options. `TaxIdOption` (pre-existing `{value, name}`) is
+  reused as the option shape.
+- **Contract change** — `CustomsMappingServiceInterface`/`CustomsMappingService` renamed the old
+  single-purpose `getReceiverTaxIdOptions(): TaxIdOption[]` to
+  `getMappingFieldsOptions(): MappingFieldOptions[]`. `CustomsController` exposes the renamed
+  method; `DemoUI` (reference implementation) and `MockCustomsMappingService` (test double) were
+  updated accordingly. **This is a breaking change** to the abstract contract platform modules
+  implement — PrestaShop/WooCommerce wiring (tracked in their own CRs) must implement the new
+  method instead of the old one.
+- **`customs.html`** — the static `mapping_receiver_tax_id` `<select>` was replaced with an empty
+  `<div id="pl-mapping-fields">` container.
+- **`CustomsController.js`** — `constructMappingFields(response)` iterates the
+  `MappingFieldOptions[]` returned by `configuration.getCustomData`, and for each entry builds a
+  `.pl-form-group` with a `<select name="{field}">` (options + previously-saved value), a label
+  using the platform-supplied `label` text, and pushes `field` onto `this.modelFields` so the
+  existing generic pre-fill/submit logic (`getFormFields()`) picks it up automatically. No field
+  names or labels are hardcoded in core JS.
+- **Core/platform boundary** — both the **label** and the **options** for each mapping field come
+  from the platform via `getMappingFieldsOptions()`; core only defines the `CustomsMapping` field
+  keys it understands (`mapping_receiver_tax_id`, `mapping_tariff_number`, `mapping_company_vat`)
+  and renders whatever subset of them the platform's response includes. Core does not reference
+  PrestaShop/WooCommerce field names.
+- **Consumption in `CustomsService.php` — deliberately NOT wired.** The `mapping_*` fields are
+  attribute-*selectors* (which system/custom field a value comes from), consumed exclusively by
+  the platform when it builds the `Order`/`Item`/`Address` objects it hands to core (the same as
+  the pre-existing `mapping_receiver_tax_id`, which `CustomsService` has never read). `CustomsService`
+  already falls back to the `default_*` **value** fields (`defaultTariffNumber`, `defaultCountry`,
+  `defaultReceiverTaxId`) when the shop object doesn't carry a value — that fallback path is
+  unchanged and requires no new wiring for the two new mapping-selector fields.
+- **Styles** — reused existing `.pl-form-group` / `.pl-customs-label`; no new SCSS, no
+  `cssCompile.php` run needed.
+- **Translations** — no new core translation keys were added. Since both the label and options of
+  every mapping field are platform-supplied (see above), the mapping section no longer depends on
+  any core-owned translation string; `customs.receiverTaxId` remains in use elsewhere (the
+  `default_receiver_tax_id` input's label) and was left untouched.
+
+**Observation (no task, out of scope for this CR):** `CustomsService::getReceiver()` compares
+`$mapping->defaultReceiverUserType` (schema-cased, e.g. `"PRIVATE_PERSON"`, as stored by
+`CustomsControllerTest`/`SendDraftTaskTest` fixtures and as required by Packlink's
+`receiver.user_type` enum) against the lowercase `self::PRIVATE_PERSON`/`self::COMPANY`
+constants. The comparison never matches for schema-cased mapping values, so `receiver.tax_id` /
+`receiver.company_name` / `receiver.vat_number` end up empty regardless of the merchant's actual
+selection. `CustomsServiceTest::testSendCustomsInvoiceBuildsPayloadAndReturnsId` documents this as
+current behavior rather than silently "fixing" logic outside this CR's stated gaps. Worth a
+follow-up ticket if confirmed unintended.
 
 **Observation (no task):** `CustomsMapping` declares return types (`: array`, `: CustomsMapping`)
 which are valid on PHP 7.0 but stylistically inconsistent with the rest of core
