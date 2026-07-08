@@ -138,5 +138,14 @@ class PostalCodeTransformerTest extends BaseTestWithServices
 
         $transformedPostalCode = PostalCodeTransformer::transform('US', '10018');
         self::assertEquals('10018', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('BR', '12130-000');
+        self::assertEquals('12130', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('BR', '12130000');
+        self::assertEquals('12130', $transformedPostalCode);
+
+        $transformedPostalCode = PostalCodeTransformer::transform('BR', '12130');
+        self::assertEquals('12130', $transformedPostalCode);
     }
 }
