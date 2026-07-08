@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.2.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.3...v4.2.4) - 2026-07-08
+### Changed
+- Fixed Brazilian postal code format for retrieving shipping services
+
 ## [4.2.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.2...v4.2.3) - 2026-07-06
 ### Changed
 - Hide banner when it is plus plan
