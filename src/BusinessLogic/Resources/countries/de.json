@@ -588,14 +588,9 @@
   "subscription": {
     "upgrade": "Upgrade",
     "upgradeNow": "Jetzt upgraden",
-    "tooltipBenefit1": "Alle Funktionen des Free-Tarifs enthalten",
-    "tooltipBenefit2": "Exklusiver Zugang zu vergünstigten Versandtarifen",
-    "tooltipBenefit3": "Zusätzliche Shop-Integrationen",
-    "tooltipBenefit4": "Branding der Kommunikation",
-    "tooltipBenefit5": "Anbindungen an Carrier-Verträge, um mit eigenen Tarifen zu versenden",
-    "tooltipBenefit6": "Premium-Support",
+    "tooltipBenefits": "Alles aus Free, plus:\n- Mehr sparen: Schalten Sie unsere günstigsten Versandtarife frei.\n- Abrechnung vereinfachen: Erhalten Sie eine einzige monatliche Rechnung.\n- Schneller Hilfe erhalten: Nutzen Sie den Premium-Live-Support.\nUnd vieles mehr!",
     "yourPricingPlan": "Ihr Preisplan:",
-    "ordersPageBanner": "Profitieren Sie von den besten Versandtarifen oder versenden Sie mit Ihren eigenen Carrier-Tarifen.",
+    "ordersPageBanner": "Upgraden Sie für ermäßigte Versandtarife, eine monatliche Rechnung und Live-Support.",
     "supportPageBannerFree": "Upgraden Sie und lösen Sie Versandprobleme schneller per Chat oder Telefon",
     "supportPageBannerPlus": "Upgraden Sie und lösen Sie Versandprobleme schneller per Telefon",
     "measureAccuratelyTitle": "Genau messen!",
@@ -609,5 +604,41 @@
   "shipmentDocumentType": {
     "shippingLabel": "Versandetikett",
     "customsInvoice": "Zollrechnung"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integration von Versandverträgen (Correos, Seur und Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit Correos, Correos Express, Seur, UPS, InPost und mehr.",
+      "subscriptions.plus-plan-features.carrier-contracts": "1 Versandvertrag verbinden (Correos, Seur und Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 2,47€ mit Correos und ab 4,44€ mit Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unbegrenzte Versandverträge (Correos, Seur und Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 2,38€ mit Correos und ab 4,35€ mit Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 2,47 € mit Correos und ab 4,44 € mit Correos Express für Pakete bis 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integration von Versandverträgen (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit Chronopost, Mondial Relay, Colissimo und mehr.",
+      "subscriptions.plus-plan-features.carrier-contracts": "1 Versandvertrag verbinden (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 2,84€ mit Chronopost und ab 2,89€ mit Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unbegrenzte Versandverträge (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 2,84€ mit Chronopost und ab 2,89€ mit Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 2,84 € mit Chronopost und ab 2,89 € mit Mondial Relay für Pakete bis 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit DPD, UPS, DHL Express, TNT und mehr.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 3,97€ mit DPD XS und ab 4,65€ mit UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 3,97€ mit DPD XS und ab 4,65€ mit UPS.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 3,97 € mit DPD XS und ab 4,65 € mit UPS für Pakete bis 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Plus-Rabatte, Versandkosten ab 3,82€ für Poste Italiane und 4,50€ für BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Integration von Versandverträgen (BRT und Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Rabatte auf alle Versandtarife mit Poste Italiane, BRT, InPost und mehr.",
+      "subscriptions.plus-plan-features.carrier-contracts": "1 Versandvertrag verbinden (BRT und Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus-Rabatte, Versandkosten ab 3,82€ für Poste Italiane und 4,50€ für BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unbegrenzte Versandverträge (BRT und Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium-Rabatte, Versandkosten ab 3,70€ für Poste Italiane und 4,35€ für BRT.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade auf Plus und versende ab 3,82 € mit Poste Italiane und ab 4,50 € mit BRT für Pakete bis 2 kg 💎!"
+    }
   }
 }

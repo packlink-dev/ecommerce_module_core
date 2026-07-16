@@ -39,6 +39,30 @@ class PromotionalBannerResponse extends FrontDto
      */
     public $upgradeUrl;
     /**
+     * Lowercase two-letter UI language code. Selects the CDN display-locale folder
+     * for the promotional banner translations (live file, with a baked-in fallback).
+     *
+     * @var string|null
+     */
+    public $language;
+    /**
+     * Lowercase Packlink account platform country, used as the "packlink_pro_<market>"
+     * CDN filename suffix. Null when the account country is unknown.
+     *
+     * @var string|null
+     */
+    public $platform;
+    /**
+     * Fully built CDN URL for the promotional banner translation file, composed from the
+     * display-locale folder (derived from {@see $language}) and the "packlink_pro_<market>"
+     * filename (derived from {@see $platform}), e.g. language "es" + platform "fr" =>
+     * "https://cdn.packlink.com/translations/pro/es-ES/packlink_pro_fr.json".
+     * Null when the language or platform country is unknown/unsupported.
+     *
+     * @var string|null
+     */
+    public $bannerCdnUrl;
+    /**
      * Fields for this DTO. Needed for validation and transformation from/to array.
      *
      * @var array
@@ -47,5 +71,8 @@ class PromotionalBannerResponse extends FrontDto
         'planTier',
         'bannerLabel',
         'upgradeUrl',
+        'language',
+        'platform',
+        'bannerCdnUrl',
     );
 }

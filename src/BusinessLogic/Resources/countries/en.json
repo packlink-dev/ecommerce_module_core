@@ -610,14 +610,9 @@
   "subscription": {
     "upgrade": "Upgrade",
     "upgradeNow": "Upgrade now",
-    "tooltipBenefit1": "All features from the Free plan included",
-    "tooltipBenefit2": "Exclusive access to best shipping rates",
-    "tooltipBenefit3": "Unlimited shipping cart integrations",
-    "tooltipBenefit4": "Branded emails",
-    "tooltipBenefit5": "Ship with your own carrier rates",
-    "tooltipBenefit6": "Premium phone customer support",
+    "tooltipBenefits": "All features from Free, plus:\n- Save more: Unlock our lowest shipping rates.\n- Simplify billing: Receive a single monthly invoice.\n- Get help faster: Access premium live support.\nAnd much more!",
     "yourPricingPlan": "Your pricing plan:",
-    "ordersPageBanner": "Unlock exclusive access to best shipping rates or ship with your own carrier rates.",
+    "ordersPageBanner": "Upgrade to get discounted shipping rates, a single monthly invoice, and live support.",
     "supportPageBannerFree": "Upgrade and handle shipping issues faster via chat or phone",
     "supportPageBannerPlus": "Upgrade and handle shipping issues faster via phone",
     "measureAccuratelyTitle": "Measure Accurately!",
@@ -631,5 +626,41 @@
   "shipmentDocumentType": {
     "shippingLabel": "Shipping label",
     "customsInvoice": "Customs invoice"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Carrier contract integration (Correos, Seur and Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Discounts on all shipping rates with Correos, Correos Express, Seur, UPS, InPost and more.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Connect 1 carrier contract (Correos, Seur and Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus discounts, shipping rates starting from €2.47 with Correos and from €4.44 with Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unlimited carrier contracts (Correos, Seur and Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium discounts, shipping rates starting from €2.38 with Correos and from €4.35 with Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade to Plus and start shipping from €2.47 with Correos and from €4.44 with Correos Express for packages up to 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Carrier contract integration (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Discounts on all shipping rates with Chronopost, Mondial Relay, Colissimo and more.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Connect 1 carrier contract (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus discounts, shipping rates starting from €2.84 with Chronopost and from €2.89 with Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unlimited carrier contracts (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium discounts, shipping rates starting from €2.84 with Chronopost and from €2.89 with Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade to Plus and start shipping from €2.84 with Chronopost and from €2.89 with Mondial Relay for packages up to 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Discounts on all shipping rates with DPD, UPS, DHL Express, TNT and more.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus discounts, shipping rates starting from €3.97 with DPD XS and from €4.65 with UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium discounts, shipping rates starting from €3.97 with DPD XS and from €4.65 with UPS.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade to Plus and start shipping from €3.97 with DPD XS and from €4.65 with UPS for packages up to 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Plus discounts, shipping rates starting from €3.82 for Poste Italiane and €4.50 for BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Carrier contract integration (BRT and Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Discounts on all shipping rates with Poste Italiane, BRT, InPost and more.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Connect 1 carrier contract (BRT and Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Plus discounts, shipping rates starting from €3.82 for Poste Italiane and €4.50 for BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Unlimited carrier contracts (BRT and Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Premium discounts, shipping rates starting from €3.70 for Poste Italiane and €4.35 for BRT.",
+      "subscriptions.upgrade-notification.more-features": "Upgrade to Plus and start shipping from €3.82 with Poste Italiane and from €4.50 with BRT for packages up to 2 kg 💎!"
+    }
   }
 }

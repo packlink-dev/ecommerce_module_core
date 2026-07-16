@@ -22,6 +22,13 @@ class PostalCodeTransformer
      * @var array
      */
     protected static $map = array(
+        'AR' => array(
+            '***** ***',
+        ),
+        'BR' => array(
+            '*****-***',
+            '*****',
+        ),
         'GB' => array(
             '** ***',
             '*** ***',
@@ -97,6 +104,12 @@ class PostalCodeTransformer
                 // Special case for US postal codes.
                 if ($countryCode === 'US') {
                     return substr($postalCode, 0, 5);
+                }
+
+                // Special case for BR postal codes: Packlink rejects full CEPs (e.g. 12130-000)
+                // but reliably accepts the 5-digit prefix, so normalize down to it.
+                if ($countryCode === 'BR') {
+                    return substr(preg_replace('/\D/', '', $postalCode), 0, 5);
                 }
 
                 return static::transformToFormat($postalCode, $supportedFormat);

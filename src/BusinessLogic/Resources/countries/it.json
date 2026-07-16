@@ -588,14 +588,9 @@
   "subscription": {
     "upgrade": "Aggiorna",
     "upgradeNow": "Aggiorna ora",
-    "tooltipBenefit1": "Tutte le funzionalità del piano Free incluse",
-    "tooltipBenefit2": "Accesso esclusivo a tariffe di spedizione scontate",
-    "tooltipBenefit3": "Integrazioni aggiuntive con negozi",
-    "tooltipBenefit4": "Personalizzazione delle comunicazioni",
-    "tooltipBenefit5": "Connessioni a contratti con corrieri per spedire con le tue tariffe",
-    "tooltipBenefit6": "Supporto premium",
+    "tooltipBenefits": "Tutto ciò che include Free, più:\n- Risparmia di più: Sblocca le nostre tariffe di spedizione più basse.\n- Semplifica la fatturazione: Ricevi un'unica fattura mensile.\n- Ottieni assistenza rapida: Accedi al supporto live premium.\nE molto altro ancora!",
     "yourPricingPlan": "Il tuo piano tariffario:",
-    "ordersPageBanner": "Accedi alle migliori tariffe di spedizione o spedisci con le tariffe del tuo corriere.",
+    "ordersPageBanner": "Aggiorna per tariffe scontate, un'unica fattura mensile e supporto live.",
     "supportPageBannerFree": "Aggiorna e gestisci i problemi di spedizione più velocemente via chat o telefono",
     "supportPageBannerPlus": "Aggiorna e gestisci i problemi di spedizione più velocemente via telefono",
     "measureAccuratelyTitle": "Misura con precisione!",
@@ -609,5 +604,41 @@
   "shipmentDocumentType": {
     "shippingLabel": "Etichetta di spedizione",
     "customsInvoice": "Fattura doganale"
+  },
+  "subscriptionBannerDefaults": {
+    "packlink_pro_es": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integrazione contratti corriere (Correos, Seur e Correos Express)",
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con Correos, Correos Express, Seur, UPS, InPost e altri.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Collega 1 contratto corriere (Correos, Seur e Correos Express)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 2,47€ con Correos e da 4,44€ con Correos Express.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratti corriere illimitati (Correos, Seur e Correos Express)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 2,38€ con Correos e da 4,35€ con Correos Express.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 2,47 € con Correos e da 4,44 € con Correos Express per pacchi fino a 1 kg 💎!"
+    },
+    "packlink_pro_fr": {
+      "subscriptions.free-plan-features.carrier-contracts": "Integrazione contratti corriere (Chronopost)",
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con Chronopost, Mondial Relay, Colissimo e altri.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Collega 1 contratto corriere (Chronopost)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 2,84€ con Chronopost e da 2,89€ con Mondial Relay.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratti corriere illimitati (Chronopost)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 2,84€ con Chronopost e da 2,89€ con Mondial Relay.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 2,84 € con Chronopost e da 2,89 € con Mondial Relay per pacchi fino a 500 g 💎!"
+    },
+    "packlink_pro_de": {
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con DPD, UPS, DHL Express, TNT e altri.",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 3,97€ con DPD XS e da 4,65€ con UPS.",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 3,97€ con DPD XS e da 4,65€ con UPS.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 3,97 € con DPD XS e da 4,65 € con UPS per pacchi fino a 500 g 💎!"
+    },
+    "packlink_pro_it": {
+      "subscriptions.feature-list.exclusive-prices": "Sconti Plus, tariffe di spedizione a partire da 3,82€ per Poste Italiane e 4,50€ per BRT.",
+      "subscriptions.free-plan-features.carrier-contracts": "Integrazione contratti corriere (BRT e Poste Italiane)",
+      "subscriptions.free-plan-prices.shipping-rate": "Sconti su tutte le tariffe di spedizione con Poste Italiane, BRT, InPost e altri.",
+      "subscriptions.plus-plan-features.carrier-contracts": "Collega 1 contratto corriere (BRT e Poste Italiane)",
+      "subscriptions.plus-plan-prices.shipping-rate": "Sconti Plus, tariffe di spedizione a partire da 3,82€ per Poste Italiane e 4,50€ per BRT.",
+      "subscriptions.premium-plan-features.carrier-contracts": "Contratti corriere illimitati (BRT e Poste Italiane)",
+      "subscriptions.premium-plan-prices.shipping-rate": "Sconti Premium, tariffe di spedizione a partire da 3,70€ per Poste Italiane e 4,35€ per BRT.",
+      "subscriptions.upgrade-notification.more-features": "Passa a Plus e inizia a spedire da 3,82 € con Poste Italiane e da 4,50 € con BRT per pacchi fino a 2 kg 💎!"
+    }
   }
 }
