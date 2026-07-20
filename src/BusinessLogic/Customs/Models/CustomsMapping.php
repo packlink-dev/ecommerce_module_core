@@ -135,7 +135,10 @@ class CustomsMapping extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
-        if (!preg_match('/^[0-9]{6,8}$/', $payload['default_tariff_number'])) {
+        // default_tariff_number is optional (not in $requiredFields); validate its
+        // format only when a value is actually supplied.
+        $tariffNumber = static::getDataValue($payload, 'default_tariff_number', '');
+        if ($tariffNumber !== '' && !preg_match('/^[0-9]{6,8}$/', $tariffNumber)) {
             static::setInvalidFieldError(
                 'default_tariff_number',
                 $validationErrors,

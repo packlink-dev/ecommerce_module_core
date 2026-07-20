@@ -91,6 +91,10 @@ if (!window.Packlink) {
          * @param {Array<{field: string, label: string, options: Array<{value: string, name: string}>}>} response
          */
         const constructMappingFields = (response) => {
+            if (!Array.isArray(response)) {
+                return;
+            }
+
             const container = templateService.getComponent('pl-mapping-fields', page);
 
             for (let fieldDefinition of response) {
@@ -121,10 +125,6 @@ if (!window.Packlink) {
 
                     select.appendChild(optionElement);
                 }
-
-                select.addEventListener('change', function () {
-                    mappingFieldValues[fieldName] = select.value;
-                });
 
                 const icon = document.createElement('i');
                 icon.className = 'material-icons';

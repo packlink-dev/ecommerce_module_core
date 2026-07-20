@@ -253,10 +253,9 @@ class CustomsServiceTest extends BaseTestWithServices
 
         self::assertEquals('PRIVATE_PERSON', $payload['receiver']['user_type']);
         self::assertEquals('Jane Roe', $payload['receiver']['full_name']);
-        // NOTE: CustomsService::getReceiver() compares $mapping->defaultReceiverUserType (schema-cased,
-        // e.g. "PRIVATE_PERSON") against the lowercase self::PRIVATE_PERSON ("private_person"), so this
-        // branch never matches and tax_id is always empty. Documents current behavior; see CR-SET-66 notes.
-        self::assertEquals('', $payload['receiver']['tax_id']);
+        // user_type is matched case-insensitively, so a schema-cased "PRIVATE_PERSON" resolves the
+        // tax id: the order has none, so it falls back to the mapping's default_receiver_tax_id ("456").
+        self::assertEquals('456', $payload['receiver']['tax_id']);
         self::assertEquals('FR', $payload['receiver']['country']);
         self::assertEquals('+33600000000', $payload['receiver']['phone_number']);
 

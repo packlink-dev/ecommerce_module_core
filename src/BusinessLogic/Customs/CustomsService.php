@@ -224,14 +224,20 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
      */
     protected function getReceiver(Order $shopOrder, CustomsMapping $mapping)
     {
+        // The mapping value may be stored schema-cased (e.g. "PRIVATE_PERSON", as the Packlink
+        // receiver.user_type enum requires) or lowercase (as the core customs form submits), so
+        // normalize before comparing against the lowercase self::* constants. The user_type sent
+        // on the wire keeps the stored (API-cased) value.
+        $receiverUserType = strtolower($mapping->defaultReceiverUserType);
+
         $receiver = new Receiver();
         $receiver->userType = $mapping->defaultReceiverUserType;
         $receiver->fullName = $shopOrder->getShippingAddress()->getName() . ' ' . $shopOrder->getShippingAddress()->getSurname();
-        $receiver->taxId = $mapping->defaultReceiverUserType === self::PRIVATE_PERSON ?
+        $receiver->taxId = $receiverUserType === self::PRIVATE_PERSON ?
             ($shopOrder->getTaxId() ?: $mapping->defaultReceiverTaxId) : '';
-        $receiver->companyName = $mapping->defaultReceiverUserType === self::COMPANY ?
+        $receiver->companyName = $receiverUserType === self::COMPANY ?
             $shopOrder->getShippingAddress()->getCompany() : '';
-        $receiver->vatNumber = $mapping->defaultReceiverUserType === self::COMPANY ?
+        $receiver->vatNumber = $receiverUserType === self::COMPANY ?
             ($shopOrder->getVatNumber() ?: $mapping->defaultReceiverTaxId) : '';
         $receiver->address = $shopOrder->getShippingAddress()->getStreet1() . ' ' .
             $shopOrder->getShippingAddress()->getStreet2();

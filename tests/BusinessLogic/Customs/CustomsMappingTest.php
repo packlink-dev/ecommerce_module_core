@@ -18,8 +18,10 @@ class CustomsMappingTest extends BaseDtoTest
     /**
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
      */
-    public function registerCustomsMapping()
+    protected function before()
     {
+        parent::before();
+
         TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
     }
 
@@ -76,6 +78,22 @@ class CustomsMappingTest extends BaseDtoTest
     public function testMissingDefaultReceiverUserTypeIsRejected()
     {
         $this->assertRequiredFieldError('default_receiver_user_type');
+    }
+
+    /**
+     * default_tariff_number is optional; omitting it must not raise a
+     * validation error nor a PHP undefined-key/preg_match warning.
+     *
+     * @throws FrontDtoValidationException
+     */
+    public function testMissingTariffNumberIsAccepted()
+    {
+        $raw = $this->getValidPayload();
+        unset($raw['default_tariff_number']);
+
+        $mapping = CustomsMapping::fromArray($raw);
+
+        self::assertSame('', $mapping->defaultTariffNumber);
     }
 
     /**

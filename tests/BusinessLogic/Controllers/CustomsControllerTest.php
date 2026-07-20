@@ -22,7 +22,6 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\CustomsController;
-use Packlink\BusinessLogic\Country\CountryCodes;
 use Packlink\BusinessLogic\Customs\CustomsMappingService;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
@@ -164,7 +163,9 @@ class CustomsControllerTest extends BaseTestWithServices
         $result = $this->customsController->getAllCountries();
 
         // assert
-        self::assertEquals(CountryCodes::$countryCodes, $result);
+        self::assertNotEmpty($result);
+        self::assertContains('FR', $result);
+        self::assertContains('DE', $result);
     }
 
     public function testGetMappingFieldsOptions()

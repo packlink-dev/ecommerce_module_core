@@ -8,6 +8,17 @@
             <directory suffix="Test.php">./tests/BusinessLogic</directory>
         </testsuite>
     </testsuites>
+    <!-- Coverage source set for PHPUnit >= 10. -->
+    <source>
+        <include>
+            <directory suffix=".php">./src/BusinessLogic</directory>
+            <directory suffix=".php">./src/Infrastructure</directory>
+        </include>
+        <exclude>
+            <directory>./src/DemoUI</directory>
+        </exclude>
+    </source>
+    <!-- Legacy coverage config for PHPUnit 4.8 (PHP 7.0 path); ignored by PHPUnit >= 10. -->
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/BusinessLogic</directory>
