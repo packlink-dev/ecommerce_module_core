@@ -214,6 +214,50 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         );
     }
 
+    /**
+     * CS-8167: draft service selection must rank by the LIVE Packlink price (used by the checkout
+     * quote), not by the STORED basePrice. Here the stored basePrice ranking and the live price
+     * ranking disagree: stored says Chrono 13 (21065) is cheaper, but live says Chrono 18 (20297)
+     * is cheaper. The cheapest service must match the live-priced checkout quote (20297).
+     */
+    public function testCheapestServiceRanksByLivePrice()
+    {
+        $method = $this->assertBasicDataToArray();
+        $packages = array(Package::defaultPackage());
+
+        // Stored basePrice ordering is the INVERSE of the live ordering below.
+        $method->addShippingService(new ShippingService(20297, '', 'IT', 'DE', 16.51, 13.76, 2.75));
+        $method->addShippingService(new ShippingService(21065, '', 'IT', 'DE', 12.89, 10.74, 2.15));
+
+        $response = file_get_contents(__DIR__ . '/../Common/ApiResponses/ShippingServices/liveVsStoredCostTest.json');
+        $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $response)));
+
+        $cheapest = ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages);
+
+        // Live cheapest is 20297 (10.74), even though its stored basePrice (13.76) is the highest.
+        self::assertEquals(20297, $cheapest->serviceId);
+        self::assertEquals(10.74, $cheapest->basePrice);
+    }
+
+    /**
+     * CS-8167: when the live services call fails, selection must fall back to the stored basePrice
+     * ranking (unchanged behavior). No mock response is queued, so the live call fails.
+     */
+    public function testCheapestServiceFallsBackToStoredPriceWhenLiveUnavailable()
+    {
+        $method = $this->assertBasicDataToArray();
+        $packages = array(Package::defaultPackage());
+
+        $method->addShippingService(new ShippingService(20297, '', 'IT', 'DE', 16.51, 13.76, 2.75));
+        $method->addShippingService(new ShippingService(21065, '', 'IT', 'DE', 12.89, 10.74, 2.15));
+
+        $cheapest = ShippingCostCalculator::getCheapestShippingService($method, 'IT', '123', 'DE', '234', $packages);
+
+        // No live prices available -> rank by stored basePrice, so 21065 (10.74) wins.
+        self::assertEquals(21065, $cheapest->serviceId);
+        self::assertEquals(10.74, $cheapest->basePrice);
+    }
+
     public function testSystemSpecificPricingPolicy()
     {
         $method = $this->assertBasicDataToArray();

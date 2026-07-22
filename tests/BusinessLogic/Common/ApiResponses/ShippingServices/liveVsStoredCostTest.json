@@ -1,0 +1,80 @@
+[
+  {
+    "currency": "EUR",
+    "carrier_name": "Chronopost",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "express",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 20297,
+    "carrier_product_id": "FR_CHRONO_18",
+    "service_info": [],
+    "price": {
+      "total_price": 12.89,
+      "tax_price": 2.15,
+      "base_price": 10.74
+    },
+    "first_estimated_delivery_date": "2019/01/02",
+    "customs_required": false,
+    "name": "Chrono 18",
+    "transit_time": "1 DAY",
+    "country": "FR",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "transit_hours": "18",
+    "available_dates": {},
+    "url_terms_and_conditions": null,
+    "base_price": "10.74"
+  },
+  {
+    "currency": "EUR",
+    "carrier_name": "Chronopost",
+    "insurance": {
+      "base_insurance": "0.00",
+      "additional_insurance": true,
+      "max_insurance": "2500.00",
+      "apply_percentage_aditional_insurance": "2.00"
+    },
+    "category": "express",
+    "dropoff": false,
+    "labels_required": true,
+    "delivery_to_parcelshop": false,
+    "url_forbidden_items": null,
+    "translation_transit_key": null,
+    "id": 21065,
+    "carrier_product_id": "FR_CHRONO_13",
+    "service_info": [],
+    "price": {
+      "total_price": 16.51,
+      "tax_price": 2.75,
+      "base_price": 13.76
+    },
+    "first_estimated_delivery_date": "2019/01/02",
+    "customs_required": false,
+    "name": "Chrono 13",
+    "transit_time": "1 DAY",
+    "country": "FR",
+    "cash_on_delivery": {
+      "apply_percentage_cash_on_delivery": "0.00",
+      "offered": false,
+      "max_cash_on_delivery": "0.00",
+      "min_cash_on_delivery": "0.00"
+    },
+    "transit_hours": "13",
+    "available_dates": {},
+    "url_terms_and_conditions": null,
+    "base_price": "13.76"
+  }
+]
