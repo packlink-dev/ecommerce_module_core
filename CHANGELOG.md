@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.9.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.1...v3.9.2) - 2026-07-27
+### Changed
+- Replaced the hardcoded browser user agent with a descriptive integration user agent (e.g. `Packlink-PrestaShop/3.6.1`)
+
 ## [3.9.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.8.2...v3.9.0)
 ### Added
 - Shipment document service for printing/downloading shipping labels and customs invoices (`ShipmentDocument` namespace, `PrintService.js`)
