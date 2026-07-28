@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\Http\DTO\Customs\Cost;
@@ -142,17 +143,61 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
 
         $user = $this->getUser();
 
+        $inventoriesOfContents = $this->getInventoryOfContents($shopOrder, $mapping);
+
+        if (!$this->isInventoryComplete($shopOrder, $inventoriesOfContents)) {
+            return null;
+        }
+
         $customsInvoice = new CustomsInvoice();
         $customsInvoice->invoiceNumber = $shopOrder->getOrderNumber();
         $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
         $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
-        $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder, $mapping);
+        $customsInvoice->inventoriesOfContents = $inventoriesOfContents;
         $customsInvoice->shipmentDetails = $this->getShipmentDetails($shopOrder);
         $customsInvoice->reasonForExport = $mapping->defaultReason;
         $customsInvoice->signature = $this->getSignature($warehouse);
 
 
         return $customsInvoice;
+    }
+
+    /**
+     * Checks that every inventory item resolved the customs-required values (tariff
+     * number and country of origin, from the item or the configured defaults). An
+     * invoice with an empty required field must be skipped - the draft then proceeds
+     * without customs - rather than sent invalid.
+     *
+     * @param Order $shopOrder
+     * @param InventoryContent[] $inventoriesOfContents
+     *
+     * @return bool
+     */
+    protected function isInventoryComplete($shopOrder, array $inventoriesOfContents)
+    {
+        foreach ($inventoriesOfContents as $inventory) {
+            if (empty($inventory->tariffNumber)) {
+                Logger::logWarning(
+                    'Customs invoice skipped for order ' . $shopOrder->getOrderNumber()
+                    . ': no tariff number resolved for item "' . $inventory->description
+                    . '" and no default tariff number is configured.'
+                );
+
+                return false;
+            }
+
+            if (empty($inventory->countryOfOrigin)) {
+                Logger::logWarning(
+                    'Customs invoice skipped for order ' . $shopOrder->getOrderNumber()
+                    . ': no country of origin resolved for item "' . $inventory->description
+                    . '" and no default country of origin is configured.'
+                );
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

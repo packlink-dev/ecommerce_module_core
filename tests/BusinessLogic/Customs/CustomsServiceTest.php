@@ -273,4 +273,113 @@ class CustomsServiceTest extends BaseTestWithServices
         self::assertEquals('default test', $payload['signature']['full_name']);
         self::assertEquals('Madrid', $payload['signature']['city']);
     }
+
+    /**
+     * An item whose tariff number resolves to nothing (no item value and no
+     * configured default) must not produce a customs invoice with an empty
+     * required field: the invoice is skipped with a warning and the draft
+     * proceeds without customs.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function testSendCustomsInvoiceSkippedWhenTariffNumberUnresolvable()
+    {
+        // arrange: no default tariff number, item carries none either.
+        $order = $this->getOrderForSkipScenario('', 'FR');
+
+        // act
+        $result = $this->customsService->sendCustomsInvoice($order);
+
+        // assert
+        self::assertNull($result);
+        self::assertEmpty($this->httpClient->getHistory(), 'No invoice request may be sent when the tariff number is unresolvable.');
+        self::assertTrue(
+            $this->shopLogger->isMessageContainedInLog('tariff number'),
+            'Skipping the customs invoice must log a warning naming the missing tariff number.'
+        );
+    }
+
+    /**
+     * Same guard for the country of origin: empty resolved value means the
+     * invoice is skipped, not sent invalid.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function testSendCustomsInvoiceSkippedWhenCountryOfOriginUnresolvable()
+    {
+        // arrange: no default country of origin, item carries none either.
+        $order = $this->getOrderForSkipScenario('123456', '');
+
+        // act
+        $result = $this->customsService->sendCustomsInvoice($order);
+
+        // assert
+        self::assertNull($result);
+        self::assertEmpty($this->httpClient->getHistory(), 'No invoice request may be sent when the country of origin is unresolvable.');
+        self::assertTrue(
+            $this->shopLogger->isMessageContainedInLog('country of origin'),
+            'Skipping the customs invoice must log a warning naming the missing country of origin.'
+        );
+    }
+
+    /**
+     * Builds an order + mapping where an item resolves neither its own customs
+     * values nor a configured default for the given fields.
+     *
+     * @param string $defaultTariffNumber
+     * @param string $defaultCountry
+     *
+     * @return Order
+     */
+    private function getOrderForSkipScenario($defaultTariffNumber, $defaultCountry)
+    {
+        $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
+
+        $mapping = new CustomsMapping();
+        $mapping->defaultReason = 'PURCHASE_OR_SALE';
+        $mapping->defaultSenderTaxId = '123';
+        $mapping->defaultReceiverUserType = 'PRIVATE_PERSON';
+        $mapping->defaultReceiverTaxId = '456';
+        $mapping->defaultTariffNumber = $defaultTariffNumber;
+        $mapping->defaultCountry = $defaultCountry;
+        $this->shopConfig->setCustomsMappings($mapping);
+
+        $user = new User();
+        $user->customerType = 'OTHERS';
+        $this->shopConfig->setUserInfo($user);
+
+        $order = new Order();
+        $order->setOrderNumber('ORDER-2');
+        $order->setCurrency('EUR');
+        $order->setTotalWeight(1.0);
+        $order->setTotalPrice(10.0);
+        $order->setTaxId('');
+        $order->setVatNumber('');
+
+        $address = new Address();
+        $address->setName('Jane');
+        $address->setSurname('Roe');
+        $address->setCompany('');
+        $address->setStreet1('Main St');
+        $address->setStreet2('');
+        $address->setZipCode('75000');
+        $address->setCity('Paris');
+        $address->setCountry('FR');
+        $address->setPhone('+33600000000');
+        $order->setShippingAddress($address);
+
+        $item = new Item();
+        $item->setTitle('Widget');
+        $item->setPrice(10.0);
+        $item->setWeight(1.0);
+        $item->setQuantity(1);
+
+        $order->setItems(array($item));
+
+        return $order;
+    }
 }

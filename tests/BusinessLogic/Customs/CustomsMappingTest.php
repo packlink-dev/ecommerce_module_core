@@ -2,11 +2,15 @@
 
 namespace Logeecom\Tests\BusinessLogic\Customs;
 
+use Logeecom\Infrastructure\ServiceRegister;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\Dto\BaseDtoTest;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\ValidationError;
+use Packlink\BusinessLogic\FileResolver\FileResolverService;
 
 /**
  * Class CustomsMappingTest.
@@ -21,6 +25,27 @@ class CustomsMappingTest extends BaseDtoTest
     protected function before()
     {
         parent::before();
+
+        // Validation errors are built through Translator, which resolves the
+        // country-labels CountryService (and its FileResolverService) from the
+        // service register.
+        new TestServiceRegister(
+            array(
+                FileResolverService::CLASS_NAME => function () {
+                    return new FileResolverService(
+                        array(
+                            __DIR__ . '/../../../src/BusinessLogic/Resources/countries',
+                        )
+                    );
+                },
+                \Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService::CLASS_NAME => function () {
+                    $fileResolverService = ServiceRegister::getService(FileResolverService::CLASS_NAME);
+
+                    /** @noinspection PhpParamsInspection */
+                    return new CountryLabelService($fileResolverService);
+                },
+            )
+        );
 
         TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
     }
@@ -48,12 +73,13 @@ class CustomsMappingTest extends BaseDtoTest
     public function testOptionalMappingFieldsCanBeOmitted()
     {
         $raw = $this->getValidPayload();
-        unset($raw['mapping_tariff_number'], $raw['mapping_company_vat']);
+        unset($raw['mapping_tariff_number'], $raw['mapping_company_vat'], $raw['mapping_country_of_origin']);
 
         $mapping = CustomsMapping::fromArray($raw);
 
         self::assertSame('', $mapping->mappingTariffNumber);
         self::assertSame('', $mapping->mappingCompanyVat);
+        self::assertSame('', $mapping->mappingCountryOfOrigin);
     }
 
     /**
@@ -219,6 +245,7 @@ class CustomsMappingTest extends BaseDtoTest
             'mapping_receiver_tax_id' => 'tax_1',
             'mapping_tariff_number' => 'hs_code_1',
             'mapping_company_vat' => 'vat_1',
+            'mapping_country_of_origin' => 'origin_1',
         );
     }
 }

@@ -35,6 +35,26 @@ class CustomsMappingService extends BaseCustomsService
                     ),
                 )
             ),
+            MappingFieldOptions::fromArray(
+                array(
+                    'field' => 'mapping_country_of_origin',
+                    'label' => 'Product country of origin field',
+                    'options' => array(
+                        array('value' => 'origin_1', 'name' => 'Country of origin 1'),
+                        array('value' => 'origin_2', 'name' => 'Country of origin 2'),
+                    ),
+                )
+            ),
+            MappingFieldOptions::fromArray(
+                array(
+                    'field' => 'mapping_company_vat',
+                    'label' => 'Company VAT field',
+                    'options' => array(
+                        array('value' => 'vat_1', 'name' => 'Company VAT 1'),
+                        array('value' => 'vat_2', 'name' => 'Company VAT 2'),
+                    ),
+                )
+            ),
         );
     }
 }

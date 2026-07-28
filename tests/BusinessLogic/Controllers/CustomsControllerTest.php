@@ -120,6 +120,7 @@ class CustomsControllerTest extends BaseTestWithServices
             'mapping_receiver_tax_id' => 'tax_1',
             'mapping_tariff_number' => 'hs_code_1',
             'mapping_company_vat' => 'vat_1',
+            'mapping_country_of_origin' => 'origin_1',
         );
         /** @var CustomsMappingService $service */
         $service = TestServiceRegister::getService(CustomsMappingService::CLASS_NAME);
@@ -145,6 +146,7 @@ class CustomsControllerTest extends BaseTestWithServices
             'mapping_receiver_tax_id' => 'tax_1',
             'mapping_tariff_number' => 'hs_code_1',
             'mapping_company_vat' => 'vat_1',
+            'mapping_country_of_origin' => 'origin_1',
         );
 
         // act
