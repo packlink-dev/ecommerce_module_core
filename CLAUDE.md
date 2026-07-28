@@ -8,31 +8,31 @@ This is `packlink/integration-core`, a PHP library that provides the shared core
 
 ## AI Docs & Change Requests
 
-All change requests, contribution guidelines, and coding standards live under `.ai-docs/`. Read the relevant docs before starting work:
+All change requests, contribution guidelines, and coding standards live under `docs/`. Read the relevant docs before starting work:
 
-- **`.ai-docs/coding-standards.md`** — authoritative coding conventions (PHP 7.0 idioms, naming, docblocks, DTO/Singleton/test patterns, frontend resources). Read this before writing code.
-- **`.ai-docs/guidelines.md`** — the change-request / contribution workflow.
-- **`.ai-docs/architecture.md`** — system-wide architecture reference (layers, ORM, task queue, Packlink API proxy, services, key flows, entity catalog, platform integration contract).
+- **`docs/coding-standard.md`** — authoritative coding conventions (PHP 7.0 idioms, naming, docblocks, DTO/Singleton/test patterns, frontend resources). Read this before writing code.
+- **`docs/guidelines.md`** — the change-request / contribution workflow.
+- **`docs/design.md`** — system-wide architecture reference (layers, ORM, task queue, Packlink API proxy, services, key flows, entity catalog, platform integration contract).
 
-**Change-request pattern.** Each change request gets its own folder, `.ai-docs/change_requests/<CR-ID>/`, named with the ticket ID plus a short slug (e.g. `CR-SET-62b-labels`). It contains three documents plus an optional folder:
+**Change-request pattern.** Each change request gets its own folder, `docs/change-requests/<CR-ID>/`, named with the ticket ID plus a short slug (e.g. `CR-SET-62b-labels`). It contains three documents plus an optional folder:
 
 - `spec.md` — *what & why*: overview, the concrete classes/DTOs/interfaces to add or change (with namespaces, fields, method signatures), New/Modified file tables, and rationale notes.
 - `design.md` — *how it fits*: narrative design — architecture recap, components & responsibilities, deltas & rationale for non-obvious decisions.
 - `tasks.md` — *ordered work*: implementation tasks with effort and dependencies, a task-dependency graph, and a files-changed-per-task table.
 - `requirements/` *(optional)* — raw source material the CR was derived from (ticket PDFs, mockup images, extracted requirements notes), kept separate from the derived spec/design/tasks docs.
 
-See `.ai-docs/change_requests/CR-SET-66-Customs-support/` as the reference example (`CR-SET-62b-labels` predates the `design.md`/`tasks.md` split and has a thinner `design.md`).
+See `docs/change-requests/2026-06-cr66-customs-support/` as the reference example (`CR-SET-62b-labels` predates the `design.md`/`tasks.md` split and has a thinner `design.md`).
 
 ## Publishing to the Client Repo (origin)
 
-`origin` is the **client repository** (`packlink-dev/ecommerce_module_core`); `internal` is the Logeecom dev repository. Internal branches (`*-internal`) and internal-only files (`.ai-docs/`, `.claude/`, `.github/`, `CLAUDE.md`, `DESIGN.md`, `LEARNINGS.md`, `docs/specs/`) must **never** be pushed or merged to origin. All delivery to origin goes through the publish script, which strips internal-only paths and squashes the changes into a single commit:
+`origin` is the **client repository** (`packlink-dev/ecommerce_module_core`); `internal` is the Logeecom dev repository. Internal branches (`*-internal`) and internal-only files (`docs/`, `.claude/`, `.github/`, `CLAUDE.md`, `DESIGN.md`, `LEARNINGS.md`, `docs/specs/`) must **never** be pushed or merged to origin. All delivery to origin goes through the publish script, which strips internal-only paths and squashes the changes into a single commit:
 
 ```bash
-bash .ai-docs/tools/publish-to-origin.sh --dry-run   # preview what would be published
-bash .ai-docs/tools/publish-to-origin.sh             # push a PR branch to origin
+bash docs/tools/publish-to-origin.sh --dry-run   # preview what would be published
+bash docs/tools/publish-to-origin.sh             # push a PR branch to origin
 ```
 
-Full workflow: `.ai-docs/publishing.md`.
+Full workflow: `docs/publishing.md`.
 
 ## Build & Test Commands
 
@@ -117,7 +117,7 @@ Controllers in `BusinessLogic/Controllers/` are thin wrappers that resolve servi
 
 ## Key Constraints
 
-> Full conventions are in `.ai-docs/coding-standards.md` — the authoritative style source. The most load-bearing constraints:
+> Full conventions are in `docs/coding-standard.md` — the authoritative style source. The most load-bearing constraints:
 
 - **PHP 7.0 minimum** — no nullable types (`?Type`), no `void` return types, no typed properties. Use PHPDoc for type hints. `array()` syntax instead of `[]` is used throughout.
 - **Platform agnostic** — this library must never depend on a specific e-commerce platform. Platform-specific behavior goes through abstract classes/interfaces (e.g., `Configuration`, `HttpClient`, `RepositoryInterface`).
@@ -139,7 +139,7 @@ Software development in this repository uses the Logeecom plugin stack:
 Precedence (a more specific rule wins only for that specific; name any overridden rule):
 
 1. Explicit user instruction
-2. This repository's `CLAUDE.md`, `DESIGN.md`, `.ai-docs/`, and local docs
+2. This repository's `CLAUDE.md`, `DESIGN.md`, `docs/`, and local docs
 3. Integration-specific plugin (`integration-core`)
 4. `engineering-core`
 

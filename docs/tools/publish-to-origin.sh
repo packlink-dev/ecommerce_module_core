@@ -10,7 +10,7 @@
 # target branch (--commit). The user's checkout is never touched.
 #
 # Usage:
-#   bash .ai-docs/tools/publish-to-origin.sh [options]
+#   bash docs/tools/publish-to-origin.sh [options]
 #
 # Options:
 #   -t <branch>    Target origin branch (default: current branch without the
@@ -30,15 +30,18 @@
 set -euo pipefail
 
 # Internal-only paths that must never reach the client repository.
-# This list is the single source of truth - .ai-docs/publishing.md documents it.
+# This list is the single source of truth - docs/publishing.md documents it.
+# "docs" covers docs/specs and every other documentation subtree.
+# ".ai-docs" is the pre-rename name, retained because older internal branches still
+# carry it; dropping it would unprotect those branches.
 INTERNAL_PATHS=(
+    "docs"
     ".ai-docs"
     ".claude"
     ".github"
     "CLAUDE.md"
     "DESIGN.md"
     "LEARNINGS.md"
-    "docs/specs"
     ".phpunit.result.cache"
 )
 

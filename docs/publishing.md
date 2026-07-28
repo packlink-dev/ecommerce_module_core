@@ -15,40 +15,46 @@ client repository. All delivery to origin goes through the publish script.
 ## Internal-only paths
 
 These paths must never reach the client repository. The canonical, machine-enforced list
-lives in `.ai-docs/tools/publish-to-origin.sh` (`INTERNAL_PATHS`); keep this table in sync
+lives in `docs/tools/publish-to-origin.sh` (`INTERNAL_PATHS`); keep this table in sync
 when it changes:
 
-- `.ai-docs/` — change requests, standards, architecture docs, tools (including the publish script itself)
+- `docs/` — the whole documentation tree: change requests, standards, design docs, per-feature
+  specs under `docs/specs/`, and `docs/tools/` (including the publish script itself). The entry is
+  the directory, so every present and future subtree is covered without editing the list again.
+- `.ai-docs/` — the pre-rename name of `docs/`, retained in the list because older internal
+  branches still carry it
 - `.claude/` — Claude Code commands and settings
 - `.github/` — internal PR templates
 - `CLAUDE.md` — AI assistant instructions
 - `DESIGN.md` — living architecture record
 - `LEARNINGS.md` — continuous-learning log
-- `docs/specs/` — per-feature spec-driven-development documents
 - `.phpunit.result.cache` — test cache
+
+Because `docs/` is internal in its entirety, this library has no client-facing documentation
+directory. Anything the client repository should carry belongs in `README.md` or `CHANGELOG.md`.
 
 These are also listed in `.git/info/exclude` (local-only ignore, not pushed anywhere) so
 untracked internal files never show up in `git status` / `git add -A` by accident.
 
 ## The publish script
 
-`.ai-docs/tools/publish-to-origin.sh` takes everything committed on the **current branch**
+`docs/tools/publish-to-origin.sh` takes everything committed on the **current branch**
 since its merge-base with the target origin branch, strips the internal-only paths, and
 commits the remainder as a **single squashed commit** on top of `origin/<target>` in a
 temporary worktree (your checkout is never touched). It then delivers that commit.
 
 ```bash
 # Preview what would be published (always do this first)
-bash .ai-docs/tools/publish-to-origin.sh --dry-run
+bash docs/tools/publish-to-origin.sh --dry-run
 
 # Default: push a PR branch to origin and print the PR link
-bash .ai-docs/tools/publish-to-origin.sh -b CR-SET-67 -m "Add customs support (CR-SET-67)"
+bash docs/tools/publish-to-origin.sh -b CR-SET-67 -m "Add customs support (CR-SET-67)"
 
 # Direct commit onto the target branch (asks for confirmation; -y skips it)
-bash .ai-docs/tools/publish-to-origin.sh --commit -m "Release version 4.2.5"
+bash docs/tools/publish-to-origin.sh --commit -m "Release version 4.2.5"
 
 # Publish to a target that can't be derived from the branch name
-bash .ai-docs/tools/publish-to-origin.sh -t master-v2
+bash docs/tools/publish-to-origin.sh -t master-v2
 ```
 
 Options:
@@ -84,9 +90,9 @@ compare URL to open the PR manually.
 
 1. Finish work on the internal branch (e.g. `master-v2-internal`); everything to be
    delivered is committed.
-2. `bash .ai-docs/tools/publish-to-origin.sh --dry-run` — check the file list contains
+2. `bash docs/tools/publish-to-origin.sh --dry-run` — check the file list contains
    only production code.
-3. `bash .ai-docs/tools/publish-to-origin.sh -b <ticket-id> -m "<message>"` — push the PR
+3. `bash docs/tools/publish-to-origin.sh -b <ticket-id> -m "<message>"` — push the PR
    branch and open the PR against the target branch.
 4. After the client-side PR is merged: `git fetch origin` and merge `origin/<target>` back
    into the internal branch so the branches stay in sync

@@ -12,7 +12,7 @@
 The customs back-end already exists (CR-SET-42). T1–T5 close the **test-coverage** gaps
 (G1–G5); **T6** is the common-UI feature work (G6) — extending the customs settings page with
 the additional mapping selects shown in the mockups. All tasks follow
-`.ai-docs/coding-standards.md` and the test patterns in `design.md` §4.
+`docs/coding-standard.md` and the test patterns in `design.md` §4.
 
 ## Task 1 — `CustomsMapping` validation tests (G1)
 

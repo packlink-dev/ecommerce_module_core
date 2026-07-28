@@ -144,7 +144,7 @@ follow-up ticket if confirmed unintended.
 
 **Observation (no task):** `CustomsMapping` declares return types (`: array`, `: CustomsMapping`)
 which are valid on PHP 7.0 but stylistically inconsistent with the rest of core
-(`.ai-docs/coding-standards.md` discourages return-type declarations). Left as-is to avoid
+(`docs/coding-standard.md` discourages return-type declarations). Left as-is to avoid
 churn; flag if the team wants a style sweep.
 
 ## 4. Test Design
@@ -179,7 +179,7 @@ public function testTariffNumberMustBeSixToEightDigits()
 
 ## 5. Coding Standards & Best Practices
 
-All code added by this CR follows `.ai-docs/coding-standards.md`:
+All code added by this CR follows `docs/coding-standard.md`:
 - PHP 7.0 — `array()` syntax, no nullable types/typed properties, PHPDoc for types.
 - `@before`/`@after` test setup chaining; in-memory repositories for isolation.
 - Reuse existing fixtures and test doubles rather than inventing new HTTP mocks.
