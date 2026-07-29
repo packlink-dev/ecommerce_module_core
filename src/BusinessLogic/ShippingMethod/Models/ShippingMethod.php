@@ -5,6 +5,7 @@ namespace Packlink\BusinessLogic\ShippingMethod\Models;
 use Logeecom\Infrastructure\ORM\Configuration\EntityConfiguration;
 use Logeecom\Infrastructure\ORM\Configuration\IndexMap;
 use Logeecom\Infrastructure\ORM\Entity;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 
 /**
@@ -44,6 +45,9 @@ class ShippingMethod extends Entity
         'fixedPrices',
         'systemDefaults',
         'tags',
+        'ddpBehavior',
+        'ddpAdjustmentType',
+        'ddpAdjustmentAmount',
     );
     /**
      * Carrier name.
@@ -173,6 +177,24 @@ class ShippingMethod extends Entity
      * @var array
      */
     public $tags = array();
+    /**
+     * Merchant duties-cost behavior ('none', 'optional' or 'enforced').
+     *
+     * @var string
+     */
+    protected $ddpBehavior = DdpBehavior::NONE;
+    /**
+     * DDP cost adjustment type ('fixed', 'percentage' or null for no adjustment).
+     *
+     * @var string|null
+     */
+    protected $ddpAdjustmentType;
+    /**
+     * Signed DDP cost adjustment amount.
+     *
+     * @var float
+     */
+    protected $ddpAdjustmentAmount = 0.0;
 
     /**
      * Transforms raw array data to this entity instance.
@@ -221,6 +243,10 @@ class ShippingMethod extends Entity
         } else {
             $this->tags = array();
         }
+
+        $this->ddpBehavior = isset($data['ddpBehavior']) ? $data['ddpBehavior'] : DdpBehavior::NONE;
+        $this->ddpAdjustmentType = isset($data['ddpAdjustmentType']) ? $data['ddpAdjustmentType'] : null;
+        $this->ddpAdjustmentAmount = isset($data['ddpAdjustmentAmount']) ? (float)$data['ddpAdjustmentAmount'] : 0.0;
     }
 
     /**
@@ -696,5 +722,87 @@ class ShippingMethod extends Entity
     public function setSystemDefaults($systemDefaults)
     {
         $this->systemDefaults = $systemDefaults;
+    }
+
+    /**
+     * Gets merchant DDP behavior.
+     *
+     * @return string DDP behavior ('none', 'optional' or 'enforced').
+     */
+    public function getDdpBehavior()
+    {
+        return $this->ddpBehavior;
+    }
+
+    /**
+     * Sets merchant DDP behavior.
+     *
+     * @param string $ddpBehavior DDP behavior ('none', 'optional' or 'enforced').
+     */
+    public function setDdpBehavior($ddpBehavior)
+    {
+        $this->ddpBehavior = $ddpBehavior;
+    }
+
+    /**
+     * Gets DDP cost adjustment type.
+     *
+     * @return string|null Adjustment type ('fixed', 'percentage' or null for no adjustment).
+     */
+    public function getDdpAdjustmentType()
+    {
+        return $this->ddpAdjustmentType;
+    }
+
+    /**
+     * Sets DDP cost adjustment type.
+     *
+     * @param string|null $ddpAdjustmentType Adjustment type ('fixed', 'percentage' or null for no adjustment).
+     */
+    public function setDdpAdjustmentType($ddpAdjustmentType)
+    {
+        $this->ddpAdjustmentType = $ddpAdjustmentType;
+    }
+
+    /**
+     * Gets signed DDP cost adjustment amount.
+     *
+     * @return float Adjustment amount.
+     */
+    public function getDdpAdjustmentAmount()
+    {
+        return $this->ddpAdjustmentAmount;
+    }
+
+    /**
+     * Sets signed DDP cost adjustment amount.
+     *
+     * @param float $ddpAdjustmentAmount Adjustment amount.
+     */
+    public function setDdpAdjustmentAmount($ddpAdjustmentAmount)
+    {
+        $this->ddpAdjustmentAmount = $ddpAdjustmentAmount;
+    }
+
+    /**
+     * Gets derived DDP support level: "mandatory" if any of the services is mandatory,
+     * "supported" if any of the services is supported, null otherwise.
+     *
+     * @return string|null DDP support level.
+     */
+    public function getDdpSupportLevel()
+    {
+        $level = null;
+        foreach ($this->getShippingServices() as $service) {
+            if ($service->getDdpSupportLevel() === DdpBehavior::LEVEL_MANDATORY) {
+                return DdpBehavior::LEVEL_MANDATORY;
+            }
+
+            if ($service->getDdpSupportLevel() === DdpBehavior::LEVEL_SUPPORTED) {
+                $level = DdpBehavior::LEVEL_SUPPORTED;
+            }
+        }
+
+        return $level;
     }
 }

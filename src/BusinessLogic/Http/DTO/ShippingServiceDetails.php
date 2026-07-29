@@ -153,6 +153,13 @@ class ShippingServiceDetails extends DataTransferObject
     public $cashOnDelivery = array();
 
     /**
+     * DDP support level for the service (null, "supported" or "mandatory").
+     *
+     * @var string|null
+     */
+    public $ddpSupportLevel;
+
+    /**
      * @inheritdoc
      */
     public function toArray()
@@ -179,6 +186,7 @@ class ShippingServiceDetails extends DataTransferObject
             'available_dates' => $this->availableDates,
             'tags' => $this->tags,
             'cash_on_delivery' => $this->cashOnDelivery,
+            'ddp_support_level' => $this->ddpSupportLevel,
         );
     }
 
@@ -218,6 +226,7 @@ class ShippingServiceDetails extends DataTransferObject
         $instance->national = self::getDataValue($raw, 'national', null);
         $instance->tags = self::getDataValue($raw, 'tags', array());
         $instance->cashOnDelivery = self::getDataValue($raw, 'cash_on_delivery', array());
+        $instance->ddpSupportLevel = self::getDataValue($raw, 'ddp_support_level', null);
 
         return $instance;
     }

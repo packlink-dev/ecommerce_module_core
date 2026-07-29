@@ -610,6 +610,7 @@ class ShippingMethodService extends BaseService implements \Packlink\BusinessLog
                 $currentService->basePrice = $newService->basePrice;
                 $currentService->totalPrice = $newService->totalPrice;
                 $currentService->taxPrice = $newService->taxPrice;
+                $currentService->ddpSupportLevel = $newService->ddpSupportLevel;
                 $set = true;
 
                 break;

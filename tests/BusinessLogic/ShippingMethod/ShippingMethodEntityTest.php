@@ -14,9 +14,11 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestHttpClient;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
+use Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\IntegrationRegistration\IntegrationRegistrationService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -150,6 +152,111 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         self::assertEquals(1, $method->taxPrice);
         self::assertEquals('IT', $method->departureCountry);
         self::assertEquals('DE', $method->destinationCountry);
+    }
+
+    public function testShippingServiceDetailsParsesDdpSupportLevel()
+    {
+        $details = ShippingServiceDetails::fromArray(array('id' => 20339, 'ddp_support_level' => 'supported'));
+        self::assertEquals('supported', $details->ddpSupportLevel);
+
+        $details->firstEstimatedDeliveryDate = new \DateTime();
+        $result = $details->toArray();
+        self::assertArrayHasKey('ddp_support_level', $result);
+        self::assertEquals('supported', $result['ddp_support_level']);
+
+        // Responses without the field (legacy / non-DDP services) must yield null.
+        $legacy = ShippingServiceDetails::fromArray(array('id' => 20339));
+        self::assertNull($legacy->ddpSupportLevel);
+    }
+
+    public function testShippingServiceDdpSupportLevelRoundTrip()
+    {
+        $data = array(
+            'serviceId' => '20339',
+            'serviceName' => 'test',
+            'departure' => 'IT',
+            'destination' => 'DE',
+            'totalPrice' => 3,
+            'basePrice' => 2,
+            'taxPrice' => 1,
+            'ddp_support_level' => DdpBehavior::LEVEL_MANDATORY,
+        );
+
+        $service = ShippingService::fromArray($data);
+        self::assertEquals(DdpBehavior::LEVEL_MANDATORY, $service->getDdpSupportLevel());
+
+        $result = $service->toArray();
+        self::assertEquals(DdpBehavior::LEVEL_MANDATORY, $result['ddp_support_level']);
+
+        // Stored rows created before DDP support must inflate to null.
+        unset($data['ddp_support_level']);
+        $legacyService = ShippingService::fromArray($data);
+        self::assertNull($legacyService->getDdpSupportLevel());
+    }
+
+    public function testShippingServiceFromServiceDetailsCopiesDdpSupportLevel()
+    {
+        $details = ShippingServiceDetails::fromArray(
+            array('id' => 20339, 'ddp_support_level' => DdpBehavior::LEVEL_SUPPORTED)
+        );
+
+        $service = ShippingService::fromServiceDetails($details);
+        self::assertEquals(DdpBehavior::LEVEL_SUPPORTED, $service->getDdpSupportLevel());
+    }
+
+    public function testInflateLegacyDataDefaultsDdpConfiguration()
+    {
+        $data = $this->getShippingMethodData();
+        unset($data['shippingServices'][0]['ddp_support_level']);
+
+        $method = new ShippingMethod();
+        $method->inflate($data);
+
+        self::assertEquals(DdpBehavior::NONE, $method->getDdpBehavior());
+        self::assertNull($method->getDdpAdjustmentType());
+        self::assertSame(0.0, $method->getDdpAdjustmentAmount());
+        $services = $method->getShippingServices();
+        self::assertNull($services[0]->getDdpSupportLevel());
+    }
+
+    public function testDdpConfigurationRoundTrip()
+    {
+        $data = $this->getShippingMethodData();
+        $data['ddpBehavior'] = DdpBehavior::ENFORCED;
+        $data['ddpAdjustmentType'] = 'percentage';
+        $data['ddpAdjustmentAmount'] = -12.5;
+
+        $method = new ShippingMethod();
+        $method->inflate($data);
+
+        self::assertEquals(DdpBehavior::ENFORCED, $method->getDdpBehavior());
+        self::assertEquals('percentage', $method->getDdpAdjustmentType());
+        self::assertSame(-12.5, $method->getDdpAdjustmentAmount());
+
+        $result = $method->toArray();
+        self::assertEquals(DdpBehavior::ENFORCED, $result['ddpBehavior']);
+        self::assertEquals('percentage', $result['ddpAdjustmentType']);
+        self::assertEquals(-12.5, $result['ddpAdjustmentAmount']);
+    }
+
+    public function testDerivedDdpSupportLevel()
+    {
+        $method = new ShippingMethod();
+        self::assertNull($method->getDdpSupportLevel());
+
+        $method->addShippingService(new ShippingService(1, '', 'IT', 'DE', 5, 4, 1));
+        self::assertNull($method->getDdpSupportLevel());
+
+        $method->addShippingService(
+            new ShippingService(2, '', 'IT', 'FR', 5, 4, 1, 'standard', null, DdpBehavior::LEVEL_SUPPORTED)
+        );
+        self::assertEquals(DdpBehavior::LEVEL_SUPPORTED, $method->getDdpSupportLevel());
+
+        // A single mandatory service outranks any number of supported ones.
+        $method->addShippingService(
+            new ShippingService(3, '', 'IT', 'US', 5, 4, 1, 'standard', null, DdpBehavior::LEVEL_MANDATORY)
+        );
+        self::assertEquals(DdpBehavior::LEVEL_MANDATORY, $method->getDdpSupportLevel());
     }
 
     public function testCheapestService()
@@ -346,6 +453,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
                         "max_cash_on_delivery" => "2.35",
                         "min_cash_on_delivery" => "0.00",
                     ),
+                    'ddp_support_level' => 'supported',
                 ),
             ),
             'pricingPolicies' => array(

@@ -12,6 +12,7 @@ use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryStorage;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
@@ -385,6 +386,47 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
         $query = new QueryFilter();
         $query->where('national', Operators::EQUALS, false);
         self::assertEquals(7, $repo->count($query));
+    }
+
+    /**
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function testExecuteSyncsDdpSupportLevel()
+    {
+        $this->prepareAndExecuteValidTask();
+
+        $method = $this->findMethodByServiceId(20339);
+        self::assertNotNull($method);
+        $methodId = $method->getId();
+        $services = $method->getShippingServices();
+        self::assertCount(1, $services);
+        self::assertEquals(DdpBehavior::LEVEL_SUPPORTED, $services[0]->getDdpSupportLevel());
+        self::assertEquals(DdpBehavior::LEVEL_SUPPORTED, $method->getDdpSupportLevel());
+
+        // Services without the field in the API response must remain without a level.
+        $noDdpMethod = $this->findMethodByServiceId(20615);
+        self::assertNotNull($noDdpMethod);
+        $noDdpServices = $noDdpMethod->getShippingServices();
+        self::assertNull($noDdpServices[0]->getDdpSupportLevel());
+        self::assertNull($noDdpMethod->getDdpSupportLevel());
+
+        // A stale stored level must be refreshed on the existing service by a re-sync.
+        $services[0]->setDdpSupportLevel(DdpBehavior::LEVEL_MANDATORY);
+        $method->setShippingServices($services);
+        $repo = RepositoryRegistry::getRepository(ShippingMethod::CLASS_NAME);
+        $repo->update($method);
+
+        $this->httpClient->setMockResponses($this->getValidMockResponses());
+        $this->executeSyncTask();
+
+        $method = $this->shippingMethodService->getShippingMethod($methodId);
+        $services = $method->getShippingServices();
+        self::assertCount(1, $services);
+        self::assertEquals(DdpBehavior::LEVEL_SUPPORTED, $services[0]->getDdpSupportLevel());
     }
 
     /**

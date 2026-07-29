@@ -15,6 +15,7 @@
     "url_forbidden_items": null,
     "translation_transit_key": null,
     "id": 20339,
+    "ddp_support_level": "supported",
     "carrier_product_id": "IT_NEXIVE_8",
     "service_info": [
       {
