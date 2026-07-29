@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./vendor/autoload.php" colors="true">
+<phpunit bootstrap="./tests/bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="Infrastructure Test Suite">
-            <directory sufix="Test.php">./tests/Infrastructure</directory>
+            <directory suffix="Test.php">./tests/Infrastructure</directory>
         </testsuite>
         <testsuite name="Business Logic Test Suite">
-            <directory sufix="Test.php">./tests/BusinessLogic</directory>
+            <directory suffix="Test.php">./tests/BusinessLogic</directory>
         </testsuite>
     </testsuites>
+    <!-- Coverage source set for PHPUnit >= 10. -->
+    <source>
+        <include>
+            <directory suffix=".php">./src/BusinessLogic</directory>
+            <directory suffix=".php">./src/Infrastructure</directory>
+        </include>
+        <exclude>
+            <directory>./src/DemoUI</directory>
+        </exclude>
+    </source>
+    <!-- Legacy coverage config for PHPUnit 4.8 (PHP 7.0 path); ignored by PHPUnit >= 10. -->
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/BusinessLogic</directory>

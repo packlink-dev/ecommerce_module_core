@@ -23,7 +23,6 @@ class CashOnDeliveryServiceTest extends BaseTestWithServices
     private $service;
 
     /**
-     * @before
      * @inheritDoc
      * @throws RepositoryNotRegisteredException
      */

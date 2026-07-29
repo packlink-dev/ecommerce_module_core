@@ -23,14 +23,13 @@ if (!window.Packlink) {
             'default_receiver_tax_id',
             'default_tariff_number',
             'default_country',
-            'mapping_receiver_tax_id',
         ];
 
         this.pageId = 'pl-customs-page';
 
         let page,
             currentCountry,
-            receiverTaxIdValue;
+            mappingFieldValues = {};
 
         /**
          * Displays page content.
@@ -77,36 +76,73 @@ if (!window.Packlink) {
         const setSpecificFields = (response) => {
             setDescriptions(response);
             currentCountry = response.default_country;
-            receiverTaxIdValue = response.mapping_receiver_tax_id;
+            mappingFieldValues = response;
 
             ajaxService.get(configuration.getSupportedCountriesUrl, constructCountryDropdown);
-            ajaxService.get(configuration.getCustomData, constructTaxDropdown)
+            ajaxService.get(configuration.getCustomData, constructMappingFields);
         };
 
-        const constructTaxDropdown = (response) => {
-            let receiverTaxId = templateService.getComponent('pl-mapping-receiver-tax', page);
-
-            let defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.innerText = ' ';
-            receiverTaxId.appendChild(defaultOption);
-
-            for (let i = 0; i < response.length; i++) {
-                const optionElement = document.createElement('option');
-
-                optionElement.value = response[i].value;
-                optionElement.innerText = response[i].name;
-
-                if (response[i].value === receiverTaxIdValue) {
-                    optionElement.selected = true;
-                }
-
-                receiverTaxId.appendChild(optionElement);
+        /**
+         * Renders a data-mapping <select> for each platform-supplied field
+         * definition. The set of fields, their labels and their options are
+         * entirely platform-driven; core neither hardcodes nor assumes any
+         * of them.
+         *
+         * @param {Array<{field: string, label: string, options: Array<{value: string, name: string}>}>} response
+         */
+        const constructMappingFields = (response) => {
+            if (!Array.isArray(response)) {
+                return;
             }
 
-            receiverTaxId.addEventListener('change', function () {
-                receiverTaxIdValue = receiverTaxId.value;
-            })
+            const container = templateService.getComponent('pl-mapping-fields', page);
+
+            for (let fieldDefinition of response) {
+                const fieldName = fieldDefinition.field,
+                    selectId = 'pl-mapping-' + fieldName;
+
+                const formGroup = document.createElement('div');
+                formGroup.className = 'pl-form-group';
+
+                const select = document.createElement('select');
+                select.id = selectId;
+                select.name = fieldName;
+
+                let defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.innerText = ' ';
+                select.appendChild(defaultOption);
+
+                for (let option of fieldDefinition.options) {
+                    const optionElement = document.createElement('option');
+
+                    optionElement.value = option.value;
+                    optionElement.innerText = option.name;
+
+                    if (option.value === mappingFieldValues[fieldName]) {
+                        optionElement.selected = true;
+                    }
+
+                    select.appendChild(optionElement);
+                }
+
+                const icon = document.createElement('i');
+                icon.className = 'material-icons';
+                icon.innerText = 'expand_more';
+
+                const label = document.createElement('label');
+                label.className = 'pl-customs-label';
+                label.setAttribute('for', selectId);
+                label.setAttribute('title', fieldDefinition.label);
+                label.innerText = fieldDefinition.label;
+
+                formGroup.appendChild(select);
+                formGroup.appendChild(icon);
+                formGroup.appendChild(label);
+                container.appendChild(formGroup);
+
+                this.modelFields.push(fieldName);
+            }
         };
 
         const constructCountryDropdown = (response) => {

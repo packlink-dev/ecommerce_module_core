@@ -245,6 +245,7 @@ echo $lang ?>">
                 {
                     baseResourcesUrl: "<?php echo UrlService::getResourceUrl() ?>",
                     stateUrl: "<?php getUrl('ModuleState', 'getCurrentState') ?>",
+                    integrationStatusUrl: "<?php getUrl('ModuleState', 'getIntegrationStatus') ?>",
                     pageConfiguration: pageConfiguration,
                     templates: {
                         'pl-login-page': {

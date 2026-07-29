@@ -34,7 +34,7 @@ class CustomsController extends BaseHttpController
 
     public function getCustomData()
     {
-        return $this->output($this->baseController->getReceiverTaxIdOptions());
+        return $this->output($this->baseController->getMappingFieldsOptions());
     }
 
     public function save(Request $request)

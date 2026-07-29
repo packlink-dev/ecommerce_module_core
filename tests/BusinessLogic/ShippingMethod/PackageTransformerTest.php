@@ -40,8 +40,6 @@ class PackageTransformerTest extends BaseTestWithServices
     private $defaultParcel;
 
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException

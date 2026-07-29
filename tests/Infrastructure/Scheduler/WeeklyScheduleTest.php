@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\TaskExecution\Scheduler\Models\WeeklySchedule;
 use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class WeeklyScheduleTest
@@ -30,14 +30,11 @@ class WeeklyScheduleTest extends TestCase
     private $oldTimeZone;
 
     /**
-     * @before
-     *
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
     public function before()
     {
-        $this->setUp();
 
         $this->oldTimeZone = date_default_timezone_get();
         date_default_timezone_set('UTC');
@@ -58,13 +55,11 @@ class WeeklyScheduleTest extends TestCase
     }
 
     /**
-     * @after
      * @return void
      */
     public function after()
     {
         date_default_timezone_set($this->oldTimeZone);
-        $this->tearDown();
     }
 
     /**

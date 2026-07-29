@@ -9,14 +9,13 @@ use Logeecom\Infrastructure\TaskExecution\AsyncBatchStarter;
 use Logeecom\Infrastructure\TaskExecution\Interfaces\AsyncProcessService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FakeRunnable;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncProcessStarter;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 class AsyncBatchStarterTest extends TestCase
 {
     private $asyncProcessStarter;
 
     /**
-     * @before
      */
     protected function before()
     {

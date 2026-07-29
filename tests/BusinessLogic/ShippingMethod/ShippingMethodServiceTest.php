@@ -33,7 +33,6 @@ class ShippingMethodServiceTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -64,7 +63,6 @@ class ShippingMethodServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

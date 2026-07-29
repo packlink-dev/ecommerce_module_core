@@ -33,7 +33,6 @@ class LocationServiceTest extends BaseTestWithServices
     public $shippingMethodService;
 
     /**
-     * @before
      * @inheritDoc
      */
     public function before()
@@ -78,7 +77,6 @@ class LocationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     public function after()

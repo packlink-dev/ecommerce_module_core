@@ -22,7 +22,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestAsyncP
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TestShopConfiguration;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 class TaskRunnerStatusStorageTest extends TestCase
 {
@@ -35,7 +35,6 @@ class TaskRunnerStatusStorageTest extends TestCase
     private $taskRunnerConfig;
 
     /**
-     * @before
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
     protected function before()

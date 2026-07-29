@@ -45,11 +45,14 @@ class CustomsController
     }
 
     /**
-     * @return array
+     * Returns the data-mapping field definitions (label + selectable options)
+     * for the customs settings page. The set of fields is platform-driven.
+     *
+     * @return \Packlink\BusinessLogic\Customs\Models\MappingFieldOptions[]
      */
-    public function getReceiverTaxIdOptions()
+    public function getMappingFieldsOptions()
     {
-        return $this->customService->getReceiverTaxIdOptions();
+        return $this->customService->getMappingFieldsOptions();
     }
 
     /**

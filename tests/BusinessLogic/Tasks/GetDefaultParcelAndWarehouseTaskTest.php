@@ -16,7 +16,6 @@ use Packlink\BusinessLogic\User\UserAccountService;
 class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
 {
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -39,7 +38,6 @@ class GetDefaultParcelAndWarehouseTaskTest extends BaseSyncTest
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

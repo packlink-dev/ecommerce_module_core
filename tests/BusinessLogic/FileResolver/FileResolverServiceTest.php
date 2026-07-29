@@ -4,7 +4,7 @@
 namespace Logeecom\Tests\BusinessLogic\FileResolver;
 
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class FileResolverServiceTest
@@ -31,12 +31,10 @@ class FileResolverServiceTest extends TestCase
     private $fileResolverService;
 
     /**
-     * @before
      * @return void
      */
     public function before()
     {
-        $this->setUp();
 
         $this->fileResolverService = new FileResolverService(
             array(

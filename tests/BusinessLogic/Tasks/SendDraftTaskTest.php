@@ -64,7 +64,6 @@ class SendDraftTaskTest extends BaseSyncTest
     private $cashOnDeliveryService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -185,7 +184,6 @@ class SendDraftTaskTest extends BaseSyncTest
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()
@@ -257,6 +255,69 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals('test', $shipmentDetails->getReference());
         $this->assertEquals(DraftStatus::COMPLETED, $detailsService->getDraftStatus('test'));
         $this->assertEmpty($detailsService->getDraftError('test'));
+    }
+
+    /**
+     * Tests that the draft payload sent to Packlink carries the has_customs
+     * flag and the customs invoice id for an international order.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testDraftPayloadCarriesCustomsFlagsForInternationalOrder()
+    {
+        TestServiceRegister::registerService(
+            ShopOrderService::CLASS_NAME,
+            function () {
+                return new TestShopOrderService();
+            }
+        );
+
+        $responses = array_merge(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/emptySearchResult.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+                ),
+            ),
+            $this->getMockResponses(),
+            array(
+                new HttpResponse(
+                    200, array(), '{}'
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/downloadUrl.json')
+                )
+            )
+        );
+        $this->httpClient->setMockResponses($responses);
+        $this->executeSyncTask();
+
+        $draftRequest = null;
+        foreach ($this->httpClient->getHistory() as $request) {
+            if ($request['method'] === 'POST' && preg_match('#/shipments$#', $request['url'])) {
+                $draftRequest = $request;
+                break;
+            }
+        }
+
+        $this->assertNotNull($draftRequest, 'Draft creation request must have been sent.');
+        $payload = json_decode($draftRequest['body'], true);
+
+        $this->assertTrue($payload['has_customs']);
+        $this->assertEquals(
+            '70b7ac2a-7a71-11eb-9439-0242ac130002',
+            $payload['customs']['customs_invoice_id']
+        );
     }
 
     public function testExecuteNotInternational()

@@ -23,7 +23,6 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     public $orderShipmentDetailsService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -43,7 +42,6 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

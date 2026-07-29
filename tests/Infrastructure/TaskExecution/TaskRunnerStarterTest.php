@@ -176,7 +176,6 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @before
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusChangeException
      * @throws \Logeecom\Infrastructure\TaskExecution\Exceptions\TaskRunnerStatusStorageUnavailableException
      * @throws \Exception
@@ -277,7 +276,6 @@ class TaskRunnerStarterTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

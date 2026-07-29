@@ -48,7 +48,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRu
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\TestTaskRunnerWakeupService;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class ScheduleCheckTaskTest
@@ -89,7 +89,6 @@ class ScheduleCheckTaskTest extends TestCase
     private $oldTimeZone;
 
     /**
-     * @before
      * @throws \Exception
      */
     public function before()
@@ -182,7 +181,6 @@ class ScheduleCheckTaskTest extends TestCase
     }
 
     /**
-     * @after
      * @return void
      */
     public function after()
@@ -190,7 +188,6 @@ class ScheduleCheckTaskTest extends TestCase
         date_default_timezone_set($this->oldTimeZone);
         MemoryStorage::reset();
 
-        $this->tearDown();
     }
 
     /**

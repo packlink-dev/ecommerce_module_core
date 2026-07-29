@@ -6,6 +6,7 @@ use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\Http\DTO\Customs\Cost;
@@ -142,17 +143,61 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
 
         $user = $this->getUser();
 
+        $inventoriesOfContents = $this->getInventoryOfContents($shopOrder, $mapping);
+
+        if (!$this->isInventoryComplete($shopOrder, $inventoriesOfContents)) {
+            return null;
+        }
+
         $customsInvoice = new CustomsInvoice();
         $customsInvoice->invoiceNumber = $shopOrder->getOrderNumber();
         $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
         $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
-        $customsInvoice->inventoriesOfContents = $this->getInventoryOfContents($shopOrder, $mapping);
+        $customsInvoice->inventoriesOfContents = $inventoriesOfContents;
         $customsInvoice->shipmentDetails = $this->getShipmentDetails($shopOrder);
         $customsInvoice->reasonForExport = $mapping->defaultReason;
         $customsInvoice->signature = $this->getSignature($warehouse);
 
 
         return $customsInvoice;
+    }
+
+    /**
+     * Checks that every inventory item resolved the customs-required values (tariff
+     * number and country of origin, from the item or the configured defaults). An
+     * invoice with an empty required field must be skipped - the draft then proceeds
+     * without customs - rather than sent invalid.
+     *
+     * @param Order $shopOrder
+     * @param InventoryContent[] $inventoriesOfContents
+     *
+     * @return bool
+     */
+    protected function isInventoryComplete($shopOrder, array $inventoriesOfContents)
+    {
+        foreach ($inventoriesOfContents as $inventory) {
+            if (empty($inventory->tariffNumber)) {
+                Logger::logWarning(
+                    'Customs invoice skipped for order ' . $shopOrder->getOrderNumber()
+                    . ': no tariff number resolved for item "' . $inventory->description
+                    . '" and no default tariff number is configured.'
+                );
+
+                return false;
+            }
+
+            if (empty($inventory->countryOfOrigin)) {
+                Logger::logWarning(
+                    'Customs invoice skipped for order ' . $shopOrder->getOrderNumber()
+                    . ': no country of origin resolved for item "' . $inventory->description
+                    . '" and no default country of origin is configured.'
+                );
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -224,14 +269,20 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
      */
     protected function getReceiver(Order $shopOrder, CustomsMapping $mapping)
     {
+        // The mapping value may be stored schema-cased (e.g. "PRIVATE_PERSON", as the Packlink
+        // receiver.user_type enum requires) or lowercase (as the core customs form submits), so
+        // normalize before comparing against the lowercase self::* constants. The user_type sent
+        // on the wire keeps the stored (API-cased) value.
+        $receiverUserType = strtolower($mapping->defaultReceiverUserType);
+
         $receiver = new Receiver();
         $receiver->userType = $mapping->defaultReceiverUserType;
         $receiver->fullName = $shopOrder->getShippingAddress()->getName() . ' ' . $shopOrder->getShippingAddress()->getSurname();
-        $receiver->taxId = $mapping->defaultReceiverUserType === self::PRIVATE_PERSON ?
+        $receiver->taxId = $receiverUserType === self::PRIVATE_PERSON ?
             ($shopOrder->getTaxId() ?: $mapping->defaultReceiverTaxId) : '';
-        $receiver->companyName = $mapping->defaultReceiverUserType === self::COMPANY ?
+        $receiver->companyName = $receiverUserType === self::COMPANY ?
             $shopOrder->getShippingAddress()->getCompany() : '';
-        $receiver->vatNumber = $mapping->defaultReceiverUserType === self::COMPANY ?
+        $receiver->vatNumber = $receiverUserType === self::COMPANY ?
             ($shopOrder->getVatNumber() ?: $mapping->defaultReceiverTaxId) : '';
         $receiver->address = $shopOrder->getShippingAddress()->getStreet1() . ' ' .
             $shopOrder->getShippingAddress()->getStreet2();

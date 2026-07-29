@@ -10,7 +10,7 @@ use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class CountryLabelsServiceTest
@@ -43,13 +43,11 @@ class CountryLabelsServiceTest extends TestCase
     private $testCountryService;
 
     /**
-     * @before
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
     public function before()
     {
-        $this->setUp();
 
         $fileResolverService = new FileResolverService(
             array(

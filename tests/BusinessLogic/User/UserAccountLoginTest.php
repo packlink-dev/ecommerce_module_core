@@ -31,7 +31,6 @@ class UserAccountLoginTest extends BaseTestWithServices
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      *
-     * @before
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
@@ -339,8 +338,6 @@ class UserAccountLoginTest extends BaseTestWithServices
     }
 
     /**
-     * @after
-     *
      * @return void
      */
     protected function after()

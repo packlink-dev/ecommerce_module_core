@@ -51,7 +51,6 @@ class RegistrationControllerTest extends BaseTestWithServices
     public $userAccountService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -117,7 +116,6 @@ class RegistrationControllerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

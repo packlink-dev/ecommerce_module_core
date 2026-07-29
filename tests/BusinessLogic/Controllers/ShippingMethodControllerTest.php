@@ -42,7 +42,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     public $systemInfoService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -83,7 +82,6 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     public function after()

@@ -19,8 +19,6 @@ use Packlink\BusinessLogic\Subscription\SubscriptionService;
 class SubscriptionServiceTest extends BaseTestWithServices
 {
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
@@ -42,7 +40,6 @@ class SubscriptionServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      */
     public function after()
     {

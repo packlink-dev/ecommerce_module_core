@@ -29,7 +29,6 @@ class EnabledStatusHandlerTest extends BaseTestWithServices
     private $handler;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -52,7 +51,6 @@ class EnabledStatusHandlerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

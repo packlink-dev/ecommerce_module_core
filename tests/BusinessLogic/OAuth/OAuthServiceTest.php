@@ -56,7 +56,6 @@ class OAuthServiceTest extends BaseTestWithServices
     public $stateService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()

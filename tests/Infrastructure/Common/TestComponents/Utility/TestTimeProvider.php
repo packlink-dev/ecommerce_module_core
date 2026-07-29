@@ -10,7 +10,6 @@ class TestTimeProvider extends TimeProvider
     private $time;
     /** @noinspection PhpMissingParentConstructorInspection */
     /**
-     *
      * TestTimeProvider constructor.
      * @throws \Exception
      */

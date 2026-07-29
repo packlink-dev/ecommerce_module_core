@@ -22,7 +22,6 @@ class LocationsControllerTest extends BaseTestWithServices
     public $shippingMethodService;
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()
@@ -137,7 +136,6 @@ class LocationsControllerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

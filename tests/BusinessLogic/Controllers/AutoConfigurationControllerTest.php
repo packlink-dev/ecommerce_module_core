@@ -58,7 +58,6 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
     private $updateShippingServiceTaskStatusService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -147,7 +146,6 @@ class AutoConfigurationControllerTest extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     public function after()

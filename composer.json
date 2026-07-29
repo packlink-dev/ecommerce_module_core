@@ -20,19 +20,29 @@
             "Logeecom\\Tests\\Infrastructure\\": "tests/Infrastructure",
             "Logeecom\\Tests\\BusinessLogic\\": "tests/BusinessLogic",
             "Logeecom\\Tests\\Brands\\": "tests/Brands"
-        }
+        },
+        "exclude-from-classmap": ["tests/Infrastructure/Common/compat/"]
     },
     "require-dev": {
-      "phpunit/phpunit": "^4.8",
+      "phpunit/phpunit": "^4.8 || ^9.6 || ^11.0",
       "leafo/scssphp": "0.0.12"
+    },
+    "config": {
+      "policy": {
+        "advisories": {
+          "ignore-id": [
+            "PKSA-z3gr-8qht-p93v",
+            "PKSA-w57n-mhp6-c9sd",
+            "PKSA-v5yj-8nmz-sk2q",
+            "PKSA-ft77-7h5f-p3r6",
+            "PKSA-b14r-zh1d-vdrc",
+            "PKSA-xxgb-wq2d-7gpg"
+          ]
+        }
+      }
     },
   "scripts": {
     "post-update-cmd":  "php cssCompile.php",
     "post-install-cmd": "php cssCompile.php"
-  },
-  "config": {
-    "platform": {
-      "php": "7.0"
-    }
   }
 }
