@@ -167,6 +167,13 @@ class Draft extends DataTransferObject
     public $cashOnDelivery = null;
 
     /**
+     * Indicates whether the customer selected DDP for the shipment.
+     *
+     * @var bool
+     */
+    public $ddpSelected = false;
+
+    /**
      * Draft constructor.
      */
     public function __construct()
@@ -230,6 +237,10 @@ class Draft extends DataTransferObject
 
         if (!empty($this->cashOnDelivery)) {
             $result['cash_on_delivery'] = $this->cashOnDelivery->toArray();
+        }
+
+        if ($this->ddpSelected) {
+            $result['selected_products'] = array('ddp' => array('is_selected' => true));
         }
 
         return $result;

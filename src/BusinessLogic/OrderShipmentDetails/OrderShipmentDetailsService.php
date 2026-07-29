@@ -159,6 +159,26 @@ class OrderShipmentDetailsService extends BaseService implements \Packlink\Busin
     }
 
     /**
+     * Sets charged DDP cost for a shipment.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     * @param float $ddpCost Charged DDP cost in the order currency.
+     *
+     * @return void
+     *
+     * @throws OrderShipmentDetailsNotFound
+     */
+    public function setDdpCost($shipmentReference, $ddpCost)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+
+        $orderDetails->setDdpCost(round((float)$ddpCost, 2));
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
      * Sets order packlink shipping status.
      *
      * @param string $shipmentReference Packlink shipment reference.

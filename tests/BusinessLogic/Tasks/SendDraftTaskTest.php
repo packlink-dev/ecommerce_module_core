@@ -257,6 +257,70 @@ class SendDraftTaskTest extends BaseSyncTest
         $this->assertEquals('test', $shipmentDetails->getReference());
         $this->assertEquals(DraftStatus::COMPLETED, $detailsService->getDraftStatus('test'));
         $this->assertEmpty($detailsService->getDraftError('test'));
+
+        $draftRequestBody = json_decode($this->getDraftRequest()['body'], true);
+        $this->assertArrayNotHasKey('selected_products', $draftRequestBody);
+        $this->assertNull($shipmentDetails->getDdpCost());
+    }
+
+    /**
+     * Tests that a DDP selection on the order is carried onto the draft payload
+     * and that the charged DDP cost is persisted on the shipment details.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testExecuteWithDdpSelected()
+    {
+        $shopOrderService = new TestShopOrderService();
+        TestServiceRegister::registerService(
+            ShopOrderService::CLASS_NAME,
+            function () use ($shopOrderService) {
+                return $shopOrderService;
+            }
+        );
+
+        $order = $shopOrderService->getOrder('test');
+        $order->setDdpSelected(true);
+        $order->setDdpCost(12.00);
+
+        $responses = array_merge(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/emptySearchResult.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/user.json')
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+                ),
+            ),
+            $this->getMockResponses(),
+            array(
+                new HttpResponse(
+                    200, array(), '{}'
+                ),
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/downloadUrl.json')
+                )
+            )
+        );
+        $this->httpClient->setMockResponses($responses);
+        $this->executeSyncTask();
+
+        $draftRequestBody = json_decode($this->getDraftRequest()['body'], true);
+        $this->assertArrayHasKey('selected_products', $draftRequestBody);
+        $this->assertEquals(array('ddp' => array('is_selected' => true)), $draftRequestBody['selected_products']);
+
+        /** @var OrderShipmentDetailsService $detailsService */
+        $detailsService = TestServiceRegister::getService(OrderShipmentDetailsService::CLASS_NAME);
+        $shipmentDetails = $detailsService->getDetailsByOrderId('test');
+        $this->assertEquals(12.00, $shipmentDetails->getDdpCost());
     }
 
     public function testExecuteNotInternational()
@@ -375,6 +439,22 @@ class SendDraftTaskTest extends BaseSyncTest
     protected function createSyncTaskInstance()
     {
         return new SendDraftBusinessTask('test');
+    }
+
+    /**
+     * Returns the captured draft creation request.
+     *
+     * @return array Request data.
+     */
+    private function getDraftRequest()
+    {
+        foreach ($this->httpClient->getHistory() as $request) {
+            if ($request['method'] === 'POST' && mb_substr($request['url'], -mb_strlen('/shipments')) === '/shipments') {
+                return $request;
+            }
+        }
+
+        return array('body' => '');
     }
 
     /**

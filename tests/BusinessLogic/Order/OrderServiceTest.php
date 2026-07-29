@@ -285,6 +285,38 @@ class OrderServiceTest extends BaseTestWithServices
     }
 
     /**
+     * @return void
+     * @throws EmptyOrderException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testPrepareDraftWithDdpSelected()
+    {
+        $order = $this->shopOrderService->getOrder('test', 0, 'IT');
+        $order->setDdpSelected(true);
+
+        $draft = $this->orderService->prepareDraft($order);
+
+        self::assertTrue($draft->ddpSelected);
+
+        $draftArray = $draft->toArray();
+        self::assertArrayHasKey('selected_products', $draftArray);
+        self::assertEquals(array('ddp' => array('is_selected' => true)), $draftArray['selected_products']);
+    }
+
+    /**
+     * @return void
+     * @throws EmptyOrderException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testPrepareDraftWithoutDdpSelected()
+    {
+        $draft = $this->orderService->prepareDraft($this->shopOrderService->getOrder('test', 0, 'IT'));
+
+        self::assertFalse($draft->ddpSelected);
+        self::assertArrayNotHasKey('selected_products', $draft->toArray());
+    }
+
+    /**
      * @param $id
      * @param $carrierName
      * @param float $basePrice

@@ -148,6 +148,10 @@ class SendDraftBusinessTask implements BusinessTask
                 $this->getOrderService()->updateShipmentData($shipment, $customsId);
             }
 
+            if ($order->isDdpSelected() && $order->getDdpCost() !== null) {
+                $this->getOrderShipmentDetailsService()->setDdpCost($reference, $order->getDdpCost());
+            }
+
             yield 90;
 
             $this->markDraftStatus(DraftStatus::COMPLETED);

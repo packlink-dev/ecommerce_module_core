@@ -145,6 +145,18 @@ class Order
      * @var string $paymentId
      */
     private $paymentId = '';
+    /**
+     * Indicates whether the customer selected DDP at checkout.
+     *
+     * @var bool
+     */
+    private $ddpSelected = false;
+    /**
+     * Charged, platform-adjusted DDP cost in the order currency.
+     *
+     * @var float|null
+     */
+    private $ddpCost;
 
     /**
      * Returns order unique identifier.
@@ -592,6 +604,46 @@ class Order
     public function setVatNumber($vatNumber)
     {
         $this->vatNumber = $vatNumber;
+    }
+
+    /**
+     * Returns whether the customer selected DDP at checkout.
+     *
+     * @return bool
+     */
+    public function isDdpSelected()
+    {
+        return $this->ddpSelected;
+    }
+
+    /**
+     * Sets whether the customer selected DDP at checkout.
+     *
+     * @param bool $ddpSelected
+     */
+    public function setDdpSelected($ddpSelected)
+    {
+        $this->ddpSelected = $ddpSelected;
+    }
+
+    /**
+     * Returns charged DDP cost in the order currency.
+     *
+     * @return float|null
+     */
+    public function getDdpCost()
+    {
+        return $this->ddpCost;
+    }
+
+    /**
+     * Sets charged DDP cost in the order currency.
+     *
+     * @param float|null $ddpCost
+     */
+    public function setDdpCost($ddpCost)
+    {
+        $this->ddpCost = $ddpCost;
     }
 
     /**

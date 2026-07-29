@@ -2,6 +2,9 @@
 
 namespace Logeecom\Tests\BusinessLogic\Order;
 
+use Logeecom\Infrastructure\Utility\TimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
+use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Http\DTO\ShipmentLabel;
 use Packlink\BusinessLogic\OrderShipmentDetails\Models\OrderShipmentDetails;
 use Packlink\BusinessLogic\ShippingMethod\Utility\ShipmentStatus;
@@ -15,6 +18,20 @@ use PHPUnit\Framework\TestCase;
  */
 class OrderShipmentDetailsEntityTest extends TestCase
 {
+    /**
+     * @before
+     */
+    protected function before()
+    {
+        new TestServiceRegister(
+            array(
+                TimeProvider::CLASS_NAME => function () {
+                    return new TestTimeProvider();
+                },
+            )
+        );
+    }
+
     /**
      * Tests if all properties within Packlink order details entity are being properly set and returned.
      */
@@ -98,6 +115,36 @@ class OrderShipmentDetailsEntityTest extends TestCase
             $orderDetailsArray['carrierTrackingUrl']
         );
         self::assertEquals(12.99, $orderDetailsArray['shippingCost']);
+    }
+
+    /**
+     * Tests DDP cost serialization round trip through toArray and fromArray.
+     */
+    public function testDdpCostToArrayAndFromArray()
+    {
+        $orderDetails = $this->getTestOrderDetails();
+        $orderDetails->setDdpCost(12.0);
+
+        $data = $orderDetails->toArray();
+        self::assertSame(12.0, $data['ddpCost']);
+
+        $inflated = OrderShipmentDetails::fromArray($data);
+        self::assertSame(12.0, $inflated->getDdpCost());
+    }
+
+    /**
+     * Tests that legacy rows without the ddpCost field inflate to a null DDP cost.
+     */
+    public function testFromArrayLegacyRowWithoutDdpCost()
+    {
+        $orderDetails = OrderShipmentDetails::fromArray(
+            array(
+                'orderId' => 5,
+                'reference' => 'DE2019PRO0000309473',
+            )
+        );
+
+        self::assertNull($orderDetails->getDdpCost());
     }
 
     /**

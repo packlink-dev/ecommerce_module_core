@@ -112,6 +112,52 @@ class OrderShipmentDetailsServiceTest extends BaseTestWithServices
     }
 
     /**
+     * Tests setting DDP cost by shipment reference.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testSetDdpCost()
+    {
+        $this->orderShipmentDetailsService->setReference('test', 'test_reference');
+
+        $this->orderShipmentDetailsService->setDdpCost('test_reference', 12.004);
+
+        $shipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference('test_reference');
+        $this->assertEquals(12.0, $shipmentDetails->getDdpCost());
+    }
+
+    /**
+     * Tests that repeating the same DDP cost write is idempotent.
+     *
+     * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
+     */
+    public function testSetDdpCostIdempotent()
+    {
+        $this->orderShipmentDetailsService->setReference('test', 'test_reference');
+
+        $this->orderShipmentDetailsService->setDdpCost('test_reference', 12.0);
+        $this->orderShipmentDetailsService->setDdpCost('test_reference', 12.0);
+
+        $shipmentDetails = $this->orderShipmentDetailsService->getDetailsByReference('test_reference');
+        $this->assertEquals(12.0, $shipmentDetails->getDdpCost());
+    }
+
+    /**
+     * @return void
+     */
+    public function testSetDdpCostUnknownReference()
+    {
+        $exThrown = null;
+        try {
+            $this->orderShipmentDetailsService->setDdpCost('some reference', 12.0);
+        } catch (\Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound $ex) {
+            $exThrown = $ex;
+        }
+
+        $this->assertNotNull($exThrown, 'Exception must be thrown if shipment reference is not found.');
+    }
+
+    /**
      * Test marking labels printed.
      *
      * @throws \Packlink\BusinessLogic\OrderShipmentDetails\Exceptions\OrderShipmentDetailsNotFound
