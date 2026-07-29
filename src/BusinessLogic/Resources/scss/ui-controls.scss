@@ -572,6 +572,19 @@
     color: $color-red;
   }
 
+  .pl-ddp-badge {
+    display: inline-block;
+    background-color: $text-color;
+    color: $color-white;
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 2px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+    margin-left: 8px;
+    white-space: nowrap;
+  }
+
   .pl-shipping-services-table {
     width: 100%;
 
