@@ -3,6 +3,7 @@
 namespace Packlink\BusinessLogic\Controllers\DTO;
 
 use Logeecom\Infrastructure\Data\DataTransferObject;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
 
 /**
@@ -80,6 +81,24 @@ class ShippingMethodConfiguration extends DataTransferObject
      * @var array
      */
     public $systemDefaults;
+    /**
+     * Merchant DDP behavior ('none', 'optional' or 'enforced').
+     *
+     * @var string
+     */
+    public $ddpBehavior = DdpBehavior::NONE;
+    /**
+     * DDP cost adjustment type ('fixed', 'percentage' or null for no adjustment).
+     *
+     * @var string|null
+     */
+    public $ddpAdjustmentType;
+    /**
+     * DDP cost adjustment amount.
+     *
+     * @var float
+     */
+    public $ddpAdjustmentAmount = 0.0;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -100,6 +119,9 @@ class ShippingMethodConfiguration extends DataTransferObject
             'activated' => $this->activated,
             'fixedPrices' => $this->fixedPrices,
             'systemDefaults' => $this->systemDefaults,
+            'ddpBehavior' => $this->ddpBehavior,
+            'ddpAdjustmentType' => $this->ddpAdjustmentType,
+            'ddpAdjustmentAmount' => $this->ddpAdjustmentAmount,
         );
 
         if ($this->pricingPolicies) {
@@ -131,6 +153,9 @@ class ShippingMethodConfiguration extends DataTransferObject
         $result->usePacklinkPriceIfNotInRange = (bool)static::getDataValue($raw, 'usePacklinkPriceIfNotInRange', false);
         $result->fixedPrices = static::getDataValue($raw, 'fixedPrices', array());
         $result->systemDefaults = static::getDataValue($raw, 'systemDefaults', array());
+        $result->ddpBehavior = static::getDataValue($raw, 'ddpBehavior', DdpBehavior::NONE);
+        $result->ddpAdjustmentType = static::getDataValue($raw, 'ddpAdjustmentType', null);
+        $result->ddpAdjustmentAmount = static::getDataValue($raw, 'ddpAdjustmentAmount', 0.0);
 
         if (isset($raw['isShipToAllCountries']) && is_bool($raw['isShipToAllCountries'])) {
             $result->isShipToAllCountries = $raw['isShipToAllCountries'];

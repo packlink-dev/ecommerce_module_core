@@ -5,8 +5,10 @@ namespace Packlink\BusinessLogic\Controllers;
 use Exception;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -73,6 +75,12 @@ class ShippingMethodController
      * @var SystemInfoService
      */
     private $systemInfoService;
+    /**
+     * Configuration service.
+     *
+     * @var Configuration
+     */
+    private $configService;
 
     /**
      * DashboardController constructor.
@@ -175,6 +183,12 @@ class ShippingMethodController
             }
         }
 
+        if (!$this->isDdpConfigurationValid($shippingMethod, $model)) {
+            Logger::logError("Invalid DDP configuration for shipping method with id {$shippingMethod->id}!");
+
+            return null;
+        }
+
         try {
             $isFirstServiceActivated = $shippingMethod->activated && !$this->shippingMethodService->isAnyMethodActive();
 
@@ -275,6 +289,11 @@ class ShippingMethodController
         $shippingMethod->currency = $item->getCurrency();
         $shippingMethod->fixedPrices = $item->getFixedPrices();
         $shippingMethod->systemDefaults = $item->getSystemDefaults();
+        $shippingMethod->ddpBehavior = $item->getDdpBehavior();
+        $shippingMethod->ddpAdjustmentType = $item->getDdpAdjustmentType();
+        $shippingMethod->ddpAdjustmentAmount = $item->getDdpAdjustmentAmount();
+        $shippingMethod->ddpSupportLevel = $item->getDdpSupportLevel();
+        $shippingMethod->customsConfigured = $this->getConfigService()->getCustomsMappings() !== null;
 
         return $shippingMethod;
     }
@@ -296,6 +315,9 @@ class ShippingMethodController
         $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
         $model->setFixedPrices($configuration->fixedPrices);
         $model->setSystemDefaults($configuration->systemDefaults);
+        $model->setDdpBehavior($configuration->ddpBehavior);
+        $model->setDdpAdjustmentType($configuration->ddpAdjustmentType);
+        $model->setDdpAdjustmentAmount(round((float)$configuration->ddpAdjustmentAmount, 2));
         $this->updatePricingPolicies($configuration, $model);
     }
 
@@ -311,5 +333,53 @@ class ShippingMethodController
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }
+    }
+
+    /**
+     * Validates the DDP configuration against the shipping method's DDP support level.
+     * A behavior other than 'none' is allowed only on methods whose services support DDP.
+     *
+     * @param ShippingMethodConfiguration $configuration Shipping method DTO.
+     * @param ShippingMethod $model Shipping method model.
+     *
+     * @return bool TRUE if the DDP configuration is valid; otherwise, FALSE.
+     */
+    private function isDdpConfigurationValid(ShippingMethodConfiguration $configuration, ShippingMethod $model)
+    {
+        $validBehaviors = array(DdpBehavior::NONE, DdpBehavior::OPTIONAL, DdpBehavior::ENFORCED);
+        if (!in_array($configuration->ddpBehavior, $validBehaviors, true)) {
+            return false;
+        }
+
+        if ($configuration->ddpBehavior !== DdpBehavior::NONE
+            && $model->getDdpSupportLevel() !== DdpBehavior::LEVEL_SUPPORTED
+        ) {
+            return false;
+        }
+
+        if (!in_array($configuration->ddpAdjustmentType, array('fixed', 'percentage', null), true)) {
+            return false;
+        }
+
+        if (!is_numeric($configuration->ddpAdjustmentAmount)) {
+            return false;
+        }
+
+        return $configuration->ddpAdjustmentType !== 'percentage'
+            || (float)$configuration->ddpAdjustmentAmount > -100;
+    }
+
+    /**
+     * Gets the configuration service.
+     *
+     * @return Configuration Configuration service.
+     */
+    private function getConfigService()
+    {
+        if ($this->configService === null) {
+            $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        }
+
+        return $this->configService;
     }
 }

@@ -58,6 +58,18 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
      * @var string
      */
     public $currency;
+    /**
+     * DDP support level of the shipping method ('supported', 'mandatory' or null).
+     *
+     * @var string|null
+     */
+    public $ddpSupportLevel;
+    /**
+     * Indicates whether the merchant has configured customs mappings.
+     *
+     * @var bool
+     */
+    public $customsConfigured = false;
 
     /**
      * Transforms DTO to its array format suitable for http client.
@@ -78,6 +90,8 @@ class ShippingMethodResponse extends ShippingMethodConfiguration
                 'logoUrl' => $this->logoUrl,
                 'currency' => $this->currency,
                 'activated' => $this->activated,
+                'ddpSupportLevel' => $this->ddpSupportLevel,
+                'customsConfigured' => $this->customsConfigured,
             )
         );
     }

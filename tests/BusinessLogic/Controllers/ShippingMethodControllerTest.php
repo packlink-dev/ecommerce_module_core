@@ -4,6 +4,7 @@ namespace Logeecom\Tests\BusinessLogic\Controllers;
 
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
+use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
 use Logeecom\Tests\BusinessLogic\Tasks\UpdateShippingServicesTaskTest;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\ORM\MemoryRepository;
@@ -11,6 +12,8 @@ use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
 use Packlink\BusinessLogic\Controllers\ShippingMethodController;
+use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
@@ -441,6 +444,155 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertCount(1, $instance->pricingPolicies);
     }
 
+    public function testShippingMethodConfigurationDdpDefaults()
+    {
+        $instance = ShippingMethodConfiguration::fromArray(
+            array(
+                'id' => 12,
+                'name' => 'First name test',
+                'showLogo' => true,
+            )
+        );
+
+        self::assertEquals(DdpBehavior::NONE, $instance->ddpBehavior);
+        self::assertNull($instance->ddpAdjustmentType);
+        self::assertSame(0.0, $instance->ddpAdjustmentAmount);
+
+        $data = $instance->toArray();
+
+        self::assertEquals(DdpBehavior::NONE, $data['ddpBehavior']);
+        self::assertNull($data['ddpAdjustmentType']);
+        self::assertSame(0.0, $data['ddpAdjustmentAmount']);
+    }
+
+    public function testShippingMethodConfigurationDdpRoundTrip()
+    {
+        $instance = ShippingMethodConfiguration::fromArray(
+            array(
+                'id' => 12,
+                'name' => 'First name test',
+                'showLogo' => true,
+                'ddpBehavior' => DdpBehavior::OPTIONAL,
+                'ddpAdjustmentType' => 'percentage',
+                'ddpAdjustmentAmount' => -10,
+            )
+        );
+
+        $data = $instance->toArray();
+
+        self::assertEquals(DdpBehavior::OPTIONAL, $data['ddpBehavior']);
+        self::assertEquals('percentage', $data['ddpAdjustmentType']);
+        self::assertEquals(-10, $data['ddpAdjustmentAmount']);
+    }
+
+    public function testSaveDdpConfiguration()
+    {
+        $this->systemInfoService->setInvalid(false);
+        $this->systemInfoService->setMultistore(false);
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $this->setDdpSupportLevel($first->id, DdpBehavior::LEVEL_SUPPORTED);
+
+        $shipment = $this->getDdpShipmentConfiguration($first);
+        $shipment->ddpBehavior = DdpBehavior::OPTIONAL;
+        $shipment->ddpAdjustmentType = 'percentage';
+        $shipment->ddpAdjustmentAmount = -10;
+
+        $model = $this->controller->save($shipment);
+
+        $this->assertNotNull($model);
+        $this->assertEquals(DdpBehavior::OPTIONAL, $model->ddpBehavior);
+        $this->assertEquals('percentage', $model->ddpAdjustmentType);
+        $this->assertEquals(-10.0, $model->ddpAdjustmentAmount);
+        $this->assertEquals(DdpBehavior::LEVEL_SUPPORTED, $model->ddpSupportLevel);
+
+        $data = $model->toArray();
+
+        $this->assertEquals(DdpBehavior::LEVEL_SUPPORTED, $data['ddpSupportLevel']);
+        $this->assertFalse($data['customsConfigured']);
+    }
+
+    public function testSaveInvalidDdpConfiguration()
+    {
+        $this->systemInfoService->setInvalid(false);
+        $this->systemInfoService->setMultistore(false);
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $this->setDdpSupportLevel($first->id, DdpBehavior::LEVEL_SUPPORTED);
+
+        $invalidCases = array(
+            array('ddpBehavior' => 'unknown'),
+            array('ddpBehavior' => DdpBehavior::MANDATORY),
+            array('ddpAdjustmentType' => 'unknown'),
+            array('ddpAdjustmentAmount' => 'abc'),
+            array('ddpAdjustmentType' => 'percentage', 'ddpAdjustmentAmount' => -100),
+        );
+
+        foreach ($invalidCases as $case) {
+            $shipment = $this->getDdpShipmentConfiguration($first);
+            foreach ($case as $property => $value) {
+                $shipment->$property = $value;
+            }
+
+            $this->assertNull($this->controller->save($shipment));
+        }
+    }
+
+    public function testSaveDdpBehaviorOnUnsupportedMethod()
+    {
+        $this->systemInfoService->setInvalid(false);
+        $this->systemInfoService->setMultistore(false);
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $this->setDdpSupportLevel($first->id, null);
+
+        $shipment = $this->getDdpShipmentConfiguration($first);
+        $shipment->ddpBehavior = DdpBehavior::ENFORCED;
+
+        $this->assertNull($this->controller->save($shipment));
+    }
+
+    public function testResponseCustomsNotConfigured()
+    {
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+
+        $this->assertFalse($all[0]->customsConfigured);
+
+        $model = $this->shippingMethodService->getShippingMethod($all[0]->id);
+        $this->assertEquals($model->getDdpSupportLevel(), $all[0]->ddpSupportLevel);
+    }
+
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     */
+    public function testResponseCustomsConfigured()
+    {
+        $this->importShippingMethods();
+        TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
+        $this->shopConfig->setCustomsMappings(
+            CustomsMapping::fromArray(
+                array(
+                    'default_reason' => 'PURCHASE_OR_SALE',
+                    'default_sender_tax_id' => '123',
+                    'default_receiver_tax_id' => '123',
+                    'default_receiver_user_type' => 'PRIVATE_PERSON',
+                    'default_tariff_number' => '123456',
+                    'default_country' => 'FR',
+                    'mapping_receiver_tax_id' => 'tax_1',
+                )
+            )
+        );
+
+        $all = $this->controller->getAll();
+
+        $this->assertTrue($all[0]->customsConfigured);
+    }
+
     public function testSaveNoShippingMethod()
     {
         $shipment = new ShippingMethodConfiguration();
@@ -515,6 +667,44 @@ class ShippingMethodControllerTest extends BaseTestWithServices
     {
         $this->assertFalse($this->controller->deactivate(124124152));
         $this->assertFalse($this->controller->deactivate('test'));
+    }
+
+    /**
+     * Creates a valid shipping method configuration from a response DTO.
+     *
+     * @param ShippingMethodResponse $method Shipping method response.
+     *
+     * @return ShippingMethodConfiguration Shipping method configuration.
+     */
+    private function getDdpShipmentConfiguration(ShippingMethodResponse $method)
+    {
+        $shipment = new ShippingMethodConfiguration();
+        $shipment->id = $method->id;
+        $shipment->name = 'DDP name test';
+        $shipment->showLogo = $method->showLogo;
+        $shipment->pricingPolicies = $method->pricingPolicies;
+        $shipment->isShipToAllCountries = true;
+        $shipment->shippingCountries = array();
+
+        return $shipment;
+    }
+
+    /**
+     * Sets the DDP support level on all services of the given shipping method.
+     *
+     * @param int $id Shipping method identifier.
+     * @param string $level DDP support level.
+     */
+    private function setDdpSupportLevel($id, $level)
+    {
+        $model = $this->shippingMethodService->getShippingMethod($id);
+        $services = $model->getShippingServices();
+        foreach ($services as $service) {
+            $service->setDdpSupportLevel($level);
+        }
+
+        $model->setShippingServices($services);
+        $this->shippingMethodService->save($model);
     }
 
     /**
