@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.9.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.2...v3.9.3) - 2026-07-29
+### Removed
+- Removed the abandoned `codacy/coverage` development dependency, which pulled in a vulnerable `symfony/process` version
+
 ## [3.9.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.1...v3.9.2) - 2026-07-27
 ### Changed
 - Replaced the hardcoded browser user agent with a descriptive integration user agent (e.g. `Packlink-PrestaShop/3.6.1`)
