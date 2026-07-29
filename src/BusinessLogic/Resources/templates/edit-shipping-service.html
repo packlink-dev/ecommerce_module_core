@@ -26,6 +26,56 @@
                     <label for="pl-show-logo">{$shippingServices.showCarrierLogo}</label>
                 </div>
             </section>
+            <div id="pl-ddp-customs-banner" class="pl-info-box pl-hidden">
+                <i class="material-icons pl-info-box-info-icon">info</i>
+                <div class="pl-info-box-content">
+                    {$shippingServices.ddpConfigureCustomsNotice}
+                </div>
+            </div>
+            <div id="pl-ddp-mandatory-banner" class="pl-info-box pl-warning pl-hidden">
+                <i class="material-icons pl-info-box-info-icon">info</i>
+                <div class="pl-info-box-content">
+                    {$shippingServices.ddpMandatoryNotice}
+                </div>
+            </div>
+            <section id="pl-ddp-section" class="pl-hidden">
+                <div class="pl-section-title">
+                    {$shippingServices.dutiesCostAtCheckout}
+                </div>
+                <div class="pl-form-group">
+                    <select name="ddpBehavior" id="pl-ddp-behavior-select">
+                        <option value="none">{$shippingServices.noDutiesCharged}</option>
+                        <option value="optional">{$shippingServices.offerDutiesOptionally}</option>
+                        <option value="enforced">{$shippingServices.enforceDutiesCost}</option>
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label for="pl-ddp-behavior-select" class="pl-text-input-label">
+                        {$shippingServices.ddpBehaviorLabel}
+                    </label>
+                </div>
+            </section>
+            <section id="pl-ddp-adjustment-group" class="pl-hidden">
+                <div class="pl-section-title">
+                    {$shippingServices.adjustDdpCost}
+                </div>
+                <div class="pl-form-group">
+                    <select name="ddpAdjustmentType" id="pl-ddp-adjustment-type-select">
+                        <option value="fixed">{$shippingServices.fixedAdjustment}</option>
+                        <option value="percentage">{$shippingServices.percentageAdjustment}</option>
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                    <label for="pl-ddp-adjustment-type-select" class="pl-text-input-label">
+                        {$shippingServices.ddpAdjustmentLabel}
+                    </label>
+                </div>
+                <div class="pl-form-group">
+                    <input id="pl-ddp-adjustment-amount" type="text" name="ddpAdjustmentAmount"
+                           data-type="number"/>
+                    <label for="pl-ddp-adjustment-amount">
+                        {$shippingServices.adjustmentAmount}
+                    </label>
+                </div>
+            </section>
             <section>
                 <div class="pl-section-title">
                     {$shippingServices.pricePolicy}
