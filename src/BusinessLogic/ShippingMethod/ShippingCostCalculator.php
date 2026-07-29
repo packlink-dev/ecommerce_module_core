@@ -596,8 +596,12 @@ class ShippingCostCalculator
     private static function getCheapestService($method, $result, $serviceProxy = null, $toCountry = '')
     {
         foreach ($method->getShippingServices() as $service) {
+            // Rank by the live price when live services were fetched; fall back to the stored
+            // basePrice only when the live call failed ($serviceProxy === null). This keeps draft
+            // service selection in parity with the live-priced checkout quote.
+            $candidatePrice = $serviceProxy !== null ? $serviceProxy->basePrice : $service->basePrice;
             if ((!$toCountry || $service->destinationCountry === $toCountry)
-                && ($result === null || $result->basePrice > $service->basePrice)
+                && ($result === null || $result->basePrice > $candidatePrice)
                 && (!$serviceProxy || self::isSameOrEquivalentService($service->serviceId,
                     $service->category,
                     $method->getCarrierName(),
