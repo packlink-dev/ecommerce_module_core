@@ -23,6 +23,8 @@ use Packlink\BusinessLogic\CountryLabels\CountryService as CountryLabelService;
 use Packlink\BusinessLogic\CountryLabels\Interfaces\CountryService as LabelServiceInterface;
 use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
+use Packlink\BusinessLogic\DDP\DdpCostService;
+use Packlink\BusinessLogic\DDP\Interfaces\DdpCostServiceInterface;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\FileResolver\FileResolverService;
@@ -303,6 +305,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             CustomsService::CLASS_NAME,
             function () {
                 return new CustomsService();
+            }
+        );
+
+        ServiceRegister::registerService(
+            DdpCostServiceInterface::CLASS_NAME,
+            function () {
+                return new DdpCostService();
             }
         );
 
