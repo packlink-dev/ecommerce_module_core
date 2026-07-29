@@ -33,6 +33,14 @@ abstract class Configuration extends Singleton
      */
     const MIN_LOG_LEVEL = 3;
     /**
+     * Product token of the user agent sent with every request.
+     */
+    const USER_AGENT_PREFIX = 'Packlink';
+    /**
+     * User agent used when the integration name is not available.
+     */
+    const DEFAULT_USER_AGENT = 'Packlink-Integration';
+    /**
      * System user context.
      *
      * @var string
@@ -71,6 +79,21 @@ abstract class Configuration extends Singleton
      * @return string Integration name.
      */
     abstract public function getIntegrationName();
+
+    /**
+     * Retrieves the user agent that identifies this integration in outgoing HTTP requests.
+     *
+     * A non-empty user agent is always sent, because some shops reject requests without one.
+     *
+     * @return string User agent.
+     */
+    public function getUserAgent()
+    {
+        $integrationName = $this->getIntegrationName();
+        $integrationName = $integrationName ? preg_replace('/[^\w.-]/', '', $integrationName) : '';
+
+        return $integrationName ? static::USER_AGENT_PREFIX . '-' . $integrationName : static::DEFAULT_USER_AGENT;
+    }
 
     /**
      * Returns current system identifier.

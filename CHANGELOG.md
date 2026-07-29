@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.2.7](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.6...v4.2.7) - 2026-07-29
+### Removed
+- Removed the abandoned `codacy/coverage` development dependency, which pulled in a vulnerable `symfony/process` version
+
+## [4.2.6](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.5...v4.2.6) - 2026-07-27
+### Changed
+- Replaced the hardcoded browser user agent with a descriptive integration user agent (e.g. `Packlink-PrestaShop/3.7.0`)
+
 ## [4.2.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.4...v4.2.5)
 ### Changed
 - Fix draft shipping service selection to be ranked by the live Packlink price (matching the checkout)

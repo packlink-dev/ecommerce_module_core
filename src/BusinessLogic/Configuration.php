@@ -56,6 +56,20 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     abstract public function getModuleVersion();
 
     /**
+     * Retrieves the user agent that identifies this integration in outgoing HTTP requests.
+     *
+     * Stamps the module version onto the base user agent, e.g. "Packlink-PrestaShop/3.7.0".
+     *
+     * @return string User agent.
+     */
+    public function getUserAgent()
+    {
+        $moduleVersion = $this->getModuleVersion();
+
+        return $moduleVersion ? parent::getUserAgent() . '/' . $moduleVersion : parent::getUserAgent();
+    }
+
+    /**
      * Gets the name of the integrated e-commerce system.
      * This name is related to Packlink API which can be different from the official system name.
      *

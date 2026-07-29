@@ -2,6 +2,7 @@
 
 namespace Logeecom\Infrastructure\Http;
 
+use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Http\DTO\Options;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Logger\Logger;
@@ -232,9 +233,28 @@ class CurlHttpClient extends HttpClient
         $this->curlOptions[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
         $this->curlOptions[CURLOPT_SSL_VERIFYPEER] = static::SSL_STRICT_MODE;
         $this->curlOptions[CURLOPT_SSL_VERIFYHOST] = static::SSL_STRICT_MODE;
-        // Set default user agent, because for some shops if user agent is missing, request will not work.
-        $this->curlOptions[CURLOPT_USERAGENT] =
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5249.91 Safari/537.36';
+        // Set user agent, because for some shops if user agent is missing, request will not work.
+        $this->curlOptions[CURLOPT_USERAGENT] = $this->getUserAgent();
+    }
+
+    /**
+     * Returns the user agent for the request.
+     *
+     * The integration identifies itself instead of impersonating a browser, so that bot protection
+     * systems (WAF, CDN) do not challenge or block the requests. A non-empty value is always returned,
+     * because for some shops if user agent is missing, request will not work.
+     *
+     * @return string User agent.
+     */
+    protected function getUserAgent()
+    {
+        try {
+            $userAgent = $this->getConfigService()->getUserAgent();
+        } catch (\Exception $e) {
+            $userAgent = '';
+        }
+
+        return $userAgent ?: Configuration::DEFAULT_USER_AGENT;
     }
 
     /**
