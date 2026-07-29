@@ -2,7 +2,7 @@
 
 > **Version:** 1.0
 > **Date:** 2026-07-29
-> **Status:** Awaiting approval
+> **Status:** Implemented (2026-07-29)
 > **Layer:** integration-core (shared across all Packlink modules)
 > **Sources:** `CR-68-DDP-Support.pdf` (v1.2), `PACKLINK-CR-SET-68-01 - Checkout flow` PDF,
 > real `GET /v1/services` response sample (provided during interview),

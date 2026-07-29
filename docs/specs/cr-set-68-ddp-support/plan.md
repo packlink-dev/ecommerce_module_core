@@ -1,6 +1,6 @@
 # Plan: CR-SET-68 — DDP Support (integration-core)
 
-> **Tier:** Full (architectural) · **Date:** 2026-07-29 · **Spec:** [spec.md](spec.md) · **Research:** [research.md](research.md)
+> **Tier:** Full (architectural) · **Status:** Implemented · **Date:** 2026-07-29 · **Spec:** [spec.md](spec.md) · **Research:** [research.md](research.md)
 > **Branch:** `feature/cr-set-68-ddp-support` · **Delegation:** subagent-per-task (spec D13)
 
 ## 1. Goal
