@@ -7,6 +7,7 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsInvoice;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsUnionsSearchRequest;
+use Packlink\BusinessLogic\Http\DTO\DDP\ShipmentProductsRequest;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
@@ -206,6 +207,28 @@ interface Proxy
      * @throws HttpCommunicationException
      */
     public function sendCustomsInvoice(CustomsInvoice $customsInvoice);
+
+    /**
+     * @param CustomsInvoice $customsInvoice
+     *
+     * @return string|null
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpRequestException
+     * @throws HttpCommunicationException
+     */
+    public function createCheckoutCustomsInvoice(CustomsInvoice $customsInvoice);
+
+    /**
+     * @param ShipmentProductsRequest $request
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\DDP\DdpProductsDetail[]
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpRequestException
+     * @throws HttpCommunicationException
+     */
+    public function getShipmentProducts(ShipmentProductsRequest $request);
 
     /**
      * @param mixed $customsInvoiceId

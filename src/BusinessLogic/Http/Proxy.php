@@ -20,6 +20,8 @@ use Packlink\BusinessLogic\Http\DTO\BFF\BffSessionResponse;
 use Packlink\BusinessLogic\Http\DTO\BFF\BffTrackingResponse;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsInvoice;
 use Packlink\BusinessLogic\Http\DTO\Customs\CustomsUnionsSearchRequest;
+use Packlink\BusinessLogic\Http\DTO\DDP\DdpProductsDetail;
+use Packlink\BusinessLogic\Http\DTO\DDP\ShipmentProductsRequest;
 use Packlink\BusinessLogic\Http\DTO\Draft;
 use Packlink\BusinessLogic\Http\DTO\DropOff;
 use Packlink\BusinessLogic\Http\DTO\LocationInfo;
@@ -611,6 +613,47 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
             ->decodeBodyToArray();
 
         return isset($result['url']) ? $result['url'] : '';
+    }
+
+    /**
+     * Creates a checkout customs invoice. The endpoint lives outside the v1/ prefix,
+     * so the call goes through callBase().
+     *
+     * @param CustomsInvoice $customsInvoice
+     *
+     * @return string|null Customs invoice ID.
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpRequestException
+     * @throws HttpCommunicationException
+     */
+    public function createCheckoutCustomsInvoice(CustomsInvoice $customsInvoice)
+    {
+        $result = $this->callBase(HttpClient::HTTP_METHOD_POST, '/v2/customs-invoices', $customsInvoice->toArray())
+            ->decodeBodyToArray();
+
+        return isset($result['id']) ? $result['id'] : null;
+    }
+
+    /**
+     * Retrieves per-service DDP cost components. All eligible services are batched
+     * into a single request. The endpoint lives outside the v1/ prefix, so the call
+     * goes through callBase().
+     *
+     * @param ShipmentProductsRequest $request
+     *
+     * @return DdpProductsDetail[]
+     *
+     * @throws HttpAuthenticationException
+     * @throws HttpRequestException
+     * @throws HttpCommunicationException
+     */
+    public function getShipmentProducts(ShipmentProductsRequest $request)
+    {
+        $result = $this->callBase(HttpClient::HTTP_METHOD_POST, '/pro/shipments/products', $request->toArray())
+            ->decodeBodyToArray();
+
+        return DdpProductsDetail::fromBatch(isset($result['products_details']) ? $result['products_details'] : array());
     }
 
     /**

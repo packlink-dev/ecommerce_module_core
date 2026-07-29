@@ -125,13 +125,13 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
     /**
      * @param Order $shopOrder
      *
-     * @return CustomsInvoice
+     * @return CustomsInvoice|null
      *
      * @throws HttpAuthenticationException
      * @throws HttpCommunicationException
      * @throws HttpRequestException
      */
-    protected function createCustomsInvoice($shopOrder)
+    public function createCustomsInvoice($shopOrder)
     {
         $warehouse = $this->getWarehouse();
         $mapping = $this->getMapping();
