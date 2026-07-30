@@ -54,19 +54,16 @@ class CustomsServiceTest extends BaseTestWithServices
     }
 
     /**
-     * Asserts createCustomsInvoice is part of the public service surface (checkout DDP flow
-     * builds an invoice without sending it) and returns a populated CustomsInvoice.
+     * The direct call exercises the public service surface the checkout DDP flow relies on
+     * (building an invoice without sending it).
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
      * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
      */
-    public function testCreateCustomsInvoiceIsPublic()
+    public function testCreateCustomsInvoiceReturnsPopulatedInvoice()
     {
-        $method = new \ReflectionMethod('Packlink\BusinessLogic\Customs\CustomsService', 'createCustomsInvoice');
-        self::assertTrue($method->isPublic());
-
         $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
         $shopOrderService = new TestShopOrderService();
         $order = $shopOrderService->getOrder('customs-service-test', 1, 'DE');

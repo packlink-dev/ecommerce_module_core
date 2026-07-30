@@ -259,6 +259,40 @@ class ShippingMethodEntityTest extends BaseTestWithServices
         self::assertEquals(DdpBehavior::LEVEL_MANDATORY, $method->getDdpSupportLevel());
     }
 
+    /**
+     * @dataProvider effectiveDdpBehaviorProvider
+     *
+     * @param string|null $ddpSupportLevel Service DDP support level.
+     * @param string $ddpBehavior Merchant-configured behavior.
+     * @param string $expected Expected effective behavior.
+     */
+    public function testEffectiveDdpBehavior($ddpSupportLevel, $ddpBehavior, $expected)
+    {
+        $method = new ShippingMethod();
+        $method->addShippingService(
+            new ShippingService(1, '', 'IT', 'DE', 5, 4, 1, 'standard', null, $ddpSupportLevel)
+        );
+        $method->setDdpBehavior($ddpBehavior);
+
+        self::assertSame($expected, $method->getEffectiveDdpBehavior());
+    }
+
+    /**
+     * @return array
+     */
+    public function effectiveDdpBehaviorProvider()
+    {
+        return array(
+            // A mandatory support level overrides any merchant configuration.
+            array(DdpBehavior::LEVEL_MANDATORY, DdpBehavior::OPTIONAL, DdpBehavior::MANDATORY),
+            array(DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::ENFORCED, DdpBehavior::ENFORCED),
+            array(DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::OPTIONAL, DdpBehavior::OPTIONAL),
+            array(DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::NONE, DdpBehavior::NONE),
+            // Without DDP support the merchant configuration is ignored.
+            array(null, DdpBehavior::ENFORCED, DdpBehavior::NONE),
+        );
+    }
+
     public function testCheapestService()
     {
         $method = $this->assertBasicDataToArray();

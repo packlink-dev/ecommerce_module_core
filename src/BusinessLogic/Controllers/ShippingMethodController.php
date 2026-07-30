@@ -81,6 +81,12 @@ class ShippingMethodController
      * @var Configuration
      */
     private $configService;
+    /**
+     * Memoized customs-configured flag; the response transform runs per method in a loop.
+     *
+     * @var bool|null
+     */
+    private $customsConfigured;
 
     /**
      * DashboardController constructor.
@@ -293,7 +299,7 @@ class ShippingMethodController
         $shippingMethod->ddpAdjustmentType = $item->getDdpAdjustmentType();
         $shippingMethod->ddpAdjustmentAmount = $item->getDdpAdjustmentAmount();
         $shippingMethod->ddpSupportLevel = $item->getDdpSupportLevel();
-        $shippingMethod->customsConfigured = $this->getConfigService()->getCustomsMappings() !== null;
+        $shippingMethod->customsConfigured = $this->isCustomsConfigured();
 
         return $shippingMethod;
     }
@@ -357,7 +363,8 @@ class ShippingMethodController
             return false;
         }
 
-        if (!in_array($configuration->ddpAdjustmentType, array('fixed', 'percentage', null), true)) {
+        $validTypes = array(DdpBehavior::ADJUSTMENT_FIXED, DdpBehavior::ADJUSTMENT_PERCENTAGE, null);
+        if (!in_array($configuration->ddpAdjustmentType, $validTypes, true)) {
             return false;
         }
 
@@ -365,8 +372,22 @@ class ShippingMethodController
             return false;
         }
 
-        return $configuration->ddpAdjustmentType !== 'percentage'
+        return $configuration->ddpAdjustmentType !== DdpBehavior::ADJUSTMENT_PERCENTAGE
             || (float)$configuration->ddpAdjustmentAmount > -100;
+    }
+
+    /**
+     * Indicates whether customs mappings are configured, computed once per request.
+     *
+     * @return bool TRUE if customs mappings exist; otherwise, FALSE.
+     */
+    private function isCustomsConfigured()
+    {
+        if ($this->customsConfigured === null) {
+            $this->customsConfigured = $this->getConfigService()->getCustomsMappings() !== null;
+        }
+
+        return $this->customsConfigured;
     }
 
     /**

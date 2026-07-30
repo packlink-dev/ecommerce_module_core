@@ -3,11 +3,9 @@
 namespace Packlink\BusinessLogic\DDP\Interfaces;
 
 use Packlink\BusinessLogic\Order\Objects\Order;
-use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
 /**
- * Interface DdpCostServiceInterface. Checkout-time retrieval of DDP cost components
- * and resolution of the effective DDP behavior for a shipping method.
+ * Interface DdpCostServiceInterface. Checkout-time retrieval of DDP cost components.
  *
  * @package Packlink\BusinessLogic\DDP\Interfaces
  */
@@ -28,14 +26,4 @@ interface DdpCostServiceInterface
      * @return \Packlink\BusinessLogic\DDP\Models\DdpCostResponse[] DDP costs keyed by service id.
      */
     public function getDdpCosts(Order $order, array $serviceIds);
-
-    /**
-     * Resolves the effective DDP behavior from the method's API support level
-     * and the merchant-configured behavior.
-     *
-     * @param ShippingMethod $method Shipping method.
-     *
-     * @return string One of DdpBehavior::NONE, OPTIONAL, ENFORCED, MANDATORY.
-     */
-    public function resolveEffectiveBehavior(ShippingMethod $method);
 }

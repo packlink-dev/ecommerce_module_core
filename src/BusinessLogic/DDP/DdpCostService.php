@@ -2,7 +2,6 @@
 
 namespace Packlink\BusinessLogic\DDP;
 
-use Logeecom\Infrastructure\Configuration\Configuration;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
@@ -44,10 +43,6 @@ class DdpCostService implements DdpCostServiceInterface
         }
 
         try {
-            if ($this->getConfigService()->getCustomsMappings() === null) {
-                return array();
-            }
-
             $invoice = $this->getCustomsService()->createCustomsInvoice($order);
             if ($invoice === null) {
                 return array();
@@ -66,27 +61,6 @@ class DdpCostService implements DdpCostServiceInterface
 
             return array();
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function resolveEffectiveBehavior(ShippingMethod $method)
-    {
-        $level = $method->getDdpSupportLevel();
-
-        if ($level === DdpBehavior::LEVEL_MANDATORY) {
-            return DdpBehavior::MANDATORY;
-        }
-
-        if ($level === DdpBehavior::LEVEL_SUPPORTED) {
-            $behavior = $method->getDdpBehavior();
-            if ($behavior === DdpBehavior::ENFORCED || $behavior === DdpBehavior::OPTIONAL) {
-                return $behavior;
-            }
-        }
-
-        return DdpBehavior::NONE;
     }
 
     /**
@@ -145,13 +119,11 @@ class DdpCostService implements DdpCostServiceInterface
             $key = (string)$serviceId;
             if (isset($methodsByServiceId[$key])) {
                 $method = $methodsByServiceId[$key];
-                $response->effectiveBehavior = $this->resolveEffectiveBehavior($method);
+                $response->effectiveBehavior = $method->getEffectiveDdpBehavior();
                 $response->ddpAdjustmentType = $method->getDdpAdjustmentType();
                 $response->ddpAdjustmentAmount = $method->getDdpAdjustmentAmount();
             } else {
                 $response->effectiveBehavior = DdpBehavior::NONE;
-                $response->ddpAdjustmentType = null;
-                $response->ddpAdjustmentAmount = 0.0;
             }
 
             $result[$serviceId] = $response;
@@ -207,15 +179,6 @@ class DdpCostService implements DdpCostServiceInterface
         }
 
         return $map;
-    }
-
-    /**
-     * @return \Packlink\BusinessLogic\Configuration
-     */
-    private function getConfigService()
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return ServiceRegister::getService(Configuration::CLASS_NAME);
     }
 
     /**

@@ -27,6 +27,14 @@ class DdpBehavior
      */
     const MANDATORY = 'mandatory';
     /**
+     * DDP cost adjustment type: fixed amount.
+     */
+    const ADJUSTMENT_FIXED = 'fixed';
+    /**
+     * DDP cost adjustment type: percentage of the DDP cost.
+     */
+    const ADJUSTMENT_PERCENTAGE = 'percentage';
+    /**
      * API support level: service supports DDP.
      */
     const LEVEL_SUPPORTED = 'supported';

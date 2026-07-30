@@ -95,15 +95,11 @@ class DdpCostServiceTest extends BaseTestWithServices
         $cost = $costs['20154'];
         self::assertInstanceOf(DdpCostResponse::class, $cost);
         self::assertSame('20154', $cost->serviceId);
+        // Full component parsing is covered by ProxyTest::testGetShipmentProductsResponseParsing.
         self::assertSame(8.79, $cost->ddpFee->totalPrice);
-        self::assertSame(8.79, $cost->ddpFee->basePrice);
-        self::assertSame(0.0, $cost->ddpFee->taxPrice);
-        self::assertSame('EUR', $cost->ddpFee->currency);
         self::assertTrue($cost->ddpFee->isEnabled);
         self::assertTrue($cost->ddpFee->isSelected);
         self::assertSame(35.22, $cost->customsAndDuties->totalPrice);
-        self::assertTrue($cost->customsAndDuties->isEnabled);
-        self::assertTrue($cost->customsAndDuties->isSelected);
         self::assertSame(DdpBehavior::OPTIONAL, $cost->effectiveBehavior);
         self::assertSame('percentage', $cost->ddpAdjustmentType);
         self::assertSame(-10.0, $cost->ddpAdjustmentAmount);
@@ -124,41 +120,6 @@ class DdpCostServiceTest extends BaseTestWithServices
         self::assertSame(DdpBehavior::NONE, $costs['20154']->effectiveBehavior);
         self::assertNull($costs['20154']->ddpAdjustmentType);
         self::assertSame(0.0, $costs['20154']->ddpAdjustmentAmount);
-    }
-
-    public function testResolveEffectiveBehaviorMandatoryLevelIgnoresMerchantBehavior()
-    {
-        $method = $this->createShippingMethod('1', DdpBehavior::LEVEL_MANDATORY, DdpBehavior::OPTIONAL);
-
-        self::assertSame(DdpBehavior::MANDATORY, $this->ddpCostService->resolveEffectiveBehavior($method));
-    }
-
-    public function testResolveEffectiveBehaviorSupportedLevelEnforced()
-    {
-        $method = $this->createShippingMethod('1', DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::ENFORCED);
-
-        self::assertSame(DdpBehavior::ENFORCED, $this->ddpCostService->resolveEffectiveBehavior($method));
-    }
-
-    public function testResolveEffectiveBehaviorSupportedLevelOptional()
-    {
-        $method = $this->createShippingMethod('1', DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::OPTIONAL);
-
-        self::assertSame(DdpBehavior::OPTIONAL, $this->ddpCostService->resolveEffectiveBehavior($method));
-    }
-
-    public function testResolveEffectiveBehaviorSupportedLevelNone()
-    {
-        $method = $this->createShippingMethod('1', DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::NONE);
-
-        self::assertSame(DdpBehavior::NONE, $this->ddpCostService->resolveEffectiveBehavior($method));
-    }
-
-    public function testResolveEffectiveBehaviorNullLevelIsAlwaysNone()
-    {
-        $method = $this->createShippingMethod('1', null, DdpBehavior::ENFORCED);
-
-        self::assertSame(DdpBehavior::NONE, $this->ddpCostService->resolveEffectiveBehavior($method));
     }
 
     public function testGetDdpCostsWithEmptyServiceIdsMakesNoHttpCalls()

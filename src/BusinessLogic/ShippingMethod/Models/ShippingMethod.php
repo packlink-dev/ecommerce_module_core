@@ -805,4 +805,29 @@ class ShippingMethod extends Entity
 
         return $level;
     }
+
+    /**
+     * Resolves the effective DDP behavior from the method's API support level
+     * and the merchant-configured behavior. A mandatory support level overrides
+     * the merchant configuration; without DDP support the behavior is always none.
+     *
+     * @return string One of DdpBehavior::NONE, OPTIONAL, ENFORCED, MANDATORY.
+     */
+    public function getEffectiveDdpBehavior()
+    {
+        $level = $this->getDdpSupportLevel();
+
+        if ($level === DdpBehavior::LEVEL_MANDATORY) {
+            return DdpBehavior::MANDATORY;
+        }
+
+        if ($level === DdpBehavior::LEVEL_SUPPORTED) {
+            $behavior = $this->getDdpBehavior();
+            if ($behavior === DdpBehavior::ENFORCED || $behavior === DdpBehavior::OPTIONAL) {
+                return $behavior;
+            }
+        }
+
+        return DdpBehavior::NONE;
+    }
 }
