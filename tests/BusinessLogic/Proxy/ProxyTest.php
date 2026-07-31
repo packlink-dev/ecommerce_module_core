@@ -12,6 +12,7 @@ use Packlink\BusinessLogic\Http\DTO\DDP\DdpProductCost;
 use Packlink\BusinessLogic\Http\DTO\DDP\DdpProductsDetail;
 use Packlink\BusinessLogic\Http\DTO\DDP\ShipmentProductsRequest;
 use Packlink\BusinessLogic\Http\DTO\DDP\ShipmentProductsRequestItem;
+use Packlink\BusinessLogic\Http\DTO\Package;
 use Packlink\BusinessLogic\Http\Proxy;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 
@@ -180,7 +181,7 @@ class ProxyTest extends BaseTestWithServices
 
     /**
      * Asserts the DDP products request hits the un-versioned /pro/ endpoint and carries
-     * the contract body shape: shipments[].{service_id,contentvalue,contentValue_currency,customs.customs_invoice_id}.
+     * the full body shape the live API requires. Verified against the real endpoint 2026-07-30.
      *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
@@ -198,10 +199,26 @@ class ProxyTest extends BaseTestWithServices
         self::assertSame('https://api.packlink.com/pro/shipments/products', $lastRequest['url']);
         $requestBody = json_decode($lastRequest['body'], true);
         self::assertCount(1, $requestBody['shipments']);
-        self::assertSame('20154', $requestBody['shipments'][0]['service_id']);
-        self::assertSame(120.46, $requestBody['shipments'][0]['contentvalue']);
-        self::assertSame('EUR', $requestBody['shipments'][0]['contentValue_currency']);
-        self::assertSame('invoice-id-1', $requestBody['shipments'][0]['customs']['customs_invoice_id']);
+        $shipment = $requestBody['shipments'][0];
+        self::assertSame('20154', $shipment['service_id']);
+        self::assertSame(120.46, $shipment['contentvalue']);
+        self::assertSame('invoice-id-1', $shipment['customs']['customs_invoice_id']);
+        // The live endpoint rejects a partial body; every field below is required for HTTP 200.
+        self::assertSame('PRO', $shipment['source']);
+        self::assertSame(array('city' => 'Madrid', 'country' => 'ES', 'zip_code' => '28001'), $shipment['from']);
+        self::assertSame(array('city' => 'London', 'country' => 'GB', 'zip_code' => 'W1S 2YS'), $shipment['to']);
+        self::assertCount(1, $shipment['packages']);
+        self::assertEquals(2.0, $shipment['packages'][0]['weight']);
+        self::assertFalse($shipment['insurance']['insurance_selected']);
+        self::assertFalse($shipment['content_second_hand']);
+        self::assertFalse($shipment['proof_of_delivery']);
+        self::assertFalse($shipment['adult_signature']);
+        self::assertFalse($shipment['additional_handling']);
+        self::assertTrue($shipment['selected_products']['ddp']['is_selected']);
+        // Not a field of this endpoint - sending it was part of what made every request 500.
+        self::assertArrayNotHasKey('contentValue_currency', $shipment);
+        // No shipment exists at checkout; the endpoint prices fine without a reference.
+        self::assertArrayNotHasKey('packlink_reference', $shipment);
     }
 
     /**
@@ -214,23 +231,21 @@ class ProxyTest extends BaseTestWithServices
         $body = file_get_contents(__DIR__ . '/../Common/ApiResponses/DDP/productsResponse.json');
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $body)));
 
-        $details = $this->getProxy()->getShipmentProducts($this->getShipmentProductsRequest());
+        $detail = $this->getProxy()->getShipmentProducts($this->getShipmentProductsRequest());
 
-        self::assertCount(1, $details);
-        self::assertInstanceOf(DdpProductsDetail::class, $details[0]);
-        self::assertNull($details[0]->serviceId);
-        self::assertInstanceOf(DdpProductCost::class, $details[0]->ddpFee);
-        self::assertSame(8.79, $details[0]->ddpFee->basePrice);
-        self::assertSame(0.0, $details[0]->ddpFee->taxPrice);
-        self::assertSame(8.79, $details[0]->ddpFee->totalPrice);
-        self::assertSame('EUR', $details[0]->ddpFee->currency);
-        self::assertTrue($details[0]->ddpFee->isEnabled);
-        self::assertTrue($details[0]->ddpFee->isSelected);
-        self::assertInstanceOf(DdpProductCost::class, $details[0]->customsAndDuties);
-        self::assertSame(35.22, $details[0]->customsAndDuties->basePrice);
-        self::assertSame(35.22, $details[0]->customsAndDuties->totalPrice);
-        self::assertTrue($details[0]->customsAndDuties->isEnabled);
-        self::assertTrue($details[0]->customsAndDuties->isSelected);
+        self::assertInstanceOf(DdpProductsDetail::class, $detail);
+        self::assertInstanceOf(DdpProductCost::class, $detail->ddpFee);
+        self::assertSame(8.79, $detail->ddpFee->basePrice);
+        self::assertSame(0.0, $detail->ddpFee->taxPrice);
+        self::assertSame(8.79, $detail->ddpFee->totalPrice);
+        self::assertSame('EUR', $detail->ddpFee->currency);
+        self::assertTrue($detail->ddpFee->isEnabled);
+        self::assertTrue($detail->ddpFee->isSelected);
+        self::assertInstanceOf(DdpProductCost::class, $detail->customsAndDuties);
+        self::assertSame(35.22, $detail->customsAndDuties->basePrice);
+        self::assertSame(35.22, $detail->customsAndDuties->totalPrice);
+        self::assertTrue($detail->customsAndDuties->isEnabled);
+        self::assertTrue($detail->customsAndDuties->isSelected);
     }
 
     /**
@@ -242,19 +257,19 @@ class ProxyTest extends BaseTestWithServices
     {
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '{"summary":{}}')));
 
-        $details = $this->getProxy()->getShipmentProducts($this->getShipmentProductsRequest());
-
-        self::assertSame(array(), $details);
+        self::assertNull($this->getProxy()->getShipmentProducts($this->getShipmentProductsRequest()));
     }
 
     /**
      * @return void
      */
-    public function testDdpProductsDetailParsesServiceIdAndFlags()
+    public function testDdpProductsDetailParsesFlagsAndIgnoresUnmatchableKeys()
     {
+        // The live response carries packlink_reference and never service_id. Nothing is correlated
+        // from it: the request is never batched, so the one entry belongs to the one request.
         $detail = DdpProductsDetail::fromArray(
             array(
-                'service_id' => '20154',
+                'packlink_reference' => 'FR2026PRO0002354009',
                 'products' => array(
                     'ddp_fee' => array(
                         'base_price' => 8.79,
@@ -268,7 +283,6 @@ class ProxyTest extends BaseTestWithServices
             )
         );
 
-        self::assertSame('20154', $detail->serviceId);
         self::assertFalse($detail->ddpFee->isEnabled);
         self::assertFalse($detail->ddpFee->isSelected);
         self::assertNull($detail->customsAndDuties);
@@ -282,11 +296,17 @@ class ProxyTest extends BaseTestWithServices
         $item = new ShipmentProductsRequestItem();
         $item->serviceId = '20154';
         $item->contentValue = 120.456;
-        $item->contentValueCurrency = 'EUR';
         $item->customsInvoiceId = 'invoice-id-1';
+        $item->fromCountry = 'ES';
+        $item->fromZip = '28001';
+        $item->fromCity = 'Madrid';
+        $item->toCountry = 'GB';
+        $item->toZip = 'W1S 2YS';
+        $item->toCity = 'London';
+        $item->packages = array(new Package(2.0, 30, 20, 25));
 
         $request = new ShipmentProductsRequest();
-        $request->items = array($item);
+        $request->item = $item;
 
         return $request;
     }

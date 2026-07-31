@@ -280,7 +280,7 @@ class ShippingMethodEntityTest extends BaseTestWithServices
     /**
      * @return array
      */
-    public function effectiveDdpBehaviorProvider()
+    public static function effectiveDdpBehaviorProvider()
     {
         return array(
             // A mandatory support level overrides any merchant configuration.

@@ -5,16 +5,19 @@ namespace Packlink\BusinessLogic\Http\DTO\DDP;
 use Logeecom\Infrastructure\Data\DataTransferObject;
 
 /**
- * Class DdpProductsDetail. One per-service entry of the /pro/shipments/products response.
+ * Class DdpProductsDetail. The single per-shipment entry of a /pro/shipments/products response.
+ *
+ * The response carries `packlink_reference`, never `service_id`, so there is nothing to correlate a
+ * result to a requested service by. That does not matter because the request is never batched (see
+ * ShipmentProductsRequest) -- the one entry returned belongs to the one entry sent.
+ *
+ * A service that does not support DDP on the requested route simply omits `ddp_fee` entirely. That is
+ * a normal answer, not an error.
  *
  * @package Packlink\BusinessLogic\Http\DTO\DDP
  */
 class DdpProductsDetail extends DataTransferObject
 {
-    /**
-     * @var string|null
-     */
-    public $serviceId;
     /**
      * @var DdpProductCost|null
      */
@@ -31,7 +34,6 @@ class DdpProductsDetail extends DataTransferObject
     {
         $result = new static();
 
-        $result->serviceId = isset($data['service_id']) ? $data['service_id'] : null;
         $products = isset($data['products']) ? $data['products'] : array();
         if (isset($products['ddp_fee'])) {
             $result->ddpFee = DdpProductCost::fromArray($products['ddp_fee']);
@@ -59,7 +61,6 @@ class DdpProductsDetail extends DataTransferObject
         }
 
         return array(
-            'service_id' => $this->serviceId,
             'products' => $products,
         );
     }

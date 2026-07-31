@@ -18,6 +18,7 @@ use Packlink\BusinessLogic\DDP\Models\DdpCostResponse;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
+use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 
 /**
  * Class DdpCostServiceTest.
@@ -52,6 +53,13 @@ class DdpCostServiceTest extends BaseTestWithServices
             }
         );
 
+        TestServiceRegister::registerService(
+            PackageTransformer::CLASS_NAME,
+            function () {
+                return PackageTransformer::getInstance();
+            }
+        );
+
         TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
 
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
@@ -71,7 +79,7 @@ class DdpCostServiceTest extends BaseTestWithServices
         $this->saveShippingMethod('20154', DdpBehavior::LEVEL_SUPPORTED, DdpBehavior::OPTIONAL, 'percentage', -10.0);
         $this->httpClient->setMockResponses($this->getSuccessfulResponses());
 
-        $costs = $this->ddpCostService->getDdpCosts($this->getOrder(), array('20154'));
+        $cost = $this->ddpCostService->getDdpCosts($this->getOrder(), '20154');
 
         $history = $this->httpClient->getHistory();
         self::assertCount(2, $history);
@@ -81,18 +89,23 @@ class DdpCostServiceTest extends BaseTestWithServices
         self::assertSame('https://api.packlink.com/pro/shipments/products', $history[1]['url']);
 
         $productsBody = json_decode($history[1]['body'], true);
+        // Exactly one entry, always: batched responses mis-attribute results (see ShipmentProductsRequest).
         self::assertCount(1, $productsBody['shipments']);
-        self::assertSame('20154', $productsBody['shipments'][0]['service_id']);
-        self::assertSame(120.45, $productsBody['shipments'][0]['contentvalue']);
-        self::assertSame('EUR', $productsBody['shipments'][0]['contentValue_currency']);
+        $shipment = $productsBody['shipments'][0];
+        self::assertSame('20154', $shipment['service_id']);
+        self::assertSame(120.45, $shipment['contentvalue']);
         self::assertSame(
             '70b7ac2a-7a71-11eb-9439-0242ac130002',
-            $productsBody['shipments'][0]['customs']['customs_invoice_id']
+            $shipment['customs']['customs_invoice_id']
         );
+        // Route and parcel data are required by the live endpoint and come from the order + warehouse.
+        self::assertSame('PRO', $shipment['source']);
+        self::assertNotEmpty($shipment['from']['country']);
+        self::assertNotEmpty($shipment['to']['country']);
+        self::assertCount(1, $shipment['packages']);
+        self::assertTrue($shipment['selected_products']['ddp']['is_selected']);
+        self::assertArrayNotHasKey('contentValue_currency', $shipment);
 
-        self::assertCount(1, $costs);
-        self::assertArrayHasKey('20154', $costs);
-        $cost = $costs['20154'];
         self::assertInstanceOf(DdpCostResponse::class, $cost);
         self::assertSame('20154', $cost->serviceId);
         // Full component parsing is covered by ProxyTest::testGetShipmentProductsResponseParsing.
@@ -106,7 +119,7 @@ class DdpCostServiceTest extends BaseTestWithServices
     }
 
     /**
-     * When no shipping method owns the requested service id, the cost entry still returns
+     * When no shipping method owns the requested service id, the cost still returns
      * with effective behavior NONE and no adjustment.
      */
     public function testGetDdpCostsWithoutOwningMethodDefaultsBehaviorToNone()
@@ -114,62 +127,114 @@ class DdpCostServiceTest extends BaseTestWithServices
         $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
         $this->httpClient->setMockResponses($this->getSuccessfulResponses());
 
-        $costs = $this->ddpCostService->getDdpCosts($this->getOrder(), array('20154'));
+        $cost = $this->ddpCostService->getDdpCosts($this->getOrder(), '20154');
 
-        self::assertCount(1, $costs);
-        self::assertSame(DdpBehavior::NONE, $costs['20154']->effectiveBehavior);
-        self::assertNull($costs['20154']->ddpAdjustmentType);
-        self::assertSame(0.0, $costs['20154']->ddpAdjustmentAmount);
+        self::assertInstanceOf(DdpCostResponse::class, $cost);
+        self::assertSame(DdpBehavior::NONE, $cost->effectiveBehavior);
+        self::assertNull($cost->ddpAdjustmentType);
+        self::assertSame(0.0, $cost->ddpAdjustmentAmount);
     }
 
-    public function testGetDdpCostsWithEmptyServiceIdsMakesNoHttpCalls()
+    public function testGetDdpCostsWithEmptyServiceIdMakesNoHttpCalls()
     {
         $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
 
-        self::assertSame(array(), $this->ddpCostService->getDdpCosts($this->getOrder(), array()));
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), ''));
         self::assertEmpty($this->httpClient->getHistory());
     }
 
     public function testGetDdpCostsWithoutCustomsConfigurationMakesNoHttpCalls()
     {
-        self::assertSame(array(), $this->ddpCostService->getDdpCosts($this->getOrder(), array('20154')));
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
         self::assertEmpty($this->httpClient->getHistory());
     }
 
     /**
      * Checkout must never break on DDP failures: an HTTP error on the invoice call is
-     * logged and yields an empty result.
+     * logged and yields no cost.
      */
-    public function testGetDdpCostsReturnsEmptyOnInvoiceCallFailure()
+    public function testGetDdpCostsReturnsNullOnInvoiceCallFailure()
     {
         $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
         $this->httpClient->setMockResponses(array());
 
-        self::assertSame(array(), $this->ddpCostService->getDdpCosts($this->getOrder(), array('20154')));
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
         self::assertNotEmpty($this->shopLogger->loggedMessages);
     }
 
     /**
-     * An HTTP error on the products call is logged and yields an empty result.
+     * An HTTP error on the products call is logged and yields no cost.
      */
-    public function testGetDdpCostsReturnsEmptyOnProductsCallFailure()
+    public function testGetDdpCostsReturnsNullOnProductsCallFailure()
     {
         $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
         $invoiceBody = file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json');
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), $invoiceBody)));
 
-        self::assertSame(array(), $this->ddpCostService->getDdpCosts($this->getOrder(), array('20154')));
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
         self::assertCount(2, $this->httpClient->getHistory());
         self::assertNotEmpty($this->shopLogger->loggedMessages);
     }
 
-    public function testGetDdpCostsReturnsEmptyWhenInvoiceIdIsMissing()
+    public function testGetDdpCostsReturnsNullWhenInvoiceIdIsMissing()
     {
         $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
         $this->httpClient->setMockResponses(array(new HttpResponse(200, array(), '{}')));
 
-        self::assertSame(array(), $this->ddpCostService->getDdpCosts($this->getOrder(), array('20154')));
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
         self::assertCount(1, $this->httpClient->getHistory());
+    }
+
+    /**
+     * A service with no DDP on the route omits ddp_fee entirely. That is an ordinary answer,
+     * not a failure: no cost, and nothing alarming in the log.
+     */
+    public function testGetDdpCostsReturnsNullWhenResponseHasNoDdpProducts()
+    {
+        $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
+        $invoiceBody = file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json');
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(200, array(), $invoiceBody),
+                new HttpResponse(200, array(), '{"products_details":[{"products":{"porterage":{}}}],"summary":{}}'),
+            )
+        );
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+        self::assertCount(2, $this->httpClient->getHistory());
+    }
+
+    /**
+     * A rejected HS code is a merchant-fixable configuration fault, not a transient outage, and the
+     * log must say so -- Packlink validates tariff numbers against a current HS revision, so a
+     * well-formed but withdrawn code passes the 6-8 digit check and fails only here.
+     */
+    public function testGetDdpCostsLogsActionableHintForRejectedHsCode()
+    {
+        $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
+        $invoiceBody = file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json');
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(200, array(), $invoiceBody),
+                new HttpResponse(
+                    400,
+                    array(),
+                    '{"messages":[{"message":"Invalid HS Code: \'851712\'","error_code":"INVALID_HS_CODE"}]}'
+                ),
+            )
+        );
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+
+        $logged = '';
+        foreach ($this->shopLogger->loggedMessages as $message) {
+            $logged .= $message->getMessage() . "\n";
+        }
+
+        self::assertStringContainsString('Invalid HS Code', $logged);
+        self::assertStringContainsString('HS code', $logged);
+        self::assertStringContainsString('retrieving DDP products', $logged);
+        self::assertStringNotContainsString('transient', $logged);
     }
 
     /**

@@ -226,7 +226,13 @@ class ShippingServiceDetails extends DataTransferObject
         $instance->national = self::getDataValue($raw, 'national', null);
         $instance->tags = self::getDataValue($raw, 'tags', array());
         $instance->cashOnDelivery = self::getDataValue($raw, 'cash_on_delivery', array());
-        $instance->ddpSupportLevel = self::getDataValue($raw, 'ddp_support_level', null);
+        // The API may express "no DDP" as null, an empty string, or the literal "none". Normalise all
+        // three to null here so no consumer downstream has to know the difference -- a plain
+        // `!== null` check on this field would otherwise read "none" as "DDP available".
+        $ddpSupportLevel = self::getDataValue($raw, 'ddp_support_level', null);
+        $instance->ddpSupportLevel = in_array($ddpSupportLevel, array(null, '', 'none'), true)
+            ? null
+            : $ddpSupportLevel;
 
         return $instance;
     }

@@ -636,13 +636,13 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
     }
 
     /**
-     * Retrieves per-service DDP cost components. All eligible services are batched
-     * into a single request. The endpoint lives outside the v1/ prefix, so the call
-     * goes through callBase().
+     * Retrieves DDP cost components for one shipment. The request carries exactly one entry -- this
+     * endpoint must never be batched, see ShipmentProductsRequest. The endpoint lives outside the
+     * v1/ prefix, so the call goes through callBase().
      *
      * @param ShipmentProductsRequest $request
      *
-     * @return DdpProductsDetail[]
+     * @return DdpProductsDetail|null Null when the response carries no entry.
      *
      * @throws HttpAuthenticationException
      * @throws HttpRequestException
@@ -653,7 +653,12 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
         $result = $this->callBase(HttpClient::HTTP_METHOD_POST, '/pro/shipments/products', $request->toArray())
             ->decodeBodyToArray();
 
-        return DdpProductsDetail::fromBatch(isset($result['products_details']) ? $result['products_details'] : array());
+        $details = isset($result['products_details']) ? $result['products_details'] : array();
+        if (empty($details[0])) {
+            return null;
+        }
+
+        return DdpProductsDetail::fromArray($details[0]);
     }
 
     /**
