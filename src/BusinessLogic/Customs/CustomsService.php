@@ -182,7 +182,12 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
         $shipmentDetails->parcelsWeight = $order->getTotalWeight();
         $cost = new Cost();
         $cost->currency = $order->getCurrency();
-        $cost->value = $order->getTotalPrice();
+        // The API expects the shipment (freight) cost here; customs value is goods + freight, so
+        // sending the goods value double-counts the goods and inflates every duty quote (C8). Fall
+        // back to the old behaviour only when the platform has not supplied the freight.
+        $cost->value = $order->getShippingCost() !== null
+            ? $order->getShippingCost()
+            : $order->getTotalPrice();
         $shipmentDetails->cost = $cost;
 
         return $shipmentDetails;

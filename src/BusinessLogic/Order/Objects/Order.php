@@ -140,6 +140,14 @@ class Order
      * @var float
      */
     private $totalWeight = 0;
+    /**
+     * Shipping (freight) cost of the order, in the order currency. Used as the customs invoice's
+     * shipment cost; customs value is assessed on goods plus freight, so this must never carry the
+     * goods value. Null when the platform has not priced transport yet.
+     *
+     * @var float|null
+     */
+    private $shippingCost;
 
     /**
      * @var string $paymentId
@@ -660,5 +668,25 @@ class Order
     public function setTotalWeight($totalWeight)
     {
         $this->totalWeight = $totalWeight;
+    }
+
+    /**
+     * Returns the shipping (freight) cost, or null when transport has not been priced.
+     *
+     * @return float|null
+     */
+    public function getShippingCost()
+    {
+        return $this->shippingCost;
+    }
+
+    /**
+     * Sets the shipping (freight) cost.
+     *
+     * @param float|null $shippingCost
+     */
+    public function setShippingCost($shippingCost)
+    {
+        $this->shippingCost = $shippingCost;
     }
 }
