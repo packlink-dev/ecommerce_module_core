@@ -783,14 +783,23 @@
 #pl-page .pl-invalid-policy {
   color: #e63f3f;
 }
+#pl-page .pl-service-name-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
 #pl-page .pl-ddp-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background-color: #3a3d46;
   color: #fff;
   font-size: 11px;
-  line-height: 1.4;
-  padding: 2px 8px;
-  border-radius: 10px;
+  line-height: 1;
+  padding: 6px 8px 4px;
+  border-radius: 4px;
   vertical-align: middle;
   margin-left: 8px;
   white-space: nowrap;
@@ -862,9 +871,11 @@
   align-items: flex-start;
   justify-content: center;
 }
+#pl-page .pl-shipping-services-list-item .pl-service-header .pl-service-name .pl-service-name-line {
+  margin-bottom: 8px;
+}
 #pl-page .pl-shipping-services-list-item .pl-service-header .pl-service-name #pl-service-name {
   font-weight: 600;
-  margin-bottom: 8px;
 }
 #pl-page .pl-shipping-services-list-item .pl-wrap-items {
   flex-direction: row;

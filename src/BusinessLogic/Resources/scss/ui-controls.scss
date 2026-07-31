@@ -572,14 +572,24 @@
     color: $color-red;
   }
 
+  .pl-service-name-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
   .pl-ddp-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     background-color: $text-color;
     color: $color-white;
     font-size: 11px;
-    line-height: 1.4;
-    padding: 2px 8px;
-    border-radius: 10px;
+    line-height: 1;
+    padding: 6px 8px 4px;
+    border-radius: 4px;
     vertical-align: middle;
     margin-left: 8px;
     white-space: nowrap;
@@ -664,9 +674,12 @@
         align-items: flex-start;
         justify-content: center;
 
+        .pl-service-name-line {
+          margin-bottom: 8px;
+        }
+
         #pl-service-name {
           font-weight: 600;
-          margin-bottom: 8px;
         }
       }
     }
