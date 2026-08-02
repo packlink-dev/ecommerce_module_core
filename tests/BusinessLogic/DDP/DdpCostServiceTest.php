@@ -231,10 +231,12 @@ class DdpCostServiceTest extends BaseTestWithServices
             $logged .= $message->getMessage() . "\n";
         }
 
-        self::assertStringContainsString('Invalid HS Code', $logged);
-        self::assertStringContainsString('HS code', $logged);
-        self::assertStringContainsString('retrieving DDP products', $logged);
-        self::assertStringNotContainsString('transient', $logged);
+        // strpos rather than assertStringContainsString/assertContains: the former does not exist in
+        // PHPUnit 4.8, the latter rejects string haystacks from PHPUnit 9 on, and the suite runs both.
+        self::assertNotFalse(strpos($logged, 'Invalid HS Code'), 'Log must quote the API message: ' . $logged);
+        self::assertNotFalse(strpos($logged, 'HS code'), 'Log must name the HS code as the fault: ' . $logged);
+        self::assertNotFalse(strpos($logged, 'retrieving DDP products'), 'Log must name the step: ' . $logged);
+        self::assertFalse(strpos($logged, 'transient'), 'A rejected HS code must not read as transient: ' . $logged);
     }
 
     /**
