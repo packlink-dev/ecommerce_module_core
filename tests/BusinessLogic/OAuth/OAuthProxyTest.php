@@ -22,7 +22,6 @@ class OAuthProxyTest extends BaseTestWithServices
     private $proxy;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()

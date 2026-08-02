@@ -10,7 +10,7 @@ use Logeecom\Infrastructure\TaskExecution\QueueItem;
 use Logeecom\Infrastructure\TaskExecutor\Interfaces\Priority;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\BarTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class AbstractGenericTest
@@ -284,28 +284,22 @@ abstract class AbstractGenericQueueItemRepositoryTest extends TestCase
     }
 
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      */
     protected function before()
     {
-        $this->setUp();
 
         RepositoryRegistry::registerRepository(QueueItem::getClassName(), $this->getQueueItemEntityRepositoryClass());
     }
 
     /**
-     * @after
-     *
      * @return void
      */
     protected function after()
     {
         $this->cleanUpStorage();
-        $this->tearDown();
     }
 
     /**

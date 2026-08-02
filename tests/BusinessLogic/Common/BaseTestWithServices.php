@@ -77,8 +77,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
     public $integrationRegistrationDataProvider;
 
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
@@ -282,8 +280,6 @@ abstract class BaseTestWithServices extends BaseInfrastructureTestWithServices
     }
 
     /**
-     * @after
-     *
      * @return void
      */
     protected function after()

@@ -81,7 +81,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     private $cashOnDeliveryService;
 
     /**
-     * @before
      * @return void
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException
      * @throws \Exception
@@ -220,8 +219,6 @@ class ShipmentDraftServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
-     *
      * @return void
      */
     protected function after()

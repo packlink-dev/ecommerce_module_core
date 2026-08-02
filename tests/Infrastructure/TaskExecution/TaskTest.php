@@ -10,7 +10,7 @@ use Logeecom\Infrastructure\Utility\TimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\Utility\TestTimeProvider;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class TaskTest
@@ -23,7 +23,6 @@ class TaskTest extends TestCase
     private $timeProvider;
 
     /**
-     * @before
      * @throws \Exception
      */
     protected function before()

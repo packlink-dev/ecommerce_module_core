@@ -41,7 +41,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     protected $serviceIds = array(20203, 20945, 20189);
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -95,7 +94,6 @@ class ShippingMethodServiceCostsTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

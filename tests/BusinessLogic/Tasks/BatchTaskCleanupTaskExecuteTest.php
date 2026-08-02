@@ -27,7 +27,6 @@ class BatchTaskCleanupTaskExecuteTest extends BaseTestWithServices
      */
     private $taskRunnerConfig;
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()

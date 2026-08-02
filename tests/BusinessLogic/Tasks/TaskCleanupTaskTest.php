@@ -33,7 +33,6 @@ class TaskCleanupTaskTest extends BaseTestWithServices
     public $queueService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()

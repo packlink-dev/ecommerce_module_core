@@ -50,6 +50,18 @@ class CustomsMapping extends FrontDto
      */
     public $mappingReceiverTaxId;
     /**
+     * @var string
+     */
+    public $mappingTariffNumber;
+    /**
+     * @var string
+     */
+    public $mappingCompanyVat;
+    /**
+     * @var string
+     */
+    public $mappingCountryOfOrigin;
+    /**
      * Fields for this DTO.
      *
      * @var array
@@ -62,6 +74,9 @@ class CustomsMapping extends FrontDto
         'default_tariff_number',
         'default_country',
         'mapping_receiver_tax_id',
+        'mapping_tariff_number',
+        'mapping_company_vat',
+        'mapping_country_of_origin',
     );
     /**
      * Required fields for DTO to be valid.
@@ -95,6 +110,9 @@ class CustomsMapping extends FrontDto
         $mapping->defaultTariffNumber = static::getDataValue($raw,'default_tariff_number');
         $mapping->defaultCountry = static::getDataValue($raw,'default_country');
         $mapping->mappingReceiverTaxId = static::getDataValue($raw,'mapping_receiver_tax_id');
+        $mapping->mappingTariffNumber = static::getDataValue($raw,'mapping_tariff_number');
+        $mapping->mappingCompanyVat = static::getDataValue($raw,'mapping_company_vat');
+        $mapping->mappingCountryOfOrigin = static::getDataValue($raw,'mapping_country_of_origin');
 
         return $mapping;
     }
@@ -114,6 +132,9 @@ class CustomsMapping extends FrontDto
             'default_tariff_number' => $this->defaultTariffNumber,
             'default_country' => $this->defaultCountry,
             'mapping_receiver_tax_id' => $this->mappingReceiverTaxId,
+            'mapping_tariff_number' => $this->mappingTariffNumber,
+            'mapping_company_vat' => $this->mappingCompanyVat,
+            'mapping_country_of_origin' => $this->mappingCountryOfOrigin,
         );
     }
 
@@ -121,7 +142,10 @@ class CustomsMapping extends FrontDto
     {
         parent::doValidate($payload, $validationErrors);
 
-        if (!preg_match('/^[0-9]{6,8}$/', $payload['default_tariff_number'])) {
+        // default_tariff_number is optional (not in $requiredFields); validate its
+        // format only when a value is actually supplied.
+        $tariffNumber = static::getDataValue($payload, 'default_tariff_number', '');
+        if ($tariffNumber !== '' && !preg_match('/^[0-9]{6,8}$/', $tariffNumber)) {
             static::setInvalidFieldError(
                 'default_tariff_number',
                 $validationErrors,

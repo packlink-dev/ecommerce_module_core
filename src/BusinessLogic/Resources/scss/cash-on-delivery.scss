@@ -1,3 +1,7 @@
+// --- Cash-on-Delivery settings page (form layout + info box) ---
+// Previously these rules lived only in the compiled app.css; moved to source
+// so `php cssCompile.php` regenerates them loss-free.
+
 #pl-cod-form {
   .pl-config-section h2 {
     padding-bottom: 20px;

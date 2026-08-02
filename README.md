@@ -11,6 +11,12 @@ run command:
 ```bash
 sh run-tests.sh
 ```
+`composer.lock` is resolved for PHP >= 8.2 (phpunit 11). `run-tests.sh` therefore
+re-resolves the phpunit requirement with each interpreter before running it, so
+older PHP versions get a compatible phpunit. The script fails the whole run on
+any composer/phpunit error and marks the run incomplete if an interpreter is not
+installed - a partial run never reports success. Requires PHP 7.0-8.4 to be
+installed at `/usr/bin/phpX.Y`.
 
 You **MUST** run code inspection so standards could be followed. 
 Assuming you are using PHPStorm ([you should](https://www.google.com/search?q=why+should+I+use+phpstorm)), 

@@ -8,7 +8,6 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ServiceRegister;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
-use Packlink\BusinessLogic\Customs\Models\TaxIdOption;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoNotRegisteredException;
 use Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException;
 use Packlink\BusinessLogic\DTO\FrontDtoFactory;
@@ -73,9 +72,14 @@ abstract class CustomsMappingService implements \Packlink\BusinessLogic\Customs\
     }
 
     /**
-     * @return TaxIdOption[]
+     * Returns the data-mapping field definitions (label + selectable options)
+     * that the customs settings page should render. The set of fields is
+     * entirely platform-driven (e.g. customer tax id, product HS code,
+     * company VAT where the platform supports it).
+     *
+     * @return \Packlink\BusinessLogic\Customs\Models\MappingFieldOptions[]
      */
-    abstract public function getReceiverTaxIdOptions();
+    abstract public function getMappingFieldsOptions();
 
     /**
      * @return User|null

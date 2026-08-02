@@ -5,7 +5,7 @@ namespace Logeecom\Tests\BusinessLogic\Dto;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestFrontDtoFactory;
 use Packlink\BusinessLogic\DTO\ValidationError;
 use Packlink\BusinessLogic\Http\DTO\Draft\Address;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class BaseDtoTest.
@@ -15,25 +15,19 @@ use PHPUnit\Framework\TestCase;
 class BaseDtoTest extends TestCase
 {
     /**
-     * @before
-     *
      * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
      */
     protected function before()
     {
-        $this->setUp();
 
         TestFrontDtoFactory::register(ValidationError::CLASS_KEY, ValidationError::CLASS_NAME);
     }
 
     /**
-     * @after
-     *
      * @return void
      */
     protected function after()
     {
-        $this->tearDown();
 
         TestFrontDtoFactory::reset();
     }

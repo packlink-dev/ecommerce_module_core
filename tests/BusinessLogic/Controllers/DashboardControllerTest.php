@@ -37,7 +37,6 @@ class DashboardControllerTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -71,7 +70,6 @@ class DashboardControllerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

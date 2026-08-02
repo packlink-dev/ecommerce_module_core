@@ -55,7 +55,6 @@ class CashOnDeliveryControllerTest extends BaseTestWithServices
     public $testShopShippingMethodService;
 
     /**
-     * @before
      * @inheritDoc
      * @throws RepositoryNotRegisteredException
      */

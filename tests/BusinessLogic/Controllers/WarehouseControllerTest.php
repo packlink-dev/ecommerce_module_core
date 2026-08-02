@@ -18,7 +18,6 @@ class WarehouseControllerTest extends BaseTestWithServices
     public $controller;
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()
@@ -97,7 +96,6 @@ class WarehouseControllerTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()

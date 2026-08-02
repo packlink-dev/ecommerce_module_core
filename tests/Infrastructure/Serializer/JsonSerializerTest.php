@@ -6,7 +6,7 @@ use Logeecom\Infrastructure\Serializer\Concrete\JsonSerializer;
 use Logeecom\Infrastructure\Serializer\Serializer;
 use Logeecom\Tests\Infrastructure\Common\TestComponents\TaskExecution\FooTask;
 use Logeecom\Tests\Infrastructure\Common\TestServiceRegister;
-use PHPUnit\Framework\TestCase;
+use Logeecom\Tests\Infrastructure\Common\CompatTestCase as TestCase;
 
 /**
  * Class JsonSerializerTest
@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 class JsonSerializerTest extends TestCase
 {
     /**
-     * @before
      */
     public function before()
     {

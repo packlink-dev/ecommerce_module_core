@@ -11,8 +11,6 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 class BaseTestWithServices extends \Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices
 {
     /**
-     * @before
-     *
      * @return void
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryClassException

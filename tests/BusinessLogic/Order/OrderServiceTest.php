@@ -66,7 +66,6 @@ class OrderServiceTest extends BaseTestWithServices
     public $registrationService;
 
     /**
-     * @before
      * @inheritdoc
      */
     protected function before()
@@ -145,7 +144,6 @@ class OrderServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @after
      * @inheritdoc
      */
     protected function after()

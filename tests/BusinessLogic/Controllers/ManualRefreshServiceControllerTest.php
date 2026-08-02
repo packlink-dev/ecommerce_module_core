@@ -55,7 +55,6 @@ class ManualRefreshServiceControllerTest extends BaseTestWithServices
     private $taskExecutor;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()

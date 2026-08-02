@@ -97,7 +97,6 @@ class RegistrationServiceTest extends BaseTestWithServices
     }
 
     /**
-     * @before
      * @inheritDoc
      */
     protected function before()

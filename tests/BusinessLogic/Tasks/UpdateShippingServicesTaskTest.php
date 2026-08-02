@@ -45,7 +45,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     public $syncTask;
 
     /**
-     * @before
      * @inheritdoc
      */
     public function before()
@@ -90,7 +89,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     }
 
     /**
-     * @after
      * @inheritDoc
      */
     protected function after()
@@ -102,7 +100,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     }
 
     /**
-     *
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
@@ -146,7 +143,6 @@ class UpdateShippingServicesTaskTest extends BaseSyncTest
     }
 
     /**
-     *
      * @return void
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
      * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
