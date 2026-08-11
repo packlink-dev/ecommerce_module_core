@@ -28,6 +28,9 @@
       "leafo/scssphp": "0.0.12"
     },
     "config": {
+      "platform": {
+            "php": "7.0"
+        },
       "policy": {
         "advisories": {
           "ignore-id": [
