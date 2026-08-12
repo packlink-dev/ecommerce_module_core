@@ -139,6 +139,10 @@ class SendDraftBusinessTask implements BusinessTask
 
             $this->getOrderService()->setReference($this->orderId, $reference);
 
+            if ($order->isDdpSelected() && $order->getDdpCost() !== null) {
+                $this->getOrderShipmentDetailsService()->setDdpCost($reference, $order->getDdpCost());
+            }
+
             yield 80;
 
             $shipment = $this->getProxy()->getShipment($reference);
@@ -146,10 +150,6 @@ class SendDraftBusinessTask implements BusinessTask
             if ($shipment) {
                 $customsId = isset($draft->customs) ? $draft->customs->customsInvoiceId : '';
                 $this->getOrderService()->updateShipmentData($shipment, $customsId);
-            }
-
-            if ($order->isDdpSelected() && $order->getDdpCost() !== null) {
-                $this->getOrderShipmentDetailsService()->setDdpCost($reference, $order->getDdpCost());
             }
 
             yield 90;

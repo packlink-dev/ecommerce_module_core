@@ -440,6 +440,25 @@ class CustomsServiceTest extends BaseTestWithServices
     }
 
     /**
+     * A missing default warehouse must yield null instead of a fatal error
+     * (getSender()/getSignature() type-hint Warehouse).
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testCreateCustomsInvoiceWithoutWarehouse()
+    {
+        $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
+        $this->shopConfig->removeDefaultWarehouse();
+        $shopOrderService = new TestShopOrderService();
+        $order = $shopOrderService->getOrder('customs-service-test-no-warehouse', 1, 'DE');
+
+        self::assertNull($this->customsService->createCustomsInvoice($order));
+    }
+
+    /**
      * @return CustomsMapping
      */
     private function getCustomsMapping()

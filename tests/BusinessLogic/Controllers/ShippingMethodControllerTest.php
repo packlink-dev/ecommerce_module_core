@@ -526,6 +526,7 @@ class ShippingMethodControllerTest extends BaseTestWithServices
             array('ddpAdjustmentType' => 'unknown'),
             array('ddpAdjustmentAmount' => 'abc'),
             array('ddpAdjustmentType' => 'percentage', 'ddpAdjustmentAmount' => -100),
+            array('ddpAdjustmentType' => 'fixed', 'ddpAdjustmentAmount' => -100000),
         );
 
         foreach ($invalidCases as $case) {
@@ -549,6 +550,25 @@ class ShippingMethodControllerTest extends BaseTestWithServices
 
         $shipment = $this->getDdpShipmentConfiguration($first);
         $shipment->ddpBehavior = DdpBehavior::ENFORCED;
+
+        $this->assertNull($this->controller->save($shipment));
+    }
+
+    /**
+     * On a mandatory-level method DDP is API-driven: any merchant behavior other than
+     * 'none' is rejected (spec section 4.2).
+     */
+    public function testSaveDdpBehaviorOnMandatoryMethod()
+    {
+        $this->systemInfoService->setInvalid(false);
+        $this->systemInfoService->setMultistore(false);
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $this->setDdpSupportLevel($first->id, DdpBehavior::LEVEL_MANDATORY);
+
+        $shipment = $this->getDdpShipmentConfiguration($first);
+        $shipment->ddpBehavior = DdpBehavior::OPTIONAL;
 
         $this->assertNull($this->controller->save($shipment));
     }

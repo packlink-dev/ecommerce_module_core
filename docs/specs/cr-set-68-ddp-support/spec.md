@@ -128,15 +128,19 @@ New service `Packlink\BusinessLogic\DDP\DdpCostService` (registered in
    platform passes (platforms already build `Order` objects; at checkout they build one from
    the cart). Returns `customs_invoice_id`. *(v2 request shape assumed identical to the v1
    CustomsInvoice — to confirm against Packlink API reference.)*
-2. **Fetch DDP costs** — `Proxy::getShipmentProducts(ShipmentProductsRequest)` →
-   `POST /pro/shipments/products` with `shipments[]`, one entry per DDP-relevant service:
-   `{service_id, contentvalue, ..., customs: {customs_invoice_id}}`. *(Fields elided in the
-   requirement PDF — additional shipment fields, e.g. addresses/packages, to confirm; the
-   request DTO isolates them.)*
-3. **Parse the response** — `products_details[]` → per service a `DdpCost` DTO:
+2. **Fetch the DDP cost** — `Proxy::getShipmentProducts(ShipmentProductsRequest)` →
+   `POST /pro/shipments/products` with `shipments[]` carrying **exactly one entry**:
+   `{service_id, contentvalue, source, from, to, packages, insurance,
+   selected_products.ddp.is_selected, customs: {customs_invoice_id}}`. *(Contract confirmed
+   against the live API 2026-07-30: batched requests mis-attribute results — the response
+   carries `packlink_reference`, never `service_id`, and ignores request order — so the
+   request is never batched. DDP cost is a function of the goods and the route, not the
+   carrier service, so one call answers for every DDP-capable service on a route.)*
+3. **Parse the response** — `products_details[0]` → a `DdpProductsDetail`:
    - `ddpFee`: `{basePrice, taxPrice, totalPrice, currency, isEnabled, isSelected}`
    - `customsAndDuties`: same shape
-   - Components stay separate (D11); **no combined total**.
+   - Components stay separate (D11); **no combined total**. A route/service without DDP
+     omits `ddp_fee` entirely — an ordinary answer yielding `null`, not an error.
    - Flag semantics (from the checkout PDF): `is_enabled` — the service/route supports DDP
      and the cost may be presented; `is_selected` — the summary `total_price` includes that
      fee. Core exposes both verbatim.
@@ -144,8 +148,8 @@ New service `Packlink\BusinessLogic\DDP\DdpCostService` (registered in
 Public API (signature at spec altitude):
 
 ```php
-// returns array<int|string serviceId, DdpCostResponse>
-DdpCostService::getDdpCosts(Order $checkoutOrder, array $serviceIds);
+// returns DdpCostResponse|null (null: no DDP on this route/service, or any failure)
+DdpCostService::getDdpCosts(Order $checkoutOrder, $serviceId);
 ```
 
 `DdpCostResponse` carries: `serviceId`, `ddpFee`, `customsAndDuties`, and (for caller
@@ -171,8 +175,10 @@ override the version segment.
   `OrderService::convertOrderToDraftDto()` maps it.
 - `OrderShipmentDetails` gains persisted `ddpCost` (float|null);
   `OrderShipmentDetailsService::setDdpCost($reference, $ddpCost)` mirrors
-  `updateShipmentCustomsData()`; `OrderService::updateShipmentData()` persists
-  `Order::$ddpCost` alongside shipping price/customs id.
+  `updateShipmentCustomsData()`. `SendDraftBusinessTask` persists `Order::$ddpCost`
+  immediately after the shipment reference is set (before the `getShipment` fetch, so a
+  transient failure there cannot drop the cost on retry); the webhook-shared
+  `OrderService::updateShipmentData()` signature is untouched.
 - The orders-page popup (platform scope) reads the persisted `ddpCost` from the existing
   shipment-details exposure (`OrderShipmentDetails::toArray()` includes it).
 

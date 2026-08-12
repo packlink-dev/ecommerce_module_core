@@ -34,12 +34,12 @@ class DdpProductsDetail extends DataTransferObject
     {
         $result = new static();
 
-        $products = isset($data['products']) ? $data['products'] : array();
-        if (isset($products['ddp_fee'])) {
+        $products = isset($data['products']) && is_array($data['products']) ? $data['products'] : array();
+        if (isset($products['ddp_fee']) && is_array($products['ddp_fee'])) {
             $result->ddpFee = DdpProductCost::fromArray($products['ddp_fee']);
         }
 
-        if (isset($products['customs_and_duties'])) {
+        if (isset($products['customs_and_duties']) && is_array($products['customs_and_duties'])) {
             $result->customsAndDuties = DdpProductCost::fromArray($products['customs_and_duties']);
         }
 

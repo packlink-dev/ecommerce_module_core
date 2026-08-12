@@ -43,10 +43,10 @@ class DdpProductCost extends DataTransferObject
     {
         $result = new static();
 
-        $result->basePrice = static::getDataValue($data, 'base_price', 0);
-        $result->taxPrice = static::getDataValue($data, 'tax_price', 0);
-        $result->totalPrice = static::getDataValue($data, 'total_price', 0);
-        $result->currency = static::getDataValue($data, 'currency');
+        $result->basePrice = (float)static::getDataValue($data, 'base_price', 0.0);
+        $result->taxPrice = (float)static::getDataValue($data, 'tax_price', 0.0);
+        $result->totalPrice = (float)static::getDataValue($data, 'total_price', 0.0);
+        $result->currency = (string)static::getDataValue($data, 'currency');
         $result->isEnabled = (bool)static::getDataValue($data, 'is_enabled', false);
         $result->isSelected = (bool)static::getDataValue($data, 'is_selected', false);
 

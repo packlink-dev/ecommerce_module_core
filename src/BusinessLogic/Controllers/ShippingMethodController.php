@@ -372,8 +372,12 @@ class ShippingMethodController
             return false;
         }
 
-        return $configuration->ddpAdjustmentType !== DdpBehavior::ADJUSTMENT_PERCENTAGE
-            || (float)$configuration->ddpAdjustmentAmount > -100;
+        $amount = (float)$configuration->ddpAdjustmentAmount;
+        if (!is_finite($amount) || abs($amount) > 99999.99) {
+            return false;
+        }
+
+        return $configuration->ddpAdjustmentType !== DdpBehavior::ADJUSTMENT_PERCENTAGE || $amount > -100;
     }
 
     /**

@@ -654,7 +654,7 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
             ->decodeBodyToArray();
 
         $details = isset($result['products_details']) ? $result['products_details'] : array();
-        if (empty($details[0])) {
+        if (empty($details[0]) || !is_array($details[0])) {
             return null;
         }
 

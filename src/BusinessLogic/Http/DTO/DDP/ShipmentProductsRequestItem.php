@@ -74,7 +74,7 @@ class ShipmentProductsRequestItem extends DataTransferObject
 
         return array(
             'service_id' => $this->serviceId,
-            'contentvalue' => round($this->contentValue, 2),
+            'contentvalue' => round((float)$this->contentValue, 2),
             'insurance' => array(
                 'insurance_selected' => false,
             ),

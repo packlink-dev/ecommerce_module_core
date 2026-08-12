@@ -669,3 +669,13 @@ No migration: entity fields are additive with `inflate()` defaults, so pre-DDP r
 no config keys change; no platform contract changes — platform modules adopt DDP by consuming the
 new service/DTO fields at their own pace. Old call sites are unaffected (no renames). Delivery to
 the client repo goes through `docs/tools/publish-to-origin.sh` as usual (internal docs stripped).
+
+Release notes / pre-release checks:
+
+- `CustomsService::createCustomsInvoice` visibility widened protected → public. Before release,
+  grep the platform module repos for `createCustomsInvoice` overrides (a `protected` override
+  fatals at class load on core upgrade) and record the widening in the release notes.
+- The `/pro/shipments/products` contract was confirmed against the live API on 2026-07-30: the
+  request must carry `from`/`to` addresses and `packages`, and must **never be batched** (the
+  response carries `packlink_reference`, no `service_id`, and ignores request order — batched
+  results mis-attribute silently). `ShipmentProductsRequest` enforces the single-entry shape.

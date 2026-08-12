@@ -137,7 +137,7 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
         $warehouse = $this->getWarehouse();
         $mapping = $this->getMapping();
 
-        if (!$mapping) {
+        if (!$mapping || !$warehouse) {
             return null;
         }
 

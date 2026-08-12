@@ -79,7 +79,7 @@ class DdpCostService implements DdpCostServiceInterface
             }
 
             return $this->buildResponse($serviceId, $detail);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logFailure($step, $e);
 
             return null;
@@ -95,11 +95,11 @@ class DdpCostService implements DdpCostServiceInterface
      * classification below works off the HTTP status and the message text it does preserve.
      *
      * @param string $step Stage of the flow that failed.
-     * @param \Exception $e Underlying failure.
+     * @param \Throwable $e Underlying failure.
      *
      * @return void
      */
-    private function logFailure($step, \Exception $e)
+    private function logFailure($step, \Throwable $e)
     {
         $message = $e->getMessage();
         $status = (int)$e->getCode();

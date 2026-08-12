@@ -240,6 +240,46 @@ class DdpCostServiceTest extends BaseTestWithServices
     }
 
     /**
+     * Malformed response shapes (scalar entries where objects are expected) must degrade to
+     * "no DDP cost", never to an uncaught TypeError on the checkout path.
+     */
+    public function testGetDdpCostsReturnsNullOnMalformedProductsResponse()
+    {
+        $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
+        $invoiceBody = file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json');
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(200, array(), $invoiceBody),
+                new HttpResponse(200, array(), '{"products_details":["garbage"],"summary":{}}'),
+            )
+        );
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(200, array(), $invoiceBody),
+                new HttpResponse(200, array(), '{"products_details":[{"products":{"ddp_fee":"12"}}],"summary":{}}'),
+            )
+        );
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+    }
+
+    /**
+     * A configured customs mapping with no default warehouse cannot assemble an invoice; the
+     * cost lookup must yield null without any HTTP call and without a fatal.
+     */
+    public function testGetDdpCostsReturnsNullWhenWarehouseIsMissing()
+    {
+        $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
+        $this->shopConfig->removeDefaultWarehouse();
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+        self::assertEmpty($this->httpClient->getHistory());
+    }
+
+    /**
      * @return HttpResponse[]
      */
     private function getSuccessfulResponses()
