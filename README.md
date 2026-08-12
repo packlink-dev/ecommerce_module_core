@@ -11,12 +11,19 @@ run command:
 ```bash
 sh run-tests.sh
 ```
-`composer.lock` is resolved for PHP >= 8.2 (phpunit 11). `run-tests.sh` therefore
-re-resolves the phpunit requirement with each interpreter before running it, so
-older PHP versions get a compatible phpunit. The script fails the whole run on
-any composer/phpunit error and marks the run incomplete if an interpreter is not
+`composer.lock` is the committed PHP 7.0 resolution (phpunit 4.8), held there by
+`config.platform.php` in `composer.json` - 7.0 is the lowest supported interpreter
+and the only resolution valid on all of them. Newer interpreters need a newer
+phpunit, so `run-tests.sh` resolves each one separately before its run - against a
+throwaway `composer-test.json` / `composer-test.lock` selected with composer's
+`COMPOSER` env var. The tracked `composer.json` and `composer.lock` are never
+opened for writing, so an interrupted run cannot leave them resolved for whichever
+interpreter happened to run last. The script fails the whole run on any
+composer/phpunit error and marks the run incomplete if an interpreter is not
 installed - a partial run never reports success. Requires PHP 7.0-8.4 to be
 installed at `/usr/bin/phpX.Y`.
+
+Afterwards run `composer install` to bring `vendor/` back in line with the lock.
 
 You **MUST** run code inspection so standards could be followed. 
 Assuming you are using PHPStorm ([you should](https://www.google.com/search?q=why+should+I+use+phpstorm)), 

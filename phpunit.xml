@@ -3,12 +3,19 @@
     <testsuites>
         <testsuite name="Infrastructure Test Suite">
             <directory suffix="Test.php">./tests/Infrastructure</directory>
+            <!-- Abstract bases that match the *Test.php suffix. PHPUnit >= 10 raises a
+                 runner warning for each one, and a runner warning is a nonzero exit. -->
+            <exclude>./tests/Infrastructure/ORM/AbstractGenericQueueItemRepositoryTest.php</exclude>
+            <exclude>./tests/Infrastructure/ORM/AbstractGenericStudentRepositoryTest.php</exclude>
+            <exclude>./tests/Infrastructure/ORM/Entity/GenericEntityTest.php</exclude>
         </testsuite>
         <testsuite name="Business Logic Test Suite">
             <directory suffix="Test.php">./tests/BusinessLogic</directory>
+            <exclude>./tests/BusinessLogic/BaseSyncTest.php</exclude>
         </testsuite>
     </testsuites>
-    <!-- Coverage source set for PHPUnit >= 10. -->
+    <!-- Coverage source set for PHPUnit >= 10. PHPUnit 9 warns that it does not know this
+         element but still exits 0; PHPUnit 4.8 does not validate the config at all. -->
     <source>
         <include>
             <directory suffix=".php">./src/BusinessLogic</directory>
@@ -18,14 +25,4 @@
             <directory>./src/DemoUI</directory>
         </exclude>
     </source>
-    <!-- Legacy coverage config for PHPUnit 4.8 (PHP 7.0 path); ignored by PHPUnit >= 10. -->
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src/BusinessLogic</directory>
-            <directory suffix=".php">./src/Infrastructure</directory>
-        </whitelist>
-        <blacklist>
-            <directory>./src/DemoUI</directory>
-        </blacklist>
-    </filter>
 </phpunit>

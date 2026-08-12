@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.3.0...v4.3.1) - 2026-08-11
+### Change
+- Add Croatia zip code
+
 ## [4.3.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.2.7...v4.3.0) - 2026-07-29
 ### Added
 - Customs support for international shipments: customs settings and mapping, the customs invoice DTO tree and proxy calls, internationality detection, invoice creation during draft, and shipment-sync persistence of `has_customs` / `customs_invoice_id`
