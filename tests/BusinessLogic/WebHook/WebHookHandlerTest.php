@@ -131,6 +131,86 @@ class WebHookHandlerTest extends BaseTestWithServices
     }
 
     /**
+     * Tests that an incident event is accepted and moves the shipment to the incident status.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testHandleIncidentEvent()
+    {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
+        $this->httpClient->setMockResponses($this->getMockIncidentResponse());
+        $webhookHandler = WebHookEventHandler::getInstance();
+
+        $result = $webhookHandler->handle($this->getIncidentEventBody());
+
+        $this->assertTrue($result);
+
+        /** @var TestShopOrderService $shopOrderService */
+        $shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $order = $shopOrderService->getOrder('test_order_id');
+
+        $this->assertNotNull($order);
+        $this->assertEquals(ShipmentStatus::INCIDENT, $order->getStatus());
+    }
+
+    /**
+     * Tests that the singular spelling of the incident event is handled identically.
+     *
+     * @throws \Packlink\BusinessLogic\Order\Exceptions\OrderNotFound
+     */
+    public function testHandleIncidentEventWithSingularEventName()
+    {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
+        $this->httpClient->setMockResponses($this->getMockIncidentResponse());
+        $webhookHandler = WebHookEventHandler::getInstance();
+
+        $result = $webhookHandler->handle($this->getIncidentEventBodyWithSingularName());
+
+        $this->assertTrue($result);
+
+        /** @var TestShopOrderService $shopOrderService */
+        $shopOrderService = ServiceRegister::getService(ShopOrderService::CLASS_NAME);
+        $order = $shopOrderService->getOrder('test_order_id');
+
+        $this->assertNotNull($order);
+        $this->assertEquals(ShipmentStatus::INCIDENT, $order->getStatus());
+    }
+
+    /**
+     * Tests that an event name that is not on the allowlist is rejected without any API call.
+     */
+    public function testHandleUnknownEventIsRejected()
+    {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
+        $this->httpClient->setMockResponses($this->getMockIncidentResponse());
+        $webhookHandler = WebHookEventHandler::getInstance();
+
+        $result = $webhookHandler->handle($this->getUnknownEventBody());
+
+        $this->assertFalse($result);
+        $this->assertEmpty($this->httpClient->getHistory());
+    }
+
+    /**
+     * Tests that a known event carrying the plural prefix is still gated by the narrower
+     * handling allowlist, so normalization does not widen what gets synced.
+     */
+    public function testNormalizedEventNameIsStillGatedByHandlingAllowlist()
+    {
+        $this->orderShipmentDetailsService->setReference('test_order_id', 'test');
+        $this->httpClient->setMockResponses($this->getMockIncidentResponse());
+        $webhookHandler = WebHookEventHandler::getInstance();
+
+        $result = $webhookHandler->handle(
+            '{"event":"shipments.shipment.label.fail","datetime":"2015-01-01 15:55:23",'
+            . '"data":{"shipment_reference":"test"}}'
+        );
+
+        $this->assertTrue($result);
+        $this->assertEmpty($this->httpClient->getHistory());
+    }
+
+    /**
      * Tests when API fails
      */
     public function testHandleShippingStatusEventHttpError()
@@ -307,6 +387,50 @@ class WebHookHandlerTest extends BaseTestWithServices
         return array(
             new HttpResponse(404, array(), null),
         );
+    }
+
+    /**
+     * Returns response for a shipment that is in the incident state.
+     *
+     * @return HttpResponse[] Array of Http responses.
+     */
+    private function getMockIncidentResponse()
+    {
+        return array(
+            new HttpResponse(
+                200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/shipmentIncident.json')
+            ),
+        );
+    }
+
+    /**
+     * Returns body of the incident event, as emitted by Packlink.
+     *
+     * @return string
+     */
+    private function getIncidentEventBody()
+    {
+        return file_get_contents(__DIR__ . '/../Common/WebhookEvents/incidentEventBody.json');
+    }
+
+    /**
+     * Returns body of the incident event using the singular event name.
+     *
+     * @return string
+     */
+    private function getIncidentEventBodyWithSingularName()
+    {
+        return file_get_contents(__DIR__ . '/../Common/WebhookEvents/incidentEventBodySingularName.json');
+    }
+
+    /**
+     * Returns body of an event whose name is not on the allowlist.
+     *
+     * @return string
+     */
+    private function getUnknownEventBody()
+    {
+        return file_get_contents(__DIR__ . '/../Common/WebhookEvents/unknownEventBody.json');
     }
 
     /**

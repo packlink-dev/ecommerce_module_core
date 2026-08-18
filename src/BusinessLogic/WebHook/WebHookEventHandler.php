@@ -37,7 +37,13 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
         'shipment.tracking.update',
         'shipment.delivered',
         'shipment.carrier.delivered',
+        'shipment.incident',
     );
+    /**
+     * Prefix that Packlink's notification service prepends to some event names
+     * (for example "shipments.shipment.incident"). Stripped before the name is matched.
+     */
+    const EVENT_NAME_PREFIX = 'shipments.';
 
     /**
      * Validates input and handles Packlink webhook event.
@@ -55,6 +61,10 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
         );
 
         $payload = json_decode($input, false);
+
+        if (is_object($payload) && isset($payload->event)) {
+            $payload->event = $this->normalizeEventName($payload->event);
+        }
 
         if (!$this->validatePayload($payload)) {
             return false;
@@ -79,7 +89,24 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
         return $payload !== null
             && $payload->datetime
             && $payload->data
-            && in_array($payload->event, self::$validEvents, true);
+            && in_array($payload->event, static::$validEvents, true);
+    }
+
+    /**
+     * Strips the plural event name prefix used by the notification service, so that a name
+     * arriving as "shipments.shipment.incident" is matched as "shipment.incident".
+     *
+     * @param string $eventName The raw event name from the payload.
+     *
+     * @return string The normalized event name.
+     */
+    protected function normalizeEventName($eventName)
+    {
+        if (is_string($eventName) && strpos($eventName, self::EVENT_NAME_PREFIX) === 0) {
+            return substr($eventName, strlen(self::EVENT_NAME_PREFIX));
+        }
+
+        return $eventName;
     }
 
     /**
@@ -138,11 +165,16 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
     /**
      * Checks if event should be handled further.
      *
-     * @param string $eventName The name of the event.
+     * Narrower than {@see static::$validEvents}: names listed there but not here are answered
+     * with a success response and deliberately not synced. The name does not select behaviour -
+     * handleEvent() derives everything from the shipment status - so any name added to
+     * $validEvents that should move the order must be added here as well.
+     *
+     * @param string $eventName The normalized name of the event.
      *
      * @return bool TRUE if the event handing should be done; otherwise, FALSE.
      */
-    private function shouldHandleEvent($eventName)
+    protected function shouldHandleEvent($eventName)
     {
         return in_array(
             $eventName,
@@ -151,7 +183,8 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
                 'shipment.delivered',
                 'shipment.carrier.delivered',
                 'shipment.label.ready',
-                'shipment.tracking.update'
+                'shipment.tracking.update',
+                'shipment.incident',
             ),
             true
         );
