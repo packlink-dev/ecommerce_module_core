@@ -107,19 +107,23 @@ class CustomsMappingTest extends BaseDtoTest
     }
 
     /**
-     * default_tariff_number is optional; omitting it must not raise a
-     * validation error nor a PHP undefined-key/preg_match warning.
+     * The default tariff number is the fallback for products that carry no HS code of their own,
+     * so it is required even when a platform attribute is mapped - a mapping resolves per product
+     * and yields nothing for a product whose attribute is empty.
      *
      * @throws FrontDtoValidationException
      */
-    public function testMissingTariffNumberIsAccepted()
+    public function testMissingTariffNumberIsRejected()
     {
-        $raw = $this->getValidPayload();
-        unset($raw['default_tariff_number']);
+        $this->assertRequiredFieldError('default_tariff_number');
+    }
 
-        $mapping = CustomsMapping::fromArray($raw);
-
-        self::assertSame('', $mapping->defaultTariffNumber);
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function testMissingCountryOfOriginIsRejected()
+    {
+        $this->assertRequiredFieldError('default_country');
     }
 
     /**
@@ -162,6 +166,207 @@ class CustomsMappingTest extends BaseDtoTest
         $mapping = CustomsMapping::fromArray($raw);
 
         self::assertEquals('12345678', $mapping->defaultTariffNumber);
+    }
+
+    /**
+     * A select rendered with an empty first option submits '', not an absent key. That must
+     * count as missing, otherwise every required-field rule is decorative.
+     *
+     * @throws FrontDtoValidationException
+     */
+    public function testEmptyRequiredFieldIsRejected()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_reason'] = '';
+
+        $errors = $this->collectErrors($raw);
+
+        self::assertNotNull($errors, 'An empty required field must raise a validation exception.');
+        self::assertTrue($this->hasError($errors, 'default_reason', ValidationError::ERROR_REQUIRED_FIELD));
+    }
+
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function testUnknownReasonIsRejected()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_reason'] = 'BECAUSE_I_SAID_SO';
+
+        $errors = $this->collectErrors($raw);
+
+        self::assertNotNull($errors);
+        self::assertTrue($this->hasError($errors, 'default_reason', ValidationError::ERROR_INVALID_FIELD));
+    }
+
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function testUnknownReceiverUserTypeIsRejected()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_receiver_user_type'] = 'ROBOT';
+
+        $errors = $this->collectErrors($raw);
+
+        self::assertNotNull($errors);
+        self::assertTrue($this->hasError($errors, 'default_receiver_user_type', ValidationError::ERROR_INVALID_FIELD));
+    }
+
+    /**
+     * Stores configured before the form carried the Packlink-cased tokens hold lowercase values.
+     * They stay valid and are normalized, so no merchant is forced to re-save.
+     *
+     * @throws FrontDtoValidationException
+     */
+    public function testLegacyLowercaseEnumValuesAreAcceptedAndNormalized()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_reason'] = 'purchase_or_sale';
+        $raw['default_receiver_user_type'] = 'private_person';
+        $raw['default_country'] = 'fr';
+
+        $mapping = CustomsMapping::fromArray($raw);
+
+        self::assertSame('PURCHASE_OR_SALE', $mapping->defaultReason);
+        self::assertSame('PRIVATE_PERSON', $mapping->defaultReceiverUserType);
+        self::assertSame('FR', $mapping->defaultCountry);
+    }
+
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function testInvalidCountryOfOriginIsRejected()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_country'] = 'FRANCE';
+
+        $errors = $this->collectErrors($raw);
+
+        self::assertNotNull($errors);
+        self::assertTrue($this->hasError($errors, 'default_country', ValidationError::ERROR_INVALID_FIELD));
+    }
+
+    /**
+     * A mapped platform attribute does not excuse the default: the mapping supplies the HS code of
+     * products that have one, the default covers every product that does not.
+     *
+     * @throws FrontDtoValidationException
+     */
+    public function testMappedTariffNumberDoesNotMakeTheDefaultOptional()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_tariff_number'] = '';
+        $raw['mapping_tariff_number'] = 'hs_code_1';
+
+        $errors = $this->collectErrors($raw);
+
+        self::assertNotNull($errors);
+        self::assertTrue($this->hasError($errors, 'default_tariff_number', ValidationError::ERROR_REQUIRED_FIELD));
+    }
+
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function testMappedCountryOfOriginDoesNotMakeTheDefaultOptional()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_country'] = '';
+        $raw['mapping_country_of_origin'] = 'origin_1';
+
+        $errors = $this->collectErrors($raw);
+
+        self::assertNotNull($errors);
+        self::assertTrue($this->hasError($errors, 'default_country', ValidationError::ERROR_REQUIRED_FIELD));
+    }
+
+    /**
+     * The readiness predicate must agree with save-time validation, so a mapping stored without a
+     * default HS code cannot report itself usable.
+     */
+    public function testIsConfiguredIsFalseWithoutDefaultTariffNumber()
+    {
+        $mapping = CustomsMapping::fromStoredArray($this->getValidPayload());
+        $mapping->defaultTariffNumber = '';
+
+        self::assertFalse($mapping->isConfigured());
+    }
+
+    /**
+     * A default receiver tax id is a stand-in for per-customer data, so it is offered as a
+     * last-resort fallback and never demanded.
+     *
+     * @throws FrontDtoValidationException
+     */
+    public function testReceiverTaxIdIsNotRequired()
+    {
+        $raw = $this->getValidPayload();
+        $raw['default_receiver_tax_id'] = '';
+        $raw['mapping_receiver_tax_id'] = '';
+
+        $mapping = CustomsMapping::fromArray($raw);
+
+        self::assertTrue($mapping->isConfigured());
+    }
+
+    /**
+     * @throws FrontDtoValidationException
+     */
+    public function testIsConfiguredIsTrueForCompleteMapping()
+    {
+        self::assertTrue(CustomsMapping::fromArray($this->getValidPayload())->isConfigured());
+    }
+
+    /**
+     * The readiness predicate must also answer for DTOs built programmatically by a platform,
+     * which bypass validation entirely.
+     */
+    public function testIsConfiguredIsFalseForEmptyMapping()
+    {
+        self::assertFalse((new CustomsMapping())->isConfigured());
+    }
+
+    /**
+     * A store that pressed "Save Changes" without touching the form under the old rules is
+     * persisted and must load - but must not count as configured.
+     */
+    public function testLegacyStoredMappingLoadsWithoutValidationAndIsNotConfigured()
+    {
+        $mapping = CustomsMapping::fromStoredArray(
+            array(
+                'default_reason' => 'purchase_or_sale',
+                'default_sender_tax_id' => '123',
+                'default_receiver_user_type' => 'private_person',
+                'default_receiver_tax_id' => '',
+                'default_tariff_number' => '',
+                'default_country' => '',
+                'mapping_receiver_tax_id' => '',
+                'mapping_tariff_number' => '',
+                'mapping_company_vat' => '',
+                'mapping_country_of_origin' => '',
+            )
+        );
+
+        self::assertSame('PURCHASE_OR_SALE', $mapping->defaultReason);
+        self::assertFalse($mapping->isConfigured());
+    }
+
+    /**
+     * Runs the payload through validation and returns the errors, or null when it validated.
+     *
+     * @param array $raw
+     *
+     * @return ValidationError[]|null
+     */
+    private function collectErrors(array $raw)
+    {
+        try {
+            CustomsMapping::fromArray($raw);
+        } catch (FrontDtoValidationException $e) {
+            return $e->getValidationErrors();
+        }
+
+        return null;
     }
 
     /**

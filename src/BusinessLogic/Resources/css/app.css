@@ -787,7 +787,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+#pl-page .pl-service-name-line #pl-service-name {
+  min-width: 0;
 }
 #pl-page .pl-ddp-badge {
   display: inline-flex;
@@ -803,6 +806,7 @@
   vertical-align: middle;
   margin-left: 8px;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 #pl-page .pl-shipping-services-table {
   width: 100%;

@@ -51,6 +51,20 @@ class DdpCostService implements DdpCostServiceInterface
             return null;
         }
 
+        // Answer the configuration question before spending two API calls on it. Without this the
+        // same misconfiguration surfaces further down as a null invoice, indistinguishable in the
+        // log from an order that legitimately needs no customs.
+        $mapping = $this->getConfiguration()->getCustomsMappings();
+        if ($mapping === null || !$mapping->isConfigured()) {
+            Logger::logWarning(
+                'DDP costs unavailable at checkout: the customs configuration is incomplete.'
+                . ' Complete the customs settings (reason for export, sender tax id, receiver user type,'
+                . ' and a resolvable HS code and country of origin) before offering duties cost.'
+            );
+
+            return null;
+        }
+
         $step = 'assembling the customs invoice';
         try {
             $invoice = $this->getCustomsService()->createCustomsInvoice($order);

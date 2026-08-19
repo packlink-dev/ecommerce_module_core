@@ -15,6 +15,7 @@ use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
 use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\DDP\DdpCostService;
 use Packlink\BusinessLogic\DDP\Models\DdpCostResponse;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingService;
@@ -63,6 +64,9 @@ class DdpCostServiceTest extends BaseTestWithServices
         TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
 
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
+        $this->shopConfig->setDefaultParcel(
+            ParcelInfo::fromArray(array('weight' => 1.0, 'width' => 10, 'height' => 10, 'length' => 10))
+        );
         $user = new User();
         $user->customerType = 'BUSINESS';
         $this->shopConfig->setUserInfo($user);
@@ -147,6 +151,27 @@ class DdpCostServiceTest extends BaseTestWithServices
     {
         self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
         self::assertEmpty($this->httpClient->getHistory());
+    }
+
+    /**
+     * A mapping that exists but cannot resolve an HS code produces no invoice, so the two calls it
+     * would take to discover that are not worth making - and the log must name the configuration
+     * rather than the generic assembly failure.
+     */
+    public function testGetDdpCostsWithIncompleteCustomsConfigurationMakesNoHttpCalls()
+    {
+        $mapping = $this->getCustomsMapping();
+        $mapping->defaultTariffNumber = '';
+        $mapping->mappingTariffNumber = '';
+        $this->shopConfig->setCustomsMappings($mapping);
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+        self::assertEmpty($this->httpClient->getHistory());
+        self::assertNotEmpty($this->shopLogger->loggedMessages);
+        self::assertContains(
+            'customs configuration is incomplete',
+            $this->shopLogger->loggedMessages[0]->getMessage()
+        );
     }
 
     /**

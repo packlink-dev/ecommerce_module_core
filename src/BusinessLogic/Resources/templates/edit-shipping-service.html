@@ -7,6 +7,12 @@
     </header>
     <div class="pl-page-content pl-page-padding">
         <form id="pl-edit-service-form" class="pl-medium-page">
+            <div id="pl-ddp-customs-banner" class="pl-info-box pl-hidden">
+                <i class="material-icons pl-info-box-info-icon">info</i>
+                <div class="pl-info-box-content">
+                    {$shippingServices.ddpConfigureCustomsNotice}
+                </div>
+            </div>
             <section>
                 <div class="pl-section-title">
                     {$shippingServices.serviceTitle}
@@ -26,12 +32,6 @@
                     <label for="pl-show-logo">{$shippingServices.showCarrierLogo}</label>
                 </div>
             </section>
-            <div id="pl-ddp-customs-banner" class="pl-info-box pl-hidden">
-                <i class="material-icons pl-info-box-info-icon">info</i>
-                <div class="pl-info-box-content">
-                    {$shippingServices.ddpConfigureCustomsNotice}
-                </div>
-            </div>
             <div id="pl-ddp-mandatory-banner" class="pl-info-box pl-warning pl-hidden">
                 <i class="material-icons pl-info-box-info-icon">info</i>
                 <div class="pl-info-box-content">

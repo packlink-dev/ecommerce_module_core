@@ -319,6 +319,20 @@ if (!window.Packlink) {
             utilityService.showElement(templateService.getComponent('pl-ddp-section'));
             behaviorSelect.value = serviceModel.ddpBehavior || 'none';
 
+            // Charging duties needs a customs invoice, which an incomplete customs configuration
+            // cannot produce, so the choice cannot be RAISED while the banner is up. The stored
+            // value is left exactly as it is: overwriting it here would silently downgrade a
+            // merchant's existing setting the next time they saved anything on this service.
+            if (serviceModel.customsConfigured === false) {
+                behaviorSelect.disabled = true;
+
+                if (behaviorSelect.value !== 'none') {
+                    showAdjustmentGroup();
+                }
+
+                return;
+            }
+
             if (behaviorSelect.value !== 'none') {
                 showAdjustmentGroup();
             }

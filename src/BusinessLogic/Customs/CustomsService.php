@@ -35,9 +35,13 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
-    const COMPANY = 'company';
+    /**
+     * user_type as the Packlink customs schema spells it: Enum: [PRIVATE_PERSON, COMPANY].
+     * These values go on the wire, so they must match the enum exactly.
+     */
+    const COMPANY = 'COMPANY';
     const BUSINESS = 'BUSINESS';
-    const PRIVATE_PERSON = 'private_person';
+    const PRIVATE_PERSON = 'PRIVATE_PERSON';
 
     /**
      * @var Warehouse
@@ -154,8 +158,8 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
         $customsInvoice->sender = $this->getSender($warehouse, $user, $mapping);
         $customsInvoice->receiver = $this->getReceiver($shopOrder, $mapping);
         $customsInvoice->inventoriesOfContents = $inventoriesOfContents;
-        $customsInvoice->shipmentDetails = $this->getShipmentDetails($shopOrder);
-        $customsInvoice->reasonForExport = $mapping->defaultReason;
+        $customsInvoice->shipmentDetails = $this->getShipmentDetails($shopOrder, $inventoriesOfContents);
+        $customsInvoice->reasonForExport = strtoupper($mapping->defaultReason);
         $customsInvoice->signature = $this->getSignature($warehouse);
 
 
@@ -164,8 +168,8 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
 
     /**
      * Checks that every inventory item resolved the customs-required values (tariff
-     * number and country of origin, from the item or the configured defaults). An
-     * invoice with an empty required field must be skipped - the draft then proceeds
+     * number, country of origin and weight, from the item or the configured fallbacks).
+     * An invoice with an empty required field must be skipped - the draft then proceeds
      * without customs - rather than sent invalid.
      *
      * @param Order $shopOrder
@@ -195,6 +199,16 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
 
                 return false;
             }
+
+            if (empty($inventory->itemWeight)) {
+                Logger::logWarning(
+                    'Customs invoice skipped for order ' . $shopOrder->getOrderNumber()
+                    . ': no weight resolved for item "' . $inventory->description
+                    . '" and the default parcel has no weight either.'
+                );
+
+                return false;
+            }
         }
 
         return true;
@@ -217,14 +231,20 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
 
     /**
      * @param Order $order
+     * @param InventoryContent[] $inventoriesOfContents Items with their weights already resolved.
      *
      * @return ShipmentDetails
      */
-    protected function getShipmentDetails(Order $order)
+    protected function getShipmentDetails(Order $order, array $inventoriesOfContents = array())
     {
         $shipmentDetails = new ShipmentDetails();
         $shipmentDetails->parcelsSize = 1;
-        $shipmentDetails->parcelsWeight = $order->getTotalWeight();
+        // The API rejects a shipment weighing nothing ("parcels_weight ... expected more than 0"),
+        // and the platform's total is the sum of the products' own weights - zero for a catalogue
+        // that does not set them. Fall back to the weights the inventory already resolved, which
+        // carry the default parcel for exactly those products.
+        $shipmentDetails->parcelsWeight = $order->getTotalWeight()
+            ?: $this->getInventoryWeight($inventoriesOfContents);
         $cost = new Cost();
         $cost->currency = $order->getCurrency();
         // The API expects the shipment (freight) cost here; customs value is goods + freight, so
@@ -247,6 +267,7 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
     protected function getInventoryOfContents(Order $order, CustomsMapping $mapping)
     {
         $result = array();
+        $defaultWeight = $this->getDefaultParcelWeight();
 
         foreach ($order->getItems() as $item) {
             $inventory = new InventoryContent();
@@ -257,7 +278,7 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
             $itemValue->currency = $order->getCurrency();
             $itemValue->value = $item->getPrice();
             $inventory->itemValue = $itemValue;
-            $inventory->itemWeight = $item->getWeight();
+            $inventory->itemWeight = $item->getWeight() ?: $defaultWeight;
             $inventory->quantity = $item->getQuantity();
 
             $result[] = $inventory;
@@ -274,14 +295,13 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
      */
     protected function getReceiver(Order $shopOrder, CustomsMapping $mapping)
     {
-        // The mapping value may be stored schema-cased (e.g. "PRIVATE_PERSON", as the Packlink
-        // receiver.user_type enum requires) or lowercase (as the core customs form submits), so
-        // normalize before comparing against the lowercase self::* constants. The user_type sent
-        // on the wire keeps the stored (API-cased) value.
-        $receiverUserType = strtolower($mapping->defaultReceiverUserType);
+        // Mappings saved before the form carried the Packlink-cased tokens hold lowercase values.
+        // CustomsMapping normalizes on read, but a platform can also set the DTO by hand, so
+        // upper-case here too - the enum is what goes on the wire.
+        $receiverUserType = strtoupper($mapping->defaultReceiverUserType);
 
         $receiver = new Receiver();
-        $receiver->userType = $mapping->defaultReceiverUserType;
+        $receiver->userType = $receiverUserType;
         $receiver->fullName = $shopOrder->getShippingAddress()->getName() . ' ' . $shopOrder->getShippingAddress()->getSurname();
         $receiver->taxId = $receiverUserType === self::PRIVATE_PERSON ?
             ($shopOrder->getTaxId() ?: $mapping->defaultReceiverTaxId) : '';
@@ -340,6 +360,41 @@ class CustomsService implements \Packlink\BusinessLogic\Customs\Interfaces\Custo
         }
 
         return $user;
+    }
+
+    /**
+     * Total weight of the resolved inventory, used when the platform reports none for the order.
+     *
+     * @param InventoryContent[] $inventoriesOfContents
+     *
+     * @return float
+     */
+    protected function getInventoryWeight(array $inventoriesOfContents)
+    {
+        $total = 0.0;
+
+        foreach ($inventoriesOfContents as $inventory) {
+            $quantity = $inventory->quantity ? (int)$inventory->quantity : 1;
+            $total += (float)$inventory->itemWeight * $quantity;
+        }
+
+        return $total;
+    }
+
+    /**
+     * Weight to declare for a product that carries none of its own.
+     *
+     * The schema requires item_weight, and the store has already answered "what does a typical
+     * package weigh" once, when it configured the default parcel - so customs reuses that answer
+     * instead of asking the merchant for a second number that would inevitably drift from it.
+     *
+     * @return float Default parcel weight, or 0 when no default parcel is configured.
+     */
+    protected function getDefaultParcelWeight()
+    {
+        $parcel = $this->getConfigService()->getDefaultParcel();
+
+        return $parcel ? (float)$parcel->weight : 0.0;
     }
 
     /**
