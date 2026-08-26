@@ -168,9 +168,14 @@ class DdpCostServiceTest extends BaseTestWithServices
         self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
         self::assertEmpty($this->httpClient->getHistory());
         self::assertNotEmpty($this->shopLogger->loggedMessages);
-        self::assertContains(
-            'customs configuration is incomplete',
-            $this->shopLogger->loggedMessages[0]->getMessage()
+
+        // strpos for the same reason as in testGetDdpCostsReturnsNullOnRejectedHsCode below:
+        // assertStringContainsString does not exist in PHPUnit 4.8 and assertContains rejects
+        // string haystacks from PHPUnit 9 on, and the suite runs both.
+        $logged = $this->shopLogger->loggedMessages[0]->getMessage();
+        self::assertNotFalse(
+            strpos($logged, 'customs configuration is incomplete'),
+            'Log must name the configuration as the fault: ' . $logged
         );
     }
 
