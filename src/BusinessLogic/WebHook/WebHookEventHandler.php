@@ -70,9 +70,39 @@ class WebHookEventHandler extends BaseService implements Interfaces\WebHookEvent
             return false;
         }
 
-        if ($this->checkAuthToken() && $this->shouldHandleEvent($payload->event)) {
-            $this->handleEvent($payload->data);
+        if (!$this->checkAuthToken()) {
+            // No authorization token means the integration is not connected. Every notification
+            // is answered with a success response and does nothing, so without this the store
+            // silently stops syncing while Packlink still records each delivery as successful.
+            Logger::logWarning(
+                'Webhook accepted but not processed: the integration has no authorization token.',
+                'Core',
+                array('event' => $payload->event)
+            );
+
+            return true;
         }
+
+        if (!$this->shouldHandleEvent($payload->event)) {
+            // Deliberately not synced - see shouldHandleEvent(). Logged at warning level because
+            // the names that land here (shipment.carrier.fail, shipment.label.fail) report a
+            // failure the merchant needs to know about, and because a merchant who has lowered
+            // the log level to keep production quiet would otherwise have no record at all.
+            Logger::logWarning(
+                'Webhook accepted but deliberately not synced.',
+                'Core',
+                array(
+                    'event' => $payload->event,
+                    'reference' => isset($payload->data->shipment_reference)
+                        ? $payload->data->shipment_reference
+                        : '',
+                )
+            );
+
+            return true;
+        }
+
+        $this->handleEvent($payload->data);
 
         return true;
     }
