@@ -30,6 +30,23 @@ use Packlink\BusinessLogic\ShippingMethod\PackageTransformer;
 class DdpCostService implements DdpCostServiceInterface
 {
     /**
+     * Per-call budget for POST/PUT /v2/customs-invoices (AC-7.4.1). Measured at 245-600 ms.
+     */
+    const INVOICE_TIMEOUT_SECONDS = 2;
+
+    /**
+     * Per-call budget for POST /pro/shipments/products (AC-7.4.1). Measured at 1250-2050 ms, so this
+     * is the call worth bounding.
+     */
+    const PRODUCTS_TIMEOUT_SECONDS = 4;
+
+    /**
+     * Connect budget. Separate from the total so a dead host fails fast instead of burning the whole
+     * per-call budget on a TCP handshake.
+     */
+    const CONNECT_TIMEOUT_SECONDS = 2;
+
+    /**
      * @var Proxy
      */
     private $proxy;
@@ -98,6 +115,280 @@ class DdpCostService implements DdpCostServiceInterface
 
             return null;
         }
+    }
+
+    /**
+     * Prices SEVERAL shipments at once, concurrently.
+     *
+     * Customs value is goods plus freight, so a carrier that ships the same cart for more money owes
+     * more duty - measured on a live route, +4.09 of freight moved the duty +0.44. Every carrier
+     * therefore needs its own lookup, and one lookup is two sequential Packlink calls (measured 245 ms
+     * for the invoice, 1730 ms for the products call). Done one after another that is ~1975 ms per
+     * carrier, which passes Shopify's rate window at four carriers and blows it at six.
+     *
+     * The calls are not a chain, though. The invoices do not depend on each other, and each products
+     * call depends only on ITS OWN invoice. So the work is two waves of concurrent requests, and the
+     * wall time is the slowest call in each wave rather than the sum: 10 carriers measured 2750 ms
+     * against 19750 ms sequential, with every figure identical to the sequential answers.
+     *
+     * Batching the products endpoint instead was rejected on evidence: it accepts an array but
+     * returns no `service_id` and an empty `packlink_reference`, so entries can only be matched by
+     * request order, and 10 entries answered HTTP 500. Separate concurrent calls carry their own
+     * responses and need no correlation key at all.
+     *
+     * `curl_multi` is used directly rather than the infrastructure HttpClient, which has no
+     * concurrent primitive. That skips the platform's own HTTP stack, which matters on WordPress,
+     * where `wp_remote_*` carries the site's proxy and SSL settings - the trade is deliberate and
+     * documented rather than hidden.
+     *
+     * An item may carry an `invoiceId` from a previous quote. The invoice is then PUT rather than
+     * POSTed, which replaces its whole content - goods, items and freight - and re-points it at this
+     * cart. Checkout invoices (`/v2/customs-invoices`) exist only to obtain a quote and are never
+     * attached to a shipment; the draft builds its own on `/customs-invoices` (v1). Reuse is
+     * therefore safe, and it matters because Packlink offers no way to delete or even list them.
+     *
+     * @param array $items Lookups keyed however the caller likes, each an array of:
+     *                     - 'order'     Order       the cart, with setShippingCost() set to THIS
+     *                                               carrier's freight (that is what makes the
+     *                                               lookups differ);
+     *                     - 'serviceId' string|int  a service that serves the route;
+     *                     - 'invoiceId' string|null an invoice to re-point instead of creating one.
+     *
+     * @return array Same keys, each an array of:
+     *               - 'invoiceId' string|null  the invoice used, to persist for reuse;
+     *               - 'costs'     DdpCostResponse|null  null when this route carries no duty;
+     *               - 'error'     string|null  why this one failed, when it did.
+     *
+     * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
+     */
+    public function getDdpCostsMany(array $items)
+    {
+        $results = array();
+
+        foreach ($items as $key => $item) {
+            $results[$key] = array('invoiceId' => null, 'costs' => null, 'error' => null);
+        }
+
+        if (empty($items)) {
+            return $results;
+        }
+
+        // Asked once for the whole batch, not once per item: it is a property of the shop.
+        $mapping = $this->getConfiguration()->getCustomsMappings();
+        if ($mapping === null || !$mapping->isConfigured()) {
+            Logger::logWarning(
+                'DDP costs unavailable at checkout: the customs configuration is incomplete.'
+                . ' Complete the customs settings (reason for export, sender tax id, receiver user type,'
+                . ' and a resolvable HS code and country of origin) before offering duties cost.'
+            );
+
+            foreach ($results as $key => $ignored) {
+                $results[$key]['error'] = 'customs configuration incomplete';
+            }
+
+            return $results;
+        }
+
+        // ---------------------------------------------------------------- wave 1: the invoices
+        $invoiceRequests = array();
+
+        foreach ($items as $key => $item) {
+            try {
+                $invoice = $this->getCustomsService()->createCustomsInvoice($item['order']);
+            } catch (\Throwable $e) {
+                $results[$key]['error'] = 'invoice assembly failed: ' . $e->getMessage();
+                continue;
+            }
+
+            if ($invoice === null) {
+                $results[$key]['error'] = 'the customs invoice could not be assembled';
+                continue;
+            }
+
+            $existing = isset($item['invoiceId']) && $item['invoiceId'] !== null && $item['invoiceId'] !== ''
+                ? (string)$item['invoiceId']
+                : null;
+
+            $invoiceRequests[$key] = array(
+                'method' => $existing === null ? 'POST' : 'PUT',
+                'url' => Proxy::BASE_URL . 'v2/customs-invoices' . ($existing === null ? '' : '/' . $existing),
+                'body' => json_encode($invoice->toArray()),
+                'timeout' => self::INVOICE_TIMEOUT_SECONDS,
+                'reusing' => $existing,
+            );
+        }
+
+        if (empty($invoiceRequests)) {
+            return $results;
+        }
+
+        foreach ($this->requestConcurrently($invoiceRequests) as $key => $response) {
+            $reused = $invoiceRequests[$key]['reusing'];
+
+            if ($response['code'] < 200 || $response['code'] >= 300) {
+                $results[$key]['error'] = 'customs invoice ' . ($reused === null ? 'creation' : 'update')
+                    . ' answered HTTP ' . $response['code'];
+                continue;
+            }
+
+            $decoded = json_decode($response['body'], true);
+            $id = is_array($decoded) && isset($decoded['id']) ? (string)$decoded['id'] : $reused;
+
+            if ($id === null || $id === '') {
+                $results[$key]['error'] = 'Packlink returned no customs invoice id';
+                continue;
+            }
+
+            $results[$key]['invoiceId'] = $id;
+        }
+
+        // ---------------------------------------------------------------- wave 2: the products calls
+        $productRequests = array();
+
+        foreach ($items as $key => $item) {
+            if ($results[$key]['invoiceId'] === null) {
+                continue;
+            }
+
+            $request = $this->buildRequest($item['order'], $item['serviceId'], $results[$key]['invoiceId']);
+
+            $productRequests[$key] = array(
+                'method' => 'POST',
+                'url' => Proxy::BASE_URL . 'pro/shipments/products',
+                'body' => json_encode($request->toArray()),
+                'timeout' => self::PRODUCTS_TIMEOUT_SECONDS,
+            );
+        }
+
+        if (empty($productRequests)) {
+            return $results;
+        }
+
+        $methodsByServiceId = $this->getMethodsByServiceId();
+
+        foreach ($this->requestConcurrently($productRequests) as $key => $response) {
+            if ($response['code'] < 200 || $response['code'] >= 300) {
+                $results[$key]['error'] = 'products call answered HTTP ' . $response['code'];
+                continue;
+            }
+
+            $decoded = json_decode($response['body'], true);
+            $details = is_array($decoded) && isset($decoded['products_details'])
+                ? $decoded['products_details']
+                : array();
+
+            if (empty($details[0]) || !is_array($details[0])) {
+                // A service with no DDP on this route omits the products entirely. Ordinary, not an error.
+                continue;
+            }
+
+            $detail = DdpProductsDetail::fromArray($details[0]);
+
+            if ($detail->ddpFee === null && $detail->customsAndDuties === null) {
+                continue;
+            }
+
+            $results[$key]['costs'] = $this->buildResponse(
+                $items[$key]['serviceId'],
+                $detail,
+                $methodsByServiceId
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * Runs a set of requests concurrently and returns each one's status and body.
+     *
+     * Two waves of this replace what would otherwise be 2N sequential round trips. Every handle
+     * carries its own timeout, which is how AC-7.4.1's sub-budgets are actually enforced - and in
+     * parallel the callback's total is bounded by the slowest call rather than their sum, so the
+     * budget holds however many carriers there are.
+     *
+     * One failed transfer never affects the others: a handle that errors comes back as code 0 and
+     * the caller records it against that item only.
+     *
+     * @param array $requests Keyed requests, each with 'method', 'url', 'body' and 'timeout'.
+     *
+     * @return array Same keys, each an array of 'code' and 'body'.
+     */
+    private function requestConcurrently(array $requests)
+    {
+        $headers = $this->getParallelHeaders();
+        $multi = curl_multi_init();
+        $handles = array();
+
+        foreach ($requests as $key => $request) {
+            $handle = curl_init($request['url']);
+            curl_setopt_array(
+                $handle,
+                array(
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CUSTOMREQUEST => $request['method'],
+                    CURLOPT_POSTFIELDS => $request['body'],
+                    CURLOPT_TIMEOUT => $request['timeout'],
+                    CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT_SECONDS,
+                    CURLOPT_HTTPHEADER => $headers,
+                )
+            );
+
+            curl_multi_add_handle($multi, $handle);
+            $handles[$key] = $handle;
+        }
+
+        do {
+            $status = curl_multi_exec($multi, $running);
+
+            if ($running) {
+                // Blocks until something moves, so the loop does not spin the CPU.
+                curl_multi_select($multi, 1.0);
+            }
+        } while ($running && $status === CURLM_OK);
+
+        $responses = array();
+
+        foreach ($handles as $key => $handle) {
+            $error = curl_error($handle);
+            $responses[$key] = array(
+                'code' => (int)curl_getinfo($handle, CURLINFO_HTTP_CODE),
+                'body' => (string)curl_multi_getcontent($handle),
+            );
+
+            if ($error !== '') {
+                Logger::logWarning('DDP parallel request failed: ' . $error);
+            }
+
+            curl_multi_remove_handle($multi, $handle);
+            curl_close($handle);
+        }
+
+        curl_multi_close($multi);
+
+        return $responses;
+    }
+
+    /**
+     * The headers a Packlink call carries.
+     *
+     * Duplicated from Proxy's own private builder because the concurrent path does not go through
+     * Proxy. Six lines, and the alternative was a concurrent primitive on the shared HttpClient -
+     * a change to infrastructure every integration depends on, for one DDP flow.
+     *
+     * @return string[]
+     */
+    private function getParallelHeaders()
+    {
+        $configuration = $this->getConfiguration();
+
+        return array(
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: ' . $configuration->getAuthorizationToken(),
+            'X-Module-Version: ' . $configuration->getModuleVersion(),
+            'X-Ecommerce-Name: ' . $configuration->getECommerceName(),
+            'X-Ecommerce-Version: ' . $configuration->getECommerceVersion(),
+        );
     }
 
     /**
@@ -206,19 +497,29 @@ class DdpCostService implements DdpCostServiceInterface
      *
      * @param string|int $serviceId Requested service id.
      * @param DdpProductsDetail $detail Response detail.
+     * @param array|null $methodsByServiceId Methods indexed by service id, when the caller already
+     *                                       loaded them; null to load them here.
      *
      * @return DdpCostResponse
      *
      * @throws \Logeecom\Infrastructure\ORM\Exceptions\RepositoryNotRegisteredException
      */
-    private function buildResponse($serviceId, DdpProductsDetail $detail)
+    // No `?array` hint on the last parameter: that syntax is PHP 7.1 and core targets 7.0, while the
+    // implicit `array $x = null` form is deprecated in PHP 8.4. Untyped is the only spelling that is
+    // clean on both ends of the supported range.
+    private function buildResponse($serviceId, DdpProductsDetail $detail, $methodsByServiceId = null)
     {
         $response = new DdpCostResponse();
         $response->serviceId = $serviceId;
         $response->ddpFee = $detail->ddpFee;
         $response->customsAndDuties = $detail->customsAndDuties;
 
-        $methodsByServiceId = $this->getMethodsByServiceId();
+        // Passed in by the batch path, which loads the map once for the whole batch rather than
+        // re-reading every shipping method per carrier.
+        if ($methodsByServiceId === null) {
+            $methodsByServiceId = $this->getMethodsByServiceId();
+        }
+
         $key = (string)$serviceId;
         if (isset($methodsByServiceId[$key])) {
             $method = $methodsByServiceId[$key];
