@@ -265,6 +265,7 @@ class DdpCostService implements DdpCostServiceInterface
         }
 
         $methodsByServiceId = $this->getMethodsByServiceId();
+        $corrections = array();
 
         foreach ($this->requestConcurrently($productRequests) as $key => $response) {
             if ($response['code'] < 200 || $response['code'] >= 300) {
@@ -279,6 +280,151 @@ class DdpCostService implements DdpCostServiceInterface
 
             if (empty($details[0]) || !is_array($details[0])) {
                 // A service with no DDP on this route omits the products entirely. Ordinary, not an error.
+                continue;
+            }
+
+            $detail = DdpProductsDetail::fromArray($details[0]);
+
+            if ($detail->ddpFee === null && $detail->customsAndDuties === null) {
+                continue;
+            }
+
+            $results[$key]['costs'] = $this->buildResponse(
+                $items[$key]['serviceId'],
+                $detail,
+                $methodsByServiceId
+            );
+
+            // Packlink's OWN carrier price for this shipment, which is what it bills the duty on.
+            $porterage = $this->readPorterage($details[0]);
+            $declared = (float)$items[$key]['order']->getShippingCost();
+
+            if ($porterage !== null && abs($porterage - $declared) >= 0.01) {
+                $corrections[$key] = $porterage;
+            }
+        }
+
+        if (!empty($corrections)) {
+            $results = $this->requoteAtPorterage($items, $results, $corrections, $methodsByServiceId);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Packlink's carrier price for a shipment, from a products response entry.
+     *
+     * The rate a platform charges the shopper is Packlink's TOTAL price: `porterage` (the carrier)
+     * plus `management_fee` (Packlink's own fee) - 33.81 + 0.99 = 34.80 on a measured order. Declaring
+     * that total as the freight is wrong, because Packlink bills the duty on the carrier price alone.
+     *
+     * @param array $detail One `products_details` entry.
+     *
+     * @return float|null Null when the response does not carry it.
+     */
+    private function readPorterage(array $detail)
+    {
+        if (!isset($detail['products']['porterage']['total_price'])) {
+            return null;
+        }
+
+        return round((float)$detail['products']['porterage']['total_price'], 2);
+    }
+
+    /**
+     * Re-quotes the shipments whose declared freight was not Packlink's own carrier price.
+     *
+     * Customs value is goods plus freight, so the duty depends on which freight is declared - and the
+     * two sides disagreed. A platform knows only Packlink's TOTAL price (its search API returns
+     * basePrice and totalPrice identical, both 34.80), while Packlink bills the duty on `porterage`
+     * alone, 33.81. Measured on a live order that cost 0.12 of over-charged duty: we quoted 122.45,
+     * Packlink billed 122.33.
+     *
+     * The carrier price is only knowable from a products response, so this is a second pass rather
+     * than a better first guess. Exactly one pass, never a loop: `porterage` is a property of the
+     * service, route and parcel, not of the freight we declared, so re-quoting cannot move it.
+     *
+     * Only the affected shipments are re-quoted, and both waves stay concurrent, so the cost is one
+     * extra round trip rather than one per carrier. The invoices are re-pointed with PUT, which is
+     * also why no new ones are created.
+     *
+     * A failed correction leaves the first answer in place: it is the figure Packlink itself quoted,
+     * so it is defensible, merely 0.12 generous to the merchant.
+     *
+     * @param array $items Original lookups.
+     * @param array $results Results so far.
+     * @param array $corrections Key => Packlink's carrier price.
+     * @param array $methodsByServiceId Methods indexed by service id.
+     *
+     * @return array Results, with the corrected shipments replaced.
+     */
+    private function requoteAtPorterage(array $items, array $results, array $corrections, array $methodsByServiceId)
+    {
+        $invoiceRequests = array();
+
+        foreach ($corrections as $key => $porterage) {
+            if ($results[$key]['invoiceId'] === null) {
+                continue;
+            }
+
+            $order = $items[$key]['order'];
+            $order->setShippingCost($porterage);
+
+            try {
+                $invoice = $this->getCustomsService()->createCustomsInvoice($order);
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            if ($invoice === null) {
+                continue;
+            }
+
+            $invoiceRequests[$key] = array(
+                'method' => 'PUT',
+                'url' => Proxy::BASE_URL . 'v2/customs-invoices/' . $results[$key]['invoiceId'],
+                'body' => json_encode($invoice->toArray()),
+                'timeout' => self::INVOICE_TIMEOUT_SECONDS,
+            );
+        }
+
+        if (empty($invoiceRequests)) {
+            return $results;
+        }
+
+        $productRequests = array();
+
+        foreach ($this->requestConcurrently($invoiceRequests) as $key => $response) {
+            if ($response['code'] < 200 || $response['code'] >= 300) {
+                // The first answer stands.
+                continue;
+            }
+
+            $request = $this->buildRequest($items[$key]['order'], $items[$key]['serviceId'], $results[$key]['invoiceId']);
+
+            $productRequests[$key] = array(
+                'method' => 'POST',
+                'url' => Proxy::BASE_URL . 'pro/shipments/products',
+                'body' => json_encode($request->toArray()),
+                'timeout' => self::PRODUCTS_TIMEOUT_SECONDS,
+            );
+        }
+
+        if (empty($productRequests)) {
+            return $results;
+        }
+
+        foreach ($this->requestConcurrently($productRequests) as $key => $response) {
+            if ($response['code'] < 200 || $response['code'] >= 300) {
+                continue;
+            }
+
+            $decoded = json_decode($response['body'], true);
+            $details = is_array($decoded) && isset($decoded['products_details'])
+                ? $decoded['products_details']
+                : array();
+
+            if (empty($details[0]) || !is_array($details[0])) {
                 continue;
             }
 
