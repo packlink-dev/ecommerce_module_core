@@ -2,6 +2,7 @@
 
 namespace Packlink\BusinessLogic\DDP;
 
+use Logeecom\Infrastructure\Http\HttpClient;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ORM\RepositoryRegistry;
 use Logeecom\Infrastructure\ServiceRegister;
@@ -138,8 +139,11 @@ class DdpCostService implements DdpCostServiceInterface
      *
      * `curl_multi` is used directly rather than the infrastructure HttpClient, which has no
      * concurrent primitive. That skips the platform's own HTTP stack, which matters on WordPress,
-     * where `wp_remote_*` carries the site's proxy and SSL settings - the trade is deliberate and
-     * documented rather than hidden.
+     * where `wp_remote_*` carries the site's proxy and SSL settings. So the transport is a choice
+     * rather than an assumption: supportsConcurrentRequests() decides, and where it says no the same
+     * two waves run one request at a time through the registered HttpClient. Every amount below is
+     * produced identically either way - only the wall time changes - so a platform can refuse the
+     * concurrent transport without losing the invoice reuse or the porterage correction.
      *
      * An item may carry an `invoiceId` from a previous quote. The invoice is then PUT rather than
      * POSTed, which replaces its whole content - goods, items and freight - and re-points it at this
@@ -222,7 +226,7 @@ class DdpCostService implements DdpCostServiceInterface
             return $results;
         }
 
-        foreach ($this->requestConcurrently($invoiceRequests) as $key => $response) {
+        foreach ($this->runRequests($invoiceRequests) as $key => $response) {
             $reused = $invoiceRequests[$key]['reusing'];
 
             if ($response['code'] < 200 || $response['code'] >= 300) {
@@ -267,7 +271,7 @@ class DdpCostService implements DdpCostServiceInterface
         $methodsByServiceId = $this->getMethodsByServiceId();
         $corrections = array();
 
-        foreach ($this->requestConcurrently($productRequests) as $key => $response) {
+        foreach ($this->runRequests($productRequests) as $key => $response) {
             if ($response['code'] < 200 || $response['code'] >= 300) {
                 $results[$key]['error'] = 'products call answered HTTP ' . $response['code'];
                 continue;
@@ -394,7 +398,7 @@ class DdpCostService implements DdpCostServiceInterface
 
         $productRequests = array();
 
-        foreach ($this->requestConcurrently($invoiceRequests) as $key => $response) {
+        foreach ($this->runRequests($invoiceRequests) as $key => $response) {
             if ($response['code'] < 200 || $response['code'] >= 300) {
                 // The first answer stands.
                 continue;
@@ -414,7 +418,7 @@ class DdpCostService implements DdpCostServiceInterface
             return $results;
         }
 
-        foreach ($this->requestConcurrently($productRequests) as $key => $response) {
+        foreach ($this->runRequests($productRequests) as $key => $response) {
             if ($response['code'] < 200 || $response['code'] >= 300) {
                 continue;
             }
@@ -445,6 +449,99 @@ class DdpCostService implements DdpCostServiceInterface
     }
 
     /**
+     * Runs one wave of requests: concurrently where the host allows it, one at a time where it does
+     * not.
+     *
+     * Both transports answer in the same shape, so the waves above are written once and every amount
+     * comes out identical either way. Only the wall time differs - the slowest request in the wave,
+     * against the sum of them.
+     *
+     * @param array $requests Keyed requests, each with 'method', 'url', 'body' and 'timeout'.
+     *
+     * @return array Same keys, each an array of 'code' and 'body'.
+     */
+    private function runRequests(array $requests)
+    {
+        if (empty($requests)) {
+            return array();
+        }
+
+        return $this->supportsConcurrentRequests()
+            ? $this->requestConcurrently($requests)
+            : $this->requestSequentially($requests);
+    }
+
+    /**
+     * Whether the concurrent transport may be used on this host.
+     *
+     * The concurrent path drives `curl_multi` directly, because the infrastructure HttpClient has no
+     * concurrent primitive. That carries two consequences a platform may have to refuse:
+     *  - the extension can simply be absent, and calling `curl_multi_init()` would then be a fatal
+     *    error rather than a handled failure;
+     *  - even when present, it bypasses the platform's own HTTP stack. A site whose proxy, CA bundle
+     *    or SSL policy lives in that stack - WordPress carries all three inside `wp_remote_*`, and it
+     *    is configured per site rather than per server - would otherwise make unconfigured requests
+     *    that fail, or worse, succeed unverified.
+     *
+     * So a platform that must not bypass its own stack overrides this and returns false. The flow
+     * then runs the same two waves through the registered HttpClient and every figure is unchanged.
+     * Platforms whose own requirements already guarantee curl (PrestaShop lists it; Shopify runs on
+     * Laravel) can leave it alone.
+     *
+     * @return bool
+     */
+    protected function supportsConcurrentRequests()
+    {
+        return function_exists('curl_multi_init')
+            && function_exists('curl_multi_exec')
+            && function_exists('curl_multi_select');
+    }
+
+    /**
+     * The same wave, one request at a time, through the platform's own HTTP client.
+     *
+     * The fallback for a host where `curl_multi` is unavailable or must not be used. It exists so that
+     * refusing the concurrent transport costs only speed: the waves, the invoice reuse and the
+     * porterage correction all still run, and the amounts are the ones the concurrent path produces.
+     *
+     * Per-request timeouts are deliberately not passed on. HttpClient takes no per-call budget, and
+     * the platform's client owns that setting alongside the proxy and SSL configuration this path
+     * exists to honour - reaching past it to impose a timeout would defeat the point of using it.
+     *
+     * A failed request is recorded as code 0 against its own key, exactly as a failed handle is in
+     * the concurrent path, so one failure never affects the rest of the wave.
+     *
+     * @param array $requests Keyed requests, each with 'method', 'url' and 'body'.
+     *
+     * @return array Same keys, each an array of 'code' and 'body'.
+     */
+    private function requestSequentially(array $requests)
+    {
+        $headers = $this->getDdpRequestHeaders();
+        $responses = array();
+
+        /** @var HttpClient $client */
+        $client = ServiceRegister::getService(HttpClient::CLASS_NAME);
+
+        foreach ($requests as $key => $request) {
+            try {
+                $response = $client->request($request['method'], $request['url'], $headers, $request['body']);
+
+                $responses[$key] = array(
+                    'code' => (int)$response->getStatus(),
+                    'body' => (string)$response->getBody(),
+                );
+            } catch (\Throwable $e) {
+                Logger::logWarning('DDP sequential request failed: ' . $e->getMessage());
+
+                $responses[$key] = array('code' => 0, 'body' => '');
+            }
+        }
+
+        return $responses;
+    }
+
+    /**
      * Runs a set of requests concurrently and returns each one's status and body.
      *
      * Two waves of this replace what would otherwise be 2N sequential round trips. Every handle
@@ -455,13 +552,15 @@ class DdpCostService implements DdpCostServiceInterface
      * One failed transfer never affects the others: a handle that errors comes back as code 0 and
      * the caller records it against that item only.
      *
+     * Reached only through runRequests(), which decides whether this transport may be used at all.
+     *
      * @param array $requests Keyed requests, each with 'method', 'url', 'body' and 'timeout'.
      *
      * @return array Same keys, each an array of 'code' and 'body'.
      */
     private function requestConcurrently(array $requests)
     {
-        $headers = $this->getParallelHeaders();
+        $headers = $this->getDdpRequestHeaders();
         $multi = curl_multi_init();
         $handles = array();
 
@@ -476,6 +575,15 @@ class DdpCostService implements DdpCostServiceInterface
                     CURLOPT_TIMEOUT => $request['timeout'],
                     CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT_SECONDS,
                     CURLOPT_HTTPHEADER => $headers,
+                    // Stated rather than left to the default: this path does not inherit the
+                    // platform's SSL policy, so the one it uses should be visible here. Verification
+                    // stays on - an unverified duty quote is a price taken from an unauthenticated
+                    // host.
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                    // A duty quote is never behind a redirect, and following one would replay the
+                    // Authorization header at whatever host answered.
+                    CURLOPT_FOLLOWLOCATION => false,
                 )
             );
 
@@ -517,23 +625,27 @@ class DdpCostService implements DdpCostServiceInterface
     /**
      * The headers a Packlink call carries.
      *
-     * Duplicated from Proxy's own private builder because the concurrent path does not go through
+     * Duplicated from Proxy's own private builder because neither transport below goes through
      * Proxy. Six lines, and the alternative was a concurrent primitive on the shared HttpClient -
      * a change to infrastructure every integration depends on, for one DDP flow.
      *
+     * Keyed exactly as Proxy keys its own, because both transports consume this: `CURLOPT_HTTPHEADER`
+     * takes the values and ignores the keys, while a platform HttpClient may read either. An indexed
+     * list works for curl and is a silent behaviour change for a client that reads keys.
+     *
      * @return string[]
      */
-    private function getParallelHeaders()
+    private function getDdpRequestHeaders()
     {
         $configuration = $this->getConfiguration();
 
         return array(
-            'Accept: application/json',
-            'Content-Type: application/json',
-            'Authorization: ' . $configuration->getAuthorizationToken(),
-            'X-Module-Version: ' . $configuration->getModuleVersion(),
-            'X-Ecommerce-Name: ' . $configuration->getECommerceName(),
-            'X-Ecommerce-Version: ' . $configuration->getECommerceVersion(),
+            'accept' => 'Accept: application/json',
+            'content' => 'Content-Type: application/json',
+            'token' => 'Authorization: ' . $configuration->getAuthorizationToken(),
+            'Module-Version' => 'X-Module-Version: ' . $configuration->getModuleVersion(),
+            'Ecommerce-Name' => 'X-Ecommerce-Name: ' . $configuration->getECommerceName(),
+            'Ecommerce-Version' => 'X-Ecommerce-Version: ' . $configuration->getECommerceVersion(),
         );
     }
 
