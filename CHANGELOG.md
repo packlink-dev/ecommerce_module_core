@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.4.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.3.1...v4.4.0) - 2026-09-09
+### Added
+- Delivered Duty Paid (DDP) support: per-service merchant DDP configuration round-tripped through the shipping method controller, duty cost retrieval at checkout with concurrent per-carrier freight pricing and a sequential fallback, DDP selection carried on the draft and persisted with the shipment, customs field mapping per shipping service, and the shared `DdpCostComposer` for platform wrappers
+### Fixed
+- Customs invoice declared the shipment cost as the goods value
+
 ## [4.3.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.3.0...v4.3.1) - 2026-08-11
 ### Change
 - Add Croatia zip code
