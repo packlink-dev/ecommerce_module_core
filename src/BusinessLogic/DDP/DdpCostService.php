@@ -230,8 +230,22 @@ class DdpCostService implements DdpCostServiceInterface
             $reused = $invoiceRequests[$key]['reusing'];
 
             if ($response['code'] < 200 || $response['code'] >= 300) {
-                $results[$key]['error'] = 'customs invoice ' . ($reused === null ? 'creation' : 'update')
-                    . ' answered HTTP ' . $response['code'];
+                $status = (int)$response['code'];
+                $detail = $this->describeFailureBody($response['body']);
+                $step = 'customs invoice ' . ($reused === null ? 'creation' : 'update');
+
+                // The same treatment the products wave gets, and it matters MORE here: the sender and
+                // receiver tax ids live on the invoice, not on the products call, so a rejected VAT
+                // number fails in this wave. Reporting only "answered HTTP 400" left the one field a
+                // merchant can actually fix unnamed.
+                Logger::logWarning(
+                    'DDP costs unavailable at checkout while performing ' . $step . ': HTTP ' . $status
+                    . ($detail === '' ? '' : ' - ' . $detail)
+                    . $this->classifyFailure($detail, $status)
+                );
+
+                $results[$key]['error'] = $step . ' answered HTTP ' . $status
+                    . ($detail === '' ? '' : ': ' . $detail);
                 continue;
             }
 
@@ -273,7 +287,26 @@ class DdpCostService implements DdpCostServiceInterface
 
         foreach ($this->runRequests($productRequests) as $key => $response) {
             if ($response['code'] < 200 || $response['code'] >= 300) {
-                $results[$key]['error'] = 'products call answered HTTP ' . $response['code'];
+                $status = (int)$response['code'];
+                $detail = $this->describeFailureBody($response['body']);
+
+                // Named in the log, and named plainly. Packlink's body carries the only thing that
+                // identifies the problem - "Invalid HS Code: '851712'" - and reporting the status alone
+                // made every refusal read alike: a withdrawn tariff number, a rejected tax id and a
+                // route Packlink does not serve all answered "HTTP 400". The caller collapses all of
+                // them to "no DDP offered", so if this line does not say which, nothing does.
+                //
+                // This is the concurrent transport's own failure path: it gets a response array rather
+                // than a throw, so it never reached logFailure() and the classification that already
+                // existed there went unused.
+                Logger::logWarning(
+                    'DDP costs unavailable at checkout while pricing products: HTTP ' . $status
+                    . ($detail === '' ? '' : ' - ' . $detail)
+                    . $this->classifyFailure($detail, $status)
+                );
+
+                $results[$key]['error'] = 'products call answered HTTP ' . $status
+                    . ($detail === '' ? '' : ': ' . $detail);
                 continue;
             }
 
@@ -665,22 +698,142 @@ class DdpCostService implements DdpCostServiceInterface
     private function logFailure($step, \Throwable $e)
     {
         $message = $e->getMessage();
-        $status = (int)$e->getCode();
 
-        if (stripos($message, 'hs code') !== false || stripos($message, 'tariff') !== false) {
+        Logger::logWarning(
+            'DDP costs unavailable at checkout while ' . $step . ': ' . $message
+            . $this->classifyFailure($message, (int)$e->getCode())
+        );
+    }
+
+    /**
+     * Turns a Packlink refusal into a sentence that names what to fix.
+     *
+     * Shared by both failure paths - the exception one and the concurrent transport's non-2xx one - so
+     * the same refusal reads the same way however it arrived. Keyed off the message text because
+     * Packlink's machine-readable `error_code` is discarded before either path sees it.
+     *
+     * @param string $message Message text from Packlink, or '' when it sent none.
+     * @param int $status HTTP status, where one is known.
+     *
+     * @return string Sentence to append to the log line, beginning with a space.
+     */
+    private function classifyFailure($message, $status)
+    {
+        $haystack = strtolower($message);
+
+        if (strpos($haystack, 'hs code') !== false
+            || strpos($haystack, 'hs_code') !== false
+            || strpos($haystack, 'tariff') !== false
+            || strpos($haystack, 'harmonized') !== false
+            || strpos($haystack, 'harmonised') !== false
+        ) {
             // Packlink validates tariff numbers against a current HS revision, so a well-formed but
             // withdrawn code (8517.12, retired in HS 2022) passes our 6-8 digit check and fails here.
-            $hint = ' At least one product\'s customs tariff number (HS code) was rejected. It must be a'
-                . ' currently valid code, not merely 6-8 digits. This will recur on every checkout with'
-                . ' this product until the code is corrected.';
-        } elseif ($status >= 400 && $status < 500) {
-            $hint = ' Packlink rejected the request data. DDP stays unavailable until the customs'
-                . ' configuration or the order data is corrected.';
-        } else {
-            $hint = ' This looks transient. DDP will be offered again once the API recovers.';
+            return ' THE HS CODE IS NOT VALID. At least one product\'s customs tariff number (HS code)'
+                . ' was rejected: it must be a CURRENTLY VALID code, not merely 6-8 digits. Fix it in'
+                . ' the customs default values, or on the product if it carries its own. This will'
+                . ' recur on every checkout with this product until the code is corrected.';
         }
 
-        Logger::logWarning('DDP costs unavailable at checkout while ' . $step . ': ' . $message . $hint);
+        if (strpos($haystack, 'tax id') !== false
+            || strpos($haystack, 'tax_id') !== false
+            || strpos($haystack, 'taxid') !== false
+            || strpos($haystack, 'vat') !== false
+            || strpos($haystack, 'nif') !== false
+            || strpos($haystack, 'eori') !== false
+        ) {
+            return ' THE TAX ID / VAT NUMBER IS NOT ACCEPTED. Check the sender tax id in the customs'
+                . ' default values, and the receiver tax id when the recipient is a company: it must'
+                . ' match the format the destination country expects, including its country prefix.';
+        }
+
+        if ($status >= 400 && $status < 500) {
+            return ' Packlink rejected the request data. DDP stays unavailable until the customs'
+                . ' configuration or the order data is corrected.';
+        }
+
+        return ' This looks transient. DDP will be offered again once the API recovers.';
+    }
+
+    /**
+     * The human-readable part of a failed response body, if it has one.
+     *
+     * Packlink answers a refusal with JSON carrying its reason under one of several keys, and
+     * occasionally with an HTML error page instead. Both are worth surfacing - a bounded slice of
+     * anything beats a bare status code - so this digs out message text where it can and falls back to
+     * a flattened, truncated excerpt where it cannot.
+     *
+     * @param string $body Raw response body.
+     *
+     * @return string Message text, or '' when the body carried nothing usable.
+     */
+    private function describeFailureBody($body)
+    {
+        if (!is_string($body) || trim($body) === '') {
+            return '';
+        }
+
+        $decoded = json_decode($body, true);
+        $text = '';
+
+        if (is_array($decoded)) {
+            $messages = $this->collectMessages($decoded, false);
+            $text = implode('; ', array_unique($messages));
+        }
+
+        if (trim($text) === '') {
+            $text = trim(preg_replace('/\s+/', ' ', strip_tags($body)));
+        }
+
+        if (strlen($text) > 300) {
+            $text = substr($text, 0, 300) . '...';
+        }
+
+        return $text;
+    }
+
+    /**
+     * Pulls message-ish strings out of a decoded error payload.
+     *
+     * Recursive and shape-agnostic on purpose: Packlink has answered with `{"message": "..."}`,
+     * `{"messages": ["...", "..."]}` and `{"errors": [{"message": "..."}]}` at different times, and a
+     * parser tied to one of those shapes reports nothing for the others.
+     *
+     * @param array $payload Decoded body, or a branch of it.
+     * @param bool $inMessageKey Whether an ancestor key was itself a message key, which makes every
+     *                           string beneath it a message.
+     *
+     * @return array
+     */
+    private function collectMessages(array $payload, $inMessageKey)
+    {
+        $messageKeys = array(
+            'message',
+            'messages',
+            'error',
+            'errors',
+            'detail',
+            'details',
+            'description',
+            'reason',
+        );
+
+        $found = array();
+
+        foreach ($payload as $key => $value) {
+            $isMessageKey = $inMessageKey || in_array(strtolower((string)$key), $messageKeys, true);
+
+            if (is_array($value)) {
+                $found = array_merge($found, $this->collectMessages($value, $isMessageKey));
+                continue;
+            }
+
+            if ($isMessageKey && is_string($value) && trim($value) !== '') {
+                $found[] = trim($value);
+            }
+        }
+
+        return $found;
     }
 
     /**

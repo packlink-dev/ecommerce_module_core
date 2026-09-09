@@ -270,6 +270,53 @@ class DdpCostServiceTest extends BaseTestWithServices
     }
 
     /**
+     * A refusal on the INVOICE call must name the rejected field too.
+     *
+     * This wave is where the sender and receiver tax ids are sent, so a rejected VAT number fails
+     * here rather than on the products call - and reporting only "answered HTTP 400" left the one
+     * thing a merchant can act on unnamed. The pre-existing invoice-failure test drives an empty mock
+     * list, which makes the call THROW and so exercises the exception path instead of this one; only a
+     * real 4xx response reaches the branch below.
+     */
+    public function testGetDdpCostsNamesTheRejectedFieldWhenTheInvoiceCallIsRefused()
+    {
+        $this->shopConfig->setCustomsMappings($this->getCustomsMapping());
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(
+                    400,
+                    array(),
+                    '{"messages":[{"message":"tax_id is not valid for destination CH","error_code":"INVALID_TAX_ID"}]}'
+                ),
+            )
+        );
+
+        self::assertNull($this->ddpCostService->getDdpCosts($this->getOrder(), '20154'));
+
+        $logged = '';
+        foreach ($this->shopLogger->loggedMessages as $message) {
+            $logged .= $message->getMessage() . "\n";
+        }
+
+        self::assertNotFalse(
+            strpos($logged, 'tax_id is not valid'),
+            'Log must quote the API message: ' . $logged
+        );
+        self::assertNotFalse(
+            strpos($logged, 'TAX ID'),
+            'Log must name the tax id as the fault: ' . $logged
+        );
+        self::assertNotFalse(
+            strpos($logged, 'customs invoice'),
+            'Log must name the step: ' . $logged
+        );
+        self::assertFalse(
+            strpos($logged, 'transient'),
+            'A rejected tax id must not read as transient: ' . $logged
+        );
+    }
+
+    /**
      * Malformed response shapes (scalar entries where objects are expected) must degrade to
      * "no DDP cost", never to an uncaught TypeError on the checkout path.
      */
