@@ -9,6 +9,7 @@ use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Order\TestShopOrderService;
 use Packlink\BusinessLogic\Customs\CustomsService;
 use Packlink\BusinessLogic\Customs\Models\CustomsMapping;
+use Packlink\BusinessLogic\Http\DTO\ParcelInfo;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Order\Objects\Address;
 use Packlink\BusinessLogic\Order\Objects\Item;
@@ -245,7 +246,8 @@ class CustomsServiceTest extends BaseTestWithServices
         self::assertEquals('ORDER-1', $payload['invoice_number']);
         self::assertEquals('PURCHASE_OR_SALE', $payload['reason_for_export']);
 
-        self::assertEquals('private_person', $payload['sender']['user_type']);
+        // Both user types go on the wire as the Packlink enum spells them: [PRIVATE_PERSON, COMPANY].
+        self::assertEquals('PRIVATE_PERSON', $payload['sender']['user_type']);
         self::assertEquals('default test', $payload['sender']['full_name']);
         self::assertEquals('123', $payload['sender']['tax_id']);
         self::assertEquals('', $payload['sender']['company_name']);
@@ -324,6 +326,123 @@ class CustomsServiceTest extends BaseTestWithServices
         self::assertTrue(
             $this->shopLogger->isMessageContainedInLog('country of origin'),
             'Skipping the customs invoice must log a warning naming the missing country of origin.'
+        );
+    }
+
+    /**
+     * A store configured through the core form before it carried the Packlink-cased tokens holds
+     * lowercase enum values. Those must never reach the API, which rejects anything outside
+     * [PURCHASE_OR_SALE, ...] and [PRIVATE_PERSON, COMPANY] - the failure that leaves DDP quoting
+     * nothing at checkout.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function testLegacyLowercaseMappingIsSentUpperCased()
+    {
+        // arrange: a mapping stored the way the old form saved it.
+        $order = $this->getOrderForSkipScenario('123456', 'FR');
+        $mapping = new CustomsMapping();
+        $mapping->defaultReason = 'purchase_or_sale';
+        $mapping->defaultSenderTaxId = '123';
+        $mapping->defaultReceiverUserType = 'private_person';
+        $mapping->defaultReceiverTaxId = '456';
+        $mapping->defaultTariffNumber = '123456';
+        $mapping->defaultCountry = 'FR';
+        $this->shopConfig->setCustomsMappings($mapping);
+
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+                ),
+            )
+        );
+
+        // act
+        $this->customsService->sendCustomsInvoice($order);
+
+        // assert
+        $history = $this->httpClient->getHistory();
+        self::assertCount(1, $history);
+        $payload = json_decode($history[0]['body'], true);
+
+        self::assertEquals('PURCHASE_OR_SALE', $payload['reason_for_export']);
+        self::assertEquals('PRIVATE_PERSON', $payload['receiver']['user_type']);
+        self::assertEquals('PRIVATE_PERSON', $payload['sender']['user_type']);
+    }
+
+    /**
+     * A product with no weight of its own is declared at the default parcel's weight - the store
+     * already answered that question once, so customs reuses it instead of asking again.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     */
+    public function testItemWithoutWeightFallsBackToTheDefaultParcelWeight()
+    {
+        // arrange
+        $order = $this->getOrderForSkipScenario('123456', 'FR');
+        foreach ($order->getItems() as $item) {
+            $item->setWeight(0.0);
+        }
+
+        $this->shopConfig->setDefaultParcel(
+            ParcelInfo::fromArray(
+                array('weight' => 2.75, 'width' => 10, 'height' => 10, 'length' => 10)
+            )
+        );
+
+        $this->httpClient->setMockResponses(
+            array(
+                new HttpResponse(
+                    200, array(), file_get_contents(__DIR__ . '/../Common/ApiResponses/Customs/createCustomsResult.json')
+                ),
+            )
+        );
+
+        // act
+        $this->customsService->sendCustomsInvoice($order);
+
+        // assert
+        $history = $this->httpClient->getHistory();
+        self::assertCount(1, $history, 'The invoice must be sent, not skipped for a missing product weight.');
+        $payload = json_decode($history[0]['body'], true);
+
+        self::assertNotEmpty($payload['inventory_of_contents']);
+        foreach ($payload['inventory_of_contents'] as $inventory) {
+            self::assertEquals(2.75, $inventory['item_weight']);
+        }
+    }
+
+    /**
+     * With no product weight and no default parcel to fall back on, the invoice is skipped rather
+     * than sent declaring nothing.
+     *
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function testInvoiceSkippedWhenNeitherProductNorDefaultParcelHasWeight()
+    {
+        // arrange
+        $order = $this->getOrderForSkipScenario('123456', 'FR');
+        foreach ($order->getItems() as $item) {
+            $item->setWeight(0.0);
+        }
+
+        // act
+        $result = $this->customsService->sendCustomsInvoice($order);
+
+        // assert
+        self::assertNull($result);
+        self::assertEmpty($this->httpClient->getHistory());
+        self::assertTrue(
+            $this->shopLogger->isMessageContainedInLog('no weight resolved'),
+            'Skipping the customs invoice must log a warning naming the missing weight.'
         );
     }
 
@@ -434,6 +553,11 @@ class CustomsServiceTest extends BaseTestWithServices
     private function arrangeInvoiceBuildContext()
     {
         $this->shopConfig->setDefaultWarehouse(new TestWarehouse());
+        // Every store configures a default parcel; customs reads its weight for products
+        // that carry none of their own.
+        $this->shopConfig->setDefaultParcel(
+            ParcelInfo::fromArray(array('weight' => 1.0, 'width' => 10, 'height' => 10, 'length' => 10))
+        );
         $user = new User();
         $user->customerType = 'BUSINESS';
         $this->shopConfig->setUserInfo($user);

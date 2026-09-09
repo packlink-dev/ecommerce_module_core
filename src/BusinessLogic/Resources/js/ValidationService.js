@@ -16,7 +16,8 @@ if (!window.Packlink) {
         phone: 'phone',
         password: 'password',
         text: 'text',
-        iban: 'iban'
+        iban: 'iban',
+        pattern: 'pattern'
     };
 
     const validationRule = {
@@ -110,9 +111,30 @@ if (!window.Packlink) {
                     return this.validateMaxLength(input);
                 case inputType.iban:
                     return this.validateIBAN(input);
+                case inputType.pattern:
+                    return this.validatePattern(input);
             }
 
             return true;
+        };
+
+        /**
+         * Validates the input against the regular expression in its data-pattern attribute.
+         * An empty value passes; use data-required to demand one.
+         *
+         * @param {HTMLInputElement} input
+         * @return {boolean}
+         */
+        this.validatePattern = (input) => {
+            if (input.value === '' || !input.dataset.pattern) {
+                return true;
+            }
+
+            return validateField(
+                input,
+                !(new RegExp(input.dataset.pattern)).test(input.value),
+                input.dataset.patternMessage || 'validation.invalidField'
+            );
         };
 
         /**

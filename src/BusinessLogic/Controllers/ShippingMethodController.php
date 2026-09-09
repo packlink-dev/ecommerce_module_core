@@ -363,6 +363,17 @@ class ShippingMethodController
             return false;
         }
 
+        // Charging duties requires a customs invoice, and a customs invoice requires a complete
+        // customs configuration. Allowing the save would leave the merchant with a service that
+        // quotes no DDP at checkout - and, when enforced, a checkout that cannot complete.
+        if ($configuration->ddpBehavior !== DdpBehavior::NONE && !$this->isCustomsConfigured()) {
+            Logger::logWarning(
+                'DDP behavior "' . $configuration->ddpBehavior . '" rejected: customs configuration is incomplete.'
+            );
+
+            return false;
+        }
+
         $validTypes = array(DdpBehavior::ADJUSTMENT_FIXED, DdpBehavior::ADJUSTMENT_PERCENTAGE, null);
         if (!in_array($configuration->ddpAdjustmentType, $validTypes, true)) {
             return false;
@@ -381,14 +392,19 @@ class ShippingMethodController
     }
 
     /**
-     * Indicates whether customs mappings are configured, computed once per request.
+     * Indicates whether customs is ready to produce an invoice, computed once per request.
      *
-     * @return bool TRUE if customs mappings exist; otherwise, FALSE.
+     * Existence of a mapping is not the question: the customs form can be saved untouched, so a
+     * stored mapping proves only that someone pressed Save. Readiness is a property of its
+     * content, which is what the DDP banner and the DDP guard both need.
+     *
+     * @return bool TRUE if the customs configuration can produce an invoice; otherwise, FALSE.
      */
     private function isCustomsConfigured()
     {
         if ($this->customsConfigured === null) {
-            $this->customsConfigured = $this->getConfigService()->getCustomsMappings() !== null;
+            $mapping = $this->getConfigService()->getCustomsMappings();
+            $this->customsConfigured = $mapping !== null && $mapping->isConfigured();
         }
 
         return $this->customsConfigured;

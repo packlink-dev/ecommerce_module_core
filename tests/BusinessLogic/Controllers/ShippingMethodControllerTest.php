@@ -483,11 +483,16 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         self::assertEquals(-10, $data['ddpAdjustmentAmount']);
     }
 
+    /**
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     */
     public function testSaveDdpConfiguration()
     {
         $this->systemInfoService->setInvalid(false);
         $this->systemInfoService->setMultistore(false);
         $this->importShippingMethods();
+        $this->configureCustoms();
         $all = $this->controller->getAll();
         $first = $all[0];
         $this->setDdpSupportLevel($first->id, DdpBehavior::LEVEL_SUPPORTED);
@@ -508,7 +513,100 @@ class ShippingMethodControllerTest extends BaseTestWithServices
         $data = $model->toArray();
 
         $this->assertEquals(DdpBehavior::LEVEL_SUPPORTED, $data['ddpSupportLevel']);
-        $this->assertFalse($data['customsConfigured']);
+        $this->assertTrue($data['customsConfigured']);
+    }
+
+    /**
+     * Duties cannot be quoted without a customs invoice, so a behavior that charges them must not
+     * be storable while the customs configuration cannot produce one.
+     */
+    public function testSaveDdpBehaviorIsRejectedWhenCustomsIsNotConfigured()
+    {
+        $this->systemInfoService->setInvalid(false);
+        $this->systemInfoService->setMultistore(false);
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $this->setDdpSupportLevel($first->id, DdpBehavior::LEVEL_SUPPORTED);
+
+        foreach (array(DdpBehavior::OPTIONAL, DdpBehavior::ENFORCED) as $behavior) {
+            $shipment = $this->getDdpShipmentConfiguration($first);
+            $shipment->ddpBehavior = $behavior;
+
+            $this->assertNull(
+                $this->controller->save($shipment),
+                'Behavior "' . $behavior . '" must be rejected while customs is not configured.'
+            );
+        }
+    }
+
+    /**
+     * The coupling only guards behaviors that charge duties; leaving DDP off must still save.
+     */
+    public function testSaveDdpBehaviorNoneIsAllowedWhenCustomsIsNotConfigured()
+    {
+        $this->systemInfoService->setInvalid(false);
+        $this->systemInfoService->setMultistore(false);
+        $this->importShippingMethods();
+        $all = $this->controller->getAll();
+        $first = $all[0];
+        $this->setDdpSupportLevel($first->id, DdpBehavior::LEVEL_SUPPORTED);
+
+        $shipment = $this->getDdpShipmentConfiguration($first);
+        $shipment->ddpBehavior = DdpBehavior::NONE;
+
+        $model = $this->controller->save($shipment);
+
+        $this->assertNotNull($model);
+        $this->assertEquals(DdpBehavior::NONE, $model->ddpBehavior);
+        $this->assertFalse($model->toArray()['customsConfigured']);
+    }
+
+    /**
+     * A mapping stored under the old, looser rules exists but cannot build an invoice. It must not
+     * read as configured, otherwise the banner stays hidden and DDP fails silently at checkout.
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     */
+    public function testIncompleteStoredCustomsMappingIsNotConfigured()
+    {
+        $this->importShippingMethods();
+        TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
+        $this->shopConfig->setCustomsMappings(
+            CustomsMapping::fromStoredArray(
+                array(
+                    'default_reason' => 'purchase_or_sale',
+                    'default_sender_tax_id' => '123',
+                    'default_receiver_user_type' => 'private_person',
+                )
+            )
+        );
+
+        $all = $this->controller->getAll();
+
+        $this->assertFalse($all[0]->customsConfigured);
+    }
+
+    /**
+     * Stores a customs mapping complete enough to build an invoice.
+     *
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoValidationException
+     * @throws \Packlink\BusinessLogic\DTO\Exceptions\FrontDtoFactoryRegistrationException
+     */
+    private function configureCustoms()
+    {
+        TestFrontDtoFactory::register(CustomsMapping::CLASS_KEY, CustomsMapping::CLASS_NAME);
+        $this->shopConfig->setCustomsMappings(
+            CustomsMapping::fromArray(
+                array(
+                    'default_reason' => 'PURCHASE_OR_SALE',
+                    'default_sender_tax_id' => '123',
+                    'default_receiver_user_type' => 'PRIVATE_PERSON',
+                    'default_tariff_number' => '123456',
+                    'default_country' => 'FR',
+                )
+            )
+        );
     }
 
     public function testSaveInvalidDdpConfiguration()

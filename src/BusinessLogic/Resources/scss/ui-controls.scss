@@ -576,7 +576,16 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    flex-wrap: wrap;
+    // Never wrap: the badge belongs on the title's line. In a narrow column (the services table
+    // lets the merchant resize SERVICE TITLE down) wrapping dropped it onto its own line under
+    // the title, where it read as a separate row rather than a tag on the service.
+    flex-wrap: nowrap;
+
+    // Let the title, not the badge, absorb a narrow column. Without min-width a flex item refuses
+    // to shrink below its content, which is what pushed the badge off the line in the first place.
+    #pl-service-name {
+      min-width: 0;
+    }
   }
 
   .pl-ddp-badge {
@@ -593,6 +602,8 @@
     vertical-align: middle;
     margin-left: 8px;
     white-space: nowrap;
+    // The badge keeps its size; the title shrinks around it.
+    flex: 0 0 auto;
   }
 
   .pl-shipping-services-table {

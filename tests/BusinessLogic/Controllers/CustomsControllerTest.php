@@ -221,4 +221,80 @@ class CustomsControllerTest extends BaseTestWithServices
         $configuration = TestServiceRegister::getService(Configuration::CLASS_NAME);
         self::assertNull($configuration->getCustomsMappings(), 'Invalid mapping must not be persisted.');
     }
+
+    /**
+     * The form's selects used to preselect their first option and its other fields were optional,
+     * so pressing "Save Changes" without touching anything marked the store customs-configured
+     * forever. That submission must now be rejected, naming both unresolvable fields.
+     */
+    public function testSaveUntouchedFormIsRejected()
+    {
+        // arrange - what an untouched form posts once the selects carry an empty first option.
+        $mapping = array(
+            'default_reason' => '',
+            'default_sender_tax_id' => '123', // prefilled from the Packlink account
+            'default_receiver_user_type' => '',
+            'default_receiver_tax_id' => '',
+            'default_tariff_number' => '',
+            'default_country' => '',
+            'mapping_receiver_tax_id' => '',
+            'mapping_tariff_number' => '',
+            'mapping_company_vat' => '',
+            'mapping_country_of_origin' => '',
+        );
+
+        // act
+        $errors = array();
+        try {
+            $this->customsController->save($mapping);
+        } catch (FrontDtoValidationException $e) {
+            $errors = $e->getValidationErrors();
+        }
+
+        // assert
+        $fields = array();
+        foreach ($errors as $error) {
+            $fields[] = $error->field;
+        }
+
+        self::assertContains('default_reason', $fields);
+        self::assertContains('default_receiver_user_type', $fields);
+        self::assertContains('default_tariff_number', $fields);
+        self::assertContains('default_country', $fields);
+
+        /** @var Configuration $configuration */
+        $configuration = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        self::assertNull($configuration->getCustomsMappings(), 'An empty mapping must not be persisted.');
+    }
+
+    /**
+     * A store that saved lowercase enum tokens before the form carried the Packlink-cased ones
+     * keeps working, and is corrected on the way in.
+     */
+    public function testLegacyLowercaseValuesAreNormalizedOnSave()
+    {
+        // arrange
+        $mapping = array(
+            'default_reason' => 'purchase_or_sale',
+            'default_sender_tax_id' => '123',
+            'default_receiver_user_type' => 'private_person',
+            'default_receiver_tax_id' => '123',
+            'default_tariff_number' => '123456',
+            'default_country' => 'fr',
+            'mapping_receiver_tax_id' => 'tax_1',
+        );
+
+        // act
+        $this->customsController->save($mapping);
+
+        // assert
+        /** @var Configuration $configuration */
+        $configuration = TestServiceRegister::getService(Configuration::CLASS_NAME);
+        $stored = $configuration->getCustomsMappings();
+
+        self::assertSame('PURCHASE_OR_SALE', $stored->defaultReason);
+        self::assertSame('PRIVATE_PERSON', $stored->defaultReceiverUserType);
+        self::assertSame('FR', $stored->defaultCountry);
+        self::assertTrue($stored->isConfigured());
+    }
 }

@@ -228,16 +228,20 @@ abstract class Configuration extends \Logeecom\Infrastructure\Configuration\Conf
     }
 
     /**
+     * Reads the stored customs mapping.
+     *
+     * Hydration is deliberately lenient: a mapping saved before a validation rule existed would
+     * otherwise throw FrontDtoValidationException here - inside whatever page happens to be
+     * rendering - and lock the merchant out instead of prompting them. Strict validation belongs
+     * to the save path; ask CustomsMapping::isConfigured() whether what came back is usable.
+     *
      * @return CustomsMapping|null
-     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getCustomsMappings()
     {
         $value = $this->getConfigValue('customsMappings');
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return $value && is_array($value) ? FrontDtoFactory::get(CustomsMapping::CLASS_KEY, $value) : null;
+        return $value && is_array($value) ? CustomsMapping::fromStoredArray($value) : null;
     }
 
     /**

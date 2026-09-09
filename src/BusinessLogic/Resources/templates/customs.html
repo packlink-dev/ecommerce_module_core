@@ -17,11 +17,12 @@
             <div class="pl-small-page">
                 <div class="pl-form-group">
                     <select id="pl-default-customs-reason" name="default_reason" data-required="true">
-                        <option value="purchase_or_sale">{$customs.purchase}</option>
-                        <option value="personal_belongings">{$customs.personalBelongings}</option>
-                        <option value="sample">{$customs.sample}</option>
-                        <option value="documents">{$customs.documents}</option>
-                        <option value="return">{$customs.return}</option>
+                        <option value=""> </option>
+                        <option value="PURCHASE_OR_SALE">{$customs.purchase}</option>
+                        <option value="PERSONAL_BELONGINGS">{$customs.personalBelongings}</option>
+                        <option value="SAMPLE">{$customs.sample}</option>
+                        <option value="DOCUMENTS">{$customs.documents}</option>
+                        <option value="RETURN">{$customs.return}</option>
                     </select>
                     <i class="material-icons">expand_more</i>
                     <label class="pl-customs-label" for="pl-default-customs-reason" title="{$customs.reasonForExport}">{$customs.reasonForExport}</label>
@@ -33,8 +34,9 @@
                 </div>
                 <div class="pl-form-group">
                     <select id="pl-default-customs-user-type" name="default_receiver_user_type" data-required="true">
-                        <option value="private_person">{$customs.private}</option>
-                        <option value="company">{$customs.company}</option>
+                        <option value=""> </option>
+                        <option value="PRIVATE_PERSON">{$customs.private}</option>
+                        <option value="COMPANY">{$customs.company}</option>
                     </select>
                     <i class="material-icons">expand_more</i>
                     <label class="pl-customs-label" for="pl-default-customs-user-type" title="{$customs.receiverUserType}">{$customs.receiverUserType}</label>
@@ -44,11 +46,13 @@
                     <label class="pl-customs-label" for="pl-default-receiver-tax" title="{$customs.receiverTaxId}">{$customs.receiverTaxId}</label>
                 </div>
                 <div class="pl-form-group">
-                    <input type="text" id="pl-default-tariff" name="default_tariff_number"/>
+                    <input type="text" id="pl-default-tariff" name="default_tariff_number"
+                           data-required="true" data-type="pattern" data-pattern="^[0-9]{6,8}$"
+                           data-pattern-message="validation.invalidHsCode"/>
                     <label class="pl-customs-label" for="pl-default-tariff" title="{$customs.tariffNumber}">{$customs.tariffNumber}</label>
                 </div>
                 <div class="pl-form-group">
-                    <select id="pl-default-country" name="default_country">
+                    <select id="pl-default-country" name="default_country" data-required="true">
                     </select>
                     <i class="material-icons">expand_more</i>
                     <label class="pl-customs-label" for="pl-default-country" title="{$customs.countryOrigin}">{$customs.countryOrigin}</label>
