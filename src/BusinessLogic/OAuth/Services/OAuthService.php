@@ -6,6 +6,8 @@ use Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use Logeecom\Infrastructure\Http\Exceptions\HttpRequestException;
 use Logeecom\Infrastructure\ORM\Interfaces\RepositoryInterface;
+use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Http\DTO\OAuthConnectData;
 use Packlink\BusinessLogic\Http\DTO\OAuthUrlData;
 use Packlink\BusinessLogic\Http\Proxy;
@@ -17,6 +19,30 @@ use Packlink\BusinessLogic\OAuth\Services\Interfaces\OAuthStateServiceInterface;
 
 class OAuthService implements OAuthServiceInterface
 {
+    /**
+     * Value the authorization server expects when the merchant sells on no marketplace (PKLPM-103).
+     */
+    const NO_MARKETPLACE = 'I do not have any marketplace outlets';
+
+    /**
+     * Integration names as the authorization server expects them, keyed by the lower-cased value
+     * platforms report through `Configuration::getECommerceName()`.
+     *
+     * A map rather than `ucfirst()` because that would produce `Woocommerce` and `Bigcommerce`,
+     * and the server matches on the exact display name.
+     *
+     * @var array
+     */
+    protected static $integrationNames = array(
+        'shopify' => 'Shopify',
+        'woocommerce' => 'WooCommerce',
+        'prestashop' => 'PrestaShop',
+        'magento' => 'Magento',
+        'wix' => 'Wix',
+        'ecwid' => 'Ecwid',
+        'bigcommerce' => 'BigCommerce',
+    );
+
     /** @var OAuthProxy */
     protected $proxy;
 
@@ -148,11 +174,60 @@ class OAuthService implements OAuthServiceInterface
             'state'         => $this->saveState($this->configuration->getTenantId()),
         );
 
+        // PKLPM-103. A merchant without an account registers from inside this screen rather than
+        // through the module's own form, and without these three the authorization server cannot tell
+        // where that registration came from: `onboarding_product` is left empty and the lead is never
+        // classified. `origin` is what lands in that field; `ecommerce` and `marketplace` prefill form
+        // fields so the merchant is not asked for what we already know.
+        //
+        // Omitted entirely when the integration cannot be named, so the URL is then byte-identical to
+        // what it was before - an empty `origin` would be worse than none at all.
+        $integrationName = $this->getIntegrationName();
+
+        if ($integrationName !== '') {
+            $queryParams['origin'] = $integrationName;
+            $queryParams['ecommerce'] = $integrationName;
+            $queryParams['marketplace'] = self::NO_MARKETPLACE;
+        }
+
+        // PHP_QUERY_RFC3986 escapes the values, which is what the server expects of `marketplace`.
         $queryString = http_build_query($queryParams, '', '&', PHP_QUERY_RFC3986);
 
         $domain = TenantDomainProvider::getDomain($domain);
 
         return 'https://' . rtrim($domain, '/') . '/auth/oauth2/authorize?' . $queryString;
+    }
+
+    /**
+     * Name of this integration as the authorization server expects it ("Shopify", "WooCommerce", ...).
+     *
+     * Read from `Configuration::getECommerceName()`, which every platform already implements, rather
+     * than from a new abstract method on `OAuthConfiguration`: adding one would fatal every module
+     * that had not implemented it yet, and this has to ship without every platform moving first.
+     *
+     * A platform the map does not know falls back to whatever it reports, which still carries the
+     * information even if the casing is off. A name that cannot be read at all yields an empty string
+     * and the caller then leaves the parameters out.
+     *
+     * @return string
+     */
+    protected function getIntegrationName()
+    {
+        try {
+            /** @var Configuration $configService */
+            $configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+            $name = trim((string)$configService->getECommerceName());
+        } catch (\Exception $e) {
+            return '';
+        }
+
+        if ($name === '') {
+            return '';
+        }
+
+        $key = strtolower($name);
+
+        return isset(static::$integrationNames[$key]) ? static::$integrationNames[$key] : $name;
     }
 
     /**
