@@ -38,7 +38,8 @@
     "invalidUrl": "Le champ doit contenir une URL valide.",
     "invalidFieldValue": "Le champ doit être défini sur « %s ».",
     "invalidMaxValue": "La valeur maximale autorisée est %s.",
-    "passwordRestriction": "Votre mot de passe doit contenir au moins %s caractères, dont au moins une lettre minuscule, une lettre majuscule, un chiffre et un symbole"
+    "passwordRestriction": "Votre mot de passe doit contenir au moins %s caractères, dont au moins une lettre minuscule, une lettre majuscule, un chiffre et un symbole",
+    "invalidHsCode": "Le code SH doit comporter 6 à 8 chiffres."
   },
   "login": {
     "apiKey": "Clé API",
@@ -495,7 +496,20 @@
     "atLeastOneCountry": "",
     "misconfiguration": "En raison du changement de devise en magasin, vous devez établir une valeur monétaire fixe en cliquant sur « Modifier » dans le service d’expédition.",
     "refreshServiceList" : "Actualiser la liste des services",
-    "refreshError": "Une erreur s'est produite lors de l'actualisation de la liste des services"
+    "refreshError": "Une erreur s'est produite lors de l'actualisation de la liste des services",
+    "ddpBadge": "Droits de douane et taxes payés",
+    "dutiesCostAtCheckout": "Coût des droits de douane lors du paiement",
+    "ddpBehaviorLabel": "Comportement",
+    "noDutiesCharged": "Aucuns droits de douane facturés lors du paiement",
+    "offerDutiesOptionally": "Proposer le coût des droits de douane lors du paiement de manière optionnelle",
+    "enforceDutiesCost": "Imposer le coût des droits de douane lors du paiement",
+    "ddpMandatoryNotice": "Ce service inclut obligatoirement le coût des droits de douane lors du paiement. N'activez ce service que si vous acceptez de le proposer avec le coût des droits de douane inclus lors du paiement.",
+    "ddpConfigureCustomsNotice": "Afin de proposer ce service à vos clients, veuillez configurer les informations douanières dans ce module.",
+    "adjustDdpCost": "Ajuster le coût DDP",
+    "ddpAdjustmentLabel": "Ajustement",
+    "fixedAdjustment": "Ajustement fixe",
+    "percentageAdjustment": "Ajustement en pourcentage",
+    "adjustmentAmount": "Montant de l'ajustement"
   },
   "orderListAndDetails": {
     "printed": "Imprimé",

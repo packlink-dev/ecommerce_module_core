@@ -1,0 +1,27 @@
+{
+  "products_details": [
+    {
+      "products": {
+        "ddp_fee": {
+          "base_price": 8.79,
+          "tax_price": 0.00,
+          "total_price": 8.79,
+          "taxes": [],
+          "currency": "EUR",
+          "is_enabled": true,
+          "is_selected": true
+        },
+        "customs_and_duties": {
+          "base_price": 35.22,
+          "tax_price": 0.00,
+          "total_price": 35.22,
+          "taxes": [],
+          "currency": "EUR",
+          "is_enabled": true,
+          "is_selected": true
+        }
+      }
+    }
+  ],
+  "summary": {}
+}

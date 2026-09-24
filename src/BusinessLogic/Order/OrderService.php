@@ -338,6 +338,7 @@ class OrderService extends BaseService implements \Packlink\BusinessLogic\Order\
         $draft->priority = $order->isHighPriority();
         $draft->source = $this->configuration->getDraftSource();
         $draft->shipmentCustomReference = $order->getOrderNumber();
+        $draft->ddpSelected = $order->isDdpSelected();
         $this->addPackages($order, $draft);
 
         $methodId = $order->getShippingMethodId();

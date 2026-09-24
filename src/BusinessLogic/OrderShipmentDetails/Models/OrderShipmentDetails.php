@@ -42,6 +42,7 @@ class OrderShipmentDetails extends Entity
         'deleted',
         'currency',
         'customsInvoiceId',
+        'ddpCost',
         'isExpired',
     );
     /**
@@ -132,6 +133,12 @@ class OrderShipmentDetails extends Entity
      * @var string
      */
     private $customsInvoiceId = '';
+    /**
+     * Charged DDP cost in the order currency.
+     *
+     * @var float|null
+     */
+    private $ddpCost;
     /**
      * @var bool
      */
@@ -516,6 +523,26 @@ class OrderShipmentDetails extends Entity
     public function setCustomsInvoiceId($customsInvoiceId)
     {
         $this->customsInvoiceId = $customsInvoiceId;
+    }
+
+    /**
+     * Returns charged DDP cost in the order currency.
+     *
+     * @return float|null
+     */
+    public function getDdpCost()
+    {
+        return $this->ddpCost;
+    }
+
+    /**
+     * Sets charged DDP cost in the order currency.
+     *
+     * @param float|null $ddpCost
+     */
+    public function setDdpCost($ddpCost)
+    {
+        $this->ddpCost = $ddpCost;
     }
 
     /**

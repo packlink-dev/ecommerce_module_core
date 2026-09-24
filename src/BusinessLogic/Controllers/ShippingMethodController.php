@@ -5,8 +5,10 @@ namespace Packlink\BusinessLogic\Controllers;
 use Exception;
 use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Infrastructure\ServiceRegister;
+use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodConfiguration;
 use Packlink\BusinessLogic\Controllers\DTO\ShippingMethodResponse;
+use Packlink\BusinessLogic\DDP\DdpBehavior;
 use Packlink\BusinessLogic\Language\Translator;
 use Packlink\BusinessLogic\ShippingMethod\Interfaces\ShopShippingMethodService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingMethod;
@@ -73,6 +75,18 @@ class ShippingMethodController
      * @var SystemInfoService
      */
     private $systemInfoService;
+    /**
+     * Configuration service.
+     *
+     * @var Configuration
+     */
+    private $configService;
+    /**
+     * Memoized customs-configured flag; the response transform runs per method in a loop.
+     *
+     * @var bool|null
+     */
+    private $customsConfigured;
 
     /**
      * DashboardController constructor.
@@ -175,6 +189,12 @@ class ShippingMethodController
             }
         }
 
+        if (!$this->isDdpConfigurationValid($shippingMethod, $model)) {
+            Logger::logError("Invalid DDP configuration for shipping method with id {$shippingMethod->id}!");
+
+            return null;
+        }
+
         try {
             $isFirstServiceActivated = $shippingMethod->activated && !$this->shippingMethodService->isAnyMethodActive();
 
@@ -275,6 +295,11 @@ class ShippingMethodController
         $shippingMethod->currency = $item->getCurrency();
         $shippingMethod->fixedPrices = $item->getFixedPrices();
         $shippingMethod->systemDefaults = $item->getSystemDefaults();
+        $shippingMethod->ddpBehavior = $item->getDdpBehavior();
+        $shippingMethod->ddpAdjustmentType = $item->getDdpAdjustmentType();
+        $shippingMethod->ddpAdjustmentAmount = $item->getDdpAdjustmentAmount();
+        $shippingMethod->ddpSupportLevel = $item->getDdpSupportLevel();
+        $shippingMethod->customsConfigured = $this->isCustomsConfigured();
 
         return $shippingMethod;
     }
@@ -296,6 +321,9 @@ class ShippingMethodController
         $model->setUsePacklinkPriceIfNotInRange($configuration->usePacklinkPriceIfNotInRange);
         $model->setFixedPrices($configuration->fixedPrices);
         $model->setSystemDefaults($configuration->systemDefaults);
+        $model->setDdpBehavior($configuration->ddpBehavior);
+        $model->setDdpAdjustmentType($configuration->ddpAdjustmentType);
+        $model->setDdpAdjustmentAmount(round((float)$configuration->ddpAdjustmentAmount, 2));
         $this->updatePricingPolicies($configuration, $model);
     }
 
@@ -311,5 +339,88 @@ class ShippingMethodController
         foreach ($configuration->pricingPolicies as $policy) {
             $model->addPricingPolicy($policy);
         }
+    }
+
+    /**
+     * Validates the DDP configuration against the shipping method's DDP support level.
+     * A behavior other than 'none' is allowed only on methods whose services support DDP.
+     *
+     * @param ShippingMethodConfiguration $configuration Shipping method DTO.
+     * @param ShippingMethod $model Shipping method model.
+     *
+     * @return bool TRUE if the DDP configuration is valid; otherwise, FALSE.
+     */
+    private function isDdpConfigurationValid(ShippingMethodConfiguration $configuration, ShippingMethod $model)
+    {
+        $validBehaviors = array(DdpBehavior::NONE, DdpBehavior::OPTIONAL, DdpBehavior::ENFORCED);
+        if (!in_array($configuration->ddpBehavior, $validBehaviors, true)) {
+            return false;
+        }
+
+        if ($configuration->ddpBehavior !== DdpBehavior::NONE
+            && $model->getDdpSupportLevel() !== DdpBehavior::LEVEL_SUPPORTED
+        ) {
+            return false;
+        }
+
+        // Charging duties requires a customs invoice, and a customs invoice requires a complete
+        // customs configuration. Allowing the save would leave the merchant with a service that
+        // quotes no DDP at checkout - and, when enforced, a checkout that cannot complete.
+        if ($configuration->ddpBehavior !== DdpBehavior::NONE && !$this->isCustomsConfigured()) {
+            Logger::logWarning(
+                'DDP behavior "' . $configuration->ddpBehavior . '" rejected: customs configuration is incomplete.'
+            );
+
+            return false;
+        }
+
+        $validTypes = array(DdpBehavior::ADJUSTMENT_FIXED, DdpBehavior::ADJUSTMENT_PERCENTAGE, null);
+        if (!in_array($configuration->ddpAdjustmentType, $validTypes, true)) {
+            return false;
+        }
+
+        if (!is_numeric($configuration->ddpAdjustmentAmount)) {
+            return false;
+        }
+
+        $amount = (float)$configuration->ddpAdjustmentAmount;
+        if (!is_finite($amount) || abs($amount) > 99999.99) {
+            return false;
+        }
+
+        return $configuration->ddpAdjustmentType !== DdpBehavior::ADJUSTMENT_PERCENTAGE || $amount > -100;
+    }
+
+    /**
+     * Indicates whether customs is ready to produce an invoice, computed once per request.
+     *
+     * Existence of a mapping is not the question: the customs form can be saved untouched, so a
+     * stored mapping proves only that someone pressed Save. Readiness is a property of its
+     * content, which is what the DDP banner and the DDP guard both need.
+     *
+     * @return bool TRUE if the customs configuration can produce an invoice; otherwise, FALSE.
+     */
+    private function isCustomsConfigured()
+    {
+        if ($this->customsConfigured === null) {
+            $mapping = $this->getConfigService()->getCustomsMappings();
+            $this->customsConfigured = $mapping !== null && $mapping->isConfigured();
+        }
+
+        return $this->customsConfigured;
+    }
+
+    /**
+     * Gets the configuration service.
+     *
+     * @return Configuration Configuration service.
+     */
+    private function getConfigService()
+    {
+        if ($this->configService === null) {
+            $this->configService = ServiceRegister::getService(Configuration::CLASS_NAME);
+        }
+
+        return $this->configService;
     }
 }

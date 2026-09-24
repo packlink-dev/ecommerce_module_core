@@ -63,6 +63,16 @@ class TestShopConfiguration extends Configuration
     }
 
     /**
+     * Removes the stored default warehouse (test helper for missing-warehouse scenarios).
+     *
+     * @return void
+     */
+    public function removeDefaultWarehouse()
+    {
+        $this->saveConfigValue('defaultWarehouse', null);
+    }
+
+    /**
      * Returns current system identifier.
      *
      * @return string Current system identifier.

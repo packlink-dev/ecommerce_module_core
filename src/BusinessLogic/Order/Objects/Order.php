@@ -140,11 +140,31 @@ class Order
      * @var float
      */
     private $totalWeight = 0;
+    /**
+     * Shipping (freight) cost of the order, in the order currency. Used as the customs invoice's
+     * shipment cost; customs value is assessed on goods plus freight, so this must never carry the
+     * goods value. Null when the platform has not priced transport yet.
+     *
+     * @var float|null
+     */
+    private $shippingCost;
 
     /**
      * @var string $paymentId
      */
     private $paymentId = '';
+    /**
+     * Indicates whether the customer selected DDP at checkout.
+     *
+     * @var bool
+     */
+    private $ddpSelected = false;
+    /**
+     * Charged, platform-adjusted DDP cost in the order currency.
+     *
+     * @var float|null
+     */
+    private $ddpCost;
 
     /**
      * Returns order unique identifier.
@@ -595,6 +615,46 @@ class Order
     }
 
     /**
+     * Returns whether the customer selected DDP at checkout.
+     *
+     * @return bool
+     */
+    public function isDdpSelected()
+    {
+        return $this->ddpSelected;
+    }
+
+    /**
+     * Sets whether the customer selected DDP at checkout.
+     *
+     * @param bool $ddpSelected
+     */
+    public function setDdpSelected($ddpSelected)
+    {
+        $this->ddpSelected = $ddpSelected;
+    }
+
+    /**
+     * Returns charged DDP cost in the order currency.
+     *
+     * @return float|null
+     */
+    public function getDdpCost()
+    {
+        return $this->ddpCost;
+    }
+
+    /**
+     * Sets charged DDP cost in the order currency.
+     *
+     * @param float|null $ddpCost
+     */
+    public function setDdpCost($ddpCost)
+    {
+        $this->ddpCost = $ddpCost;
+    }
+
+    /**
      * @return float|int
      */
     public function getTotalWeight()
@@ -608,5 +668,25 @@ class Order
     public function setTotalWeight($totalWeight)
     {
         $this->totalWeight = $totalWeight;
+    }
+
+    /**
+     * Returns the shipping (freight) cost, or null when transport has not been priced.
+     *
+     * @return float|null
+     */
+    public function getShippingCost()
+    {
+        return $this->shippingCost;
+    }
+
+    /**
+     * Sets the shipping (freight) cost.
+     *
+     * @param float|null $shippingCost
+     */
+    public function setShippingCost($shippingCost)
+    {
+        $this->shippingCost = $shippingCost;
     }
 }

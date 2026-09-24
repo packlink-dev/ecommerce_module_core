@@ -264,9 +264,88 @@ if (!window.Packlink) {
                 setCountrySelection();
             }
 
+            bindDdpSection();
+
             templateService.getComponent('pl-page-submit-btn').addEventListener('click', save);
 
             utilityService.hideSpinner();
+        };
+
+        /**
+         * Binds DDP banners, behavior selection and cost adjustment inputs.
+         */
+        const bindDdpSection = () => {
+            const level = serviceModel.ddpSupportLevel;
+
+            if (!level) {
+                return;
+            }
+
+            const adjustmentGroup = templateService.getComponent('pl-ddp-adjustment-group'),
+                typeSelect = form['ddpAdjustmentType'],
+                amountInput = form['ddpAdjustmentAmount'];
+
+            if (serviceModel.customsConfigured === false) {
+                utilityService.showElement(templateService.getComponent('pl-ddp-customs-banner'));
+            }
+
+            typeSelect.value = serviceModel.ddpAdjustmentType || 'fixed';
+            typeSelect.addEventListener('change', () => {
+                serviceModel.ddpAdjustmentType = typeSelect.value;
+            });
+
+            amountInput.value = serviceModel.ddpAdjustmentAmount || 0;
+            amountInput.addEventListener('blur', () => {
+                serviceModel.ddpAdjustmentAmount = parseFloat(amountInput.value) || 0;
+            });
+
+            const showAdjustmentGroup = () => {
+                utilityService.showElement(adjustmentGroup);
+                // The posted adjustment type must match what the visible select shows.
+                if (!serviceModel.ddpAdjustmentType) {
+                    serviceModel.ddpAdjustmentType = typeSelect.value;
+                }
+            };
+
+            if (level === 'mandatory') {
+                utilityService.showElement(templateService.getComponent('pl-ddp-mandatory-banner'));
+                showAdjustmentGroup();
+
+                return;
+            }
+
+            const behaviorSelect = templateService.getComponent('pl-ddp-behavior-select');
+
+            utilityService.showElement(templateService.getComponent('pl-ddp-section'));
+            behaviorSelect.value = serviceModel.ddpBehavior || 'none';
+
+            // Charging duties needs a customs invoice, which an incomplete customs configuration
+            // cannot produce, so the choice cannot be RAISED while the banner is up. The stored
+            // value is left exactly as it is: overwriting it here would silently downgrade a
+            // merchant's existing setting the next time they saved anything on this service.
+            if (serviceModel.customsConfigured === false) {
+                behaviorSelect.disabled = true;
+
+                if (behaviorSelect.value !== 'none') {
+                    showAdjustmentGroup();
+                }
+
+                return;
+            }
+
+            if (behaviorSelect.value !== 'none') {
+                showAdjustmentGroup();
+            }
+
+            behaviorSelect.addEventListener('change', () => {
+                serviceModel.ddpBehavior = behaviorSelect.value;
+
+                if (behaviorSelect.value === 'none') {
+                    utilityService.hideElement(adjustmentGroup);
+                } else {
+                    showAdjustmentGroup();
+                }
+            });
         };
 
         /**
@@ -325,6 +404,17 @@ if (!window.Packlink) {
 
             if (!configuration.hasTaxConfiguration) {
                 excludedElementNames.push('tax');
+            }
+
+            // Hidden DDP inputs must not participate in validation.
+            if (serviceModel.ddpSupportLevel !== 'supported') {
+                excludedElementNames.push('ddpBehavior');
+            }
+
+            if (!serviceModel.ddpSupportLevel
+                || (serviceModel.ddpSupportLevel === 'supported' && (serviceModel.ddpBehavior || 'none') === 'none')
+            ) {
+                excludedElementNames.push('ddpAdjustmentType', 'ddpAdjustmentAmount');
             }
 
             for (let systemId in pricePolicyControllers) {

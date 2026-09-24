@@ -24,6 +24,11 @@ if (!window.Packlink) {
      * @property {boolean} usePacklinkPriceIfNotInRange
      * @property {Object} fixedPrices
      * @property {Object} systemDefaults
+     * @property {'supported'|'mandatory'|null} ddpSupportLevel
+     * @property {boolean} customsConfigured
+     * @property {'none'|'optional'|'enforced'} ddpBehavior
+     * @property {'fixed'|'percentage'|null} ddpAdjustmentType
+     * @property {number} ddpAdjustmentAmount
      */
 
     /**
@@ -97,6 +102,12 @@ if (!window.Packlink) {
             carrierLogo.setAttribute('title', service.carrierName);
 
             itemEl.querySelector('#pl-service-name').innerHTML = service.name;
+
+            const ddpBadge = itemEl.querySelector('[data-pl-ddp-badge]');
+            if (ddpBadge && service.ddpSupportLevel) {
+                ddpBadge.classList.remove('pl-hidden');
+            }
+
             itemEl.querySelector('#pl-service-policy').innerHTML = translator.translate('shippingServices.' + (service.pricingPolicies.length ? 'myPrices' : 'packlinkPrices')) + ' (' + service.currency + ')';
             if (currentPage === 'pick-shipping-services'
                 || systemInfo.currencies.includes(service.currency)

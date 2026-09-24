@@ -139,6 +139,10 @@ class SendDraftBusinessTask implements BusinessTask
 
             $this->getOrderService()->setReference($this->orderId, $reference);
 
+            if ($order->isDdpSelected() && $order->getDdpCost() !== null) {
+                $this->getOrderShipmentDetailsService()->setDdpCost($reference, $order->getDdpCost());
+            }
+
             yield 80;
 
             $shipment = $this->getProxy()->getShipment($reference);

@@ -159,6 +159,26 @@ class OrderShipmentDetailsService extends BaseService implements \Packlink\Busin
     }
 
     /**
+     * Sets charged DDP cost for a shipment.
+     *
+     * @param string $shipmentReference Packlink shipment reference.
+     * @param float $ddpCost Charged DDP cost in the order currency.
+     *
+     * @return void
+     *
+     * @throws OrderShipmentDetailsNotFound
+     */
+    public function setDdpCost($shipmentReference, $ddpCost)
+    {
+        /** @var OrderShipmentDetails $orderDetails */
+        $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
+
+        $orderDetails->setDdpCost(round((float)$ddpCost, 2));
+
+        $this->repository->persist($orderDetails);
+    }
+
+    /**
      * Sets order packlink shipping status.
      *
      * @param string $shipmentReference Packlink shipment reference.
@@ -189,7 +209,16 @@ class OrderShipmentDetailsService extends BaseService implements \Packlink\Busin
     {
         /** @var OrderShipmentDetails $orderDetails */
         $orderDetails = $this->getDetailsByReferenceInternal($shipmentReference);
-        $orderDetails->setShippingCost($price);
+
+        // Packlink carries no price on a shipment it has not priced yet - typically while it is still
+        // 'processing' - and Shipment::fromArray() flattens that absent price to 0.0. Storing it would
+        // erase a price an earlier poll had established and leave the order panel reporting a shipment
+        // that cost nothing, so only a real price is recorded. The currency is always kept current: it
+        // also labels the duty amount, which exists before the shipment is priced.
+        if ((float)$price > 0) {
+            $orderDetails->setShippingCost((float)$price);
+        }
+
         $orderDetails->setCurrency($currency);
 
         $this->repository->persist($orderDetails);

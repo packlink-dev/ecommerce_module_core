@@ -83,6 +83,15 @@ $pl-info-border: #B3D7FF;
         font-weight: 700;
       }
     }
+
+    &.pl-warning {
+      background-color: #fff8e1;
+      border-left-color: #f2c200;
+
+      .pl-info-box-info-icon {
+        color: #f2c200;
+      }
+    }
   }
 
   .pl-account-section {

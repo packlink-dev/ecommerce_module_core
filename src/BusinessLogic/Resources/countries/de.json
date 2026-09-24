@@ -38,7 +38,8 @@
     "invalidUrl": "Dieses Feld muss eine gültige URL enthalten.",
     "invalidFieldValue": "Dieses Feld muss auf „%s“ gesetzt werden.",
     "invalidMaxValue": "Der maximale Wert beträgt %s.",
-    "passwordRestriction": "Ihr Passwort muss mindestens %s Zeichen lang sein und mindestens einen Kleinbuchstaben, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten"
+    "passwordRestriction": "Ihr Passwort muss mindestens %s Zeichen lang sein und mindestens einen Kleinbuchstaben, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten",
+    "invalidHsCode": "Der HS-Code muss 6 bis 8 Ziffern haben."
   },
   "login": {
     "apiKey": "API-Schlüssel",
@@ -495,7 +496,20 @@
     "atLeastOneCountry": "",
     "misconfiguration": "Um Währungsänderungen zu speichern, müssen Sie einen Festpreiswert einstellen, indem Sie auf Versandservice \"Bearbeiten\" klicken.",
     "refreshServiceList" : "Serviceliste aktualisieren",
-    "refreshError": "Beim Aktualisieren der Serviceliste ist ein Fehler aufgetreten"
+    "refreshError": "Beim Aktualisieren der Serviceliste ist ein Fehler aufgetreten",
+    "ddpBadge": "Zölle und Abgaben bezahlt",
+    "dutiesCostAtCheckout": "Zollkosten bei der Kaufabwicklung",
+    "ddpBehaviorLabel": "Verhalten",
+    "noDutiesCharged": "Keine Zollkosten bei der Kaufabwicklung",
+    "offerDutiesOptionally": "Zollkosten bei der Kaufabwicklung optional anbieten",
+    "enforceDutiesCost": "Zollkosten bei der Kaufabwicklung verpflichtend erheben",
+    "ddpMandatoryNotice": "Dies ist ein Service, bei dem verpflichtende Zollkosten bei der Kaufabwicklung enthalten sind. Aktivieren Sie diesen Service nur, wenn Sie damit einverstanden sind, ihn mit inbegriffenen Zollkosten bei der Kaufabwicklung anzubieten.",
+    "ddpConfigureCustomsNotice": "Um diesen Service Ihren Kunden anbieten zu können, konfigurieren Sie bitte die Zollinformationen in diesem Modul.",
+    "adjustDdpCost": "DDP-Kosten anpassen",
+    "ddpAdjustmentLabel": "Anpassung",
+    "fixedAdjustment": "Feste Anpassung",
+    "percentageAdjustment": "Prozentuale Anpassung",
+    "adjustmentAmount": "Anpassungsbetrag"
   },
   "orderListAndDetails": {
     "printed": "Ausgedruckt",

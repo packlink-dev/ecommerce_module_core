@@ -66,6 +66,13 @@ class ShippingService
     public $cashOnDeliveryConfig;
 
     /**
+     * DDP support level for the service (null, "supported" or "mandatory").
+     *
+     * @var string|null $ddpSupportLevel
+     */
+    public $ddpSupportLevel;
+
+    /**
      * ShippingService constructor.
      *
      * @param string $serviceId Packlink service id.
@@ -76,6 +83,7 @@ class ShippingService
      * @param float $basePrice Base price.
      * @param float $taxPrice Tax price.
      * @param CashOnDeliveryConfig|null $cashOnDeliveryConfig
+     * @param string|null $ddpSupportLevel DDP support level.
      */
     public function __construct(
         $serviceId = '',
@@ -86,7 +94,8 @@ class ShippingService
         $basePrice = 0.0,
         $taxPrice = 0.0,
         $category = '',
-        $cashOnDeliveryConfig = null
+        $cashOnDeliveryConfig = null,
+        $ddpSupportLevel = null
     ) {
         $this->serviceId = $serviceId;
         $this->serviceName = $serviceName;
@@ -97,6 +106,27 @@ class ShippingService
         $this->taxPrice = $taxPrice;
         $this->category = $category;
         $this->cashOnDeliveryConfig = $cashOnDeliveryConfig;
+        $this->ddpSupportLevel = $ddpSupportLevel;
+    }
+
+    /**
+     * Gets DDP support level.
+     *
+     * @return string|null DDP support level.
+     */
+    public function getDdpSupportLevel()
+    {
+        return $this->ddpSupportLevel;
+    }
+
+    /**
+     * Sets DDP support level.
+     *
+     * @param string|null $ddpSupportLevel DDP support level.
+     */
+    public function setDdpSupportLevel($ddpSupportLevel)
+    {
+        $this->ddpSupportLevel = $ddpSupportLevel;
     }
 
     /**
@@ -119,7 +149,8 @@ class ShippingService
             isset($data['category']) ? $data['category'] : '',
             isset($data['cash_on_delivery'])
                 ? CashOnDeliveryConfig::fromArray($data['cash_on_delivery'])
-                : null
+                : null,
+            isset($data['ddp_support_level']) ? $data['ddp_support_level'] : null
         );
     }
 
@@ -143,7 +174,8 @@ class ShippingService
             $shippingServiceDetails->category,
             !empty($shippingServiceDetails->cashOnDelivery)
                 ? CashOnDeliveryConfig::fromArray($shippingServiceDetails->cashOnDelivery)
-                : null
+                : null,
+            $shippingServiceDetails->ddpSupportLevel
         );
     }
 
@@ -165,7 +197,8 @@ class ShippingService
             'category' => $this->category,
             'cash_on_delivery' => $this->cashOnDeliveryConfig
                 ? $this->cashOnDeliveryConfig->toArray()
-                : null
+                : null,
+            'ddp_support_level' => $this->ddpSupportLevel
         );
     }
 }
