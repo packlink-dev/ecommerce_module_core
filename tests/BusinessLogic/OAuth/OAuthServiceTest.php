@@ -119,11 +119,65 @@ class OAuthServiceTest extends BaseTestWithServices
             'redirect_uri' => 'www.example.com',
             'scope' => 'write read',
             'state' =>  $state->getState(),
+            // PKLPM-103. The test shop reports an e-commerce name the map does not know, so it is
+            // passed through unchanged - which is the documented fallback.
+            'origin' => 'test_system',
+            'ecommerce' => 'test_system',
+            'marketplace' => OAuthService::NO_MARKETPLACE,
         ), '', '&', PHP_QUERY_RFC3986);
 
         $expectedUrl = 'https://' . TenantDomainProvider::getDomain('ES') . '/auth/oauth2/authorize?' . $expectedParams;
 
         $this->assertEquals($expectedUrl, $actualUrl);
+    }
+
+    /**
+     * PKLPM-103. A platform reports a lower-case slug; the authorization server matches on the
+     * display name, and `onboarding_product` is set from `origin`.
+     *
+     * @throws QueryFilterInvalidParamException|EntityClassException
+     */
+    public function testBuildRedirectUrlSendsTheIntegrationNameTheAuthorizationServerExpects()
+    {
+        $this->shopConfig->setECommerceName('shopify');
+
+        $url = $this->service->buildRedirectUrlAndSaveState('ES');
+
+        self::assertTrue(strpos($url, 'origin=Shopify') !== false, 'origin must be the display name: ' . $url);
+        self::assertTrue(strpos($url, 'ecommerce=Shopify') !== false, 'ecommerce must be the display name: ' . $url);
+    }
+
+    /**
+     * PKLPM-103. The value contains spaces and the server expects them escaped; the existing
+     * PHP_QUERY_RFC3986 encoding is what does it, so this pins that it is not lost.
+     *
+     * @throws QueryFilterInvalidParamException|EntityClassException
+     */
+    public function testBuildRedirectUrlEscapesTheMarketplaceValue()
+    {
+        $url = $this->service->buildRedirectUrlAndSaveState('ES');
+
+        self::assertTrue(
+            strpos($url, 'marketplace=I%20do%20not%20have%20any%20marketplace%20outlets') !== false,
+            'marketplace must be present and escaped: ' . $url
+        );
+    }
+
+    /**
+     * PKLPM-103. An integration that cannot be named sends no tracking parameters at all, so the URL
+     * stays exactly what it was before this change rather than carrying an empty origin.
+     *
+     * @throws QueryFilterInvalidParamException|EntityClassException
+     */
+    public function testBuildRedirectUrlOmitsTheParamsWhenTheIntegrationCannotBeNamed()
+    {
+        $this->shopConfig->setECommerceName('');
+
+        $url = $this->service->buildRedirectUrlAndSaveState('ES');
+
+        self::assertTrue(strpos($url, 'origin=') === false, 'origin must be absent: ' . $url);
+        self::assertTrue(strpos($url, 'ecommerce=') === false, 'ecommerce must be absent: ' . $url);
+        self::assertTrue(strpos($url, 'marketplace=') === false, 'marketplace must be absent: ' . $url);
     }
 
     /**

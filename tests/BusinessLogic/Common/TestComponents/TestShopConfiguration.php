@@ -7,6 +7,15 @@ use Packlink\BusinessLogic\Configuration;
 class TestShopConfiguration extends Configuration
 {
     private $callbackUrl = 'https://some-shop.test/callback?a=1&b=abc';
+    /**
+     * Name this test shop reports as its e-commerce platform.
+     *
+     * Settable so a test can exercise the name-dependent behaviour without a subclass: the 3.x
+     * line still builds on PHP 5.6, where an anonymous class is a parse error.
+     *
+     * @var string
+     */
+    private $eCommerceName = 'test_system';
     private $servicePointEnabled = true;
     /**
      * In-memory integration ID to avoid consuming MemoryStorage auto-increment IDs.
@@ -156,7 +165,17 @@ class TestShopConfiguration extends Configuration
      */
     public function getECommerceName()
     {
-        return 'test_system';
+        return $this->eCommerceName;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
+    public function setECommerceName($name)
+    {
+        $this->eCommerceName = $name;
     }
 
     /**

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.9.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.3...v3.9.4) - 2026-09-28
+### Change
+- Send `origin`, `ecommerce` and `marketplace` on the OAuth authorize redirect, so a merchant who registers from inside the OAuth screen is attributed to the integration they came from
+
 ## [3.9.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.2...v3.9.3) - 2026-07-29
 ### Removed
 - Removed the abandoned `codacy/coverage` development dependency, which pulled in a vulnerable `symfony/process` version
