@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.4.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.1...v4.4.2) - 2026-09-29
+### Fixed
+- Shipment incident notifications were refused instead of updating the order: `shipment.incident` was absent from the accepted-event list, and is now registered in both `$validEvents` and `shouldHandleEvent()`
+- Event names were matched exactly, so any name carrying the plural `shipments.` prefix was refused; the prefix is now stripped before matching, for every event rather than only the incident event
+- `$validEvents` is read through `static::` and `shouldHandleEvent()` is `protected` rather than `private`, so a platform wrapper that redeclares either is honoured instead of silently diverging from core
+### Added
+- Warning-level log for the two paths that previously answered with a success response and did nothing without leaving a trace: an empty authorization token, and events accepted but deliberately not synced (`shipment.carrier.fail`, `shipment.label.fail`)
+
 ## [4.4.1](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.0...v4.4.1) - 2026-09-23
 ### Change
 - Send `origin`, `ecommerce` and `marketplace` on the OAuth authorize redirect, so a merchant who registers from inside the OAuth screen is attributed to the integration they came from
