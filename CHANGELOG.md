@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.4.3](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.2...v4.4.3) - 2026-10-14
+### Changed
+- Rebrand the shared admin to the new Packlink PRO logo and the Figtree font, both served locally instead of from the Packlink CDN
+- Use black instead of blue for the delivery type icons and the checkout map pin
+
 ## [4.4.2](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.1...v4.4.2) - 2026-09-29
 ### Fixed
 - Shipment incident notifications were refused instead of updating the order: `shipment.incident` was absent from the accepted-event list, and is now registered in both `$validEvents` and `shouldHandleEvent()`
