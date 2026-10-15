@@ -84,10 +84,21 @@ class PackageTransformerTest extends BaseTestWithServices
     {
         $package = $this->transformer->transform($packages);
 
-        $this->assertEquals($expected->weight, $package->weight);
-        $this->assertEquals($expected->width, $package->width);
-        $this->assertEquals($expected->height, $package->height);
-        $this->assertEquals($expected->length, $package->length);
+        $this->assertEquals($expected->weight, $package->weight, '', 0.0001);
+        $this->assertEquals($expected->width, $package->width, '', 0.0001);
+        $this->assertEquals($expected->height, $package->height, '', 0.0001);
+        $this->assertEquals($expected->length, $package->length, '', 0.0001);
+    }
+
+    public function testMultipleItemsKeepTheLongestSide()
+    {
+        // A 65 cm long item and an item without dimensions or weight.
+        $package = $this->transformer->transform(array(new Package(3, 20, 15, 65), new Package()));
+
+        $this->assertEquals(
+            array('width' => 22, 'height' => 20, 'length' => 65, 'weight' => 13.5),
+            $package->toArray()
+        );
     }
 
     /**
@@ -96,41 +107,55 @@ class PackageTransformerTest extends BaseTestWithServices
     public static function packagesProvider()
     {
         return array(
-            array(
+            'single item keeps its dimensions' => array(
                 array(
                     new Package(5.25, 20, 15, 10),
                 ),
                 new Package(5.25, 20, 15, 10),
             ),
-            array(
+            'single item gets default sides only where missing' => array(
                 array(
                     new Package(5.25, 20, 0, 0),
                 ),
                 new Package(5.25, 20, self::HEIGHT, self::LENGTH),
             ),
-            array(
+            'two items grow the shortest side to fit the summed volume' => array(
                 array(
                     new Package(5.25, 20, 10, 10),
                     new Package(5.75, 20, 10, 10),
                 ),
-                new Package(11, self::WIDTH, self::HEIGHT, self::LENGTH),
+                new Package(11, 20, 20, 10),
             ),
-            array(
+            'item without dimensions counts as the default parcel' => array(
                 array(
                     new Package(5.25, 20, 10, 10),
                     new Package(5.75, 20, 10, 10),
                     new Package(),
                 ),
-                new Package(11 + self::WEIGHT, self::WIDTH, self::HEIGHT, self::LENGTH),
+                new Package(11 + self::WEIGHT, 30, 20, 20),
             ),
-            array(
+            'several items without dimensions' => array(
                 array(
                     new Package(3, 20, 10, 10),
                     new Package(3.246, 20, 10, 10),
                     new Package(),
                     new Package(),
                 ),
-                new Package(6.246 + 2 * self::WEIGHT, self::WIDTH, self::HEIGHT, self::LENGTH),
+                new Package(6.246 + 2 * self::WEIGHT, 50, 20, 20),
+            ),
+            'long item is not shortened to the default length' => array(
+                array(
+                    new Package(3, 20, 15, 65),
+                    new Package(),
+                ),
+                new Package(3 + self::WEIGHT, 27500 / (20 * 65), 20, 65),
+            ),
+            'box of the longest sides already fits the summed volume' => array(
+                array(
+                    new Package(1, 60, 10, 10),
+                    new Package(1, 10, 60, 10),
+                ),
+                new Package(2, 60, 60, 10),
             ),
         );
     }

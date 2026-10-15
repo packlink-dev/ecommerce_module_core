@@ -45,6 +45,9 @@ class PackageTransformer extends Singleton
     /**
      * Transforms array of packages into one grouped package.
      *
+     * Missing package sides and weight are taken from the default parcel. The grouped package keeps the longest
+     * side of each axis, and its shortest side is grown when needed so that it holds the summed package volume.
+     *
      * @param Package[] $packages Array of packages.
      *
      * @return Package Grouped packages.
@@ -56,16 +59,44 @@ class PackageTransformer extends Singleton
             return new Package($default->weight, $default->width, $default->height, $default->length);
         }
 
-        $count = count($packages);
-        $width = $count === 1 && $packages[0]->width ? $packages[0]->width : $default->width;
-        $length = $count === 1 && $packages[0]->length ? $packages[0]->length : $default->length;
-        $height = $count === 1 && $packages[0]->height ? $packages[0]->height : $default->height;
-
-        $weight = 0;
+        $grouped = new Package();
+        $volume = 0;
         foreach ($packages as $package) {
-            $weight += $package->weight ?: $default->weight;
+            $width = $package->width ?: $default->width;
+            $height = $package->height ?: $default->height;
+            $length = $package->length ?: $default->length;
+
+            $grouped->weight += $package->weight ?: $default->weight;
+            $grouped->width = max($grouped->width, $width);
+            $grouped->height = max($grouped->height, $height);
+            $grouped->length = max($grouped->length, $length);
+            $volume += $width * $height * $length;
         }
 
-        return new Package($weight, $width, $height, $length);
+        $this->growToVolume($grouped, $volume);
+
+        return $grouped;
+    }
+
+    /**
+     * Grows the shortest side of the package until the package holds the given volume.
+     *
+     * @param Package $package Package to grow.
+     * @param float $volume Volume the package must hold.
+     */
+    private function growToVolume(Package $package, $volume)
+    {
+        if ($package->width * $package->height * $package->length >= $volume) {
+            return;
+        }
+
+        $shortest = min($package->width, $package->height, $package->length);
+        if ($package->width == $shortest) {
+            $package->width = $volume / ($package->height * $package->length);
+        } elseif ($package->height == $shortest) {
+            $package->height = $volume / ($package->width * $package->length);
+        } else {
+            $package->length = $volume / ($package->width * $package->height);
+        }
     }
 }
