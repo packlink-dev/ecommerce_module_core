@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [3.9.5](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.4...v3.9.5) - 2026-10-15
+### Changed
+- Rebrand the shared admin to the new Packlink PRO logo and the Figtree font, both served locally instead of from the Packlink CDN
+- Use black instead of blue for the delivery type icons and the checkout map pin
+
 ## [3.9.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v3.9.3...v3.9.4) - 2026-09-28
 ### Change
 - Send `origin`, `ecommerce` and `marketplace` on the OAuth authorize redirect, so a merchant who registers from inside the OAuth screen is attributed to the integration they came from
