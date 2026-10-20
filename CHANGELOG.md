@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.3...master-v2)
+## [4.4.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.3...v4.4.4) - 2026-10-20
 ### Fixed
 - Keep product dimensions when a cart has more than one item. The grouped parcel keeps the longest side of each axis, grows its shortest side to hold the summed item volume, and uses the default parcel only for a missing side or weight. Multi-item carts, and single products ordered in a quantity above one, were quoted as the default parcel, so their shipping costs will now change ([#111](https://github.com/packlink-dev/ecommerce_module_core/issues/111))
 
