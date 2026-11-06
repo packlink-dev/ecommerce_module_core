@@ -4,6 +4,18 @@ if (!window.Packlink) {
 
 (function () {
     const PAGE_SIZE = 4;
+    // Icons of the design (stroke SVGs); static markup only.
+    const SVG = (size, body, width) => '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (width || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
+    const ICONS = {
+        close: SVG(20, '<path d="M6 6l12 12M18 6 6 18"></path>', 2.4),
+        upDown: SVG(12, '<path d="M7 9l5-5 5 5M7 15l5 5 5-5"></path>', 2.4),
+        search: SVG(14, '<circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path>', 2.2),
+        box: SVG(26, '<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3 7.5 12 12l9-4.5M12 12v9"></path>', 1.6),
+        plus: SVG(10, '<path d="M12 5v14M5 12h14"></path>', 3),
+        chevronDown: SVG(16, '<path d="M6 9l6 6 6-6"></path>', 2.4),
+        chevronUp: SVG(16, '<path d="M6 15l6-6 6 6"></path>', 2.4),
+        truck: SVG(20, '<path d="M3 7h11v9H3z"></path><path d="M14 10h4l3 3v3h-7"></path><circle cx="7" cy="17.5" r="1.8"></circle><circle cx="17" cy="17.5" r="1.8"></circle>')
+    };
     const MIN_SEARCH_LENGTH = 3;
     const ERROR_MESSAGES = {
         market_unavailable: 'simulatedPrices.marketUnavailable',
@@ -16,7 +28,9 @@ if (!window.Packlink) {
      * plan when the panel opens, when a country chip is picked, and when a destination is picked. Every quote
      * is one Packlink call; nothing is cached.
      *
-     * @param {{dataUrl: string, searchUrl: string, locationSearchUrl: string}} configuration
+     * @param {{dataUrl: string, searchUrl: string, locationSearchUrl: string, initialData: ?Object}} configuration
+     *   initialData: the panel data rendered into the page (core SimulatedPricesController::getConfiguration()),
+     *   used on pages of a merchant without an account so the panel is drawn without waiting for a request.
      * @constructor
      */
     function SimulatedPricesPanel(configuration) {
@@ -29,6 +43,7 @@ if (!window.Packlink) {
             destinationCountry = null,
             result = null,
             expanded = false,
+            outsideClickHandler = null,
             latestRequest = 0,
             elements = {};
 
@@ -36,14 +51,27 @@ if (!window.Packlink) {
          * Loads the panel data and renders the panel into the container. The container stays hidden when the
          * merchant may not see simulated prices (PREMIUM plan) or the data cannot be loaded.
          *
+         * The panel is drawn at once as a placeholder of its final size (title, introduction, a loading card),
+         * so the page does not shift when the data and the prices arrive.
+         *
          * @param {HTMLElement} container
-         * @param {{onClose?: function, onReady?: function}} [options]
+         * @param {{onClose?: function, onReady?: function, onUnavailable?: function, introduction?: boolean}} [options]
          */
         this.render = (container, options) => {
             options = options || {};
-            utilityService.hideElement(container);
-            ajaxService.get(configuration.dataUrl, (response) => {
+            buildPlaceholder(container, options);
+            utilityService.showElement(container);
+            const unavailable = () => {
+                utilityService.hideElement(container);
+                if (options.onUnavailable) {
+                    options.onUnavailable();
+                }
+            };
+
+            const start = (response) => {
                 if (!response || !response.enabled || !response.markets || response.markets.length === 0) {
+                    unavailable();
+
                     return;
                 }
 
@@ -61,7 +89,55 @@ if (!window.Packlink) {
                 if (options.onReady) {
                     options.onReady();
                 }
-            }, () => null);
+            };
+
+            if (configuration.initialData && options.introduction) {
+                // Login and registration: no account yet, so the rendered configuration is the whole data.
+                start(Object.assign({connected: false, currentTier: null, upgradeUrl: null}, configuration.initialData));
+
+                return;
+            }
+
+            ajaxService.get(configuration.dataUrl, start, unavailable);
+        };
+
+        /**
+         * Title, introduction (when asked for) and a loading card, before the data arrives.
+         *
+         * @param {HTMLElement} container
+         * @param {{onClose?: function, introduction?: boolean}} options
+         */
+        const buildPlaceholder = (container, options) => {
+            container.innerHTML = '';
+            container.classList.add('pl-simulated-prices-panel');
+            container.appendChild(buildHeader(options.onClose));
+            if (options.introduction) {
+                container.appendChild(el('p', 'pl-simulated-prices-description', translator.translate('simulatedPrices.description')));
+            }
+
+            container.appendChild(el('div', 'pl-simulated-prices-controls'));
+            elements.results = el('div', 'pl-simulated-prices-results');
+            container.appendChild(elements.results);
+            renderLoading();
+        };
+
+        /**
+         * @param {function} [onClose]
+         * @return {HTMLElement}
+         */
+        const buildHeader = (onClose) => {
+            const header = el('div', 'pl-simulated-prices-header');
+            header.appendChild(el('h2', 'pl-simulated-prices-title', translator.translate('simulatedPrices.title')));
+            if (onClose) {
+                const close = el('button', 'pl-simulated-prices-close');
+                close.type = 'button';
+                close.setAttribute('aria-label', translator.translate('simulatedPrices.close'));
+                close.appendChild(icon(ICONS.close));
+                close.addEventListener('click', onClose);
+                header.appendChild(close);
+            }
+
+            return header;
         };
 
         /**
@@ -72,19 +148,11 @@ if (!window.Packlink) {
             container.innerHTML = '';
             container.classList.add('pl-simulated-prices-panel');
 
-            const header = el('div', 'pl-simulated-prices-header');
-            header.appendChild(el('h2', 'pl-simulated-prices-title', translator.translate('simulatedPrices.title')));
-            if (onClose) {
-                const close = el('button', 'pl-simulated-prices-close');
-                close.type = 'button';
-                close.setAttribute('aria-label', translator.translate('simulatedPrices.close'));
-                close.appendChild(el('i', 'material-icons', 'close'));
-                close.addEventListener('click', onClose);
-                header.appendChild(close);
+            container.appendChild(buildHeader(onClose));
+            // The introduction is for a merchant without an account (login and registration pages only).
+            if (!data.connected) {
+                container.appendChild(el('p', 'pl-simulated-prices-description', translator.translate('simulatedPrices.description')));
             }
-
-            container.appendChild(header);
-            container.appendChild(el('p', 'pl-simulated-prices-description', translator.translate('simulatedPrices.description')));
 
             const controls = el('div', 'pl-simulated-prices-controls');
             const chips = el('div', 'pl-simulated-prices-chips');
@@ -113,7 +181,7 @@ if (!window.Packlink) {
             button.setAttribute('aria-expanded', 'false');
             elements.destinationFlag = flag(destinationCountry);
             button.appendChild(elements.destinationFlag);
-            button.appendChild(el('span', 'pl-simulated-prices-country-arrow'));
+            button.appendChild(icon(ICONS.upDown));
             const list = el('ul', 'pl-simulated-prices-country-list pl-hidden');
             list.setAttribute('role', 'listbox');
             list.setAttribute('aria-label', translator.translate('simulatedPrices.destination'));
@@ -132,11 +200,18 @@ if (!window.Packlink) {
                 list.appendChild(option);
             });
             button.addEventListener('click', () => toggleCountryList(list.classList.contains('pl-hidden')));
-            document.addEventListener('click', (event) => {
+            // One page listener per panel: the sidebar is rebuilt on every opening, and a listener of an earlier
+            // build would close the new list right after it opens.
+            if (outsideClickHandler) {
+                document.removeEventListener('click', outsideClickHandler);
+            }
+
+            outsideClickHandler = (event) => {
                 if (!picker.contains(event.target)) {
                     toggleCountryList(false);
                 }
-            });
+            };
+            document.addEventListener('click', outsideClickHandler);
             picker.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape') {
                     toggleCountryList(false);
@@ -156,6 +231,7 @@ if (!window.Packlink) {
             input.addEventListener('input', utilityService.debounce(250, () => onDestinationInput(input.value)));
             elements.input = input;
             elements.options = el('div', 'pl-simulated-prices-options pl-hidden');
+            searchWrapper.appendChild(icon(ICONS.search));
             searchWrapper.appendChild(input);
             searchWrapper.appendChild(elements.options);
 
@@ -167,7 +243,6 @@ if (!window.Packlink) {
             elements.chips = chips;
             elements.results = el('div', 'pl-simulated-prices-results');
             container.appendChild(elements.results);
-            container.appendChild(el('p', 'pl-simulated-prices-disclaimer', translator.translate('simulatedPrices.disclaimer')));
 
             updateChips();
         };
@@ -286,18 +361,29 @@ if (!window.Packlink) {
 
         const renderLoading = () => {
             elements.results.innerHTML = '';
+            const card = el('div', 'pl-simulated-prices-card');
             const loading = el('div', 'pl-simulated-prices-message');
             loading.appendChild(el('div', 'pl-simulated-prices-spinner'));
-            elements.results.appendChild(loading);
+            card.appendChild(loading);
+            card.appendChild(disclaimer());
+            elements.results.appendChild(card);
         };
+
+        /**
+         * The disclaimer closes every state of the card, as in the design.
+         *
+         * @return {HTMLElement}
+         */
+        const disclaimer = () => el('p', 'pl-simulated-prices-disclaimer', translator.translate('simulatedPrices.disclaimer'));
 
         const renderResult = () => {
             const box = elements.results;
             box.innerHTML = '';
 
             if (result.error || result.services.length === 0) {
+                const emptyCard = el('div', 'pl-simulated-prices-card');
                 const message = el('div', 'pl-simulated-prices-message');
-                message.appendChild(el('i', 'material-icons', 'error_outline'));
+                message.appendChild(icon(ICONS.box));
                 if (!result.error || result.error === 'no_services') {
                     message.appendChild(el('strong', '', translator.translate('simulatedPrices.noServicesTitle')));
                     message.appendChild(el('span', '', translator.translate('simulatedPrices.noServicesHint')));
@@ -307,7 +393,9 @@ if (!window.Packlink) {
                     )));
                 }
 
-                box.appendChild(message);
+                emptyCard.appendChild(message);
+                emptyCard.appendChild(disclaimer());
+                box.appendChild(emptyCard);
 
                 return;
             }
@@ -315,7 +403,7 @@ if (!window.Packlink) {
             const card = el('div', 'pl-simulated-prices-card');
             if (result.fromPrice) {
                 const note = el('div', 'pl-simulated-prices-note');
-                note.appendChild(el('i', 'material-icons', 'inventory_2'));
+                note.appendChild(icon(ICONS.box));
                 const text = el('div');
                 const price = formatPrice(result.fromPrice.totalPrice, result.fromPrice.currency);
                 text.appendChild(el('strong', '', result.connected
@@ -342,7 +430,9 @@ if (!window.Packlink) {
                 if (result.connected && tier === result.currentTier) {
                     plan.appendChild(el('span', 'pl-simulated-prices-tag pl-simulated-prices-current', translator.translate('simulatedPrices.currentPlan')));
                 } else if (result.connected && data.upgradeUrl) {
-                    const upgrade = el('a', 'pl-simulated-prices-tag pl-simulated-prices-upgrade', translator.translate('simulatedPrices.upgrade'));
+                    const upgrade = el('a', 'pl-simulated-prices-tag pl-simulated-prices-upgrade');
+                    upgrade.appendChild(icon(ICONS.plus));
+                    upgrade.appendChild(document.createTextNode(translator.translate('simulatedPrices.upgrade')));
                     upgrade.href = data.upgradeUrl;
                     upgrade.target = '_blank';
                     upgrade.rel = 'noopener noreferrer';
@@ -407,6 +497,7 @@ if (!window.Packlink) {
                     ? translator.translate('simulatedPrices.showLess')
                     : translator.translate('simulatedPrices.showMore', [rest]));
                 toggle.type = 'button';
+                toggle.appendChild(icon(expanded ? ICONS.chevronUp : ICONS.chevronDown));
                 toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
                 toggle.addEventListener('click', () => {
                     expanded = !expanded;
@@ -415,6 +506,7 @@ if (!window.Packlink) {
                 card.appendChild(toggle);
             }
 
+            card.appendChild(disclaimer());
             box.appendChild(card);
         };
 
@@ -478,6 +570,21 @@ if (!window.Packlink) {
          * @param {string} [text]
          * @return {HTMLElement}
          */
+        /**
+         * Builds an icon from one of the fixed ICONS markups (never from data).
+         *
+         * @param {string} markup
+         * @return {Element}
+         */
+        const icon = (markup) => {
+            const holder = document.createElement('span');
+            holder.className = 'pl-simulated-prices-icon';
+            holder.setAttribute('aria-hidden', 'true');
+            holder.innerHTML = markup;
+
+            return holder;
+        };
+
         const el = (tag, className, text) => {
             const element = document.createElement(tag);
             if (className) {
@@ -501,6 +608,11 @@ if (!window.Packlink) {
      *     simulatedPricesLocationSearchUrl?: string}} configuration
      * @return {SimulatedPricesPanel|null}
      */
+    /**
+     * Truck icon of the "Discover our rates" button (static markup).
+     */
+    SimulatedPricesPanel.truckIcon = ICONS.truck;
+
     SimulatedPricesPanel.fromPageConfiguration = (configuration) => {
         if (!configuration || !configuration.simulatedPricesDataUrl || !configuration.simulatedPricesSearchUrl
             || !configuration.simulatedPricesLocationSearchUrl) {
@@ -510,7 +622,8 @@ if (!window.Packlink) {
         return new SimulatedPricesPanel({
             dataUrl: configuration.simulatedPricesDataUrl,
             searchUrl: configuration.simulatedPricesSearchUrl,
-            locationSearchUrl: configuration.simulatedPricesLocationSearchUrl
+            locationSearchUrl: configuration.simulatedPricesLocationSearchUrl,
+            initialData: configuration.simulatedPricesConfiguration || null
         });
     };
 
@@ -531,11 +644,25 @@ if (!window.Packlink) {
             return;
         }
 
+        // Everything the page had (form, registration bar) becomes the left column; the panel is the right one.
+        // Both columns exist from the first paint, the panel as a placeholder of its final size.
+        const main = document.createElement('div');
+        main.className = 'pl-simulated-prices-page-main';
+        while (page.firstChild) {
+            main.appendChild(page.firstChild);
+        }
+
+        page.appendChild(main);
         const container = document.createElement('section');
-        container.className = 'pl-simulated-prices-panel pl-hidden';
+        container.className = 'pl-simulated-prices-panel';
         page.appendChild(container);
+        page.classList.add('pl-with-simulated-prices');
         panel.render(container, {
-            onReady: () => page.classList.add('pl-with-simulated-prices')
+            introduction: true,
+            onUnavailable: () => {
+                page.classList.remove('pl-with-simulated-prices');
+                container.remove();
+            }
         });
     };
 
