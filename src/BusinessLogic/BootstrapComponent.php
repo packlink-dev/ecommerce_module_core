@@ -46,6 +46,7 @@ use Packlink\BusinessLogic\Scheduler\Interfaces\SchedulerInterface;
 use Packlink\BusinessLogic\ShipmentDocument\Interfaces\ShipmentDocumentServiceInterface;
 use Packlink\BusinessLogic\ShipmentDocument\ShipmentDocumentService;
 use Packlink\BusinessLogic\ShipmentDraft\Interfaces\ShipmentDraftServiceInterface;
+use Packlink\BusinessLogic\SimulatedPrices\SimulatedPricesService;
 use Packlink\BusinessLogic\Subscription\SubscriptionService;
 use Packlink\BusinessLogic\ShipmentDraft\ShipmentDraftService;
 use Packlink\BusinessLogic\ShippingMethod\Models\ShippingPricePolicy;
@@ -180,6 +181,13 @@ class BootstrapComponent extends \Logeecom\Infrastructure\BootstrapComponent
             SubscriptionService::CLASS_NAME,
             function () {
                 return SubscriptionService::getInstance();
+            }
+        );
+
+        ServiceRegister::registerService(
+            SimulatedPricesService::CLASS_NAME,
+            function () {
+                return SimulatedPricesService::getInstance();
             }
         );
 

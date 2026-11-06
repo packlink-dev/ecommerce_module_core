@@ -27,6 +27,13 @@ if (!window.Packlink) {
         let systemInfo;
 
         /**
+         * Simulated prices sidebar; null when the module does not provide the panel URLs.
+         *
+         * @type {{open: function, close: function}|null}
+         */
+        let ratesSidebar = null;
+
+        /**
          * Displays page content.
          *
          */
@@ -44,6 +51,7 @@ if (!window.Packlink) {
             });
 
             settingsButtonService.displaySettings(settingsMenu, state);
+            ratesSidebar = initRatesSidebar();
 
             if (configuration.getSubscriptionPlanUrl) {
                 const bannerController = new Packlink.SubscriptionBannerController();
@@ -71,6 +79,71 @@ if (!window.Packlink) {
             }
 
             ajaxService.get(configuration.getServicesUrl, bindServices);
+        };
+
+        /**
+         * Adds the "Discover our rates" button and the simulated prices sidebar (CR-SET-72-02) when the module
+         * provides the panel URLs. The panel loads its data, and stays hidden for PREMIUM merchants, only once
+         * the sidebar is opened.
+         *
+         * @return {{open: function, close: function}|null}
+         */
+        const initRatesSidebar = () => {
+            const panel = Packlink.SimulatedPricesPanel
+                ? Packlink.SimulatedPricesPanel.fromPageConfiguration(configuration)
+                : null;
+            const page = templateService.getMainPage().querySelector('.pl-my-shipping-services-page');
+            if (!panel || !page) {
+                return null;
+            }
+
+            const header = page.querySelector('header'),
+                content = page.querySelector('.pl-page-content'),
+                main = document.createElement('div'),
+                sidebar = document.createElement('aside'),
+                button = document.createElement('button');
+
+            main.className = 'pl-simulated-prices-main';
+            while (content.firstChild) {
+                main.appendChild(content.firstChild);
+            }
+
+            content.appendChild(main);
+            sidebar.className = 'pl-simulated-prices-sidebar pl-hidden';
+            content.appendChild(sidebar);
+
+            let opened = false;
+            const sidebarApi = {
+                open: () => {
+                    if (opened) {
+                        return;
+                    }
+
+                    opened = true;
+                    utilityService.showElement(sidebar);
+                    page.classList.add('pl-simulated-prices-open');
+                    button.setAttribute('aria-expanded', 'true');
+                    panel.render(sidebar, {onClose: sidebarApi.close});
+                    window.dispatchEvent(new Event('resize'));
+                },
+                close: () => {
+                    opened = false;
+                    utilityService.hideElement(sidebar);
+                    page.classList.remove('pl-simulated-prices-open');
+                    button.setAttribute('aria-expanded', 'false');
+                    window.dispatchEvent(new Event('resize'));
+                }
+            };
+
+            button.type = 'button';
+            button.className = 'pl-button pl-button-inverted pl-discover-rates-button';
+            button.setAttribute('aria-expanded', 'false');
+            button.innerHTML = '<i class="material-icons">local_shipping</i>';
+            button.appendChild(document.createTextNode(translator.translate('simulatedPrices.discoverRates')));
+            button.addEventListener('click', () => (opened ? sidebarApi.close() : sidebarApi.open()));
+            header.appendChild(button);
+
+            return sidebarApi;
         };
 
         const addServiceClick = () => {
@@ -112,6 +185,9 @@ if (!window.Packlink) {
                 utilityService.hideElement(table);
                 utilityService.hideElement(list);
                 utilityService.showElement(templateService.getComponent('pl-no-shipping-services'));
+                if (ratesSidebar) {
+                    ratesSidebar.open();
+                }
             }
 
             utilityService.hideSpinner();

@@ -36,6 +36,7 @@ use Packlink\BusinessLogic\Http\DTO\Subscription\Subscription;
 use Packlink\BusinessLogic\Http\DTO\Tracking;
 use Packlink\BusinessLogic\Http\DTO\User;
 use Packlink\BusinessLogic\Http\Exceptions\DraftNotCreatedException;
+use Packlink\BusinessLogic\Http\Exceptions\PacklinkErrorException;
 use Packlink\BusinessLogic\IntegrationRegistration\DTO\IntegrationRegistrationPayload;
 use Packlink\BusinessLogic\IntegrationRegistration\Exceptions\IntegrationNotRegisteredException;
 use Packlink\BusinessLogic\IntegrationRegistration\Interfaces\IntegrationRegistrationDataProviderInterface;
@@ -314,18 +315,34 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      */
     public function searchLocations($platformCountry, $postalZone, $query)
     {
-        $brand = $this->getBrandConfigurationService()->get();
+        $response = $this->call(
+            HttpClient::HTTP_METHOD_GET,
+            $this->getSearchLocationsEndpoint($platformCountry, $postalZone, $query)
+        );
 
-        $url = 'locations/postalcodes?' . http_build_query(
-                array(
-                    'platform' => $brand->platformCode,
-                    'platform_country' => $platformCountry,
-                    'postalzone' => $postalZone,
-                    'q' => $query,
-                )
-            );
+        return LocationInfo::fromBatch($response->decodeBodyToArray());
+    }
 
-        $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
+    /**
+     * Performs search for locations without sending credentials. Used for merchants who have no
+     * Packlink account yet.
+     *
+     * @param string $platformCountry Country code to search in.
+     * @param string $postalZone Postal zone to search in.
+     * @param string $query Query to search for.
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
+     *
+     * @throws HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function searchLocationsWithoutCredentials($platformCountry, $postalZone, $query)
+    {
+        $response = $this->callWithoutCredentials(
+            $this->getSearchLocationsEndpoint($platformCountry, $postalZone, $query)
+        );
+        $this->validateResponse($response);
 
         return LocationInfo::fromBatch($response->decodeBodyToArray());
     }
@@ -362,29 +379,76 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
      */
     public function getPostalZones($countryCode, $lang = 'en')
     {
-        $brand = $this->getBrandConfigurationService()->get();
+        $response = $this->call(HttpClient::HTTP_METHOD_GET, $this->getPostalZonesEndpoint($countryCode, $lang));
 
-        $url = 'locations/postalzones/destinations?' . http_build_query(
-                array(
-                    'platform' => $brand->platformCode,
-                    'platform_country' => $countryCode,
-                    'language' => $lang,
-                )
-            );
+        return $this->filterPostalZones($response, $countryCode);
+    }
 
-        $response = $this->call(HttpClient::HTTP_METHOD_GET, $url);
+    /**
+     * Returns array of PostalZone objects by specified country without sending credentials. Used for
+     * merchants who have no Packlink account yet.
+     *
+     * @param string $countryCode
+     * @param string $lang
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\PostalZone[]
+     *
+     * @throws HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpAuthenticationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException
+     */
+    public function getPostalZonesWithoutCredentials($countryCode, $lang = 'en')
+    {
+        $response = $this->callWithoutCredentials($this->getPostalZonesEndpoint($countryCode, $lang));
+        $this->validateResponse($response);
 
-        $postalZones = PostalZone::fromBatch($response->decodeBodyToArray());
+        return $this->filterPostalZones($response, $countryCode);
+    }
 
-        $postalZones = array_filter(
-            $postalZones,
-            function ($postalZone) use ($countryCode) {
-                /** @var PostalZone $postalZone */
-                return $postalZone->isoCode === $countryCode;
-            }
-        );
+    /**
+     * Gets shipping services with prices on every subscription plan for a merchant who has no Packlink
+     * account yet. The request carries no credentials, never reads or writes the stored token and never
+     * registers an integration. Packlink returns plan prices automatically, so "price_simulation" is not sent.
+     *
+     * @param ShippingServiceSearch $params Search parameters.
+     * @param string $platform Packlink platform code, for example "PRO".
+     * @param string $platformCountry Packlink market, for example "ES".
+     *
+     * @return ShippingServiceDetails[] Found services with per-plan prices.
+     *
+     * @throws PacklinkErrorException When Packlink answers with an unsuccessful status.
+     * @throws HttpCommunicationException
+     * @throws \Logeecom\Infrastructure\Http\Exceptions\HttpRequestException When search parameters are missing.
+     */
+    public function getSimulatedShippingServices(ShippingServiceSearch $params, $platform, $platformCountry)
+    {
+        if (!$params->isValid()) {
+            Logger::logDebug('Missing required search parameter(s).', 'Core', $params->toArray());
+            throw new HttpRequestException('Missing required search parameter(s).', 400);
+        }
 
-        return $postalZones;
+        $query = $params->toArray();
+        unset($query['price_simulation']);
+        $query = array('platform' => $platform, 'platform_country' => strtoupper($platformCountry)) + $query;
+
+        $response = $this->callWithoutCredentials('services/unregistered-user-pricing?' . http_build_query($query));
+        if (!$response->isSuccessful()) {
+            throw $this->createPacklinkErrorException($response);
+        }
+
+        $body = $response->decodeBodyToArray();
+        if (empty($body)) {
+            return array();
+        }
+
+        $shippingDetails = ShippingServiceDetails::fromBatch($body);
+        foreach ($shippingDetails as $shippingDetail) {
+            $shippingDetail->departureCountry = $params->fromCountry;
+            $shippingDetail->destinationCountry = $params->toCountry;
+            $shippingDetail->national = $params->toCountry === $params->fromCountry;
+        }
+
+        return $shippingDetails;
     }
 
     /**
@@ -1154,6 +1218,147 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
             'Module-Version' => 'X-Module-Version: ' . $this->configService->getModuleVersion(),
             'Ecommerce-Name' => 'X-Ecommerce-Name: ' . $this->configService->getECommerceName(),
             'Ecommerce-Version' => 'X-Ecommerce-Version: ' . $this->configService->getECommerceVersion(),
+        );
+    }
+
+    /**
+     * Makes a GET call without credentials and returns the response without validating it.
+     *
+     * @param string $endpoint Endpoint resource on remote API, with the query string.
+     *
+     * @return HttpResponse Response from request.
+     *
+     * @throws HttpCommunicationException
+     */
+    private function callWithoutCredentials($endpoint)
+    {
+        return $this->client->request(
+            HttpClient::HTTP_METHOD_GET,
+            static::BASE_URL . static::API_VERSION . ltrim($endpoint, '/'),
+            $this->getRequestHeadersWithoutCredentials()
+        );
+    }
+
+    /**
+     * Returns the request headers of a call that must not identify an account: no Authorization
+     * header, not even an empty one, and no tenant headers.
+     *
+     * @return array Formatted request headers.
+     */
+    private function getRequestHeadersWithoutCredentials()
+    {
+        return array(
+            'accept' => 'Accept: application/json',
+            'Module-Version' => 'X-Module-Version: ' . $this->configService->getModuleVersion(),
+            'Ecommerce-Name' => 'X-Ecommerce-Name: ' . $this->configService->getECommerceName(),
+            'Ecommerce-Version' => 'X-Ecommerce-Version: ' . $this->configService->getECommerceVersion(),
+        );
+    }
+
+    /**
+     * Builds an exception that keeps the HTTP status and the first Packlink error code of the response.
+     * Error bodies vary: coded messages, uncoded messages, a top-level message, or no body at all.
+     *
+     * @param HttpResponse $response Unsuccessful response.
+     *
+     * @return PacklinkErrorException
+     */
+    private function createPacklinkErrorException(HttpResponse $response)
+    {
+        $body = json_decode($response->getBody(), true);
+        $message = '';
+        $errorCode = '';
+        if (is_array($body)) {
+            if (isset($body['messages']) && is_array($body['messages'])) {
+                foreach ($body['messages'] as $item) {
+                    if (!is_array($item)) {
+                        continue;
+                    }
+
+                    if ($message === '' && isset($item['message'])) {
+                        $message = (string)$item['message'];
+                    }
+
+                    if ($errorCode === '' && !empty($item['error_code'])) {
+                        $errorCode = (string)$item['error_code'];
+                    }
+                }
+            } elseif (isset($body['message'])) {
+                $message = (string)$body['message'];
+            }
+        }
+
+        Logger::logInfo(
+            'Packlink unregistered-user pricing failed.',
+            'Core',
+            array('status' => $response->getStatus(), 'errorCode' => $errorCode, 'message' => $message)
+        );
+
+        return new PacklinkErrorException($message, $response->getStatus(), $errorCode);
+    }
+
+    /**
+     * Returns the postal zones endpoint with its query string.
+     *
+     * @param string $countryCode
+     * @param string $lang
+     *
+     * @return string
+     */
+    private function getPostalZonesEndpoint($countryCode, $lang)
+    {
+        $brand = $this->getBrandConfigurationService()->get();
+
+        return 'locations/postalzones/destinations?' . http_build_query(
+                array(
+                    'platform' => $brand->platformCode,
+                    'platform_country' => $countryCode,
+                    'language' => $lang,
+                )
+            );
+    }
+
+    /**
+     * Returns the postal code search endpoint with its query string.
+     *
+     * @param string $platformCountry
+     * @param string $postalZone
+     * @param string $query
+     *
+     * @return string
+     */
+    private function getSearchLocationsEndpoint($platformCountry, $postalZone, $query)
+    {
+        $brand = $this->getBrandConfigurationService()->get();
+
+        return 'locations/postalcodes?' . http_build_query(
+                array(
+                    'platform' => $brand->platformCode,
+                    'platform_country' => $platformCountry,
+                    'postalzone' => $postalZone,
+                    'q' => $query,
+                )
+            );
+    }
+
+    /**
+     * Parses postal zones and keeps only those of the requested country.
+     *
+     * @param HttpResponse $response
+     * @param string $countryCode
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\PostalZone[]
+     */
+    private function filterPostalZones(HttpResponse $response, $countryCode)
+    {
+        $postalZones = PostalZone::fromBatch($response->decodeBodyToArray());
+
+        return array_filter(
+            $postalZones,
+            function ($postalZone) use ($countryCode) {
+                /** @var PostalZone $postalZone */
+                return $postalZone->isoCode === $countryCode;
+            }
         );
     }
 

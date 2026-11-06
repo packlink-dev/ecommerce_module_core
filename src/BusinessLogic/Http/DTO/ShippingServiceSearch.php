@@ -15,6 +15,10 @@ use Packlink\BusinessLogic\Brand\BrandConfigurationService;
 class ShippingServiceSearch extends DataTransferObject
 {
     /**
+     * Value of the price simulation parameter that requests prices for every subscription plan.
+     */
+    const PRICE_SIMULATION_ALL = 'all';
+    /**
      * Service ID. Optional.
      *
      * @var int
@@ -50,6 +54,12 @@ class ShippingServiceSearch extends DataTransferObject
      * @var \Packlink\BusinessLogic\Http\DTO\Package[]
      */
     public $packages;
+    /**
+     * Price simulation parameter. Optional; when empty, the parameter is not sent.
+     *
+     * @var string|null
+     */
+    public $priceSimulation;
 
     /**
      * ShippingServiceSearch constructor.
@@ -107,6 +117,10 @@ class ShippingServiceSearch extends DataTransferObject
             $data["packages[$index][weight]"] = $package->weight;
         }
 
+        if (!empty($this->priceSimulation)) {
+            $data['price_simulation'] = $this->priceSimulation;
+        }
+
         return $data;
     }
 
@@ -126,6 +140,7 @@ class ShippingServiceSearch extends DataTransferObject
         $instance->fromZip = self::getDataValue($raw, 'from[zip]');
         $instance->toCountry = self::getDataValue($raw, 'to[country]');
         $instance->toZip = self::getDataValue($raw, 'to[zip]');
+        $instance->priceSimulation = self::getDataValue($raw, 'price_simulation', null);
         $instance->packages = array();
 
         $index = 0;

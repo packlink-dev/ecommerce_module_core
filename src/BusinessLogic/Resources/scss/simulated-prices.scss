@@ -1,0 +1,434 @@
+// Simulated prices panel (CR-SET-72-02): login and registration pages, My shipping services sidebar.
+$sp-highlight: #6c2bd9;
+$sp-row: #f2f2f2;
+
+.pl-login-page.pl-with-simulated-prices,
+.pl-register-page.pl-with-simulated-prices {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+
+  > div,
+  > form {
+    flex: 1 1 440px;
+    min-width: 0;
+  }
+
+  > .pl-simulated-prices-panel {
+    flex: 1 1 520px;
+    min-width: 0;
+    background: #f4f4f4;
+    padding: 40px 32px;
+  }
+}
+
+.pl-simulated-prices-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  &.pl-hidden {
+    display: none;
+  }
+}
+
+.pl-simulated-prices-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pl-simulated-prices-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-heading-color;
+}
+
+.pl-simulated-prices-close {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: $color-light-gray;
+  width: 44px;
+  height: 44px;
+}
+
+.pl-simulated-prices-description {
+  margin: 8px 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pl-simulated-prices-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.pl-simulated-prices-chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: 12px;
+}
+
+.pl-simulated-prices-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  margin: 0 8px 8px 0;
+  padding: 0 12px;
+  border: 1px solid #c9cdd3;
+  border-radius: 2px;
+  background: $color-white;
+  font: inherit;
+  font-size: 12px;
+  color: $text-color;
+  cursor: pointer;
+
+  &[aria-pressed="true"] {
+    background: #e4e7f2;
+    border-color: #9aa3c2;
+  }
+}
+
+.pl-simulated-prices-flag {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.pl-simulated-prices-destination {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+
+  .pl-simulated-prices-destination-label {
+    margin-right: 8px;
+  }
+
+  .pl-simulated-prices-country {
+    position: relative;
+    margin-right: 8px;
+  }
+
+  .pl-simulated-prices-country-button {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid #c9cccf;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .pl-simulated-prices-country-arrow {
+    width: 0;
+    height: 0;
+    margin-left: 6px;
+    border-top: 5px solid #4a4f57;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+  }
+
+  .pl-simulated-prices-country-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 20;
+    min-width: 160px;
+    margin: 4px 0 0;
+    padding: 4px;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    list-style: none;
+
+    &.pl-hidden {
+      display: none;
+    }
+  }
+
+  .pl-simulated-prices-country-option {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      background: #f1f1f1;
+    }
+
+    &[aria-selected="true"] {
+      font-weight: 700;
+    }
+
+    .pl-simulated-prices-flag {
+      margin-right: 8px;
+    }
+  }
+}
+
+.pl-simulated-prices-search {
+  position: relative;
+
+  .pl-simulated-prices-search-input {
+    width: 160px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid #c9cdd3;
+    border-radius: 2px;
+    font-size: 12px;
+    box-sizing: border-box;
+  }
+}
+
+.pl-simulated-prices-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  max-height: 240px;
+  overflow-y: auto;
+  background: $color-white;
+  border: 1px solid $border-color;
+
+  &.pl-hidden {
+    display: none;
+  }
+}
+
+.pl-simulated-prices-option {
+  padding: 8px;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover {
+    background: $sp-row;
+  }
+}
+
+.pl-simulated-prices-results {
+  position: relative;
+  min-height: 300px;
+}
+
+.pl-simulated-prices-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  font-size: 13px;
+  background: $color-white;
+  border: 1px solid $border-color;
+}
+
+.pl-simulated-prices-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid $color-light;
+  border-top-color: $color-blue;
+  border-radius: 50%;
+  animation: pl-simulated-prices-spin 1s linear infinite;
+}
+
+@keyframes pl-simulated-prices-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pl-simulated-prices-card {
+  background: $color-white;
+  border: 1px solid $border-color;
+}
+
+.pl-simulated-prices-note {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  font-size: 12px;
+
+  .material-icons {
+    margin-right: 8px;
+    color: $color-light-gray;
+  }
+
+  span {
+    display: block;
+    color: $color-light-gray;
+  }
+}
+
+.pl-simulated-prices-scroll {
+  overflow-x: auto;
+
+  &.pl-simulated-prices-expanded {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+}
+
+.pl-simulated-prices-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+
+  .pl-simulated-prices-plan-col {
+    width: 22%;
+  }
+
+  th,
+  td {
+    padding: 8px 12px;
+    text-align: center;
+  }
+
+  thead th {
+    font-weight: 700;
+    vertical-align: top;
+  }
+
+  thead th:first-child {
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  tbody th {
+    text-align: left;
+    font-weight: 400;
+  }
+
+  tbody tr:nth-child(odd) {
+    background: $sp-row;
+  }
+
+  .pl-simulated-prices-highlight {
+    color: $sp-highlight;
+    font-weight: 700;
+  }
+}
+
+.pl-simulated-prices-carrier {
+  display: flex;
+  align-items: center;
+
+  img {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    border-radius: 4px;
+    object-fit: contain;
+  }
+
+  .pl-simulated-prices-names {
+    min-width: 0;
+  }
+
+  span {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pl-simulated-prices-service {
+    font-size: 11px;
+    color: $color-light-gray;
+  }
+}
+
+.pl-simulated-prices-plan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// "Current plan" and "Upgrade" share one box, so the plan names stay on one line across columns.
+.pl-simulated-prices-tag {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  font-size: 11px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.pl-simulated-prices-current {
+  background: #e3e3e3;
+  font-weight: 400;
+}
+
+.pl-simulated-prices-upgrade {
+  border-color: #5b33c2;
+  color: #5b33c2;
+  font-weight: 600;
+}
+
+.pl-simulated-prices-toggle {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  color: $color-blue;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pl-simulated-prices-disclaimer {
+  margin: 12px 0 0;
+  font-size: 10px;
+  font-style: italic;
+}
+
+.pl-discover-rates-button {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+
+  .material-icons {
+    margin-right: 8px;
+  }
+}
+
+.pl-my-shipping-services-page.pl-simulated-prices-open {
+  > .pl-page-content {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .pl-simulated-prices-main {
+    flex: 1 1 50%;
+    min-width: 0;
+  }
+
+  .pl-simulated-prices-sidebar {
+    flex: 0 0 50%;
+    min-width: 0;
+    padding: 24px;
+    background: $sp-row;
+    border-left: 1px solid $color-light;
+    box-sizing: border-box;
+  }
+}

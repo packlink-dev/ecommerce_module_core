@@ -654,5 +654,38 @@
       "subscriptions.premium-plan-prices.shipping-rate": "Descuentos Premium, tarifas de envío desde 3,70€ para Poste Italiane y 4,35€ para BRT.",
       "subscriptions.upgrade-notification.more-features": "Actualiza a Plus y empieza a enviar desde 3,82 € con Poste Italiane y desde 4,50 € con BRT para paquetes de hasta 2 kg 💎!"
     }
+  },
+  "simulatedPrices": {
+    "title": "Descubre nuestras tarifas de envío",
+    "description": "Envía tu paquete con Packlink. Envía fácilmente, compara servicios de mensajería, completa la información necesaria, paga y prepara tu paquete para la entrega. Sigue tu envío en cualquier momento desde la web de Packlink.",
+    "discoverRates": "Descubre nuestras tarifas",
+    "close": "Cerrar",
+    "destination": "Destino:",
+    "destinationPlaceholder": "Código postal o ciudad",
+    "carrier": "Transportista",
+    "currentPlan": "Plan actual",
+    "upgrade": "Mejorar",
+    "startShippingFrom": "Empieza a enviar desde %s",
+    "startShippingFromWithPlan": "Empieza a enviar desde %s con el plan %s",
+    "parcelNote": "Precios para un paquete de 15 × 10 × 3 cm de hasta 0,5 kg",
+    "disclaimer": "La información de precios se ofrece solo con fines ilustrativos y pretende mostrar los costes de envío estimados dentro de la capital.",
+    "noServicesTitle": "No hay servicios disponibles para esta ruta.",
+    "noServicesHint": "Prueba con otro código postal o país de destino.",
+    "marketUnavailable": "La vista previa de precios no está disponible para este mercado.",
+    "validation": "Revisa el código postal y el país de destino.",
+    "packlinkError": "No se han podido cargar los precios. Inténtalo de nuevo más tarde.",
+    "tooManyRequests": "Demasiadas búsquedas. Inténtalo de nuevo en un minuto.",
+    "showMore": "Mostrar más (%s)",
+    "showLess": "Mostrar menos",
+    "businessDay": "1 día laborable",
+    "businessDays": "%s días laborables",
+    "marketES": "España",
+    "marketFR": "Francia",
+    "marketDE": "Alemania",
+    "marketIT": "Italia",
+    "marketGB": "Reino Unido",
+    "planFree": "Free",
+    "planPlus": "Plus",
+    "planPremium": "Premium"
   }
 }

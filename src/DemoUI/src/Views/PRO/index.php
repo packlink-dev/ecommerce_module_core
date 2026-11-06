@@ -148,6 +148,7 @@ echo $lang ?>">
 <script src="./resources/js/CustomsController.js"></script>
 
 <script src="./resources/js/SubscriptionBannerController.js"></script>
+<script src="./resources/js/SimulatedPricesPanel.js"></script>
 <script src="./resources/js/MyShippingServicesController.js"></script>
 <script src="./resources/js/PickShippingServiceController.js"></script>
 <script src="./resources/js/ShippingServicesRenderer.js"></script>
@@ -174,11 +175,17 @@ echo $lang ?>">
                     submit: "<?php getUrl('Login', 'login') ?>",
                     connect: "<?php getUrl('Login', 'getRedirectUrl') ?>",
                     listOfCountriesUrl: "<?php getUrl('Country', 'get') ?>",
-                    logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>"
+                    logoPath: "<?php echo UrlService::getResourceUrl('images/flags') ?>",
+                    simulatedPricesDataUrl: "<?php getUrl('SimulatedPrices', 'getData') ?>",
+                    simulatedPricesSearchUrl: "<?php getUrl('SimulatedPrices', 'search') ?>",
+                    simulatedPricesLocationSearchUrl: "<?php getUrl('DefaultWarehouse', 'searchPostalCodes') ?>"
                 },
                 'register': {
                     getRegistrationData: "<?php getUrl('Registration', 'get') ?>",
-                    submit: "<?php getUrl('Registration', 'post') ?>"
+                    submit: "<?php getUrl('Registration', 'post') ?>",
+                    simulatedPricesDataUrl: "<?php getUrl('SimulatedPrices', 'getData') ?>",
+                    simulatedPricesSearchUrl: "<?php getUrl('SimulatedPrices', 'search') ?>",
+                    simulatedPricesLocationSearchUrl: "<?php getUrl('DefaultWarehouse', 'searchPostalCodes') ?>"
                 },
                 'onboarding-state': {
                     getState: "<?php getUrl('Onboarding', 'getCurrentState') ?>"
@@ -222,7 +229,10 @@ echo $lang ?>">
                     getCurrencyDetailsUrl: "<?php getUrl('SystemInfo', 'get') ?>",
                     systemId: null,
                     getSubscriptionPlanUrl: "<?php getUrl('Subscription', 'getPlan') ?>",
-                    getPromotionalBannerUrl: "<?php getUrl('Subscription', 'getPromotionalBanner') ?>"
+                    getPromotionalBannerUrl: "<?php getUrl('Subscription', 'getPromotionalBanner') ?>",
+                    simulatedPricesDataUrl: "<?php getUrl('SimulatedPrices', 'getData') ?>",
+                    simulatedPricesSearchUrl: "<?php getUrl('SimulatedPrices', 'search') ?>",
+                    simulatedPricesLocationSearchUrl: "<?php getUrl('DefaultWarehouse', 'searchPostalCodes') ?>"
                 },
                 'pick-shipping-service': {
                     getServicesUrl: "<?php getUrl('ShippingMethods', 'getInactive') ?>",

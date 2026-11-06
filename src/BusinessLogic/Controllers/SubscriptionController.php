@@ -8,6 +8,7 @@ use Packlink\BusinessLogic\Configuration;
 use Packlink\BusinessLogic\Controllers\DTO\PromotionalBannerResponse;
 use Packlink\BusinessLogic\Controllers\DTO\SubscriptionPlanResponse;
 use Packlink\BusinessLogic\Subscription\SubscriptionService;
+use Packlink\BusinessLogic\Subscription\UpgradeUrlProvider;
 
 /**
  * Class SubscriptionController. Aggregates subscription plan + promotional banner
@@ -21,16 +22,6 @@ class SubscriptionController
      * Fully qualified name of this class.
      */
     const CLASS_NAME = __CLASS__;
-
-    /**
-     * Country-to-Packlink-domain mapping for the upgrade URL.
-     */
-    private static $platformDomains = array(
-        'ES' => 'es',
-        'FR' => 'fr',
-        'DE' => 'de',
-        'IT' => 'it',
-    );
 
     /**
      * UI language => CDN display-locale folder. Selects the locale subfolder of the
@@ -125,7 +116,7 @@ class SubscriptionController
 
         $country = $this->getMerchantCountry();
 
-        $response->upgradeUrl = $this->buildUpgradeUrl($country);
+        $response->upgradeUrl = UpgradeUrlProvider::getUpgradeUrl($country);
         $response->bannerLabel = self::GENERIC_BANNER_LABEL;
         $response->language = $this->getSystemLanguage();
         $response->platform = $country !== '' ? strtolower($country) : null;
@@ -163,18 +154,6 @@ class SubscriptionController
         $userInfo = $this->configuration->getUserInfo();
 
         return $userInfo !== null ? strtoupper((string)$userInfo->country) : '';
-    }
-
-    /**
-     * @param string $country
-     *
-     * @return string
-     */
-    private function buildUpgradeUrl($country)
-    {
-        $domain = isset(self::$platformDomains[$country]) ? self::$platformDomains[$country] : 'com';
-
-        return 'https://pro.packlink.' . $domain . '/private/subscriptions';
     }
 
     /**
