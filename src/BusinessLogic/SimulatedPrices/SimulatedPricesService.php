@@ -324,7 +324,8 @@ class SimulatedPricesService extends BaseService
 
     /**
      * Maps an unsuccessful unregistered-user pricing response to an error code. The Packlink error code is
-     * read first, because "market not available" comes back as 404 or, for an unmapped market such as GB, as 400.
+     * read first, because "market not available" comes back as 404 or, for an unmapped market such as GB, as 400;
+     * every other 400 is invalid input.
      *
      * @param PacklinkErrorException $e
      *
@@ -347,7 +348,9 @@ class SimulatedPricesService extends BaseService
             return self::ERROR_PACKLINK;
         }
 
-        if ($e->getCode() === 400 && $errorCode === '') {
+        // Any other 400 means invalid input, with or without an error code: the merchant corrects it, a
+        // retry with the same input fails again.
+        if ($e->getCode() === 400) {
             return self::ERROR_VALIDATION;
         }
 

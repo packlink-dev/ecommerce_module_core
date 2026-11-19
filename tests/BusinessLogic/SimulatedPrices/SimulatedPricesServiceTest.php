@@ -164,6 +164,7 @@ class SimulatedPricesServiceTest extends BaseTestWithServices
         $cases = array(
             array(404, '{"messages":[{"message":"x","error_code":"UNREGISTERED_USER_PRICES_NOT_AVAILABLE"}]}', 'market_unavailable'),
             array(400, '{"messages":[{"message":"Bad Request"}]}', 'validation'),
+            array(400, '{"messages":[{"message":"x","error_code":"INVALID_FILTER"}]}', 'validation'),
             array(400, '{"messages":[{"message":"x","error_code":"CLIENT_REQUIRED"}]}', 'packlink_error'),
             array(401, '{"message":"Unauthorized"}', 'packlink_error'),
             array(403, '', 'packlink_error'),
