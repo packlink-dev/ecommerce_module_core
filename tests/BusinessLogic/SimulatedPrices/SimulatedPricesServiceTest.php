@@ -3,6 +3,7 @@
 namespace Logeecom\Tests\BusinessLogic\SimulatedPrices;
 
 use Logeecom\Infrastructure\Http\HttpResponse;
+use Logeecom\Infrastructure\Logger\Logger;
 use Logeecom\Tests\BusinessLogic\Common\BaseTestWithServices;
 use Logeecom\Tests\BusinessLogic\Common\TestComponents\Dto\TestWarehouse;
 use Logeecom\Tests\BusinessLogic\ShippingMethod\TestShopShippingMethodService;
@@ -179,6 +180,39 @@ class SimulatedPricesServiceTest extends BaseTestWithServices
             $result = $this->search(array('market' => 'ES'));
 
             $this->assertEquals($case[2], $result['error'], "HTTP {$case[0]} {$case[1]}");
+        }
+    }
+
+    public function testNonConnectedPacklinkErrorIsLoggedOnceWithItsMessage()
+    {
+        $cases = array(
+            array(500, '{"messages":[{"message":"Pricing broken","error_code":"INTERNAL_ERROR"}]}', array(Logger::WARNING)),
+            array(403, '{"message":"Forbidden"}', array(Logger::ERROR)),
+            array(404, '{"messages":[{"message":"x","error_code":"UNREGISTERED_USER_PRICES_NOT_AVAILABLE"}]}', array()),
+            array(400, '{"messages":[{"message":"Bad Request"}]}', array()),
+        );
+
+        $this->disconnect();
+        foreach ($cases as $case) {
+            $this->shopLogger->loggedMessages = array();
+            $this->mockResponses(array(new HttpResponse($case[0], array(), $case[1])));
+
+            $this->search(array('market' => 'ES'));
+
+            $levels = array();
+            foreach ($this->shopLogger->loggedMessages as $log) {
+                if (stripos($log->getMessage(), 'unregistered-user pricing') !== false) {
+                    $levels[] = $log->getLogLevel();
+                    $context = array();
+                    foreach ($log->getContext() as $item) {
+                        $context[$item->getName()] = $item->getValue();
+                    }
+
+                    $this->assertArrayHasKey('message', $context, "HTTP {$case[0]}: Packlink message is logged");
+                }
+            }
+
+            $this->assertEquals($case[2], $levels, "HTTP {$case[0]}: one log at the right level, none for expected states");
         }
     }
 

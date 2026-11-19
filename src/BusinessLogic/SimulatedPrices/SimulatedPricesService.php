@@ -334,6 +334,8 @@ class SimulatedPricesService extends BaseService
     protected function mapPacklinkError(PacklinkErrorException $e)
     {
         $errorCode = $e->getErrorCode();
+        // Logged once, here: an unavailable market and invalid input are expected states and are not logged.
+        $context = array('status' => $e->getCode(), 'errorCode' => $errorCode, 'message' => $e->getMessage());
         if ($e->getCode() === 404 || $errorCode === 'PLATFORM_REQUIRED') {
             return self::ERROR_MARKET_UNAVAILABLE;
         }
@@ -342,7 +344,7 @@ class SimulatedPricesService extends BaseService
             Logger::logError(
                 'Unregistered-user pricing rejected credentials although none must be sent.',
                 'Core',
-                array('status' => $e->getCode(), 'errorCode' => $errorCode)
+                $context
             );
 
             return self::ERROR_PACKLINK;
@@ -354,11 +356,7 @@ class SimulatedPricesService extends BaseService
             return self::ERROR_VALIDATION;
         }
 
-        Logger::logWarning(
-            'Unregistered-user pricing failed.',
-            'Core',
-            array('status' => $e->getCode(), 'errorCode' => $errorCode)
-        );
+        Logger::logWarning('Unregistered-user pricing failed.', 'Core', $context);
 
         return self::ERROR_PACKLINK;
     }

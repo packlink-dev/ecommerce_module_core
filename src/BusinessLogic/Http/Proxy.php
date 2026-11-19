@@ -1288,12 +1288,7 @@ class Proxy implements \Packlink\BusinessLogic\Http\Interfaces\Proxy
             }
         }
 
-        Logger::logInfo(
-            'Packlink unregistered-user pricing failed.',
-            'Core',
-            array('status' => $response->getStatus(), 'errorCode' => $errorCode, 'message' => $message)
-        );
-
+        // Not logged here: the caller knows whether the error is an expected state or a failure and logs it once.
         return new PacklinkErrorException($message, $response->getStatus(), $errorCode);
     }
 
