@@ -17,6 +17,10 @@ if (!window.Packlink) {
         truck: SVG(20, '<path d="M3 7h11v9H3z"></path><path d="M14 10h4l3 3v3h-7"></path><circle cx="7" cy="17.5" r="1.8"></circle><circle cx="17" cy="17.5" r="1.8"></circle>')
     };
     const MIN_SEARCH_LENGTH = 3;
+    const CACHE_KEY = 'packlink.simulatedPrices';
+    // Packlink prices change rarely, but a plan bought elsewhere must show within minutes.
+    const CACHE_TTL_MS = 10 * 60 * 1000;
+    const CACHE_MAX_ENTRIES = 20;
     const ERROR_MESSAGES = {
         market_unavailable: 'simulatedPrices.marketUnavailable',
         validation: 'simulatedPrices.validation',
@@ -25,8 +29,8 @@ if (!window.Packlink) {
 
     /**
      * "Discover our shipping rates" panel (CR-SET-72-02). Quotes a fixed sample parcel on every Packlink PRO
-     * plan when the panel opens, when a country chip is picked, and when a destination is picked. Every quote
-     * is one Packlink call; nothing is cached.
+     * plan when the panel opens, when a country chip is picked, and when a destination is picked. A quote with
+     * the same inputs is reused for 10 minutes (see cacheKey).
      *
      * @param {{dataUrl: string, searchUrl: string, locationSearchUrl: string, initialData: ?Object}} configuration
      *   initialData: the panel data rendered into the page (core SimulatedPricesController::getConfiguration()),
@@ -341,8 +345,18 @@ if (!window.Packlink) {
          */
         const quote = (postalCode) => {
             const requestId = ++latestRequest;
-            renderLoading();
             const payload = {market: market, toCountry: destinationCountry, toPostalCode: postalCode};
+            const key = cacheKey(payload);
+            const cached = readCache(key);
+            if (cached) {
+                result = cached;
+                expanded = false;
+                renderResult();
+
+                return;
+            }
+
+            renderLoading();
             const done = (response) => {
                 // A slower earlier answer must not overwrite the answer to the latest choice.
                 if (requestId !== latestRequest) {
@@ -352,11 +366,72 @@ if (!window.Packlink) {
                 result = response && Array.isArray(response.services)
                     ? response
                     : {services: [], tiers: [], error: (response && response.error) || 'packlink_error'};
+                if (result.error === null || result.error === 'no_services') {
+                    writeCache(key, result);
+                }
+
                 expanded = false;
                 renderResult();
             };
 
             ajaxService.post(configuration.searchUrl, payload, done, done);
+        };
+
+        /**
+         * A quote is kept in the tab's sessionStorage for 10 minutes and reused while its inputs stay the same, as
+         * the Packlink contract asks (section 7), so reopening the panel or reloading the page sends no new
+         * Packlink request. The key holds the shop's search URL and the account state, market and plan:
+         * connecting, disconnecting or changing the plan never reuses an earlier quote. Only prices and
+         * "no services" are kept, so a failed search is always asked again.
+         *
+         * @param {{market: string, toCountry: string, toPostalCode: string}} payload
+         * @return {string}
+         */
+        const cacheKey = (payload) => JSON.stringify([
+            configuration.searchUrl,
+            data.connected ? 'connected' : 'guest',
+            data.accountMarket || '',
+            data.currentTier || '',
+            payload.market,
+            payload.toCountry,
+            payload.toPostalCode
+        ]);
+
+        const readCacheEntries = () => {
+            try {
+                const entries = JSON.parse(window.sessionStorage.getItem(CACHE_KEY) || '{}');
+
+                return entries && typeof entries === 'object' ? entries : {};
+            } catch (e) {
+                return {};
+            }
+        };
+
+        const readCache = (key) => {
+            const entry = readCacheEntries()[key];
+
+            return entry && entry.result && Date.now() - entry.storedAt <= CACHE_TTL_MS ? entry.result : null;
+        };
+
+        const writeCache = (key, value) => {
+            const now = Date.now();
+            const entries = readCacheEntries();
+            entries[key] = {storedAt: now, result: value};
+            // Expired entries are dropped and the oldest go first, so the storage stays small.
+            const kept = {};
+            Object.keys(entries)
+                .filter((k) => entries[k] && now - entries[k].storedAt <= CACHE_TTL_MS)
+                .sort((a, b) => entries[b].storedAt - entries[a].storedAt)
+                .slice(0, CACHE_MAX_ENTRIES)
+                .forEach((k) => {
+                    kept[k] = entries[k];
+                });
+
+            try {
+                window.sessionStorage.setItem(CACHE_KEY, JSON.stringify(kept));
+            } catch (e) {
+                // Storage blocked or full: the panel still works, it only asks Packlink again next time.
+            }
         };
 
         const renderLoading = () => {
