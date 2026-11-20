@@ -623,7 +623,14 @@ if (!window.Packlink) {
 
         const findMarket = (code) => data.markets.filter((item) => item.code === code)[0] || null;
 
-        const flagUrl = (code) => 'https://flagcdn.com/w40/' + code.toLowerCase() + '.png';
+        /**
+         * Flag of a market (chips and destination countries are the same markets), bundled with the module,
+         * so the panel loads nothing from a third party.
+         *
+         * @param {string} code
+         * @return {string}
+         */
+        const flagUrl = (code) => Packlink.templateService.replaceResourcesUrl('{$BASE_URL$}/images/flags/' + code + '.svg');
 
         /**
          * @param {string} code
