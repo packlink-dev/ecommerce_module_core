@@ -31,8 +31,10 @@ if (!window.Packlink) {
          *     getSubscriptionPlanUrl: string,
          *     getPromotionalBannerUrl?: string,
          *     bannerTextOverride?: string,
-         *     upgradeUrl?: string
+         *     upgradeUrl?: string,
+         *     onPlan?: function(string|null)
          * }} config
+         *   onPlan: called once with the plan tier, or null when the plan could not be read.
          */
         this.init = (config) => {
             if (!config || !config.getSubscriptionPlanUrl) {
@@ -41,6 +43,9 @@ if (!window.Packlink) {
 
             ajaxService.get(config.getSubscriptionPlanUrl, (response) => {
                 planTier = response ? response.planTier : null;
+                if (config.onPlan) {
+                    config.onPlan(planTier);
+                }
 
                 // The promotional banner is only shown to FREE merchants. PLUS and PREMIUM
                 // merchants (or when the plan is unavailable) do not see it.
@@ -60,6 +65,10 @@ if (!window.Packlink) {
                 } else if (config.bannerTextOverride) {
                     upgradeUrl = config.upgradeUrl;
                     renderBanner(config.bannerTextOverride);
+                }
+            }, () => {
+                if (config.onPlan) {
+                    config.onPlan(null);
                 }
             });
         };

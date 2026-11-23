@@ -44,6 +44,11 @@ if (!window.Packlink) {
 
             templateService.getComponent('pl-go-to-register', loginPage).addEventListener('click', goToRegister);
 
+            // Modules that have not added SimulatedPricesPanel.js to their script list keep the page as before.
+            if (Packlink.SimulatedPricesPanel) {
+                Packlink.SimulatedPricesPanel.attachBesidePage(loginPage.querySelector('.pl-login-page'), configuration);
+            }
+
             Packlink.utilityService.hideSpinner();
         };
 

@@ -116,6 +116,44 @@ interface Proxy
     public function getPostalZones($countryCode, $lang = 'en');
 
     /**
+     * Returns array of PostalZone objects by specified country without sending credentials.
+     *
+     * @param string $countryCode
+     * @param string $lang
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\PostalZone[]
+     */
+    public function getPostalZonesWithoutCredentials($countryCode, $lang = 'en');
+
+    /**
+     * Performs search for locations without sending credentials.
+     *
+     * @param string $platformCountry Country code to search in.
+     * @param string $postalZone Postal zone to search in.
+     * @param string $query Query to search for.
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\LocationInfo[]
+     */
+    public function searchLocationsWithoutCredentials($platformCountry, $postalZone, $query);
+
+    /**
+     * Gets shipping services with prices on every subscription plan for a merchant without a Packlink account.
+     *
+     * @param \Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch $params Search parameters.
+     * @param string $platform Packlink platform code, for example "PRO".
+     * @param string $platformCountry Packlink market, for example "ES".
+     *
+     * @return \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails[]
+     *
+     * @throws \Packlink\BusinessLogic\Http\Exceptions\PacklinkErrorException
+     */
+    public function getSimulatedShippingServices(
+        \Packlink\BusinessLogic\Http\DTO\ShippingServiceSearch $params,
+        $platform,
+        $platformCountry
+    );
+
+    /**
      * @param ShippingServiceSearch $params
      *
      * @return \Packlink\BusinessLogic\Http\DTO\ShippingServiceDetails[]

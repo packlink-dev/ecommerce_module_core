@@ -160,6 +160,27 @@ class ShippingServiceDetails extends DataTransferObject
     public $ddpSupportLevel;
 
     /**
+     * Shipping prices of this service per subscription plan, when the price simulation was requested.
+     *
+     * @var PlanPrice[]
+     */
+    public $pricesPerPlan = array();
+
+    /**
+     * Plan code of the plan the prices were quoted for, when the price simulation was requested.
+     *
+     * @var string|null
+     */
+    public $currentPlanCode;
+
+    /**
+     * Plan code of the next higher plan, or null when there is none.
+     *
+     * @var string|null
+     */
+    public $nextPlanCode;
+
+    /**
      * @inheritdoc
      */
     public function toArray()
@@ -187,7 +208,7 @@ class ShippingServiceDetails extends DataTransferObject
             'tags' => $this->tags,
             'cash_on_delivery' => $this->cashOnDelivery,
             'ddp_support_level' => $this->ddpSupportLevel,
-        );
+        ) + $this->priceSimulationToArray();
     }
 
     /**
@@ -234,6 +255,53 @@ class ShippingServiceDetails extends DataTransferObject
             ? null
             : $ddpSupportLevel;
 
+        $instance->setPriceSimulation($raw);
+
         return $instance;
+    }
+
+    /**
+     * Reads the per-plan prices. The services endpoints nest them in "price_simulation"; the flat
+     * "prices_per_plan" key of the first requirement sample is accepted as a fallback.
+     *
+     * @param array $raw Raw service data.
+     */
+    private function setPriceSimulation(array $raw)
+    {
+        $simulation = self::getDataValue($raw, 'price_simulation', null);
+        if (is_array($simulation)) {
+            $plans = self::getDataValue($simulation, 'prices_per_plan', array());
+            $this->currentPlanCode = self::getDataValue($simulation, 'current_plan_code', null);
+            $this->nextPlanCode = self::getDataValue($simulation, 'next_case_plan_code', null);
+        } else {
+            $plans = self::getDataValue($raw, 'prices_per_plan', array());
+        }
+
+        $this->pricesPerPlan = is_array($plans) ? PlanPrice::fromBatch($plans) : array();
+    }
+
+    /**
+     * Serializes the per-plan prices; returns nothing when there are none, so the output stays as before.
+     *
+     * @return array
+     */
+    private function priceSimulationToArray()
+    {
+        if (empty($this->pricesPerPlan)) {
+            return array();
+        }
+
+        $plans = array();
+        foreach ($this->pricesPerPlan as $plan) {
+            $plans[] = $plan->toArray();
+        }
+
+        return array(
+            'price_simulation' => array(
+                'current_plan_code' => $this->currentPlanCode,
+                'next_case_plan_code' => $this->nextPlanCode,
+                'prices_per_plan' => $plans,
+            ),
+        );
     }
 }

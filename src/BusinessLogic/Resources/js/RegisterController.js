@@ -52,6 +52,11 @@ if (!window.Packlink) {
             initInputField('pl-register-phone');
             initInputField('pl-register-shipment-volume');
             initInputField('pl-register-terms-and-conditions');
+
+            // Modules that have not added SimulatedPricesPanel.js to their script list keep the page as before.
+            if (Packlink.SimulatedPricesPanel) {
+                Packlink.SimulatedPricesPanel.attachBesidePage(registerPage.querySelector('.pl-register-page'), configuration);
+            }
         };
 
         /**

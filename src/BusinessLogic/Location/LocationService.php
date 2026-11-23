@@ -154,7 +154,11 @@ class LocationService extends BaseService implements \Packlink\BusinessLogic\Loc
      */
     public function searchLocations($country, $query)
     {
-        $postalZones = $this->proxy->getPostalZones($country);
+        // A merchant without a Packlink account has no token; Packlink serves this search without credentials.
+        $withCredentials = (bool)$this->configuration->getAuthorizationToken();
+        $postalZones = $withCredentials
+            ? $this->proxy->getPostalZones($country)
+            : $this->proxy->getPostalZonesWithoutCredentials($country);
 
         if (empty($postalZones)) {
             throw new PlatformCountryNotSupportedException('Platform country not supported');
@@ -162,7 +166,9 @@ class LocationService extends BaseService implements \Packlink\BusinessLogic\Loc
 
         $result = array();
         foreach ($postalZones as $postalZone) {
-            $partial = $this->proxy->searchLocations($country, $postalZone->id, $query);
+            $partial = $withCredentials
+                ? $this->proxy->searchLocations($country, $postalZone->id, $query)
+                : $this->proxy->searchLocationsWithoutCredentials($country, $postalZone->id, $query);
 
             if (!empty($partial)) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */

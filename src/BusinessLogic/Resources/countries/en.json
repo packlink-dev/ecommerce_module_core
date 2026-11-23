@@ -676,5 +676,38 @@
       "subscriptions.premium-plan-prices.shipping-rate": "Premium discounts, shipping rates starting from €3.70 for Poste Italiane and €4.35 for BRT.",
       "subscriptions.upgrade-notification.more-features": "Upgrade to Plus and start shipping from €3.82 with Poste Italiane and from €4.50 with BRT for packages up to 2 kg 💎!"
     }
+  },
+  "simulatedPrices": {
+    "title": "Discover our shipping rates",
+    "description": "Send your parcel with Packlink. Ship your parcel easily, compare courier services, fill out the necessary info, pay and prepare your package for the delivery. Track your shipment anytime from the Packlink website.",
+    "discoverRates": "Discover our rates",
+    "close": "Close",
+    "destination": "Destination:",
+    "destinationPlaceholder": "Postcode or city",
+    "carrier": "Carrier",
+    "currentPlan": "Current plan",
+    "upgrade": "Upgrade",
+    "startShippingFrom": "Start shipping from %s",
+    "startShippingFromWithPlan": "Start shipping from %s with the %s plan",
+    "parcelNote": "Prices for a 15 × 10 × 3 cm parcel up to 0.5 kg",
+    "disclaimer": "The price information is provided for illustrative purposes only and is intended to demonstrate estimated shipping costs within the capital city.",
+    "noServicesTitle": "No services are available for this route.",
+    "noServicesHint": "Try another destination postal code or country.",
+    "marketUnavailable": "Price preview is not available for this market.",
+    "validation": "Check the destination postcode and country.",
+    "packlinkError": "Prices could not be loaded. Try again later.",
+    "tooManyRequests": "Too many searches. Try again in a minute.",
+    "showMore": "Show more (%s)",
+    "showLess": "Show less",
+    "businessDay": "1 business day",
+    "businessDays": "%s business days",
+    "marketES": "Spain",
+    "marketFR": "France",
+    "marketDE": "Germany",
+    "marketIT": "Italy",
+    "marketGB": "UK",
+    "planFree": "Free",
+    "planPlus": "Plus",
+    "planPremium": "Premium"
   }
 }
