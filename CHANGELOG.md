@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [4.5.0](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.4...v4.5.0) - 2026-11-23
+### Added
+- Simulated prices on the Packlink PRO platform: `SimulatedPricesService` and `SimulatedPricesController` quote a fixed 15 x 10 x 3 cm, 0.5 kg parcel on every Packlink PRO plan. A merchant with an account gets the account's own prices from `/v1/services` with `price_simulation=all`, with the current plan marked and higher plans offered as an upgrade; PREMIUM merchants get no panel. A merchant without an account gets the unregistered-user pricing of the selected market (ES, FR, DE, IT, GB) without credentials
+- Keyless proxy calls for merchants without an account: `getSimulatedShippingServices`, `getPostalZonesWithoutCredentials` and `searchLocationsWithoutCredentials` on `Http\Interfaces\Proxy`, used by the destination postcode search. A module that implements the interface itself must add them
+- Optional `ShopOriginProvider` interface, so a module can quote from the shop address when it lies in the selected market
+- Shared admin panel `SimulatedPricesPanel.js` for the login, registration and My shipping services pages, with translations in five languages. A quote is reused for 10 minutes while its inputs, the account and the plan stay the same
+
 ## [4.4.4](https://github.com/packlink-dev/ecommerce_module_core/compare/v4.4.3...v4.4.4) - 2026-10-20
 ### Fixed
 - Keep product dimensions when a cart has more than one item. The grouped parcel keeps the longest side of each axis, grows its shortest side to hold the summed item volume, and uses the default parcel only for a missing side or weight. Multi-item carts, and single products ordered in a quantity above one, were quoted as the default parcel, so their shipping costs will now change ([#111](https://github.com/packlink-dev/ecommerce_module_core/issues/111))
