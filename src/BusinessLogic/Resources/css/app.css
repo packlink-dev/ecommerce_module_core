@@ -1723,9 +1723,9 @@
   min-width: 0;
 }
 #pl-page .pl-my-shipping-services-page.pl-simulated-prices-open .pl-simulated-prices-sidebar {
-  flex: 0 0 650px;
+  flex: 0 1 650px;
   max-width: 100%;
-  min-width: 0;
+  min-width: 420px;
   padding: 24px 22px 28px;
   gap: 16px;
   background: #fff;
