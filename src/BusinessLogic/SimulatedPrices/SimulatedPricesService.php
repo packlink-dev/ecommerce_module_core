@@ -363,7 +363,7 @@ class SimulatedPricesService extends BaseService
 
     /**
      * Converts Packlink services to the result: visible tiers only, missing prices left out, services without
-     * a displayable price dropped, sorted by the first visible column and then the next ones.
+     * a displayable price dropped, sorted by the first visible column and then the next ones, one row per carrier.
      *
      * @param ShippingServiceDetails[] $services
      * @param string[] $tiers Visible tiers, lowest first.
@@ -405,6 +405,8 @@ class SimulatedPricesService extends BaseService
             }
         );
 
+        $rows = $this->keepCheapestPerCarrier($rows);
+        // After the grouping, so the note price is always a price shown in the table.
         $result['fromPrice'] = $this->getFromPrice($rows, $this->getNoteTier($tiers, $currentTier));
         foreach ($rows as $row) {
             $row['prices'] = array_values($row['prices']);
@@ -412,6 +414,26 @@ class SimulatedPricesService extends BaseService
         }
 
         return $result;
+    }
+
+    /**
+     * Keeps one row per carrier (business analysis: the table lists carriers, not services). The rows are
+     * already sorted, so the first row of a carrier is its cheapest service on the visible columns.
+     *
+     * @param array $rows Sorted result rows.
+     *
+     * @return array
+     */
+    protected function keepCheapestPerCarrier(array $rows)
+    {
+        $kept = array();
+        foreach ($rows as $row) {
+            if (!isset($kept[$row['carrierName']])) {
+                $kept[$row['carrierName']] = $row;
+            }
+        }
+
+        return array_values($kept);
     }
 
     /**

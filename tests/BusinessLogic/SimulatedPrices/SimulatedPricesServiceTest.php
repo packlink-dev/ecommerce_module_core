@@ -281,6 +281,42 @@ class SimulatedPricesServiceTest extends BaseTestWithServices
         $this->assertEquals(array('TieLowPlus', 'TieHighPlus', 'Expensive', 'NoFree'), $this->carrierNames($result));
     }
 
+    public function testEachCarrierIsListedOnceWithItsCheapestService()
+    {
+        $this->disconnect();
+        $services = array(
+            $this->service(1, 'Correos', array('free_es' => 3.98, 'plus_es' => 3.91)),
+            $this->service(2, 'SEUR', array('free_es' => 4.6, 'plus_es' => 4.3)),
+            $this->service(3, 'Correos', array('free_es' => 3.09, 'plus_es' => 2.99)),
+            $this->service(4, 'Correos', array('free_es' => 3.84, 'plus_es' => 3.65)),
+            $this->service(5, 'Correos Express', array('free_es' => 4.95, 'plus_es' => 4.6)),
+        );
+        $this->mockResponses(array($this->servicesResponse($services)));
+
+        $result = $this->search(array('market' => 'ES'));
+
+        $this->assertEquals(array('Correos', 'SEUR', 'Correos Express'), $this->carrierNames($result));
+        $this->assertEquals(3, $result['services'][0]['id']);
+    }
+
+    public function testConnectedNoteUsesTheServicesShownInTheTable()
+    {
+        $this->connect();
+        $services = array(
+            // Cheapest Correos on Free (the first column), so it is the Correos row; Plus 2.90.
+            $this->service(1, 'Correos', array('free_es' => 3.0, 'plus_es' => 2.9)),
+            // Lower Plus price, but hidden behind the row above.
+            $this->service(2, 'Correos', array('free_es' => 3.5, 'plus_es' => 2.0)),
+            $this->service(3, 'SEUR', array('free_es' => 4.0, 'plus_es' => 3.5)),
+        );
+        $this->mockResponses(array($this->subscriptionResponse('Free'), $this->servicesResponse($services)));
+
+        $result = $this->search(array('market' => 'ES'));
+
+        $this->assertEquals(array('Correos', 'SEUR'), $this->carrierNames($result));
+        $this->assertEquals(array('tier' => 'PLUS', 'totalPrice' => 2.9, 'currency' => 'EUR'), $result['fromPrice']);
+    }
+
     public function testConnectedFreeMerchantSeesAllTiersWithCurrentPlanAndNextPlanNote()
     {
         $this->connect();

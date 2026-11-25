@@ -537,7 +537,8 @@ if (!window.Packlink) {
                     carrier.appendChild(logo);
                 }
 
-                const details = [service.serviceName, transit(service)].filter((part) => !!part).join(' · ');
+                // One row per carrier (its cheapest service), so the row shows the carrier and the transit time.
+                const details = transit(service);
                 const names = el('div', 'pl-simulated-prices-names');
                 const name = el('span', '', service.carrierName);
                 name.title = service.carrierName;
